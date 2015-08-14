@@ -1,0 +1,4 @@
+== V2.01 ==
+
+ALTER TABLE `wp_arlo_events` ADD `e_locationvisible` TINYINT(1) NOT NULL DEFAULT '0' AFTER `e_locationroomname`;
+ALTER TABLE `wp_arlo_events` ADD `e_providerorganisation` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `e_registeruri`;

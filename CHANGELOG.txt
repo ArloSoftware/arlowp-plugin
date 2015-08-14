@@ -1,0 +1,35 @@
+== V2.03 ==
+
+New boxed layout for "Event": event_boxed.tmpl
+New "show" attribute for "arlo_event_list_item" and new way to handle the show more dates
+New data attribute for '<ul class="arlo-list arlo-show-more events" data-show-text="Show more">' to handle the text
+
+New boxed layout for "Upcoming events": upcoming_boxed.tmpl
+
+== V2.02 ==
+
+Bugfixes
+------------------
+Template category filter url was bad if a filter was already applied
+If there is no next running for a template and no register interest url, it showed the date of 01. jan 1970 instead of nothing
+
+Enhancement
+------------------
+Remove all reference for Prefer
+
+== V2.01 ==
+
+Bugfixes
+------------------
+If a venue is not displayed on the website, the Location is just a text instead of a link
+Handle database error and rollback all the changes if one of the insert scripts failed
+If there is no available link for "Register interest", remove the whole link
+Fixed event template category filter form action parameter
+
+New functionality
+------------------
+Availability to modify the "Free" terminology
+Availability to choose the price display (incl/excl GST)
+Automatically submit the filter form when the dropdown filter is changes
+New "Provider" field
+

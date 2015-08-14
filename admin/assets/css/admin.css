@@ -1,0 +1,163 @@
+/* This stylesheet is used to style the admin option form of the plugin. */
+
+/* Plugin Prefix is specified in arlo-for-wordpress.php */
+
+/* based on desired max width - menu sidebar width: 180px as of WP 3.9 */
+.arlo-sections-wrap {
+	max-width: 820px;
+}
+
+.arlo-section {
+	position: relative;
+	border-bottom: 1px solid #ddd;
+	border-top: 1px solid #f6f6f6;
+}
+
+.arlo-section:nth-of-type(1) {
+	border-top-color: transparent;
+}
+
+.arlo-section:nth-of-type(4) {
+	border-bottom-color: transparent;
+}
+
+.arlo-tooltip {
+	float: right;
+	margin-top: 16px;
+	text-decoration: none;
+}
+
+.arlo-field-wrap, #arlo-template-select {
+	margin-bottom: 1em;
+}
+
+.arlo-field [type='text'], .arlo-field [type='url'] {
+	width: 100%;
+}
+
+.arlo-check {
+	float: left;
+}
+
+.arlo-check input {
+	margin: 2px 10px 2px 0;
+}
+
+.arlo-check + .arlo-label {
+	width: auto;
+	float: left;
+}
+
+.arlo-submit input {
+	float: right;
+}
+
+.js #arlo-template-select {
+	display: block;
+}
+
+.js #arlo-template-select select {
+	float: right;
+	width: 70%;
+}
+
+/* hide the template edit select box if no javascript */
+.no-js #arlo-template-select {
+	display: none;
+	visibility: hidden;
+}
+
+.arlo-preview {
+	float: right;
+}
+
+.arlo-template-editor-wrap {
+	margin-bottom: 1em;
+}
+/* only hide the editors if javascript is enabled */
+.js .arlo_template_section > [class^='arlo'] {
+	display: none;
+}
+
+.js  .arlo_template_section .arlo-event {
+	display: block;
+}
+
+.arlo-validate.invalid {
+	background-color: #FEE;
+}
+
+.arlo-validate.invalid:focus {
+	border-color: #F22;
+	-webkit-box-shadow: 0 0 2px rgba(255,34,34,.8);
+	box-shadow: 0 0 2px rgba(255,34,34,.8);
+}
+
+.arlo-field small {
+	display: none;
+}
+
+.arlo-field .invalid + small {
+	display: block;
+}
+
+/* label font size and weight is based on WP 3.9 admin styles, though not using those styles directly as the label would need to be in a table header cell, urgh */
+.arlo-label label {
+	display: block;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 29px;
+	width: 100%;
+}
+
+.arlo_template_section label {
+	visibility: hidden;
+	height: 1px;
+}
+
+.arlo-codes {
+	font-size: 11px;
+	margin-top: 0;
+}
+
+.arlo-codes ul {
+	margin-left: 15px;
+}
+
+/* clearing for divs containing floated elements */
+
+.cf:before,
+.cf:after {
+    content: " "; 
+    display: table;
+}
+
+.cf:after {
+    clear: both;
+}	
+
+/* media queries, these match the wordpress admin breakpoints as of WP 3.9 */
+
+@media only screen and (min-width: 601px) {
+
+}
+
+@media only screen and (min-width: 783px) {
+	.arlo-label {
+		float: left;
+		width: 30%;
+	}
+
+	.arlo-label + .arlo-field {
+		float: left;
+		width: 70%;
+	}
+
+	.arlo-check input {
+		margin: 6px 10px 6px 0;
+	}
+}
+
+@media only screen and (min-width: 901px) {
+	
+}

@@ -1,0 +1,32 @@
+[arlo_timezones wrap="<div class='arlo-timezone-toggle'>%s</div>"]
+<div class="arlo-template-head">
+	<h1>[arlo_event_template_permalink wrap='<a href="%s">'][arlo_event_template_name]</a></h1>
+	[arlo_event_template_summary wrap="<p>aaaa %s</p>"]
+</div>
+<ul class="arlo-list arlo-show-more events" data-show="3" data-show-text="Show more">
+	[arlo_event_list]
+	[arlo_event_list_item show="3"]
+	<li class="arlo-cf">
+		<div class="arlo-cal">
+			[arlo_event_start_date format="D d M" wrap='<div class="arlo-date">%s</div>']
+
+		</div>
+		<div class="arlo-event-details">
+			<span class="arlo-event-time">[arlo_event_duration], [arlo_event_start_date format="g:i A"] - [arlo_event_end_date format="g:i A"]</span>
+			[arlo_event_location label="" wrap="<span class='arlo-event-location'>%s</span>"]
+			[arlo_event_session_description wrap='<span class="arlo-event-session-description">%s</span>']
+			[arlo_event_presenters label="Presenters: "]
+		</div>
+		[arlo_event_offers]
+		[arlo_event_registration]
+	</li>
+	[/arlo_event_list_item]
+	[/arlo_event_list]
+</ul>
+<div class="arlo-clear-both"></div>
+[arlo_suggest_datelocation wrap="<div class='arlo-suggest'>%s</div>"]
+
+[arlo_content_field_item]
+	[arlo_content_field_name wrap='<h5>%s</h5>']
+	[arlo_content_field_text wrap='<p>%s</p>']
+[/arlo_content_field_item]
