@@ -2607,8 +2607,6 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 		'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id']
 	);
 	
-	var_dump($conditions);
-	
 	$event = \Arlo\Events::get($conditions, array('e.e_startdatetime ASC'), 1);
         	
 	if(empty($event) && !empty($GLOBALS['arlo_event_list_item']['et_registerinteresturi'])) {
