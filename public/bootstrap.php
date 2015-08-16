@@ -1057,9 +1057,8 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 			break;
 		}
 	}
-
-	$items = $wpdb->get_results(
-		"SELECT et.*, post.ID as post_id, etc.*, c.*
+	
+	$items = $wpdb->get_results("SELECT et.*, post.ID as post_id, etc.c_arlo_id, c.*
 		FROM $t1 et 
 		{$join}
 		LEFT JOIN $t2 post 
@@ -1072,9 +1071,9 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 		$group 
 		$order
 		LIMIT $offset,$limit", ARRAY_A);
-		
+				
 	$output = '';
-
+		
 	$previous = null;
 	foreach($items as $item) {
 		if(isset($atts['group'])) {
@@ -1091,10 +1090,10 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 				break;
 			}
 		}
-	
+		
 		$GLOBALS['arlo_eventtemplate'] = $item;
 		$GLOBALS['arlo_event_list_item'] = $item;
-                
+		
 		$output .= do_shortcode($content);
 		unset($GLOBALS['arlo_eventtemplate']);
 		unset($GLOBALS['arlo_event_list_item']);
@@ -2607,6 +2606,8 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 	$conditions = array(
 		'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id']
 	);
+	
+	var_dump($conditions);
 	
 	$event = \Arlo\Events::get($conditions, array('e.e_startdatetime ASC'), 1);
         	
