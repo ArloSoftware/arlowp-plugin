@@ -1145,7 +1145,18 @@ $shortcodes->add('event_template_summary', function($content='', $atts, $shortco
 
 $shortcodes->add('content_field_item', function($content='', $atts, $shortcode_name){
 	global $post, $wpdb;
-
+	
+	extract(shortcode_atts(array(
+		'fields'	=> 'all',
+	), $atts, $shortcode_name));
+	
+	if (strtolower($fields) != 'all') {
+		$where_fields = explode(',', $fields);
+		$where_fields = array_map(function($field) {
+			return '"' . trim($field) . '"';
+		}, $where_fields);
+	}
+	
 	$t1 = "{$wpdb->prefix}arlo_eventtemplates";
 	$t2 = "{$wpdb->prefix}arlo_contentfields";
 
@@ -1153,6 +1164,7 @@ $shortcodes->add('content_field_item', function($content='', $atts, $shortcode_n
 		INNER JOIN $t2
 		ON $t1.et_id = $t2.et_id
 		WHERE $t1.et_post_name = '$post->post_name'
+		" . (is_array($where_fields) && count($where_fields) > 0 ? " AND cf_fieldname IN (" . implode(',', $where_fields) . ") " : "") . "
 		ORDER BY $t2.cf_order", ARRAY_A);
 
 	$output = '';

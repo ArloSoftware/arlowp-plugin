@@ -1,3 +1,16 @@
+== V2.04 ==
+
+Bugfixes
+------------------
+Issue #1
+
+
+Enhancement
+------------------
+New "location" filter for events list
+New "fields" setting for description to define fields
+
+
 == V2.03 ==
 
 New boxed layout for "Event": event_boxed.tmpl
