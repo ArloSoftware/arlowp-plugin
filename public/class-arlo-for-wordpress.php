@@ -1126,16 +1126,106 @@ class Arlo_For_Wordpress {
 					$timestamp
 				) );
                                 
-                                if ($query === false) {
-                                    throw new Exception('Database insert failed: ' . $table_name);
-                                }
-                                
+                if ($query === false) {
+                    throw new Exception('Database insert failed: ' . $table_name);
+                }               
 			}
 		}
+		
+		//count the templates in the categories
+		$sql = "
+		SELECT
+			COUNT(1) AS num,  
+			c_arlo_id
+		FROM
+			{$wpdb->prefix}arlo_eventtemplates_categories
+		WHERE
+			active = '{$timestamp}'
+		GROUP BY
+			c_arlo_id
+		";
+
+		$items = $wpdb->get_results($sql, ARRAY_A);
+		if (!is_null($items)) {
+			foreach ($items as $counts) {
+				$sql = "
+				UPDATE
+					{$wpdb->prefix}arlo_categories
+				SET
+					c_template_num = %d
+				WHERE
+					c_arlo_id = %d
+				";
+				$query = $wpdb->query( $wpdb->prepare($sql, $counts['num'], $counts['c_arlo_id']) );
+				
+		        if ($query === false) {
+		        	throw new Exception('Database insert failed: ' . $table_name);
+		        }
+			}		
+		}
+		
+		$this->set_categories_count(0, $timestamp);
 		
 		return $items;
 	}
 	
+	private function set_categories_count($cat_id, $timestamp) {
+		global $wpdb;
+		$cat_id = intval($cat_id);
+		
+		$where = "
+		c_arlo_id = {$cat_id}
+		";
+		
+		if ($cat_id == 0) {
+			$where = "
+			(
+			SELECT 
+				COUNT(1) 
+			FROM 
+				{$wpdb->prefix}arlo_categories
+			WHERE 
+				wpc.c_arlo_id = wp_arlo_categories.c_parent_id
+			AND
+				active = '{$timestamp}'
+			) = 0			
+			";
+		}
+		
+		$sql = "
+		SELECT 
+			c_arlo_id,
+			c_template_num,
+			c_parent_id
+		FROM 
+			{$wpdb->prefix}arlo_categories AS wpc
+		WHERE 
+			{$where}
+		AND
+			active = '{$timestamp}'
+		";
+
+		$cats = $wpdb->get_results($sql, ARRAY_A);
+		if (!is_null($cats)) {
+			foreach ($cats as $cat) {
+				if ($cat['c_parent_id'] > 0) {
+					$sql = "
+					UPDATE 
+						{$wpdb->prefix}arlo_categories
+					SET 
+						c_template_num = c_template_num + %d
+					WHERE
+						c_arlo_id = %d
+					AND
+						active = '{$timestamp}'
+					";
+					$query = $wpdb->query( $wpdb->prepare($sql, $cat['c_template_num'], $cat['c_parent_id']) );
+					$this->set_categories_count($cat['c_parent_id'], $timestamp);
+				}
+			}		
+		}
+	}
+		
 	private function import_cleanup($timestamp) {
 		global $wpdb;
 		

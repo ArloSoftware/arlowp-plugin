@@ -543,7 +543,7 @@ function install_table_arlo_events() {
 		`v_id` INT NULL,
 		`e_locationname` VARCHAR(255) NULL,
 		`e_locationroomname` VARCHAR(255) NULL,
-                `e_locationvisible` TINYINT(1) NOT NULL DEFAULT '0',
+        `e_locationvisible` TINYINT(1) NOT NULL DEFAULT '0',
 		`e_isfull` TINYINT(1) NOT NULL DEFAULT FALSE,
 		`e_placesremaining` INT NULL,
 		`e_sessiondescription` VARCHAR(255) NULL,
@@ -756,6 +756,7 @@ function install_table_arlo_categories() {
 		`c_slug` varchar(255) NOT NULL DEFAULT '',
 		`c_header` text,
 		`c_footer` text,
+		`c_template_num` SMALLINT UNSIGNED NOT NULL DEFAULT '0',
 		`c_order` INT DEFAULT NULL,
 		`c_parent_id` INT DEFAULT NULL,
 		`active` datetime DEFAULT NULL,
@@ -2412,12 +2413,12 @@ $shortcodes->add('group_divider', function($content='', $atts, $shortcode_name){
 });
 
 // category list
-function category_ul($items) {
+function category_ul($items, $counts) {
 	$post_types = arlo_get_option('post_types');
 	$events_url = get_page_link($post_types['event']['posts_page']);
 
 	if(!is_array($items) || empty($items)) return '';
-
+	
 	$html = '<ul class="arlo-category-list">';
 	
 	foreach($items as $cat) {
@@ -2430,7 +2431,7 @@ function category_ul($items) {
 		}
 		
 		$html .= '">';
-		$html .= $cat->c_name;
+		$html .= $cat->c_name . ( !is_null($counts) ?  sprintf($counts, $cat->c_template_num) : '' );
 		$html .= '</a>';
 		if(isset($cat->children)) {
 			$html .= category_ul($cat->children);
@@ -2453,6 +2454,9 @@ $shortcodes->add('categories', function($content='', $atts, $shortcode_name){
 	// show title?
 	$title = (isset($atts['title'])) ? $atts['title'] : null;
 	
+	// show counts
+	$counts = (isset($atts['counts'])) ? $atts['counts'] : null;
+		
 	// start at
 	$start_at = (isset($atts['parent'])) ? (int)$atts['parent'] : 0;
 	if(!isset($atts['parent']) && $start_at == 0 && $slug = get_query_var('arlo_event_category')) {
@@ -2478,7 +2482,7 @@ $shortcodes->add('categories', function($content='', $atts, $shortcode_name){
 		$return .= sprintf($title, $current->c_name);
 	}
 	
-	$return .= category_ul($tree);
+	$return .= category_ul($tree, $counts);
 	
 	return $return;
 });

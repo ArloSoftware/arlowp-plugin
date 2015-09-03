@@ -8,7 +8,7 @@ Issue #1
 Enhancement
 ------------------
 New "location" filter for events list
-New "fields" setting for description to define fields
+New "fields" setting for [arlo_content_field_item] to define description fields
 
 
 == V2.03 ==

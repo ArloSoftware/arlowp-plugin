@@ -1,3 +1,8 @@
+== V2.05 ==
+ALTER TABLE  `wp_arlo_categories` ADD  `c_template_num` SMALLINT UNSIGNED NOT NULL DEFAULT '0' AFTER  `c_footer`
+ALTER TABLE  `c1_arlo`.`wp_arlo_categories` ADD UNIQUE (`c_arlo_id`)
+ALTER TABLE  `c1_arlo`.`wp_arlo_categories` ADD INDEX (`c_parent_id`)
+
 == V2.01 ==
 
 ALTER TABLE `wp_arlo_events` ADD `e_locationvisible` TINYINT(1) NOT NULL DEFAULT '0' AFTER `e_locationroomname`;

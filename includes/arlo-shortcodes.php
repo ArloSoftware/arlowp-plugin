@@ -101,9 +101,9 @@ class Shortcodes extends Singleton {
 		// merge and extract attributes
 		extract(shortcode_atts(array(
 			'wrap' => '%s',
-			'label' => ''
+			'label' => '',
 		), $atts, $shortcode_name));
-                	
+		
 		// need to decide ordering - currently makes sense to process the specific filter first
 		$content = apply_filters('arlo_shortcode_content_'.$shortcode_name, $content, $atts, $shortcode_name);
 		$content = apply_filters('arlo_shortcode_content', $content, $atts, $shortcode_name);
@@ -123,7 +123,7 @@ class Shortcodes extends Singleton {
                         }
 			
 			
-			// wrap content
+			// wrap content			
 			$content = sprintf($wrap, $content);                        
 		}
 		
