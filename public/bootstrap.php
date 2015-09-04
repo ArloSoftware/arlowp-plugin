@@ -484,7 +484,8 @@ function install_table_arlo_eventtemplate() {
 			`et_post_name` VARCHAR(255) NULL,
 			`active` DATETIME NULL,
 			`et_registerinteresturi` TEXT NULL,
-			PRIMARY KEY (`et_id`))
+			PRIMARY KEY (`et_id`)),
+			INDEX `et_arlo_id` (`et_arlo_id`),
 			CHARACTER SET utf8 COLLATE=utf8_general_ci;";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
@@ -511,7 +512,9 @@ function install_table_arlo_contentfields() {
 			`cf_order` INT NULL,
 			`e_contenttype` VARCHAR(255) NULL,
 			`active` DATETIME NULL,
-			PRIMARY KEY (`cf_id`))
+			PRIMARY KEY (`cf_id`),
+			INDEX `cf_order` (`cf_order`),
+			INDEX `et_id` (`et_id`)
 			CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -551,10 +554,13 @@ function install_table_arlo_events() {
 		`e_viewuri` VARCHAR(255) NULL,
 		`e_registermessage` VARCHAR(255) NULL,
 		`e_registeruri` VARCHAR(255) NULL,
-                `e_providerorganisation` VARCHAR(255) NULL,
+		`e_providerorganisation` VARCHAR(255) NULL,
 		`e_isonline` TINYINT(1) NOT NULL DEFAULT FALSE,
 		`active` DATETIME NULL,
-		PRIMARY KEY (`e_id`))
+		PRIMARY KEY (`e_id`),
+		INDEX `et_arlo_id` (`et_arlo_id`),
+		INDEX `e_arlo_id` (`e_arlo_id`),
+		INDEX `v_id` (`v_id`)
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -594,7 +600,8 @@ function install_table_arlo_venues() {
 		`v_facilityinfoparking` TEXT NULL,
 		`v_post_name` VARCHAR(255) NULL,
 		`active` DATETIME NULL,
-		PRIMARY KEY (`v_id`))
+		PRIMARY KEY (`v_id`)),
+		INDEX `v_arlo_id` (`v_arlo_id`)
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -628,7 +635,8 @@ function install_table_arlo_presenters() {
 		`p_linkedinid` VARCHAR(255) NULL,
 		`p_post_name` VARCHAR(255) NULL,
 		`active` DATETIME NULL,
-		PRIMARY KEY (`p_id`))
+		PRIMARY KEY (`p_id`)),
+		INDEX `p_arlo_id` (`p_arlo_id`)
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -668,7 +676,11 @@ function install_table_arlo_offers() {
 		`o_order` INT NULL,
 		`o_replaces` INT NULL,
 		`active` DATETIME NULL,
-		PRIMARY KEY (`o_id`))
+		PRIMARY KEY (`o_id`)),
+		INDEX `o_arlo_id` (`o_arlo_id`),
+		INDEX `et_id` (`et_id`),
+		INDEX `e_id` (`e_id`),
+		INDEX `o_order` (`o_order`)
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -694,9 +706,10 @@ function install_table_arlo_eventtemplates_presenters() {
 		`p_arlo_id` INT NULL,
 		`p_order` INT NULL COMMENT 'Order of the presenters for the event template.',
 		`active` datetime DEFAULT NULL,
+		PRIMARY KEY (`et_arlo_id`,`p_arlo_id`),
+		INDEX `cf_order` (`p_order`),
 		INDEX `fk_et_id_idx` (`et_arlo_id` ASC),
-		INDEX `fk_p_id_idx` (`p_arlo_id` ASC),
-		UNIQUE KEY `uk_eventtemplates_presenters` (`et_arlo_id`,`p_arlo_id`)
+		INDEX `fk_p_id_idx` (`p_arlo_id` ASC)
 		)
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
@@ -724,9 +737,9 @@ function install_table_arlo_events_presenters() {
 		`p_arlo_id` INT NULL,
 		`p_order` INT NULL COMMENT 'Order of the presenters for the event.',
 		`active` datetime DEFAULT NULL,
+		PRIMARY KEY (`e_arlo_id`,`p_arlo_id`),		
 		INDEX `fk_e_id_idx` (`e_arlo_id` ASC),
-		INDEX `fk_p_id_idx` (`p_arlo_id` ASC),
-		UNIQUE KEY `uk_events_presenters` (`e_arlo_id`,`p_arlo_id`)
+		INDEX `fk_p_id_idx` (`p_arlo_id` ASC)
 		)
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
@@ -760,7 +773,9 @@ function install_table_arlo_categories() {
 		`c_order` INT DEFAULT NULL,
 		`c_parent_id` INT DEFAULT NULL,
 		`active` datetime DEFAULT NULL,
-		PRIMARY KEY (`c_id`))
+		PRIMARY KEY (`c_id`)),
+		UNIQUE KEY `c_arlo_id` (`c_arlo_id`),
+		KEY `c_parent_id` (`c_parent_id`)
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -785,9 +800,9 @@ function install_table_arlo_eventtemplates_categories() {
 		`et_arlo_id` INT NULL,
 		`c_arlo_id` INT NULL,
 		`active` datetime DEFAULT NULL,
+		PRIMARY KEY (`et_arlo_id`,`c_arlo_id`),
 		INDEX `fk_et_id_idx` (`et_arlo_id` ASC),
-		INDEX `fk_c_id_idx` (`c_arlo_id` ASC),
-		UNIQUE KEY `uk_eventtemplates_categories` (`et_arlo_id`,`c_arlo_id`)
+		INDEX `fk_c_id_idx` (`c_arlo_id` ASC)
 		)
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
