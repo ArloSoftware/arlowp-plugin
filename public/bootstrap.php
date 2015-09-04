@@ -924,6 +924,8 @@ $shortcodes->add('event_template_list', function($content='', $atts, $shortcode_
 $shortcodes->add('event_template_list_pagination', function($content='', $atts, $shortcode_name){
 	global $wpdb, $wp_query;
 	
+	if (isset($GLOBALS['show_only_at_bottom']) && $GLOBALS['show_only_at_bottom']) return;
+	
 	$limit = isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page');
 
 	$t1 = "{$wpdb->prefix}arlo_eventtemplates";
@@ -1000,6 +1002,11 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 
 $shortcodes->add('event_template_list_item', function($content='', $atts, $shortcode_name){
 	global $wpdb, $wp_query;
+		
+	if (isset($atts['show_only_at_bottom']) && $atts['show_only_at_bottom'] == "true" && isset($GLOBALS['categories_count']) && $GLOBALS['categories_count']) {
+		$GLOBALS['show_only_at_bottom'] = true;
+		return;
+	}
 
 	$limit = isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page');
 	$offset = (get_query_var('paged') && intval(get_query_var('paged')) > 0) ? intval(get_query_var('paged')) * $limit - $limit: 0 ;
@@ -1019,7 +1026,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 		$join .= " LEFT JOIN $t5 e USING (et_arlo_id)";
 
 	endif;	
-	
+		
 	if(isset($wp_query->query_vars['arlo_event_category']) || isset($atts['category'])) {
 
 		$cat_slug = '';
@@ -1318,7 +1325,7 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 
 $shortcodes->add('event_list_item', function($content='', $atts, $shortcode_name){
 	global $post, $wpdb;
-
+	
 	$t1 = "{$wpdb->prefix}arlo_eventtemplates";
 	$t2 = "{$wpdb->prefix}arlo_events";
 	$t3 = "{$wpdb->prefix}arlo_venues";
@@ -2464,6 +2471,9 @@ $shortcodes->add('categories', function($content='', $atts, $shortcode_name){
 	}
 	
 	$tree = \Arlo\Categories::getTree($start_at, $depth);
+	
+	$GLOBALS['categories_count'] = count($tree);
+	
 	if(empty($tree)) return;
 	
 	if($start_at == 0) {
@@ -2674,5 +2684,5 @@ $shortcodes->add('label', function($content='', $atts, $shortcode_name){
 
 // event list wrapper
 $shortcodes->add('event_list', function($content='', $atts, $shortcode_name){
-	return $content;	
+		return $content;
 });

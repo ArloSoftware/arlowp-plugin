@@ -1,3 +1,11 @@
+== V2.05 ==
+
+Enhancement
+------------------
+New "counts" property for the "arlo_categories" shortcode to show the number of the templates within the category and its subcategories
+New "show_only_at_bottom" (bool) property for the "arlo_event_template_list_item" shortcode to show the items only, if the user is in a leaf/bottom category
+
+
 == V2.04 ==
 
 Bugfixes
