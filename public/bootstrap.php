@@ -484,8 +484,8 @@ function install_table_arlo_eventtemplate() {
 			`et_post_name` VARCHAR(255) NULL,
 			`active` DATETIME NULL,
 			`et_registerinteresturi` TEXT NULL,
-			PRIMARY KEY (`et_id`)),
-			INDEX `et_arlo_id` (`et_arlo_id`),
+			PRIMARY KEY (`et_id`),
+			INDEX `et_arlo_id` (`et_arlo_id`))
 			CHARACTER SET utf8 COLLATE=utf8_general_ci;";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
@@ -514,7 +514,7 @@ function install_table_arlo_contentfields() {
 			`active` DATETIME NULL,
 			PRIMARY KEY (`cf_id`),
 			INDEX `cf_order` (`cf_order`),
-			INDEX `et_id` (`et_id`)
+			INDEX `et_id` (`et_id`))
 			CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -560,7 +560,7 @@ function install_table_arlo_events() {
 		PRIMARY KEY (`e_id`),
 		INDEX `et_arlo_id` (`et_arlo_id`),
 		INDEX `e_arlo_id` (`e_arlo_id`),
-		INDEX `v_id` (`v_id`)
+		INDEX `v_id` (`v_id`))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -600,8 +600,8 @@ function install_table_arlo_venues() {
 		`v_facilityinfoparking` TEXT NULL,
 		`v_post_name` VARCHAR(255) NULL,
 		`active` DATETIME NULL,
-		PRIMARY KEY (`v_id`)),
-		INDEX `v_arlo_id` (`v_arlo_id`)
+		PRIMARY KEY (`v_id`),
+		INDEX `v_arlo_id` (`v_arlo_id`))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -635,8 +635,8 @@ function install_table_arlo_presenters() {
 		`p_linkedinid` VARCHAR(255) NULL,
 		`p_post_name` VARCHAR(255) NULL,
 		`active` DATETIME NULL,
-		PRIMARY KEY (`p_id`)),
-		INDEX `p_arlo_id` (`p_arlo_id`)
+		PRIMARY KEY (`p_id`),
+		INDEX `p_arlo_id` (`p_arlo_id`))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -676,11 +676,11 @@ function install_table_arlo_offers() {
 		`o_order` INT NULL,
 		`o_replaces` INT NULL,
 		`active` DATETIME NULL,
-		PRIMARY KEY (`o_id`)),
+		PRIMARY KEY (`o_id`),
 		INDEX `o_arlo_id` (`o_arlo_id`),
 		INDEX `et_id` (`et_id`),
 		INDEX `e_id` (`e_id`),
-		INDEX `o_order` (`o_order`)
+		INDEX `o_order` (`o_order`))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -709,8 +709,7 @@ function install_table_arlo_eventtemplates_presenters() {
 		PRIMARY KEY (`et_arlo_id`,`p_arlo_id`),
 		INDEX `cf_order` (`p_order`),
 		INDEX `fk_et_id_idx` (`et_arlo_id` ASC),
-		INDEX `fk_p_id_idx` (`p_arlo_id` ASC)
-		)
+		INDEX `fk_p_id_idx` (`p_arlo_id` ASC))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -739,8 +738,7 @@ function install_table_arlo_events_presenters() {
 		`active` datetime DEFAULT NULL,
 		PRIMARY KEY (`e_arlo_id`,`p_arlo_id`),		
 		INDEX `fk_e_id_idx` (`e_arlo_id` ASC),
-		INDEX `fk_p_id_idx` (`p_arlo_id` ASC)
-		)
+		INDEX `fk_p_id_idx` (`p_arlo_id` ASC))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -773,9 +771,9 @@ function install_table_arlo_categories() {
 		`c_order` INT DEFAULT NULL,
 		`c_parent_id` INT DEFAULT NULL,
 		`active` datetime DEFAULT NULL,
-		PRIMARY KEY (`c_id`)),
+		PRIMARY KEY (`c_id`),
 		UNIQUE KEY `c_arlo_id` (`c_arlo_id`),
-		KEY `c_parent_id` (`c_parent_id`)
+		KEY `c_parent_id` (`c_parent_id`))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -802,8 +800,7 @@ function install_table_arlo_eventtemplates_categories() {
 		`active` datetime DEFAULT NULL,
 		PRIMARY KEY (`et_arlo_id`,`c_arlo_id`),
 		INDEX `fk_et_id_idx` (`et_arlo_id` ASC),
-		INDEX `fk_c_id_idx` (`c_arlo_id` ASC)
-		)
+		INDEX `fk_c_id_idx` (`c_arlo_id` ASC))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -829,8 +826,8 @@ function install_table_arlo_import_log() {
 		  `message` text,
 		  `created` datetime DEFAULT NULL,
 		  `successful` tinyint(1) DEFAULT NULL,
-		  PRIMARY KEY (`id`)
-		) CHARACTER SET utf8 COLLATE=utf8_general_ci;";
+		  PRIMARY KEY (`id`)) 
+		  CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
