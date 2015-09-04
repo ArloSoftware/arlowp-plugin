@@ -38,7 +38,19 @@ function arlo_uninstall() {
 function arlo_delete_tables()
 {
     global $wpdb;
-	$sql="DROP TABLE IF EXISTS " . $wpdb->prefix . "arlo_eventtemplates," . $wpdb->prefix . "arlo_contentfields, " . $wpdb->prefix . "arlo_events, " . $wpdb->prefix . "arlo_venues, " . $wpdb->prefix . "arlo_presenters, " . $wpdb->prefix . "arlo_offers, " . $wpdb->prefix . "arlo_eventtemplates_presenters, " . $wpdb->prefix . "arlo_events_presenters, " . $wpdb->prefix . "arlo_import_log;";
+	$sql="
+	DROP TABLE IF EXISTS " . 
+		$wpdb->prefix . "arlo_categories," . 
+		$wpdb->prefix . "arlo_contentfields, " . 
+		$wpdb->prefix . "arlo_events, " . 		
+		$wpdb->prefix . "arlo_events_presenters, " . 
+		$wpdb->prefix . "arlo_eventtemplates," . 
+		$wpdb->prefix . "arlo_eventtemplates_categories," . 		
+		$wpdb->prefix . "arlo_eventtemplates_presenters, " . 
+		$wpdb->prefix . "arlo_offers, " . 		
+		$wpdb->prefix . "arlo_presenters, " . 
+		$wpdb->prefix . "arlo_venues, " . 
+		$wpdb->prefix . "arlo_import_log;";
 
 	$wpdb->query($sql);
 
