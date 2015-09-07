@@ -2598,6 +2598,7 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
         $settings = get_option('arlo_settings');  
         $price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : PLUGIN_PREFIX . '-exclgst';
         $price_field = $price_setting == PLUGIN_PREFIX . '-exclgst' ? 'o_offeramounttaxexclusive' : 'o_offeramounttaxinclusive';
+        $price_field_show = $price_setting == PLUGIN_PREFIX . '-exclgst' ? 'o_formattedamounttaxexclusive' : 'o_formattedamounttaxinclusive';
         $free_text = (isset($settings['free_text'])) ? esc_attr($settings['free_text']) : __('Free', 'arlo');
         
         
@@ -2634,7 +2635,7 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 		return $free_text;
 	}
 	
-	return __('From') . ' ' . $offer->$price_field;
+	return __('From') . ' ' . $offer->$price_field_show;
 });
 
 // event template next running
