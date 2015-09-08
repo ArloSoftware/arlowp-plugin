@@ -2453,7 +2453,7 @@ function category_ul($items, $counts) {
 		$html .= $cat->c_name . ( !is_null($counts) ?  sprintf($counts, $cat->c_template_num) : '' );
 		$html .= '</a>';
 		if(isset($cat->children)) {
-			$html .= category_ul($cat->children);
+			$html .= category_ul($cat->children, $counts);
 		}
 		$html .= '</li>';
 	}
