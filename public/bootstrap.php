@@ -2432,7 +2432,7 @@ $shortcodes->add('group_divider', function($content='', $atts, $shortcode_name){
 });
 
 // category list
-function category_ul($items, $counts) {
+function category_ul($items, $counts, $show_child_elements = true) {
 	$post_types = arlo_get_option('post_types');
 	$events_url = get_page_link($post_types['event']['posts_page']);
 
@@ -2452,8 +2452,8 @@ function category_ul($items, $counts) {
 		$html .= '">';
 		$html .= $cat->c_name . ( !is_null($counts) ?  sprintf($counts, $cat->c_template_num) : '' );
 		$html .= '</a>';
-		if(isset($cat->children)) {
-			$html .= category_ul($cat->children, $counts);
+		if(isset($cat->children) && $show_child_elements) {
+			$html .= category_ul($cat->children, $counts, $show_child_elements);
 		}
 		$html .= '</li>';
 	}
@@ -2475,6 +2475,9 @@ $shortcodes->add('categories', function($content='', $atts, $shortcode_name){
 	
 	// show counts
 	$counts = (isset($atts['counts'])) ? $atts['counts'] : null;
+        
+	// show child elements
+	$show_child_elements = (isset($atts['show_child_elements']) && ($atts['show_child_elements'] === "false" || $atts['show_child_elements'] == 0 )) ? false : true;
 		
 	// start at
 	$start_at = (isset($atts['parent'])) ? (int)$atts['parent'] : 0;
@@ -2504,7 +2507,7 @@ $shortcodes->add('categories', function($content='', $atts, $shortcode_name){
 		$return .= sprintf($title, $current->c_name);
 	}
 	
-	$return .= category_ul($tree, $counts);
+	$return .= category_ul($tree, $counts, $show_child_elements);
 	
 	return $return;
 });
