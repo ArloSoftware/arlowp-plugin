@@ -1,3 +1,10 @@
+== V2.06 ==
+
+Enhancement
+------------------
+Provider has a link in the provider field
+
+
 == V2.05 ==
 
 Enhancement

@@ -13,6 +13,7 @@
 				 	<li>[arlo_event_start_date]</li>
 					<li>[arlo_event_end_date]</li>
 					<li>[arlo_event_location]</li>
+					<li>[arlo_event_provider]</li>
 					<li>[arlo_event_session_description]</li>
 					<li>[arlo_event_presenters]</li>
 					<li>[arlo_event_offers]</li>

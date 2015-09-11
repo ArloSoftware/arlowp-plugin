@@ -555,6 +555,7 @@ function install_table_arlo_events() {
 		`e_registermessage` VARCHAR(255) NULL,
 		`e_registeruri` VARCHAR(255) NULL,
 		`e_providerorganisation` VARCHAR(255) NULL,
+		`e_providerwebsite` VARCHAR(255) NULL,
 		`e_isonline` TINYINT(1) NOT NULL DEFAULT FALSE,
 		`active` DATETIME NULL,
 		PRIMARY KEY (`e_id`),
@@ -1639,8 +1640,12 @@ $shortcodes->add('event_provider', function($content='', $atts, $shortcode_name)
 		'link' => 'true'
 	), $atts, $shortcode_name));
 
-
-        $output = $GLOBALS['arlo_event_list_item']['e_providerorganisation'];
+	if (!empty($GLOBALS['arlo_event_list_item']['e_providerwebsite'])) {
+		$output = '<a href="' . $GLOBALS['arlo_event_list_item']['e_providerwebsite'] . '" target="_blank">' . $GLOBALS['arlo_event_list_item']['e_providerorganisation'] . "</a>";
+	} else {
+		$output = $GLOBALS['arlo_event_list_item']['e_providerorganisation'];
+	} 
+	
 
 	return $output;
 });

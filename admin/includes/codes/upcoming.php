@@ -8,6 +8,7 @@
 			<li>[arlo_event_start_date]</li>
 			<li>[arlo_event_end_date]</li>
 			<li>[arlo_event_location]</li>
+			<li>[arlo_event_provider]</li>
 			<li>[arlo_event_registration]</li>
 			<li>[arlo_upcoming_offer]</li>
 		</ul>

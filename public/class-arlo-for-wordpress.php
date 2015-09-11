@@ -565,20 +565,6 @@ class Arlo_For_Wordpress {
 		}catch(\Exception $e){}
 		ob_end_clean();
 	}
-        
-        public function database_upgrade() {
-            global $wpdb;
-		
-            $table_name = "{$wpdb->prefix}arlo_events";
-		
-            if ($wpdb->query("ALTER TABLE $table_name ADD `e_locationvisible` TINYINT(1) NOT NULL DEFAULT '0' AFTER `e_locationroomname`")) {
-                if (!$wpdb->query("ALTER TABLE $table_name ADD `e_providerorganisation` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `e_registeruri`")) {
-                    die ("Cannot run upgrade script!1");
-                }
-            } else {
-                die ("Cannot run upgrade script!2");
-            }
-        }
 	
 	public function import($force=false) {
 		// check for last sucessful import. Continue if imported mor than an hour ago or forced. Otherwise, return.
@@ -860,14 +846,14 @@ class Arlo_For_Wordpress {
 		);
 		
 		$table_name = "{$wpdb->prefix}arlo_events";
-		
+				
 		if(!empty($items)) {
 			foreach($items as $item) {
 				$query = $wpdb->query(
 					$wpdb->prepare( 
 						"INSERT INTO $table_name 
-						(e_arlo_id, et_arlo_id, e_code, e_startdatetime, e_finishdatetime, e_datetimeoffset, e_timezone, v_id, e_locationname, e_locationroomname, e_locationvisible , e_isfull, e_placesremaining, e_sessiondescription, e_notice, e_viewuri, e_registermessage, e_registeruri, e_providerorganisation, e_isonline, active) 
-						VALUES ( %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) 
+						(e_arlo_id, et_arlo_id, e_code, e_startdatetime, e_finishdatetime, e_datetimeoffset, e_timezone, v_id, e_locationname, e_locationroomname, e_locationvisible , e_isfull, e_placesremaining, e_sessiondescription, e_notice, e_viewuri, e_registermessage, e_registeruri, e_providerorganisation, e_providerwebsite, e_isonline, active) 
+						VALUES ( %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) 
 						", 
 					    $item->EventID,
 						$item->EventTemplateID,
@@ -879,7 +865,7 @@ class Arlo_For_Wordpress {
 						@$item->Location->VenueID,
 						@$item->Location->Name,
 						@$item->Location->VenueRoomName,
-                                                (!empty($item->Location->ViewUri) ? 1 : 0 ),
+						(!empty($item->Location->ViewUri) ? 1 : 0 ),
 						@$item->IsFull,
 						@$item->PlacesRemaining,
 						@$item->SessionsDescription,
@@ -887,15 +873,16 @@ class Arlo_For_Wordpress {
 						@$item->ViewUri,
 						@$item->RegistrationInfo->RegisterMessage,
 						@$item->RegistrationInfo->RegisterUri,
-                                                @$item->Provider->Name,
+						@$item->Provider->Name,
+						@$item->Provider->WebsiteUri,
 						@$item->Location->IsOnline,
 						$timestamp
 					)
 				);
                                 
-                                if ($query === false) {
-                                    throw new Exception('Database insert failed: ' . $table_name);
-                                }
+				if ($query === false) {
+					throw new Exception('Database insert failed: ' . $table_name);
+				}
 				
 				$event_id = $wpdb->insert_id;
 				
@@ -927,9 +914,10 @@ class Arlo_For_Wordpress {
 							(isset($offer->ReplacesOfferID)) ? $offer->ReplacesOfferID+1 : null,
 							$timestamp
 						) );
-                                                if ($query === false) {
-                                                    throw new Exception('Database insert failed: ' . $table_name);
-                                                }
+						
+						if ($query === false) {
+							throw new Exception('Database insert failed: ' . $table_name);
+						}
 					}
 				}
 				
@@ -946,12 +934,14 @@ class Arlo_For_Wordpress {
 						    $index,
 						    $timestamp
 						) );
-                                                if ($query === false) {
-                                                    throw new Exception('Database insert failed: ' . $table_name);
-                                                }
+						
+						if ($query === false) {
+							throw new Exception('Database insert failed: ' . $table_name);
+						}
 					}
 				}
 			}
+			
 		}
 		
 		return $items;
