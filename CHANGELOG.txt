@@ -2,7 +2,7 @@
 
 Enhancement
 ------------------
-Provider has a link in the provider field
+New "arlo_event_provider" field with link #12
 
 
 == V2.05 ==
