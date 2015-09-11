@@ -29,6 +29,7 @@
 * [arlo_event_end_date format=""]
 * [arlo_event_location]
 * [arlo_event_provider]
+* [arlo_event_delivery]
 * [arlo_event_session_description]
 * [arlo_event_presenters layout='list||string' link='true||false']
 * [arlo_event_offers]

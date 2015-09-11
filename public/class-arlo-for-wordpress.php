@@ -101,7 +101,19 @@ class Arlo_For_Wordpress {
     public static $price_settings = array(
         'exclgst' => 'Exclude GST.',
         'inclgst' => 'Include GST.',
-    );    
+    );  
+    
+	/**
+	 * $delivery_labels: used to show the different delivery types
+	 *
+	 * @since    2.0.6
+	 *
+	 * @var      array
+	 */
+    public static $delivery_labels = array(
+        0 => 'Workshop',
+        1 => 'Online (Webinar)',
+    );
     
 	/**
 	 * $templates: defines the available templates for the plugin

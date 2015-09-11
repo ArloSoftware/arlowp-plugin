@@ -1650,6 +1650,26 @@ $shortcodes->add('event_provider', function($content='', $atts, $shortcode_name)
 	return $output;
 });
 
+// event provider shortcode
+
+$shortcodes->add('event_delivery', function($content='', $atts, $shortcode_name){
+	global $wpdb, $arlo_plugin;
+
+	$e_arlo_id = $GLOBALS['arlo_event_list_item']['e_arlo_id'];
+		
+	$active = $arlo_plugin->get_last_import();
+
+	// merge and extract attributes
+	extract(shortcode_atts(array(
+		'layout' => '',
+		'link' => 'true'
+	), $atts, $shortcode_name));
+	
+	$output = Arlo_For_Wordpress::$delivery_labels[$GLOBALS['arlo_event_list_item']['e_isonline']];
+
+	return $output;
+});
+
 
 // upcoming event list shortcode
 

@@ -3,6 +3,7 @@
 Enhancement
 ------------------
 New "arlo_event_provider" field with link #12
+New "arlo_event_delivery" field #12
 
 
 == V2.05 ==
