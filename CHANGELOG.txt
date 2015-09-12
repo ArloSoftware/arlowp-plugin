@@ -4,6 +4,7 @@ Enhancement
 ------------------
 New "arlo_event_provider" field with link #12
 New "arlo_event_delivery" field #12
+New "delivery" filter for "arlo_upcoming_event_filters" shortcode
 
 
 == V2.05 ==

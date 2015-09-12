@@ -104,11 +104,19 @@ function arlo_child_categories($cats, $depth=0) {
 function arlo_create_filter($type, $items, $label=null) {
 	if(is_null($label)) $label = $type;
 	$filter_html = '<select id="arlo-filter-'.$type.'" name="'.$type.'">';
-	$filter_html .= '<option value="0">'.__('Filter by '.$label, 'arlo').'</option>';
-
-	foreach($items as $item) {
+	$filter_html .= '<option value="">'.__('Filter by '.$label, 'arlo').'</option>';
+	$selected_value = urldecode(get_query_var($type));
 	
-		$selected = (urldecode(get_query_var($type)) == $item['value']) ? ' selected="selected"' : '';
+	foreach($items as $key => $item) {
+
+		if (empty($item['string']) && empty($item['value'])) {
+			$item = array(
+				'string' => $item,
+				'value' => $key
+			);
+		}
+		
+		$selected = (strlen($selected_value) && $selected_value == $item['value']) ? ' selected="selected"' : '';
 
 		$filter_html .= '<option value="'.$item['value'].'"'.$selected.'>';
 		$filter_html .= $item['string'];
@@ -220,6 +228,7 @@ function arlo_register_custom_post_types() {
 	add_rewrite_tag('%category%', '([^&]+)');
 	add_rewrite_tag('%month%', '([^&]+)');
 	add_rewrite_tag('%location%', '([^&]+)');
+	add_rewrite_tag('%delivery%', '([^&]+)');
 	
 	// flush cached rewrite rules if we've just updated the arlo settings
 	if(isset($_GET['settings-updated'])) flush_rewrite_rules();
@@ -1706,16 +1715,16 @@ $shortcodes->add('upcoming_list_pagination', function($content='', $atts, $short
 	endif;
 
 	if(isset($_GET['location']) && !empty($_GET['location'])) :
-
 		$where .= " AND e.e_locationname = '" . $_GET['location'] . "'";
-
 	endif;
 
 	if(isset($_GET['category']) && !empty($_GET['category'])) :
-
 		$where .= " AND c.c_arlo_id = " . current(explode('-',$_GET['category']));
-
 	endif;
+	
+	if(isset($_GET['delivery']) && strlen($_GET['delivery']) && is_numeric($_GET['delivery'])) :
+		$where .= " AND e.e_isonline = " . $_GET['delivery'];
+	endif;	
 
 	$items = $wpdb->get_results(
 		"SELECT DISTINCT e.e_id, e.e_locationname, c.c_arlo_id
@@ -1773,17 +1782,17 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 	endif;
 
 	if(isset($_GET['location']) && !empty($_GET['location'])) :
-
 		$where .= " AND e.e_locationname = '" . $_GET['location'] . "'";
-
 	endif;
 
 	if(isset($_GET['category']) && !empty($_GET['category'])) :
-
 		$where .= " AND c.c_arlo_id = " . current(explode('-',$_GET['category']));
-
 	endif;
 
+	if(isset($_GET['delivery']) && strlen($_GET['delivery']) && is_numeric($_GET['delivery'])) :
+		$where .= " AND e.e_isonline = " . $_GET['delivery'];
+	endif;
+	
 	$items = $wpdb->get_results(
 		"SELECT DISTINCT
 		e.*, et.et_name, et.et_post_name, et.et_descriptionsummary, et.et_registerinteresturi, o.o_formattedamounttaxexclusive, o_offeramounttaxexclusive, o.o_formattedamounttaxinclusive, o_offeramounttaxinclusive, o.o_taxrateshortcode, v.v_post_name, c.c_arlo_id
@@ -1859,7 +1868,7 @@ $shortcodes->add('upcoming_offer', function($content='', $atts, $shortcode_name)
 
 $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortcode_name){
 	extract(shortcode_atts(array(
-		'filters'	=> 'category,month,location',
+		'filters'	=> 'category,month,location,delivery',
 		'filtertext'  	=> 'Filter Events',
 		'resettext'	=> 'Reset'
 	), $atts, $shortcode_name));
@@ -1886,6 +1895,15 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 				$filter_html .= arlo_create_filter($filter, arlo_child_categories($cats[0]->children));
 
 				break;
+				
+			case 'delivery' :
+
+				// delivery select
+
+				$filter_html .= arlo_create_filter($filter, Arlo_For_Wordpress::$delivery_labels);
+
+				break;
+								
 
 			case 'month' :
 
