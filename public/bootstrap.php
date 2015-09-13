@@ -83,7 +83,8 @@ function arlo_child_categories($cats, $depth=0) {
 
 		$output[] = array(
 			'string' => str_repeat('&ndash;', $depth) . $space . $cat->c_name,
-			'value' => $cat->c_slug
+			'value' => $cat->c_slug,
+			'id' => $cat->c_arlo_id
 			);
 		$output = array_merge($output, arlo_child_categories($cat->children, $depth+1));
 
@@ -968,25 +969,45 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 	
 	
 	if(isset($wp_query->query_vars['arlo_event_category']) || isset($atts['category'])) {
-		$cat_slug = '';
+
+		$cat_id = 0;
 
 		if(isset($atts['category'])) {
 			$cat_slug = $atts['category'];
 		} else {
 			$cat_slug = $wp_query->query_vars['arlo_event_category'];
 		}
-		$where .= " AND c.c_slug = '$cat_slug'";
-	// } else {
-	// 	// take advantage of getTree
-	// 	$cats = \Arlo\Categories::getTree(0, null);
+		$where .= " AND ( c.c_slug = '$cat_slug'";
 		
-	// 	$ids = array();
+		$cat_id = $wpdb->get_var("
+		SELECT
+			c_arlo_id
+		FROM 
+			{$wpdb->prefix}arlo_categories
+		WHERE 
+			c_slug = '{$cat_slug}'
+		");
 		
-	// 	foreach($cats[0]->children as $cat) {
-	// 		$ids[] = $cat->c_arlo_id;
-	// 	}
+		if (is_null($cat_id)) {
+			$cat_id = 0;
+		} 
 		
-	// 	$where .= " AND (c.c_arlo_id IN (" . implode(',', $ids) . ") OR c.c_arlo_id IS NULL)";
+		if (isset($GLOBALS['show_child_elements']) && $GLOBALS['show_child_elements']) {
+			$cats = \Arlo\Categories::getTree($cat_id, null);
+			
+			$categories_tree = arlo_child_categories($cats);
+			
+			$ids = array_map(function($item) {
+				return $item['id'];
+			}, $categories_tree);
+			
+			
+			if (is_array($ids) && count($ids)) {
+				$where .= " OR c.c_arlo_id IN (" . implode(',', $ids) . ")";
+			}
+		}
+		
+		$where .= ')';
 	}
 
 	// grouping
@@ -1024,6 +1045,8 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 
 $shortcodes->add('event_template_list_item', function($content='', $atts, $shortcode_name){
 	global $wpdb, $wp_query;
+	
+	
 		
 	if (isset($atts['show_only_at_bottom']) && $atts['show_only_at_bottom'] == "true" && isset($GLOBALS['categories_count']) && $GLOBALS['categories_count']) {
 		$GLOBALS['show_only_at_bottom'] = true;
@@ -1051,26 +1074,47 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 		
 	if(isset($wp_query->query_vars['arlo_event_category']) || isset($atts['category'])) {
 
-		$cat_slug = '';
+		$cat_id = 0;
 
 		if(isset($atts['category'])) {
 			$cat_slug = $atts['category'];
 		} else {
 			$cat_slug = $wp_query->query_vars['arlo_event_category'];
 		}
-		$where .= " AND c.c_slug = '$cat_slug'";
-	// } else {
-	// 	// take advantage of getTree
-	// 	$cats = \Arlo\Categories::getTree(0, null);
+		$where .= " AND ( c.c_slug = '$cat_slug'";
 		
-	// 	$ids = array();
+		$cat_id = $wpdb->get_var("
+		SELECT
+			c_arlo_id
+		FROM 
+			{$wpdb->prefix}arlo_categories
+		WHERE 
+			c_slug = '{$cat_slug}'
+		");
 		
-	// 	foreach($cats[0]->children as $cat) {
-	// 		$ids[] = $cat->c_arlo_id;
-	// 	}
+		if (is_null($cat_id)) {
+			$cat_id = 0;
+		} 
 		
-	// 	$where .= " AND (c.c_arlo_id IN (" . implode(',', $ids) . ") OR c.c_arlo_id IS NULL)";
-	}
+		if (isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true") {
+			$GLOBALS['show_child_elements'] = true;
+		
+			$cats = \Arlo\Categories::getTree($cat_id, null);
+			
+			$categories_tree = arlo_child_categories($cats);
+			
+			$ids = array_map(function($item) {
+				return $item['id'];
+			}, $categories_tree);
+			
+			
+			if (is_array($ids) && count($ids)) {
+				$where .= " OR c.c_arlo_id IN (" . implode(',', $ids) . ")";
+			}
+		}
+		
+		$where .= ')';
+	}	
 	
 	// grouping
 	$group = "GROUP BY et.et_arlo_id";
