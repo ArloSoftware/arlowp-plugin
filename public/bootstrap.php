@@ -2748,6 +2748,7 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 	$event = \Arlo\Events::get($conditions, array('e.e_startdatetime ASC'), 1);
         
         $buttonclass = (!empty($atts['buttonclass']) ? $atts['buttonclass'] : "" );
+        $dateclass = (!empty($atts['dateclass']) ? $atts['dateclass'] : "" );
         	
 	if(empty($event) && !empty($GLOBALS['arlo_event_list_item']['et_registerinteresturi'])) {
 		return '<a href="' . $GLOBALS['arlo_event_list_item']['et_registerinteresturi'] . '" title="' . __('Register interest') . '" class="' . $buttonclass . '">' . __('Register interest') . '</a>';
@@ -2759,7 +2760,7 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
                     $format = 'd M';
             }
 
-            return date($format, strtotime($event->e_startdatetime));            
+            return '<span class="' . $dateclass . '">' . date($format, strtotime($event->e_startdatetime)) . '</span>';
         }
         
 	return '';
