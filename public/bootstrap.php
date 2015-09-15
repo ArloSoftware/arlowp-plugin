@@ -59,6 +59,11 @@ add_filter('page_template', function($template){
 			return $file;
 		}
 	}
+        
+        add_filter( 'body_class', function( $classes ) {
+            $classes[] = 'arlo';
+            return $classes;
+        });
 	
 	return $template;
 }, 100, 1);
