@@ -1507,12 +1507,14 @@ $shortcodes->add('event_registration', function($content='', $atts, $shortcode_n
 	$registeruri = $GLOBALS['arlo_event_list_item']['e_registeruri'];
 	$registermessage = $GLOBALS['arlo_event_list_item']['e_registermessage'];
 	$placesremaining = $GLOBALS['arlo_event_list_item']['e_placesremaining'];
+        
+        $class = (!empty($atts['class']) ? $atts['class'] : 'arlo-button' );
 
 	$registration = '<div class="arlo-event-registration">';
 	$registration .= (($isfull) ? '<span class="arlo-event-full">' . __('Event is full', 'arlo') . '</span>' : '');
 	// test if there is a register uri string, if so display the button
 	if(!is_null($registeruri) && $registeruri != '') {
-		$registration .= '<a class="arlo-button ' . (($isfull) ? 'arlo-waiting-list' : 'arlo-register') . '" href="'. $registeruri . '" target="_blank">';
+		$registration .= '<a class="' . $class . ' ' . (($isfull) ? 'arlo-waiting-list' : 'arlo-register') . '" href="'. $registeruri . '" target="_blank">';
 		$registration .= (($isfull) ? __('Join waiting list', 'arlo') : __($registermessage, 'arlo')) . '</a>';
 	} else {
             $registration .= $registermessage;
