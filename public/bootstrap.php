@@ -12,7 +12,7 @@ add_filter( 'the_title', function($title, $id = null){
 	$pages = array(
 		$settings['post_types']['event']['posts_page']
 	);
-	
+        
 	if($id === null || !in_array($id, $pages)) return $title;
 	
 	$cat = \Arlo\Categories::get(array('slug' => get_query_var('arlo_event_category')));
@@ -2746,9 +2746,11 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 	);
 	
 	$event = \Arlo\Events::get($conditions, array('e.e_startdatetime ASC'), 1);
+        
+        $buttonclass = (!empty($atts['buttonclass']) ? $atts['buttonclass'] : "" );
         	
 	if(empty($event) && !empty($GLOBALS['arlo_event_list_item']['et_registerinteresturi'])) {
-		return '<a href="' . $GLOBALS['arlo_event_list_item']['et_registerinteresturi'] . '" title="' . __('Register interest') . '">' . __('Register interest') . '</a>';
+		return '<a href="' . $GLOBALS['arlo_event_list_item']['et_registerinteresturi'] . '" title="' . __('Register interest') . '" class="' . $buttonclass . '">' . __('Register interest') . '</a>';
 	}
         
         if (!empty($event->e_startdatetime)) {
