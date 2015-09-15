@@ -1312,7 +1312,8 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 	extract(shortcode_atts(array(
 		'filters'	=> 'category,location',
 		'filtertext'  	=> 'Filter Events',
-		'resettext'		=> 'Reset'
+		'resettext'	=> 'Reset',
+                'buttonclass'   => 'arlo-button'
 	), $atts, $shortcode_name));
 	
 	$filters_array = explode(',',$filters);
@@ -1379,7 +1380,7 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 
 	$filter_html .= '<div class="arlo-filters-buttons">';
         
-	$filter_html .= '<a href="'.get_page_link().'" class="arlo-button">'.$resettext.'</a></div>';
+	$filter_html .= '<a href="'.get_page_link().'" class="' . $buttonclass . '">'.$resettext.'</a></div>';
 
 	$filter_html .= '</form>';
 	
@@ -1916,7 +1917,8 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 	extract(shortcode_atts(array(
 		'filters'	=> 'category,month,location,delivery',
 		'filtertext'  	=> 'Filter Events',
-		'resettext'	=> 'Reset'
+		'resettext'	=> 'Reset',
+                'buttonclass'   => 'arlo-button'
 	), $atts, $shortcode_name));
 
 	$filters_array = explode(',',$filters);
@@ -2006,7 +2008,7 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 
 	$filter_html .= '<div class="arlo-filters-buttons">';
         
-	$filter_html .= '<a href="'.get_page_link().'" class="arlo-button">'.$resettext.'</a></div>';
+	$filter_html .= '<a href="'.get_page_link().'" class="' . $buttonclass . '">'.$resettext.'</a></div>';
 
 	$filter_html .= '</form>';
 	
