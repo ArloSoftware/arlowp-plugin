@@ -2740,13 +2740,13 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 // event template next running
 $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_name){
 	if(!isset($GLOBALS['arlo_event_list_item']) || empty($GLOBALS['arlo_event_list_item']['et_arlo_id'])) return;
-	
+        
 	$conditions = array(
 		'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id']
 	);
 	
 	$event = \Arlo\Events::get($conditions, array('e.e_startdatetime ASC'), 1);
-        
+                
         $buttonclass = (!empty($atts['buttonclass']) ? $atts['buttonclass'] : "" );
         $dateclass = (!empty($atts['dateclass']) ? $atts['dateclass'] : "" );
         	
@@ -2757,10 +2757,14 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
         if (!empty($event->e_startdatetime)) {
             $format = 'd M y';
             if(date('y', strtotime($event->e_startdatetime)) == date('y')) {
-                    $format = 'd M';
+                $format = 'd M';
             }
-
-            return '<span class="' . $dateclass . '">' . date($format, strtotime($event->e_startdatetime)) . '</span>';
+            
+            if ($event->e_registeruri && !$event->e_isfull) {
+                return '<a href="' . $event->e_registeruri . '" class="' . $dateclass . ' arlo-register">' . date($format, strtotime($event->e_startdatetime)) . '</span>';
+            } else {
+                return '<span class="' . $dateclass . '">' . date($format, strtotime($event->e_startdatetime)) . '</span>';
+            }
         }
         
 	return '';
