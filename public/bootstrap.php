@@ -2761,7 +2761,7 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
             }
             
             if ($event->e_registeruri && !$event->e_isfull) {
-                return '<a href="' . $event->e_registeruri . '" class="' . $dateclass . ' arlo-register">' . date($format, strtotime($event->e_startdatetime)) . '</span>';
+                return '<a href="' . $event->e_registeruri . '" class="' . $dateclass . ' arlo-register">' . date($format, strtotime($event->e_startdatetime)) . '</a>';
             } else {
                 return '<span class="' . $dateclass . '">' . date($format, strtotime($event->e_startdatetime)) . '</span>';
             }
