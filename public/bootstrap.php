@@ -1277,38 +1277,6 @@ $shortcodes->add('content_field_text', function($content='', $atts, $shortcode_n
 	return wpautop($GLOBALS['arlo_content_field_item']['cf_text']);
 });
 
-// event template category filter shortcode
-
-$shortcodes->add('event_template_category_filter', function($content='', $atts, $shortcode_name){
-
-	extract(shortcode_atts(array(
-		'resettext'		=> 'Reset'
-	), $atts, $shortcode_name));
-
-	global $post;
-        
-        $slug = get_post( $post )->post_name;
-        
-	$uri = explode('?', $_SERVER['REQUEST_URI']);
-	$action = preg_replace('/(.*)\/page\/([^\/]*)\/?/i', '$1/', $uri[0]);            
-        
-	$filter_html = '<form id="arlo-event-filter" class="arlo-filters" method="get" action="'.site_url().'/'.$slug.'/">';
-
-	// category select
-
-	$cats = \Arlo\Categories::getTree();
-
-	$filter_html .= arlo_create_filter('arlo_event_category', arlo_child_categories($cats[0]->children), 'category');
-
-	$filter_html .= '<div class="arlo-filters-buttons">';
-        
-	$filter_html .= '<a href="'.get_page_link().'" class="arlo-button">'.$resettext.'</a></div>';
-
-	$filter_html .= '</form>';
-	
-	return $filter_html;
-});
-
 // event template filter shortcode
 
 $shortcodes->add('event_template_filters', function($content='', $atts, $shortcode_name){
