@@ -2692,17 +2692,17 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 	
 	$event = \Arlo\Events::get($conditions, array('e.e_startdatetime ASC'), 1);
                 
-        $buttonclass = (!empty($atts['buttonclass']) ? $atts['buttonclass'] : "" );
-        $dateclass = (!empty($atts['dateclass']) ? $atts['dateclass'] : "" );
+    $buttonclass = (!empty($atts['buttonclass']) ? $atts['buttonclass'] : "" );
+    $dateclass = (!empty($atts['dateclass']) ? $atts['dateclass'] : "" );
+    $format = (!empty($atts['format']) ? $atts['format'] : "d M y" );
         	
 	if(empty($event) && !empty($GLOBALS['arlo_event_list_item']['et_registerinteresturi'])) {
 		return '<a href="' . $GLOBALS['arlo_event_list_item']['et_registerinteresturi'] . '" title="' . __('Register interest') . '" class="' . $buttonclass . '">' . __('Register interest') . '</a>';
 	}
         
         if (!empty($event->e_startdatetime)) {
-            $format = 'd M y';
             if(date('y', strtotime($event->e_startdatetime)) == date('y')) {
-                $format = 'd M';
+            	$format = preg_replace('/\s+/', ' ', str_replace(["Y", "y"], "", $format));
             }
             
             if ($event->e_registeruri && !$event->e_isfull) {
