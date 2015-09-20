@@ -47,7 +47,15 @@ class Events extends Singleton {
 			$order = ' ORDER BY ' . implode(', ', $order);
 		}
 		
-		$result = ($limit != 1) ? $wpdb->get_results($query.$where.$order) : $wpdb->get_row($query.$where.$order);
+		//limit
+		
+		if ($limit > 1) {
+			$limit = ' LIMIT ' . $limit;
+		} else {
+			$limit = '';
+		}
+		
+		$result = (!empty($limit)) ? $wpdb->get_results($query.$where.$order.$limit) : $wpdb->get_row($query.$where.$order);
 		
 		return $result;
 	}

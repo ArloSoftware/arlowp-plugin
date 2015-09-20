@@ -2685,34 +2685,58 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 // event template next running
 $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_name){
 	if(!isset($GLOBALS['arlo_event_list_item']) || empty($GLOBALS['arlo_event_list_item']['et_arlo_id'])) return;
+	$return = "";
         
 	$conditions = array(
 		'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id']
 	);
 	
-	$event = \Arlo\Events::get($conditions, array('e.e_startdatetime ASC'), 1);
-                
-    $buttonclass = (!empty($atts['buttonclass']) ? $atts['buttonclass'] : "" );
-    $dateclass = (!empty($atts['dateclass']) ? $atts['dateclass'] : "" );
-    $format = (!empty($atts['format']) ? $atts['format'] : "d M y" );
-        	
-	if(empty($event) && !empty($GLOBALS['arlo_event_list_item']['et_registerinteresturi'])) {
-		return '<a href="' . $GLOBALS['arlo_event_list_item']['et_registerinteresturi'] . '" title="' . __('Register interest') . '" class="' . $buttonclass . '">' . __('Register interest') . '</a>';
+	// merge and extract attributes
+	extract(shortcode_atts(array(
+		'buttonclass' => '',
+		'dateclass' => '',
+		'format' => 'd M y',
+		'layout' => '',
+		'limit' => 1
+	), $atts, $shortcode_name));	
+	
+	$events = \Arlo\Events::get($conditions, array('e.e_startdatetime ASC'), $limit);
+		
+	if (!is_array($events)) {
+		$events = array($events);
 	}
+	
+	if ($layout == "list") {
+		$return = '<ul class="arlo-event-next-running">';
+	}
+	
+	if(count($events) == 0 && !empty($GLOBALS['arlo_event_list_item']['et_registerinteresturi'])) {
+		$return = '<a href="' . $GLOBALS['arlo_event_list_item']['et_registerinteresturi'] . '" title="' . __('Register interest') . '" class="' . $buttonclass . '">' . __('Register interest') . '</a>';
+	} else if (count($events)) {
+		$return_links = [];
+
+		foreach ($events as $event) {
+			if (!empty($event->e_startdatetime)) {
+	            if(date('y', strtotime($event->e_startdatetime)) == date('y')) {
+	            	$format = trim(preg_replace('/\s+/', ' ', str_replace(["Y", "y"], "", $format)));
+	            }	
+	            
+	            if ($event->e_registeruri && !$event->e_isfull) {
+	                $return_links[] = ($layout == 'list' ? "<li>" : "") . '<a href="' . $event->e_registeruri . '" class="' . $dateclass . ' arlo-register">' . date($format, strtotime($event->e_startdatetime)) . '</a>' . ($layout == 'list' ? "</li>" : "");
+	            } else {
+	                $return_links[] = ($layout == 'list' ? "<li>" : "") . '<span class="' . $dateclass . '">' . date($format, strtotime($event->e_startdatetime)) . '</span>' . ($layout == 'list' ? "</li>" : "");
+	            }
+	        }	
+		}	
+		
+		$return .= implode(($layout == 'list' ? "" : ", "), $return_links);
+	}
+	
+	if ($layout == "list") {
+		$return .= '</ul>';
+	}   
         
-        if (!empty($event->e_startdatetime)) {
-            if(date('y', strtotime($event->e_startdatetime)) == date('y')) {
-            	$format = preg_replace('/\s+/', ' ', str_replace(["Y", "y"], "", $format));
-            }
-            
-            if ($event->e_registeruri && !$event->e_isfull) {
-                return '<a href="' . $event->e_registeruri . '" class="' . $dateclass . ' arlo-register">' . date($format, strtotime($event->e_startdatetime)) . '</a>';
-            } else {
-                return '<span class="' . $dateclass . '">' . date($format, strtotime($event->e_startdatetime)) . '</span>';
-            }
-        }
-        
-	return '';
+	return $return;
 });
 
 // category header
