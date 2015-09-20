@@ -1282,7 +1282,6 @@ $shortcodes->add('content_field_text', function($content='', $atts, $shortcode_n
 $shortcodes->add('event_template_category_filter', function($content='', $atts, $shortcode_name){
 
 	extract(shortcode_atts(array(
-		'filtertext'  	=> 'Filter Events',
 		'resettext'		=> 'Reset'
 	), $atts, $shortcode_name));
 
@@ -1316,7 +1315,6 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 
 	extract(shortcode_atts(array(
 		'filters'	=> 'category,location',
-		'filtertext'  	=> 'Filter Events',
 		'resettext'	=> 'Reset',
                 'buttonclass'   => 'arlo-button'
 	), $atts, $shortcode_name));
@@ -1921,9 +1919,8 @@ $shortcodes->add('upcoming_offer', function($content='', $atts, $shortcode_name)
 $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortcode_name){
 	extract(shortcode_atts(array(
 		'filters'	=> 'category,month,location,delivery',
-		'filtertext'  	=> 'Filter Events',
 		'resettext'	=> 'Reset',
-                'buttonclass'   => 'arlo-button'
+		'buttonclass'   => 'arlo-button'
 	), $atts, $shortcode_name));
 
 	$filters_array = explode(',',$filters);
