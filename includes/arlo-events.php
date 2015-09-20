@@ -34,6 +34,10 @@ class Events extends Singleton {
 						$where[] = "e.et_arlo_id = $value";
 					}
 				break;
+				
+				default:
+					$where[] = $value;
+				break;
 			}
 		}
 		
