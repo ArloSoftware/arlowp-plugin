@@ -1691,38 +1691,21 @@ $shortcodes->add('event_provider', function($content='', $atts, $shortcode_name)
 
 	$e_arlo_id = $GLOBALS['arlo_event_list_item']['e_arlo_id'];
 		
-	$active = $arlo_plugin->get_last_import();
-
-	// merge and extract attributes
-	extract(shortcode_atts(array(
-		'layout' => '',
-		'link' => 'true'
-	), $atts, $shortcode_name));
-
 	if (!empty($GLOBALS['arlo_event_list_item']['e_providerwebsite'])) {
 		$output = '<a href="' . $GLOBALS['arlo_event_list_item']['e_providerwebsite'] . '" target="_blank">' . $GLOBALS['arlo_event_list_item']['e_providerorganisation'] . "</a>";
 	} else {
 		$output = $GLOBALS['arlo_event_list_item']['e_providerorganisation'];
-	} 
-	
+	}	
 
 	return $output;
 });
 
-// event provider shortcode
+// event delivery shortcode
 
 $shortcodes->add('event_delivery', function($content='', $atts, $shortcode_name){
 	global $wpdb, $arlo_plugin;
 
 	$e_arlo_id = $GLOBALS['arlo_event_list_item']['e_arlo_id'];
-		
-	$active = $arlo_plugin->get_last_import();
-
-	// merge and extract attributes
-	extract(shortcode_atts(array(
-		'layout' => '',
-		'link' => 'true'
-	), $atts, $shortcode_name));
 	
 	$output = Arlo_For_Wordpress::$delivery_labels[$GLOBALS['arlo_event_list_item']['e_isonline']];
 
