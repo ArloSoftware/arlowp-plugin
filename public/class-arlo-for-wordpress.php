@@ -30,7 +30,16 @@ class Arlo_For_Wordpress {
 	 *
 	 * @var     string
 	 */
-	const VERSION = '1.0.0';
+	const VERSION = '2.0.6';
+
+	/**
+	 * Minimum required PHP version
+	 *
+	 * @since   2.0.6
+	 *
+	 * @var     string
+	 */
+	const MIN_PHP_VERSION = '5.4.0';
 
 	/**
 	 * @TODO - Rename "arlo-for-wordpress" to the name your your plugin
@@ -240,6 +249,11 @@ class Arlo_For_Wordpress {
 	 *                                       activated on an individual blog.
 	 */
 	public static function activate( $network_wide ) {
+		
+		//check the PHP version
+		if (version_compare(phpversion(), self::MIN_PHP_VERSION) === -1) {
+    		wp_die('The minimum required PHP version for the Arlo plugin is ' . self::MIN_PHP_VERSION);
+		}
 
 		if ( function_exists( 'is_multisite' ) && is_multisite() ) {
 

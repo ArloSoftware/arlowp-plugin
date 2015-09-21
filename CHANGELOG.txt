@@ -2,6 +2,7 @@
 
 Enhancement
 ------------------
+PHP version checker
 New "limit" and "layout" attribute for "arlo_event_next_running" shortcode
 New "format" attribute for "arlo_event_next_running" shortcode
 New "arlo_event_provider" field with link #12
