@@ -2,7 +2,8 @@
 
 Enhancement
 ------------------
-PHP version checker
+Issue #25
+PHP version checker Issue #24
 New "limit" and "layout" attribute for "arlo_event_next_running" shortcode
 New "format" attribute for "arlo_event_next_running" shortcode
 New "arlo_event_provider" field with link #12
@@ -10,6 +11,17 @@ New "arlo_event_delivery" field #12
 New "delivery" filter for "arlo_upcoming_event_filters" shortcode
 New "show_child_elements" (bool) property for the "arlo_event_template_list_item" shortcode to show the category's sub/child categories
 New "class" attribute for "arlo_event_registration" shortcode
+
+Bugfixes
+------------------
+Issue #35
+Issue #34
+Issue #32
+Issue #29
+Issue #28
+Issue #27
+Issue #26
+Issue #21
 
 
 == V2.05 ==
