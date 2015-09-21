@@ -440,7 +440,7 @@ class Arlo_For_Wordpress {
 	 * @since    1.0.0
 	 */
 	public function enqueue_styles() {
-		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css?23072015', __FILE__ ), array(), self::VERSION );
+		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css?21092015', __FILE__ ), array(), self::VERSION );
 	}
 
 	/**
@@ -449,7 +449,7 @@ class Arlo_For_Wordpress {
 	 * @since    1.0.0
 	 */
 	public function enqueue_scripts() {
-		wp_enqueue_script( $this->plugin_slug . '-plugin-script', plugins_url( 'assets/js/public.js?23072015', __FILE__ ), array( 'jquery' ), self::VERSION );
+		wp_enqueue_script( $this->plugin_slug . '-plugin-script', plugins_url( 'assets/js/public.js?21092015', __FILE__ ), array( 'jquery' ), self::VERSION );
 	}
 	
 	/**  Local Setter  */

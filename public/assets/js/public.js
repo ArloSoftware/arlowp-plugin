@@ -7,8 +7,8 @@
                 var showText = "Show me more dates";
                 
 		if($('.arlo-show-more').length == 1) {
-                        if ($('.arlo-show-more[data-show]').attr('data-show') !== null)
-                        if ($('.arlo-show-more[data-show-text]').attr('data-show-text') !== null)
+                        if ($('.arlo-show-more[data-show]').attr('data-show') != null)
+                        if ($('.arlo-show-more[data-show-text]').attr('data-show-text') != null)
                             showText = $('.arlo-show-more').attr('data-show-text');
                         
 		}
