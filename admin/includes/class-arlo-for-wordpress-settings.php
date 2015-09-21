@@ -86,38 +86,6 @@ class Arlo_For_Wordpress_Settings {
 	    
 			// create on section
 			add_settings_section( $section_id, __($post_type['singular_name'], $this->plugin_slug).' '.__('Post Type', $this->plugin_slug), null, $this->plugin_slug );
-		
-	    	// post type name
-			add_settings_field(
-				$id . '_post_name',
-				'<label for="arlo_'.$id.'_name">Name</label>',
-				array(
-					$this,
-					'arlo_post_name_callback'
-				),
-				$this->plugin_slug,
-				$section_id,
-				array(
-					'id'		=> $id,
-					'label_for' => $post_type['singular_name']
-				)
-			);
-	    
-	    	// post type name (singular)
-			add_settings_field(
-				$id . '_post_name_singular',
-				'<label for="arlo_'.$id.'_name_singular">Name (Singular)</label>',
-				array(
-					$this,
-					'arlo_post_name_singular_callback'
-				),
-				$this->plugin_slug,
-				$section_id,
-				array(
-					'id'		=> $id,
-					'label_for' => $post_type['singular_name']
-				)
-			);
 	    
 	    	// post type slug
 			add_settings_field(
@@ -219,22 +187,6 @@ class Arlo_For_Wordpress_Settings {
             
 	    echo $html;
 	}     
-
-	function arlo_post_name_callback($args) {
-	    $settings = get_option('arlo_settings');
-	    $val = esc_attr($settings['post_types'][$args['id']]['name']);
-	    $html = '<input type="text" id="arlo_'.$args['id'].'_name" name="arlo_settings[post_types]['.$args['id'].'][name]" value="'.$val.'" />';
-
-	    echo $html;
-	}
-
-	function arlo_post_name_singular_callback($args) {
-	    $settings = get_option('arlo_settings');
-	    $val = esc_attr($settings['post_types'][$args['id']]['singular_name']);
-	    $html = '<input type="text" id="arlo_'.$args['id'].'_name_singular" name="arlo_settings[post_types]['.$args['id'].'][singular_name]" value="'.$val.'" />';
-
-	    echo $html;
-	}
 
 	function arlo_posts_page_callback($args) {
 	    $settings = get_option('arlo_settings');

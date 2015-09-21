@@ -177,8 +177,8 @@ function arlo_register_custom_post_types() {
                 
 		$args = array(
 			'labels' => array(
-                'name' => __( $settings['post_types'][$id]['name'] ),
-                'singular_name' => __( $settings['post_types'][$id]['singular_name'] )
+                'name' => __( $type['name'] ),
+                'singular_name' => __( $type['singular_name'] )
             ),
 			'public'             => true,
 			'publicly_queryable' => true,

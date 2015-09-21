@@ -3,7 +3,7 @@
 
 	$plugin = Arlo_For_Wordpress::get_instance();
 
-	$event_name = arlo_get_option('post_types')['event']['name'];
+	$event_name = Arlo_For_Wordpress::$post_types['event']['singular_name'];
 
 	// output the widget title
 	$title = apply_filters( 'widget_title', empty( $instance['title'] ) ? __( 'Upcoming' ) . ' ' . $event_name : $instance['title'], $instance, $this->id_base );
