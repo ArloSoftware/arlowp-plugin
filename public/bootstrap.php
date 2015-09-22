@@ -2679,7 +2679,7 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 		return $free_text;
 	}
 	
-	return __('From') . ' ' . $offer->$price_field_show;
+	return '<span class="arlo-from-text">' . __('From') . '</span> ' . $offer->$price_field_show;
 });
 
 // event template next running
