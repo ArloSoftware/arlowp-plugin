@@ -31,7 +31,11 @@ add_filter( 'the_title', function($title, $id = null){
 	}
 	
 	// append category name to events page
-	return '<span class="cat-title-ext">' . $title . ': </span>' . $subtitle;
+        if (!empty($title)) {
+            $title = '<span class="cat-title-ext">' . $title . ': </span>';
+        }
+        
+	return $title . $subtitle;
 }, 10, 2);
 
 /*
@@ -2568,7 +2572,7 @@ $shortcodes->add('event_duration', function($content='', $atts, $shortcode_name)
 	$start = $events->e_startdatetime;
 	$end = $events->e_finishdatetime;
 	$difference = strtotime($end)-strtotime($start);// seconds
-	
+        
 	// if we're the same day, display hours
 	if(date('d-m', strtotime($start)) == date('d-m', strtotime($end))) {
 		$hours = floor($difference/60/60);
@@ -2698,8 +2702,11 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 		'dateclass' => '',
 		'format' => 'd M y',
 		'layout' => '',
-		'limit' => 1
-	), $atts, $shortcode_name));	
+		'limit' => 1,
+                'removeyear' => "true"
+	), $atts, $shortcode_name));
+        
+        $removeyear = ($removeyear == "false" || $removeyear == "0" ? false : true);
 	
 	$events = \Arlo\Events::get($conditions, array('e.e_startdatetime ASC'), $limit);
 		
@@ -2718,7 +2725,7 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 
 		foreach ($events as $event) {
 			if (!empty($event->e_startdatetime)) {
-	            if(date('y', strtotime($event->e_startdatetime)) == date('y')) {
+	            if(date('y', strtotime($event->e_startdatetime)) == date('y') && $removeyear) {
 	            	$format = trim(preg_replace('/\s+/', ' ', str_replace(["Y", "y"], "", $format)));
 	            }	
 	            

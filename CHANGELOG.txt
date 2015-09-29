@@ -2,6 +2,7 @@
 
 Enhancement
 ------------------
+New "removeyear" attribute for "arlo_event_next_running" shortcode
 Issue #25
 PHP version checker Issue #24
 New "limit" and "layout" attribute for "arlo_event_next_running" shortcode
