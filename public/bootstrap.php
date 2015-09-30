@@ -2751,6 +2751,8 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 $shortcodes->add('category_header', function($content='', $atts, $shortcode_name){
 	if($slug = get_query_var('arlo_event_category')) {
 		$category = \Arlo\Categories::get(array('slug' => $slug), 1);
+	} else if(isset($_GET['category']) && !empty($_GET['category'])) {
+		$category = \Arlo\Categories::get(array('id' => current(explode('-', $_GET['category']))), 1);
 	} else {
 		$category = \Arlo\Categories::get(array('parent_id' => 0), 1);
 	}
