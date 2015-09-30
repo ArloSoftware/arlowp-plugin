@@ -353,6 +353,10 @@ class Arlo_For_Wordpress_Admin {
 
 		if ( ! isset( $wp_settings_fields[$page][$section] ) )
 			return;
+			
+		if ($section == 'arlo_template_section') {
+			echo "<h5>Available shortcodes</h5>";
+		}
 
 		foreach ( (array) $wp_settings_fields[$page][$section] as $field ) {
 			echo '<div class="'.PLUGIN_PREFIX.'-field-wrap cf '.PLUGIN_PREFIX.'-'. strtolower(esc_attr($field['args']['label_for'])).'">';

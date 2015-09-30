@@ -1,18 +1,31 @@
 <ul class="arlo-codes">
-	<li>[arlo_upcoming_list_item]</li>
+	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/categoryrelated#arlo_category_header" target="_blank">[arlo_category_header]</a></li>
+	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/upcomingeventrelated#arlo_upcoming_event_filters" target="_blank">[arlo_upcoming_event_filters]</a></li>
+	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/upcomingeventrelated#arlo_upcoming_list_item" target="_blank">[arlo_upcoming_list_item]</a></li>
 	<li>
 		<ul>
-			<li>[arlo_event_template_name]</li>
-			<li>[arlo_event_template_summary]</li>
-			<li>[arlo_event_template_permalink]</li>
-			<li>[arlo_event_start_date]</li>
-			<li>[arlo_event_end_date]</li>
-			<li>[arlo_event_location]</li>
-			<li>[arlo_event_provider]</li>
-			<li>[arlo_event_delivery]</li>
-			<li>[arlo_event_registration]</li>
-			<li>[arlo_upcoming_offer]</li>
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/#arlo_group_divider" target="_blank">[arlo_group_divider]</a></li>
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_code" target="_blank">[arlo_event_code]</a></li>
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_duration" target="_blank">[arlo_event_duration]</a></li>
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_price" target="_blank">[arlo_event_price]</a></li>
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_next_running" target="_blank">[arlo_event_next_running]</a></li>
+		 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_start_date" target="_blank">[arlo_event_start_date]</a></li>
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_end_date" target="_blank">[arlo_event_end_date]</a></li>
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_location" target="_blank">[arlo_event_location]</a></li>
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_provider" target="_blank">[arlo_event_provider]</a></li>
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_delivery" target="_blank">[arlo_event_delivery]</a></li>
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_session_description" target="_blank">[arlo_event_session_description]</a></li>
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_presenters" target="_blank">[arlo_event_presenters]</a></li>
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_offers" target="_blank">[arlo_event_offers]</a></li>
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_registration" target="_blank">[arlo_event_registration]</a></li>		
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_code" target="_blank">[arlo_event_template_code]</a></li>
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_name" target="_blank">[arlo_event_template_name]</a></li>
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_summary" target="_blank">[arlo_event_template_summary]</a></li>
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_permalink" target="_blank">[arlo_event_template_permalink]</a></li>
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/upcomingeventrelated#arlo_upcoming_offer" target="_blank">[arlo_upcoming_offer]</a></li>
 		</ul>
 	</li>
-	<li>[/arlo_upcoming_list_item]</li>
+	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/upcomingeventrelated#arlo_upcoming_list_item" target="_blank">[/arlo_upcoming_list_item]</a></li>
+	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/categoryrelated#arlo_category_footer" target="_blank">[arlo_category_footer]</a></li>
+	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/upcomingeventrelated#arlo_upcoming_list_pagination" target="_blank">[arlo_upcoming_list_pagination]</a></li>
 </ul>

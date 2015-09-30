@@ -1,16 +1,16 @@
 <ul class="arlo-codes">
-	<li>[arlo_presenter_list_item]</li>
+	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/presenterrelated#arlo_presenter_list_item" target="_blank">[arlo_presenter_list_item]</a></li>
 	<li>
 		<ul>
-			<li>[arlo_presenter_name]</li>
-			<li>[arlo_presenter_firstname]</li>
-			<li>[arlo_presenter_lastname]</li>
-			<li>[arlo_presenter_permalink]</li>
-			<li>[arlo_presenter_link]</li>
-			<li>[arlo_presenter_profile]</li>
-			<li>[arlo_presenter_qualifications]</li>
-			<li>[arlo_presenter_social]</li>
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/presenterrelated#arlo_presenter_permalink" target="_blank">[arlo_presenter_permalink]</a></li>
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/presenterrelated#arlo_presenter_name" target="_blank">[arlo_presenter_name]</a></li>
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/presenterrelated#arlo_presenter_profile" target="_blank">[arlo_presenter_profile]</a></li>
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/presenterrelated#arlo_presenter_qualifications" target="_blank">[arlo_presenter_qualifications]</a></li>
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/presenterrelated#arlo_presenter_social_link" target="_blank">[arlo_presenter_social_link]</a></li>
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/presenterrelated#arlo_presenter_interests" target="_blank">[arlo_presenter_interests]</a></li>	
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/presenterrelated#arlo_presenter_events_link" target="_blank">[arlo_presenter_events_link]</a></li>
 		</ul>
 	</li>
-	<li>[/arlo_presenter_list_item]</li>
+	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/presenterrelated#arlo_presenter_list_item" target="_blank">[/arlo_presenter_list_item]</a></li>
+	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/presenterrelated#arlo_presenter_list_pagination" target="_blank">[arlo_presenter_list_pagination]</a></li>
 </ul>
