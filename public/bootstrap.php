@@ -1554,7 +1554,7 @@ $shortcodes->add('event_offers', function($content='', $atts, $shortcode_name){
 		if($amount > 0) {
 			$offers .= '<span class="amount">'.$famount.'</span> ';
 			// only include the excl. tax if the offer is not replaced
-			$offers .= $replaced ? '' : ($price_setting == PLUGIN_PREFIX . '-exclgst' ? __('excl.', 'arlo') : __('incl.', 'arlo')).' '.$o_taxrateshortcode;
+			$offers .= $replaced ? '' : '<span class="arlo-price-tax">' . ($price_setting == PLUGIN_PREFIX . '-exclgst' ? __('excl.', 'arlo') : __('incl.', 'arlo')).' '.$o_taxrateshortcode . '</span>';
 		} else {
 			$offers .= '<span class="amount free">'.$free_text.'</span> ';
 		}
@@ -1567,7 +1567,7 @@ $shortcodes->add('event_offers', function($content='', $atts, $shortcode_name){
 			$offers .= '>';
 			// display replacement offer label if there is one
 			$offers .= (!is_null($replacement_label) || $replacement_label != '') ? $replacement_label.' ':'';
-			$offers .= '<span class="amount">'.$replacement_amount.'</span> '.__('excl.', 'arlo').' '.$o_taxrateshortcode;
+			$offers .= '<span class="amount">'.$replacement_amount.'</span> <span class="arlo-price-tax">'.($price_setting == PLUGIN_PREFIX . '-exclgst' ? __('excl.', 'arlo') : __('incl.', 'arlo')).' '.$o_taxrateshortcode . '</span>';
 			// display replacement offer message if there is one
 			$offers .= (!is_null($replacement_message) || $replacement_message != '') ? ' '.$replacement_message:'';
 
@@ -1864,7 +1864,7 @@ $shortcodes->add('upcoming_offer', function($content='', $atts, $shortcode_name)
 	$famount = $price_setting == PLUGIN_PREFIX . '-exclgst' ? $GLOBALS['arlo_event_list_item']['o_formattedamounttaxexclusive'] : $GLOBALS['arlo_event_list_item']['o_formattedamounttaxinclusive'];
 	$tax = $GLOBALS['arlo_event_list_item']['o_taxrateshortcode'];
 
-	$offer = ($amount > 0) ? '<span class="arlo-amount">'.$famount .'</span> '. ($price_setting == PLUGIN_PREFIX . '-exclgst' ? __(' excl.', 'arlo') : __(' incl.', 'arlo')).' '.$tax : '<span class="arlo-amount">'.$free_text.'</span>';
+	$offer = ($amount > 0) ? '<span class="arlo-amount">'.$famount .'</span> <span class="arlo-price-tax">'. ($price_setting == PLUGIN_PREFIX . '-exclgst' ? __(' excl.', 'arlo') : __(' incl.', 'arlo')).' '.$tax . '</span>' : '<span class="arlo-amount">'.$free_text.'</span>';
 
 	return $offer;
 });
