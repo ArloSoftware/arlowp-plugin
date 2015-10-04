@@ -87,6 +87,26 @@
 				timer = setTimeout(callback, ms);
 			};
 		})();
+		
+		$('#arlo-reload-template').click(function() {
+			var template = $('#arlo-template-select > select').val();
+			var templateName = $("#arlo-template-select > select > option[value='" + template + "']").text();
+			var message = "Do you really want to replace the existing template with the original one for '" + templateName + "'?";
+			if (confirm(message)) {
+				arloReloadTemplate();
+			}
+		});
+		
+		function arloReloadTemplate() {
+			var template = $('#arlo-template-select > select').val();
+			var editor = $('#' + template.replace("arlo-",""));
+			
+			if (arlo_blueprints[template] != null && editor.length) {
+				$(editor).val(arlo_blueprints[template]);
+			} else {
+				alert("Couldn't find the template!");
+			}
+		}
 
 	});
 

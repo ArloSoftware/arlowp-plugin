@@ -118,7 +118,6 @@ class Arlo_For_Wordpress_Settings {
 	    	$name = __($template['name'], $this->plugin_slug);
 			add_settings_field( $id, '<label for="'.$id.'">'.$name.'</label>', array($this, 'arlo_template_callback'), $this->plugin_slug, 'arlo_template_section', array('id'=>$id,'label_for'=>$id) );
 		}
-
 	}
 
 	/*
@@ -141,8 +140,11 @@ class Arlo_For_Wordpress_Settings {
 	    }
 
 		$output .= '</select></div>';
-
+		
 		echo $output;
+		
+		$this->arlo_reload_template_callback();
+		
 	}
 
 	/*
@@ -218,6 +220,33 @@ class Arlo_For_Wordpress_Settings {
 	    $val = isset($settings['templates'][$args['id']]['html']) ? $settings['templates'][$args['id']]['html'] : '';
 	    wp_editor($val, $args['id'], array('textarea_name'=>'arlo_settings[templates]['.$args['id'].'][html]','textarea_rows'=>'20'));
 	}
+	
+	function arlo_reload_template_callback() {
+		    echo '<div class="cf">
+		    		<div id="'.PLUGIN_PREFIX.'-reload-template"><a>Reload original template</a></div>
+		    		<script type="text/javascript"> var arlo_blueprints = ' . json_encode($this->arlo_template_source()) . ';</script>
+		    	</div>';
+	}
+	
+	function arlo_template_source() {
+		$settings = get_option('arlo_settings');
+		$templates = [];
+		
+		foreach ($settings["templates"] as $key => $val) {
+			$templates[PLUGIN_PREFIX . '-' . $key] = $this->arlo_get_blueprint($key);
+		}
+		
+		return $templates;
+	}
+	                                                                                                                                                      
+	function arlo_get_blueprint($name) {
+		$path = PLUGIN_DIR.'/includes/blueprints/'.$name.'.tmpl';
+
+		if(file_exists($path)) {
+			return file_get_contents($path);
+		}
+	}
+	
 }
 
 ?>

@@ -124,6 +124,11 @@
 	margin-left: 15px;
 }
 
+#arlo-reload-template {
+	cursor: pointer;
+	float: right;
+}
+
 /* clearing for divs containing floated elements */
 
 .cf:before,
