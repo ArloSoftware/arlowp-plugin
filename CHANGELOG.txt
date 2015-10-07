@@ -2,6 +2,9 @@
 Enhancement
 ------------------
 Reload original templates
+Database upgrade can be run by de/activate the plugin
+
+
 
 == V2.06 ==
 

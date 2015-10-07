@@ -1264,7 +1264,7 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 	extract(shortcode_atts(array(
 		'filters'	=> 'category,location',
 		'resettext'	=> 'Reset',
-                'buttonclass'   => 'arlo-button'
+                'buttonclass'   => 'button'
 	), $atts, $shortcode_name));
 	
 	$filters_array = explode(',',$filters);
@@ -1460,7 +1460,7 @@ $shortcodes->add('event_registration', function($content='', $atts, $shortcode_n
 	$registermessage = $GLOBALS['arlo_event_list_item']['e_registermessage'];
 	$placesremaining = $GLOBALS['arlo_event_list_item']['e_placesremaining'];
         
-        $class = (!empty($atts['class']) ? $atts['class'] : 'arlo-button' );
+        $class = (!empty($atts['class']) ? $atts['class'] : 'button' );
 
 	$registration = '<div class="arlo-event-registration">';
 	$registration .= (($isfull) ? '<span class="arlo-event-full">' . __('Event is full', 'arlo') . '</span>' : '');
@@ -1851,7 +1851,7 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 	extract(shortcode_atts(array(
 		'filters'	=> 'category,month,location,delivery',
 		'resettext'	=> 'Reset',
-		'buttonclass'   => 'arlo-button'
+		'buttonclass'   => 'button'
 	), $atts, $shortcode_name));
 
 	$filters_array = explode(',',$filters);
