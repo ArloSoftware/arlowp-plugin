@@ -412,7 +412,7 @@ function arlo_get_blueprint($name) {
 
 	}
 
-	return 'Blueprint not found';
+	return 'BlueprINT(11) NOT found';
 }
 
 /**
@@ -452,15 +452,15 @@ function arlo_get_option($key, $default=null) {
  * @return void
  */
 function arlo_add_datamodel() {
-	/* 1 */ install_table_arlo_eventtemplate();
-	/* 2 */ install_table_arlo_contentfields();
-	/* 3 */ install_table_arlo_events();
-	/* 4 */ install_table_arlo_venues();
-	/* 5 */ install_table_arlo_presenters();
-	/* 6 */ install_table_arlo_offers();
-	/* 7 */ install_table_arlo_eventtemplates_presenters();
-	/* 8 */ install_table_arlo_events_presenters();
-	/* 0 */ install_table_arlo_import_log();
+	install_table_arlo_eventtemplate();
+	install_table_arlo_contentfields();
+	install_table_arlo_events();
+	install_table_arlo_venues();
+	install_table_arlo_presenters();
+	install_table_arlo_offers();
+	install_table_arlo_eventtemplates_presenters();
+	install_table_arlo_events_presenters();
+	install_table_arlo_import_log();
 	install_table_arlo_categories();
 	install_table_arlo_eventtemplates_categories();
 	return;
@@ -495,16 +495,16 @@ function install_table_arlo_eventtemplate() {
 
 	if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
 		$sql = "CREATE TABLE " . $table_name . " (
-			`et_id` INT NOT NULL AUTO_INCREMENT,
-			`et_arlo_id` INT NOT NULL,
-			`et_code` VARCHAR(255) NULL,
-			`et_name` VARCHAR(255) NULL,
-			`et_descriptionsummary` TEXT NULL,
-			`et_post_name` VARCHAR(255) NULL,
-			`active` DATETIME NULL,
-			`et_registerinteresturi` TEXT NULL,
-			PRIMARY KEY (`et_id`),
-			INDEX `et_arlo_id` (`et_arlo_id`))
+			et_id INT(11) NOT NULL AUTO_INCREMENT,
+			et_arlo_id INT(11) NOT NULL,
+			et_code VARCHAR(255) NULL,
+			et_name VARCHAR(255) NULL,
+			et_descriptionsummary TEXT NULL,
+			et_post_name VARCHAR(255) NULL,
+			active DATETIME NULL,
+			et_registerinteresturi TEXT NULL,
+			PRIMARY KEY  (et_id),
+			KEY et_arlo_id (et_arlo_id))
 			CHARACTER SET utf8 COLLATE=utf8_general_ci;";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
@@ -524,16 +524,16 @@ function install_table_arlo_contentfields() {
 
 	if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
 		$sql = "CREATE TABLE " . $table_name . " (
-			`cf_id` INT NOT NULL AUTO_INCREMENT,
-			`et_id` INT NOT NULL,
-			`cf_fieldname` VARCHAR(255) NULL,
-			`cf_text` TEXT NULL,
-			`cf_order` INT NULL,
-			`e_contenttype` VARCHAR(255) NULL,
-			`active` DATETIME NULL,
-			PRIMARY KEY (`cf_id`),
-			INDEX `cf_order` (`cf_order`),
-			INDEX `et_id` (`et_id`))
+			cf_id INT(11) NOT NULL AUTO_INCREMENT,
+			et_id INT(11) NOT NULL,
+			cf_fieldname VARCHAR(255) NULL,
+			cf_text TEXT NULL,
+			cf_order INT NULL,
+			e_contenttype VARCHAR(255) NULL,
+			active DATETIME NULL,
+			PRIMARY KEY  (cf_id),
+			KEY cf_order (cf_order),
+			KEY et_id (et_id))
 			CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -554,33 +554,33 @@ function install_table_arlo_events() {
 
 	if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
 		$sql = "CREATE TABLE " . $table_name . " (
-		`e_id` INT NOT NULL AUTO_INCREMENT,
-		`e_arlo_id` INT NOT NULL,
-		`et_arlo_id` INT NULL,
-		`e_code` VARCHAR(255) NULL,
-		`e_startdatetime` DATETIME NOT NULL,
-		`e_finishdatetime` DATETIME NULL,
-		`e_datetimeoffset` VARCHAR(6) NULL COMMENT 'Date time offset in minutes\n',
-		`e_timezone` VARCHAR(10) NULL,
-		`v_id` INT NULL,
-		`e_locationname` VARCHAR(255) NULL,
-		`e_locationroomname` VARCHAR(255) NULL,
-        `e_locationvisible` TINYINT(1) NOT NULL DEFAULT '0',
-		`e_isfull` TINYINT(1) NOT NULL DEFAULT FALSE,
-		`e_placesremaining` INT NULL,
-		`e_sessiondescription` VARCHAR(255) NULL,
-		`e_notice` TEXT NULL,
-		`e_viewuri` VARCHAR(255) NULL,
-		`e_registermessage` VARCHAR(255) NULL,
-		`e_registeruri` VARCHAR(255) NULL,
-		`e_providerorganisation` VARCHAR(255) NULL,
-		`e_providerwebsite` VARCHAR(255) NULL,
-		`e_isonline` TINYINT(1) NOT NULL DEFAULT FALSE,
-		`active` DATETIME NULL,
-		PRIMARY KEY (`e_id`),
-		INDEX `et_arlo_id` (`et_arlo_id`),
-		INDEX `e_arlo_id` (`e_arlo_id`),
-		INDEX `v_id` (`v_id`))
+		e_id INT(11) NOT NULL AUTO_INCREMENT,
+		e_arlo_id INT(11) NOT NULL,
+		et_arlo_id INT NULL,
+		e_code VARCHAR(255) NULL,
+		e_startdatetime DATETIME NOT NULL,
+		e_finishdatetime DATETIME NULL,
+		e_datetimeoffset VARCHAR(6) NULL,
+		e_timezone VARCHAR(10) NULL,
+		v_id INT NULL,
+		e_locationname VARCHAR(255) NULL,
+		e_locationroomname VARCHAR(255) NULL,
+        e_locationvisible TINYINT(1) NOT NULL DEFAULT '0',
+		e_isfull TINYINT(1) NOT NULL DEFAULT FALSE,
+		e_placesremaining INT NULL,
+		e_sessiondescription VARCHAR(255) NULL,
+		e_notice TEXT NULL,
+		e_viewuri VARCHAR(255) NULL,
+		e_registermessage VARCHAR(255) NULL,
+		e_registeruri VARCHAR(255) NULL,
+		e_providerorganisation VARCHAR(255) NULL,
+		e_providerwebsite VARCHAR(255) NULL,
+		e_isonline TINYINT(1) NOT NULL DEFAULT FALSE,
+		active DATETIME NULL,
+		PRIMARY KEY  (e_id),
+		KEY et_arlo_id (et_arlo_id),
+		KEY e_arlo_id (e_arlo_id),
+		KEY v_id (v_id))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -601,27 +601,27 @@ function install_table_arlo_venues() {
 
 	if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
 		$sql = "CREATE TABLE " . $table_name . " (
-		`v_id` INT NOT NULL AUTO_INCREMENT,
-		`v_arlo_id` INT NOT NULL,
-		`v_name` VARCHAR(255) NULL,
-		`v_geodatapointlatitude` DECIMAL(10,6) NULL,
-		`v_geodatapointlongitude` DECIMAL(10,6) NULL,
-		`v_physicaladdressline1` VARCHAR(255) NULL,
-		`v_physicaladdressline2` VARCHAR(255) NULL,
-		`v_physicaladdressline3` VARCHAR(255) NULL,
-		`v_physicaladdressline4` VARCHAR(255) NULL,
-		`v_physicaladdresssuburb` VARCHAR(255) NULL,
-		`v_physicaladdresscity` VARCHAR(255) NULL,
-		`v_physicaladdressstate` VARCHAR(255) NULL,
-		`v_physicaladdresspostcode` VARCHAR(255) NULL,
-		`v_physicaladdresscountry` VARCHAR(255) NULL,
-		`v_viewuri` VARCHAR(255) NULL,
-		`v_facilityinfodirections` TEXT NULL,
-		`v_facilityinfoparking` TEXT NULL,
-		`v_post_name` VARCHAR(255) NULL,
-		`active` DATETIME NULL,
-		PRIMARY KEY (`v_id`),
-		INDEX `v_arlo_id` (`v_arlo_id`))
+		v_id INT(11) NOT NULL AUTO_INCREMENT,
+		v_arlo_id INT(11) NOT NULL,
+		v_name VARCHAR(255) NULL,
+		v_geodatapointlatitude DECIMAL(10,6) NULL,
+		v_geodatapointlongitude DECIMAL(10,6) NULL,
+		v_physicaladdressline1 VARCHAR(255) NULL,
+		v_physicaladdressline2 VARCHAR(255) NULL,
+		v_physicaladdressline3 VARCHAR(255) NULL,
+		v_physicaladdressline4 VARCHAR(255) NULL,
+		v_physicaladdresssuburb VARCHAR(255) NULL,
+		v_physicaladdresscity VARCHAR(255) NULL,
+		v_physicaladdressstate VARCHAR(255) NULL,
+		v_physicaladdresspostcode VARCHAR(255) NULL,
+		v_physicaladdresscountry VARCHAR(255) NULL,
+		v_viewuri VARCHAR(255) NULL,
+		v_facilityinfodirections TEXT NULL,
+		v_facilityinfoparking TEXT NULL,
+		v_post_name VARCHAR(255) NULL,
+		active DATETIME NULL,
+		PRIMARY KEY  (v_id),
+		KEY v_arlo_id (v_arlo_id))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -642,21 +642,21 @@ function install_table_arlo_presenters() {
 
 	if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
 		$sql = "CREATE TABLE " . $table_name . " (
-		`p_id` INT NOT NULL AUTO_INCREMENT,
-		`p_arlo_id` INT NOT NULL,
-		`p_firstname` VARCHAR(64) NULL,
-		`p_lastname` VARCHAR(64) NULL,
-		`p_viewuri` VARCHAR(255) NULL,
-		`p_profile` TEXT NULL,
-		`p_qualifications` TEXT NULL,
-		`p_interests` TEXT NULL,
-		`p_twitterid` VARCHAR(255) NULL,
-		`p_facebookid` VARCHAR(255) NULL,
-		`p_linkedinid` VARCHAR(255) NULL,
-		`p_post_name` VARCHAR(255) NULL,
-		`active` DATETIME NULL,
-		PRIMARY KEY (`p_id`),
-		INDEX `p_arlo_id` (`p_arlo_id`))
+		p_id INT(11) NOT NULL AUTO_INCREMENT,
+		p_arlo_id INT(11) NOT NULL,
+		p_firstname VARCHAR(64) NULL,
+		p_lastname VARCHAR(64) NULL,
+		p_viewuri VARCHAR(255) NULL,
+		p_profile TEXT NULL,
+		p_qualifications TEXT NULL,
+		p_interests TEXT NULL,
+		p_twitterid VARCHAR(255) NULL,
+		p_facebookid VARCHAR(255) NULL,
+		p_linkedinid VARCHAR(255) NULL,
+		p_post_name VARCHAR(255) NULL,
+		active DATETIME NULL,
+		PRIMARY KEY  (p_id),
+		KEY p_arlo_id (p_arlo_id))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -678,29 +678,29 @@ function install_table_arlo_offers() {
 
 	if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
 		$sql = "CREATE TABLE " . $table_name . " (
-		`o_id` INT NOT NULL AUTO_INCREMENT,
-		`o_arlo_id` INT,
-		`et_id` INT,
-		`e_id` INT,
-		`o_label` VARCHAR(255) NULL,
-		`o_isdiscountoffer` TINYINT(1) NOT NULL DEFAULT FALSE,
-		`o_currencycode` VARCHAR(255) NULL,
-		`o_offeramounttaxexclusive` DECIMAL(15,2) NULL,
-		`o_offeramounttaxinclusive` DECIMAL(15,2) NULL,
-		`o_formattedamounttaxexclusive` VARCHAR(255) NULL,
-		`o_formattedamounttaxinclusive` VARCHAR(255) NULL,
-		`o_taxrateshortcode` VARCHAR(255) NULL,
-		`o_taxratename` VARCHAR(255) NULL,
-		`o_taxratepercentage` DECIMAL(3,2) NULL,
-		`o_message` TEXT NULL,
-		`o_order` INT NULL,
-		`o_replaces` INT NULL,
-		`active` DATETIME NULL,
-		PRIMARY KEY (`o_id`),
-		INDEX `o_arlo_id` (`o_arlo_id`),
-		INDEX `et_id` (`et_id`),
-		INDEX `e_id` (`e_id`),
-		INDEX `o_order` (`o_order`))
+		o_id INT(11) NOT NULL AUTO_INCREMENT,
+		o_arlo_id INT,
+		et_id INT,
+		e_id INT,
+		o_label VARCHAR(255) NULL,
+		o_isdiscountoffer TINYINT(1) NOT NULL DEFAULT FALSE,
+		o_currencycode VARCHAR(255) NULL,
+		o_offeramounttaxexclusive DECIMAL(15,2) NULL,
+		o_offeramounttaxinclusive DECIMAL(15,2) NULL,
+		o_formattedamounttaxexclusive VARCHAR(255) NULL,
+		o_formattedamounttaxinclusive VARCHAR(255) NULL,
+		o_taxrateshortcode VARCHAR(255) NULL,
+		o_taxratename VARCHAR(255) NULL,
+		o_taxratepercentage DECIMAL(3,2) NULL,
+		o_message TEXT NULL,
+		o_order INT NULL,
+		o_replaces INT NULL,
+		active DATETIME NULL,
+		PRIMARY KEY  (o_id),
+		KEY o_arlo_id (o_arlo_id),
+		KEY et_id (et_id),
+		KEY e_id (e_id),
+		KEY o_order (o_order))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -722,14 +722,14 @@ function install_table_arlo_eventtemplates_presenters() {
 
 	if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
 		$sql = "CREATE TABLE " . $table_name . " (
-		`et_arlo_id` INT NULL,
-		`p_arlo_id` INT NULL,
-		`p_order` INT NULL COMMENT 'Order of the presenters for the event template.',
-		`active` datetime DEFAULT NULL,
-		PRIMARY KEY (`et_arlo_id`,`p_arlo_id`),
-		INDEX `cf_order` (`p_order`),
-		INDEX `fk_et_id_idx` (`et_arlo_id` ASC),
-		INDEX `fk_p_id_idx` (`p_arlo_id` ASC))
+		et_arlo_id INT NULL,
+		p_arlo_id INT NULL,
+		p_order INT NULL COMMENT 'Order of the presenters for the event template.',
+		active datetime DEFAULT NULL,
+		PRIMARY KEY  (et_arlo_id,p_arlo_id),
+		KEY cf_order (p_order),
+		KEY fk_et_id_idx (et_arlo_id ASC),
+		KEY fk_p_id_idx (p_arlo_id ASC))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -752,13 +752,13 @@ function install_table_arlo_events_presenters() {
 
 	if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
 		$sql = "CREATE TABLE " . $table_name . " (
-		`e_arlo_id` INT NULL,
-		`p_arlo_id` INT NULL,
-		`p_order` INT NULL COMMENT 'Order of the presenters for the event.',
-		`active` datetime DEFAULT NULL,
-		PRIMARY KEY (`e_arlo_id`,`p_arlo_id`),		
-		INDEX `fk_e_id_idx` (`e_arlo_id` ASC),
-		INDEX `fk_p_id_idx` (`p_arlo_id` ASC))
+		e_arlo_id INT NULL,
+		p_arlo_id INT NULL,
+		p_order INT NULL COMMENT 'Order of the presenters for the event.',
+		active datetime DEFAULT NULL,
+		PRIMARY KEY  (e_arlo_id,p_arlo_id),		
+		KEY fk_e_id_idx (e_arlo_id ASC),
+		KEY fk_p_id_idx (p_arlo_id ASC))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -781,19 +781,19 @@ function install_table_arlo_categories() {
 
 	if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
 		$sql = "CREATE TABLE " . $table_name . " (
-		`c_id` INT NOT NULL AUTO_INCREMENT,
-		`c_arlo_id` INT NOT NULL,
-		`c_name` varchar(255) NOT NULL DEFAULT '',
-		`c_slug` varchar(255) NOT NULL DEFAULT '',
-		`c_header` text,
-		`c_footer` text,
-		`c_template_num` SMALLINT UNSIGNED NOT NULL DEFAULT '0',
-		`c_order` INT DEFAULT NULL,
-		`c_parent_id` INT DEFAULT NULL,
-		`active` datetime DEFAULT NULL,
-		PRIMARY KEY (`c_id`),
-		UNIQUE KEY `c_arlo_id` (`c_arlo_id`),
-		KEY `c_parent_id` (`c_parent_id`))
+		c_id INT(11) NOT NULL AUTO_INCREMENT,
+		c_arlo_id INT(11) NOT NULL,
+		c_name varchar(255) NOT NULL DEFAULT '',
+		c_slug varchar(255) NOT NULL DEFAULT '',
+		c_header text,
+		c_footer text,
+		c_template_num SMALLINT UNSIGNED NOT NULL DEFAULT '0',
+		c_order INT DEFAULT NULL,
+		c_parent_id INT DEFAULT NULL,
+		active datetime DEFAULT NULL,
+		PRIMARY KEY  (c_id),
+		UNIQUE KEY c_arlo_id (c_arlo_id),
+		KEY c_parent_id (c_parent_id))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -815,12 +815,12 @@ function install_table_arlo_eventtemplates_categories() {
 
 	if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
 		$sql = "CREATE TABLE " . $table_name . " (
-		`et_arlo_id` INT NULL,
-		`c_arlo_id` INT NULL,
-		`active` datetime DEFAULT NULL,
-		PRIMARY KEY (`et_arlo_id`,`c_arlo_id`),
-		INDEX `fk_et_id_idx` (`et_arlo_id` ASC),
-		INDEX `fk_c_id_idx` (`c_arlo_id` ASC))
+		et_arlo_id INT NULL,
+		c_arlo_id INT NULL,
+		active datetime DEFAULT NULL,
+		PRIMARY KEY  (et_arlo_id,c_arlo_id),
+		KEY fk_et_id_idx (et_arlo_id ASC),
+		KEY fk_c_id_idx (c_arlo_id ASC))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -841,12 +841,12 @@ function install_table_arlo_import_log() {
 	$table_name = $wpdb->prefix . "arlo_import_log";
 
 	if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
-		$sql = "CREATE TABLE `$table_name` (
-		  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-		  `message` text,
-		  `created` datetime DEFAULT NULL,
-		  `successful` tinyint(1) DEFAULT NULL,
-		  PRIMARY KEY (`id`)) 
+		$sql = "CREATE TABLE $table_name (
+		  id int(11) unsigned NOT NULL AUTO_INCREMENT,
+		  message text,
+		  created datetime DEFAULT NULL,
+		  successful tinyint(1) DEFAULT NULL,
+		  PRIMARY KEY  (id)) 
 		  CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
