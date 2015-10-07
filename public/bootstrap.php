@@ -493,23 +493,21 @@ function install_table_arlo_eventtemplate() {
 	global $wpdb, $current_user;
 	$table_name = $wpdb->prefix . "arlo_eventtemplates";
 
-	if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
-		$sql = "CREATE TABLE " . $table_name . " (
-			et_id INT(11) NOT NULL AUTO_INCREMENT,
-			et_arlo_id INT(11) NOT NULL,
-			et_code VARCHAR(255) NULL,
-			et_name VARCHAR(255) NULL,
-			et_descriptionsummary TEXT NULL,
-			et_post_name VARCHAR(255) NULL,
-			active DATETIME NULL,
-			et_registerinteresturi TEXT NULL,
-			PRIMARY KEY  (et_id),
-			KEY et_arlo_id (et_arlo_id))
-			CHARACTER SET utf8 COLLATE=utf8_general_ci;";
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+	$sql = "CREATE TABLE " . $table_name . " (
+		et_id INT(11) NOT NULL AUTO_INCREMENT,
+		et_arlo_id INT(11) NOT NULL,
+		et_code VARCHAR(255) NULL,
+		et_name VARCHAR(255) NULL,
+		et_descriptionsummary TEXT NULL,
+		et_post_name VARCHAR(255) NULL,
+		active DATETIME NULL,
+		et_registerinteresturi TEXT NULL,
+		PRIMARY KEY  (et_id),
+		KEY et_arlo_id (et_arlo_id))
+		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
-        dbDelta($sql);
-	  }
+    dbDelta($sql);
 }
 
 /**
@@ -522,24 +520,22 @@ function install_table_arlo_contentfields() {
 	global $wpdb, $current_user;
 	$table_name = $wpdb->prefix . "arlo_contentfields";
 
-	if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
-		$sql = "CREATE TABLE " . $table_name . " (
-			cf_id INT(11) NOT NULL AUTO_INCREMENT,
-			et_id INT(11) NOT NULL,
-			cf_fieldname VARCHAR(255) NULL,
-			cf_text TEXT NULL,
-			cf_order INT NULL,
-			e_contenttype VARCHAR(255) NULL,
-			active DATETIME NULL,
-			PRIMARY KEY  (cf_id),
-			KEY cf_order (cf_order),
-			KEY et_id (et_id))
-			CHARACTER SET utf8 COLLATE=utf8_general_ci;";
+	$sql = "CREATE TABLE " . $table_name . " (
+		cf_id INT(11) NOT NULL AUTO_INCREMENT,
+		et_id INT(11) NOT NULL,
+		cf_fieldname VARCHAR(255) NULL,
+		cf_text TEXT NULL,
+		cf_order INT NULL,
+		e_contenttype VARCHAR(255) NULL,
+		active DATETIME NULL,
+		PRIMARY KEY  (cf_id),
+		KEY cf_order (cf_order),
+		KEY et_id (et_id))
+		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
-        dbDelta($sql);
-	  }
+    dbDelta($sql);
 }
 
 /**
@@ -552,8 +548,7 @@ function install_table_arlo_events() {
 	global $wpdb, $current_user;
 	$table_name = $wpdb->prefix . "arlo_events";
 
-	if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
-		$sql = "CREATE TABLE " . $table_name . " (
+	$sql = "CREATE TABLE " . $table_name . " (
 		e_id INT(11) NOT NULL AUTO_INCREMENT,
 		e_arlo_id INT(11) NOT NULL,
 		et_arlo_id INT NULL,
@@ -565,7 +560,7 @@ function install_table_arlo_events() {
 		v_id INT NULL,
 		e_locationname VARCHAR(255) NULL,
 		e_locationroomname VARCHAR(255) NULL,
-        e_locationvisible TINYINT(1) NOT NULL DEFAULT '0',
+	    e_locationvisible TINYINT(1) NOT NULL DEFAULT '0',
 		e_isfull TINYINT(1) NOT NULL DEFAULT FALSE,
 		e_placesremaining INT NULL,
 		e_sessiondescription VARCHAR(255) NULL,
@@ -583,10 +578,9 @@ function install_table_arlo_events() {
 		KEY v_id (v_id))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
-		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
-        dbDelta($sql);
-	  }
+    dbDelta($sql);
 }
 
 /**
@@ -599,8 +593,7 @@ function install_table_arlo_venues() {
 	global $wpdb, $current_user;
 	$table_name = $wpdb->prefix . "arlo_venues";
 
-	if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
-		$sql = "CREATE TABLE " . $table_name . " (
+	$sql = "CREATE TABLE " . $table_name . " (
 		v_id INT(11) NOT NULL AUTO_INCREMENT,
 		v_arlo_id INT(11) NOT NULL,
 		v_name VARCHAR(255) NULL,
@@ -624,10 +617,9 @@ function install_table_arlo_venues() {
 		KEY v_arlo_id (v_arlo_id))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
-		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
-        dbDelta($sql);
-	  }
+    dbDelta($sql);
 }
 
 /**
@@ -640,8 +632,7 @@ function install_table_arlo_presenters() {
 	global $wpdb, $current_user;
 	$table_name = $wpdb->prefix . "arlo_presenters";
 
-	if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
-		$sql = "CREATE TABLE " . $table_name . " (
+	$sql = "CREATE TABLE " . $table_name . " (
 		p_id INT(11) NOT NULL AUTO_INCREMENT,
 		p_arlo_id INT(11) NOT NULL,
 		p_firstname VARCHAR(64) NULL,
@@ -659,10 +650,9 @@ function install_table_arlo_presenters() {
 		KEY p_arlo_id (p_arlo_id))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
-		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
-        dbDelta($sql);
-	  }
+    dbDelta($sql);
 }
 
 /**
@@ -676,8 +666,7 @@ function install_table_arlo_offers() {
 	$charset_collate = core_set_charset();
 	$table_name = $wpdb->prefix . "arlo_offers";
 
-	if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
-		$sql = "CREATE TABLE " . $table_name . " (
+	$sql = "CREATE TABLE " . $table_name . " (
 		o_id INT(11) NOT NULL AUTO_INCREMENT,
 		o_arlo_id INT,
 		et_id INT,
@@ -703,10 +692,9 @@ function install_table_arlo_offers() {
 		KEY o_order (o_order))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
-		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
-        dbDelta($sql);
-	  }
+    dbDelta($sql);
 }
 
 /**
@@ -720,8 +708,7 @@ function install_table_arlo_eventtemplates_presenters() {
 	$charset_collate = core_set_charset();
 	$table_name = $wpdb->prefix . "arlo_eventtemplates_presenters";
 
-	if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
-		$sql = "CREATE TABLE " . $table_name . " (
+	$sql = "CREATE TABLE " . $table_name . " (
 		et_arlo_id INT NULL,
 		p_arlo_id INT NULL,
 		p_order INT NULL COMMENT 'Order of the presenters for the event template.',
@@ -732,11 +719,9 @@ function install_table_arlo_eventtemplates_presenters() {
 		KEY fk_p_id_idx (p_arlo_id ASC))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
-		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
-        dbDelta($sql);
-	  }
-		
+	dbDelta($sql);
 }
 
 /**
@@ -750,8 +735,7 @@ function install_table_arlo_events_presenters() {
 	$charset_collate = core_set_charset();
 	$table_name = $wpdb->prefix . "arlo_events_presenters";
 
-	if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
-		$sql = "CREATE TABLE " . $table_name . " (
+	$sql = "CREATE TABLE " . $table_name . " (
 		e_arlo_id INT NULL,
 		p_arlo_id INT NULL,
 		p_order INT NULL COMMENT 'Order of the presenters for the event.',
@@ -761,11 +745,9 @@ function install_table_arlo_events_presenters() {
 		KEY fk_p_id_idx (p_arlo_id ASC))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
-		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
-        dbDelta($sql);
-	  }
-		
+	dbDelta($sql);
 }
 
 /**
@@ -779,8 +761,7 @@ function install_table_arlo_categories() {
 	$charset_collate = core_set_charset();
 	$table_name = $wpdb->prefix . "arlo_categories";
 
-	if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
-		$sql = "CREATE TABLE " . $table_name . " (
+	$sql = "CREATE TABLE " . $table_name . " (
 		c_id INT(11) NOT NULL AUTO_INCREMENT,
 		c_arlo_id INT(11) NOT NULL,
 		c_name varchar(255) NOT NULL DEFAULT '',
@@ -796,10 +777,9 @@ function install_table_arlo_categories() {
 		KEY c_parent_id (c_parent_id))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
-		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
-        dbDelta($sql);
-	  }
+	dbDelta($sql);
 }
 
 /**
@@ -813,8 +793,7 @@ function install_table_arlo_eventtemplates_categories() {
 	$charset_collate = core_set_charset();
 	$table_name = $wpdb->prefix . "arlo_eventtemplates_categories";
 
-	if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
-		$sql = "CREATE TABLE " . $table_name . " (
+	$sql = "CREATE TABLE " . $table_name . " (
 		et_arlo_id INT NULL,
 		c_arlo_id INT NULL,
 		active datetime DEFAULT NULL,
@@ -823,10 +802,9 @@ function install_table_arlo_eventtemplates_categories() {
 		KEY fk_c_id_idx (c_arlo_id ASC))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
-		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
-        dbDelta($sql);
-	  }
+	dbDelta($sql);
 }
 
 /**
@@ -840,8 +818,7 @@ function install_table_arlo_import_log() {
 	$charset_collate = core_set_charset();
 	$table_name = $wpdb->prefix . "arlo_import_log";
 
-	if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
-		$sql = "CREATE TABLE $table_name (
+	$sql = "CREATE TABLE $table_name (
 		  id int(11) unsigned NOT NULL AUTO_INCREMENT,
 		  message text,
 		  created datetime DEFAULT NULL,
@@ -849,10 +826,9 @@ function install_table_arlo_import_log() {
 		  PRIMARY KEY  (id)) 
 		  CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
-		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
-        dbDelta($sql);
-	  }
+    dbDelta($sql);
 }
 
 /**
