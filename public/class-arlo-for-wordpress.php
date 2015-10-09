@@ -1148,6 +1148,8 @@ class Arlo_For_Wordpress {
 			}
 		}
 		
+		$this->import_eventtemplatescategoriesitems();
+		
 		//count the templates in the categories
 		$sql = "
 		SELECT
@@ -1239,6 +1241,43 @@ class Arlo_For_Wordpress {
 					$this->set_categories_count($cat['c_parent_id'], $timestamp);
 				}
 			}		
+		}
+	}
+	
+	private function import_eventtemplatescategoriesitems() {
+		global $wpdb;
+	
+		$client = $this->get_api_client();
+		
+		$items = $client->EventTemplateCategoryItems()->getAllTemplateCategoriesItems(
+			array(
+				'CategoryID',
+				'EventTemplateID',
+				'SequenceIndex',
+			)
+		);
+		
+		$table_name = "{$wpdb->prefix}arlo_eventtemplates_categories";
+		
+		if(!empty($items)) {
+			foreach($items as $item) {
+				$sql = "
+				UPDATE
+					{$table_name}
+				SET
+					et_order = %d
+				WHERE
+					et_arlo_id = %d
+				AND
+					c_arlo_id = %d
+				";
+								
+				$query = $wpdb->query( $wpdb->prepare($sql, $item->SequenceIndex, $item->EventTemplateID, $item->CategoryID) );
+				
+		        if ($query === false) {
+		        	throw new Exception('Database insert failed: ' . $table_name);
+		        }
+			}
 		}
 	}
 		

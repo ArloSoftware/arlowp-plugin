@@ -525,7 +525,7 @@ function install_table_arlo_contentfields() {
 		et_id INT(11) NOT NULL,
 		cf_fieldname VARCHAR(255) NULL,
 		cf_text TEXT NULL,
-		cf_order INT NULL,
+		cf_order INT(11) NULL,
 		e_contenttype VARCHAR(255) NULL,
 		active DATETIME NULL,
 		PRIMARY KEY  (cf_id),
@@ -551,18 +551,18 @@ function install_table_arlo_events() {
 	$sql = "CREATE TABLE " . $table_name . " (
 		e_id INT(11) NOT NULL AUTO_INCREMENT,
 		e_arlo_id INT(11) NOT NULL,
-		et_arlo_id INT NULL,
+		et_arlo_id INT(11) NULL,
 		e_code VARCHAR(255) NULL,
 		e_startdatetime DATETIME NOT NULL,
 		e_finishdatetime DATETIME NULL,
 		e_datetimeoffset VARCHAR(6) NULL,
 		e_timezone VARCHAR(10) NULL,
-		v_id INT NULL,
+		v_id INT(11) NULL,
 		e_locationname VARCHAR(255) NULL,
 		e_locationroomname VARCHAR(255) NULL,
 	    e_locationvisible TINYINT(1) NOT NULL DEFAULT '0',
 		e_isfull TINYINT(1) NOT NULL DEFAULT FALSE,
-		e_placesremaining INT NULL,
+		e_placesremaining INT(11) NULL,
 		e_sessiondescription VARCHAR(255) NULL,
 		e_notice TEXT NULL,
 		e_viewuri VARCHAR(255) NULL,
@@ -682,8 +682,8 @@ function install_table_arlo_offers() {
 		o_taxratename VARCHAR(255) NULL,
 		o_taxratepercentage DECIMAL(3,2) NULL,
 		o_message TEXT NULL,
-		o_order INT NULL,
-		o_replaces INT NULL,
+		o_order INT(11) NULL,
+		o_replaces INT(11) NULL,
 		active DATETIME NULL,
 		PRIMARY KEY  (o_id),
 		KEY o_arlo_id (o_arlo_id),
@@ -709,9 +709,9 @@ function install_table_arlo_eventtemplates_presenters() {
 	$table_name = $wpdb->prefix . "arlo_eventtemplates_presenters";
 
 	$sql = "CREATE TABLE " . $table_name . " (
-		et_arlo_id INT NULL,
-		p_arlo_id INT NULL,
-		p_order INT NULL COMMENT 'Order of the presenters for the event template.',
+		et_arlo_id INT(11) NULL,
+		p_arlo_id INT(11) NULL,
+		p_order INT(11) NULL COMMENT 'Order of the presenters for the event template.',
 		active datetime DEFAULT NULL,
 		PRIMARY KEY  (et_arlo_id,p_arlo_id),
 		KEY cf_order (p_order),
@@ -736,9 +736,9 @@ function install_table_arlo_events_presenters() {
 	$table_name = $wpdb->prefix . "arlo_events_presenters";
 
 	$sql = "CREATE TABLE " . $table_name . " (
-		e_arlo_id INT NULL,
-		p_arlo_id INT NULL,
-		p_order INT NULL COMMENT 'Order of the presenters for the event.',
+		e_arlo_id INT(11) NULL,
+		p_arlo_id INT(11) NULL,
+		p_order INT(11) NULL COMMENT 'Order of the presenters for the event.',
 		active datetime DEFAULT NULL,
 		PRIMARY KEY  (e_arlo_id,p_arlo_id),		
 		KEY fk_e_id_idx (e_arlo_id ASC),
@@ -794,8 +794,9 @@ function install_table_arlo_eventtemplates_categories() {
 	$table_name = $wpdb->prefix . "arlo_eventtemplates_categories";
 
 	$sql = "CREATE TABLE " . $table_name . " (
-		et_arlo_id INT NULL,
-		c_arlo_id INT NULL,
+		et_arlo_id INT(11) NULL,
+		c_arlo_id INT(11) NULL,
+		et_order SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0',
 		active datetime DEFAULT NULL,
 		PRIMARY KEY  (et_arlo_id,c_arlo_id),
 		KEY fk_et_id_idx (et_arlo_id ASC),
@@ -1112,7 +1113,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 		switch($atts['group']) {
 			case 'category':
 				$group = '';
-				$order = "ORDER BY c.c_order ASC, c.c_name ASC, et.et_name ASC";
+				$order = "ORDER BY c.c_order ASC, etc.et_order ASC, c.c_name ASC, et.et_name ASC";
 			break;
 		}
 	}
