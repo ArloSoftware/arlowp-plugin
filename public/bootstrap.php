@@ -1097,9 +1097,11 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 			if (is_array($ids) && count($ids)) {
 				$where .= " OR c.c_arlo_id IN (" . implode(',', $ids) . ")";
 			}
-		}
+		} 
 		
 		$where .= ')';
+	} else if (!(isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true")) {
+		$where .= ' AND c.c_parent_id = 1';
 	}	
 	
 	// grouping
@@ -1118,6 +1120,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 		}
 	}
 	
+		
 	$items = $wpdb->get_results("SELECT et.*, post.ID as post_id, etc.c_arlo_id, c.*
 		FROM $t1 et 
 		{$join}
