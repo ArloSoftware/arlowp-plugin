@@ -1148,7 +1148,7 @@ class Arlo_For_Wordpress {
 			}
 		}
 		
-		$this->import_eventtemplatescategoriesitems();
+		$this->import_eventtemplatescategoriesitems($timestamp);
 		
 		//count the templates in the categories
 		$sql = "
@@ -1183,6 +1183,14 @@ class Arlo_For_Wordpress {
 		}
 		
 		$this->set_categories_count(0, $timestamp);
+		
+		$cats = \Arlo\Categories::getTree($cat_id, null);
+		$this->set_category_depth_level($cats, $timestamp);
+		
+		$sql = "SELECT MAX(c_depth_level) FROM {$wpdb->prefix}arlo_categories WHERE active = '{$timestamp}'";
+		$max_depth = $wpdb->get_var($sql);
+		
+		$this->set_category_depth_order($cats, $max_depth, 0, $timestamp);
 		
 		return $items;
 	}
@@ -1235,26 +1243,90 @@ class Arlo_For_Wordpress {
 					WHERE
 						c_arlo_id = %d
 					AND
-						active = '{$timestamp}'
+						active = '%s'
 					";
-					$query = $wpdb->query( $wpdb->prepare($sql, $cat['c_template_num'], $cat['c_parent_id']) );
+					$query = $wpdb->query( $wpdb->prepare($sql, $cat['c_template_num'], $cat['c_parent_id'], $timestamp) );
 					$this->set_categories_count($cat['c_parent_id'], $timestamp);
 				}
 			}		
 		}
 	}
 	
-	private function import_eventtemplatescategoriesitems() {
+	private function set_category_depth_level($cats, $timestamp) {
+		global $wpdb;
+		
+		foreach ($cats as $cat) {
+			$sql = "
+			UPDATE 
+				{$wpdb->prefix}arlo_categories
+			SET 
+				c_depth_level = %d
+			WHERE
+				c_arlo_id = %d
+			AND
+				active = '%s'
+			";
+			$query = $wpdb->query( $wpdb->prepare($sql, $cat->depth_level, $cat->c_arlo_id, $timestamp) );
+			if (is_array($cat->children)) {
+				$this->set_category_depth_level($cat->children, $timestamp);
+			}
+		}
+	}
+	
+	private function set_category_depth_order($cats, $max_depth, $parent_order = 0, $timestamp) {
+		global $wpdb;
+		$num = 100;
+		
+		foreach ($cats as $index => $cat) {		
+			$order = $parent_order + pow($num, $max_depth - $cat->depth_level) * ($index + 1);
+
+			$sql = "
+			UPDATE
+				{$wpdb->prefix}arlo_categories
+			SET
+				c_order = %d
+			WHERE
+				c_arlo_id = %d
+			AND
+				active = '%s'	
+			";
+			
+			var_dump($wpdb->prepare($sql, $order + $cat->c_order, $cat->c_arlo_id, $timestamp));
+						
+			$query = $wpdb->query( $wpdb->prepare($sql, $order + $cat->c_order, $cat->c_arlo_id, $timestamp) );
+			if ($query === false) {
+				throw new Exception('Database update failed in set_category_depth_order()');
+			} else if (is_array($cat->children)) {
+				$this->set_category_depth_order($cat->children, $max_depth, $order, $timestamp);
+			}
+		}
+	}	
+		
+	private function import_eventtemplatescategoriesitems($timestamp) {
 		global $wpdb;
 	
 		$client = $this->get_api_client();
+		
+		$sql = "
+		SELECT 
+			c_arlo_id
+		FROM
+			{$wpdb->prefix}arlo_categories
+		WHERE 
+			active = '{$timestamp}'
+		";
+		$category_ids = $wpdb->get_results($sql, ARRAY_A);
+		$category_ids = array_map(function($item) {
+			return $item['c_arlo_id'];
+		}, $category_ids);
 		
 		$items = $client->EventTemplateCategoryItems()->getAllTemplateCategoriesItems(
 			array(
 				'CategoryID',
 				'EventTemplateID',
 				'SequenceIndex',
-			)
+			),
+			$category_ids
 		);
 		
 		$table_name = "{$wpdb->prefix}arlo_eventtemplates_categories";

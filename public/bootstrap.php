@@ -769,8 +769,9 @@ function install_table_arlo_categories() {
 		c_header text,
 		c_footer text,
 		c_template_num SMALLINT UNSIGNED NOT NULL DEFAULT '0',
-		c_order INT DEFAULT NULL,
-		c_parent_id INT DEFAULT NULL,
+		c_order bigint(20) DEFAULT NULL,
+		c_depth_level tinyint(3) unsigned NOT NULL DEFAULT '0',
+		c_parent_id INT(11) DEFAULT NULL,
 		active datetime DEFAULT NULL,
 		PRIMARY KEY  (c_id),
 		UNIQUE KEY c_arlo_id (c_arlo_id),
@@ -1138,6 +1139,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 	$output = '';
 		
 	$previous = null;
+
 	foreach($items as $item) {
 		if(isset($atts['group'])) {
 			switch($atts['group']) {
