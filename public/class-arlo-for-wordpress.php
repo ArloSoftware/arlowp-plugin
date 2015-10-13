@@ -1291,8 +1291,6 @@ class Arlo_For_Wordpress {
 				active = '%s'	
 			";
 			
-			var_dump($wpdb->prepare($sql, $order + $cat->c_order, $cat->c_arlo_id, $timestamp));
-						
 			$query = $wpdb->query( $wpdb->prepare($sql, $order + $cat->c_order, $cat->c_arlo_id, $timestamp) );
 			if ($query === false) {
 				throw new Exception('Database update failed in set_category_depth_order()');
