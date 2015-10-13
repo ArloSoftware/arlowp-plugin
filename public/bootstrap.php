@@ -13,11 +13,13 @@ add_filter( 'the_title', function($title, $id = null){
 		$settings['post_types']['event']['posts_page']
 	);
         
-	if($id === null || !in_array($id, $pages)) return $title;
+        $cat_slug = !empty($_GET["category"]) ? $_GET["category"] : get_query_var('arlo_event_category');
+
+        if($id === null || (!in_array($id, $pages) && empty($cat_slug))) return $title;
 	
-	$cat = \Arlo\Categories::get(array('slug' => get_query_var('arlo_event_category')));
+	$cat = \Arlo\Categories::get(array('slug' => $cat_slug));
 	$location = urldecode(get_query_var('arlo_event_location'));
-	
+        
 	if(!$cat && empty($location)) return $title;
 	
 	if (!empty($cat->c_name)) {
