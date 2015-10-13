@@ -10,13 +10,14 @@ add_filter( 'the_title', function($title, $id = null){
 	$settings = get_option('arlo_settings');
 	
 	$pages = array(
-		$settings['post_types']['event']['posts_page']
+		$settings['post_types']['event']['posts_page'],
+                $settings['post_types']['upcoming']['posts_page']
 	);
-        
+                
         $cat_slug = !empty($_GET["category"]) ? $_GET["category"] : get_query_var('arlo_event_category');
 
-        if($id === null || (!in_array($id, $pages) && empty($cat_slug))) return $title;
-	
+        if($id === null || !in_array($id, $pages)) return $title;
+        	
 	$cat = \Arlo\Categories::get(array('slug' => $cat_slug));
 	$location = urldecode(get_query_var('arlo_event_location'));
         
