@@ -914,37 +914,7 @@ class Arlo_For_Wordpress {
 					)
 				);
                                 
-				if ($query === false) {
-					
-					die($wpdb->prepare( 
-						"INSERT INTO $table_name 
-						(e_arlo_id, et_arlo_id, e_code, e_startdatetime, e_finishdatetime, e_datetimeoffset, e_timezone, e_timezone_id, v_id, e_locationname, e_locationroomname, e_locationvisible , e_isfull, e_placesremaining, e_sessiondescription, e_notice, e_viewuri, e_registermessage, e_registeruri, e_providerorganisation, e_providerwebsite, e_isonline, active) 
-						VALUES ( %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) 
-						", 
-					    $item->EventID,
-						$item->EventTemplateID,
-						@$item->Code,
-						substr(@$item->StartDateTime,0,26),
-						substr(@$item->EndDateTime,0,26),
-						substr(@$item->StartDateTime,27,6),
-						@$item->TimeZone,
-						@$item->TimeZoneID,
-						@$item->Location->VenueID,
-						@$item->Location->Name,
-						@$item->Location->VenueRoomName,
-						(!empty($item->Location->ViewUri) ? 1 : 0 ),
-						@$item->IsFull,
-						@$item->PlacesRemaining,
-						@$item->SessionsDescription,
-						@$item->Notice,
-						@$item->ViewUri,
-						@$item->RegistrationInfo->RegisterMessage,
-						@$item->RegistrationInfo->RegisterUri,
-						@$item->Provider->Name,
-						@$item->Provider->WebsiteUri,
-						@$item->Location->IsOnline,
-						$timestamp
-					));
+				if ($query === false) {					
 					throw new Exception('Database insert failed: ' . $table_name);
 				}
 				
