@@ -83,7 +83,7 @@ class Arlo_For_Wordpress {
 	 * @var      array
 	 */
     public static $post_types = array(
-                'event' => array(
+		'event' => array(
 			'slug' => 'event',
 			'name' => 'Events',
 			'singular_name' => 'Event'
