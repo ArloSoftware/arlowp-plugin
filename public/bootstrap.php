@@ -463,6 +463,7 @@ function arlo_add_datamodel() {
 	install_table_arlo_import_log();
 	install_table_arlo_categories();
 	install_table_arlo_eventtemplates_categories();
+	install_table_arlo_timezones();
 	return;
 }
 
@@ -557,6 +558,7 @@ function install_table_arlo_events() {
 		e_finishdatetime DATETIME NULL,
 		e_datetimeoffset VARCHAR(6) NULL,
 		e_timezone VARCHAR(10) NULL,
+		e_timezone_id TINYINT(3) UNSIGNED NULL,
 		v_id INT(11) NULL,
 		e_locationname VARCHAR(255) NULL,
 		e_locationroomname VARCHAR(255) NULL,
@@ -580,7 +582,7 @@ function install_table_arlo_events() {
 
 	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
-    dbDelta($sql);
+	dbDelta($sql);
 }
 
 /**
@@ -810,6 +812,30 @@ function install_table_arlo_eventtemplates_categories() {
 }
 
 /**
+ * install_table_arlo_eventtemplates_categories function.
+ * 
+ * @access public
+ * @return void
+ */
+function install_table_arlo_timezones() {	
+	global $wpdb, $current_user;
+	$charset_collate = core_set_charset();
+	$table_name = $wpdb->prefix . "arlo_timezones";
+
+	$sql = "CREATE TABLE " . $table_name . " (
+			id tinyint(3) unsigned NOT NULL,
+			name varchar(256) NOT NULL,
+			active datetime NOT NULL,
+  			PRIMARY KEY  (id)) 
+  			CHARACTER SET utf8 COLLATE=utf8_general_ci;	
+  			";
+	
+	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+
+	dbDelta($sql);
+}
+
+/**
  * install_table_arlo_import_log function.
  * 
  * @access public
@@ -876,43 +902,22 @@ function arlo_get_post_by_name($name, $post_type='post') {
  * @return void
  */
 function getTimezones() {
-	return array(
-		array(
-			'name' => 'Perth',
-			'timezone_id' => 'Australia/Perth',
-			'abbreviation' => 'AWST'
-		),
-		array(
-			'name' => 'Adelaide',
-			'timezone_id' => 'Australia/Adelaide',
-			'abbreviation' => 'ACST'
-		),
-		array(
-			'name' => 'Darwin',
-			'timezone_id' => 'Australia/Darwin',
-			'abbreviation' => 'ACST'
-		),
-		array(
-			'name' => 'Brisbane',
-			'timezone_id' => 'Australia/Brisbane',
-			'abbreviation' => 'AEST'
-		),
-		array(
-			'name' => 'Canberra, Melbourne, Sydney',
-			'timezone_id' => 'Australia/Canberra',
-			'abbreviation' => 'AEST'
-		),
-		array(
-			'name' => 'Hobart',
-			'timezone_id' => 'Australia/Hobart',
-			'abbreviation' => 'AEST'
-		),
-		array(
-			'name' => 'Auckland, Wellington',
-			'timezone_id' => 'Pacific/Auckland',
-			'abbreviation' => 'NZST'
-		),
-	);
+	global $wpdb, $arlo_plugin;
+	
+	$table = $wpdb->prefix . "arlo_timezones";
+	$active = $arlo_plugin->get_last_import();
+	
+	$sql = "
+	SELECT
+		id,
+		name
+	FROM
+		{$table}
+	WHERE
+		active = '{$active}'
+	ORDER BY name
+	";
+	return $wpdb->get_results($sql);
 }
 
 /*
@@ -1420,9 +1425,14 @@ $shortcodes->add('event_start_date', function($content='', $atts, $shortcode_nam
 	$start_date = new DateTime($GLOBALS['arlo_event_list_item']['e_startdatetime']);
 	
 	if(isset($_GET['timezone']) && $GLOBALS['arlo_event_list_item']['e_isonline']) {
-		$start_date->modify(($GLOBALS['arlo_event_list_item']['e_datetimeoffset'] * -1) . ' hours');
-		$start_date->setTimezone(new DateTimeZone($_GET['timezone']));
+		//Get the timezone offset for the specified timezone
+
+		if (!empty($GLOBALS['selected_timezone_offset'])) {
+			$start_date->modify(($GLOBALS['arlo_event_list_item']['e_datetimeoffset'] * -1) . ' hours');
+			//$start_date->setTimezone(new DateTimeZone("Australia/Perth"));
+		}
 	}
+		
 
 	$format = 'D g:i A';
 
@@ -1439,8 +1449,13 @@ $shortcodes->add('event_end_date', function($content='', $atts, $shortcode_name)
 	$end_date = new DateTime($GLOBALS['arlo_event_list_item']['e_finishdatetime']);
 	
 	if(isset($_GET['timezone']) && $GLOBALS['arlo_event_list_item']['e_isonline']) {
-		$end_date->modify(($GLOBALS['arlo_event_list_item']['e_datetimeoffset'] * -1) . ' hours');
-		$end_date->setTimezone(new DateTimeZone($_GET['timezone']));
+	
+		if (!empty($GLOBALS['selected_timezone_offset'])) {
+			$end_date->modify(($GLOBALS['selected_timezone_offset'] * -1) . ' hours');
+		}
+	
+		
+		//$end_date->setTimezone(new DateTimeZone($_GET['timezone']));
 	}
 
 	$format = 'D g:i A';
@@ -2388,7 +2403,7 @@ $shortcodes->add('timezones', function($content='', $atts, $shortcode_name){
 	$t1 = "{$wpdb->prefix}arlo_eventtemplates";
 	$t2 = "{$wpdb->prefix}arlo_events";
 	
-	$items = $wpdb->get_results("SELECT $t2.e_isonline, $t2.e_datetimeoffset FROM $t2
+	$items = $wpdb->get_results("SELECT $t2.e_isonline, $t2.e_timezone_id FROM $t2
 		LEFT JOIN $t1
 		ON $t2.et_arlo_id = $t1.et_arlo_id AND $t2.e_isonline = 1
 		WHERE $t1.et_post_name = '$post->post_name'
@@ -2401,17 +2416,17 @@ $shortcodes->add('timezones', function($content='', $atts, $shortcode_name){
 	$content = '<form method="GET">';
 	$content .= '<select name="timezone">';
 	
-	foreach(getTimezones() as $timezone) {
-		$timezone_object = new DateTimeZone($timezone['timezone_id']);
-		$time = new DateTime('now', $timezone_object);
-		$offset = $time->format('P');
-		
+	foreach(getTimezones() as $timezone) {		
 		$selected = false;
-		if((isset($_GET['timezone']) && $_GET['timezone'] == $timezone['timezone_id']) || (!isset($_GET['timezone']) && $offset == $items[0]['e_datetimeoffset'])) {
+		if((isset($_GET['timezone']) && $_GET['timezone'] == $timezone->id) || (!isset($_GET['timezone']) && $timezone->id == $items[0]['e_timezone_id'])) {
 			$selected = true;
+			$offset = preg_match("/\(GMT(.*)\)/", $timezone->name, $matches);
+			if (is_array($matches) && !empty($matches[1])) {
+				$GLOBALS['selected_timezone_offset'] = $matches[1];
+			} 
 		}
-	
-		$content .= '<option value="' . $timezone['timezone_id'] . '" ' . ($selected ? 'selected' : '') . '>(' . $offset . ') ' . $timezone['name'] . '</option>';
+		
+		$content .= '<option value="' . $timezone->id . '" ' . ($selected ? 'selected' : '') . '>'. $timezone->name . '</option>';
 	}
 	
 	$content .= '</select>';

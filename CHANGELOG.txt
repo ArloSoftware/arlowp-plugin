@@ -3,7 +3,7 @@ Enhancement
 ------------------
 Reload original templates
 Database upgrade can be run by de/activate the plugin
-
+Event order on the "events list" page
 
 
 == V2.06 ==
