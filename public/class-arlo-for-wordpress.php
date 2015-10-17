@@ -83,7 +83,7 @@ class Arlo_For_Wordpress {
 	 * @var      array
 	 */
     public static $post_types = array(
-    	'event' => array(
+                'event' => array(
 			'slug' => 'event',
 			'name' => 'Events',
 			'singular_name' => 'Event'
@@ -97,7 +97,12 @@ class Arlo_For_Wordpress {
 			'slug' => 'venue',
 			'name' => 'Venues',
 			'singular_name' => 'Venue'
-		)
+		),
+		'upcoming' => array(
+			'slug' => 'upcomingevents',
+			'name' => 'Upcoming events',
+			'singular_name' => 'Upcoming event'
+		)        
     );
     
 	/**
@@ -1353,8 +1358,6 @@ class Arlo_For_Wordpress {
 				active = '%s'	
 			";
 			
-			var_dump($wpdb->prepare($sql, $order + $cat->c_order, $cat->c_arlo_id, $timestamp));
-						
 			$query = $wpdb->query( $wpdb->prepare($sql, $order + $cat->c_order, $cat->c_arlo_id, $timestamp) );
 			if ($query === false) {
 				throw new Exception('Database update failed in set_category_depth_order()');
