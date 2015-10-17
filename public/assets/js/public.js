@@ -32,13 +32,14 @@
         });
                 
                 
-
+		/*
 		$('#arlo-event-filter').on('submit', function(e) {
 
 			e.preventDefault();
 
 			var cat = $('#arlo-filter-arlo_event_category').val();
 			var location = $('#arlo-filter-arlo_event_location').val();
+			var delivery = $('#arlo-filter-delivery').val();
 			var page = $(this).attr('action');
 
 			if(cat != 0)
@@ -47,11 +48,16 @@
 			if (location != 0) 
 				page += 'location/' + location + '/';
 				
+			if (delivery != "") 
+				page += 'delivery/' + delivery + '/';
+				
 			window.location.href = page;
 			
 			
 
 		} );
+		
+		*/
 
 	});
 

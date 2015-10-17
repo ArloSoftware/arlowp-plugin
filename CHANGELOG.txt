@@ -1,9 +1,11 @@
 == V2.07 ==
+
 Enhancement
 ------------------
 Reload original templates
 Database upgrade can be run by de/activate the plugin
 Event order on the "events list" page
+New "delivery" filter for "arlo_event_template_filters" shortcode
 
 
 == V2.06 ==

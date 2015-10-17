@@ -14,12 +14,12 @@ add_filter( 'the_title', function($title, $id = null){
                 $settings['post_types']['upcoming']['posts_page']
 	);
                 
-        $cat_slug = !empty($_GET["category"]) ? $_GET["category"] : get_query_var('arlo_event_category');
+	$cat_slug = !empty($_GET["category"]) ? $_GET["category"] : "";
 
-        if($id === null || !in_array($id, $pages)) return $title;
+	if($id === null || !in_array($id, $pages)) return $title;
         	
 	$cat = \Arlo\Categories::get(array('slug' => $cat_slug));
-	$location = urldecode(get_query_var('arlo_event_location'));
+	$location = urldecode($_GET['location']);
         
 	if(!$cat && empty($location)) return $title;
 	
@@ -209,20 +209,7 @@ function arlo_register_custom_post_types() {
 		if($page_id) {
 			switch($id) {
 				case 'event':
-					add_rewrite_rule('^' . $slug . '/page/([^/]*)/?','index.php?page_id=' . $page_id . '&paged=$matches[1]','top');
-					
-					add_rewrite_rule('^' . $slug . '/location/([^/]*)/page/([^/]*)/?','index.php?page_id=' . $page_id . '&arlo_event_location=$matches[1]&paged=$matches[2]','top');
-					add_rewrite_rule('^' . $slug . '/location/([^/]*)/?','index.php?page_id=' . $page_id . '&arlo_event_location=$matches[1]','top');
-										
-					
-					add_rewrite_rule('^' . $slug . '/category/([^/]*)/location/([^/]*)/page/([^/]*)/?','index.php?page_id=' . $page_id . '&arlo_event_category=$matches[1]&arlo_event_location=$matches[2]&paged=$matches[3]','top');					
-					add_rewrite_rule('^' . $slug . '/category/([^/]*)/location/([^/]*)/?','index.php?page_id=' . $page_id . '&arlo_event_category=$matches[1]&arlo_event_location=$matches[2]','top');					
-					
-					add_rewrite_rule('^' . $slug . '/category/([^/]*)/page/([^/]*)/?','index.php?page_id=' . $page_id . '&arlo_event_category=$matches[1]&paged=$matches[2]','top');
-					add_rewrite_rule('^' . $slug . '/category/([^/]*)/?','index.php?page_id=' . $page_id . '&arlo_event_category=$matches[1]','top');
-										
-					add_rewrite_tag('%arlo_event_category%', '([^&]+)');
-					add_rewrite_tag('%arlo_event_location%', '([^&]+)');
+
 				break;
 				case 'presenter':
 					add_rewrite_rule('^' . $slug . '/page/([^/]*)/?','index.php?page_id=' . $page_id . '&paged=$matches[1]','top');
@@ -955,22 +942,29 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 	$where = "WHERE post.post_type = 'arlo_event'";
 	$join = "";
 	
-	if(!empty($wp_query->query_vars['arlo_event_location'])) :
+	if(!empty($_GET['location']) || (isset($_GET['delivery']) && strlen($_GET['delivery']) && is_numeric($_GET['delivery'])) ) :
 
-		$where .= " AND e.e_locationname = '" . urldecode($wp_query->query_vars['arlo_event_location']) . "'";
 		$join .= " LEFT JOIN $t5 e USING (et_arlo_id)";
-
+		
+		if(!empty($_GET['location'])) :
+			$where .= " AND e.e_locationname = '" . urldecode($_GET['location']) . "'";
+		endif;	
+		
+		if(isset($_GET['delivery']) && strlen($_GET['delivery']) && is_numeric($_GET['delivery'])) :
+			$where .= " AND e.e_isonline = " . $_GET['delivery'];
+		endif;	
+		
 	endif;	
 	
 	
-	if(isset($wp_query->query_vars['arlo_event_category']) || isset($atts['category'])) {
+	if(isset($_GET['category']) || isset($atts['category'])) {
 
 		$cat_id = 0;
 
 		if(isset($atts['category'])) {
 			$cat_slug = $atts['category'];
 		} else {
-			$cat_slug = $wp_query->query_vars['arlo_event_category'];
+			$cat_slug = $_GET['category'];
 		}
 		$where .= " AND ( c.c_slug = '$cat_slug'";
 		
@@ -1041,8 +1035,6 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 $shortcodes->add('event_template_list_item', function($content='', $atts, $shortcode_name){
 	global $wpdb, $wp_query;
 	
-	
-		
 	if (isset($atts['show_only_at_bottom']) && $atts['show_only_at_bottom'] == "true" && isset($GLOBALS['categories_count']) && $GLOBALS['categories_count']) {
 		$GLOBALS['show_only_at_bottom'] = true;
 		return;
@@ -1060,21 +1052,29 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 	$where = "WHERE post.post_type = 'arlo_event'";
 	$join = "";
 	
-	if(!empty($wp_query->query_vars['arlo_event_location'])) :
+	if(!empty($_GET['location']) || (isset($_GET['delivery']) && strlen($_GET['delivery']) && is_numeric($_GET['delivery'])) ) :
 
-		$where .= " AND e.e_locationname = '" . urldecode($wp_query->query_vars['arlo_event_location']) . "'";
 		$join .= " LEFT JOIN $t5 e USING (et_arlo_id)";
-
-	endif;	
 		
-	if(isset($wp_query->query_vars['arlo_event_category']) || isset($atts['category'])) {
+		if(!empty($_GET['location'])) :
+			$where .= " AND e.e_locationname = '" . urldecode($_GET['location']) . "'";
+		endif;	
+		
+		if(isset($_GET['delivery']) && strlen($_GET['delivery']) && is_numeric($_GET['delivery'])) :
+			$where .= " AND e.e_isonline = " . $_GET['delivery'];
+		endif;	
+		
+	endif;	
+	
+		
+	if(isset($_GET['category']) || isset($atts['category'])) {
 
 		$cat_id = 0;
 
 		if(isset($atts['category'])) {
 			$cat_slug = $atts['category'];
 		} else {
-			$cat_slug = $wp_query->query_vars['arlo_event_category'];
+			$cat_slug = $_GET['category'];
 		}
 		$where .= " AND ( c.c_slug = '$cat_slug'";
 		
@@ -1276,9 +1276,9 @@ $shortcodes->add('content_field_text', function($content='', $atts, $shortcode_n
 $shortcodes->add('event_template_filters', function($content='', $atts, $shortcode_name){
 
 	extract(shortcode_atts(array(
-		'filters'	=> 'category,location',
+		'filters'	=> 'category,location,delivery',
 		'resettext'	=> 'Reset',
-                'buttonclass'   => 'button'
+		'buttonclass'   => 'button'
 	), $atts, $shortcode_name));
 	
 	$filters_array = explode(',',$filters);
@@ -1303,9 +1303,17 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 				
 				$cats = \Arlo\Categories::getTree();
 
-				$filter_html .= arlo_create_filter('arlo_event_category', arlo_child_categories($cats[0]->children), 'category');
+				$filter_html .= arlo_create_filter('category', arlo_child_categories($cats[0]->children), 'category');
 				
 				break;
+				
+			case 'delivery' :
+
+				// delivery select
+
+				$filter_html .= arlo_create_filter($filter, Arlo_For_Wordpress::$delivery_labels);
+
+				break;				
 
 			case 'location' :
 
@@ -1332,7 +1340,7 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 
 				endfor;
 
-				$filter_html .= arlo_create_filter('arlo_event_location', $locations, 'location');
+				$filter_html .= arlo_create_filter('location', $locations, 'location');
 
 				break;
 
@@ -2526,7 +2534,7 @@ $shortcodes->add('categories', function($content='', $atts, $shortcode_name){
         		
 	// start at
 	$start_at = (isset($atts['parent'])) ? (int)$atts['parent'] : 0;
-	if(!isset($atts['parent']) && $start_at == 0 && $slug = get_query_var('arlo_event_category')) {
+	if(!isset($atts['parent']) && $start_at == 0 && $slug = $_GET['category']) {
 		$start_at = current(explode('-', $slug));
 	}
 	
@@ -2749,9 +2757,7 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 
 // category header
 $shortcodes->add('category_header', function($content='', $atts, $shortcode_name){
-	if($slug = get_query_var('arlo_event_category')) {
-		$category = \Arlo\Categories::get(array('slug' => $slug), 1);
-	} else if(isset($_GET['category']) && !empty($_GET['category'])) {
+	if(isset($_GET['category']) && !empty($_GET['category'])) {
 		$category = \Arlo\Categories::get(array('id' => current(explode('-', $_GET['category']))), 1);
 	} else {
 		$category = \Arlo\Categories::get(array('parent_id' => 0), 1);
@@ -2764,8 +2770,8 @@ $shortcodes->add('category_header', function($content='', $atts, $shortcode_name
 
 // category footer
 $shortcodes->add('category_footer', function($content='', $atts, $shortcode_name){
-	if($slug = get_query_var('arlo_event_category')) {
-		$category = \Arlo\Categories::get(array('slug' => $slug), 1);
+	if(isset($_GET['category']) && !empty($_GET['category'])) {
+		$category = \Arlo\Categories::get(array('id' => current(explode('-', $_GET['category']))), 1);
 	} else {
 		$category = \Arlo\Categories::get(array('parent_id' => 0), 1);
 	}
