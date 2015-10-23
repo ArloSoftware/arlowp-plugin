@@ -10,6 +10,7 @@ New "delivery" filter for "arlo_event_template_filters" shortcode
 Bugfixes
 ------------------
 Issue #19
+Issue #46
 
 
 == V2.06 ==

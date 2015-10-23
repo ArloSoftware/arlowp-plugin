@@ -2562,7 +2562,7 @@ function category_ul($items, $counts) {
 		$html .= $events_url;
 		
 		if($cat->c_parent_id != 0) {
-		$html .= 'category/' . $cat->c_slug . '/';
+		$html .= '?arlo-category=' . $cat->c_slug;
 		}
 		
 		$html .= '">';
