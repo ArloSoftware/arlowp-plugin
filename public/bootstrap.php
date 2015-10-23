@@ -2485,7 +2485,7 @@ $shortcodes->add('timezones', function($content='', $atts, $shortcode_name){
 		return '';
 	}
 
-	$content = '<form method="GET">';
+	$content = '<form method="GET" class="arlo-timezone">';
 	$content .= '<select name="timezone">';
 	
 	foreach(getTimezones() as $timezone) {		
@@ -2501,7 +2501,6 @@ $shortcodes->add('timezones', function($content='', $atts, $shortcode_name){
 	}
 	
 	$content .= '</select>';
-	$content .= '<input type="submit" value="Go" />';
 	$content .= '</form>';
 
 	return $content;
