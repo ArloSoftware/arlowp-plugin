@@ -992,18 +992,38 @@ class Arlo_For_Wordpress {
 		
 		if(!empty($items)) {
 			foreach($items as $item) {
-				$query = $wpdb->query( $wpdb->prepare( 
-					"REPLACE INTO $table_name 
-					(id, name, active) 
-					VALUES (%d, %s, %s)", 
-				    $item->TimeZoneID,
-					$item->Name,
-					$timestamp
-				) );
+				$query = $wpdb->replace(
+					$table_name,
+					array(
+						'id' => $item->TimeZoneID,
+						'name' => $item->Name,
+						'active' => $timestamp
+					),
+					array(
+						'%d', '%s', '%s'
+					)
+				);
                                 
 				if ($query === false) {
 					throw new Exception('Database insert failed: ' . $table_name);
-				}				
+				} else {
+					if (is_array($item->TzNames)) {
+						foreach ($item->TzNames as $TzName) {
+							$query = $wpdb->replace(
+								$table_name . '_olson',
+								array(
+									'timezone_id' => $item->TimeZoneID,
+									'olson_name' => $TzName,
+									'active' => $timestamp
+								),
+								array(
+									'%d', '%s', '%s'
+								)
+							);
+
+						} 
+					}
+				}			
 			}
 		}
 		

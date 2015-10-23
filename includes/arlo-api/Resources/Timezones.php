@@ -15,7 +15,8 @@ class Timezones extends Resource
 	public function search($count = 256) {
 		$data = array(
 			'top=' . $count,
-			'format=json'
+			'format=json',
+			'fields=TimeZoneID,Name,TzNames'
 		);
 		
 		$results = $this->request(implode('&', $data));

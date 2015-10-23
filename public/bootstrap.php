@@ -802,7 +802,7 @@ function install_table_arlo_eventtemplates_categories() {
 }
 
 /**
- * install_table_arlo_eventtemplates_categories function.
+ * install_table_arlo_timezones function.
  * 
  * @access public
  * @return void
@@ -812,17 +812,28 @@ function install_table_arlo_timezones() {
 	$charset_collate = core_set_charset();
 	$table_name = $wpdb->prefix . "arlo_timezones";
 
-	$sql = "CREATE TABLE " . $table_name . " (
-			id tinyint(3) unsigned NOT NULL,
-			name varchar(256) NOT NULL,
-			active datetime NOT NULL,
-  			PRIMARY KEY  (id)) 
-  			CHARACTER SET utf8 COLLATE=utf8_general_ci;	
-  			";
+	$sql = "
+		CREATE TABLE " . $table_name . " (
+		id tinyint(3) unsigned NOT NULL,
+		name varchar(256) NOT NULL,
+		active datetime NOT NULL,
+		PRIMARY KEY  (id)) 
+		CHARACTER SET utf8 COLLATE=utf8_general_ci;	
+  	";
+  			
+	$sql2 = " 
+		CREATE TABLE IF NOT EXISTS " . $table_name . "_olson (
+		timezone_id int(11) NOT NULL,
+		olson_name varchar(255) NOT NULL,
+		active datetime NOT NULL,
+		PRIMARY KEY  (timezone_id,olson_name)
+		) CHARACTER SET utf8 COLLATE=utf8_general_ci;
+	";
 	
 	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
 	dbDelta($sql);
+	dbDelta($sql2);	
 }
 
 /**
@@ -909,6 +920,28 @@ function getTimezones() {
 	";
 	return $wpdb->get_results($sql);
 }
+
+function getTimezoneOlsonNames($timezone_id) {
+	global $wpdb, $arlo_plugin;
+	
+	$timezone_id = intval($timezone_id);
+	
+	$table = $wpdb->prefix . "arlo_timezones_olson";
+	$active = $arlo_plugin->get_last_import();
+	
+	$sql = "
+	SELECT
+		olson_name
+	FROM
+		{$table}
+	WHERE
+		timezone_id = {$timezone_id}
+	AND
+		active = '{$active}'
+	";
+	return $wpdb->get_results($sql);
+}
+
 
 /*
  * Shortcodes
@@ -1435,17 +1468,25 @@ $shortcodes->add('event_location', function($content='', $atts, $shortcode_name)
 $shortcodes->add('event_start_date', function($content='', $atts, $shortcode_name){
 	if(!isset($GLOBALS['arlo_event_list_item']['e_startdatetime'])) return '';
 	
-	$start_date = new DateTime($GLOBALS['arlo_event_list_item']['e_startdatetime']);
+	$timewithtz = str_replace(' ','T',$GLOBALS['arlo_event_list_item']['e_startdatetime']) . $GLOBALS['arlo_event_list_item']['e_datetimeoffset'];
 	
-	if(isset($_GET['timezone']) && $GLOBALS['arlo_event_list_item']['e_isonline']) {
-		//Get the timezone offset for the specified timezone
-
-		if (!empty($GLOBALS['selected_timezone_offset'])) {
-			$start_date->modify(($GLOBALS['arlo_event_list_item']['e_datetimeoffset'] * -1) . ' hours');
-			//$start_date->setTimezone(new DateTimeZone("Australia/Perth"));
+	$start_date = new DateTime($timewithtz);
+		
+	if($GLOBALS['arlo_event_list_item']['e_isonline']) {
+		if (is_array($GLOBALS['selected_timezone_olson_names'])) {
+			foreach ($GLOBALS['selected_timezone_olson_names'] as $TzName) {
+				try {
+					$timezone = new DateTimeZone($TzName->olson_name);
+				} catch (Exception $e) {
+				}
+				
+				if ($timezone !== null) {
+					break;
+				}
+			}
+			$start_date->setTimezone($timezone);
 		}
 	}
-		
 
 	$format = 'D g:i A';
 
@@ -1459,17 +1500,26 @@ $shortcodes->add('event_start_date', function($content='', $atts, $shortcode_nam
 $shortcodes->add('event_end_date', function($content='', $atts, $shortcode_name){
 	if(!isset($GLOBALS['arlo_event_list_item']['e_finishdatetime'])) return '';
 
-	$end_date = new DateTime($GLOBALS['arlo_event_list_item']['e_finishdatetime']);
+	$timewithtz = str_replace(' ','T',$GLOBALS['arlo_event_list_item']['e_finishdatetime']) . $GLOBALS['arlo_event_list_item']['e_datetimeoffset'];
 	
-	if(isset($_GET['timezone']) && $GLOBALS['arlo_event_list_item']['e_isonline']) {
-	
-		if (!empty($GLOBALS['selected_timezone_offset'])) {
-			$end_date->modify(($GLOBALS['selected_timezone_offset'] * -1) . ' hours');
-		}
-	
+	$end_date = new DateTime($timewithtz);
 		
-		//$end_date->setTimezone(new DateTimeZone($_GET['timezone']));
+	if($GLOBALS['arlo_event_list_item']['e_isonline']) {
+		if (is_array($GLOBALS['selected_timezone_olson_names'])) {
+			foreach ($GLOBALS['selected_timezone_olson_names'] as $TzName) {
+				try {
+					$timezone = new DateTimeZone($TzName->olson_name);
+				} catch (Exception $e) {
+				}
+				
+				if ($timezone !== null) {
+					break;
+				}
+			}
+			$end_date->setTimezone($timezone);
+		}
 	}
+
 
 	$format = 'D g:i A';
 
@@ -2442,10 +2492,9 @@ $shortcodes->add('timezones', function($content='', $atts, $shortcode_name){
 		$selected = false;
 		if((isset($_GET['timezone']) && $_GET['timezone'] == $timezone->id) || (!isset($_GET['timezone']) && $timezone->id == $items[0]['e_timezone_id'])) {
 			$selected = true;
-			$offset = preg_match("/\(GMT(.*)\)/", $timezone->name, $matches);
-			if (is_array($matches) && !empty($matches[1])) {
-				$GLOBALS['selected_timezone_offset'] = $matches[1];
-			} 
+			//get olson timezones
+			$olson_names = getTimezoneOlsonNames($timezone->id);
+			$GLOBALS['selected_timezone_olson_names'] = $olson_names;
 		}
 		
 		$content .= '<option value="' . $timezone->id . '" ' . ($selected ? 'selected' : '') . '>'. $timezone->name . '</option>';
