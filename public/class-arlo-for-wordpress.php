@@ -30,7 +30,7 @@ class Arlo_For_Wordpress {
 	 *
 	 * @var     string
 	 */
-	const VERSION = '2.0.6';
+	const VERSION = '2.0.7';
 
 	/**
 	 * Minimum required PHP version
@@ -257,7 +257,7 @@ class Arlo_For_Wordpress {
 		
 		//check the PHP version
 		if (version_compare(phpversion(), self::MIN_PHP_VERSION) === -1) {
-    		wp_die('The minimum required PHP version for the Arlo plugin is ' . self::MIN_PHP_VERSION);
+    		wp_die(sprintf(__('The minimum required PHP version for the Arlo plugin is %s'), self::MIN_PHP_VERSION));
 		}
 
 		if ( function_exists( 'is_multisite' ) && is_multisite() ) {
@@ -434,7 +434,7 @@ class Arlo_For_Wordpress {
 
 		$domain = $this->plugin_slug;
 		$locale = apply_filters( 'plugin_locale', get_locale(), $domain );
-
+		
 		load_textdomain( $domain, trailingslashit( WP_LANG_DIR ) . $domain . '/' . $domain . '-' . $locale . '.mo' );
 
 	}
@@ -455,6 +455,9 @@ class Arlo_For_Wordpress {
 	 */
 	public function enqueue_scripts() {
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script', plugins_url( 'assets/js/public.js?24102015', __FILE__ ), array( 'jquery' ), self::VERSION );
+		wp_localize_script( $this->plugin_slug . '-plugin-script', 'objectL10n', array(
+			'showmoredates' => __( 'Show me more dates', $this->plugin_slug ),
+		) );
 	}
 	
 	/**  Local Setter  */
@@ -470,12 +473,6 @@ class Arlo_For_Wordpress {
             return $this->data[$name];
         }
 
-        /*$trace = debug_backtrace();
-        trigger_error(
-            'Undefined property via __get(): ' . $name .
-            ' in ' . $trace[0]['file'] .
-            ' on line ' . $trace[0]['line'],
-            E_USER_NOTICE);*/
         return null;
     }
 
@@ -536,14 +533,6 @@ class Arlo_For_Wordpress {
 			$wpdb->prepare("DELETE FROM $table_name WHERE CREATED < NOW() - INTERVAL 14 DAY ORDER BY ID ASC LIMIT 10", '')
 		);
 
-		// $wpdb->delete(
-		// 	$table_name,
-		// 	array(
-		// 		'CREATED' => 
-		// 	);
-			
-		// );
-
 		if($successful) {
 			$this->set_last_import($timestamp);
 		}
@@ -581,7 +570,6 @@ class Arlo_For_Wordpress {
 		$transport = new \ArloAPI\Transports\Wordpress();
 		$transport->setRequestTimeout(30);
 		
-		// need to get platform name from options table - using theme-test for development purposes
 		$client = new \ArloAPI\Client($platform_name, $transport);
 		
 		$this->__set('api_client', $client);
@@ -729,9 +717,9 @@ class Arlo_For_Wordpress {
 					)
 				);
                                 
-                                if ($query === false) {
-                                    throw new Exception('Database insert failed: ' . $table_name);
-                                }
+                if ($query === false) {
+                    throw new Exception('Database insert failed: ' . $table_name);
+                }
 				
 				$template_event_id = $wpdb->insert_id;
 				
@@ -776,9 +764,9 @@ class Arlo_For_Wordpress {
 							$timestamp
 						) );
                                                         
-                                                if ($query === false) {
-                                                    throw new Exception('Database insert failed: ' . $table_name);
-                                                }
+	                    if ($query === false) {
+	                        throw new Exception('Database insert failed: ' . $table_name);
+	                    }
 					}
 				}
 				
@@ -797,9 +785,9 @@ class Arlo_For_Wordpress {
 							@$content->Content->ContentType,
 							$timestamp
 						) );
-                                                if ($query === false) {
-                                                    throw new Exception('Database insert failed: ' . $table_name);
-                                                }
+                        if ($query === false) {
+                            throw new Exception('Database insert failed: ' . $table_name);
+                        }
 					}
 				}
 				
@@ -817,9 +805,9 @@ class Arlo_For_Wordpress {
 						    $timestamp
 						) );
                                                         
-                                                if ($query === false) {
-                                                    throw new Exception('Database insert failed: ' . $table_name);
-                                                }
+                        if ($query === false) {
+                            throw new Exception('Database insert failed: ' . $table_name);
+                        }
 					}
 				}
 				
@@ -836,9 +824,9 @@ class Arlo_For_Wordpress {
 						    $timestamp
 						) );
                                                         
-                                                if ($query === false) {
-                                                    throw new Exception('Database insert failed: ' . $table_name);
-                                                }
+                        if ($query === false) {
+                            throw new Exception('Database insert failed: ' . $table_name);
+                        }
 					}
 				}
 			}
@@ -1070,10 +1058,9 @@ class Arlo_For_Wordpress {
 					$timestamp
 				) );
                                 
-                                if ($query === false) {
-                                    throw new Exception('Database insert failed: ' . $table_name);
-                                }
-
+                if ($query === false) {
+                    throw new Exception('Database insert failed: ' . $table_name);
+                }
 				
 				$name = $item->FirstName . ' ' . $item->LastName;
 				
@@ -1140,11 +1127,10 @@ class Arlo_For_Wordpress {
 					$timestamp
 				) );
                                 
-                                if ($query === false) {
-                                    throw new Exception('Database insert failed: ' . $table_name);
-                                }
+                if ($query === false) {
+                    throw new Exception('Database insert failed: ' . $table_name);
+                }
                                 
-				
 				// create associated custom post, if it dosen't exist
 				// should be arlo_venues
 				if(!arlo_get_post_by_name($slug, 'arlo_venue')) {
@@ -1421,9 +1407,9 @@ class Arlo_For_Wordpress {
 			'presenters',
 			'venues',
 			'categories',
-                        'events_presenters',
-                        'eventtemplates_categories',
-                        'eventtemplates_presenters',
+            'events_presenters',
+            'eventtemplates_categories',
+            'eventtemplates_presenters',
 		);
                 		
 		foreach($tables as $table) {
@@ -1588,32 +1574,5 @@ class Arlo_For_Wordpress {
 		// update settings
 		update_option('arlo_settings', $settings);
 	}
-	
-	// maybe later...
-	/*public function the_posts_action($posts) {
-		foreach($posts as &$post) {
-		
-			switch($post->post_type) {
-				case 'arlo_presenter':
-					$post = $this->the_post_presenter($post);
-				break;
-			}
-		}
-		
-		return $posts;
-	}
-	
-	public function the_post_presenter($post) {
-		// get associated arlo data here
-		
-		// save to an arlo object in the post
-		$post->presenter_name = 'bro';
-		
-		// parse the shortcodes/macros and save back to post_content or post_excerpt
-		$post->post_excerpt = arlo_replace_macros($post, '[arlo_presenter_name]');
-		
-		// return post to proceed as normal
-		return $post;
-	}*/
 }
 

@@ -355,7 +355,7 @@ class Arlo_For_Wordpress_Admin {
 			return;
 			
 		if ($section == 'arlo_template_section') {
-			echo "<h5>Available shortcodes</h5>";
+			echo '<h5>' . __('Available shortcodes', $this->plugin_slug) . '</h5>';
 		}
 
 		foreach ( (array) $wp_settings_fields[$page][$section] as $field ) {

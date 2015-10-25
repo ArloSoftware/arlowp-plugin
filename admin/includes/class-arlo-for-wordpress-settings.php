@@ -50,11 +50,11 @@ class Arlo_For_Wordpress_Settings {
                         array(
                             'id' => 'platform_name',
                             'label_for' => 'arlo_platform_name',
-                            'after_html' => '<a href="?page=arlo-for-wordpress&arlo-import">Re-import all data now</a>',
+                            'after_html' => '<a href="?page=arlo-for-wordpress&arlo-import">'.__('Re-import all data now', $this->plugin_slug).'</a>',
                             )
                 );                
                 
-                add_settings_field('arlo_price_setting', '<label for="arlo_price_setting">Price shown</label>', array($this, 'arlo_price_setting_callback'), $this->plugin_slug, 'arlo_general_section');
+                add_settings_field('arlo_price_setting', '<label for="arlo_price_setting">'.__('Price shown', $this->plugin_slug).'</label>', array($this, 'arlo_price_setting_callback'), $this->plugin_slug, 'arlo_general_section');
                 
 		// create API Endpoint field
 		add_settings_field(
@@ -90,7 +90,7 @@ class Arlo_For_Wordpress_Settings {
 	    	// post type slug
 			add_settings_field(
 				$id . '_posts_page',
-				'<label for="arlo_'.$id.'_posts_page">Posts Page</label>',
+				'<label for="arlo_'.$id.'_posts_page">'.__('Posts Page', $this->plugin_slug).'</label>',
 				array(
 					$this,
 					'arlo_posts_page_callback'
@@ -206,15 +206,6 @@ class Arlo_For_Wordpress_Settings {
 	    echo $html;
 	}
 
-	/*function arlo_cron_callback($args) {
-	    $settings = (array) get_option( "arlo_settings" );
-	    $val = array_key_exists($args['id'], $settings) ? esc_attr($settings[$args['id']]) : '';
-	    $html = '<input type="checkbox" id="'.$args['id'].'" name="arlo_settings['.$args['id'].']" '.($val ? 'checked' : '').' />';
-	    $html .= '<label for="'.$args['id'].'">'.$args['label'].'</label>';
-
-	    echo $html;
-	}*/
-
 	function arlo_template_callback($args) {
 	    $settings = get_option('arlo_settings');
 	    $val = isset($settings['templates'][$args['id']]['html']) ? $settings['templates'][$args['id']]['html'] : '';
@@ -223,7 +214,7 @@ class Arlo_For_Wordpress_Settings {
 	
 	function arlo_reload_template_callback() {
 		    echo '<div class="cf">
-		    		<div id="'.PLUGIN_PREFIX.'-reload-template"><a>Reload original template</a></div>
+		    		<div id="'.PLUGIN_PREFIX.'-reload-template"><a>' . __('Reload original template', $this->plugin_slug) . '</a></div>
 		    		<script type="text/javascript"> var arlo_blueprints = ' . json_encode($this->arlo_template_source()) . ';</script>
 		    	</div>';
 	}

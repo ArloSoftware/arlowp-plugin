@@ -6,7 +6,7 @@
 <p>
 	<label for="<?php echo $this->get_field_id('depth'); ?>"><?php _e('Depth',$this->plugin_slug); ?>:</label>
 	<input type="text" id="<?php echo $this->get_field_id('depth'); ?>" name="<?php echo $this->get_field_name('depth'); ?>" size="3" value="<?php echo $depth; ?>" /><br />
-	<small><?php _e('Sets the depth of categories to display. Entering 0 (zero) will display all levels.',$this->plugin_slug); ?></small>
+	<small><?php _e('Sets the depth of categories to display. Entering 0 (zero) will display all levels.', $this->plugin_slug); ?></small>
 </p>
 <p>
 	<label for="<?php echo $this->get_field_id('parent'); ?>"><?php _e('Match category',$this->plugin_slug); ?>:</label>

@@ -11,7 +11,7 @@ add_filter( 'the_title', function($title, $id = null){
 	
 	$pages = array(
 		$settings['post_types']['event']['posts_page'],
-                $settings['post_types']['upcoming']['posts_page']
+		$settings['post_types']['upcoming']['posts_page']
 	);
                 
 	$cat_slug = !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : '';
@@ -34,7 +34,7 @@ add_filter( 'the_title', function($title, $id = null){
 	}
 	
 	// append category name to events page
-        if (!empty($title)) {
+        if (!empty($subtitle)) {
             $title = '<span class="cat-title-ext">' . $title . ': </span>';
         }
         
@@ -49,7 +49,7 @@ add_action('parse_query', function($wp_query){
 		$wp_query->is_single = false;
 		$wp_query->is_page = true;
 	}
-	
+
 	return $wp_query;
 });
 
@@ -99,7 +99,6 @@ function arlo_child_categories($cats, $depth=0) {
 			'id' => $cat->c_arlo_id
 			);
 		$output = array_merge($output, arlo_child_categories($cat->children, $depth+1));
-
 	}
 
 	return $output;
@@ -117,7 +116,7 @@ function arlo_child_categories($cats, $depth=0) {
 function arlo_create_filter($type, $items, $label=null) {
 	if(is_null($label)) $label = $type;
 	$filter_html = '<select id="arlo-filter-'.$type.'" name="arlo-'.$type.'">';
-	$filter_html .= '<option value="">'.__('Filter by '.$label, 'arlo').'</option>';
+	$filter_html .= '<option value="">'.sprintf(__('Filter by %s', $GLOBALS['arlo_plugin_slug']), $label).'</option>';
 	$selected_value = isset($_GET['arlo-' . $type]) ? urldecode($_GET['arlo-' . $type]) : '';
 		
 	foreach($items as $key => $item) {
@@ -184,8 +183,8 @@ function arlo_register_custom_post_types() {
                 
 		$args = array(
 			'labels' => array(
-                'name' => __( $type['name'] ),
-                'singular_name' => __( $type['singular_name'] )
+                'name' => __( $type['name'], $GLOBALS['arlo_plugin_slug']),
+                'singular_name' => __( $type['singular_name'], $GLOBALS['arlo_plugin_slug'])
             ),
 			'public'             => true,
 			'publicly_queryable' => true,
@@ -193,16 +192,16 @@ function arlo_register_custom_post_types() {
 			'show_in_menu'       => false,
 			'query_var'          => true,
 			'rewrite'            => array(
-										'slug' => $slug,
-										'with_front' => false // false ensures no blog-like url
-									),
+				'slug' => $slug,
+				'with_front' => false // false ensures no blog-like url
+			),
 			'capability_type'    => 'page',
 			'has_archive'        => false,
 			'hierarchical'       => false,
 			'menu_position'      => null,
 			'supports'			 => array(
-										'comments' => false
-									)
+				'comments' => false
+			)
 		);
 		
 		// let's try some custom rewrite rules
@@ -402,7 +401,7 @@ function arlo_get_blueprint($name) {
 
 	}
 
-	return 'BlueprINT(11) NOT found';
+	return 'Blueprint NOT found';
 }
 
 /**
@@ -1228,13 +1227,10 @@ $shortcodes->add('event_template_name', function($content='', $atts, $shortcode_
 
 // event template permalink shortcode
 
-$shortcodes->add('event_template_permalink', function($content='', $atts, $shortcode_name){
-        
+$shortcodes->add('event_template_permalink', function($content='', $atts, $shortcode_name){        
 	if(!isset($GLOBALS['arlo_eventtemplate']['et_post_name'])) return '';
 
 	$et_id = arlo_get_post_by_name($GLOBALS['arlo_eventtemplate']['et_post_name'], 'arlo_event');
-
-	global $post;
 
 	return get_permalink($et_id);
 });
@@ -1311,7 +1307,7 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 
 	extract(shortcode_atts(array(
 		'filters'	=> 'category,location,delivery',
-		'resettext'	=> 'Reset',
+		'resettext'	=> __('Reset', $GLOBALS['arlo_plugin_slug']),
 		'buttonclass'   => 'button'
 	), $atts, $shortcode_name));
 	
@@ -1324,7 +1320,6 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 	}
         
 	$uri = explode('?', $_SERVER['REQUEST_URI']);
-	$action = preg_replace('/(.*)\/page\/([^\/]*)\/?/i', '$1/', $uri[0]);
 	
 	$filter_html = '<form id="arlo-event-filter" class="arlo-filters" method="get" action="'.site_url().'/'.$slug.'/">';
 	
@@ -1338,7 +1333,7 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 				
 				$cats = \Arlo\Categories::getTree();
 
-				$filter_html .= arlo_create_filter('category', arlo_child_categories($cats[0]->children), 'category');
+				$filter_html .= arlo_create_filter('category', arlo_child_categories($cats[0]->children), __('category', $GLOBALS['arlo_plugin_slug']));
 				
 				break;
 				
@@ -1346,7 +1341,7 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 
 				// delivery select
 
-				$filter_html .= arlo_create_filter($filter, Arlo_For_Wordpress::$delivery_labels, 'delivery');
+				$filter_html .= arlo_create_filter($filter, Arlo_For_Wordpress::$delivery_labels, __('delivery', $GLOBALS['arlo_plugin_slug']));
 
 				break;				
 
@@ -1375,7 +1370,7 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 
 				endfor;
 
-				$filter_html .= arlo_create_filter($filter, $locations, 'location');
+				$filter_html .= arlo_create_filter($filter, $locations, __('location', $GLOBALS['arlo_plugin_slug']));
 
 				break;
 
@@ -1544,19 +1539,22 @@ $shortcodes->add('event_registration', function($content='', $atts, $shortcode_n
 	$registermessage = $GLOBALS['arlo_event_list_item']['e_registermessage'];
 	$placesremaining = $GLOBALS['arlo_event_list_item']['e_placesremaining'];
         
-        $class = (!empty($atts['class']) ? $atts['class'] : 'button' );
+	$class = (!empty($atts['class']) ? $atts['class'] : 'button' );
 
 	$registration = '<div class="arlo-event-registration">';
-	$registration .= (($isfull) ? '<span class="arlo-event-full">' . __('Event is full', 'arlo') . '</span>' : '');
+	$registration .= (($isfull) ? '<span class="arlo-event-full">' . __('Event is full', $GLOBALS['arlo_plugin_slug']) . '</span>' : '');
 	// test if there is a register uri string, if so display the button
 	if(!is_null($registeruri) && $registeruri != '') {
 		$registration .= '<a class="' . $class . ' ' . (($isfull) ? 'arlo-waiting-list' : 'arlo-register') . '" href="'. $registeruri . '" target="_blank">';
-		$registration .= (($isfull) ? __('Join waiting list', 'arlo') : __($registermessage, 'arlo')) . '</a>';
+		$registration .= (($isfull) ? __('Join waiting list', $GLOBALS['arlo_plugin_slug']) : __($registermessage, $GLOBALS['arlo_plugin_slug'])) . '</a>';
 	} else {
-            $registration .= $registermessage;
-        }
-	$registration .= (($placesremaining > 1) ? '<span class="arlo-places-remaining">' . $placesremaining . ' ' . __('places remaining', 'arlo') .'</span>' : '');
-	$registration .= (($placesremaining == 1) ? '<span class="arlo-places-remaining">' . $placesremaining . ' ' . __('place remaining', 'arlo') .'</span>' : '');
+		$registration .= $registermessage;
+	}
+
+	if ($placesremaining > 0) {
+		$registration .= '<span class="arlo-places-remaining">' . sprintf( _n( '%d place remaining', '%d places remaining', $placesremaining, $GLOBALS['arlo_plugin_slug'] ), $placesremaining ) .'</span>';	
+	}
+	
 	$registration .= '</div>';
 
 	return $registration;
@@ -1587,15 +1585,15 @@ $shortcodes->add('event_offers', function($content='', $atts, $shortcode_name){
         
         $settings = get_option('arlo_settings');  
         $price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : PLUGIN_PREFIX . '-exclgst';      
-        $free_text = (isset($settings['free_text'])) ? esc_attr($settings['free_text']) : __('Free', 'arlo');
+        $free_text = (isset($settings['free_text'])) ? esc_attr($settings['free_text']) : __('Free', $GLOBALS['arlo_plugin_slug']);
 
 
 	foreach($offers_array as $offer) {
 
 		extract($offer);
                 
-                $amount = $price_setting == PLUGIN_PREFIX . '-exclgst' ? $o_offeramounttaxexclusive : $o_offeramounttaxinclusive;
-                $famount = $price_setting == PLUGIN_PREFIX . '-exclgst' ? $o_formattedamounttaxexclusive : $o_formattedamounttaxinclusive;
+		$amount = $price_setting == PLUGIN_PREFIX . '-exclgst' ? $o_offeramounttaxexclusive : $o_offeramounttaxinclusive;
+		$famount = $price_setting == PLUGIN_PREFIX . '-exclgst' ? $o_formattedamounttaxexclusive : $o_formattedamounttaxinclusive;
 
 		// set to true if there is a replacement offer returned for this event offer
 		$replaced = (!is_null($replacement_amount) && $replacement_amount != '');
@@ -1613,8 +1611,8 @@ $shortcodes->add('event_offers', function($content='', $atts, $shortcode_name){
 		$offers .= (!is_null($o_label) || $o_label != '') ? $o_label.' ':'';
 		if($amount > 0) {
 			$offers .= '<span class="amount">'.$famount.'</span> ';
-			// only include the excl. tax if the offer is not replaced
-			$offers .= $replaced ? '' : '<span class="arlo-price-tax">' . ($price_setting == PLUGIN_PREFIX . '-exclgst' ? __('excl.', 'arlo') : __('incl.', 'arlo')).' '.$o_taxrateshortcode . '</span>';
+			// only include the excl. tax if the offer is not replaced			
+			$offers .= $replaced ? '' : '<span class="arlo-price-tax">' . ($price_setting == PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode) : sprintf(__('incl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode) . '</span>');
 		} else {
 			$offers .= '<span class="amount free">'.$free_text.'</span> ';
 		}
@@ -1622,12 +1620,11 @@ $shortcodes->add('event_offers', function($content='', $atts, $shortcode_name){
 		$offers .= (!is_null($o_message) || $o_message != '') ? ' '.$o_message:'';
 		// if a replacement offer exists
 		if($replaced) {
-			$offers .= '</span><span';
-			$offers .= $replacement_discount ? ' class="discount"' : '';
-			$offers .= '>';
+			$offers .= '</span><span ' . $replacement_discount ? 'class="discount"' : '' . '>';
+			
 			// display replacement offer label if there is one
 			$offers .= (!is_null($replacement_label) || $replacement_label != '') ? $replacement_label.' ':'';
-			$offers .= '<span class="amount">'.$replacement_amount.'</span> <span class="arlo-price-tax">'.($price_setting == PLUGIN_PREFIX . '-exclgst' ? __('excl.', 'arlo') : __('incl.', 'arlo')).' '.$o_taxrateshortcode . '</span>';
+			$offers .= '<span class="amount">'.$replacement_amount.'</span> <span class="arlo-price-tax">'.($price_setting == PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode) : sprintf(__('incl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode)) . '</span>';
 			// display replacement offer message if there is one
 			$offers .= (!is_null($replacement_message) || $replacement_message != '') ? ' '.$replacement_message:'';
 
@@ -1675,7 +1672,7 @@ $shortcodes->add('event_presenters', function($content='', $atts, $shortcode_nam
 	if($layout == 'list') {
 
 		$output .= '<figure>';
-		$output .= '<figcaption class="arlo-event-presenters-title">'._n('Presenter', 'Presenters', $np, 'arlo').'</figcaption>';
+		$output .= '<figcaption class="arlo-event-presenters-title">'._n('Presenter', 'Presenters', $np, $GLOBALS['arlo_plugin_slug']).'</figcaption>';
 		$output .= '<ul class="arlo-list event-presenters">';
 
 		foreach($items as $item) {
@@ -1840,9 +1837,9 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 
 		$dates = explode(':',urldecode($_GET['arlo-month']));
 
-		$where .= " AND (DATE(e.e_startdatetime) BETWEEN DATE('$dates[0]')";
+		$where .= " AND (DATE(e.e_startdatetime) BETWEEN DATE('{$dates[0]}')";
 
-		$where .= " AND DATE('$dates[1]'))";
+		$where .= " AND DATE('{$dates[1]}'))";
 		
 
 	endif;
@@ -1884,7 +1881,7 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 
 	if(empty($items)) :
 
-		$output = '<p class="arlo-no-results">' . __('No events to show', 'arlo') . '</p>';
+		$output = '<p class="arlo-no-results">' . __('No events to show', $GLOBALS['arlo_plugin_slug']) . '</p>';
 
 	else :
 
@@ -1917,15 +1914,15 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 // upcoming event offer shortcode
 
 $shortcodes->add('upcoming_offer', function($content='', $atts, $shortcode_name){
-        $settings = get_option('arlo_settings');  
-        $price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : PLUGIN_PREFIX . '-exclgst';
-        $free_text = (isset($settings['free_text'])) ? esc_attr($settings['free_text']) : __('Free', 'arlo');
+	$settings = get_option('arlo_settings');  
+	$price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : PLUGIN_PREFIX . '-exclgst';
+	$free_text = (isset($settings['free_text'])) ? esc_attr($settings['free_text']) : __('Free', $GLOBALS['arlo_plugin_slug']);
             
 	$amount = $price_setting == PLUGIN_PREFIX . '-exclgst' ? $GLOBALS['arlo_event_list_item']['o_offeramounttaxexclusive'] : $GLOBALS['arlo_event_list_item']['o_offeramounttaxinclusive'];
 	$famount = $price_setting == PLUGIN_PREFIX . '-exclgst' ? $GLOBALS['arlo_event_list_item']['o_formattedamounttaxexclusive'] : $GLOBALS['arlo_event_list_item']['o_formattedamounttaxinclusive'];
 	$tax = $GLOBALS['arlo_event_list_item']['o_taxrateshortcode'];
 
-	$offer = ($amount > 0) ? '<span class="arlo-amount">'.$famount .'</span> <span class="arlo-price-tax">'. ($price_setting == PLUGIN_PREFIX . '-exclgst' ? __(' excl.', 'arlo') : __(' incl.', 'arlo')).' '.$tax . '</span>' : '<span class="arlo-amount">'.$free_text.'</span>';
+	$offer = ($amount > 0) ? '<span class="arlo-amount">'.$famount .'</span> <span class="arlo-price-tax">'. ($price_setting == PLUGIN_PREFIX . '-exclgst' ? sprintf(__(' excl. %s', $GLOBALS['arlo_plugin_slug']), $tax) : sprintf(__(' incl. %s', $GLOBALS['arlo_plugin_slug']), $tax)) . '</span>' : '<span class="arlo-amount">'.$free_text.'</span>';
 
 	return $offer;
 });
@@ -1937,7 +1934,7 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 	
 	extract(shortcode_atts(array(
 		'filters'	=> 'category,month,location,delivery',
-		'resettext'	=> 'Reset',
+		'resettext'	=> __('Reset', $GLOBALS['arlo_plugin_slug']),
 		'buttonclass'   => 'button'
 	), $atts, $shortcode_name));
 
@@ -1952,7 +1949,6 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 	}
 	
 	$uri = explode('?', $_SERVER['REQUEST_URI']);
-	$action = preg_replace('/(.*)\/page\/([^\/]*)\/?/i', '$1/', $uri[0]);
 	
 	$filter_html = '<form class="arlo-filters" method="get" action="'.site_url().'/'.$slug.'">';
 
@@ -1966,7 +1962,7 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 
 				$cats = \Arlo\Categories::getTree();
 
-				$filter_html .= arlo_create_filter($filter, arlo_child_categories($cats[0]->children), 'category');
+				$filter_html .= arlo_create_filter($filter, arlo_child_categories($cats[0]->children), __('category', $GLOBALS['arlo_plugin_slug']));
 
 				break;
 				
@@ -1974,7 +1970,7 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 
 				// delivery select
 
-				$filter_html .= arlo_create_filter($filter, Arlo_For_Wordpress::$delivery_labels, 'delivery');
+				$filter_html .= arlo_create_filter($filter, Arlo_For_Wordpress::$delivery_labels, __('delivery', $GLOBALS['arlo_plugin_slug']));
 
 				break;
 								
@@ -1994,7 +1990,7 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 
 				}
 
-				$filter_html .= arlo_create_filter($filter, $months, 'months');
+				$filter_html .= arlo_create_filter($filter, $months, __('month', $GLOBALS['arlo_plugin_slug']));
 
 				break;
 
@@ -2024,7 +2020,7 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 
 				endfor;
 
-				$filter_html .= arlo_create_filter($filter, $locations, 'location');
+				$filter_html .= arlo_create_filter($filter, $locations, __('location', $GLOBALS['arlo_plugin_slug']));
 
 				break;
 
@@ -2149,7 +2145,7 @@ $shortcodes->add('venue_map', function($content='', $atts, $shortcode_name){
 		$map .= '&zoom=' . $zoom . '"';
 		$map .= ' height="' . $height . '"';
 		$map .= ' width="' . $width . '"';
-		$map .= ' alt="Map of ' . $name . '"'; 
+		$map .= ' alt="' .sprintf(__('Map of %s', $GLOBALS['arlo_plugin_slug']), $name) . '"'; 
 		$map .= ' />';
 
 		return $map;
@@ -2512,7 +2508,7 @@ $shortcodes->add('suggest_datelocation', function($content='', $atts, $shortcode
 
 	// merge and extract attributes
 	extract(shortcode_atts(array(
-		'text'	=> 'Suggest another date/location',
+		'text'	=> __('Suggest another date/location', $GLOBALS['arlo_plugin_slug']),
 	), $atts, $shortcode_name));
 	
 	if(!isset($GLOBALS['arlo_eventtemplate']['et_registerinteresturi']) || empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) return '';
@@ -2644,21 +2640,16 @@ $shortcodes->add('event_duration', function($content='', $atts, $shortcode_name)
 	if(date('d-m', strtotime($start)) == date('d-m', strtotime($end))) {
 		$hours = floor($difference/60/60);
                 
-                if ($hours > 6) {
-                    return "1 day";
-                }
+		if ($hours > 6) {
+			return __('1 day', $GLOBALS['arlo_plugin_slug']);
+		}
 
 		$minutes = ceil(($difference % 3600)/60);
 
 		$duration = '';
 		
 		if($hours > 0) {
-			$duration .= $hours;
-			if($hours > 1) {
-				$duration .= ' hours';
-			} else {
-				$duration .= ' hour';
-			}
+			$duration .= sprintf(_n('%d hour', '%d hours', $hours, $GLOBALS['arlo_plugin_slug']), $hours);
 		}
 
 		if($hours > 0 && $minutes > 0) {
@@ -2666,12 +2657,7 @@ $shortcodes->add('event_duration', function($content='', $atts, $shortcode_name)
 		}
 
 		if($minutes > 0) {
-			$duration .= $minutes;
-			if($minutes > 1) {
-				$duration .= ' minutes';
-			} else {
-				$duration .= ' minute';
-			}
+			$duration .= sprintf(_n('%d minute', '%d minutes', $minutes, $GLOBALS['arlo_plugin_slug']), $minutes);
 		}
 		
 		return $duration;
@@ -2681,26 +2667,14 @@ $shortcodes->add('event_duration', function($content='', $atts, $shortcode_name)
 	if(ceil($difference/60/60/24) <= 7) {
 		$days = ceil($difference/60/60/24);
 		
-		if($days > 1) {
-			$days .= ' days';
-		} else {
-			$days .= ' day';
-		}
-		
-		return $days;
+		return sprintf(_n('%d day','%d days', $days, $GLOBALS['arlo_plugin_slug']), $days);
 	}
 	
 	// if not the same day, and more than 7 days, then show number of weeks
 	if(ceil($difference/60/60/24) > 7) {
 		$weeks = ceil($difference/60/60/24/7);
 		
-		if($weeks > 1) {
-			$weeks .= ' weeks';
-		} else {
-			$weeks .= ' week';
-		}
-		
-		return $weeks;
+		return sprintf(_n('%d week','%d weeks', $weeks, $GLOBALS['arlo_plugin_slug']), $weeks);		
 	}
 	
 	return;
@@ -2714,7 +2688,7 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
         $price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : PLUGIN_PREFIX . '-exclgst';
         $price_field = $price_setting == PLUGIN_PREFIX . '-exclgst' ? 'o_offeramounttaxexclusive' : 'o_offeramounttaxinclusive';
         $price_field_show = $price_setting == PLUGIN_PREFIX . '-exclgst' ? 'o_formattedamounttaxexclusive' : 'o_formattedamounttaxinclusive';
-        $free_text = (isset($settings['free_text'])) ? esc_attr($settings['free_text']) : __('Free', 'arlo');
+        $free_text = (isset($settings['free_text'])) ? esc_attr($settings['free_text']) : __('Free', $GLOBALS['arlo_plugin_slug']);
         
         
 	// attempt to find event template offer
@@ -2750,7 +2724,7 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 		return $free_text;
 	}
 	
-	return '<span class="arlo-from-text">' . __('From') . '</span> ' . $offer->$price_field_show;
+	return '<span class="arlo-from-text">' . __('From', $GLOBALS['arlo_plugin_slug']) . '</span> ' . $offer->$price_field_show;
 });
 
 // event template next running
@@ -2770,10 +2744,10 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 		'format' => 'd M y',
 		'layout' => '',
 		'limit' => 1,
-                'removeyear' => "true"
+		'removeyear' => "true"
 	), $atts, $shortcode_name));
         
-        $removeyear = ($removeyear == "false" || $removeyear == "0" ? false : true);
+	$removeyear = ($removeyear == "false" || $removeyear == "0" ? false : true);
 	
 	$events = \Arlo\Events::get($conditions, array('e.e_startdatetime ASC'), $limit);
 		
@@ -2786,7 +2760,7 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 	}
 	
 	if(count($events) == 0 && !empty($GLOBALS['arlo_event_list_item']['et_registerinteresturi'])) {
-		$return = '<a href="' . $GLOBALS['arlo_event_list_item']['et_registerinteresturi'] . '" title="' . __('Register interest') . '" class="' . $buttonclass . '">' . __('Register interest') . '</a>';
+		$return = '<a href="' . $GLOBALS['arlo_event_list_item']['et_registerinteresturi'] . '" title="' . __('Register interest', $GLOBALS['arlo_plugin_slug']) . '" class="' . $buttonclass . '">' . __('Register interest', $GLOBALS['arlo_plugin_slug']) . '</a>';
 	} else if (count($events)) {
 		$return_links = [];
 
