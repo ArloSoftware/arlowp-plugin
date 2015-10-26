@@ -1313,14 +1313,12 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 	
 	$filters_array = explode(',',$filters);
         
-	if (!empty($settings['post_types']['upcoming'])) {
-		$slug = get_post($settings['post_types']['upcoming']['posts_page'])->post_name;
+	if (!empty($settings['post_types']['event'])) {
+		$slug = get_post($settings['post_types']['event']['posts_page'])->post_name;
 	} else {
 		$slug = get_post($post)->post_name;
 	}
-        
-	$uri = explode('?', $_SERVER['REQUEST_URI']);
-	
+        	
 	$filter_html = '<form id="arlo-event-filter" class="arlo-filters" method="get" action="'.site_url().'/'.$slug.'/">';
 	
 	foreach($filters_array as $filter) :
@@ -1417,9 +1415,9 @@ $shortcodes->add('event_list_item', function($content='', $atts, $shortcode_name
 
 		$GLOBALS['arlo_event_list_item'] = $item;
                 
-                if (!empty($atts['show']) && $key == $atts['show']) {
-                    $output .= '</ul><div class="arlo-clear-both"></div><ul class="arlo-list arlo-show-more-hidden events">';
-                }
+		if (!empty($atts['show']) && $key == $atts['show']) {
+		    $output .= '</ul><div class="arlo-clear-both"></div><ul class="arlo-list arlo-show-more-hidden events">';
+		}
 
 		$output .= do_shortcode($content);
 
@@ -1947,8 +1945,6 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 	} else {
 		$slug = get_post($post)->post_name;
 	}
-	
-	$uri = explode('?', $_SERVER['REQUEST_URI']);
 	
 	$filter_html = '<form class="arlo-filters" method="get" action="'.site_url().'/'.$slug.'">';
 
