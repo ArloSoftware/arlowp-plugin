@@ -96,6 +96,9 @@ require_once( plugin_dir_path( __FILE__ ) . '/widgets/upcoming-widget/class-arlo
 add_action( 'plugins_loaded', array( 'Arlo_For_Wordpress_Upcoming_Widget', 'get_instance' ) );
 require_once( plugin_dir_path( __FILE__ ) . '/widgets/categories-widget/class-arlo-for-wordpress-categories-widget.php' );
 add_action( 'plugins_loaded', array( 'Arlo_For_Wordpress_Categories_Widget', 'get_instance' ) );
+require_once( plugin_dir_path( __FILE__ ) . '/widgets/search-widget/class-arlo-for-wordpress-search-widget.php' );
+add_action( 'plugins_loaded', array( 'arlo_for_wordpress_search_widget', 'get_instance' ) );
+
 
 /*----------------------------------------------------------------------------*
  * Dashboard and Administrative Functionality

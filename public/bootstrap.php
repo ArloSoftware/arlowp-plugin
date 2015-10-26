@@ -988,6 +988,17 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 		
 	endif;	
 	
+	if (!empty($_GET['arlo-search'])) {
+		$where .= '
+		AND (
+				et_code like "%' . $_GET['arlo-search'] . '%"
+			OR
+				et_name like "%' . $_GET['arlo-search'] . '%"
+			OR 
+				et_descriptionsummary like "%' . $_GET['arlo-search'] . '%"
+		)
+		';
+	}	
 	
 	if(isset($_GET['arlo-category']) || isset($atts['category'])) {
 
@@ -1097,6 +1108,18 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 		endif;	
 		
 	endif;	
+	
+	if (!empty($_GET['arlo-search'])) {
+		$where .= '
+		AND (
+				et_code like "%' . $_GET['arlo-search'] . '%"
+			OR
+				et_name like "%' . $_GET['arlo-search'] . '%"
+			OR 
+				et_descriptionsummary like "%' . $_GET['arlo-search'] . '%"
+		)
+		';
+	}	
 	
 		
 	if(isset($_GET['arlo-category']) || isset($atts['category'])) {
@@ -1312,14 +1335,14 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 	), $atts, $shortcode_name));
 	
 	$filters_array = explode(',',$filters);
+	
+	$settings = get_option('arlo_settings');  
         
-	if (!empty($settings['post_types']['upcoming'])) {
-		$slug = get_post($settings['post_types']['upcoming']['posts_page'])->post_name;
+	if (!empty($settings['post_types']['event'])) {
+		$slug = get_post($settings['post_types']['event']['posts_page'])->post_name;
 	} else {
 		$slug = get_post($post)->post_name;
 	}
-        
-	$uri = explode('?', $_SERVER['REQUEST_URI']);
 	
 	$filter_html = '<form id="arlo-event-filter" class="arlo-filters" method="get" action="'.site_url().'/'.$slug.'/">';
 	
@@ -1402,14 +1425,17 @@ $shortcodes->add('event_list_item', function($content='', $atts, $shortcode_name
 	$t4 = "{$wpdb->prefix}arlo_events_presenters";
 	$t5 = "{$wpdb->prefix}arlo_presenters";
 	$t6 = "{$wpdb->prefix}arlo_offers";
-
-	$items = $wpdb->get_results("SELECT $t2.*, $t3.v_post_name FROM $t2
+	
+	$sql = 
+		"SELECT $t2.*, $t3.v_post_name FROM $t2
 		LEFT JOIN $t3
 		ON $t2.v_id = $t3.v_arlo_id
 		LEFT JOIN $t1
 		ON $t2.et_arlo_id = $t1.et_arlo_id
 		WHERE $t1.et_post_name = '$post->post_name'
-		ORDER BY $t2.e_startdatetime", ARRAY_A);
+		ORDER BY $t2.e_startdatetime";
+		
+	$items = $wpdb->get_results($sql, ARRAY_A);
 	
 	$output = '';
 
@@ -1417,9 +1443,9 @@ $shortcodes->add('event_list_item', function($content='', $atts, $shortcode_name
 
 		$GLOBALS['arlo_event_list_item'] = $item;
                 
-                if (!empty($atts['show']) && $key == $atts['show']) {
-                    $output .= '</ul><div class="arlo-clear-both"></div><ul class="arlo-list arlo-show-more-hidden events">';
-                }
+		if (!empty($atts['show']) && $key == $atts['show']) {
+		    $output .= '</ul><div class="arlo-clear-both"></div><ul class="arlo-list arlo-show-more-hidden events">';
+		}
 
 		$output .= do_shortcode($content);
 
@@ -1947,8 +1973,6 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 	} else {
 		$slug = get_post($post)->post_name;
 	}
-	
-	$uri = explode('?', $_SERVER['REQUEST_URI']);
 	
 	$filter_html = '<form class="arlo-filters" method="get" action="'.site_url().'/'.$slug.'">';
 
