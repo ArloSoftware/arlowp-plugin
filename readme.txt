@@ -1,4 +1,4 @@
-=== Arlo for WordPress – Training and Event Management, and online registration ===
+=== Arlo - Training and Event Management, and online registration ===
 Contributors: arlo, adamfentosi
 Tags: online registration, event registration, training management,  event management, event plugin, training company software, training calendar, training administration, training management software, training provider, solution, events calendar, wordpress events, event ticketing, wordpress lms, class registration, conference registration,  ticket, registration, event manager, training, booking, ticketing
 Requires at least: 3.7
@@ -7,7 +7,7 @@ Stable tag: 2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Seamlessly integrate Arlo’s market leading training and event management system into your website using the Arlo for WordPress plugin. 
+Seamlessly integrate Arlo√ïs market leading training and event management system into your website using the Arlo for WordPress plugin. 
 
 == Description ==
 = Arlo training and event management system =
@@ -97,7 +97,7 @@ The minimum requirement PHP version for the plugin is PHP 5.4.
 
 == Languages ==
 
-The Arlo for WordPress – Training and Event Management, and online registration plugin is only available in English, but we will translate it to many different languages soon.
+The Arlo - Training and Event Management, and online registration plugin is only available in English, but we will translate it to many different languages soon.
 
 == Screenshots ==
 1. Settings page
