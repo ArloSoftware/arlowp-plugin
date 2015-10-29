@@ -207,8 +207,11 @@ function arlo_register_custom_post_types() {
 		// let's try some custom rewrite rules
 		if($page_id) {
 			switch($id) {
+				case 'upcoming':
+					add_rewrite_rule('^' . $slug . '/page/([^/]*)/?','index.php?page_id=' . $page_id . '&paged=$matches[1]','top');
+				break;			
 				case 'event':
-
+					add_rewrite_rule('^' . $slug . '/page/([^/]*)/?','index.php?page_id=' . $page_id . '&paged=$matches[1]','top');
 				break;
 				case 'presenter':
 					add_rewrite_rule('^' . $slug . '/page/([^/]*)/?','index.php?page_id=' . $page_id . '&paged=$matches[1]','top');
@@ -228,6 +231,7 @@ function arlo_register_custom_post_types() {
 	add_rewrite_tag('%month%', '([^&]+)');
 	add_rewrite_tag('%location%', '([^&]+)');
 	add_rewrite_tag('%delivery%', '([^&]+)');
+	add_rewrite_tag('%paged%', '([^&]+)');
 	
 	// flush cached rewrite rules if we've just updated the arlo settings
 	if(isset($_GET['settings-updated'])) flush_rewrite_rules();
@@ -374,10 +378,12 @@ function arlo_pagination($num, $limit=null) {
 	
 	$big = 999999999;
 	
+	$current = !empty($_GET['paged']) ? intval($_GET['paged']) : intval(get_query_var('paged'));
+	
 	return paginate_links(array(
 		'base' => str_replace( $big, '%#%', esc_url( get_pagenum_link( $big ) ) ),
 		'format' => '?paged=%#%',
-		'current' => max( 1, get_query_var('paged') ),
+		'current' => max( 1, $current ),
 		'total' => ceil($num/$limit),
 		'mid_size' => 6
 	));
@@ -1073,7 +1079,8 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 	}
 
 	$limit = isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page');
-	$offset = (get_query_var('paged') && intval(get_query_var('paged')) > 0) ? intval(get_query_var('paged')) * $limit - $limit: 0 ;
+	$page = !empty($_GET['paged']) ? intval($_GET['paged']) : intval(get_query_var('paged'));
+	$offset = ($page > 0) ? $page * $limit - $limit: 0 ;
 
 	$t1 = "{$wpdb->prefix}arlo_eventtemplates";
 	$t2 = "{$wpdb->prefix}posts";
@@ -1818,7 +1825,8 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 	global $wpdb;
 
 	$limit = isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page');
-	$offset = (get_query_var('paged') && intval(get_query_var('paged')) > 0) ? intval(get_query_var('paged')) * $limit - $limit: 0 ;
+	$page = !empty($_GET['paged']) ? intval($_GET['paged']) : intval(get_query_var('paged'));
+	$offset = ($page > 0) ? $page * $limit - $limit: 0 ;
 
 	$output = '';
 
