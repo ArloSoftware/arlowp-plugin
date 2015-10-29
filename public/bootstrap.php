@@ -1071,12 +1071,14 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 // event template list item shortcode
 
 $shortcodes->add('event_template_list_item', function($content='', $atts, $shortcode_name){
-	global $wpdb, $wp_query;
+	global $wpdb, $wp_query, $arlo_plugin;
 	
 	if (isset($atts['show_only_at_bottom']) && $atts['show_only_at_bottom'] == "true" && isset($GLOBALS['categories_count']) && $GLOBALS['categories_count']) {
 		$GLOBALS['show_only_at_bottom'] = true;
 		return;
 	}
+        
+        $active = $arlo_plugin->get_last_import();
 
 	$limit = isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page');
 	$page = !empty($_GET['paged']) ? intval($_GET['paged']) : intval(get_query_var('paged'));
@@ -1088,7 +1090,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 	$t4 = "{$wpdb->prefix}arlo_categories";
 	$t5 = "{$wpdb->prefix}arlo_events";
 		
-	$where = "WHERE post.post_type = 'arlo_event'";
+	$where = "WHERE post.post_type = 'arlo_event' AND et.active = '{$active}'";
 	$join = "";
 	
 	if(!empty($_GET['arlo-location']) || (isset($_GET['arlo-delivery']) && strlen($_GET['arlo-delivery']) && is_numeric($_GET['arlo-delivery'])) ) :
@@ -1149,7 +1151,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 		
 		$where .= ')';
 	} else if (!(isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true")) {
-		$where .= ' AND c.c_parent_id = 1';
+		$where .= ' AND c.c_parent_id = (SELECT c_arlo_id FROM ' . $t4 . ' WHERE c_parent_id = 0 AND active = "' . $active . '")';
 	}	
 	
 	// grouping
