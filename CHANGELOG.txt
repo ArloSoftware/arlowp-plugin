@@ -1,3 +1,10 @@
+== V2.1 ==
+
+Bugfixes
+------------------
+Issue #51
+
+
 == V2.07 ==
 
 Enhancement
