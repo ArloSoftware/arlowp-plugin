@@ -399,7 +399,7 @@ function arlo_pagination($num, $limit=null) {
  * @return   string the contents of the blueprint file
  */
 function arlo_get_blueprint($name) {
-	$path = PLUGIN_DIR.'/includes/blueprints/'.$name.'.tmpl';
+	$path = ARLO_PLUGIN_DIR.'/includes/blueprints/'.$name.'.tmpl';
 
 	if(file_exists($path)) {
 
@@ -1589,7 +1589,7 @@ $shortcodes->add('event_offers', function($content='', $atts, $shortcode_name){
 	$offers = '<ul class="arlo-list arlo-event-offers">';
         
         $settings = get_option('arlo_settings');  
-        $price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : PLUGIN_PREFIX . '-exclgst';      
+        $price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : ARLO_PLUGIN_PREFIX . '-exclgst';      
         $free_text = (isset($settings['free_text'])) ? esc_attr($settings['free_text']) : __('Free', $GLOBALS['arlo_plugin_slug']);
 
 
@@ -1597,8 +1597,8 @@ $shortcodes->add('event_offers', function($content='', $atts, $shortcode_name){
 
 		extract($offer);
                 
-		$amount = $price_setting == PLUGIN_PREFIX . '-exclgst' ? $o_offeramounttaxexclusive : $o_offeramounttaxinclusive;
-		$famount = $price_setting == PLUGIN_PREFIX . '-exclgst' ? $o_formattedamounttaxexclusive : $o_formattedamounttaxinclusive;
+		$amount = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $o_offeramounttaxexclusive : $o_offeramounttaxinclusive;
+		$famount = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $o_formattedamounttaxexclusive : $o_formattedamounttaxinclusive;
 
 		// set to true if there is a replacement offer returned for this event offer
 		$replaced = (!is_null($replacement_amount) && $replacement_amount != '');
@@ -1617,7 +1617,7 @@ $shortcodes->add('event_offers', function($content='', $atts, $shortcode_name){
 		if($amount > 0) {
 			$offers .= '<span class="amount">'.$famount.'</span> ';
 			// only include the excl. tax if the offer is not replaced			
-			$offers .= $replaced ? '' : '<span class="arlo-price-tax">' . ($price_setting == PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode) : sprintf(__('incl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode) . '</span>');
+			$offers .= $replaced ? '' : '<span class="arlo-price-tax">' . ($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode) : sprintf(__('incl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode) . '</span>');
 		} else {
 			$offers .= '<span class="amount free">'.$free_text.'</span> ';
 		}
@@ -1629,7 +1629,7 @@ $shortcodes->add('event_offers', function($content='', $atts, $shortcode_name){
 			
 			// display replacement offer label if there is one
 			$offers .= (!is_null($replacement_label) || $replacement_label != '') ? $replacement_label.' ':'';
-			$offers .= '<span class="amount">'.$replacement_amount.'</span> <span class="arlo-price-tax">'.($price_setting == PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode) : sprintf(__('incl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode)) . '</span>';
+			$offers .= '<span class="amount">'.$replacement_amount.'</span> <span class="arlo-price-tax">'.($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode) : sprintf(__('incl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode)) . '</span>';
 			// display replacement offer message if there is one
 			$offers .= (!is_null($replacement_message) || $replacement_message != '') ? ' '.$replacement_message:'';
 
@@ -1921,14 +1921,14 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 
 $shortcodes->add('upcoming_offer', function($content='', $atts, $shortcode_name){
 	$settings = get_option('arlo_settings');  
-	$price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : PLUGIN_PREFIX . '-exclgst';
+	$price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : ARLO_PLUGIN_PREFIX . '-exclgst';
 	$free_text = (isset($settings['free_text'])) ? esc_attr($settings['free_text']) : __('Free', $GLOBALS['arlo_plugin_slug']);
             
-	$amount = $price_setting == PLUGIN_PREFIX . '-exclgst' ? $GLOBALS['arlo_event_list_item']['o_offeramounttaxexclusive'] : $GLOBALS['arlo_event_list_item']['o_offeramounttaxinclusive'];
-	$famount = $price_setting == PLUGIN_PREFIX . '-exclgst' ? $GLOBALS['arlo_event_list_item']['o_formattedamounttaxexclusive'] : $GLOBALS['arlo_event_list_item']['o_formattedamounttaxinclusive'];
+	$amount = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $GLOBALS['arlo_event_list_item']['o_offeramounttaxexclusive'] : $GLOBALS['arlo_event_list_item']['o_offeramounttaxinclusive'];
+	$famount = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $GLOBALS['arlo_event_list_item']['o_formattedamounttaxexclusive'] : $GLOBALS['arlo_event_list_item']['o_formattedamounttaxinclusive'];
 	$tax = $GLOBALS['arlo_event_list_item']['o_taxrateshortcode'];
 
-	$offer = ($amount > 0) ? '<span class="arlo-amount">'.$famount .'</span> <span class="arlo-price-tax">'. ($price_setting == PLUGIN_PREFIX . '-exclgst' ? sprintf(__(' excl. %s', $GLOBALS['arlo_plugin_slug']), $tax) : sprintf(__(' incl. %s', $GLOBALS['arlo_plugin_slug']), $tax)) . '</span>' : '<span class="arlo-amount">'.$free_text.'</span>';
+	$offer = ($amount > 0) ? '<span class="arlo-amount">'.$famount .'</span> <span class="arlo-price-tax">'. ($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__(' excl. %s', $GLOBALS['arlo_plugin_slug']), $tax) : sprintf(__(' incl. %s', $GLOBALS['arlo_plugin_slug']), $tax)) . '</span>' : '<span class="arlo-amount">'.$free_text.'</span>';
 
 	return $offer;
 });
@@ -2689,9 +2689,9 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 	if(!isset($GLOBALS['arlo_event_list_item']) || empty($GLOBALS['arlo_event_list_item']['et_arlo_id'])) return;
 	
         $settings = get_option('arlo_settings');  
-        $price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : PLUGIN_PREFIX . '-exclgst';
-        $price_field = $price_setting == PLUGIN_PREFIX . '-exclgst' ? 'o_offeramounttaxexclusive' : 'o_offeramounttaxinclusive';
-        $price_field_show = $price_setting == PLUGIN_PREFIX . '-exclgst' ? 'o_formattedamounttaxexclusive' : 'o_formattedamounttaxinclusive';
+        $price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : ARLO_PLUGIN_PREFIX . '-exclgst';
+        $price_field = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? 'o_offeramounttaxexclusive' : 'o_offeramounttaxinclusive';
+        $price_field_show = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? 'o_formattedamounttaxexclusive' : 'o_formattedamounttaxinclusive';
         $free_text = (isset($settings['free_text'])) ? esc_attr($settings['free_text']) : __('Free', $GLOBALS['arlo_plugin_slug']);
         
         
