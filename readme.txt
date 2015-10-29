@@ -1,4 +1,4 @@
-=== Arlo - Training and Event Management, and online registration ===
+=== Arlo training and event management system ===
 Contributors: arlo, adamfentosi
 Tags: online registration, event registration, training management,  event management, event plugin, training company software, training calendar, training administration, training management software, training provider, solution, events calendar, wordpress events, event ticketing, wordpress lms, class registration, conference registration,  ticket, registration, event manager, training, booking, ticketing
 Requires at least: 3.7
@@ -7,7 +7,7 @@ Stable tag: 2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Seamlessly integrate ArloÕs market leading training and event management system into your website using the Arlo for WordPress plugin. 
+Seamlessly integrate Arlo's market leading training and event management system into your website using the Arlo for WordPress plugin. 
 
 == Description ==
 = Arlo training and event management system =
@@ -43,7 +43,7 @@ Arlo for WordPress providers to the building blocks you need to create to suppor
 * [Arlo categories](https://developer.arlo.co/doc/wordpress/widgets#widget-categories) 
 
 = Get started today! =
-Sign-up for a [free Arlo trial](https://www.arlo.co/try-arlo) and then install the Arlo WordPress site now!
+Sign-up for a [free Arlo trial](https://www.arlo.co/try-arlo) and then install the "Arlo training and event management system" plugin now!
  
 [youtube http://www.youtube.com/watch?v=6MWDFKjYNPY]
 
@@ -71,7 +71,7 @@ Sign-up for a [free Arlo trial](https://www.arlo.co/try-arlo) and then install t
 
 = Once Configured =
 
-* Arlo comes with a lot of different shortcodes, and you can customize your plugin with the shortcodes. For more information about the shortcodes please visit the [Arlo developer site](https://developer.arlo.co/doc/wordpress/)
+* The Arlo plugin comes with a lot of different shortcodes, and you can customize your plugin with the shortcodes. For more information about the shortcodes please visit the [Arlo developer site](https://developer.arlo.co/doc/wordpress/)
 
 = Developers Guide =
 
@@ -83,13 +83,13 @@ For more information about the shortcodes please visit the [Arlo developer site]
 
 Yes! The Arlo Training and Event Management plugin works out-of-the-box with nearly every WordPress theme. But if you want to customize, you have to use a 3rd party plugin to add external css to your site.
 
-= Can I use the plugin without an Arlo registration? =
+= Can I use the plugin without an Arlo platform? =
 
-Unfortunately no, you have to sign up for a [free Arlo trial](https://www.arlo.co/try-arlo) 
+Unfortunately no, you have to sign up for a [free Arlo trial](https://www.arlo.co/try-arlo). 
 
 = Where can I find documentation? =
 
-The plugin's documentation can be found in our [Arlo developer site](https://developer.arlo.co/doc/wordpress/)
+The plugin's documentation can be found in our [Arlo developer site](https://developer.arlo.co/doc/wordpress/).
 
 = Can I use the plugin with PHP 5.3? =
 
