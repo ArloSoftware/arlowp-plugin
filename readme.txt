@@ -71,11 +71,11 @@ Sign-up for a [free Arlo trial](https://www.arlo.co/try-arlo) and then install t
 
 = Once Configured =
 
-* The Arlo plugin comes with a lot of different shortcodes, and you can customize your plugin with the shortcodes. For more information about the shortcodes please visit the [Arlo developer site](https://developer.arlo.co/doc/wordpress/)
+* The Arlo plugin comes with a lot of different shortcodes, and you can customize your plugin with the shortcodes. For more information about the shortcodes please visit the [Arlo developer site](https://developer.arlo.co/doc/wordpress/index)
 
 = Developers Guide =
 
-For more information about the shortcodes please visit the [Arlo developer site](https://developer.arlo.co/doc/wordpress/)
+For more information about the shortcodes please visit the [Arlo developer site](https://developer.arlo.co/doc/wordpres/index)
 
 == Frequently Asked Questions ==
 
@@ -89,7 +89,7 @@ Unfortunately no, you have to sign up for a [free Arlo trial](https://www.arlo.c
 
 = Where can I find documentation? =
 
-The plugin's documentation can be found in our [Arlo developer site](https://developer.arlo.co/doc/wordpress/).
+The plugin's documentation can be found in our [Arlo developer site](https://developer.arlo.co/doc/wordpress/index).
 
 = Can I use the plugin with PHP 5.3? =
 
