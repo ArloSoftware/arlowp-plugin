@@ -1,5 +1,5 @@
 === Arlo training and event management system ===
-Contributors: arlo, adamfentosi
+Contributors: ArloSoftware, adamfentosi
 Tags: online registration, event registration, training management,  event management, event plugin, training company software, training calendar, training administration, training management software, training provider, solution, events calendar, wordpress events, event ticketing, wordpress lms, class registration, conference registration,  ticket, registration, event manager, training, booking, ticketing
 Requires at least: 3.7
 Tested up to: 4.3.1
@@ -58,7 +58,7 @@ Sign-up for a [free Arlo trial](https://www.arlo.co/try-arlo) and then install t
 = From WordPress.org =
 
 1. Download the Arlo WordPress plugin.
-2. Upload the 'arlowp-plugin' directory to your '/wp-content/plugins/' directory, using your favorite method (ftp, sftp, scp, etc...)
+2. Upload the 'arlo-training-and-event-management-system' directory to your '/wp-content/plugins/' directory, using your favorite method (ftp, sftp, scp, etc...)
 3. Activate Arlo from your Plugins page.
 
 = Once Activated =
