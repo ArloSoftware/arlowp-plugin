@@ -35,7 +35,7 @@ add_filter( 'the_title', function($title, $id = null){
 	
 	// append category name to events page
         if (!empty($subtitle)) {
-            $title = '<span class="cat-title-ext">' . $title . ': </span>';
+            $subtitle = '<span class="cat-title-ext">' . (!empty($title) ? ': ':'') . $subtitle . ' </span>';
         }
         
 	return $title . $subtitle;
@@ -1035,7 +1035,8 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 		}
 		
 		$where .= ')';
-	}
+	}	
+
 
 	// grouping
 	$group = "GROUP BY et.et_arlo_id";
@@ -1169,8 +1170,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 			break;
 		}
 	}
-	
-		
+
 	$items = $wpdb->get_results("SELECT et.*, post.ID as post_id, etc.c_arlo_id, c.*
 		FROM $t1 et 
 		{$join}
