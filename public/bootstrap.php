@@ -1035,9 +1035,10 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 		}
 		
 		$where .= ')';
-	}	
-
-
+	} else if (!(isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true")) {
+		$where .= ' AND c.c_parent_id = (SELECT c_arlo_id FROM ' . $t4 . ' WHERE c_parent_id = 0 AND active = "' . $active . '")';
+	}
+	
 	// grouping
 	$group = "GROUP BY et.et_arlo_id";
 	
