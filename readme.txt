@@ -13,24 +13,33 @@ Seamlessly integrate Arlo's market leading training and event management system 
 = Arlo training and event management system =
 Arlo is a cloud-based training and event management system for managing, marketing and delivering physical and online training and event services. It provides streamlined event scheduling, online registrations, invoicing and receipting, runs marketing activities, and manages client records and relationships. The service can be rapidly deployed and seamlessly integrated within your website and connected with your other business applications.
 
-* [Online Registration](https://www.arlo.co/features/online-registration) - Offer the entire registration experience online. Create simple registration forms for free events, complex forms for conferences, and everything between. Accept payments, issue invoices, and manage transfers, cancellations, and refunds. [Learn more]
-* [Event and Course Management](https://www.arlo.co/features/event-management-software) - Manage all event information and resources through Arlo: one place, online, and accessible wherever you are. Track tasks, record notes, send emails, print name labels, manage waiting lists, and more. 
-* [Apps Integration](https://www.arlo.co/integration-and-apps) - Integrate Arlo with your other business applications such as feedback survey software, accounting software, email marketing, and webinar software.
-* [Online Delivery](https://www.arlo.co/features/online-delivery) - Easily manage online presentations, such as live webinars for sales and training, and self-paced e-learning. Read more.
-* [Customer Relationship Management](https://www.arlo.co/features/customer-relationship-management) - Manage information about existing clients, and easily run campaigns to target potential customers. Arlo is a fully featured customer relationship management tool. Read more.
+* [Online registration](https://www.arlo.co/features/online-registration) - Offer the entire registration experience online. Create simple registration forms for free events, complex forms for conferences, and everything between. Accept payments, issue invoices, and manage transfers, cancellations, and refunds. 
+* [Event and course management](https://www.arlo.co/features/event-management-software) - Manage all event information and resources through Arlo: one place, online, and accessible wherever you are. Track tasks, record notes, send emails, print name labels, manage waiting lists, and more. 
+* [Apps integration](https://www.arlo.co/integration-and-apps) - Integrate Arlo with your other business applications such as feedback survey software, accounting software, email marketing, and webinar software.
+* [Online delivery](https://www.arlo.co/features/online-delivery) - Easily manage online presentations, such as live webinars for sales and training, and self-paced e-learning.
+* [Customer relationship management](https://www.arlo.co/features/customer-relationship-management) - Manage information about existing clients, and easily run campaigns to target potential customers. Arlo is a fully featured customer relationship management tool. 
 
 = Arlo WordPress integration - built for web developers! =
 Create beautiful and interactive training and event websites using the Arlo for WordPress plugin. Access an extensive library of WordPress Shortcodes, Templates, and Widgets, all designed specifically for web developer to make integration easy.  
 
-Arlo for WordPress providers to the building blocks you need to create to support your creative designs.  It is includes;
-**Shortcodes** - Shortcodes are used to present Arlo data in WordPress. You can add additional attributes to do nifty things with very little effort.
+Arlo for WordPress providers your with the building blocks to create great looking sites.
+
+**Automatically creates pages and site structure**
+
+* Event, event list, catalogue, venue, and presenter pages are automatically created as part of the install.
+* When an event is added in Arlo, a new post (page) is automatically created on WordPress for the event. And when a new presenter or venue is added, a new post (page) is also created.
+
+**Shortcodes** - Access a range of shortcodes to display data in your WordPress site. You can also add additional attributes to do nifty things with very little effort.
+
 * [Upcoming events](https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/upcomingeventrelated)
 * [Event](https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated)
 * [Event template](https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated)
 * [Category](https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/categoryrelated)
 * [Venue](https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated)
 * [Presenter](https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/presenterrelated)
+
 **Templates** - The plugin comes preloaded with the following templates which can all be edited.
+
 * [Event page](https://developer.arlo.co/doc/wordpress/templates#event-template)
 * [Catalogue](https://developer.arlo.co/doc/wordpress/templates#events-list-template)
 * [Upcoming events](https://developer.arlo.co/doc/wordpress/templates#upcoming-events-template)
@@ -38,7 +47,9 @@ Arlo for WordPress providers to the building blocks you need to create to suppor
 * [Venue information page](https://developer.arlo.co/doc/wordpress/templates#venue-template)
 * [Presenter list](https://developer.arlo.co/doc/wordpress/templates#presenter-list-template)
 * [Presenter profile pages](https://developer.arlo.co/doc/wordpress/templates#presenter-template)
+
 **Widgets** - The following widgets can be added to any page in your site. 
+
 * [Arlo upcoming events](https://developer.arlo.co/doc/wordpress/widgets#widget-upcoming-events)
 * [Arlo categories](https://developer.arlo.co/doc/wordpress/widgets#widget-categories) 
 
