@@ -111,8 +111,14 @@ The minimum requirement PHP version for the plugin is PHP 5.4.
 The Arlo - Training and Event Management, and online registration plugin is only available in English, but we will translate it to many different languages soon.
 
 == Screenshots ==
-1. Settings page
-2. Available shortcodes
+
+1. Arlo dashboard
+2. Arlo event page
+3. Arlo integration
+4. Arlo integration
+5. Arlo integration
+6. Arlo integration
+7. Arlo integration
 
 == Changelog ==
 = 2.1.1 =
