@@ -15,8 +15,8 @@
 
 <div class="wrap arlo-wrap">
 	<h2><?php echo esc_html( get_admin_page_title() ); ?></h2>
-	<div class="<?php echo PLUGIN_PREFIX; ?>-sections-wrap">
-		<form id="<?php echo PLUGIN_PREFIX; ?>-settings" method="post" action="options.php">
+	<div class="<?php echo ARLO_PLUGIN_PREFIX; ?>-sections-wrap">
+		<form id="<?php echo ARLO_PLUGIN_PREFIX; ?>-settings" method="post" action="options.php">
 			<?php settings_fields( 'arlo_settings' ); ?>
             <?php $this->do_settings_sections( $this->plugin_slug ); ?>
             <?php submit_button(); ?>

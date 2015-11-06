@@ -38,9 +38,15 @@ add_filter( 'the_title', function($title, $id = null){
 	}
 	
 	// append category name to events page
+<<<<<<< HEAD
 	if (!empty($subtitle)) {
 		$title = '<span class="cat-title-ext">' . $title . ': </span>';
 	}
+=======
+        if (!empty($subtitle)) {
+            $subtitle = '<span class="cat-title-ext">' . (!empty($title) ? ': ':'') . $subtitle . ' </span>';
+        }
+>>>>>>> master
         
 	return $title . $subtitle;
 }, 10, 2);
@@ -211,8 +217,11 @@ function arlo_register_custom_post_types() {
 		// let's try some custom rewrite rules
 		if($page_id) {
 			switch($id) {
+				case 'upcoming':
+					add_rewrite_rule('^' . $slug . '/page/([^/]*)/?','index.php?page_id=' . $page_id . '&paged=$matches[1]','top');
+				break;			
 				case 'event':
-
+					add_rewrite_rule('^' . $slug . '/page/([^/]*)/?','index.php?page_id=' . $page_id . '&paged=$matches[1]','top');
 				break;
 				case 'eventsearch':
 					add_rewrite_rule('^' . $slug . '/page/([^/]*)/?','index.php?page_id=' . $page_id . '&paged=$matches[1]','top');
@@ -235,6 +244,7 @@ function arlo_register_custom_post_types() {
 	add_rewrite_tag('%month%', '([^&]+)');
 	add_rewrite_tag('%location%', '([^&]+)');
 	add_rewrite_tag('%delivery%', '([^&]+)');
+	add_rewrite_tag('%paged%', '([^&]+)');
 	
 	// flush cached rewrite rules if we've just updated the arlo settings
 	if(isset($_GET['settings-updated'])) flush_rewrite_rules();
@@ -381,10 +391,12 @@ function arlo_pagination($num, $limit=null) {
 	
 	$big = 999999999;
 	
+	$current = !empty($_GET['paged']) ? intval($_GET['paged']) : intval(get_query_var('paged'));
+	
 	return paginate_links(array(
 		'base' => str_replace( $big, '%#%', esc_url( get_pagenum_link( $big ) ) ),
 		'format' => '?paged=%#%',
-		'current' => max( 1, get_query_var('paged') ),
+		'current' => max( 1, $current ),
 		'total' => ceil($num/$limit),
 		'mid_size' => 6
 	));
@@ -400,7 +412,7 @@ function arlo_pagination($num, $limit=null) {
  * @return   string the contents of the blueprint file
  */
 function arlo_get_blueprint($name) {
-	$path = PLUGIN_DIR.'/includes/blueprints/'.$name.'.tmpl';
+	$path = ARLO_PLUGIN_DIR.'/includes/blueprints/'.$name.'.tmpl';
 
 	if(file_exists($path)) {
 
@@ -1056,8 +1068,10 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 		}
 		
 		$where .= ')';
+	} else if (!(isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true")) {
+		$where .= ' AND c.c_parent_id = (SELECT c_arlo_id FROM ' . $t4 . ' WHERE c_parent_id = 0 AND active = "' . $active . '")';
 	}
-
+	
 	// grouping
 	$group = "GROUP BY et.et_arlo_id";
 	
@@ -1092,15 +1106,18 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 // event template list item shortcode
 
 $shortcodes->add('event_template_list_item', function($content='', $atts, $shortcode_name){
-	global $wpdb, $wp_query;
+	global $wpdb, $wp_query, $arlo_plugin;
 	
 	if (isset($atts['show_only_at_bottom']) && $atts['show_only_at_bottom'] == "true" && isset($GLOBALS['categories_count']) && $GLOBALS['categories_count']) {
 		$GLOBALS['show_only_at_bottom'] = true;
 		return;
 	}
+        
+        $active = $arlo_plugin->get_last_import();
 
 	$limit = isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page');
-	$offset = (get_query_var('paged') && intval(get_query_var('paged')) > 0) ? intval(get_query_var('paged')) * $limit - $limit: 0 ;
+	$page = !empty($_GET['paged']) ? intval($_GET['paged']) : intval(get_query_var('paged'));
+	$offset = ($page > 0) ? $page * $limit - $limit: 0 ;
 
 	$t1 = "{$wpdb->prefix}arlo_eventtemplates";
 	$t2 = "{$wpdb->prefix}posts";
@@ -1108,7 +1125,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 	$t4 = "{$wpdb->prefix}arlo_categories";
 	$t5 = "{$wpdb->prefix}arlo_events";
 		
-	$where = "WHERE post.post_type = 'arlo_event'";
+	$where = "WHERE post.post_type = 'arlo_event' AND et.active = '{$active}'";
 	$join = "";
 	
 	if(!empty($_GET['arlo-location']) || (isset($_GET['arlo-delivery']) && strlen($_GET['arlo-delivery']) && is_numeric($_GET['arlo-delivery'])) ) :
@@ -1181,7 +1198,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 		
 		$where .= ')';
 	} else if (!(isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true")) {
-		$where .= ' AND c.c_parent_id = 1';
+		$where .= ' AND c.c_parent_id = (SELECT c_arlo_id FROM ' . $t4 . ' WHERE c_parent_id = 0 AND active = "' . $active . '")';
 	}	
 	
 	// grouping
@@ -1199,8 +1216,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 			break;
 		}
 	}
-	
-		
+
 	$items = $wpdb->get_results("SELECT et.*, post.ID as post_id, etc.c_arlo_id, c.*
 		FROM $t1 et 
 		{$join}
@@ -1367,7 +1383,11 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 	} else {
 		$slug = get_post($post)->post_name;
 	}
+<<<<<<< HEAD
 	
+=======
+        	
+>>>>>>> master
 	$filter_html = '<form id="arlo-event-filter" class="arlo-filters" method="get" action="'.site_url().'/'.$slug.'/">';
 	
 	foreach($filters_array as $filter) :
@@ -1634,7 +1654,7 @@ $shortcodes->add('event_offers', function($content='', $atts, $shortcode_name){
 	$offers = '<ul class="arlo-list arlo-event-offers">';
         
         $settings = get_option('arlo_settings');  
-        $price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : PLUGIN_PREFIX . '-exclgst';      
+        $price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : ARLO_PLUGIN_PREFIX . '-exclgst';      
         $free_text = (isset($settings['free_text'])) ? esc_attr($settings['free_text']) : __('Free', $GLOBALS['arlo_plugin_slug']);
 
 
@@ -1642,8 +1662,8 @@ $shortcodes->add('event_offers', function($content='', $atts, $shortcode_name){
 
 		extract($offer);
                 
-		$amount = $price_setting == PLUGIN_PREFIX . '-exclgst' ? $o_offeramounttaxexclusive : $o_offeramounttaxinclusive;
-		$famount = $price_setting == PLUGIN_PREFIX . '-exclgst' ? $o_formattedamounttaxexclusive : $o_formattedamounttaxinclusive;
+		$amount = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $o_offeramounttaxexclusive : $o_offeramounttaxinclusive;
+		$famount = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $o_formattedamounttaxexclusive : $o_formattedamounttaxinclusive;
 
 		// set to true if there is a replacement offer returned for this event offer
 		$replaced = (!is_null($replacement_amount) && $replacement_amount != '');
@@ -1662,7 +1682,7 @@ $shortcodes->add('event_offers', function($content='', $atts, $shortcode_name){
 		if($amount > 0) {
 			$offers .= '<span class="amount">'.$famount.'</span> ';
 			// only include the excl. tax if the offer is not replaced			
-			$offers .= $replaced ? '' : '<span class="arlo-price-tax">' . ($price_setting == PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode) : sprintf(__('incl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode) . '</span>');
+			$offers .= $replaced ? '' : '<span class="arlo-price-tax">' . ($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode) : sprintf(__('incl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode) . '</span>');
 		} else {
 			$offers .= '<span class="amount free">'.$free_text.'</span> ';
 		}
@@ -1674,7 +1694,7 @@ $shortcodes->add('event_offers', function($content='', $atts, $shortcode_name){
 			
 			// display replacement offer label if there is one
 			$offers .= (!is_null($replacement_label) || $replacement_label != '') ? $replacement_label.' ':'';
-			$offers .= '<span class="amount">'.$replacement_amount.'</span> <span class="arlo-price-tax">'.($price_setting == PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode) : sprintf(__('incl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode)) . '</span>';
+			$offers .= '<span class="amount">'.$replacement_amount.'</span> <span class="arlo-price-tax">'.($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode) : sprintf(__('incl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode)) . '</span>';
 			// display replacement offer message if there is one
 			$offers .= (!is_null($replacement_message) || $replacement_message != '') ? ' '.$replacement_message:'';
 
@@ -1870,7 +1890,8 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 	global $wpdb;
 
 	$limit = isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page');
-	$offset = (get_query_var('paged') && intval(get_query_var('paged')) > 0) ? intval(get_query_var('paged')) * $limit - $limit: 0 ;
+	$page = !empty($_GET['paged']) ? intval($_GET['paged']) : intval(get_query_var('paged'));
+	$offset = ($page > 0) ? $page * $limit - $limit: 0 ;
 
 	$output = '';
 
@@ -1965,14 +1986,14 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 
 $shortcodes->add('upcoming_offer', function($content='', $atts, $shortcode_name){
 	$settings = get_option('arlo_settings');  
-	$price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : PLUGIN_PREFIX . '-exclgst';
+	$price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : ARLO_PLUGIN_PREFIX . '-exclgst';
 	$free_text = (isset($settings['free_text'])) ? esc_attr($settings['free_text']) : __('Free', $GLOBALS['arlo_plugin_slug']);
             
-	$amount = $price_setting == PLUGIN_PREFIX . '-exclgst' ? $GLOBALS['arlo_event_list_item']['o_offeramounttaxexclusive'] : $GLOBALS['arlo_event_list_item']['o_offeramounttaxinclusive'];
-	$famount = $price_setting == PLUGIN_PREFIX . '-exclgst' ? $GLOBALS['arlo_event_list_item']['o_formattedamounttaxexclusive'] : $GLOBALS['arlo_event_list_item']['o_formattedamounttaxinclusive'];
+	$amount = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $GLOBALS['arlo_event_list_item']['o_offeramounttaxexclusive'] : $GLOBALS['arlo_event_list_item']['o_offeramounttaxinclusive'];
+	$famount = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $GLOBALS['arlo_event_list_item']['o_formattedamounttaxexclusive'] : $GLOBALS['arlo_event_list_item']['o_formattedamounttaxinclusive'];
 	$tax = $GLOBALS['arlo_event_list_item']['o_taxrateshortcode'];
 
-	$offer = ($amount > 0) ? '<span class="arlo-amount">'.$famount .'</span> <span class="arlo-price-tax">'. ($price_setting == PLUGIN_PREFIX . '-exclgst' ? sprintf(__(' excl. %s', $GLOBALS['arlo_plugin_slug']), $tax) : sprintf(__(' incl. %s', $GLOBALS['arlo_plugin_slug']), $tax)) . '</span>' : '<span class="arlo-amount">'.$free_text.'</span>';
+	$offer = ($amount > 0) ? '<span class="arlo-amount">'.$famount .'</span> <span class="arlo-price-tax">'. ($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__(' excl. %s', $GLOBALS['arlo_plugin_slug']), $tax) : sprintf(__(' incl. %s', $GLOBALS['arlo_plugin_slug']), $tax)) . '</span>' : '<span class="arlo-amount">'.$free_text.'</span>';
 
 	return $offer;
 });
@@ -2733,9 +2754,9 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 	if(!isset($GLOBALS['arlo_event_list_item']) || empty($GLOBALS['arlo_event_list_item']['et_arlo_id'])) return;
 	
         $settings = get_option('arlo_settings');  
-        $price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : PLUGIN_PREFIX . '-exclgst';
-        $price_field = $price_setting == PLUGIN_PREFIX . '-exclgst' ? 'o_offeramounttaxexclusive' : 'o_offeramounttaxinclusive';
-        $price_field_show = $price_setting == PLUGIN_PREFIX . '-exclgst' ? 'o_formattedamounttaxexclusive' : 'o_formattedamounttaxinclusive';
+        $price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : ARLO_PLUGIN_PREFIX . '-exclgst';
+        $price_field = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? 'o_offeramounttaxexclusive' : 'o_offeramounttaxinclusive';
+        $price_field_show = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? 'o_formattedamounttaxexclusive' : 'o_formattedamounttaxinclusive';
         $free_text = (isset($settings['free_text'])) ? esc_attr($settings['free_text']) : __('Free', $GLOBALS['arlo_plugin_slug']);
         
         

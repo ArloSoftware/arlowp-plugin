@@ -1,3 +1,17 @@
+== V2.1.1 ==
+
+Bugfixes
+------------------
+Pagination link error: https://github.com/ArloSoftware/arlowp-plugin/issues/59
+Title starts with a ":" when a category is selected, but the page hasn't got a name: https://github.com/ArloSoftware/arlowp-plugin/issues/60
+
+== V2.1 ==
+
+Bugfixes
+------------------
+Issue #51
+
+
 == V2.07 ==
 
 Enhancement

@@ -131,12 +131,12 @@ class Arlo_For_Wordpress_Settings {
 	}*/
 
 	function arlo_template_section_callback() {
-		$output = '<div id="'.PLUGIN_PREFIX.'-template-select" class="cf">';
-		$output .= '<select name="'.PLUGIN_PREFIX.'TemplateSelect">';
+		$output = '<div id="'.ARLO_PLUGIN_PREFIX.'-template-select" class="cf">';
+		$output .= '<select name="'.ARLO_PLUGIN_PREFIX.'TemplateSelect">';
 
 	    foreach(Arlo_For_Wordpress::$templates as $id => $template) {
 	    	$name = __($template['name'], $this->plugin_slug);
-			$output .= '<option value="'.PLUGIN_PREFIX.'-'.$id.'">'.$name.'</option>';
+			$output .= '<option value="'.ARLO_PLUGIN_PREFIX.'-'.$id.'">'.$name.'</option>';
 	    }
 
 		$output .= '</select></div>';
@@ -157,13 +157,13 @@ class Arlo_For_Wordpress_Settings {
             $settings = get_option('arlo_settings');
             $setting_id = 'price_setting';
             
-            $output = '<div id="'.PLUGIN_PREFIX.'-price-setting" class="cf">';
+            $output = '<div id="'.ARLO_PLUGIN_PREFIX.'-price-setting" class="cf">';
             $output .= '<select name="arlo_settings['.$setting_id.']">';            
             
-            $val = (isset($settings[$setting_id])) ? esc_attr($settings[$setting_id]) : PLUGIN_PREFIX . '-exclgst';
+            $val = (isset($settings[$setting_id])) ? esc_attr($settings[$setting_id]) : ARLO_PLUGIN_PREFIX . '-exclgst';
             
             foreach(Arlo_For_Wordpress::$price_settings as $key => $value) {
-                $key = PLUGIN_PREFIX . '-' . $key;
+                $key = ARLO_PLUGIN_PREFIX . '-' . $key;
                 $selected = $key == $val ? 'selected="selected"' : '';
                 $output .= '<option ' . $selected . ' value="'.$key.'" >'.$value.'</option>';
 	    }
@@ -214,7 +214,7 @@ class Arlo_For_Wordpress_Settings {
 	
 	function arlo_reload_template_callback() {
 		    echo '<div class="cf">
-		    		<div id="'.PLUGIN_PREFIX.'-reload-template"><a>' . __('Reload original template', $this->plugin_slug) . '</a></div>
+		    		<div id="'.ARLO_PLUGIN_PREFIX.'-reload-template"><a>' . __('Reload original template', $this->plugin_slug) . '</a></div>
 		    		<script type="text/javascript"> var arlo_blueprints = ' . json_encode($this->arlo_template_source()) . ';</script>
 		    	</div>';
 	}
@@ -224,14 +224,14 @@ class Arlo_For_Wordpress_Settings {
 		$templates = [];
 		
 		foreach ($settings["templates"] as $key => $val) {
-			$templates[PLUGIN_PREFIX . '-' . $key] = $this->arlo_get_blueprint($key);
+			$templates[ARLO_PLUGIN_PREFIX . '-' . $key] = $this->arlo_get_blueprint($key);
 		}
 		
 		return $templates;
 	}
 	                                                                                                                                                      
 	function arlo_get_blueprint($name) {
-		$path = PLUGIN_DIR.'/includes/blueprints/'.$name.'.tmpl';
+		$path = ARLO_PLUGIN_DIR.'/includes/blueprints/'.$name.'.tmpl';
 
 		if(file_exists($path)) {
 			return file_get_contents($path);

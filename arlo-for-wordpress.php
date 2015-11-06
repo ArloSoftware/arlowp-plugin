@@ -13,16 +13,15 @@
  *
  * @wordpress-plugin
  * Plugin Name:       Arlo
- * Plugin URI:       
  * Description:       Connect your WordPress to Arlo
- * Version:           2.0.7
+ * Version:           2.1.1
  * Author:            Arlo
  * Author URI:       http://arlo.co
  * Text Domain:       arlo-for-wordpress
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Domain Path:       /languages
- * GitHub Plugin URI: https://github.com/<owner>/<repo>
+ * GitHub Plugin URI: https://github.com/ArloSoftware/arlowp-plugin
  */
 
 /*----------------------------------------------------------------------------*
@@ -31,9 +30,9 @@
  *----------------------------------------------------------------------------*/
 
 // mostly used for adding css class prefixes, if this is changed, the prefixes in the css will need to be changed too.
-define('PLUGIN_PREFIX', 'arlo'); 
-define('PLUGIN_NAME', 'Arlo');
-define('PLUGIN_DIR', plugin_dir_path( __FILE__ ));
+define('ARLO_PLUGIN_PREFIX', 'arlo'); 
+define('ARLO_PLUGIN_NAME', 'Arlo');
+define('ARLO_PLUGIN_DIR', plugin_dir_path( __FILE__ ));
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {

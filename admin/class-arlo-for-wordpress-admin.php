@@ -221,8 +221,8 @@ class Arlo_For_Wordpress_Admin {
 		 *   For reference: http://codex.wordpress.org/Roles_and_Capabilities
 		 */
 		$this->plugin_screen_hook_suffix = add_options_page(
-			PLUGIN_NAME . ' ' . __( 'Settings', $this->plugin_slug ),
-			PLUGIN_NAME,
+			ARLO_PLUGIN_NAME . ' ' . __( 'Settings', $this->plugin_slug ),
+			ARLO_PLUGIN_NAME,
 			'manage_options',
 			$this->plugin_slug,
 			array( $this, 'display_plugin_admin_page' )
@@ -359,17 +359,17 @@ class Arlo_For_Wordpress_Admin {
 		}
 
 		foreach ( (array) $wp_settings_fields[$page][$section] as $field ) {
-			echo '<div class="'.PLUGIN_PREFIX.'-field-wrap cf '.PLUGIN_PREFIX.'-'. strtolower(esc_attr($field['args']['label_for'])).'">';
+			echo '<div class="'.ARLO_PLUGIN_PREFIX.'-field-wrap cf '.ARLO_PLUGIN_PREFIX.'-'. strtolower(esc_attr($field['args']['label_for'])).'">';
 			if ( !empty($field['args']['label_for']) )
-				echo '<div class="'.PLUGIN_PREFIX.'-label"><label for="' . esc_attr( $field['args']['label_for'] ) . '">' . $field['title'] . '</label>';
+				echo '<div class="'.ARLO_PLUGIN_PREFIX.'-label"><label for="' . esc_attr( $field['args']['label_for'] ) . '">' . $field['title'] . '</label>';
 			else
-				echo '<div class="'.PLUGIN_PREFIX.'-label"><label>' . $field['title'] . '</label>';
+				echo '<div class="'.ARLO_PLUGIN_PREFIX.'-label"><label>' . $field['title'] . '</label>';
 			if($field['callback'][1] == 'arlo_template_callback') {
-				$path = PLUGIN_DIR.'admin/includes/codes/'.$field['id'].'.php';
+				$path = ARLO_PLUGIN_DIR.'admin/includes/codes/'.$field['id'].'.php';
 				if(file_exists($path)) include($path);
 			}
 			echo '</div>';
-			echo '<div class="'.PLUGIN_PREFIX.'-field">';
+			echo '<div class="'.ARLO_PLUGIN_PREFIX.'-field">';
 			call_user_func($field['callback'], $field['args']);
 			echo '</div>';
 			echo '</div>';
