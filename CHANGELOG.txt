@@ -1,3 +1,9 @@
+== V2.1.2 ==
+
+Enhancement
+------------------
+New basic search widget
+
 == V2.1.1 ==
 
 Bugfixes

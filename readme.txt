@@ -3,7 +3,7 @@ Contributors: ArloSoftware, adamfentosi
 Tags: online registration, event registration, training management,  event management, event plugin, training company software, training calendar, training administration, training management software, training provider, solution, events calendar, wordpress events, event ticketing, wordpress lms, class registration, conference registration,  ticket, registration, event manager, training, booking, ticketing
 Requires at least: 3.7
 Tested up to: 4.3.1
-Stable tag: 2.1.1
+Stable tag: 2.1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -121,8 +121,16 @@ The Arlo - Training and Event Management, and online registration plugin is only
 7. Arlo integration
 
 == Changelog ==
+
+= 2.1.2 =
+
+New search widget
+
+
 = 2.1.1 =
+
 Pagination link error: https://github.com/ArloSoftware/arlowp-plugin/issues/59
+
 Title starts with a ":" when a category is selected, but the page hasn't got a name: https://github.com/ArloSoftware/arlowp-plugin/issues/60
 
 = 2.1 = 
