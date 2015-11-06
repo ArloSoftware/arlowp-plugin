@@ -88,6 +88,12 @@ class Arlo_For_Wordpress {
 			'name' => 'Events',
 			'singular_name' => 'Event'
 		),
+		'eventsearch' => array(
+			'slug' => 'eventsearch',
+			'name' => 'Event search',
+			'singular_name' => 'Event search'
+		),
+		
 		'presenter' => array(
 			'slug' => 'presenter',
 			'name' => 'Presenters',
@@ -144,6 +150,10 @@ class Arlo_For_Wordpress {
 		'events' => array(
 			'id' => 'events',
 			'name' => 'Event List'
+		),
+		'eventsearch' => array(
+			'id' => 'eventsearch',
+			'name' => 'Event search list'
 		),
 		'upcoming' => array(
 			'id' => 'upcoming',
@@ -396,19 +406,35 @@ class Arlo_For_Wordpress {
 	 *
 	 */
 	function set_default_options() {
-		$default_settings = array(
-			'platform_name' => '',
-			'post_types' => self::$post_types,
-			'templates' => array()
-		);
+		$settings = get_option('arlo_settings');
 		
-		foreach(self::$templates as $id => $template) {
-			$default_settings['templates'][$id] = array(
-				'html' => arlo_get_blueprint($id)
+		if (is_array($settings) && count($settings)) {
+			//add new templates			
+			foreach(self::$templates as $id => $template) {
+				if (empty($settings['templates'][$id]['html'])) {
+					$settings['templates'][$id] = array(
+						'html' => arlo_get_blueprint($id)
+					);				
+				}
+			}
+			
+			update_option('arlo_settings', $settings);
+			
+		} else {
+			$default_settings = array(
+				'platform_name' => '',
+				'post_types' => self::$post_types,
+				'templates' => array()
 			);
+			
+			foreach(self::$templates as $id => $template) {
+				$default_settings['templates'][$id] = array(
+					'html' => arlo_get_blueprint($id)
+				);
+			}		
+			
+			add_option('arlo_settings', $default_settings);			
 		}
-	
-		add_option('arlo_settings', $default_settings);
 	}
 
 	/**
@@ -1528,6 +1554,12 @@ class Arlo_For_Wordpress {
 				'content' 			=> '[arlo_event_template_list]',
 				'child_post_type'	=> 'event'
 			),
+			array(
+				'name'				=> 'eventsearch',
+				'title'				=> 'Event search',
+				'content' 			=> '[arlo_event_template_search_list]',
+				'child_post_type'	=> 'event'
+			),			
 			array(
 				'name'				=> 'upcoming',
 				'title'				=> 'Upcoming Events',

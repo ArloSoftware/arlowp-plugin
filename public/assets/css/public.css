@@ -220,6 +220,10 @@ ul.page-numbers li {
 	margin-right: 0.5em;
 }
 
+table.arlo-no-results td {
+	text-align: center;
+}
+
 /* BOXED LAYOUT OVERRIDE */
 
 

@@ -11,17 +11,19 @@ add_filter( 'the_title', function($title, $id = null){
 	
 	$pages = array(
 		$settings['post_types']['event']['posts_page'],
-		$settings['post_types']['upcoming']['posts_page']
+		$settings['post_types']['eventsearch']['posts_page'],
+		$settings['post_types']['upcoming']['posts_page'],
 	);
-                
-	$cat_slug = !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : '';
-
-	if($id === null || !in_array($id, $pages)) return $title;
+	
+	$cat_slug = !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : '';	
         	
 	$cat = \Arlo\Categories::get(array('slug' => $cat_slug));
-	$location = urldecode($_GET['arlo-location']);
-        
-	if(!$cat && empty($location)) return $title;
+	$location = stripslashes(urldecode($_GET['arlo-location']));
+	$search = stripslashes(urldecode($_GET['arlo-search']));	
+                
+	if($id === null || !in_array($id, $pages)) return $title;
+		
+	if(!$cat && empty($location) && empty($search)) return $title;
 	
 	if (!empty($cat->c_name)) {
 		$subtitle = $cat->c_name;
@@ -31,12 +33,14 @@ add_filter( 'the_title', function($title, $id = null){
 		}
 	} else if (!empty($location)) {
 		$subtitle = $location;		
+	} else if (!empty($search)) {
+		$subtitle = $search;
 	}
 	
 	// append category name to events page
-        if (!empty($subtitle)) {
-            $title = '<span class="cat-title-ext">' . $title . ': </span>';
-        }
+	if (!empty($subtitle)) {
+		$title = '<span class="cat-title-ext">' . $title . ': </span>';
+	}
         
 	return $title . $subtitle;
 }, 10, 2);
@@ -209,6 +213,9 @@ function arlo_register_custom_post_types() {
 			switch($id) {
 				case 'event':
 
+				break;
+				case 'eventsearch':
+					add_rewrite_rule('^' . $slug . '/page/([^/]*)/?','index.php?page_id=' . $page_id . '&paged=$matches[1]','top');
 				break;
 				case 'presenter':
 					add_rewrite_rule('^' . $slug . '/page/([^/]*)/?','index.php?page_id=' . $page_id . '&paged=$matches[1]','top');
@@ -949,6 +956,15 @@ function getTimezoneOlsonNames($timezone_id) {
 $shortcodes = \Arlo\Shortcodes::init();
 
 // event template list shortcode
+$shortcodes->add('event_template_search_list', function($content='', $atts, $shortcode_name){
+	$templates = arlo_get_option('templates');
+	$content = $templates['eventsearch']['html'];
+
+	return $content;
+});
+
+
+// event template list shortcode
 $shortcodes->add('event_template_list', function($content='', $atts, $shortcode_name){
 	$templates = arlo_get_option('templates');
 	$content = $templates['events']['html'];
@@ -1198,36 +1214,44 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 		$group 
 		$order
 		LIMIT $offset,$limit", ARRAY_A);
-				
-	$output = '';
 		
-	$previous = null;
+	if(empty($items)) :
 
-	foreach($items as $item) {
-		if(isset($atts['group'])) {
-			switch($atts['group']) {
-				case 'category':
-					if(is_null($previous) || $item['c_id'] != $previous['c_id']) {
-						$item['show_divider'] = $item['c_name'];
-					}
-				break;
-				case 'alpha':
-					if(is_null($previous) || $item['et_name'][0] != $previous['et_name'][0]) {
-						$item['show_divider'] = $item['et_name'][0];
-					}
-				break;
+		$output = '</table><table class="arlo-no-results"><tr><td>' . __('No events to show', $GLOBALS['arlo_plugin_slug']) . '</td></tr>';
+
+	else :
+					
+		$output = '';
+			
+		$previous = null;
+	
+		foreach($items as $item) {
+			if(isset($atts['group'])) {
+				switch($atts['group']) {
+					case 'category':
+						if(is_null($previous) || $item['c_id'] != $previous['c_id']) {
+							$item['show_divider'] = $item['c_name'];
+						}
+					break;
+					case 'alpha':
+						if(is_null($previous) || $item['et_name'][0] != $previous['et_name'][0]) {
+							$item['show_divider'] = $item['et_name'][0];
+						}
+					break;
+				}
 			}
+			
+			$GLOBALS['arlo_eventtemplate'] = $item;
+			$GLOBALS['arlo_event_list_item'] = $item;
+			
+			$output .= do_shortcode($content);
+			unset($GLOBALS['arlo_eventtemplate']);
+			unset($GLOBALS['arlo_event_list_item']);
+			
+			$previous = $item;
 		}
-		
-		$GLOBALS['arlo_eventtemplate'] = $item;
-		$GLOBALS['arlo_event_list_item'] = $item;
-		
-		$output .= do_shortcode($content);
-		unset($GLOBALS['arlo_eventtemplate']);
-		unset($GLOBALS['arlo_event_list_item']);
-		
-		$previous = $item;
-	}
+	
+	endif;
 
 	return $output;
 });
