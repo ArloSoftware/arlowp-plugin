@@ -38,15 +38,10 @@ add_filter( 'the_title', function($title, $id = null){
 	}
 	
 	// append category name to events page
-<<<<<<< HEAD
 	if (!empty($subtitle)) {
-		$title = '<span class="cat-title-ext">' . $title . ': </span>';
+		$subtitle = '<span class="cat-title-ext">' . (!empty($title) ? ': ':'') . $subtitle . ' </span>';
 	}
-=======
-        if (!empty($subtitle)) {
-            $subtitle = '<span class="cat-title-ext">' . (!empty($title) ? ': ':'') . $subtitle . ' </span>';
-        }
->>>>>>> master
+
         
 	return $title . $subtitle;
 }, 10, 2);
@@ -1383,11 +1378,7 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 	} else {
 		$slug = get_post($post)->post_name;
 	}
-<<<<<<< HEAD
-	
-=======
-        	
->>>>>>> master
+
 	$filter_html = '<form id="arlo-event-filter" class="arlo-filters" method="get" action="'.site_url().'/'.$slug.'/">';
 	
 	foreach($filters_array as $filter) :
