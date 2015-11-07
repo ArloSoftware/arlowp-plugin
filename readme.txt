@@ -126,6 +126,8 @@ The Arlo - Training and Event Management, and online registration plugin is only
 
 New search widget
 
+Custom "No events to show" message
+
 
 = 2.1.1 =
 
