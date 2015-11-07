@@ -56,16 +56,29 @@ class Arlo_For_Wordpress_Settings {
                 
                 add_settings_field('arlo_price_setting', '<label for="arlo_price_setting">'.__('Price shown', $this->plugin_slug).'</label>', array($this, 'arlo_price_setting_callback'), $this->plugin_slug, 'arlo_general_section');
                 
-		// create API Endpoint field
+		// create Free text field
 		add_settings_field(
                         'arlo_free_text', 
-                        '<label for="arlo_free_text">'.__('Free text', $this->plugin_slug).'</label>', 
+                        '<label for="arlo_free_text">'.__('"Free" text', $this->plugin_slug).'</label>', 
                         array($this, 'arlo_simple_input_callback'), 
                         $this->plugin_slug, 'arlo_general_section', 
                         array(
                             'id' => 'free_text',
                             'label_for' => 'arlo_free_text',
                             'default_val' => __('Free', $this->plugin_slug),
+                            )
+                );
+
+		// create No events to show text field
+		add_settings_field(
+                        'arlo_noevent_text', 
+                        '<label for="arlo_noevent_text">'.__('"No events to show" text', $this->plugin_slug).'</label>', 
+                        array($this, 'arlo_simple_input_callback'), 
+                        $this->plugin_slug, 'arlo_general_section', 
+                        array(
+                            'id' => 'noevent_text',
+                            'label_for' => 'arlo_noevent_text',
+                            'default_val' => __('No events to show', $this->plugin_slug),
                             )
                 );
                 

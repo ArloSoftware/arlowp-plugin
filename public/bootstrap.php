@@ -1136,6 +1136,8 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 
 $shortcodes->add('event_template_list_item', function($content='', $atts, $shortcode_name){
 	global $wpdb, $wp_query, $arlo_plugin;
+
+	$settings = get_option('arlo_settings');  
 	
 	if (isset($atts['show_only_at_bottom']) && $atts['show_only_at_bottom'] == "true" && isset($GLOBALS['categories_count']) && $GLOBALS['categories_count']) {
 		$GLOBALS['show_only_at_bottom'] = true;
@@ -1261,8 +1263,8 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 		LIMIT $offset,$limit", ARRAY_A);
 		
 	if(empty($items)) :
-
-		$output = '</table><table class="arlo-no-results"><tr><td>' . __('No events to show', $GLOBALS['arlo_plugin_slug']) . '</td></tr>';
+		$no_event_text = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', $GLOBALS['arlo_plugin_slug']);
+		$output = '</table><table class="arlo-no-results"><tr><td>' . $no_event_text . '</td></tr>';
 
 	else :
 					
@@ -1913,6 +1915,7 @@ $shortcodes->add('upcoming_list_pagination', function($content='', $atts, $short
 
 $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_name){
 	global $wpdb;
+	$settings = get_option('arlo_settings');
 
 	$limit = isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page');
 	$page = !empty($_GET['paged']) ? intval($_GET['paged']) : intval(get_query_var('paged'));
@@ -1976,9 +1979,10 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 		LIMIT $offset, $limit", ARRAY_A);
 
 	if(empty($items)) :
-
-		$output = '<p class="arlo-no-results">' . __('No events to show', $GLOBALS['arlo_plugin_slug']) . '</p>';
-
+	
+		$no_event_text = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', $GLOBALS['arlo_plugin_slug']);
+		$output = '<p class="arlo-no-results">' . $no_event_text . '</p>';
+		
 	else :
 
 		$previous = null;
