@@ -457,6 +457,7 @@ function arlo_get_option($key, $default=null) {
 function arlo_add_datamodel() {
 	install_table_arlo_eventtemplate();
 	install_table_arlo_contentfields();
+	install_table_arlo_events_tags();
 	install_table_arlo_events();
 	install_table_arlo_venues();
 	install_table_arlo_presenters();
@@ -725,6 +726,39 @@ function install_table_arlo_eventtemplates_presenters() {
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+
+	dbDelta($sql);
+}
+
+/**
+ * install_table_arlo_eventtemplates_presenters function.
+ * 
+ * @access public
+ * @return void
+ */
+function install_table_arlo_events_tags() {	
+	global $wpdb, $current_user;
+	
+	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+	
+	$charset_collate = core_set_charset();
+
+	$sql = "CREATE TABLE " . $wpdb->prefix . "arlo_tags (
+  		id mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  		tag varchar(255) NOT NULL,
+		active datetime NOT NULL,
+		PRIMARY KEY  (id))
+		CHARACTER SET utf8 COLLATE=utf8_general_ci";
+		
+	dbDelta($sql);
+
+	$sql = "CREATE TABLE " . $wpdb->prefix . "arlo_events_tags (
+		e_arlo_id int(11) NOT NULL,
+		tag_id mediumint(8) unsigned NOT NULL,
+		active datetime NOT NULL,
+		PRIMARY KEY  (e_arlo_id,tag_id))
+  		CHARACTER SET utf8 COLLATE=utf8_general_ci";
+  		
 
 	dbDelta($sql);
 }

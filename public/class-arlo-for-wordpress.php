@@ -888,7 +888,8 @@ class Arlo_For_Wordpress {
 				'ViewUri',
 				'RegistrationInfo',
 				'Provider',
-				'TemplateCode'
+				'TemplateCode',
+				'Tags'
 			)
 		);
 		
@@ -933,6 +934,74 @@ class Arlo_For_Wordpress {
 				}
 				
 				$event_id = $wpdb->insert_id;
+				
+				//save the tags
+				if (isset($item->Tags) && is_array($item->Tags)) {
+					$exisiting_tags = [];
+					$sql = "
+					SELECT 
+						id, 
+						tag
+					FROM
+						{$wpdb->prefix}arlo_tags 
+					WHERE 
+						tag IN ('" . implode("', '", $item->Tags) . "')
+					AND
+						active = '{$timestamp}'
+					";
+					$rows = $wpdb->get_results($sql, ARRAY_A);
+					foreach ($rows as $row) {
+						$exisiting_tags[$row['tag']] = $row['id'];
+					}
+					unset($rows);
+					
+					foreach ($item->Tags as $tag) {
+						if (empty($exisiting_tags[$tag])) {
+							$query = $wpdb->query( $wpdb->prepare( 
+								"INSERT INTO {$wpdb->prefix}arlo_tags
+								(tag, active) 
+								VALUES ( %s, %s ) 
+								", 
+								$tag,
+								$timestamp
+							) );
+							
+							
+							echo $wpdb->prepare( 
+								"INSERT INTO {$wpdb->prefix}arlo_tags
+								(tag, active) 
+								VALUES ( %s, %s ) 
+								", 
+								$tag,
+								$timestamp
+							);
+							
+							if ($query === false) {
+								throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_tags' );
+							} else {
+								$exisiting_tags[$tag] = $wpdb->insert_id;
+							}
+						}
+												
+						if (!empty($exisiting_tags[$tag])) {
+							$query = $wpdb->query( $wpdb->prepare( 
+								"REPLACE INTO {$wpdb->prefix}arlo_events_tags
+								(e_arlo_id, tag_id, active) 
+								VALUES ( %d, %d, %s ) 
+								", 
+								$item->EventID,
+								$exisiting_tags[$tag],
+								$timestamp
+							) );
+							
+							if ($query === false) {
+								throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_events_tags' );
+							}
+						} else {
+							throw new Exception('Couldn\'t find tag: ' . $tag );
+						}
+					}
+				}
 				
 				// need to insert associated data here
 				// advertised offers
@@ -988,8 +1057,7 @@ class Arlo_For_Wordpress {
 						}
 					}
 				}
-			}
-			
+			}			
 		}
 		
 		return $items;
@@ -1430,12 +1498,15 @@ class Arlo_For_Wordpress {
 			'contentfields',
 			'offers',
 			'events',
+			'events_tags',
+			'tags',
 			'presenters',
 			'venues',
 			'categories',
             'events_presenters',
             'eventtemplates_categories',
             'eventtemplates_presenters',
+            
 		);
                 		
 		foreach($tables as $table) {
