@@ -861,6 +861,117 @@ class Arlo_For_Wordpress {
 		return $items;
 	}
 	
+	private function save_event_data($item = array(), $parent_id = 0, $timestamp) {
+		global $wpdb;
+		
+		$table_name = "{$wpdb->prefix}arlo_events";
+		
+		$query = $wpdb->query(
+			$wpdb->prepare( 
+				"INSERT INTO $table_name 
+				(e_arlo_id, et_arlo_id, e_parent_arlo_id, e_code, e_name, e_startdatetime, e_finishdatetime, e_datetimeoffset, e_timezone, e_timezone_id, v_id, e_locationname, e_locationroomname, e_locationvisible , e_isfull, e_placesremaining, e_summary, e_sessiondescription, e_notice, e_viewuri, e_registermessage, e_registeruri, e_providerorganisation, e_providerwebsite, e_isonline, active) 
+				VALUES ( %d, %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) 
+				", 
+			    $item->EventID,
+				$item->EventTemplateID,
+				$parent_id,
+				@$item->Code,
+				$item->Name,
+				substr(@$item->StartDateTime,0,26),
+				substr(@$item->EndDateTime,0,26),
+				substr(@$item->StartDateTime,27,6),
+				@$item->TimeZone,
+				@$item->TimeZoneID,
+				@$item->Location->VenueID,
+				@$item->Location->Name,
+				@$item->Location->VenueRoomName,
+				(!empty($item->Location->ViewUri) ? 1 : 0 ),
+				@$item->IsFull,
+				@$item->PlacesRemaining,
+				@$item->Summary,
+				@$item->SessionsDescription,
+				@$item->Notice,
+				@$item->ViewUri,
+				@$item->RegistrationInfo->RegisterMessage,
+				@$item->RegistrationInfo->RegisterUri,
+				@$item->Provider->Name,
+				@$item->Provider->WebsiteUri,
+				@$item->Location->IsOnline,
+				$timestamp
+			)
+		);
+                        
+		if ($query === false) {					
+			throw new Exception('Database insert failed: ' . $table_name);
+		}	
+		
+		$event_id = $wpdb->insert_id;
+		
+		// need to insert associated data here
+		// advertised offers
+		if(isset($item->AdvertisedOffers) && !empty($item->AdvertisedOffers)) {
+			$offers = array_reverse($item->AdvertisedOffers);
+			foreach($offers as $key => $offer) {
+				$query = $wpdb->query( $wpdb->prepare( 
+					"INSERT INTO {$wpdb->prefix}arlo_offers 
+					(o_arlo_id, et_id, e_id, o_label, o_isdiscountoffer, o_currencycode, o_offeramounttaxexclusive, o_offeramounttaxinclusive, o_formattedamounttaxexclusive, o_formattedamounttaxinclusive, o_taxrateshortcode, o_taxratename, o_taxratepercentage, o_message, o_order, o_replaces, active) 
+					VALUES ( %d, %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, %s, %s ) 
+					", 
+					$offer->OfferID+1,
+				    null,
+					$event_id,
+					@$offer->Label,
+					@$offer->IsDiscountOffer,
+					@$offer->OfferAmount->CurrencyCode,
+					@$offer->OfferAmount->AmountTaxExclusive,
+					@$offer->OfferAmount->AmountTaxInclusive,
+					@$offer->OfferAmount->FormattedAmountTaxExclusive,
+					@$offer->OfferAmount->FormattedAmountTaxInclusive,
+					@$offer->OfferAmount->TaxRate->ShortName,
+					@$offer->OfferAmount->TaxRate->Name,
+					@$offer->OfferAmount->TaxRate->RatePercent,
+					@$offer->Message,
+					$key+1,
+					(isset($offer->ReplacesOfferID)) ? $offer->ReplacesOfferID+1 : null,
+					$timestamp
+				) );
+				
+				if ($query === false) {
+					throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_offers');
+				}
+			}
+		}
+		
+		// prsenters
+		if(isset($item->Presenters) && !empty($item->Presenters)) {
+			foreach($item->Presenters as $index => $presenter) {
+				$query = $wpdb->query( $wpdb->prepare( 
+					"REPLACE INTO {$wpdb->prefix}arlo_events_presenters 
+					(e_arlo_id, p_arlo_id, p_order, active) 
+					VALUES ( %d, %d, %d, %s ) 
+					", 
+				    $item->EventID,
+				    $presenter->PresenterID,
+				    $index,
+				    $timestamp
+				) );
+				
+				if ($query === false) {
+					throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_events_presenters');
+				}
+			}
+		}
+		
+		//Save session information
+		if ($parent_id == 0 && isset($item->Sessions) && is_array($item->Sessions) && $item->Sessions[0]->EventID != $item->EventID ) {
+			foreach ($item->Sessions as $session) {
+				$this->save_event_data($session, $item->EventID, $timestamp);
+			}
+		}	
+		
+		return $event_id;
+	}
+	
 	private function import_events($timestamp) {
 		global $wpdb;
 	
@@ -889,51 +1000,15 @@ class Arlo_For_Wordpress {
 				'RegistrationInfo',
 				'Provider',
 				'TemplateCode',
-				'Tags'
+				'Tags',
+				'Sessions'
 			)
 		);
 		
-		$table_name = "{$wpdb->prefix}arlo_events";
-				
 		if(!empty($items)) {
 			foreach($items as $item) {
-				$query = $wpdb->query(
-					$wpdb->prepare( 
-						"INSERT INTO $table_name 
-						(e_arlo_id, et_arlo_id, e_code, e_startdatetime, e_finishdatetime, e_datetimeoffset, e_timezone, e_timezone_id, v_id, e_locationname, e_locationroomname, e_locationvisible , e_isfull, e_placesremaining, e_sessiondescription, e_notice, e_viewuri, e_registermessage, e_registeruri, e_providerorganisation, e_providerwebsite, e_isonline, active) 
-						VALUES ( %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) 
-						", 
-					    $item->EventID,
-						$item->EventTemplateID,
-						@$item->Code,
-						substr(@$item->StartDateTime,0,26),
-						substr(@$item->EndDateTime,0,26),
-						substr(@$item->StartDateTime,27,6),
-						@$item->TimeZone,
-						@$item->TimeZoneID,
-						@$item->Location->VenueID,
-						@$item->Location->Name,
-						@$item->Location->VenueRoomName,
-						(!empty($item->Location->ViewUri) ? 1 : 0 ),
-						@$item->IsFull,
-						@$item->PlacesRemaining,
-						@$item->SessionsDescription,
-						@$item->Notice,
-						@$item->ViewUri,
-						@$item->RegistrationInfo->RegisterMessage,
-						@$item->RegistrationInfo->RegisterUri,
-						@$item->Provider->Name,
-						@$item->Provider->WebsiteUri,
-						@$item->Location->IsOnline,
-						$timestamp
-					)
-				);
-                                
-				if ($query === false) {					
-					throw new Exception('Database insert failed: ' . $table_name);
-				}
 				
-				$event_id = $wpdb->insert_id;
+				$event_id = $this->save_event_data($item, 0, $timestamp);
 				
 				//save the tags
 				if (isset($item->Tags) && is_array($item->Tags)) {
@@ -965,17 +1040,7 @@ class Arlo_For_Wordpress {
 								$tag,
 								$timestamp
 							) );
-							
-							
-							echo $wpdb->prepare( 
-								"INSERT INTO {$wpdb->prefix}arlo_tags
-								(tag, active) 
-								VALUES ( %s, %s ) 
-								", 
-								$tag,
-								$timestamp
-							);
-							
+														
 							if ($query === false) {
 								throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_tags' );
 							} else {
@@ -1001,63 +1066,8 @@ class Arlo_For_Wordpress {
 							throw new Exception('Couldn\'t find tag: ' . $tag );
 						}
 					}
-				}
-				
-				// need to insert associated data here
-				// advertised offers
-				if(isset($item->AdvertisedOffers) && !empty($item->AdvertisedOffers)) {
-					$offers = array_reverse($item->AdvertisedOffers);
-					foreach($offers as $key => $offer) {
-						$query = $wpdb->query( $wpdb->prepare( 
-							"INSERT INTO {$wpdb->prefix}arlo_offers 
-							(o_arlo_id, et_id, e_id, o_label, o_isdiscountoffer, o_currencycode, o_offeramounttaxexclusive, o_offeramounttaxinclusive, o_formattedamounttaxexclusive, o_formattedamounttaxinclusive, o_taxrateshortcode, o_taxratename, o_taxratepercentage, o_message, o_order, o_replaces, active) 
-							VALUES ( %d, %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, %s, %s ) 
-							", 
-							$offer->OfferID+1,
-						    null,
-							$event_id,
-							@$offer->Label,
-							@$offer->IsDiscountOffer,
-							@$offer->OfferAmount->CurrencyCode,
-							@$offer->OfferAmount->AmountTaxExclusive,
-							@$offer->OfferAmount->AmountTaxInclusive,
-							@$offer->OfferAmount->FormattedAmountTaxExclusive,
-							@$offer->OfferAmount->FormattedAmountTaxInclusive,
-							@$offer->OfferAmount->TaxRate->ShortName,
-							@$offer->OfferAmount->TaxRate->Name,
-							@$offer->OfferAmount->TaxRate->RatePercent,
-							@$offer->Message,
-							$key+1,
-							(isset($offer->ReplacesOfferID)) ? $offer->ReplacesOfferID+1 : null,
-							$timestamp
-						) );
-						
-						if ($query === false) {
-							throw new Exception('Database insert failed: ' . $table_name);
-						}
-					}
-				}
-				
-				// prsenters
-				if(isset($item->Presenters) && !empty($item->Presenters)) {
-					foreach($item->Presenters as $index => $presenter) {
-						$query = $wpdb->query( $wpdb->prepare( 
-							"REPLACE INTO {$wpdb->prefix}arlo_events_presenters 
-							(e_arlo_id, p_arlo_id, p_order, active) 
-							VALUES ( %d, %d, %d, %s ) 
-							", 
-						    $item->EventID,
-						    $presenter->PresenterID,
-						    $index,
-						    $timestamp
-						) );
-						
-						if ($query === false) {
-							throw new Exception('Database insert failed: ' . $table_name);
-						}
-					}
-				}
-			}			
+				}				
+			}				
 		}
 		
 		return $items;
