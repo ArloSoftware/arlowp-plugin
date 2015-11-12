@@ -141,6 +141,8 @@ Pagination link error: https://github.com/ArloSoftware/arlowp-plugin/issues/59
 
 Title starts with a ":" when a category is selected, but the page hasn't got a name: https://github.com/ArloSoftware/arlowp-plugin/issues/60
 
+Import error/success message
+
 = 2.1 = 
 Initial public release
 

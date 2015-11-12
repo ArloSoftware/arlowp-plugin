@@ -12,13 +12,17 @@
 class Arlo_For_Wordpress_Settings {
 
 	public function __construct() {
+	
+		if (!session_id()) {
+			session_start();
+		}
 
 		$plugin = Arlo_For_Wordpress::get_instance();
 		$this->plugin_slug = $plugin->get_plugin_slug();
 		
 		if(isset($_GET['arlo-import'])) {
-			$plugin->import(true);
-			wp_redirect( $_SERVER['HTTP_REFERER'] );
+			$_SESSION['arlo-import'] = $plugin->import(true);
+			wp_redirect( $_SERVER['HTTP_REFERER']);
 			exit;
 		}
                 
@@ -26,6 +30,11 @@ class Arlo_For_Wordpress_Settings {
 			$plugin->database_upgrade();
 			wp_redirect( $_SERVER['HTTP_REFERER'] );
 			exit;
+		}
+		
+		
+		if(isset($_SESSION['arlo-import'])) {
+			add_action( 'admin_notices', array($plugin, "import_notice") );
 		}
                 
 

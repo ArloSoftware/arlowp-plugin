@@ -512,7 +512,7 @@ class Arlo_For_Wordpress {
 		$items = $wpdb->get_results(
 			"SELECT log.* 
 			FROM $table_name log 
-			ORDER BY log.created DESC
+			ORDER BY log.id DESC
 			LIMIT $limit"
 		);
 		
@@ -607,7 +607,9 @@ class Arlo_For_Wordpress {
 		ob_start();
 		try{
 			$this->import();
-		}catch(\Exception $e){}
+		}catch(\Exception $e){
+			var_dump($e);
+		}
 		ob_end_clean();
 	}
 	
@@ -1620,6 +1622,22 @@ class Arlo_For_Wordpress {
 		wp_redirect( $location, 301 );
 		exit;
 	}
+	
+	public static function import_notice() {
+		$import = self::get_instance()->get_import_log();
+		
+		if (strpos($import[0]->message, "404") !== false ) {
+			$import[0]->message = __('The given platform name is not exists');
+		}
+		
+		echo '
+		<div class="' . ($import[0]->successful !== "1" ? "error" : "updated") . ' notice">
+        	<p>' . $import[0]->message . '</p>
+	    </div>
+		';
+		
+		unset($_SESSION['arlo-import']);
+	}	
 
 	/**
 	 * add_pages function.

@@ -3,8 +3,8 @@
 Enhancement
 ------------------
 New basic search widget
-
 Custom "No events to show" message
+Import error/success message
 
 Bugfixes
 ------------------
