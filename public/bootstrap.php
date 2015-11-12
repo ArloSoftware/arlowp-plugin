@@ -1101,7 +1101,7 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 		
 		$where .= ')';
 	} else if (!(isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true")) {
-		$where .= ' AND c.c_parent_id = (SELECT c_arlo_id FROM ' . $t4 . ' WHERE c_parent_id = 0 AND active = "' . $active . '")';
+		$where .= ' AND (c.c_parent_id = (SELECT c_arlo_id FROM ' . $t4 . ' WHERE c_parent_id = 0 AND active = "' . $active . '") OR c.c_parent_id IS NULL)';
 	}
 	
 	// grouping
@@ -1232,7 +1232,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 		
 		$where .= ')';
 	} else if (!(isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true")) {
-		$where .= ' AND c.c_parent_id = (SELECT c_arlo_id FROM ' . $t4 . ' WHERE c_parent_id = 0 AND active = "' . $active . '")';
+		$where .= ' AND (c.c_parent_id = (SELECT c_arlo_id FROM ' . $t4 . ' WHERE c_parent_id = 0 AND active = "' . $active . '") OR c.c_parent_id IS NULL)';
 	}	
 	
 	// grouping
@@ -1250,7 +1250,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 			break;
 		}
 	}
-
+	
 	$items = $wpdb->get_results("SELECT et.*, post.ID as post_id, etc.c_arlo_id, c.*
 		FROM $t1 et 
 		{$join}
