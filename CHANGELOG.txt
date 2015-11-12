@@ -6,6 +6,11 @@ New basic search widget
 
 Custom "No events to show" message
 
+Bugfixes
+------------------
+
+If there is no category, there is no template in the events list: https://github.com/ArloSoftware/arlowp-plugin/issues/66
+
 == V2.1.1 ==
 
 Bugfixes

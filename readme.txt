@@ -106,6 +106,10 @@ The plugin's documentation can be found in our [Arlo developer site](https://dev
 
 The minimum requirement PHP version for the plugin is PHP 5.4.
 
+= Can I log a bug? =
+
+Sure! Create a new issue on the plugin's [GitHub site](https://github.com/ArloSoftware/arlowp-plugin/issues)
+
 == Languages ==
 
 The Arlo - Training and Event Management, and online registration plugin is only available in English, but we will translate it to many different languages soon.
@@ -127,6 +131,8 @@ The Arlo - Training and Event Management, and online registration plugin is only
 New search widget
 
 Custom "No events to show" message
+
+If there is no category, there is no template in the events list: https://github.com/ArloSoftware/arlowp-plugin/issues/66
 
 
 = 2.1.1 =
