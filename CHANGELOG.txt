@@ -5,6 +5,7 @@ Enhancement
 New basic search widget
 Custom "No events to show" message
 Import error/success message
+New "Welcome bar" with load demo data button: https://github.com/ArloSoftware/arlowp-plugin/issues/64
 
 Bugfixes
 ------------------

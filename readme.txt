@@ -134,6 +134,8 @@ Custom "No events to show" message
 
 If there is no category, there is no template in the events list: https://github.com/ArloSoftware/arlowp-plugin/issues/66
 
+New "Welcome bar" with load demo data button: https://github.com/ArloSoftware/arlowp-plugin/issues/64
+
 
 = 2.1.1 =
 
