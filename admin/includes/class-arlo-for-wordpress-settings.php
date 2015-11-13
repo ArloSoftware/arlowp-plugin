@@ -37,13 +37,13 @@ class Arlo_For_Wordpress_Settings {
 			wp_redirect( admin_url( 'options-general.php?page=arlo-for-wordpress'));
 			exit;
 		}		
-		
+				
 		if(isset($_SESSION['arlo-import'])) {
 			add_action( 'admin_notices', array($plugin, "import_notice") );
 		}
 		
 		$settings = get_option('arlo_settings');
-		if (empty($settings['platform_name'])) {
+		if (empty($settings['platform_name']) && !empty($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress') {
 			add_action( 'admin_notices', array($plugin, "welcome_notice") );
 		}
 		

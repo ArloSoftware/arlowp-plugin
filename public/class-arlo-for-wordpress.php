@@ -661,27 +661,44 @@ class Arlo_For_Wordpress {
 			$settings['platform_name'] = 'demo-au';
 		}
 		
+		$error = [];
+		
 		foreach (self::$post_types as $id => $page) {
-			if (empty($settings['post_types'][$id]['posts_page'])) {
-				//try to find and publish the page
+			//try to find and publish the page
+			$args = array(
+  				'name' => $id,
+  				'post_type' => 'page',
+  				'post_status' => array('publish','draft'),
+  				'numberposts' => 1
+			);
+			
+			$posts = get_posts($args);
+			
+			if (!(is_array($posts) && count($posts) == 1)) {
 				$args = array(
 	  				'name' => $page['name'],
 	  				'post_type' => 'page',
-	  				'post_status' => 'draft',
+	  				'post_status' => array('publish','draft'),
 	  				'numberposts' => 1
 				);
-	
-				$posts = get_posts($args);
-				if (is_array($posts) && count($posts) == 1) {
-					wp_publish_post($posts['ID']);
-					$settings['post_types'][$id]['posts_page'] = $posts['ID'];
-				} else {
 				
-				} 
+				$posts = get_posts($args);					
 			}
+							
+			if (is_array($posts) && count($posts) == 1) {
+				if ($posts[0]->post_status == 'draft') {
+					wp_publish_post($posts[0]->ID);
+				}
+				
+				$settings['post_types'][$id]['posts_page'] = $posts[0]->ID;
+			} else {
+				$error[] = $page['name'];
+			} 
 		}
 		
 		update_option('arlo_settings', $settings);
+		
+		$_SESSION['arlo-demo'] = $error;
 		
 		$_SESSION['arlo-import'] = $this->import(true);
 	}
@@ -1697,6 +1714,11 @@ class Arlo_For_Wordpress {
 	}
 	
 	public static function import_notice() {
+	
+		if(isset($_SESSION['arlo-demo'])) {		
+			self::load_demo_notice($_SESSION['arlo-demo']);
+		}	
+	
 		$import = self::get_instance()->get_import_log();
 		
 		if (strpos($import[0]->message, "404") !== false ) {
@@ -1711,6 +1733,27 @@ class Arlo_For_Wordpress {
 		
 		unset($_SESSION['arlo-import']);
 	}	
+	
+	public static function load_demo_notice($error = []) {
+		$events = arlo_get_post_by_name('events', 'page');
+		$upcoming = arlo_get_post_by_name('upcoming', 'page');
+				
+		if (count($error)) {
+			$message = sprintf(__('Couldn\t set the following post types: %s', self::get_instance()->plugin_slug), implode(', ', $error));
+		} else {
+			$message = sprintf(__('Now you can add the pages to your menu or you can visit the <a href="%s" target="_blank">%s</a> or <a href="%s" target="_blank">%s</a> pages', self::get_instance()->plugin_slug), $events->guid, $events->post_title, $upcoming->guid,  $upcoming->post_title);
+		}
+		
+		echo '
+		<div class="' . (count($error) ? "error" : "updated") . ' notice">
+        	<p>' . $message . '</p>
+	    </div>
+		';
+		
+		unset($_SESSION['arlo-demo']);
+	}	
+	
+	
 	
 	public static function welcome_notice() {
 		echo '
