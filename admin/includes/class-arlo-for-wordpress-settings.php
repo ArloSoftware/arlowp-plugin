@@ -22,7 +22,7 @@ class Arlo_For_Wordpress_Settings {
 		
 		if(isset($_GET['arlo-import'])) {
 			$_SESSION['arlo-import'] = $plugin->import(true);
-			wp_redirect( $_SERVER['HTTP_REFERER']);
+			wp_redirect( admin_url( 'options-general.php?page=arlo-for-wordpress'));
 			exit;
 		}
                 
@@ -31,12 +31,22 @@ class Arlo_For_Wordpress_Settings {
 			wp_redirect( $_SERVER['HTTP_REFERER'] );
 			exit;
 		}
-		
+
+		if(isset($_GET['load-demo'])) {
+			$plugin->load_demo();
+			wp_redirect( admin_url( 'options-general.php?page=arlo-for-wordpress'));
+			exit;
+		}		
 		
 		if(isset($_SESSION['arlo-import'])) {
 			add_action( 'admin_notices', array($plugin, "import_notice") );
 		}
-                
+		
+		$settings = get_option('arlo_settings');
+		if (empty($settings['platform_name'])) {
+			add_action( 'admin_notices', array($plugin, "welcome_notice") );
+		}
+		
 
 		// allocates the wp-options option key value pair that will store the plugin settings
 		register_setting( 'arlo_settings', 'arlo_settings' );

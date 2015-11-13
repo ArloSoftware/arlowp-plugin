@@ -112,6 +112,47 @@ class Arlo_For_Wordpress {
     );
     
 	/**
+	 * $pages: used to set the necessary pages
+	 *
+	 * @since    2.2.0
+	 *
+	 * @var      array
+	 */
+	 
+    public static $pages = array(
+
+			array(
+				'name'				=> 'events',
+				'title'				=> 'Events',
+				'content' 			=> '[arlo_event_template_list]',
+				'child_post_type'	=> 'event'
+			),
+			array(
+				'name'				=> 'eventsearch',
+				'title'				=> 'Event search',
+				'content' 			=> '[arlo_event_template_search_list]',
+				'child_post_type'	=> 'event'
+			),			
+			array(
+				'name'				=> 'upcoming',
+				'title'				=> 'Upcoming Events',
+				'content' 			=> '[arlo_upcoming_list]'
+			),
+			array(
+				'name'				=> 'presenters',
+				'title'				=> 'Presenters',
+				'content' 			=> '[arlo_presenter_list]',
+				'child_post_type'	=> 'presenter'
+			),
+			array(
+				'name'				=> 'venues',
+				'title'				=> 'Venues',
+				'content' 			=> '[arlo_venue_list]',
+				'child_post_type'	=> 'venue'
+			),
+		);    
+    
+	/**
 	 * $price_settings: used to set the price showing on the site
 	 *
 	 * @since    2.1.0
@@ -611,6 +652,38 @@ class Arlo_For_Wordpress {
 			var_dump($e);
 		}
 		ob_end_clean();
+	}
+	
+	public function load_demo() {
+		$settings = get_option('arlo_settings');
+		
+		if (empty($settings['platform_name'])) {
+			$settings['platform_name'] = 'demo-au';
+		}
+		
+		foreach (self::$post_types as $id => $page) {
+			if (empty($settings['post_types'][$id]['posts_page'])) {
+				//try to find and publish the page
+				$args = array(
+	  				'name' => $page['name'],
+	  				'post_type' => 'page',
+	  				'post_status' => 'draft',
+	  				'numberposts' => 1
+				);
+	
+				$posts = get_posts($args);
+				if (is_array($posts) && count($posts) == 1) {
+					wp_publish_post($posts['ID']);
+					$settings['post_types'][$id]['posts_page'] = $posts['ID'];
+				} else {
+				
+				} 
+			}
+		}
+		
+		update_option('arlo_settings', $settings);
+		
+		$_SESSION['arlo-import'] = $this->import(true);
 	}
 	
 	public function import($force=false) {
@@ -1627,12 +1700,33 @@ class Arlo_For_Wordpress {
 		$import = self::get_instance()->get_import_log();
 		
 		if (strpos($import[0]->message, "404") !== false ) {
-			$import[0]->message = __('The given platform name is not exists');
+			$import[0]->message = __('The given platform name is not exists', self::get_instance()->plugin_slug);
 		}
 		
 		echo '
 		<div class="' . ($import[0]->successful !== "1" ? "error" : "updated") . ' notice">
         	<p>' . $import[0]->message . '</p>
+	    </div>
+		';
+		
+		unset($_SESSION['arlo-import']);
+	}	
+	
+	public static function welcome_notice() {
+		echo '
+		<div class="notice">
+			<table class="arlo-welcome">
+				<tr>
+					<td class="logo" valign="top">
+						<a href="http://www.arlo.co" target="_blank"><img src="' . plugins_url( '/assets/img/icon-128x128.png', __FILE__) . '" style="width: 65px"></a>
+					</td>
+					<td>
+						<p>' . __( 'Create beautiful and interactive training and event websites using the Arlo for WordPress plugin. Access an extensive library of WordPress Shortcodes, Templates, and Widgets, all designed specifically for web developers to make integration easy.', self::get_instance()->plugin_slug) . '</p>
+						<p>' . __('Learn how to use <a href="https://developer.arlo.co/doc/wordpress/index" target="_blank">Arlo for WordPress</a> or visit <a href="http://www.arlo.co" target="_blank">www.arlo.co</a> to find out more about Arlo.', self::get_instance()->plugin_slug) . '</p>
+						<p><a href="?page=arlo-for-wordpress&load-demo" class="button button-primary">' . __('Try with demo data', self::get_instance()->plugin_slug) . '</a> &nbsp; &nbsp; <a href="http://www.arlo.co/register" target="_blank"  class="button button-primary">' . __('Get started with free trial', self::get_instance()->plugin_slug) . '</a></p>
+					</td>
+				</tr>
+			</table>
 	    </div>
 		';
 		
@@ -1646,41 +1740,10 @@ class Arlo_For_Wordpress {
 	 * @return void
 	 */
 	function add_pages() {
-		$pages = array(
-			array(
-				'name'				=> 'events',
-				'title'				=> 'Events',
-				'content' 			=> '[arlo_event_template_list]',
-				'child_post_type'	=> 'event'
-			),
-			array(
-				'name'				=> 'eventsearch',
-				'title'				=> 'Event search',
-				'content' 			=> '[arlo_event_template_search_list]',
-				'child_post_type'	=> 'event'
-			),			
-			array(
-				'name'				=> 'upcoming',
-				'title'				=> 'Upcoming Events',
-				'content' 			=> '[arlo_upcoming_list]'
-			),
-			array(
-				'name'				=> 'presenters',
-				'title'				=> 'Presenters',
-				'content' 			=> '[arlo_presenter_list]',
-				'child_post_type'	=> 'presenter'
-			),
-			array(
-				'name'				=> 'venues',
-				'title'				=> 'Venues',
-				'content' 			=> '[arlo_venue_list]',
-				'child_post_type'	=> 'venue'
-			),
-		);
 		
 		$settings = get_option('arlo_settings');
 	
-		foreach($pages as $page) {
+		foreach(self::$pages as $page) {
 			$current_page = get_page_by_title($page['title']);
 		
 			if(is_null($current_page)) {
