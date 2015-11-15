@@ -811,6 +811,7 @@ class Arlo_For_Wordpress {
 				'ViewUri',
 				'RegisterInterestUri',
 				'Categories',
+				'Tags',
 			)
 		);
 		
@@ -840,6 +841,64 @@ class Arlo_For_Wordpress {
                 }
 				
 				$template_event_id = $wpdb->insert_id;
+				
+				//save the tags
+				if (isset($item->Tags) && is_array($item->Tags)) {
+					$exisiting_tags = [];
+					$sql = "
+					SELECT 
+						id, 
+						tag
+					FROM
+						{$wpdb->prefix}arlo_tags 
+					WHERE 
+						tag IN ('" . implode("', '", $item->Tags) . "')
+					AND
+						active = '{$timestamp}'
+					";
+					$rows = $wpdb->get_results($sql, ARRAY_A);
+					foreach ($rows as $row) {
+						$exisiting_tags[$row['tag']] = $row['id'];
+					}
+					unset($rows);
+					
+					foreach ($item->Tags as $tag) {
+						if (empty($exisiting_tags[$tag])) {
+							$query = $wpdb->query( $wpdb->prepare( 
+								"INSERT INTO {$wpdb->prefix}arlo_tags
+								(tag, active) 
+								VALUES ( %s, %s ) 
+								", 
+								$tag,
+								$timestamp
+							) );
+														
+							if ($query === false) {
+								throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_tags' );
+							} else {
+								$exisiting_tags[$tag] = $wpdb->insert_id;
+							}
+						}
+												
+						if (!empty($exisiting_tags[$tag])) {
+							$query = $wpdb->query( $wpdb->prepare( 
+								"REPLACE INTO {$wpdb->prefix}arlo_eventtemplates_tags
+								(et_arlo_id, tag_id, active) 
+								VALUES ( %d, %d, %s ) 
+								", 
+								$item->TemplateID,
+								$exisiting_tags[$tag],
+								$timestamp
+							) );
+							
+							if ($query === false) {
+								throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_events_tags' );
+							}
+						} else {
+							throw new Exception('Couldn\'t find tag: ' . $tag );
+						}
+					}
+				}				
 				
 				// create associated custom post, if it dosen't exist
 				if(!arlo_get_post_by_name($slug, 'arlo_event')) {
@@ -1608,7 +1667,7 @@ class Arlo_For_Wordpress {
             'events_presenters',
             'eventtemplates_categories',
             'eventtemplates_presenters',
-            
+            'eventtemplates_tags',
 		);
                 		
 		foreach($tables as $table) {
