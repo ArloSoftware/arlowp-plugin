@@ -1336,7 +1336,7 @@ $shortcodes->add('event_template_permalink', function($content='', $atts, $short
 	if(!isset($GLOBALS['arlo_eventtemplate']['et_post_name'])) return '';
 
 	$et_id = arlo_get_post_by_name($GLOBALS['arlo_eventtemplate']['et_post_name'], 'arlo_event');
-
+	
 	return get_permalink($et_id);
 });
 
@@ -1848,6 +1848,71 @@ $shortcodes->add('event_delivery', function($content='', $atts, $shortcode_name)
 
 	return $output;
 });
+
+$shortcodes->add('suggest_templates', function($content='', $atts, $shortcode_name){
+	global $wpdb, $wp_query, $arlo_plugin;
+	if (empty($GLOBALS['arlo_eventtemplate']['et_arlo_id'])) return '';
+
+	$settings = get_option('arlo_settings');  
+	
+	extract(shortcode_atts(array(
+		'limit'	=> 5,
+		'tagprefix'	=> 'group_',
+	), $atts, $shortcode_name));
+	
+	$active = $arlo_plugin->get_last_import();
+	
+	//select the tag_id associated with the template and starts with the prefix
+	$items = $wpdb->get_results("
+		SELECT 
+			et_arlo_id,
+			et_code,
+			et_name,
+			et_descriptionsummary,
+			et_post_name,
+			et_registerinteresturi 
+		FROM 
+			{$wpdb->prefix}arlo_eventtemplates AS et
+		LEFT JOIN 
+			{$wpdb->prefix}arlo_eventtemplates_tags AS t
+		USING
+			(et_arlo_id)
+		WHERE 
+			et.active = '{$active}'
+		AND
+			t.tag_id IN (SELECT 
+							GROUP_CONCAT(ett.tag_id)
+						FROM 
+							{$wpdb->prefix}arlo_eventtemplates_tags AS ett
+						LEFT JOIN 
+							{$wpdb->prefix}arlo_tags AS t
+						ON
+							ett.tag_id = t.id AND t.active = '{$active}'
+						WHERE
+							t.tag LIKE '{$tagprefix}%'
+						AND
+							ett.active = '{$active}'
+						AND
+							ett.et_arlo_id = {$GLOBALS['arlo_eventtemplate']['et_arlo_id']}
+						)
+		ORDER BY 
+			et.et_name ASC
+		LIMIT 
+			$limit", ARRAY_A);
+			
+	$output = '';
+	if(!empty($items)) :
+		foreach($items as $item) {
+			$GLOBALS['arlo_eventtemplate'] = $item;
+			
+			$output .= do_shortcode($content);
+			unset($GLOBALS['arlo_eventtemplate']);
+		}
+	endif;
+
+	return $output;
+});
+
 
 
 // upcoming event list shortcode
@@ -2838,11 +2903,11 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 
 // event template next running
 $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_name){
-	if(!isset($GLOBALS['arlo_event_list_item']) || empty($GLOBALS['arlo_event_list_item']['et_arlo_id'])) return;
+	if(!isset($GLOBALS['arlo_eventtemplate']) || empty($GLOBALS['arlo_eventtemplate']['et_arlo_id'])) return;
 	$return = "";
         
 	$conditions = array(
-		'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id'],
+		'template_id' => $GLOBALS['arlo_eventtemplate']['et_arlo_id'],
 		'date' => 'e.e_startdatetime > NOW()'
 	);
 	
@@ -2868,8 +2933,8 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 		$return = '<ul class="arlo-event-next-running">';
 	}
 	
-	if(count($events) == 0 && !empty($GLOBALS['arlo_event_list_item']['et_registerinteresturi'])) {
-		$return = '<a href="' . $GLOBALS['arlo_event_list_item']['et_registerinteresturi'] . '" title="' . __('Register interest', $GLOBALS['arlo_plugin_slug']) . '" class="' . $buttonclass . '">' . __('Register interest', $GLOBALS['arlo_plugin_slug']) . '</a>';
+	if(count($events) == 0 && !empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) {
+		$return = '<a href="' . $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'] . '" title="' . __('Register interest', $GLOBALS['arlo_plugin_slug']) . '" class="' . $buttonclass . '">' . __('Register interest', $GLOBALS['arlo_plugin_slug']) . '</a>';
 	} else if (count($events)) {
 		$return_links = [];
 

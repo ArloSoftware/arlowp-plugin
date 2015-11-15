@@ -29,3 +29,13 @@
 [arlo_content_field_name wrap='<h5>%s</h5>']
 [arlo_content_field_text wrap='<p>%s</p>']
 [/arlo_content_field_item]
+
+<h3>Similar courses</h3>
+<table class="arlo_suggest_templates">
+[arlo_suggest_templates limit="4"]
+<tr>
+	<td>[arlo_event_template_permalink wrap='<a href="%s">'][arlo_event_template_code] - [arlo_event_template_name]</a></td>
+	<td align="right">[arlo_event_next_running]</td>
+</tr>
+[/arlo_suggest_templates]
+</table>

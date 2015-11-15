@@ -224,6 +224,10 @@ table.arlo-no-results td {
 	text-align: center;
 }
 
+table.arlo_suggest_templates {
+	width: 100%;
+}
+
 /* BOXED LAYOUT OVERRIDE */
 
 
