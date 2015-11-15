@@ -401,7 +401,7 @@ class Arlo_For_Wordpress_Admin {
 	
 		if($old['platform_name'] != $new['platform_name']) {
 			$plugin = Arlo_For_Wordpress::get_instance();
-			$_SESSION['arlo-import'] = $plugin->import();
+			$_SESSION['arlo-import'] = $plugin->import(true);
 		}
 		
 		// need to check for posts-page change here
