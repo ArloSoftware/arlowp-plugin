@@ -658,7 +658,7 @@ class Arlo_For_Wordpress {
 		$settings = get_option('arlo_settings');
 		
 		if (empty($settings['platform_name'])) {
-			$settings['platform_name'] = 'demo-au';
+			$settings['platform_name'] = 'websitetestdata';
 		}
 		
 		$error = [];

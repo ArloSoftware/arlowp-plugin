@@ -26,12 +26,6 @@ class Arlo_For_Wordpress_Settings {
 			exit;
 		}
                 
-		if(isset($_GET['database-upgrade'])) {
-			$plugin->database_upgrade();
-			wp_redirect( $_SERVER['HTTP_REFERER'] );
-			exit;
-		}
-
 		if(isset($_GET['load-demo'])) {
 			$plugin->load_demo();
 			wp_redirect( admin_url( 'options-general.php?page=arlo-for-wordpress'));
