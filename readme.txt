@@ -136,7 +136,7 @@ If there is no category, there is no template in the events list: https://github
 
 New "Welcome bar" with load demo data button: https://github.com/ArloSoftware/arlowp-plugin/issues/64
 
-New [arlo_suggest_templates] shortcode 
+New [arlo_suggest_templates] shortcode based on tag or category
 
 Modify the platform name field on the settings page https://github.com/ArloSoftware/arlowp-plugin/issues/68
 

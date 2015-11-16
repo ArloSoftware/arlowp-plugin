@@ -1857,29 +1857,18 @@ $shortcodes->add('suggest_templates', function($content='', $atts, $shortcode_na
 	
 	extract(shortcode_atts(array(
 		'limit'	=> 5,
+		'base' => 'category',
 		'tagprefix'	=> 'group_',
+		'onlyscheduled' => 'false'
 	), $atts, $shortcode_name));
 	
 	$active = $arlo_plugin->get_last_import();
 	
-	//select the tag_id associated with the template and starts with the prefix
-	$items = $wpdb->get_results("
-		SELECT 
-			et_arlo_id,
-			et_code,
-			et_name,
-			et_descriptionsummary,
-			et_post_name,
-			et_registerinteresturi 
-		FROM 
-			{$wpdb->prefix}arlo_eventtemplates AS et
-		LEFT JOIN 
-			{$wpdb->prefix}arlo_eventtemplates_tags AS t
-		USING
-			(et_arlo_id)
-		WHERE 
-			et.active = '{$active}'
-		AND
+	switch ($base) {
+		case 'tag': 
+			//select the tag_id associated with the template and starts with the prefix
+			
+			$where = "
 			t.tag_id IN (SELECT 
 							GROUP_CONCAT(ett.tag_id)
 						FROM 
@@ -1895,11 +1884,73 @@ $shortcodes->add('suggest_templates', function($content='', $atts, $shortcode_na
 						AND
 							ett.et_arlo_id = {$GLOBALS['arlo_eventtemplate']['et_arlo_id']}
 						)
-		ORDER BY 
-			et.et_name ASC
-		LIMIT 
-			$limit", ARRAY_A);
+			";
 			
+			$join = "		
+			LEFT JOIN 
+				{$wpdb->prefix}arlo_eventtemplates_tags AS t
+			USING
+				(et_arlo_id)
+			";
+		break;
+		default:
+			//select the categories associated with the template
+			$where = "
+			c.c_arlo_id IN (SELECT 
+							GROUP_CONCAT(ecc.c_arlo_id)
+						FROM 
+							{$wpdb->prefix}arlo_eventtemplates_categories AS ecc
+						WHERE
+							ecc.active = '{$active}'
+						AND
+							ecc.et_arlo_id = {$GLOBALS['arlo_eventtemplate']['et_arlo_id']}
+						)
+			";		
+		
+			$join = "
+			LEFT JOIN 
+				{$wpdb->prefix}arlo_eventtemplates_categories AS c
+			USING
+				(et_arlo_id)
+			";			
+		break;
+	}
+		
+	if ($onlyscheduled === "true") {
+		$join .= "
+		INNER JOIN 
+			{$wpdb->prefix}arlo_events
+		USING 
+			(et_arlo_id)
+		";
+	} 
+	
+	$sql = "
+		SELECT 
+			et.et_arlo_id,
+			et.et_code,
+			et.et_name,
+			et.et_descriptionsummary,
+			et.et_post_name,
+			et.et_registerinteresturi 
+		FROM 
+			{$wpdb->prefix}arlo_eventtemplates AS et
+		{$join}
+		WHERE 
+			et.active = '{$active}'
+		AND
+			et.et_arlo_id != {$GLOBALS['arlo_eventtemplate']['et_arlo_id']}
+		AND
+			{$where}
+		GROUP BY
+			et.et_arlo_id
+		ORDER BY 
+			RAND()
+		LIMIT 
+			$limit";
+	
+	$items = $wpdb->get_results($sql, ARRAY_A);
+		
 	$output = '';
 	if(!empty($items)) :
 		foreach($items as $item) {
