@@ -7,11 +7,17 @@ Custom "No events to show" message
 Import error/success message
 New "Welcome bar" with load demo data button: https://github.com/ArloSoftware/arlowp-plugin/issues/64
 New [arlo_suggest_templates] shortcode 
+Add last import date to the settings page: https://github.com/ArloSoftware/arlowp-plugin/issues/69
 
 Bugfixes
 ------------------
 
 If there is no category, there is no template in the events list: https://github.com/ArloSoftware/arlowp-plugin/issues/66
+Link is wrong for the arlo_content_field_list_item shortcode: https://github.com/ArloSoftware/arlowp-plugin/issues/67
+Modify the platform name field on the settings page https://github.com/ArloSoftware/arlowp-plugin/issues/68
+Remove the platform name causes an import: https://github.com/ArloSoftware/arlowp-plugin/issues/70
+
+
 
 == V2.1.1 ==
 

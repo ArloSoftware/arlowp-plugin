@@ -138,6 +138,12 @@ New "Welcome bar" with load demo data button: https://github.com/ArloSoftware/ar
 
 New [arlo_suggest_templates] shortcode 
 
+Modify the platform name field on the settings page https://github.com/ArloSoftware/arlowp-plugin/issues/68
+
+Remove the platform name causes an import: https://github.com/ArloSoftware/arlowp-plugin/issues/70
+
+Add last import date to the settings page: https://github.com/ArloSoftware/arlowp-plugin/issues/69
+
 
 = 2.1.1 =
 
