@@ -399,7 +399,7 @@ class Arlo_For_Wordpress_Admin {
 	public function settings_saved($old) {
 		$new = get_option('arlo_settings', array());
 	
-		if($old['platform_name'] != $new['platform_name']) {
+		if($old['platform_name'] != $new['platform_name'] && !empty($new['platform_name'])) {
 			$plugin = Arlo_For_Wordpress::get_instance();
 			$_SESSION['arlo-import'] = $plugin->import(true);
 		}
