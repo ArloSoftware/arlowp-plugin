@@ -31,6 +31,10 @@
 	margin-bottom: 1em;
 }
 
+.arlo-field-wrap.search {
+	background-color: transparent;
+}
+
 .arlo-field [type='text'], .arlo-field [type='url'] {
 	width: 100%;
 }
