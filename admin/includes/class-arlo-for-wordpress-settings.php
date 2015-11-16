@@ -64,11 +64,24 @@ class Arlo_For_Wordpress_Settings {
                             'id' => 'platform_name',
                             'label_for' => 'arlo_platform_name',
                             'before_html' => '<div class="arlo_platform">https://my.arlo.co/</div>',
-                            'after_html' => '<a href="?page=arlo-for-wordpress&arlo-import">'.__('Re-import all data now', $this->plugin_slug).'</a>',
                             )
                 );                
                 
-                add_settings_field('arlo_price_setting', '<label for="arlo_price_setting">'.__('Price shown', $this->plugin_slug).'</label>', array($this, 'arlo_price_setting_callback'), $this->plugin_slug, 'arlo_general_section');
+		// create lat import text
+		add_settings_field(
+                        'arlo_last_import', 
+                        '<label for="arlo_last_import">'.__('Last import', $this->plugin_slug).'</label>', 
+                        array($this, 'arlo_simple_text_callback'), 
+                        $this->plugin_slug, 'arlo_general_section', 
+                        array(
+                            'html' => $plugin->get_last_import() . '&nbsp;&nbsp;<a href="?page=arlo-for-wordpress&arlo-import">'.__('Synchronize now', $this->plugin_slug).'</a>'
+                            )
+                );
+                
+              
+		// create price settings dropdown
+		add_settings_field('arlo_price_setting', '<label for="arlo_price_setting">'.__('Price shown', $this->plugin_slug).'</label>', array($this, 'arlo_price_setting_callback'), $this->plugin_slug, 'arlo_general_section');                
+        
                 
 		// create Free text field
 		add_settings_field(
@@ -217,7 +230,20 @@ class Arlo_For_Wordpress_Settings {
         }
             
 	    echo $html;
-	}     
+	}  
+	
+	
+	function arlo_simple_text_callback($args) {
+	    $html = '';
+	        
+        if (!empty($args['html'])) {
+            $html .= $args['html'];
+        }
+                    
+	    echo $html;
+	} 	
+	
+	   
 
 	function arlo_posts_page_callback($args) {
 	    $settings = get_option('arlo_settings');

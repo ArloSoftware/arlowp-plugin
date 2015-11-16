@@ -706,25 +706,25 @@ class Arlo_For_Wordpress {
 	public function import($force=false) {
 		// check for last sucessful import. Continue if imported mor than an hour ago or forced. Otherwise, return.
             
-		$timestamp = date('Y-m-d H:i:s');
-		$this->add_import_log('Import Started', $timestamp, false);
+		$timestamp = date('Y-m-d H:i:s T');
+		$this->add_import_log('Synchronization Started', $timestamp, false);
 		$last = $this->get_last_import();
 		
 		// MV: Untangled the if statements. 
 		// If not forced
 		if(!$force) {
 			// LOG THIS AS AN AUTOMATIC IMPORT
-			$this->add_import_log('Import identified as automatic import.', $timestamp, false);
+			$this->add_import_log('Synchronization identified as automatic synchronization.', $timestamp, false);
 			if(!empty($last)) {
 				// LOG THAT A PREVIOUS SUCCESSFUL IMPORT HAS BEEN FOUND
-				$this->add_import_log('Previous succesful import found.', $timestamp, false);
+				$this->add_import_log('Previous succesful synchronization found.', $timestamp, false);
 				if(strtotime('-1 hour') > strtotime($last)) {
 					// LOG THE FACT THAT PREVIOUS SUCCESSFUL IMPORT IS MORE THAN AN HOUR AGO
-					$this->add_import_log('Import more than an hour old. Import required.', $timestamp, false);
+					$this->add_import_log('Synchronization more than an hour old. Synchronization required.', $timestamp, false);
 				}
 				else {
 					// LOG THE FACT THAT PREVIOUS SUCCESSFUL IMPORT IS MORE THAN AN HOUR AGO
-					$this->add_import_log('Import less than an hour old. Import stopped.', $timestamp, false);
+					$this->add_import_log('Synchronization less than an hour old. Synchronization stopped.', $timestamp, false);
 					// LOG DATA USED TO DECIDE IMPORT NOT REQUIRED.
 					$this->add_import_log($last . '-'  . strtotime($last) . '-' . strtotime('-1 hour') . '-'  . !$force, $timestamp, false);
 					return false;
@@ -742,8 +742,6 @@ class Arlo_For_Wordpress {
 		// need to check for valid platform name here - return false if none found
 		// can we ping tha API?
 	
-		// set import start time
-		$timestamp = date('Y-m-d H:i:s');
 		
 		try {
 			global $wpdb;
@@ -773,7 +771,7 @@ class Arlo_For_Wordpress {
 			// rollback
 			$wpdb->query('ROLLBACK');
                         
-			$this->add_import_log('Import Failed: ' . $e->getMessage(), $timestamp, false);
+			$this->add_import_log('Synchronization failed: ' . $e->getMessage(), $timestamp, false);
 			
 			return false;
 		}
@@ -790,7 +788,7 @@ class Arlo_For_Wordpress {
 		flush_rewrite_rules(true);
 		
 		// update logs
-		$this->add_import_log('Import Successful', $timestamp);
+		$this->add_import_log('Synchronization successful', $timestamp);
 		
 		return true;
 	}
