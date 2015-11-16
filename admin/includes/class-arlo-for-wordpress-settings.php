@@ -63,6 +63,7 @@ class Arlo_For_Wordpress_Settings {
                         array(
                             'id' => 'platform_name',
                             'label_for' => 'arlo_platform_name',
+                            'before_html' => '<div class="arlo_platform">https://my.arlo.co/</div>',
                             'after_html' => '<a href="?page=arlo-for-wordpress&arlo-import">'.__('Re-import all data now', $this->plugin_slug).'</a>',
                             )
                 );                
@@ -202,16 +203,18 @@ class Arlo_For_Wordpress_Settings {
 	function arlo_simple_input_callback($args) {
 	    $settings = get_option('arlo_settings');
 	    $val = (isset($settings[$args['id']])) ? esc_attr($settings[$args['id']]) : (!empty($args['default_val']) ? $args['default_val'] : '' );
+	    
+	    $html = '';
+	        
+        if (!empty($args['before_html'])) {
+            $html .= $args['before_html'];
+        }
             
-            if (!empty($args['before_html'])) {
-                $html .= $args['before_html'];
-            }
+	    $html .= '<input type="text" class="' . (!empty($args['class']) ? $args['class'] : "") . '" id="arlo_'.$args['id'].'" name="arlo_settings['.$args['id'].']" value="'.$val.'" />';
             
-	    $html = '<input type="text" id="arlo_'.$args['id'].'" name="arlo_settings['.$args['id'].']" value="'.$val.'" />';
-            
-            if (!empty($args['after_html'])) {
-                $html .= $args['after_html'];
-            }
+        if (!empty($args['after_html'])) {
+            $html .= $args['after_html'];
+        }
             
 	    echo $html;
 	}     

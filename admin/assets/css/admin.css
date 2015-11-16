@@ -35,6 +35,16 @@
 	width: 100%;
 }
 
+.arlo-field .arlo_platform {
+	display: inline-block;
+	color: #aaa;
+	margin-right: 6px;
+}
+
+.arlo-field .arlo_platform + input {
+	width: 60%;
+}
+
 .arlo-check {
 	float: left;
 }
