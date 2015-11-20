@@ -1772,10 +1772,6 @@ class Arlo_For_Wordpress {
 	
 	public static function import_notice() {
 	
-		if(isset($_SESSION['arlo-demo'])) {		
-			self::load_demo_notice($_SESSION['arlo-demo']);
-		}	
-	
 		$import = self::get_instance()->get_import_log();
 		
 		if (strpos($import[0]->message, "404") !== false ) {
@@ -1792,22 +1788,112 @@ class Arlo_For_Wordpress {
 	}	
 	
 	public static function load_demo_notice($error = []) {
+		global $wpdb;
+		$settings = get_option('arlo_settings');
+		$import = self::get_instance()->get_import_log();
 		$events = arlo_get_post_by_name('events', 'page');
 		$upcoming = arlo_get_post_by_name('upcoming', 'page');
+		$presenters = arlo_get_post_by_name('presenters', 'page');
+		$venues = arlo_get_post_by_name('venues', 'page');
+		$timestamp = get_option('arlo_last_import');
+		
+		//Get the first event template wich has event
+		$sql = "
+		SELECT 
+			guid
+		FROM
+			{$wpdb->prefix}arlo_events AS e
+		LEFT JOIN 		
+			{$wpdb->prefix}arlo_eventtemplates AS et		
+		ON
+			e.et_arlo_id = et.et_arlo_id
+		AND
+			e.active = '{$timestamp}'
+		LEFT JOIN
+			{$wpdb->prefix}posts
+		ON
+			et_post_name = post_name		
+		AND
+			post_status = 'publish'
+		WHERE 
+			et.active = '{$timestamp}'
+		LIMIT 
+			1
+		";
+		$event = $wpdb->get_results($sql, ARRAY_A);
+		
+		//Get the first presenter
+		$sql = "
+		SELECT 
+			guid
+		FROM
+			{$wpdb->prefix}arlo_presenters AS p
+		LEFT JOIN
+			{$wpdb->prefix}posts
+		ON
+			p_post_name = post_name		
+		AND
+			post_status = 'publish'
+		WHERE 
+			p.active = '{$timestamp}'
+		LIMIT 
+			1
+		";
+		$presenter = $wpdb->get_results($sql, ARRAY_A);		
+		
+		//Get the first venue
+		$sql = "
+		SELECT 
+			guid
+		FROM
+			{$wpdb->prefix}arlo_venues AS v
+		LEFT JOIN
+			{$wpdb->prefix}posts
+		ON
+			v_post_name = post_name		
+		AND
+			post_status = 'publish'
+		WHERE 
+			v.active = '{$timestamp}'
+		LIMIT 
+			1
+		";
+		$venue = $wpdb->get_results($sql, ARRAY_A);		
+		
+		
+		if (!empty($settings['platform_name'])) {
+			if (count($error)) {
+				$message = '<p>' . sprintf(__('Couldn\'t set the following post types: %s', self::get_instance()->plugin_slug), implode(', ', $error)) . '</p>';
+			} else {
+				$message = 
+				'<h3>' . __('Start editing your new pages', self::get_instance()->plugin_slug) . '</h3><p>'.
 				
-		if (count($error)) {
-			$message = sprintf(__('Couldn\t set the following post types: %s', self::get_instance()->plugin_slug), implode(', ', $error));
-		} else {
-			$message = sprintf(__('Now you can add the pages to your menu or you can visit the <a href="%s" target="_blank">%s</a> or <a href="%s" target="_blank">%s</a> pages', self::get_instance()->plugin_slug), $events->guid, $events->post_title, $upcoming->guid,  $upcoming->post_title);
-		}
-		
-		echo '
-		<div class="' . (count($error) ? "error" : "updated") . ' notice">
-        	<p>' . $message . '</p>
-	    </div>
-		';
-		
-		unset($_SESSION['arlo-demo']);
+				sprintf(__('View <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a> or <a href="%s" target="_blank">%s</a> pages', self::get_instance()->plugin_slug), 
+					$event[0]['guid'],
+					__('Event', self::get_instance()->plugin_slug),
+					$events->guid, 
+					__('Category', self::get_instance()->plugin_slug), 
+					$upcoming->guid,  
+					$upcoming->post_title,
+					$presenter[0]['guid'],
+					__('Presenter profile', self::get_instance()->plugin_slug), 
+					$presenters->guid, 
+					__('Presenters list', self::get_instance()->plugin_slug), 
+					$venue[0]['guid'],
+					__('Venue information', self::get_instance()->plugin_slug), 					
+					$venues->guid,  
+					__('Venues list', self::get_instance()->plugin_slug)
+				) . '</p><p>' . __('Edit the page <a href="#arlo-template-select">templates</a> for each of these websites pages below.') . '</p>';
+			}
+			
+			echo '
+			<div class="' . (count($error) ? "error" : "") . ' notice">
+	        	' . $message . '
+		 	</div>
+		 	';
+			
+			unset($_SESSION['arlo-demo']);		
+		}				
 	}	
 	
 	
@@ -1815,6 +1901,7 @@ class Arlo_For_Wordpress {
 	public static function welcome_notice() {
 		echo '
 		<div class="notice">
+			<h3>' . __('Welcome to Arlo for WordPress', self::get_instance()->plugin_slug) . '</h3>
 			<table class="arlo-welcome">
 				<tr>
 					<td class="logo" valign="top">
@@ -1829,6 +1916,8 @@ class Arlo_For_Wordpress {
 			</table>
 	    </div>
 		';
+		
+		self::load_demo_notice($_SESSION['arlo-demo']);
 		
 		unset($_SESSION['arlo-import']);
 	}	
