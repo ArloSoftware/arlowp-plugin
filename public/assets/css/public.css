@@ -2,6 +2,7 @@
 
 .arlo-list {
 	list-style-type: none;
+	list-style: none;
 	margin-left: 0;
 	padding-left: 0;
 }
@@ -14,6 +15,7 @@
 .arlo-list.upcoming > li {
 	border: 1px solid #ccc;
 	margin-bottom: 1em;
+	margin-left: 0px;
 	padding: 1em;
 }
 
