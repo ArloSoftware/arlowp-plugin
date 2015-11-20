@@ -1920,9 +1920,23 @@ class Arlo_For_Wordpress {
 		
 		self::load_demo_notice($_SESSION['arlo-demo']);
 		self::webinar_notice();
+		self::developer_notice();
 		
 		unset($_SESSION['arlo-import']);
 	}	
+	
+	public static function developer_notice() {
+		echo '
+		<div class="notice">
+			<p class="developer">
+				
+				<img src="' . plugins_url( '/assets/img/tips-yellow.png', __FILE__) . '" style="width: 32px">
+				' . __('Are you a web developer building a site for a client?', self::get_instance()->plugin_slug) . '
+				' . sprintf(__('<a target="_blank" href="%s">Contact us to become an Arlo partner</a>', self::get_instance()->plugin_slug), 'https://www.arlo.co/contact') . '
+			</p>
+	    </div>
+		';	
+	}
 	
 	public static function webinar_notice() {
 		echo '
@@ -1930,12 +1944,12 @@ class Arlo_For_Wordpress {
 			<p class="webinar">
 				<a target="_blank" href="http://tiny.cc/arlo_overview_video" target="_blank"><img src="' . plugins_url( '/assets/img/video-yellow.png', __FILE__) . '" style="width: 32px">' . __('Watch overview video', self::get_instance()->plugin_slug) .'</a>
 				<img src="' . plugins_url( '/assets/img/training-yellow.png', __FILE__) . '" style="width: 32px">
-				' . __('Join <a target="_blank" href="" class="webinar_url">Arlo for WordPress Getting started</a> webinar on <span id="webinar_date"></span>') . '
-				' . __('<a target="_blank" href="" class="webinar_url">Register now!</a> or <a target="_blank" href="" id="webinar_template_url">view more times</a>') . '
+				' . __('Join <a target="_blank" href="" class="webinar_url">Arlo for WordPress Getting started</a> webinar on <span id="webinar_date"></span>', self::get_instance()->plugin_slug) . '
+				' . __('<a target="_blank" href="" class="webinar_url">Register now!</a> or <a target="_blank" href="" id="webinar_template_url">view more times</a>', self::get_instance()->plugin_slug) . '
 			</p>
 	    </div>
 		';	
-	}
+	}	
 
 	/**
 	 * add_pages function.

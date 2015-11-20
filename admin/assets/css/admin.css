@@ -83,7 +83,8 @@
 	color: #444;
 }
 
-.settings_page_arlo-for-wordpress p.webinar img {
+.settings_page_arlo-for-wordpress p.webinar img, 
+.settings_page_arlo-for-wordpress p.developer img {
 	vertical-align: middle;
 	margin: 0px 6px;
 }
