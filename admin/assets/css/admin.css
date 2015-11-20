@@ -75,6 +75,19 @@
 	width: 70%;
 }
 
+.settings_page_arlo-for-wordpress p.webinar {
+	color: #ccc;
+}
+
+.settings_page_arlo-for-wordpress p.webinar span {
+	color: #444;
+}
+
+.settings_page_arlo-for-wordpress p.webinar img {
+	vertical-align: middle;
+	margin: 0px 6px;
+}
+
 /* hide the template edit select box if no javascript */
 .no-js #arlo-template-select {
 	display: none;

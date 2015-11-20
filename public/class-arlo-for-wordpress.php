@@ -512,7 +512,7 @@ class Arlo_For_Wordpress {
 	 * @since    1.0.0
 	 */
 	public function enqueue_styles() {
-		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css?15112015', __FILE__ ), array(), self::VERSION );
+		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css?20112015', __FILE__ ), array(), self::VERSION );
 	}
 
 	/**
@@ -1899,6 +1899,7 @@ class Arlo_For_Wordpress {
 	
 	
 	public static function welcome_notice() {
+		$settings = get_option('arlo_settings');
 		echo '
 		<div class="notice">
 			<h3>' . __('Welcome to Arlo for WordPress', self::get_instance()->plugin_slug) . '</h3>
@@ -1910,7 +1911,7 @@ class Arlo_For_Wordpress {
 					<td>
 						<p>' . __( 'Create beautiful and interactive training and event websites using the Arlo for WordPress plugin. Access an extensive library of WordPress Shortcodes, Templates, and Widgets, all designed specifically for web developers to make integration easy.', self::get_instance()->plugin_slug) . '</p>
 						<p>' . __('Learn how to use <a href="https://developer.arlo.co/doc/wordpress/index" target="_blank">Arlo for WordPress</a> or visit <a href="http://www.arlo.co" target="_blank">www.arlo.co</a> to find out more about Arlo.', self::get_instance()->plugin_slug) . '</p>
-						<p><a href="?page=arlo-for-wordpress&load-demo" class="button button-primary">' . __('Try with demo data', self::get_instance()->plugin_slug) . '</a> &nbsp; &nbsp; <a href="http://www.arlo.co/register" target="_blank"  class="button button-primary">' . __('Get started with free trial', self::get_instance()->plugin_slug) . '</a></p>
+						<p>' . (empty($settings['platform_name']) ? '<a href="?page=arlo-for-wordpress&load-demo" class="button button-primary">' . __('Try with demo data', self::get_instance()->plugin_slug) . '</a> &nbsp; &nbsp; ' : '') .'<a href="http://www.arlo.co/register" target="_blank"  class="button button-primary">' . __('Get started with free trial', self::get_instance()->plugin_slug) . '</a></p>
 					</td>
 				</tr>
 			</table>
@@ -1918,9 +1919,23 @@ class Arlo_For_Wordpress {
 		';
 		
 		self::load_demo_notice($_SESSION['arlo-demo']);
+		self::webinar_notice();
 		
 		unset($_SESSION['arlo-import']);
 	}	
+	
+	public static function webinar_notice() {
+		echo '
+		<div class="notice" id="webinar_notice" style="display: none">
+			<p class="webinar">
+				<a target="_blank" href="http://tiny.cc/arlo_overview_video" target="_blank"><img src="' . plugins_url( '/assets/img/video-yellow.png', __FILE__) . '" style="width: 32px">' . __('Watch overview video', self::get_instance()->plugin_slug) .'</a>
+				<img src="' . plugins_url( '/assets/img/training-yellow.png', __FILE__) . '" style="width: 32px">
+				' . __('Join <a target="_blank" href="" class="webinar_url">Arlo for WordPress Getting started</a> webinar on <span id="webinar_date"></span>') . '
+				' . __('<a target="_blank" href="" class="webinar_url">Register now!</a> or <a target="_blank" href="" id="webinar_template_url">view more times</a>') . '
+			</p>
+	    </div>
+		';	
+	}
 
 	/**
 	 * add_pages function.

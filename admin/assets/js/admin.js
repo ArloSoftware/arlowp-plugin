@@ -1,4 +1,4 @@
-(function ( $ ) {
+(function ( $, LS, LSApi ) {
 	"use strict";
 
 	$(function () {
@@ -107,7 +107,45 @@
 				alert("Couldn't find the template!");
 			}
 		}
-
+		
+		//get events for the webinar
+		var arloApiClient = new LS.Api.ApiClient({
+			platformID: "presentations"
+		});
+		
+		var eventSearchOptions = {
+            fields: ['ViewUri', 'RegistrationInfo', 'StartDateTime'],
+            filter: { templateCode: 'ARLO9'},
+            top: 1
+        };
+        
+        var callback = {
+			success: loadAPIResultsSuccess,
+			error: loadAPIResultsError
+       	}
+		
+		arloApiClient.getResources().getEventSearchResource().searchEvents(eventSearchOptions, callback);
+		
+		function loadAPIResultsSuccess(data) {
+			if (data.Items != null && data.Count == 1) {
+				var item = data.Items[0];
+				var date = item.StartDateTime.substr(0,10);
+				var time = item.StartDateTime.substr(11,5);
+				
+				$('#webinar_date').html(date + ' ' + time + ' NZDT');
+				
+				$('#webinar_template_url').attr('href', item.ViewUri);
+				
+				$('.webinar_url').attr('href', item.RegistrationInfo.RegisterUri);
+				
+				$('#webinar_notice').fadeIn();
+			}
+			
+		}
+		
+		function loadAPIResultsError(error) {
+			console.log(error);
+		}
 	});
 
-}(jQuery));
+}(jQuery, window.LS, window.LS.Api));
