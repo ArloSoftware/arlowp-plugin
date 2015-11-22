@@ -30,7 +30,7 @@ class Arlo_For_Wordpress {
 	 *
 	 * @var     string
 	 */
-	const VERSION = '2.1.2';
+	const VERSION = '2.1.5';
 
 	/**
 	 * Minimum required PHP version
@@ -167,7 +167,7 @@ class Arlo_For_Wordpress {
 	/**
 	 * $dismissible_notices: valid dismissible notices
 	 *
-	 * @since    2.1.2
+	 * @since    2.1.5
 	 *
 	 * @var      array
 	 */

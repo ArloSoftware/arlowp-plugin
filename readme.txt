@@ -3,7 +3,7 @@ Contributors: ArloSoftware, adamfentosi
 Tags: online registration, event registration, training management,  event management, event plugin, training company software, training calendar, training administration, training management software, training provider, solution, events calendar, wordpress events, event ticketing, wordpress lms, class registration, conference registration,  ticket, registration, event manager, training, booking, ticketing
 Requires at least: 3.7
 Tested up to: 4.3.1
-Stable tag: 2.1.2
+Stable tag: 2.1.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -126,7 +126,7 @@ The Arlo - Training and Event Management, and online registration plugin is only
 
 == Changelog ==
 
-= 2.1.2 =
+= 2.1.5 =
 
 New search widget
 
@@ -135,6 +135,8 @@ Custom "No events to show" message
 If there is no category, there is no template in the events list: https://github.com/ArloSoftware/arlowp-plugin/issues/66
 
 New "Welcome bar" with load demo data button: https://github.com/ArloSoftware/arlowp-plugin/issues/64
+
+Dismissible notices for the welcome bar: https://github.com/ArloSoftware/arlowp-plugin/issues/73
 
 New [arlo_suggest_templates] shortcode based on tag or category
 

@@ -1,4 +1,4 @@
-== V2.1.2 ==
+== V2.1.5 ==
 
 Enhancement
 ------------------
@@ -6,6 +6,7 @@ New basic search widget
 Custom "No events to show" message
 Import error/success message
 New "Welcome bar" with load demo data button: https://github.com/ArloSoftware/arlowp-plugin/issues/64
+Dismissible notices for the welcome bar: https://github.com/ArloSoftware/arlowp-plugin/issues/73
 New [arlo_suggest_templates] shortcode based on tag or category
 Add last import date to the settings page: https://github.com/ArloSoftware/arlowp-plugin/issues/69
 
