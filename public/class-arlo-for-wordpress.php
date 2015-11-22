@@ -162,7 +162,21 @@ class Arlo_For_Wordpress {
     public static $price_settings = array(
         'exclgst' => 'Exclude GST.',
         'inclgst' => 'Include GST.',
-    );  
+    ); 
+    
+	/**
+	 * $dismissible_notices: valid dismissible notices
+	 *
+	 * @since    2.1.2
+	 *
+	 * @var      array
+	 */
+    public static $dismissible_notices = array(
+    	'welcome' => 'arlo-welcome-admin-notice',
+    	'developer' => 'arlo-developer-admin-notice',
+    	'webinar' => 'arlo-webinar-admin-notice',
+    	'newpages' => 'arlo-newpages-admin-notice',
+    );     
     
 	/**
 	 * $delivery_labels: used to show the different delivery types
@@ -261,6 +275,9 @@ class Arlo_For_Wordpress {
 		// content and excerpt filters to hijack arlo registered post types
 		add_filter('the_content', 'arlo_the_content');
 	
+	
+		add_action( 'wp_ajax_dismissible_notice', array($this, 'dismissible_notice_callback'));
+		
 		// the_post action - allows us to inject Arlo-specific data as required
 		// consider this later
 		//add_action( 'the_posts', array( $this, 'the_posts_action' ) );
@@ -656,6 +673,9 @@ class Arlo_For_Wordpress {
 	
 	public function load_demo() {
 		$settings = get_option('arlo_settings');
+		$notice_id = self::$dismissible_notices['newpages'];
+		$user = wp_get_current_user();
+		update_user_meta($user->ID, $notice_id, 1);
 		
 		if (empty($settings['platform_name'])) {
 			$settings['platform_name'] = 'websitetestdata';
@@ -1790,133 +1810,149 @@ class Arlo_For_Wordpress {
 	public static function load_demo_notice($error = []) {
 		global $wpdb;
 		$settings = get_option('arlo_settings');
-		$import = self::get_instance()->get_import_log();
-		$events = arlo_get_post_by_name('events', 'page');
-		$upcoming = arlo_get_post_by_name('upcoming', 'page');
-		$presenters = arlo_get_post_by_name('presenters', 'page');
-		$venues = arlo_get_post_by_name('venues', 'page');
 		$timestamp = get_option('arlo_last_import');
 		
-		//Get the first event template wich has event
-		$sql = "
-		SELECT 
-			guid
-		FROM
-			{$wpdb->prefix}arlo_events AS e
-		LEFT JOIN 		
-			{$wpdb->prefix}arlo_eventtemplates AS et		
-		ON
-			e.et_arlo_id = et.et_arlo_id
-		AND
-			e.active = '{$timestamp}'
-		LEFT JOIN
-			{$wpdb->prefix}posts
-		ON
-			et_post_name = post_name		
-		AND
-			post_status = 'publish'
-		WHERE 
-			et.active = '{$timestamp}'
-		LIMIT 
-			1
-		";
-		$event = $wpdb->get_results($sql, ARRAY_A);
-		
-		//Get the first presenter
-		$sql = "
-		SELECT 
-			guid
-		FROM
-			{$wpdb->prefix}arlo_presenters AS p
-		LEFT JOIN
-			{$wpdb->prefix}posts
-		ON
-			p_post_name = post_name		
-		AND
-			post_status = 'publish'
-		WHERE 
-			p.active = '{$timestamp}'
-		LIMIT 
-			1
-		";
-		$presenter = $wpdb->get_results($sql, ARRAY_A);		
-		
-		//Get the first venue
-		$sql = "
-		SELECT 
-			guid
-		FROM
-			{$wpdb->prefix}arlo_venues AS v
-		LEFT JOIN
-			{$wpdb->prefix}posts
-		ON
-			v_post_name = post_name		
-		AND
-			post_status = 'publish'
-		WHERE 
-			v.active = '{$timestamp}'
-		LIMIT 
-			1
-		";
-		$venue = $wpdb->get_results($sql, ARRAY_A);		
-		
-		
-		if (!empty($settings['platform_name'])) {
-			if (count($error)) {
-				$message = '<p>' . sprintf(__('Couldn\'t set the following post types: %s', self::get_instance()->plugin_slug), implode(', ', $error)) . '</p>';
-			} else {
-				$message = 
-				'<h3>' . __('Start editing your new pages', self::get_instance()->plugin_slug) . '</h3><p>'.
+		$notice_id = self::$dismissible_notices['newpages'];
+		$user = wp_get_current_user();
+		$meta = get_user_meta($user->ID, $notice_id, true);
 				
-				sprintf(__('View <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a> or <a href="%s" target="_blank">%s</a> pages', self::get_instance()->plugin_slug), 
-					$event[0]['guid'],
-					__('Event', self::get_instance()->plugin_slug),
-					$events->guid, 
-					__('Category', self::get_instance()->plugin_slug), 
-					$upcoming->guid,  
-					$upcoming->post_title,
-					$presenter[0]['guid'],
-					__('Presenter profile', self::get_instance()->plugin_slug), 
-					$presenters->guid, 
-					__('Presenters list', self::get_instance()->plugin_slug), 
-					$venue[0]['guid'],
-					__('Venue information', self::get_instance()->plugin_slug), 					
-					$venues->guid,  
-					__('Venues list', self::get_instance()->plugin_slug)
-				) . '</p><p>' . __('Edit the page <a href="#arlo-template-select">templates</a> for each of these websites pages below.') . '</p>';
-			}
-			
+		if (count($error)) {
 			echo '
-			<div class="' . (count($error) ? "error" : "") . ' notice">
-	        	' . $message . '
-		 	</div>
-		 	';
+				<div class="' . (count($error) ? "error" : "") . ' notice is-dismissible" id="' . $notice_id . '">
+		        	<p>' . sprintf(__('Couldn\'t set the following post types: %s', self::get_instance()->plugin_slug), implode(', ', $error)) . '</p>
+		        	<button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button>
+			 	</div>';
+		} else {
+			if ($meta !== '0') {	
+				$import = self::get_instance()->get_import_log();
+				$events = arlo_get_post_by_name('events', 'page');
+				$upcoming = arlo_get_post_by_name('upcoming', 'page');
+				$presenters = arlo_get_post_by_name('presenters', 'page');
+				$venues = arlo_get_post_by_name('venues', 'page');			
 			
-			unset($_SESSION['arlo-demo']);		
-		}				
+				if (!empty($settings['platform_name'])) {		
+					//Get the first event template wich has event
+					$sql = "
+					SELECT 
+						guid
+					FROM
+						{$wpdb->prefix}arlo_events AS e
+					LEFT JOIN 		
+						{$wpdb->prefix}arlo_eventtemplates AS et		
+					ON
+						e.et_arlo_id = et.et_arlo_id
+					AND
+						e.active = '{$timestamp}'
+					LEFT JOIN
+						{$wpdb->prefix}posts
+					ON
+						et_post_name = post_name		
+					AND
+						post_status = 'publish'
+					WHERE 
+						et.active = '{$timestamp}'
+					LIMIT 
+						1
+					";
+					$event = $wpdb->get_results($sql, ARRAY_A);
+					
+					//Get the first presenter
+					$sql = "
+					SELECT 
+						guid
+					FROM
+						{$wpdb->prefix}arlo_presenters AS p
+					LEFT JOIN
+						{$wpdb->prefix}posts
+					ON
+						p_post_name = post_name		
+					AND
+						post_status = 'publish'
+					WHERE 
+						p.active = '{$timestamp}'
+					LIMIT 
+						1
+					";
+					$presenter = $wpdb->get_results($sql, ARRAY_A);		
+					
+					//Get the first venue
+					$sql = "
+					SELECT 
+						guid
+					FROM
+						{$wpdb->prefix}arlo_venues AS v
+					LEFT JOIN
+						{$wpdb->prefix}posts
+					ON
+						v_post_name = post_name		
+					AND
+						post_status = 'publish'
+					WHERE 
+						v.active = '{$timestamp}'
+					LIMIT 
+						1
+					";
+					$venue = $wpdb->get_results($sql, ARRAY_A);		
+					
+					$message = 
+					'<h3>' . __('Start editing your new pages', self::get_instance()->plugin_slug) . '</h3><p>'.
+					
+					sprintf(__('View <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a> or <a href="%s" target="_blank">%s</a> pages', self::get_instance()->plugin_slug), 
+						$event[0]['guid'],
+						__('Event', self::get_instance()->plugin_slug),
+						$events->guid, 
+						__('Category', self::get_instance()->plugin_slug), 
+						$upcoming->guid,  
+						$upcoming->post_title,
+						$presenter[0]['guid'],
+						__('Presenter profile', self::get_instance()->plugin_slug), 
+						$presenters->guid, 
+						__('Presenters list', self::get_instance()->plugin_slug), 
+						$venue[0]['guid'],
+						__('Venue information', self::get_instance()->plugin_slug), 					
+						$venues->guid,  
+						__('Venues list', self::get_instance()->plugin_slug)
+					) . '</p><p>' . __('Edit the page <a href="#arlo-template-select">templates</a> for each of these websites pages below.') . '</p>';
+					
+					echo '
+					<div class="' . (count($error) ? "error" : "") . ' notice is-dismissible" id="' . $notice_id . '">
+			        	' . $message . '
+			        	<button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button>
+				 	</div>
+				 	';
+					
+					unset($_SESSION['arlo-demo']);		
+				}				
+			}		
+		}
 	}	
-	
-	
 	
 	public static function welcome_notice() {
 		$settings = get_option('arlo_settings');
-		echo '
-		<div class="notice">
-			<h3>' . __('Welcome to Arlo for WordPress', self::get_instance()->plugin_slug) . '</h3>
-			<table class="arlo-welcome">
-				<tr>
-					<td class="logo" valign="top">
-						<a href="http://www.arlo.co" target="_blank"><img src="' . plugins_url( '/assets/img/icon-128x128.png', __FILE__) . '" style="width: 65px"></a>
-					</td>
-					<td>
-						<p>' . __( 'Create beautiful and interactive training and event websites using the Arlo for WordPress plugin. Access an extensive library of WordPress Shortcodes, Templates, and Widgets, all designed specifically for web developers to make integration easy.', self::get_instance()->plugin_slug) . '</p>
-						<p>' . __('Learn how to use <a href="https://developer.arlo.co/doc/wordpress/index" target="_blank">Arlo for WordPress</a> or visit <a href="http://www.arlo.co" target="_blank">www.arlo.co</a> to find out more about Arlo.', self::get_instance()->plugin_slug) . '</p>
-						<p>' . (empty($settings['platform_name']) ? '<a href="?page=arlo-for-wordpress&load-demo" class="button button-primary">' . __('Try with demo data', self::get_instance()->plugin_slug) . '</a> &nbsp; &nbsp; ' : '') .'<a href="http://www.arlo.co/register" target="_blank"  class="button button-primary">' . __('Get started with free trial', self::get_instance()->plugin_slug) . '</a></p>
-					</td>
-				</tr>
-			</table>
-	    </div>
-		';
+		$notice_id = self::$dismissible_notices['welcome'];
+		$user = wp_get_current_user();
+		$meta = get_user_meta($user->ID, $notice_id, true);
+		
+		if ($meta !== '0') {
+			echo '
+			<div class="notice is-dismissible" id="' . $notice_id . '">
+				<h3>' . __('Welcome to Arlo for WordPress', self::get_instance()->plugin_slug) . '</h3>
+				<table class="arlo-welcome">
+					<tr>
+						<td class="logo" valign="top">
+							<a href="http://www.arlo.co" target="_blank"><img src="' . plugins_url( '/assets/img/icon-128x128.png', __FILE__) . '" style="width: 65px"></a>
+						</td>
+						<td>
+							<p>' . __( 'Create beautiful and interactive training and event websites using the Arlo for WordPress plugin. Access an extensive library of WordPress Shortcodes, Templates, and Widgets, all designed specifically for web developers to make integration easy.', self::get_instance()->plugin_slug) . '</p>
+							<p>' . __('Learn how to use <a href="https://developer.arlo.co/doc/wordpress/index" target="_blank">Arlo for WordPress</a> or visit <a href="http://www.arlo.co" target="_blank">www.arlo.co</a> to find out more about Arlo.', self::get_instance()->plugin_slug) . '</p>
+							<p>' . (empty($settings['platform_name']) ? '<a href="?page=arlo-for-wordpress&load-demo" class="button button-primary">' . __('Try with demo data', self::get_instance()->plugin_slug) . '</a> &nbsp; &nbsp; ' : '') .'<a href="http://www.arlo.co/register" target="_blank"  class="button button-primary">' . __('Get started with free trial', self::get_instance()->plugin_slug) . '</a></p>
+						</td>
+					</tr>
+				</table>
+				<button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button>
+		    </div>
+			';		
+		}
 		
 		self::load_demo_notice($_SESSION['arlo-demo']);
 		self::webinar_notice();
@@ -1926,29 +1962,57 @@ class Arlo_For_Wordpress {
 	}	
 	
 	public static function developer_notice() {
-		echo '
-		<div class="notice">
-			<p class="developer">
-				
-				<img src="' . plugins_url( '/assets/img/tips-yellow.png', __FILE__) . '" style="width: 32px">
-				' . __('Are you a web developer building a site for a client?', self::get_instance()->plugin_slug) . '
-				' . sprintf(__('<a target="_blank" href="%s">Contact us to become an Arlo partner</a>', self::get_instance()->plugin_slug), 'https://www.arlo.co/contact') . '
-			</p>
-	    </div>
-		';	
+		$notice_id = self::$dismissible_notices['developer'];
+		$user = wp_get_current_user();
+		$meta = get_user_meta($user->ID, $notice_id, true);
+
+		if ($meta !== '0') {
+			echo '
+			<div class="notice is-dismissible" id="' . $notice_id . '">
+				<p class="developer">
+					
+					<img src="' . plugins_url( '/assets/img/tips-yellow.png', __FILE__) . '" style="width: 32px">
+					' . __('Are you a web developer building a site for a client?', self::get_instance()->plugin_slug) . '
+					' . sprintf(__('<a target="_blank" href="%s">Contact us to become an Arlo partner</a>', self::get_instance()->plugin_slug), 'https://www.arlo.co/contact') . '
+				</p>
+				<button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button>
+		    </div>
+			';	
+		}
 	}
 	
 	public static function webinar_notice() {
-		echo '
-		<div class="notice" id="webinar_notice" style="display: none">
-			<p class="webinar">
-				<a target="_blank" href="http://tiny.cc/arlo_overview_video" target="_blank"><img src="' . plugins_url( '/assets/img/video-yellow.png', __FILE__) . '" style="width: 32px">' . __('Watch overview video', self::get_instance()->plugin_slug) .'</a>
-				<img src="' . plugins_url( '/assets/img/training-yellow.png', __FILE__) . '" style="width: 32px">
-				' . __('Join <a target="_blank" href="" class="webinar_url">Arlo for WordPress Getting started</a> webinar on <span id="webinar_date"></span>', self::get_instance()->plugin_slug) . '
-				' . __('<a target="_blank" href="" class="webinar_url">Register now!</a> or <a target="_blank" href="" id="webinar_template_url">view more times</a>', self::get_instance()->plugin_slug) . '
-			</p>
-	    </div>
-		';	
+		$notice_id = self::$dismissible_notices['webinar'];
+		$user = wp_get_current_user();
+		$meta = get_user_meta($user->ID, $notice_id, true);
+
+		if ($meta !== '0') {	
+			echo '
+			<div class="notice is-dismissible" id="' . $notice_id . '" style="display: none">
+				<p class="webinar">
+					<a target="_blank" href="http://tiny.cc/arlo_overview_video" target="_blank"><img src="' . plugins_url( '/assets/img/video-yellow.png', __FILE__) . '" style="width: 32px">' . __('Watch overview video', self::get_instance()->plugin_slug) .'</a>
+					<img src="' . plugins_url( '/assets/img/training-yellow.png', __FILE__) . '" style="width: 32px">
+					' . __('Join <a target="_blank" href="" class="webinar_url">Arlo for WordPress Getting started</a> webinar on <span id="webinar_date"></span>', self::get_instance()->plugin_slug) . '
+					' . __('<a target="_blank" href="" class="webinar_url">Register now!</a> or <a target="_blank" href="" id="webinar_template_url">view more times</a>', self::get_instance()->plugin_slug) . '
+				</p>
+				<button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button>
+		    </div>
+			';	
+		}
+	}	
+	
+	
+	public static function dismissible_notice_callback() {
+		global $wp_db;
+		
+		$user = wp_get_current_user();
+		
+		if (in_array($_POST['id'], self::$dismissible_notices)) {
+			update_user_meta($user->ID, $_POST['id'], 0);
+		}
+		
+		echo $_POST['id'];
+		wp_die();
 	}	
 
 	/**

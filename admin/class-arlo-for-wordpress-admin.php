@@ -85,6 +85,7 @@ class Arlo_For_Wordpress_Admin {
 
 		add_filter ( 'user_can_richedit' , array( $this, 'disable_visual_editor') , 50 );
 
+
 		/*
 		 * Define custom functionality.
 		 *
@@ -396,13 +397,17 @@ class Arlo_For_Wordpress_Admin {
 		return $default;
 
 	}
-	
+		
 	public function settings_saved($old) {
 		$new = get_option('arlo_settings', array());
 	
 		if($old['platform_name'] != $new['platform_name'] && !empty($new['platform_name'])) {
 			$plugin = Arlo_For_Wordpress::get_instance();
 			$_SESSION['arlo-import'] = $plugin->import(true);
+		} else if (empty($new['platform_name'])) {
+			$notice_id = Arlo_For_Wordpress::$dismissible_notices['welcome'];
+			$user = wp_get_current_user();
+			update_user_meta($user->ID, $notice_id, 1);			
 		}
 		
 		// need to check for posts-page change here

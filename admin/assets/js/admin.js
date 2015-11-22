@@ -109,43 +109,66 @@
 		}
 		
 		//get events for the webinar
-		var arloApiClient = new LS.Api.ApiClient({
-			platformID: "presentations"
-		});
-		
-		var eventSearchOptions = {
-            fields: ['ViewUri', 'RegistrationInfo', 'StartDateTime'],
-            filter: { templateCode: 'ARLO9'},
-            top: 1
-        };
-        
-        var callback = {
-			success: loadAPIResultsSuccess,
-			error: loadAPIResultsError
-       	}
-		
-		arloApiClient.getResources().getEventSearchResource().searchEvents(eventSearchOptions, callback);
-		
-		function loadAPIResultsSuccess(data) {
-			if (data.Items != null && data.Count == 1) {
-				var item = data.Items[0];
-				var date = item.StartDateTime.substr(0,10);
-				var time = item.StartDateTime.substr(11,5);
-				
-				$('#webinar_date').html(date + ' ' + time + ' NZDT');
-				
-				$('#webinar_template_url').attr('href', item.ViewUri);
-				
-				$('.webinar_url').attr('href', item.RegistrationInfo.RegisterUri);
-				
-				$('#webinar_notice').fadeIn();
+		var webinarNotice = jQuery('#arlo-webinar-admin-notice');
+		if (webinarNotice.length > 0) {
+			var arloApiClient = new LS.Api.ApiClient({
+				platformID: "presentations"
+			});
+			
+			var eventSearchOptions = {
+	            fields: ['ViewUri', 'RegistrationInfo', 'StartDateTime'],
+	            filter: { templateCode: 'ARLO9'},
+	            top: 1
+	        };
+	        
+			var loadAPIResultsSuccess = function(data) {				
+				if (data.Items != null && data.Count == 1) {
+					var item = data.Items[0];
+					var date = item.StartDateTime.substr(0,10);
+					var time = item.StartDateTime.substr(11,5);
+					
+					jQuery('#webinar_date').html(date + ' ' + time + ' NZDT');
+					
+					jQuery('#webinar_template_url').attr('href', item.ViewUri);
+					
+					jQuery('.webinar_url').attr('href', item.RegistrationInfo.RegisterUri);
+					
+					jQuery('#arlo-webinar-admin-notice').fadeIn();
+				}				
 			}
+			
+			var loadAPIResultsError = function(error) {
+				console.log(error);
+			}	        
+	        
+	        var callback = {
+				success: loadAPIResultsSuccess,
+				error: loadAPIResultsError
+	       	}
+	       	
+	       	
+			
+			arloApiClient.getResources().getEventSearchResource().searchEvents(eventSearchOptions, callback);
+			
 			
 		}
 		
-		function loadAPIResultsError(error) {
-			console.log(error);
-		}
+		//dismissible admin notices
+		console.log(jQuery('.settings_page_arlo-for-wordpress .notice.is-dismissible .notice-dismiss'));
+		jQuery('.settings_page_arlo-for-wordpress .notice.is-dismissible .notice-dismiss').click(function() {
+			var id = jQuery(this).parent().attr('id');
+			if (id != null) {
+				var data = {
+					action: 'dismissible_notice',
+					id: id
+				}
+				
+				jQuery.post(ajaxurl, data, function(response) {
+				});
+			}
+		})
+		
+		
 	});
 
 }(jQuery, window.LS, window.LS.Api));

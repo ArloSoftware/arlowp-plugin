@@ -36,11 +36,9 @@ class Arlo_For_Wordpress_Settings {
 			add_action( 'admin_notices', array($plugin, "import_notice") );
 		}
 		
-		//$settings = get_option('arlo_settings');
-		//if (empty($settings['platform_name']) && !empty($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress') {
+		if (!empty($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress') {
 			add_action( 'admin_notices', array($plugin, "welcome_notice") );
-		//}
-		
+		}
 
 		// allocates the wp-options option key value pair that will store the plugin settings
 		register_setting( 'arlo_settings', 'arlo_settings' );
@@ -231,7 +229,6 @@ class Arlo_For_Wordpress_Settings {
             
 	    echo $html;
 	}  
-	
 	
 	function arlo_simple_text_callback($args) {
 	    $html = '';
