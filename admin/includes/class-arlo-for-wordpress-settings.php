@@ -20,12 +20,16 @@ class Arlo_For_Wordpress_Settings {
 		$plugin = Arlo_For_Wordpress::get_instance();
 		$this->plugin_slug = $plugin->get_plugin_slug();
 		
+		if ($_GET['page'] == 'arlo-for-wordpress' && get_option('permalink_structure') != "/%postname%/") {
+			add_action( 'admin_notices', array($plugin, "permalink_notice") );
+		}				
+		
 		if(isset($_GET['arlo-import'])) {
 			$_SESSION['arlo-import'] = $plugin->import(true);
 			wp_redirect( admin_url( 'options-general.php?page=arlo-for-wordpress'));
 			exit;
 		}
-                
+		                
 		if(isset($_GET['load-demo'])) {
 			$plugin->load_demo();
 			wp_redirect( admin_url( 'options-general.php?page=arlo-for-wordpress'));
@@ -38,7 +42,7 @@ class Arlo_For_Wordpress_Settings {
 		
 		if (!empty($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress') {
 			add_action( 'admin_notices', array($plugin, "welcome_notice") );
-		}
+		}		
 
 		// allocates the wp-options option key value pair that will store the plugin settings
 		register_setting( 'arlo_settings', 'arlo_settings' );
