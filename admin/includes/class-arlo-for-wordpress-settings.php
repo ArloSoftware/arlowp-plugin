@@ -16,13 +16,31 @@ class Arlo_For_Wordpress_Settings {
 		if (!session_id()) {
 			session_start();
 		}
+		
+		// allocates the wp-options option key value pair that will store the plugin settings
+		register_setting( 'arlo_settings', 'arlo_settings' );		
 
 		$plugin = Arlo_For_Wordpress::get_instance();
 		$this->plugin_slug = $plugin->get_plugin_slug();
 		
 		if ($_GET['page'] == 'arlo-for-wordpress' && get_option('permalink_structure') != "/%postname%/") {
 			add_action( 'admin_notices', array($plugin, "permalink_notice") );
-		}				
+		}					
+		
+		$settings = get_option('arlo_settings');
+		if ($_GET['page'] == 'arlo-for-wordpress' && !empty($settings['platform_name'])) {
+			$show_notice = false;
+			foreach (Arlo_For_Wordpress::$post_types as $id => $post_type) {
+				if (empty($settings['post_types'][$id]['posts_page'])) {
+					$show_notice = true;
+					break;				
+				}
+			}
+			
+			if ($show_notice) {
+				add_action( 'admin_notices', array($plugin, "posttype_notice") );
+			}
+		}
 		
 		if(isset($_GET['arlo-import'])) {
 			$_SESSION['arlo-import'] = $plugin->import(true);
@@ -43,9 +61,8 @@ class Arlo_For_Wordpress_Settings {
 		if (!empty($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress') {
 			add_action( 'admin_notices', array($plugin, "welcome_notice") );
 		}		
-
-		// allocates the wp-options option key value pair that will store the plugin settings
-		register_setting( 'arlo_settings', 'arlo_settings' );
+		
+		
 
 		/*
 		 *

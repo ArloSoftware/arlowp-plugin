@@ -2002,15 +2002,22 @@ class Arlo_For_Wordpress {
 	}	
 	
 	public static function permalink_notice() {
-	
 		echo '
 		<div class="error notice">
 			<p>' . sprintf(__('In order to make the Arlo for Wordpress plugin work, you have to set the <a target="_blank" href="%s">Permalinks</a>  to "Post name"', self::get_instance()->plugin_slug), admin_url('options-permalink.php')) . '</p>
 	    </div>
-		';
-		
-		unset($_SESSION['arlo-import']);
+		';		
 	}		
+	
+	public static function posttype_notice() {
+		echo '
+		<div class="error notice">
+			<p>' . sprintf(__('Before you can use all the functionality in the plugin, you have to set all the <a href="%s">Post types</a> in the Arlo for Wordpress settings page', self::get_instance()->plugin_slug), admin_url('options-general.php?page=arlo-for-wordpress#arlo_noevent_text')) . '</p>
+			<p>' . sprintf(__('For more information, please check the plugin\'s <a target="_blank" href="%s">documentation</a> page', self::get_instance()->plugin_slug), 'http://developer.arlo.co/doc/wordpress/index#pages-and-post-types') . '</p>
+	    </div>
+		';
+	}		
+	
 	
 	public static function dismissible_notice_callback() {
 		global $wp_db;
