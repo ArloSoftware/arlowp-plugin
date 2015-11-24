@@ -1901,7 +1901,7 @@ class Arlo_For_Wordpress {
 						$event[0]['guid'],
 						__('Event', self::get_instance()->plugin_slug),
 						$events->guid, 
-						__('Category', self::get_instance()->plugin_slug), 
+						__('Catalogue', self::get_instance()->plugin_slug), 
 						$upcoming->guid,  
 						$upcoming->post_title,
 						$presenter[0]['guid'],
@@ -1990,7 +1990,7 @@ class Arlo_For_Wordpress {
 			echo '
 			<div class="notice is-dismissible" id="' . $notice_id . '" style="display: none">
 				<p class="webinar">
-					<a target="_blank" href="http://tiny.cc/arlo_overview_video" target="_blank"><img src="' . plugins_url( '/assets/img/video-yellow.png', __FILE__) . '" style="width: 32px">' . __('Watch overview video', self::get_instance()->plugin_slug) .'</a>
+					<a target="_blank" href="https://www.arlo.co/video/wordpress-overview" target="_blank"><img src="' . plugins_url( '/assets/img/video-yellow.png', __FILE__) . '" style="width: 32px">' . __('Watch overview video', self::get_instance()->plugin_slug) .'</a>
 					<img src="' . plugins_url( '/assets/img/training-yellow.png', __FILE__) . '" style="width: 32px">
 					' . __('Join <a target="_blank" href="" class="webinar_url">Arlo for WordPress Getting started</a> webinar on <span id="webinar_date"></span>', self::get_instance()->plugin_slug) . '
 					' . __('<a target="_blank" href="" class="webinar_url">Register now!</a> or <a target="_blank" href="" id="webinar_template_url">view more times</a>', self::get_instance()->plugin_slug) . '
