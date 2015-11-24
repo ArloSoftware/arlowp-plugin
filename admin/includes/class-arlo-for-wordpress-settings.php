@@ -86,8 +86,9 @@ class Arlo_For_Wordpress_Settings {
                             )
                 );                
                 
-		// create lat import text
-		add_settings_field(
+        if (!empty($settings['platform_name'])) {
+			// create lat import text
+			add_settings_field(
                         'arlo_last_import', 
                         '<label for="arlo_last_import">'.__('Last import', $this->plugin_slug).'</label>', 
                         array($this, 'arlo_simple_text_callback'), 
@@ -95,7 +96,8 @@ class Arlo_For_Wordpress_Settings {
                         array(
                             'html' => $plugin->get_last_import() . '&nbsp;&nbsp;<a href="?page=arlo-for-wordpress&arlo-import">'.__('Synchronize now', $this->plugin_slug).'</a>'
                             )
-                );
+                );        
+        }
                 
               
 		// create price settings dropdown
