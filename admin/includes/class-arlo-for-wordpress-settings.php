@@ -139,25 +139,24 @@ class Arlo_For_Wordpress_Settings {
 		 *
 		 * Post Type Settings
 		 *
-		 */
+		 */ 
+		 
+		$page_setup_section_id = 'arlo_page_setup';
+		add_settings_section( $page_setup_section_id, __('Page setup', $this->plugin_slug), null, $this->plugin_slug );		 
 
 		// post type settings
 	    foreach(Arlo_For_Wordpress::$post_types as $id => $post_type) {
-	    	$section_id = 'arlo_'.$id.'_post_type_section';
-	    
-			// create on section
-			add_settings_section( $section_id, __($post_type['singular_name'], $this->plugin_slug).' '.__('Post Type', $this->plugin_slug), null, $this->plugin_slug );
 	    
 	    	// post type slug
 			add_settings_field(
-				$id . '_posts_page',
-				'<label for="arlo_'.$id.'_posts_page">'.__('Posts Page', $this->plugin_slug).'</label>',
+				'arlo_'.$id.'_posts_page',
+				'<label for="arlo_'.$id.'_posts_page">'.__($post_type['singular_name'], $this->plugin_slug).'</label>',
 				array(
 					$this,
 					'arlo_posts_page_callback'
 				),
 				$this->plugin_slug,
-				$section_id,
+				$page_setup_section_id,
 				array(
 					'id'		=> $id,
 					'label_for' => $post_type['singular_name']

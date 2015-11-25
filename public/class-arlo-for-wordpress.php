@@ -83,32 +83,31 @@ class Arlo_For_Wordpress {
 	 * @var      array
 	 */
     public static $post_types = array(
+		'upcoming' => array(
+			'slug' => 'upcomingevents',
+			'name' => 'Upcoming events',
+			'singular_name' => 'Upcoming event list'
+		),
 		'event' => array(
 			'slug' => 'event',
 			'name' => 'Events',
-			'singular_name' => 'Event'
+			'singular_name' => 'Catalogue'
 		),
+		'venue' => array(
+			'slug' => 'venue',
+			'name' => 'Venues',
+			'singular_name' => 'Venue list'
+		),		
+		'presenter' => array(
+			'slug' => 'presenter',
+			'name' => 'Presenters',
+			'singular_name' => 'Presenter list'
+		),		
 		'eventsearch' => array(
 			'slug' => 'eventsearch',
 			'name' => 'Event search',
 			'singular_name' => 'Event search'
 		),
-		
-		'presenter' => array(
-			'slug' => 'presenter',
-			'name' => 'Presenters',
-			'singular_name' => 'Presenter'
-		),
-		'venue' => array(
-			'slug' => 'venue',
-			'name' => 'Venues',
-			'singular_name' => 'Venue'
-		),
-		'upcoming' => array(
-			'slug' => 'upcomingevents',
-			'name' => 'Upcoming events',
-			'singular_name' => 'Upcoming event'
-		)        
     );
     
 	/**
