@@ -1943,7 +1943,7 @@ class Arlo_For_Wordpress {
 						</td>
 						<td>
 							<p>' . __( 'Create beautiful and interactive training and event websites using the Arlo for WordPress plugin. Access an extensive library of WordPress Shortcodes, Templates, and Widgets, all designed specifically for web developers to make integration easy.', self::get_instance()->plugin_slug) . '</p>
-							<p>' . __('Learn how to use <a href="https://developer.arlo.co/doc/wordpress/index" target="_blank">Arlo for WordPress</a> or visit <a href="http://www.arlo.co" target="_blank">www.arlo.co</a> to find out more about Arlo.', self::get_instance()->plugin_slug) . '</p>
+							<p>' . __('<a href="https://developer.arlo.co/doc/wordpress/index" target="_blank">Learn how to use</a> Arlo for WordPress or visit <a href="http://www.arlo.co" target="_blank">www.arlo.co</a> to find out more about Arlo.', self::get_instance()->plugin_slug) . '</p>
 							<p>' . (empty($settings['platform_name']) ? '<a href="?page=arlo-for-wordpress&load-demo" class="button button-primary">' . __('Try with demo data', self::get_instance()->plugin_slug) . '</a> &nbsp; &nbsp; ' : '') .'<a href="http://www.arlo.co/register" target="_blank"  class="button button-primary">' . __('Get started with free trial', self::get_instance()->plugin_slug) . '</a></p>
 						</td>
 					</tr>
