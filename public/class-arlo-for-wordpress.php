@@ -2012,8 +2012,8 @@ class Arlo_For_Wordpress {
 	public static function posttype_notice() {
 		echo '
 		<div class="error notice">
-			<p>' . sprintf(__('Before you can use all the functionality in the plugin, you have to set all the <a href="%s">Post types</a> in the Arlo for Wordpress settings page', self::get_instance()->plugin_slug), admin_url('options-general.php?page=arlo-for-wordpress#arlo_noevent_text')) . '</p>
-			<p>' . sprintf(__('For more information, please check the plugin\'s <a target="_blank" href="%s">documentation</a> page', self::get_instance()->plugin_slug), 'http://developer.arlo.co/doc/wordpress/index#pages-and-post-types') . '</p>
+			<p><strong>' . __("Page setup required.", self::get_instance()->plugin_slug) . '</strong> ' . __('Arlo for WordPress requires you to setup the pages which will host event information.', self::get_instance()->plugin_slug ) .' '. sprintf(__('<a href="%s">Setup pages</a>', self::get_instance()->plugin_slug), admin_url('options-general.php?page=arlo-for-wordpress#arlo_noevent_text')) . '</p>
+			<p>' . sprintf(__('<a target="_blank" href="%s">View documentation</a> for more information.', self::get_instance()->plugin_slug), 'http://developer.arlo.co/doc/wordpress/index#pages-and-post-types') . '</p>
 	    </div>
 		';
 	}		
