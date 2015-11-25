@@ -203,7 +203,7 @@ class Arlo_For_Wordpress {
 		),
 		'events' => array(
 			'id' => 'events',
-			'name' => 'Event List'
+			'name' => 'Catalogue'
 		),
 		'eventsearch' => array(
 			'id' => 'eventsearch',
@@ -211,7 +211,7 @@ class Arlo_For_Wordpress {
 		),
 		'upcoming' => array(
 			'id' => 'upcoming',
-			'name' => 'Upcoming Events'
+			'name' => 'Upcoming event list'
 		),
 		'presenter' => array(
 			'id' => 'presenter',
@@ -219,7 +219,7 @@ class Arlo_For_Wordpress {
 		),
 		'presenters' => array(
 			'id' => 'presenters',
-			'name' => 'Presenter List'
+			'name' => 'Presenter list'
 		),
 		'venue' => array(
 			'id' => 'venue',
@@ -227,7 +227,7 @@ class Arlo_For_Wordpress {
 		),
 		'venues' => array(
 			'id' => 'venues',
-			'name' => 'Venue List'
+			'name' => 'Venue list'
 		),
     );
 
