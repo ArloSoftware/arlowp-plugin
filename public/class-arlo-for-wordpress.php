@@ -2004,7 +2004,7 @@ class Arlo_For_Wordpress {
 	public static function permalink_notice() {
 		echo '
 		<div class="error notice">
-			<p>' . sprintf(__('In order to make the Arlo for Wordpress plugin work, you have to set the <a target="_blank" href="%s">Permalinks</a>  to "Post name"', self::get_instance()->plugin_slug), admin_url('options-permalink.php')) . '</p>
+			<p><strong>' . __("Permalink setting change required.", self::get_instance()->plugin_slug) . '</strong> ' . sprintf(__('Arlo for WordPress requires <a target="_blank" href="%s">Permalinks</a> to be set to "Post name".', self::get_instance()->plugin_slug), admin_url('options-permalink.php')) . '</p>
 	    </div>
 		';		
 	}		
