@@ -1027,7 +1027,9 @@ $shortcodes->add('event_template_list', function($content='', $atts, $shortcode_
 // event template list pagination
 
 $shortcodes->add('event_template_list_pagination', function($content='', $atts, $shortcode_name){
-	global $wpdb, $wp_query;
+	global $wpdb, $wp_query, $arlo_plugin;
+
+	$active = $arlo_plugin->get_last_import();
 	
 	if (isset($GLOBALS['show_only_at_bottom']) && $GLOBALS['show_only_at_bottom']) return;
 	
@@ -1045,6 +1047,7 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 	if(!empty($_GET['arlo-location']) || (isset($_GET['arlo-delivery']) && strlen($_GET['arlo-delivery']) && is_numeric($_GET['arlo-delivery'])) ) :
 
 		$join .= " LEFT JOIN $t5 e USING (et_arlo_id)";
+		$where .= " AND e.e_parent_arlo_id = 0";
 		
 		if(!empty($_GET['arlo-location'])) :
 			$where .= " AND e.e_locationname = '" . urldecode($_GET['arlo-location']) . "'";
@@ -1068,11 +1071,11 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 		';
 	}	
 	
-	if(isset($_GET['arlo-category']) || isset($atts['category'])) {
+	if(!empty($_GET['arlo-category']) || !empty($atts['category'])) {
 
 		$cat_id = 0;
 
-		if(isset($atts['category'])) {
+		if(!empty($atts['category'])) {
 			$cat_slug = $atts['category'];
 		} else {
 			$cat_slug = $_GET['arlo-category'];
@@ -1154,10 +1157,10 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 		$GLOBALS['show_only_at_bottom'] = true;
 		return;
 	}
-        
-        $active = $arlo_plugin->get_last_import();
 
-	$limit = isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page');
+	$active = $arlo_plugin->get_last_import();
+
+	$limit = !empty($atts['limit']) ? $atts['limit'] : get_option('posts_per_page');
 	$page = !empty($_GET['paged']) ? intval($_GET['paged']) : intval(get_query_var('paged'));
 	$offset = ($page > 0) ? $page * $limit - $limit: 0 ;
 
@@ -1173,7 +1176,8 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 	if(!empty($_GET['arlo-location']) || (isset($_GET['arlo-delivery']) && strlen($_GET['arlo-delivery']) && is_numeric($_GET['arlo-delivery'])) ) :
 
 		$join .= " LEFT JOIN $t5 e USING (et_arlo_id)";
-		
+		$where .= " AND e.e_parent_arlo_id = 0";
+
 		if(!empty($_GET['arlo-location'])) :
 			$where .= " AND e.e_locationname = '" . urldecode($_GET['arlo-location']) . "'";
 		endif;	
@@ -1197,11 +1201,11 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 	}	
 	
 		
-	if(isset($_GET['arlo-category']) || isset($atts['category'])) {
+	if(!empty($_GET['arlo-category']) || !empty($atts['category'])) {
 
 		$cat_id = 0;
 
-		if(isset($atts['category'])) {
+		if(!empty($atts['category'])) {
 			$cat_slug = $atts['category'];
 		} else {
 			$cat_slug = $_GET['arlo-category'];
@@ -1515,6 +1519,7 @@ $shortcodes->add('event_list_item', function($content='', $atts, $shortcode_name
 		LEFT JOIN $t1
 		ON $t2.et_arlo_id = $t1.et_arlo_id
 		WHERE $t1.et_post_name = '$post->post_name'
+		AND $t2.e_parent_arlo_id = 0
 		ORDER BY $t2.e_startdatetime";
 		
 	$items = $wpdb->get_results($sql, ARRAY_A);
@@ -1988,7 +1993,7 @@ $shortcodes->add('upcoming_list_pagination', function($content='', $atts, $short
 	$t5 = "{$wpdb->prefix}arlo_eventtemplates_categories";
 	$t6 = "{$wpdb->prefix}arlo_categories";
 
-	$where = 'WHERE CURDATE() < DATE(e.e_startdatetime)';
+	$where = 'WHERE CURDATE() < DATE(e.e_startdatetime) AND e_parent_arlo_id = 0 ';
 
 	if(isset($_GET['arlo-month']) && !empty($_GET['arlo-month'])) :
 
@@ -2057,7 +2062,7 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 	$t5 = "{$wpdb->prefix}arlo_eventtemplates_categories";
 	$t6 = "{$wpdb->prefix}arlo_categories";
 
-	$where = 'WHERE CURDATE() < DATE(e.e_startdatetime)';
+	$where = 'WHERE CURDATE() < DATE(e.e_startdatetime)  AND e_parent_arlo_id = 0 ';
 
 	if(isset($_GET['arlo-month']) && !empty($_GET['arlo-month'])) :
 
@@ -2656,7 +2661,7 @@ $shortcodes->add('presenter_events_list', function($content='', $atts, $shortcod
 		FROM $t1 et
 		LEFT JOIN $t2 e ON  e.et_arlo_id = et.et_arlo_id
 		INNER JOIN $t3 exp ON exp.e_arlo_id = e.e_arlo_id AND exp.active = e.active
-		WHERE exp.p_arlo_id = $p_id
+		WHERE exp.p_arlo_id = $p_id AND e_parent_arlo_id = 0
 		GROUP BY et.et_name
 		ORDER BY et.et_name ASC", ARRAY_A);
 
@@ -2698,7 +2703,7 @@ $shortcodes->add('timezones', function($content='', $atts, $shortcode_name){
 	
 	$items = $wpdb->get_results("SELECT $t2.e_isonline, $t2.e_timezone_id FROM $t2
 		LEFT JOIN $t1
-		ON $t2.et_arlo_id = $t1.et_arlo_id AND $t2.e_isonline = 1
+		ON $t2.et_arlo_id = $t1.et_arlo_id AND $t2.e_isonline = 1 AND $t2.e_parent_arlo_id = 0
 		WHERE $t1.et_post_name = '$post->post_name'
 		", ARRAY_A);
 	
@@ -2749,7 +2754,7 @@ $shortcodes->add('suggest_datelocation', function($content='', $atts, $shortcode
 	
 	$items = $wpdb->get_results("SELECT $t2.e_isonline, $t2.e_datetimeoffset FROM $t2
 		LEFT JOIN $t1
-		ON $t2.et_arlo_id = $t1.et_arlo_id
+		ON $t2.et_arlo_id = $t1.et_arlo_id AND $t2.e_parent_arlo_id = 0
 		WHERE $t1.et_post_name = '$post->post_name'
 		", ARRAY_A);
 	
