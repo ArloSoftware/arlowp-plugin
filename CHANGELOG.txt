@@ -1,3 +1,10 @@
+== V2.1.5.2 ==
+
+Bugfixes
+------------------
+
+Two event with the same dates on a template page https://github.com/ArloSoftware/arlowp-plugin/issues/76
+
 == V2.1.5.1 ==
 
 Enhancement
