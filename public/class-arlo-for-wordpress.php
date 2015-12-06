@@ -729,6 +729,8 @@ class Arlo_For_Wordpress {
 		$this->add_import_log('Synchronization Started', $timestamp, false);
 		$last = $this->get_last_import();
 		
+		set_time_limit(300);
+		
 		// MV: Untangled the if statements. 
 		// If not forced
 		if(!$force) {
