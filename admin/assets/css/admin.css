@@ -157,6 +157,11 @@
 	float: right;
 }
 
+#arlo-sub-template-select {
+	float: right;
+}
+
+
 table.arlo-welcome td.logo {
 	width: 80px;
 	padding-top: 15px;

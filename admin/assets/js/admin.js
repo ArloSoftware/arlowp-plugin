@@ -23,6 +23,8 @@
 			$('.arlo_template_section > [class^="arlo"]').hide();
 			//tinyMCE.DOM.setStyle(tinyMCE.DOM.get($(this).val() + '_ifr'), 'height', '400px');
 			$(temp).show();
+			
+			arloSetSubTemplateSelect(temp);
 		});
 
 		// basic validation
@@ -64,7 +66,6 @@
 		});
 
 		// checks the input value against the specified pattern
-
 		function arloValidate(el) {
 
 			if($(el).attr('required') !== undefined || $(el).val() != '') {
@@ -79,7 +80,6 @@
 		}
 
 		// delay function for keyup events
-
 		var delay = (function(){
 			var timer = 0;
 			return function(callback, ms){
@@ -87,6 +87,8 @@
 				timer = setTimeout(callback, ms);
 			};
 		})();
+		
+		// show confirm message to reload the template from the blueprint
 		
 		$('#arlo-reload-template').click(function() {
 			var template = $('#arlo-template-select > select').val();
@@ -97,14 +99,35 @@
 			}
 		});
 		
+		// reload the template from the blueprint
 		function arloReloadTemplate() {
 			var template = $('#arlo-template-select > select').val();
+			var templateSufix = $("#arlo-sub-template-select > select").val();			
 			var editor = $('#' + template.replace("arlo-",""));
+			
+			if (templateSufix.length > 0) {
+				template += '-'+templateSufix; 
+			}
 			
 			if (arlo_blueprints[template] != null && editor.length) {
 				$(editor).val(arlo_blueprints[template]);
 			} else {
 				alert("Couldn't find the template!");
+			}
+		}
+		
+		//set the sub template selector
+		function arloSetSubTemplateSelect(template) {
+			template = template.replace(".arlo-","");
+			if (arlo_template_info != null && arlo_template_info[template] != null && arlo_template_info[template].sub != null) {
+				var el = $('#arlo-sub-template-select select');
+				el.empty();
+				$.each(arlo_template_info[template].sub, function(value,key) {
+					el.append($("<option></option>").attr("value", value).text(key));
+				});
+				$('#arlo-sub-template-select').show();
+			} else {
+				$('#arlo-sub-template-select').hide();
 			}
 		}
 		
@@ -154,7 +177,6 @@
 		}
 		
 		//dismissible admin notices
-		console.log(jQuery('.settings_page_arlo-for-wordpress .notice.is-dismissible .notice-dismiss'));
 		jQuery('.settings_page_arlo-for-wordpress .notice.is-dismissible .notice-dismiss').click(function() {
 			var id = jQuery(this).parent().attr('id');
 			if (id != null) {

@@ -199,11 +199,15 @@ class Arlo_For_Wordpress {
     public static $templates = array(
 		'event' => array(
 			'id' => 'event',
-			'name' => 'Event'
+			'name' => 'Event',
+			'sub' => array(
+				'' => 'List',
+				'grid' => 'Grid'
+			)
 		),
 		'events' => array(
 			'id' => 'events',
-			'name' => 'Catalogue'
+			'name' => 'Catalogue'			
 		),
 		'eventsearch' => array(
 			'id' => 'eventsearch',
@@ -211,7 +215,11 @@ class Arlo_For_Wordpress {
 		),
 		'upcoming' => array(
 			'id' => 'upcoming',
-			'name' => 'Upcoming event list'
+			'name' => 'Upcoming event list',
+			'sub' => array(
+				'' => 'List',
+				'grid' => 'Grid'
+			)
 		),
 		'presenter' => array(
 			'id' => 'presenter',

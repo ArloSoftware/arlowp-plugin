@@ -186,9 +186,6 @@ class Arlo_For_Wordpress_Settings {
 	 *
 	 */
 
-	/*function arlo_cron_section_callback() {
-	    echo '<p>Proactively envisioned multimedia based expertise and cross-media growth strategies. Seamlessly visualize quality intellectual capital without superior collaboration and idea-sharing. Holistically pontificate installed base portals after maintainable products.</p>';
-	}*/
 
 	function arlo_template_section_callback() {
 		$output = '<div id="'.ARLO_PLUGIN_PREFIX.'-template-select" class="cf">';
@@ -213,25 +210,25 @@ class Arlo_For_Wordpress_Settings {
 	 *
 	 */
         
-        function arlo_price_setting_callback() {
-            $settings = get_option('arlo_settings');
-            $setting_id = 'price_setting';
-            
-            $output = '<div id="'.ARLO_PLUGIN_PREFIX.'-price-setting" class="cf">';
-            $output .= '<select name="arlo_settings['.$setting_id.']">';            
-            
-            $val = (isset($settings[$setting_id])) ? esc_attr($settings[$setting_id]) : ARLO_PLUGIN_PREFIX . '-exclgst';
-            
-            foreach(Arlo_For_Wordpress::$price_settings as $key => $value) {
-                $key = ARLO_PLUGIN_PREFIX . '-' . $key;
-                $selected = $key == $val ? 'selected="selected"' : '';
-                $output .= '<option ' . $selected . ' value="'.$key.'" >'.$value.'</option>';
-	    }
-
-            $output .= '</select></div>';
-
-            echo $output;
-        }
+	function arlo_price_setting_callback() {
+		$settings = get_option('arlo_settings');
+		$setting_id = 'price_setting';
+		
+		$output = '<div id="'.ARLO_PLUGIN_PREFIX.'-price-setting" class="cf">';
+		$output .= '<select name="arlo_settings['.$setting_id.']">';            
+		
+		$val = (isset($settings[$setting_id])) ? esc_attr($settings[$setting_id]) : ARLO_PLUGIN_PREFIX . '-exclgst';
+		
+		foreach(Arlo_For_Wordpress::$price_settings as $key => $value) {
+		    $key = ARLO_PLUGIN_PREFIX . '-' . $key;
+		    $selected = $key == $val ? 'selected="selected"' : '';
+		    $output .= '<option ' . $selected . ' value="'.$key.'" >'.$value.'</option>';
+		}
+		
+		$output .= '</select></div>';
+		
+		echo $output;
+	}
         
 	function arlo_simple_input_callback($args) {
 	    $settings = get_option('arlo_settings');
@@ -287,18 +284,46 @@ class Arlo_For_Wordpress_Settings {
 	}
 	
 	function arlo_reload_template_callback() {
-		    echo '<div class="cf">
-		    		<div id="'.ARLO_PLUGIN_PREFIX.'-reload-template"><a>' . __('Reload original template', $this->plugin_slug) . '</a></div>
-		    		<script type="text/javascript"> var arlo_blueprints = ' . json_encode($this->arlo_template_source()) . ';</script>
-		    	</div>';
+	    echo '<div class="cf">
+	    		<div id="' . ARLO_PLUGIN_PREFIX . '-sub-template-select">';
+	    
+	    $first_template = reset(Arlo_For_Wordpress::$templates);
+		if (isset($first_template['sub']) && is_array($first_template['sub'])) {
+			echo '<strong>'. __('Style and layout', $this->plugin_slug) . '</strong> &nbsp;';
+		    echo '<select name="' . ARLO_PLUGIN_PREFIX . 'SubTemplateSelect">';
+		    foreach ($first_template['sub'] as $k => $v) {
+		    	echo '<option value="' . $k . '">' . $v . '</option>';
+		    }
+	    				
+	    	echo '</select>';
+		}
+	    		
+	    echo '
+	    		</div>
+	    	</div>
+	    	<div class="cf">
+	    		<div id="' . ARLO_PLUGIN_PREFIX . '-reload-template"><a>' . __('Reload original template', $this->plugin_slug) . '</a></div>
+	    		<script type="text/javascript"> 
+	    			var arlo_blueprints = ' . json_encode($this->arlo_template_source()) . ';
+	    			var arlo_template_info = ' . json_encode(Arlo_For_Wordpress::$templates) . ';
+	    		</script>
+	    	</div>';
 	}
 	
 	function arlo_template_source() {
-		$settings = get_option('arlo_settings');
+		
 		$templates = [];
 		
-		foreach ($settings["templates"] as $key => $val) {
+		foreach (Arlo_For_Wordpress::$templates as $key => $val) {
 			$templates[ARLO_PLUGIN_PREFIX . '-' . $key] = $this->arlo_get_blueprint($key);
+			
+			if (isset($val['sub']) && is_array($val['sub'])) {
+				foreach ($val['sub'] as $sufix => $sufixname) {
+					if (!empty($sufix)) {
+						$templates[ARLO_PLUGIN_PREFIX . '-' . $key . '-' . $sufix] = $this->arlo_get_blueprint($key . '_' . $sufix);			
+					}
+				}
+			}
 		}
 		
 		return $templates;
