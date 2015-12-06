@@ -1,3 +1,16 @@
+== V2.1.6 ==
+
+Bugfixes
+------------------
+
+The sample links are bad for the venue and presenter: https://github.com/ArloSoftware/arlowp-plugin/issues/78
+Higher time limit for the import: https://github.com/ArloSoftware/arlowp-plugin/issues/77
+
+Enhancement
+------------------
+
+Style and layout selector for the templates
+
 == V2.1.5.2 ==
 
 Bugfixes

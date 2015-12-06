@@ -126,6 +126,17 @@ The Arlo - Training and Event Management, and online registration plugin is only
 
 == Changelog ==
 
+= 2.1.6 =
+
+Style and layout selector for the templates
+
+The sample links are bad for the venue and presenter: 
+https://github.com/ArloSoftware/arlowp-plugin/issues/78
+
+Higher time limit for the import: 
+https://github.com/ArloSoftware/arlowp-plugin/issues/77
+
+
 = 2.1.5.2 =
 
 Two event with the same dates on a template page:
