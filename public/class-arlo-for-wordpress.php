@@ -1833,7 +1833,7 @@ class Arlo_For_Wordpress {
 					//Get the first event template wich has event
 					$sql = "
 					SELECT 
-						guid
+						ID
 					FROM
 						{$wpdb->prefix}arlo_events AS e
 					LEFT JOIN 		
@@ -1858,7 +1858,7 @@ class Arlo_For_Wordpress {
 					//Get the first presenter
 					$sql = "
 					SELECT 
-						guid
+						ID
 					FROM
 						{$wpdb->prefix}arlo_presenters AS p
 					LEFT JOIN
@@ -1877,7 +1877,7 @@ class Arlo_For_Wordpress {
 					//Get the first venue
 					$sql = "
 					SELECT 
-						guid
+						ID
 					FROM
 						{$wpdb->prefix}arlo_venues AS v
 					LEFT JOIN
@@ -1897,17 +1897,17 @@ class Arlo_For_Wordpress {
 					'<h3>' . __('Start editing your new pages', self::get_instance()->plugin_slug) . '</h3><p>'.
 					
 					sprintf(__('View <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a> or <a href="%s" target="_blank">%s</a> pages', self::get_instance()->plugin_slug), 
-						$event[0]['guid'],
+						get_post_permalink($event[0]['ID']),
 						__('Event', self::get_instance()->plugin_slug),
 						$events->guid, 
 						__('Catalogue', self::get_instance()->plugin_slug), 
 						$upcoming->guid,  
 						$upcoming->post_title,
-						$presenter[0]['guid'],
+						get_post_permalink($presenter[0]['ID']),
 						__('Presenter profile', self::get_instance()->plugin_slug), 
 						$presenters->guid, 
 						__('Presenters list', self::get_instance()->plugin_slug), 
-						$venue[0]['guid'],
+						get_post_permalink($venue[0]['ID']),
 						__('Venue information', self::get_instance()->plugin_slug), 					
 						$venues->guid,  
 						__('Venues list', self::get_instance()->plugin_slug)
