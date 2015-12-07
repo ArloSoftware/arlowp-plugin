@@ -9,7 +9,8 @@ Higher time limit for the import: https://github.com/ArloSoftware/arlowp-plugin/
 Enhancement
 ------------------
 
-Style and layout selector for the templates
+Style and layout selector for the templates: https://github.com/ArloSoftware/arlowp-plugin/issues/79
+Save the previously selected template and layout on the settings page: https://github.com/ArloSoftware/arlowp-plugin/issues/80
 
 == V2.1.5.2 ==
 
