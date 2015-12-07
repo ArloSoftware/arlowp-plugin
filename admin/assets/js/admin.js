@@ -172,8 +172,6 @@
 				success: loadAPIResultsSuccess,
 				error: loadAPIResultsError
 	       	}
-	       	
-	       	
 			
 			arloApiClient.getResources().getEventSearchResource().searchEvents(eventSearchOptions, callback);
 			
@@ -192,8 +190,7 @@
 				jQuery.post(ajaxurl, data, function(response) {
 				});
 			}
-		})
-		
+		})		
 		
 	});
 
