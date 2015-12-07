@@ -107,9 +107,6 @@
 	display: none;
 }
 
-.js  .arlo_template_section .arlo-event {
-	display: block;
-}
 
 .arlo-validate.invalid {
 	background-color: #FEE;
@@ -152,7 +149,7 @@
 	margin-left: 15px;
 }
 
-#arlo-reload-template {
+.arlo-reload-template {
 	cursor: pointer;
 	float: right;
 }

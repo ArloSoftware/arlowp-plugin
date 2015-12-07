@@ -188,20 +188,23 @@ class Arlo_For_Wordpress_Settings {
 
 
 	function arlo_template_section_callback() {
+		$settings = get_option('arlo_settings');
 		$output = '<div id="'.ARLO_PLUGIN_PREFIX.'-template-select" class="cf">';
-		$output .= '<select name="'.ARLO_PLUGIN_PREFIX.'TemplateSelect">';
-
+		$output .= '<select name="arlo_settings[template]">';
+		
 	    foreach(Arlo_For_Wordpress::$templates as $id => $template) {
 	    	$name = __($template['name'], $this->plugin_slug);
-			$output .= '<option value="'.ARLO_PLUGIN_PREFIX.'-'.$id.'">'.$name.'</option>';
+	    	$selected = (!empty($settings['template']) && $settings['template'] == 'arlo-'.$id ? 'selected' : '');
+			$output .= '<option value="'.ARLO_PLUGIN_PREFIX.'-'.$id.'" ' . $selected . '>'.$name.'</option>';
 	    }
 
-		$output .= '</select></div>';
+		$output .= '</select></div>
+	    		<script type="text/javascript"> 
+	    			var arlo_blueprints = ' . json_encode($this->arlo_template_source()) . ';
+	    		</script>		
+		';
 		
 		echo $output;
-		
-		$this->arlo_reload_template_callback();
-		
 	}
 
 	/*
@@ -280,33 +283,32 @@ class Arlo_For_Wordpress_Settings {
 	function arlo_template_callback($args) {
 	    $settings = get_option('arlo_settings');
 	    $val = isset($settings['templates'][$args['id']]['html']) ? $settings['templates'][$args['id']]['html'] : '';
+	    $this->arlo_reload_template_callback($args['id'], $settings);
 	    wp_editor($val, $args['id'], array('textarea_name'=>'arlo_settings[templates]['.$args['id'].'][html]','textarea_rows'=>'20'));
 	}
 	
-	function arlo_reload_template_callback() {
+	function arlo_reload_template_callback($template, $settings) {
 	    echo '<div class="cf">
 	    		<div id="' . ARLO_PLUGIN_PREFIX . '-sub-template-select">';
-	    
-	    $first_template = reset(Arlo_For_Wordpress::$templates);
-		if (isset($first_template['sub']) && is_array($first_template['sub'])) {
-			echo '<strong>'. __('Style and layout', $this->plugin_slug) . '</strong> &nbsp;';
-		    echo '<select name="' . ARLO_PLUGIN_PREFIX . 'SubTemplateSelect">';
-		    foreach ($first_template['sub'] as $k => $v) {
-		    	echo '<option value="' . $k . '">' . $v . '</option>';
-		    }
-	    				
-	    	echo '</select>';
-		}
+	    if (!empty(Arlo_For_Wordpress::$templates[$template])) {
+			$template_definition = Arlo_For_Wordpress::$templates[$template];
+			if (isset($template_definition['sub']) && is_array($template_definition['sub'])) {
+				echo '<strong>'. __('Style and layout', $this->plugin_slug) . '</strong> &nbsp;';
+			    echo '<select name="arlo_settings[subtemplate]['.$template.']">';
+			    foreach ($template_definition['sub'] as $k => $v) {
+			    	$selected = (!empty($settings['subtemplate'][$template]) && $settings['subtemplate'][$template] == $k ? 'selected' : '');
+			    	echo '<option value="' . $k . '" '.$selected.'>' . $v . '</option>';
+			    }
+		    				
+		    	echo '</select>';
+			}	    
+	    }
 	    		
 	    echo '
 	    		</div>
 	    	</div>
 	    	<div class="cf">
-	    		<div id="' . ARLO_PLUGIN_PREFIX . '-reload-template"><a>' . __('Reload original template', $this->plugin_slug) . '</a></div>
-	    		<script type="text/javascript"> 
-	    			var arlo_blueprints = ' . json_encode($this->arlo_template_source()) . ';
-	    			var arlo_template_info = ' . json_encode(Arlo_For_Wordpress::$templates) . ';
-	    		</script>
+	    		<div class="' . ARLO_PLUGIN_PREFIX . '-reload-template"><a>' . __('Reload original template', $this->plugin_slug) . '</a></div>
 	    	</div>';
 	}
 	

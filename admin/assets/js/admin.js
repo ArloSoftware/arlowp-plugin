@@ -2,6 +2,14 @@
 	"use strict";
 
 	$(function () {
+	
+		//show the selected template editor
+		var selectedTemplate = $('#arlo-template-select select').val();
+		if (selectedTemplate == '') {
+			selectedTemplate = event;
+		}
+		
+		$('.arlo_template_section .' + selectedTemplate).show();
 
 		// enable tooltips
 
@@ -23,8 +31,6 @@
 			$('.arlo_template_section > [class^="arlo"]').hide();
 			//tinyMCE.DOM.setStyle(tinyMCE.DOM.get($(this).val() + '_ifr'), 'height', '400px');
 			$(temp).show();
-			
-			arloSetSubTemplateSelect(temp);
 		});
 
 		// basic validation
@@ -90,14 +96,27 @@
 		
 		// show confirm message to reload the template from the blueprint
 		
-		$('#arlo-reload-template').click(function() {
+		$('.arlo-reload-template').on('click', function() {
+			arloReloadTemplateConfirm()
+		});
+		
+		var previousSubTemplate;
+		$("#arlo-sub-template-select > select").on('focus', function () {
+			previousSubTemplate = this.value;
+		}).change(function() {
+			arloReloadTemplateConfirm();
+		});		
+				
+		function arloReloadTemplateConfirm() {
 			var template = $('#arlo-template-select > select').val();
 			var templateName = $("#arlo-template-select > select > option[value='" + template + "']").text();
 			var message = "Do you really want to replace the existing template with the original one for '" + templateName + "'?";
 			if (confirm(message)) {
 				arloReloadTemplate();
+			} else if (previousSubTemplate != null) {
+				$("#arlo-sub-template-select > select").val(previousSubTemplate);
 			}
-		});
+		}
 		
 		// reload the template from the blueprint
 		function arloReloadTemplate() {
@@ -115,22 +134,7 @@
 				alert("Couldn't find the template!");
 			}
 		}
-		
-		//set the sub template selector
-		function arloSetSubTemplateSelect(template) {
-			template = template.replace(".arlo-","");
-			if (arlo_template_info != null && arlo_template_info[template] != null && arlo_template_info[template].sub != null) {
-				var el = $('#arlo-sub-template-select select');
-				el.empty();
-				$.each(arlo_template_info[template].sub, function(value,key) {
-					el.append($("<option></option>").attr("value", value).text(key));
-				});
-				$('#arlo-sub-template-select').show();
-			} else {
-				$('#arlo-sub-template-select').hide();
-			}
-		}
-		
+				
 		//get events for the webinar
 		var webinarNotice = jQuery('#arlo-webinar-admin-notice');
 		if (webinarNotice.length > 0) {

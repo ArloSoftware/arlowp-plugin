@@ -2039,7 +2039,8 @@ class Arlo_For_Wordpress {
 		
 		echo $_POST['id'];
 		wp_die();
-	}	
+	}
+		
 
 	/**
 	 * add_pages function.
