@@ -101,7 +101,7 @@
 		});
 		
 		var previousSubTemplate;
-		$("#arlo-sub-template-select > select").on('focus', function () {
+		$(".arlo-sub-template-select > select").on('focus', function () {
 			previousSubTemplate = this.value;
 		}).change(function() {
 			arloReloadTemplateConfirm();
@@ -114,14 +114,14 @@
 			if (confirm(message)) {
 				arloReloadTemplate();
 			} else if (previousSubTemplate != null) {
-				$("#arlo-sub-template-select > select").val(previousSubTemplate);
+				$(".arlo-sub-template-select > select:visible").val(previousSubTemplate);
 			}
 		}
 		
 		// reload the template from the blueprint
 		function arloReloadTemplate() {
 			var template = $('#arlo-template-select > select').val();
-			var templateSufix = $("#arlo-sub-template-select > select").val();			
+			var templateSufix = $(".arlo-sub-template-select > select:visible").val();			
 			var editor = $('#' + template.replace("arlo-",""));
 			
 			if (templateSufix.length > 0) {

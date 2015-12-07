@@ -289,7 +289,7 @@ class Arlo_For_Wordpress_Settings {
 	
 	function arlo_reload_template_callback($template, $settings) {
 	    echo '<div class="cf">
-	    		<div id="' . ARLO_PLUGIN_PREFIX . '-sub-template-select">';
+	    		<div class="' . ARLO_PLUGIN_PREFIX . '-sub-template-select">';
 	    if (!empty(Arlo_For_Wordpress::$templates[$template])) {
 			$template_definition = Arlo_For_Wordpress::$templates[$template];
 			if (isset($template_definition['sub']) && is_array($template_definition['sub'])) {
