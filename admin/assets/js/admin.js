@@ -11,19 +11,6 @@
 		
 		$('.arlo_template_section .' + selectedTemplate).show();
 
-		// enable tooltips
-
-		$('[data-tooltip]').darkTooltip({
-			animation: 'fadeIn',
-			gravity: 'east',
-		});
-
-		// prevent tooltip buttons from submitting the form
-
-		$('[data-tooltip]').on('click touch', function(e) {
-			e.preventDefault();
-		});
-
 		// show template editor on select change
 
 		$('#arlo-template-select select').on('change', function() {

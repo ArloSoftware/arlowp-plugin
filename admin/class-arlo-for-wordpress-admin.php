@@ -144,7 +144,6 @@ class Arlo_For_Wordpress_Admin {
 		$screen = get_current_screen();
 		if ( $this->plugin_screen_hook_suffix == $screen->id ) {
 			wp_enqueue_style( $this->plugin_slug .'-admin-styles', plugins_url( 'assets/css/admin.css', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );
-			wp_enqueue_style( $this->plugin_slug .'-tooltip-styles', plugins_url( 'assets/css/lib/darktooltip.min.css', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );
 		}
 
 	}
@@ -169,7 +168,6 @@ class Arlo_For_Wordpress_Admin {
 		$screen = get_current_screen();
 		if ( $this->plugin_screen_hook_suffix == $screen->id ) {
 			wp_enqueue_script( $this->plugin_slug . '-lsapiclient', plugins_url( 'assets/js/lib/ls-apiclient-1.2.0.min.js', __FILE__ ), array( 'jquery' ), Arlo_For_Wordpress::VERSION, true );
-			wp_enqueue_script( $this->plugin_slug . '-tooltip-script', plugins_url( 'assets/js/lib/jquery.darktooltip.min.js', __FILE__ ), array( 'jquery' ), Arlo_For_Wordpress::VERSION, true );
 			wp_enqueue_script( $this->plugin_slug . '-admin-script', plugins_url( 'assets/js/admin.js', __FILE__ ), array( 'jquery' ), Arlo_For_Wordpress::VERSION, true );		
 		}
 
