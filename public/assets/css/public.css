@@ -230,6 +230,18 @@ table.arlo_suggest_templates {
 	width: 100%;
 }
 
+/* Tooltip */
+
+.arlo-tooltip-html {
+	display: none;
+}
+
+.arlo-tooltip-button {
+	font-weight: 700;
+	cursor: pointer;
+	text-align: right;
+}
+
 /* BOXED LAYOUT OVERRIDE */
 
 

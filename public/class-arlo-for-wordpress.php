@@ -30,7 +30,7 @@ class Arlo_For_Wordpress {
 	 *
 	 * @var     string
 	 */
-	const VERSION = '2.1.5.2';
+	const VERSION = '2.1.6';
 
 	/**
 	 * Minimum required PHP version
@@ -537,6 +537,7 @@ class Arlo_For_Wordpress {
 	 */
 	public function enqueue_styles() {
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css?20112015', __FILE__ ), array(), self::VERSION );
+		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-darktooltip', plugins_url( 'assets/css/libs/darktooltip.min.css', __FILE__ ), array(), self::VERSION );
 	}
 
 	/**
@@ -546,6 +547,7 @@ class Arlo_For_Wordpress {
 	 */
 	public function enqueue_scripts() {
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script', plugins_url( 'assets/js/public.js?15112015', __FILE__ ), array( 'jquery' ), self::VERSION );
+		wp_enqueue_script( $this->plugin_slug . '-plugin-script-darktooltip', plugins_url( 'assets/js/libs/jquery.darktooltip.min.js', __FILE__ ), array( 'jquery' ), self::VERSION );
 		wp_localize_script( $this->plugin_slug . '-plugin-script', 'objectL10n', array(
 			'showmoredates' => __( 'Show me more dates', $this->plugin_slug ),
 		) );

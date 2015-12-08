@@ -3,7 +3,7 @@ Contributors: ArloSoftware, adamfentosi
 Tags: online registration, event registration, training management,  event management, event plugin, training company software, training calendar, training administration, training management software, training provider, solution, events calendar, wordpress events, event ticketing, wordpress lms, class registration, conference registration,  ticket, registration, event manager, training, booking, ticketing
 Requires at least: 3.7
 Tested up to: 4.3.1
-Stable tag: 2.1.5.2
+Stable tag: 2.1.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -142,6 +142,9 @@ https://github.com/ArloSoftware/arlowp-plugin/issues/80
 
 New shortcode [arlo_event_template_tags] and [arlo_event_tags]: 
 https://github.com/ArloSoftware/arlowp-plugin/issues/81
+
+Show session information for the event in a tooltip [arlo_event_session_list_item]: 
+https://github.com/ArloSoftware/arlowp-plugin/issues/49
 
 
 = 2.1.5.2 =

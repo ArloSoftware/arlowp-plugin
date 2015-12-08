@@ -38,13 +38,17 @@
 		if ($('.arlo-boxed').length) {
 			var boxedMaxHeight = 0;
 			$('.arlo-boxed .arlo-list li.arlo-cf:not(.arlo-group-divider)').each(function() {
-				console.log($(this).height());
 				if ($(this).height() > boxedMaxHeight) {
 					boxedMaxHeight = $(this).height()
 				}
 			});
 			$('.arlo-boxed .arlo-list li.arlo-cf:not(.arlo-group-divider)').height(boxedMaxHeight);
 		}
+		
+		//tooltip init
+		$('.arlo-tooltip-button').darkTooltip({
+			gravity: 'north'
+		});
 
 	});
 

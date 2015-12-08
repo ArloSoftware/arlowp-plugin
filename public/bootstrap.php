@@ -1655,6 +1655,7 @@ $shortcodes->add('event_list_item', function($content='', $atts, $shortcode_name
 	return $output;
 });
 
+
 // event code shortcode
 
 $shortcodes->add('event_code', function($content='', $atts, $shortcode_name){
@@ -1663,20 +1664,33 @@ $shortcodes->add('event_code', function($content='', $atts, $shortcode_name){
 	return $GLOBALS['arlo_event_list_item']['e_code'];
 });
 
+
+// event name shortcode
+
+$shortcodes->add('event_name', function($content='', $atts, $shortcode_name){
+	if(!isset($GLOBALS['arlo_event_list_item']['e_name']) && !isset($GLOBALS['arlo_event_session_list_item']['e_code'])) return '';
+	
+	$event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
+
+	return $event['e_name'];
+});
+
 // event location shortcode
 
 $shortcodes->add('event_location', function($content='', $atts, $shortcode_name){
-	if(!isset($GLOBALS['arlo_event_list_item']['e_locationname'])) return '';
+	if(!isset($GLOBALS['arlo_event_list_item']['e_locationname']) && !isset($GLOBALS['arlo_event_session_list_item']['e_locationname'])) return '';
+	
+	$event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
 
-	$location = $GLOBALS['arlo_event_list_item']['e_locationname'];
+	$location = $event['e_locationname'];
 
-	if($GLOBALS['arlo_event_list_item']['e_isonline'] || $GLOBALS['arlo_event_list_item']['v_id'] == 0 || $GLOBALS['arlo_event_list_item']['e_locationvisible'] == 0) {
+	if($event['e_isonline'] || $event['v_id'] == 0 || $event['e_locationvisible'] == 0) {
 
 		return $location;
 
 	} else {
 
-		$permalink = get_permalink(arlo_get_post_by_name($GLOBALS['arlo_event_list_item']['v_post_name'], 'arlo_venue'));
+		$permalink = get_permalink(arlo_get_post_by_name($event['v_post_name'], 'arlo_venue'));
 
 		return '<a href="'.$permalink.'">'.$location.'</a>';
 
@@ -1687,13 +1701,15 @@ $shortcodes->add('event_location', function($content='', $atts, $shortcode_name)
 // event start date shortcode
 
 $shortcodes->add('event_start_date', function($content='', $atts, $shortcode_name){
-	if(!isset($GLOBALS['arlo_event_list_item']['e_startdatetime'])) return '';
+	if(!isset($GLOBALS['arlo_event_list_item']['e_startdatetime']) && !isset($GLOBALS['arlo_event_session_list_item']['e_startdatetime'])) return '';
 	
-	$timewithtz = str_replace(' ','T',$GLOBALS['arlo_event_list_item']['e_startdatetime']) . $GLOBALS['arlo_event_list_item']['e_datetimeoffset'];
+	$event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
+	
+	$timewithtz = str_replace(' ', 'T', $event['e_startdatetime']) . $event['e_datetimeoffset'];
 	
 	$start_date = new DateTime($timewithtz);
 		
-	if($GLOBALS['arlo_event_list_item']['e_isonline']) {
+	if($event['e_isonline']) {
 		if (is_array($GLOBALS['selected_timezone_olson_names'])) {
 			foreach ($GLOBALS['selected_timezone_olson_names'] as $TzName) {
 				try {
@@ -1718,14 +1734,16 @@ $shortcodes->add('event_start_date', function($content='', $atts, $shortcode_nam
 
 // event end date shortcode
 
-$shortcodes->add('event_end_date', function($content='', $atts, $shortcode_name){
-	if(!isset($GLOBALS['arlo_event_list_item']['e_finishdatetime'])) return '';
+$shortcodes->add('event_end_date', function($content='', $atts, $shortcode_name){	
+	if(!isset($GLOBALS['arlo_event_list_item']['e_finishdatetime']) && !isset($GLOBALS['arlo_event_session_list_item']['e_finishdatetime'])) return '';
+	
+	$event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
 
-	$timewithtz = str_replace(' ','T',$GLOBALS['arlo_event_list_item']['e_finishdatetime']) . $GLOBALS['arlo_event_list_item']['e_datetimeoffset'];
+	$timewithtz = str_replace(' ','T',$event['e_finishdatetime']) . $event['e_datetimeoffset'];
 	
 	$end_date = new DateTime($timewithtz);
 		
-	if($GLOBALS['arlo_event_list_item']['e_isonline']) {
+	if($event['e_isonline']) {
 		if (is_array($GLOBALS['selected_timezone_olson_names'])) {
 			foreach ($GLOBALS['selected_timezone_olson_names'] as $TzName) {
 				try {
@@ -1740,7 +1758,6 @@ $shortcodes->add('event_end_date', function($content='', $atts, $shortcode_name)
 			$end_date->setTimezone($timezone);
 		}
 	}
-
 
 	$format = 'D g:i A';
 
@@ -1966,6 +1983,62 @@ $shortcodes->add('event_delivery', function($content='', $atts, $shortcode_name)
 
 	return $output;
 });
+
+
+//session 
+
+// event list item shortcode
+
+$shortcodes->add('event_session_list_item', function($content='', $atts, $shortcode_name){
+	if(!isset($GLOBALS['arlo_event_list_item']['e_arlo_id'])) return '';
+	global $post, $wpdb;
+	
+	$output = '';
+	
+	extract(shortcode_atts(array(
+		'label'	=> __('Session information', $GLOBALS['arlo_plugin_slug']),
+		'header' => __('Sessions', $GLOBALS['arlo_plugin_slug']),
+	), $atts, $shortcode_name));	
+	
+	$sql = "
+		SELECT 
+			e_name, 
+			e_locationname,
+			e_locationvisible,
+			e_startdatetime,
+			e_finishdatetime,
+			e_datetimeoffset,
+			e_isonline,
+			0 AS v_id
+		FROM
+			{$wpdb->prefix}arlo_events
+		WHERE 
+			e_parent_arlo_id = {$GLOBALS['arlo_event_list_item']['e_arlo_id']}
+		ORDER BY 
+			e_startdatetime";
+					
+	$items = $wpdb->get_results($sql, ARRAY_A);
+	if (is_array($items) && count($items)) {
+		$output .= '<div data-tooltip="#' . ARLO_PLUGIN_PREFIX . '_session_tooltip_' . $GLOBALS['arlo_event_list_item']['e_arlo_id'] . '" class="' . ARLO_PLUGIN_PREFIX . '-tooltip-button">'.$label.'</div>
+		<div class="' . ARLO_PLUGIN_PREFIX . '-tooltip-html" id="' . ARLO_PLUGIN_PREFIX . '_session_tooltip_' . $GLOBALS['arlo_event_list_item']['e_arlo_id'] . '"><h5>' . $header . '</h5>';
+		
+		foreach($items as $key => $item) {
+	
+			$GLOBALS['arlo_event_session_list_item'] = $item;
+			
+			$output .= do_shortcode($content);
+			
+			unset($GLOBALS['arlo_event_session_list_item']);
+		}
+		
+		$output .= '</div>';	
+	}
+	
+	return $output;
+});
+
+
+
 
 $shortcodes->add('suggest_templates', function($content='', $atts, $shortcode_name){
 	global $wpdb, $wp_query, $arlo_plugin;
