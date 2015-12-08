@@ -22,6 +22,7 @@
 					<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_presenters" target="_blank">[arlo_event_presenters]</a></li>
 					<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_offers" target="_blank">[arlo_event_offers]</a></li>
 					<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_registration" target="_blank">[arlo_event_registration]</a></li>
+					<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_template_tags" target="_blank">[arlo_event_tags]</a></li>
 				</ul>
 			</li>
 			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_list_item" target="_blank">[/arlo_event_list_item]</a></li>

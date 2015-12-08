@@ -1374,6 +1374,62 @@ $shortcodes->add('event_template_tags', function($content='', $atts, $shortcode_
 	return $output;
 });
 
+// event template tags shortcode
+
+$shortcodes->add('event_tags', function($content='', $atts, $shortcode_name){
+	if(!isset($GLOBALS['arlo_event_list_item']['e_arlo_id'])) return '';
+	
+	global $wpdb, $arlo_plugin;
+	$output = '';
+	$tags = [];
+	
+	$active = $arlo_plugin->get_last_import();
+		
+	// merge and extract attributes
+	extract(shortcode_atts(array(
+		'layout' => '',
+	), $atts, $shortcode_name));
+	
+	$items = $wpdb->get_results("
+		SELECT 
+			tag
+		FROM 
+			{$wpdb->prefix}arlo_tags AS t
+		LEFT JOIN 
+			{$wpdb->prefix}arlo_events_tags AS et 
+		ON
+			tag_id = id
+		WHERE
+			et.e_arlo_id = {$GLOBALS['arlo_event_list_item']['e_arlo_id']}
+		AND	
+			t.active = '{$active}'
+		AND
+			et.active = '{$active}'
+		", ARRAY_A);	
+		
+	foreach ($items as $t) {
+		$tags[] = $t['tag'];
+	}
+	
+	switch($layout) {
+		case 'list':
+			$output = '<ul class="arlo-event_tags-list">';
+			
+			foreach($tags as $tag) {
+				$output .= '<li>' . $tag . '</li>';
+			}
+			
+			$output .= '</ul>';
+		break;
+	
+		default:
+			$output = '<div class="arlo-event_tags-list">' . implode(', ', $tags) . '</div>';
+		break;
+	}
+	
+	return $output;
+});
+
 
 // event template code shortcode
 
