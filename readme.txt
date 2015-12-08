@@ -140,6 +140,9 @@ https://github.com/ArloSoftware/arlowp-plugin/issues/77
 Save the previously selected template and layout on the settings page: 
 https://github.com/ArloSoftware/arlowp-plugin/issues/80
 
+New shortcode [arlo_event_template_tags] and [arlo_event_tags]: 
+https://github.com/ArloSoftware/arlowp-plugin/issues/81
+
 
 = 2.1.5.2 =
 
