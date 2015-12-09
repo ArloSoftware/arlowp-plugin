@@ -96,7 +96,30 @@ class Arlo_For_Wordpress_Admin {
 		add_filter( '@TODO', array( $this, 'filter_method_name' ) );
 		
 		add_action( 'update_option_arlo_settings', array($this, 'settings_saved') );
+		
+		$this->check_plugin_version($plugin);
 	}
+	
+	/**
+	 * Check the version of the plugin
+	 *
+	 * @since     2.1.6
+	 *
+	 * @return    null
+	 */
+	public static function check_plugin_version($plugin) {
+		$plugin_version = get_option('arlo_plugin_version');
+		
+		if (!empty($plugin_version)) {
+			if ($plugin_version != $plugin::VERSION) {
+				$plugin::update_data_model();
+				update_option('arlo_plugin_version', $plugin::VERSION);
+			}
+		} else {
+			update_option('arlo_plugin_version', $plugin::VERSION);
+		}
+	}	
+	
 
 	/**
 	 * Return an instance of this class.

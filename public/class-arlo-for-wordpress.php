@@ -439,6 +439,19 @@ class Arlo_For_Wordpress {
 		return $wpdb->get_col( $sql );
 
 	}
+	
+	
+	/**
+	 * Update data model
+	 *
+	 * @since    2.1.6
+	 *
+	 * @return   null
+	 */
+	public static function update_data_model() {
+		arlo_add_datamodel();
+	}	
+	
 
 	/**
 	 * Fired for each blog when the plugin is activated.
@@ -447,10 +460,11 @@ class Arlo_For_Wordpress {
 	 */
 	private static function single_activate() {
 		// @TODO: Define activation functionality here
-
-		// flush permalinks upon plugin deactivation
+		
+		//add data model
 		arlo_add_datamodel();
 
+		// flush permalinks upon plugin deactivation
 		flush_rewrite_rules();
 
 		// must happen before adding pages
@@ -462,6 +476,8 @@ class Arlo_For_Wordpress {
 
 		// now add pages
 		self::add_pages();
+		
+		update_option('arlo_plugin_version', self::VERSION);
 	}
 
 	/**

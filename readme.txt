@@ -146,6 +146,9 @@ https://github.com/ArloSoftware/arlowp-plugin/issues/81
 Show session information for the event in a tooltip [arlo_event_session_list_item]: 
 https://github.com/ArloSoftware/arlowp-plugin/issues/49
 
+Update the database on plugin update:
+https://github.com/ArloSoftware/arlowp-plugin/issues/82
+
 
 = 2.1.5.2 =
 
