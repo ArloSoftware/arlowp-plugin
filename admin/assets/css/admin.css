@@ -2,6 +2,14 @@
 
 /* Plugin Prefix is specified in arlo-for-wordpress.php */
 
+
+#adminmenu .toplevel_page_arlo-for-wordpress.current a.current .wp-menu-image {
+	opacity: 1;
+	filter: alpha(opacity=100);
+	background: transparent url(../img/icon-20x20.png) no-repeat center;
+}
+
+
 /* based on desired max width - menu sidebar width: 180px as of WP 3.9 */
 .arlo-sections-wrap {
 	max-width: 820px;

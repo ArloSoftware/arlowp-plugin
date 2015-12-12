@@ -163,8 +163,11 @@ class Arlo_For_Wordpress_Admin {
 		if ( ! isset( $this->plugin_screen_hook_suffix ) ) {
 			return;
 		}
+		
+		wp_enqueue_style( $this->plugin_slug .'-admin-public-styles', plugins_url( 'assets/css/admin_public.css', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );		
 
-		$screen = get_current_screen();
+		$screen = get_current_screen();	
+		
 		if ( $this->plugin_screen_hook_suffix == $screen->id ) {
 			wp_enqueue_style( $this->plugin_slug .'-admin-styles', plugins_url( 'assets/css/admin.css', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );
 		}
@@ -243,6 +246,8 @@ class Arlo_For_Wordpress_Admin {
 		 * - Change 'manage_options' to the capability you see fit
 		 *   For reference: http://codex.wordpress.org/Roles_and_Capabilities
 		 */
+		 
+		 /*
 		$this->plugin_screen_hook_suffix = add_options_page(
 			ARLO_PLUGIN_NAME . ' ' . __( 'Settings', $this->plugin_slug ),
 			ARLO_PLUGIN_NAME,
@@ -250,7 +255,10 @@ class Arlo_For_Wordpress_Admin {
 			$this->plugin_slug,
 			array( $this, 'display_plugin_admin_page' )
 		);
+		*/
 
+
+		$this->plugin_screen_hook_suffix = add_menu_page( 'Arlo settings page', 'Arlo', 'manage_options', $this->plugin_slug, array( $this, 'display_plugin_admin_page' ), 'none', '10.4837219128727371208127' ); 
 	}
 
 	/**
