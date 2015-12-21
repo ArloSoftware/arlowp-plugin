@@ -979,13 +979,21 @@ function getTimezones() {
 	return $wpdb->get_results($sql);
 }
 
-function getTimezoneOlsonNames($timezone_id) {
+function getTimezoneOlsonNames($timezone_id = 0) {
 	global $wpdb, $arlo_plugin;
 	
 	$timezone_id = intval($timezone_id);
 	
 	$table = $wpdb->prefix . "arlo_timezones_olson";
 	$active = $arlo_plugin->get_last_import();
+	$where = '';
+	
+	if ($timezone_id > 0) {
+		$where = "
+			timezone_id = {$timezone_id}
+		AND		
+		";
+	}
 	
 	$sql = "
 	SELECT
@@ -993,8 +1001,7 @@ function getTimezoneOlsonNames($timezone_id) {
 	FROM
 		{$table}
 	WHERE
-		timezone_id = {$timezone_id}
-	AND
+		{$where}	
 		active = '{$active}'
 	";
 	return $wpdb->get_results($sql);
@@ -1703,6 +1710,8 @@ $shortcodes->add('event_location', function($content='', $atts, $shortcode_name)
 $shortcodes->add('event_start_date', function($content='', $atts, $shortcode_name){
 	if(!isset($GLOBALS['arlo_event_list_item']['e_startdatetime']) && !isset($GLOBALS['arlo_event_session_list_item']['e_startdatetime'])) return '';
 	
+	$timezone = null;
+	
 	$event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
 	
 	$timewithtz = str_replace(' ', 'T', $event['e_startdatetime']) . $event['e_datetimeoffset'];
@@ -1721,13 +1730,22 @@ $shortcodes->add('event_start_date', function($content='', $atts, $shortcode_nam
 					break;
 				}
 			}
-			$start_date->setTimezone($timezone);
+			
+			if (!is_null($timezone)) {
+				$start_date->setTimezone($timezone);
+			}
+			
 		}
 	}
 
 	$format = 'D g:i A';
 
 	if(isset($atts['format'])) $format = $atts['format'];
+	
+	//if we haven't got timezone, we need to append the timezone abbrev
+	if ($event['e_isonline'] && is_null($timezone) && (preg_match('[G|g|i]', $format) === 1)) {
+		$format .= " T";
+	}
 
 	return $start_date->format($format);
 });
@@ -1738,6 +1756,8 @@ $shortcodes->add('event_end_date', function($content='', $atts, $shortcode_name)
 	if(!isset($GLOBALS['arlo_event_list_item']['e_finishdatetime']) && !isset($GLOBALS['arlo_event_session_list_item']['e_finishdatetime'])) return '';
 	
 	$event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
+	
+	$timezone = null;
 
 	$timewithtz = str_replace(' ','T',$event['e_finishdatetime']) . $event['e_datetimeoffset'];
 	
@@ -1755,13 +1775,22 @@ $shortcodes->add('event_end_date', function($content='', $atts, $shortcode_name)
 					break;
 				}
 			}
-			$end_date->setTimezone($timezone);
+			
+			if (!is_null($timezone)) {
+				$end_date->setTimezone($timezone);
+			}
+			
 		}
 	}
 
 	$format = 'D g:i A';
 
 	if(isset($atts['format'])) $format = $atts['format'];
+		
+	//if we haven't got timezone, we need to append the timezone abbrev
+	if ($event['e_isonline'] && is_null($timezone) && (preg_match('[G|g|i]', $format) === 1)) {
+		$format .= " T";
+	}	
 
 	return $end_date->format($format);
 });
@@ -2896,6 +2925,8 @@ $shortcodes->add('timezones', function($content='', $atts, $shortcode_name){
 	if(empty($items)) {
 		return '';
 	}
+	
+	$olson_names = getTimezoneOlsonNames();	
 
 	$content = '<form method="GET" class="arlo-timezone">';
 	$content .= '<select name="timezone">';
@@ -2914,6 +2945,11 @@ $shortcodes->add('timezones', function($content='', $atts, $shortcode_name){
 	
 	$content .= '</select>';
 	$content .= '</form>';
+	
+	//if there is no olson names in the database, that means we couldn't do a timezone conversion
+	if (!(is_array($olson_names) && count($olson_names))) {
+		$content = '';
+	}
 
 	return $content;
 });

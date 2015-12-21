@@ -1275,7 +1275,7 @@ class Arlo_For_Wordpress {
 		$client = $this->get_api_client();
 		
 		$items = $client->Timezones()->getAllTimezones();
-		
+				
 		$table_name = "{$wpdb->prefix}arlo_timezones";
 		
 		if(!empty($items)) {

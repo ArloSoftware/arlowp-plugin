@@ -134,6 +134,9 @@ https://github.com/ArloSoftware/arlowp-plugin/issues/84
 After sync, not all the tables are cleaned up:
 https://github.com/ArloSoftware/arlowp-plugin/issues/86
 
+Warning with setTimezone fn with a live online event: 
+https://github.com/ArloSoftware/arlowp-plugin/issues/83
+
 = 2.1.6 =
 
 Style and layout selector for the templates:
