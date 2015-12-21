@@ -9,11 +9,20 @@ $arlo_plugin_slug = $arlo_plugin->get_plugin_slug();
 add_filter( 'the_title', function($title, $id = null){
 	$settings = get_option('arlo_settings');
 	
-	$pages = array(
-		$settings['post_types']['event']['posts_page'],
-		$settings['post_types']['eventsearch']['posts_page'],
-		$settings['post_types']['upcoming']['posts_page'],
-	);
+	$pages = [];
+	
+	if (!empty($settings['post_types']['event']['posts_page'])) {
+		array_push($pages, $settings['post_types']['event']['posts_page']);
+	}
+	
+	if (!empty($settings['post_types']['eventsearch']['posts_page'])) {
+		array_push($pages, $settings['post_types']['event']['posts_page']);
+	}
+
+	if (!empty($settings['post_types']['upcoming']['posts_page'])) {
+		array_push($pages, $settings['post_types']['event']['posts_page']);
+	}
+	
 	
 	$subtitle = '';
 	
