@@ -15,11 +15,13 @@ add_filter( 'the_title', function($title, $id = null){
 		$settings['post_types']['upcoming']['posts_page'],
 	);
 	
+	$subtitle = '';
+	
 	$cat_slug = !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : '';	
         	
 	$cat = \Arlo\Categories::get(array('slug' => $cat_slug));
-	$location = stripslashes(urldecode($_GET['arlo-location']));
-	$search = stripslashes(urldecode($_GET['arlo-search']));	
+	$location = !empty($_GET['arlo-location']) ? stripslashes(urldecode($_GET['arlo-location'])) : "";
+	$search = !empty($_GET['arlo-search']) ? stripslashes(urldecode($_GET['arlo-search'])) : "";	
                 
 	if($id === null || !in_array($id, $pages)) return $title;
 		
@@ -134,7 +136,7 @@ function arlo_create_filter($type, $items, $label=null) {
 		}
 		
 		$selected = (strlen($selected_value) && $selected_value == $item['value']) ? ' selected="selected"' : '';
-
+		
 		$filter_html .= '<option value="'.$item['value'].'"'.$selected.'>';
 		$filter_html .= $item['string'];
 		$filter_html .= '</option>';
@@ -176,7 +178,8 @@ function arlo_register_custom_post_types() {
 
 	foreach(Arlo_For_Wordpress::$post_types as $id => $type) {
 		// default slug
-		$slug = str_replace('_', '-', strtolower(trim(preg_replace('/[^A-Za-z]+/', '', $settings['post_types'][$id]['name']))));
+		
+		$slug = str_replace('_', '-', strtolower(trim(preg_replace('/[^A-Za-z]+/', '', $type['name']))));
 		$slug = 'arlo/' . $slug;
 		
 		// slug based on page, if it exists
@@ -1481,6 +1484,8 @@ $shortcodes->add('content_field_item', function($content='', $atts, $shortcode_n
 		'fields'	=> 'all',
 	), $atts, $shortcode_name));
 	
+	$where_fields = null;
+	
 	if (strtolower($fields) != 'all') {
 		$where_fields = explode(',', $fields);
 		$where_fields = array_map(function($field) {
@@ -1585,19 +1590,19 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 				$items = $wpdb->get_results(
 					"SELECT e.e_locationname
 					FROM $t1 e 
+					WHERE 
+						e_locationname != ''
 					GROUP BY e.e_locationname 
 					ORDER BY e.e_locationname", ARRAY_A);
 
 				$locations = array();
 
-				$l = count($items);
-
-				for($i=0;$i<$l;$i++) :
-
-					$locations[$i]['string'] = $items[$i]['e_locationname'];
-					$locations[$i]['value'] = $items[$i]['e_locationname'];
-
-				endfor;
+				foreach ($items as $item) {
+					$locations[] = array(
+						'string' => $item['e_locationname'],
+						'value' => $item['e_locationname'],
+					);
+				}
 
 				$filter_html .= arlo_create_filter($filter, $locations, __('location', $GLOBALS['arlo_plugin_slug']));
 
@@ -1719,7 +1724,7 @@ $shortcodes->add('event_start_date', function($content='', $atts, $shortcode_nam
 	$start_date = new DateTime($timewithtz);
 		
 	if($event['e_isonline']) {
-		if (is_array($GLOBALS['selected_timezone_olson_names'])) {
+		if (!empty($GLOBALS['selected_timezone_olson_names']) && is_array($GLOBALS['selected_timezone_olson_names'])) {
 			foreach ($GLOBALS['selected_timezone_olson_names'] as $TzName) {
 				try {
 					$timezone = new DateTimeZone($TzName->olson_name);
@@ -1764,7 +1769,7 @@ $shortcodes->add('event_end_date', function($content='', $atts, $shortcode_name)
 	$end_date = new DateTime($timewithtz);
 		
 	if($event['e_isonline']) {
-		if (is_array($GLOBALS['selected_timezone_olson_names'])) {
+		if (!empty($GLOBALS['selected_timezone_olson_names']) && is_array($GLOBALS['selected_timezone_olson_names'])) {
 			foreach ($GLOBALS['selected_timezone_olson_names'] as $TzName) {
 				try {
 					$timezone = new DateTimeZone($TzName->olson_name);
@@ -2450,20 +2455,19 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 				$items = $wpdb->get_results(
 					"SELECT e.e_locationname
 					FROM $t1 e 
+					WHERE 
+						e_locationname != ''
 					GROUP BY e.e_locationname 
 					ORDER BY e.e_locationname", ARRAY_A);
 
-
 				$locations = array();
 
-				$l = count($items);
-
-				for($i=0;$i<$l;$i++) :
-
-					$locations[$i]['string'] = $items[$i]['e_locationname'];
-					$locations[$i]['value'] = $items[$i]['e_locationname'];
-
-				endfor;
+				foreach ($items as $item) {
+					$locations[] = array(
+						'string' => $item['e_locationname'],
+						'value' => $item['e_locationname'],
+					);
+				}
 
 				$filter_html .= arlo_create_filter($filter, $locations, __('location', $GLOBALS['arlo_plugin_slug']));
 
@@ -3041,7 +3045,8 @@ $shortcodes->add('categories', function($content='', $atts, $shortcode_name){
         		
 	// start at
 	$start_at = (isset($atts['parent'])) ? (int)$atts['parent'] : 0;
-	if(!isset($atts['parent']) && $start_at == 0 && $slug = $_GET['arlo-category']) {
+	if(!isset($atts['parent']) && $start_at == 0 && !empty($_GET['arlo-category'])) {
+		$slug = $_GET['arlo-category'];
 		$start_at = current(explode('-', $slug));
 	}
 	

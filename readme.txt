@@ -137,6 +137,8 @@ https://github.com/ArloSoftware/arlowp-plugin/issues/86
 Warning with setTimezone fn with a live online event: 
 https://github.com/ArloSoftware/arlowp-plugin/issues/83
 
+Remove PHP notice errors
+
 = 2.1.6 =
 
 Style and layout selector for the templates:
