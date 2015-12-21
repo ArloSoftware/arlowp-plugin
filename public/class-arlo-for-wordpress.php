@@ -1713,6 +1713,8 @@ class Arlo_For_Wordpress {
             'eventtemplates_categories',
             'eventtemplates_presenters',
             'eventtemplates_tags',
+            'timezones',
+            'timezones_olson'
 		);
                 		
 		foreach($tables as $table) {
