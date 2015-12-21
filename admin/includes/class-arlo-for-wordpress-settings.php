@@ -23,12 +23,12 @@ class Arlo_For_Wordpress_Settings {
 		$plugin = Arlo_For_Wordpress::get_instance();
 		$this->plugin_slug = $plugin->get_plugin_slug();
 		
-		if ($_GET['page'] == 'arlo-for-wordpress' && get_option('permalink_structure') != "/%postname%/") {
+		if (isset($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress' && get_option('permalink_structure') != "/%postname%/") {
 			add_action( 'admin_notices', array($plugin, "permalink_notice") );
 		}					
 		
 		$settings = get_option('arlo_settings');
-		if ($_GET['page'] == 'arlo-for-wordpress' && !empty($settings['platform_name'])) {
+		if (isset($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress' && !empty($settings['platform_name'])) {
 			$show_notice = false;
 			foreach (Arlo_For_Wordpress::$post_types as $id => $post_type) {
 				if (empty($settings['post_types'][$id]['posts_page'])) {

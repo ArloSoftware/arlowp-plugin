@@ -877,7 +877,7 @@ class Arlo_For_Wordpress {
 						@$item->Description->Summary,
 						$slug,
 						$timestamp,
-						$item->RegisterInterestUri
+						!empty($item->RegisterInterestUri) ? $item->RegisterInterestUri : ''
 					)
 				);
                                 
@@ -1159,7 +1159,7 @@ class Arlo_For_Wordpress {
 		}
 		
 		//Save session information
-		if ($parent_id == 0 && isset($item->Sessions) && is_array($item->Sessions) && $item->Sessions[0]->EventID != $item->EventID ) {
+		if ($parent_id == 0 && isset($item->Sessions) && is_array($item->Sessions) && !empty($item->Sessions[0]->EventID) && $item->Sessions[0]->EventID != $item->EventID ) {
 			foreach ($item->Sessions as $session) {
 				$this->save_event_data($session, $item->EventID, $timestamp);
 			}
@@ -1527,7 +1527,7 @@ class Arlo_For_Wordpress {
 		
 		$this->set_categories_count(0, $timestamp);
 		
-		$cats = \Arlo\Categories::getTree($cat_id, null);
+		$cats = \Arlo\Categories::getTree(0, null);
 		$this->set_category_depth_level($cats, $timestamp);
 		
 		$sql = "SELECT MAX(c_depth_level) FROM {$wpdb->prefix}arlo_categories WHERE active = '{$timestamp}'";
@@ -1685,7 +1685,7 @@ class Arlo_For_Wordpress {
 					c_arlo_id = %d
 				";
 								
-				$query = $wpdb->query( $wpdb->prepare($sql, $item->SequenceIndex, $item->EventTemplateID, $item->CategoryID) );
+				$query = $wpdb->query( $wpdb->prepare($sql, !empty($item->SequenceIndex) ? $item->SequenceIndex : 0, $item->EventTemplateID, $item->CategoryID) );
 				
 		        if ($query === false) {
 		        	throw new Exception('Database insert failed: ' . $table_name);
@@ -1983,7 +1983,7 @@ class Arlo_For_Wordpress {
 			';		
 		}
 		
-		self::load_demo_notice($_SESSION['arlo-demo']);
+		self::load_demo_notice(!empty($_SESSION['arlo-demo']) ? $_SESSION['arlo-demo'] : []);
 		self::webinar_notice();
 		self::developer_notice();
 		

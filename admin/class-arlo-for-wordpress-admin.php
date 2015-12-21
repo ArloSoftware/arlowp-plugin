@@ -336,7 +336,7 @@ class Arlo_For_Wordpress_Admin {
 	 */
 	function do_settings_sections( $page ) {
 		global $wp_settings_sections, $wp_settings_fields;
-
+		
 		if ( ! isset( $wp_settings_sections[$page] ) )
 			return;
 
@@ -382,6 +382,7 @@ class Arlo_For_Wordpress_Admin {
 		}
 
 		foreach ( (array) $wp_settings_fields[$page][$section] as $field ) {
+			$field['args']['label_for'] = !empty($field['args']['label_for']) ? $field['args']['label_for'] : "";
 			echo '<div class="'.ARLO_PLUGIN_PREFIX.'-field-wrap cf '.ARLO_PLUGIN_PREFIX.'-'. strtolower(esc_attr($field['args']['label_for'])).'">';
 			if ( !empty($field['args']['label_for']) )
 				echo '<div class="'.ARLO_PLUGIN_PREFIX.'-label"><label for="' . esc_attr( $field['args']['label_for'] ) . '">' . $field['title'] . '</label>';
