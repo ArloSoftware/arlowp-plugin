@@ -1,3 +1,11 @@
+== V2.1.7 ==
+
+Bugfixes
+------------------
+
+Delete the plugin doesn't remove all the db tables: https://github.com/ArloSoftware/arlowp-plugin/issues/84
+
+
 == V2.1.6 ==
 
 Bugfixes

@@ -126,6 +126,11 @@ The Arlo - Training and Event Management, and online registration plugin is only
 
 == Changelog ==
 
+= 2.1.7 =
+
+Delete the plugin doesn't remove all the db tables:
+https://github.com/ArloSoftware/arlowp-plugin/issues/84
+
 = 2.1.6 =
 
 Style and layout selector for the templates:
