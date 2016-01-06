@@ -128,6 +128,15 @@ The Arlo - Training and Event Management, and online registration plugin is only
 
 = 2.1.7 =
 
+JS error while reloading the templates: 
+https://github.com/ArloSoftware/arlowp-plugin/issues/89
+
+Event search doesn't return the template if it's under a category's subcategory: 
+https://github.com/ArloSoftware/arlowp-plugin/issues/88
+
+De/Activate the plugin overwrites the page settings: 
+https://github.com/ArloSoftware/arlowp-plugin/issues/87
+
 Delete the plugin doesn't remove all the db tables:
 https://github.com/ArloSoftware/arlowp-plugin/issues/84
 
