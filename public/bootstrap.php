@@ -1300,7 +1300,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 		
 	if(empty($items)) :
 		$no_event_text = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', $GLOBALS['arlo_plugin_slug']);
-		$output = '</table><table class="arlo-no-results"><tr><td>' . $no_event_text . '</td></tr>';
+		$output = '</table><style> .arlo table.event-templates {display: none;} </style><table class="arlo-no-results"><tr><td>' . $no_event_text . '</td></tr>';
 
 	else :
 					
