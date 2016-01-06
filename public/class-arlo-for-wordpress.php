@@ -1839,6 +1839,11 @@ class Arlo_For_Wordpress {
 		$settings = get_option('arlo_settings');
 		$timestamp = get_option('arlo_last_import');
 		
+		$events = arlo_get_post_by_name('events', 'page');
+		$upcoming = arlo_get_post_by_name('upcoming', 'page');
+		$presenters = arlo_get_post_by_name('presenters', 'page');
+		$venues = arlo_get_post_by_name('venues', 'page');
+		
 		$notice_id = self::$dismissible_notices['newpages'];
 		$user = wp_get_current_user();
 		$meta = get_user_meta($user->ID, $notice_id, true);
@@ -1852,12 +1857,8 @@ class Arlo_For_Wordpress {
 		} else {
 			if ($meta !== '0') {	
 				$import = self::get_instance()->get_import_log();
-				$events = arlo_get_post_by_name('events', 'page');
-				$upcoming = arlo_get_post_by_name('upcoming', 'page');
-				$presenters = arlo_get_post_by_name('presenters', 'page');
-				$venues = arlo_get_post_by_name('venues', 'page');			
-			
-				if (!empty($settings['platform_name'])) {		
+				
+				if (!empty($settings['platform_name']) && $events !== false && $upcoming !== false && $presenters !== false && $venues !== false) {		
 					//Get the first event template wich has event
 					$sql = "
 					SELECT 
@@ -1922,8 +1923,7 @@ class Arlo_For_Wordpress {
 					";
 					$venue = $wpdb->get_results($sql, ARRAY_A);		
 					
-					$message = 
-					'<h3>' . __('Start editing your new pages', self::get_instance()->plugin_slug) . '</h3><p>'.
+					$message = '<h3>' . __('Start editing your new pages', self::get_instance()->plugin_slug) . '</h3><p>'.
 					
 					sprintf(__('View <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a> or <a href="%s" target="_blank">%s</a> pages', self::get_instance()->plugin_slug), 
 						get_post_permalink($event[0]['ID']),
@@ -2083,6 +2083,7 @@ class Arlo_For_Wordpress {
 					'post_content' 	=> $page['content']
 				));
 				
+				/*
 				if(isset($page['child_post_type'])) {
 					foreach(self::$post_types as $id => $type) {
 						if($page['child_post_type'] == $id) {
@@ -2090,6 +2091,7 @@ class Arlo_For_Wordpress {
 						}
 					}
 				}
+				*/
 			}
 		}
 	

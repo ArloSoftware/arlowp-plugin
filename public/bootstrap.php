@@ -958,7 +958,7 @@ function arlo_get_post_by_name($name, $post_type='post') {
 	);
 	
 	$posts = get_posts($args);
-	
+		
 	if( $posts ) {
 		return $posts[0];
 	}
