@@ -1558,7 +1558,7 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 	
 	$settings = get_option('arlo_settings');  
         
-	if (!empty($settings['post_types']['event'])) {
+	if (!empty($settings['post_types']['event']['posts_page'])) {
 		$slug = get_post($settings['post_types']['event']['posts_page'])->post_name;
 	} else {
 		$slug = get_post($post)->post_name;
@@ -1575,8 +1575,10 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 				// category select
 				
 				$cats = \Arlo\Categories::getTree();
-
-				$filter_html .= arlo_create_filter('category', arlo_child_categories($cats[0]->children), __('category', $GLOBALS['arlo_plugin_slug']));
+				
+				if (is_array($cats)) {
+					$filter_html .= arlo_create_filter('category', arlo_child_categories($cats[0]->children), __('category', $GLOBALS['arlo_plugin_slug']));
+				}
 				
 				break;
 				
@@ -2403,7 +2405,7 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 	
 	$settings = get_option('arlo_settings');  
 		
-	if (!empty($settings['post_types']['upcoming'])) {
+	if (!empty($settings['post_types']['upcoming']['posts_page'])) {
 		$slug = get_post($settings['post_types']['upcoming']['posts_page'])->post_name;
 	} else {
 		$slug = get_post($post)->post_name;
@@ -2421,7 +2423,9 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 
 				$cats = \Arlo\Categories::getTree();
 
-				$filter_html .= arlo_create_filter($filter, arlo_child_categories($cats[0]->children), __('category', $GLOBALS['arlo_plugin_slug']));
+				if (is_array($cats)) {
+					$filter_html .= arlo_create_filter($filter, arlo_child_categories($cats[0]->children), __('category', $GLOBALS['arlo_plugin_slug']));					
+				}
 
 				break;
 				

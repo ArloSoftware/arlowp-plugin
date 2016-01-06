@@ -17,9 +17,13 @@
 
 	$shortcode = '[arlo_categories' . $parent . ' depth="' . $depth . '"]';
 
-	$output = '<div class="arlo-categories-widget">' . do_shortcode($shortcode) . '</div>';
+	$output = do_shortcode($shortcode);
 
-	if(empty($output)) $output = __('No categories to display.', $this->plugin_slug);
+	if (!empty($output)) {
+		$output = '<div class="arlo-categories-widget">' . $output . '</div>';	
+	} else {
+		$output = '<p>' . __('No categories to display.', $plugin_slug) . '</p>';
+	} 
 
 	// output the events list
 	echo $output;
