@@ -111,7 +111,7 @@
 			var templateSufix = $(".arlo-sub-template-select > select:visible").val();			
 			var editor = $('#' + template.replace("arlo-",""));
 			
-			if (templateSufix.length > 0) {
+			if (typeof templateSufix !== "undefined" && templateSufix.length > 0) {
 				template += '-'+templateSufix; 
 			}
 			
