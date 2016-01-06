@@ -1881,6 +1881,7 @@ class Arlo_For_Wordpress {
 					LIMIT 
 						1
 					";
+
 					$event = $wpdb->get_results($sql, ARRAY_A);
 					
 					//Get the first presenter
