@@ -1217,6 +1217,8 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 				et_descriptionsummary like "%' . $_GET['arlo-search'] . '%"
 		)
 		';
+		
+		$atts['show_child_elements'] = "true";
 	}	
 	
 		
