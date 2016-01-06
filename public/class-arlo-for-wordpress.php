@@ -472,7 +472,7 @@ class Arlo_For_Wordpress {
 		
 		// run import every 15 minutes
 		$temp = wp_schedule_event( time(), 'minutes_15', 'arlo_import' ) . ': Log initiated.';
-		self::get_instance()->add_import_log($temp, $timestamp);
+		self::get_instance()->add_import_log($temp, date('Y-m-d H:i:s T'));
 
 		// now add pages
 		self::add_pages();
@@ -486,7 +486,7 @@ class Arlo_For_Wordpress {
 	 * @since    1.0.0
 	 *
 	 */
-	function set_default_options() {
+	private static function set_default_options() {
 		$settings = get_option('arlo_settings');
 		
 		if (is_array($settings) && count($settings)) {
@@ -638,9 +638,7 @@ class Arlo_For_Wordpress {
 		);
 		
 		// MV: Automatically purge the log after two weeks day. 
-		$wpdb->query(
-			$wpdb->prepare("DELETE FROM $table_name WHERE CREATED < NOW() - INTERVAL 14 DAY ORDER BY ID ASC LIMIT 10", '')
-		);
+		$wpdb->query("DELETE FROM $table_name WHERE CREATED < NOW() - INTERVAL 14 DAY ORDER BY ID ASC LIMIT 10");
 
 		if($successful) {
 			$this->set_last_import($timestamp);
@@ -1719,7 +1717,7 @@ class Arlo_For_Wordpress {
                 		
 		foreach($tables as $table) {
 			$table = $wpdb->prefix . 'arlo_' . $table;
-			$wpdb->query($wpdb->prepare("DELETE FROM $table WHERE active <> %s", $timestamp));
+			$wpdb->query($wpdb->prepare("DELETE FROM $table WHERE active <> '%s'", $timestamp));
 		}
                 
 	}
@@ -2068,7 +2066,7 @@ class Arlo_For_Wordpress {
 	 * @access public
 	 * @return void
 	 */
-	function add_pages() {
+	private static function add_pages() {
 		
 		$settings = get_option('arlo_settings');
 	
