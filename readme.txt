@@ -128,6 +128,9 @@ The Arlo - Training and Event Management, and online registration plugin is only
 
 = 2.1.7 =
 
+In the category list, there is no register interest link: 
+https://github.com/ArloSoftware/arlowp-plugin/issues/90
+
 JS error while reloading the templates: 
 https://github.com/ArloSoftware/arlowp-plugin/issues/89
 

@@ -3222,11 +3222,7 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 	$removeyear = ($removeyear == "false" || $removeyear == "0" ? false : true);
 	
 	$events = \Arlo\Events::get($conditions, array('e.e_startdatetime ASC'), $limit);
-		
-	if (!is_array($events)) {
-		$events = array($events);
-	}
-	
+			
 	if ($layout == "list") {
 		$return = '<ul class="arlo-event-next-running">';
 	}
@@ -3235,6 +3231,10 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 		$return = '<a href="' . $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'] . '" title="' . __('Register interest', $GLOBALS['arlo_plugin_slug']) . '" class="' . $buttonclass . '">' . __('Register interest', $GLOBALS['arlo_plugin_slug']) . '</a>';
 	} else if (count($events)) {
 		$return_links = [];
+		
+		if (!is_array($events)) {
+			$events = array($events);
+		}		
 
 		foreach ($events as $event) {
 			if (!empty($event->e_startdatetime)) {
