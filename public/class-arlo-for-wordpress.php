@@ -861,6 +861,7 @@ class Arlo_For_Wordpress {
 		$table_name = "{$wpdb->prefix}arlo_eventtemplates";
 		
 		if(!empty($items)) {
+		
 			foreach($items as $item) {
 				$slug = sanitize_title($item->TemplateID . ' ' . $item->Name);
 				$query = $wpdb->query(

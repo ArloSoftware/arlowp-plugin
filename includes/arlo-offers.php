@@ -13,6 +13,7 @@ class Offers extends Singleton {
 		$query = "SELECT o.* FROM {$wpdb->prefix}arlo_offers AS o";
 		
 		$where = array();
+		$join = array();
 	
 		// conditions
 		foreach($conditions as $key => $value) {
@@ -36,10 +37,13 @@ class Offers extends Singleton {
 				break;
 				
 				case 'event_template_id':
+					$join[] = "
+					LEFT JOIN {$wpdb->prefix}arlo_eventtemplates AS et USING (et_id) 
+					";
 					if(is_array($value)) {
-						$where[] = "o.et_id IN (" . implode(',', $value) . ")";
+						$where[] = "et.et_arlo_id IN (" . implode(',', $value) . ")";
 					} else {
-						$where[] = "o.et_id = $value";
+						$where[] = "et.et_arlo_id = $value";
 					}
 				break;
 				
@@ -59,7 +63,9 @@ class Offers extends Singleton {
 			$order = ' ORDER BY ' . implode(', ', $order);
 		}
 		
-		$result = ($limit != 1) ? $wpdb->get_results($query.$where.$order) : $wpdb->get_row($query.$where.$order);
+		$join = implode("\r", $join);
+		
+		$result = ($limit != 1) ? $wpdb->get_results($query.$join.$where.$order) : $wpdb->get_row($query.$join.$where.$order);
 		
 		return $result;
 	}

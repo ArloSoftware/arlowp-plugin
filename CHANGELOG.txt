@@ -3,6 +3,7 @@
 Bugfixes
 ------------------
 
+The template price isn't available as a shortcode: https://github.com/ArloSoftware/arlowp-plugin/issues/91
 In the category list, there is no register interest link: https://github.com/ArloSoftware/arlowp-plugin/issues/90
 JS error while reloading the templates: https://github.com/ArloSoftware/arlowp-plugin/issues/89
 Event search doesn't return the template if it's under a category's subcategory: https://github.com/ArloSoftware/arlowp-plugin/issues/88

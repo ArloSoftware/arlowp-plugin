@@ -128,6 +128,9 @@ The Arlo - Training and Event Management, and online registration plugin is only
 
 = 2.1.7 =
 
+The template price isn't available as a shortcode: 
+https://github.com/ArloSoftware/arlowp-plugin/issues/91
+
 In the category list, there is no register interest link: 
 https://github.com/ArloSoftware/arlowp-plugin/issues/90
 
@@ -149,7 +152,7 @@ https://github.com/ArloSoftware/arlowp-plugin/issues/86
 Warning with setTimezone fn with a live online event: 
 https://github.com/ArloSoftware/arlowp-plugin/issues/83
 
-Remove PHP notice errors
+Remove PHP notices, errors
 
 = 2.1.6 =
 
