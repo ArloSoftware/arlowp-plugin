@@ -685,13 +685,13 @@ class Arlo_For_Wordpress {
 	}
 	
 	public function cron_import() {
-		ob_start();
+		//ob_start();
 		try{
 			$this->import();
 		}catch(\Exception $e){
 			var_dump($e);
 		}
-		ob_end_clean();
+		//ob_end_clean();
 	}
 	
 	public function load_demo() {
@@ -757,6 +757,7 @@ class Arlo_For_Wordpress {
 		
 		// MV: Untangled the if statements. 
 		// If not forced
+		/*
 		if(!$force) {
 			// LOG THIS AS AN AUTOMATIC IMPORT
 			$this->add_import_log('Synchronization identified as automatic synchronization.', $timestamp, false);
@@ -776,10 +777,11 @@ class Arlo_For_Wordpress {
 				}
 			}
 		}
+		*/
 	
 		// excessive, but some servers are slow...
-		ini_set('max_execution_time', 300);
-		set_time_limit(300);
+		ini_set('max_execution_time', 3000);
+		set_time_limit(3000);
 		
 		// first check valid api_client
 		if(!$this->get_api_client()) return false;
@@ -796,19 +798,26 @@ class Arlo_For_Wordpress {
 			
 			// import from arlo endpoints
 			$this->import_timezones($timestamp);
+			echo '.';
 			
 			$this->import_presenters($timestamp);
+			echo '.';
 			
 			$this->import_event_templates($timestamp);
+			echo '.';
 			
 			$this->import_events($timestamp);
+			echo '.';
 			
 			$this->import_venues($timestamp);
+			echo '.';
 			
 			$this->import_categories($timestamp);
+			echo '.';
 			
 			// now delete the old data
 			$this->import_cleanup($timestamp);
+			echo '.';
                         
 			// commit
 			$wpdb->query('COMMIT');
