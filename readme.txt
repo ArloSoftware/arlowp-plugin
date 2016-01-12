@@ -128,6 +128,9 @@ The Arlo - Training and Event Management, and online registration plugin is only
 
 = 2.1.7 =
 
+The arlo_event_template_tags is in wrong place: 
+https://github.com/ArloSoftware/arlowp-plugin/issues/85
+
 No "Register your interest" link on the template page: 
 https://github.com/ArloSoftware/arlowp-plugin/issues/92
 

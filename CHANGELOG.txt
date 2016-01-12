@@ -3,6 +3,7 @@
 Bugfixes
 ------------------
 
+The arlo_event_template_tags is in wrong place: https://github.com/ArloSoftware/arlowp-plugin/issues/85
 No "Register your interest" link on the template page: https://github.com/ArloSoftware/arlowp-plugin/issues/92
 The template price isn't available as a shortcode: https://github.com/ArloSoftware/arlowp-plugin/issues/91
 In the category list, there is no register interest link: https://github.com/ArloSoftware/arlowp-plugin/issues/90
