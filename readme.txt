@@ -128,6 +128,9 @@ The Arlo - Training and Event Management, and online registration plugin is only
 
 = 2.1.7 =
 
+No "Register your interest" link on the template page: 
+https://github.com/ArloSoftware/arlowp-plugin/issues/92
+
 The template price isn't available as a shortcode: 
 https://github.com/ArloSoftware/arlowp-plugin/issues/91
 

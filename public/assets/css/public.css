@@ -230,6 +230,13 @@ table.arlo_suggest_templates {
 	width: 100%;
 }
 
+p.arlo-no-results {
+	padding: 1em;
+	text-align: center;
+	background-color: #f3f3f3;
+	font-size: 0.8em;
+}
+
 /* Tooltip */
 
 .arlo-tooltip-html {

@@ -129,6 +129,19 @@ class Arlo_For_Wordpress_Settings {
                             'default_val' => __('No events to show', $this->plugin_slug),
                             )
                 );
+
+		// create No events to show text field
+		add_settings_field(
+                        'arlo_noeventontemplate_text', 
+                        '<label for="arlo_noeventontemplate_text">'.__('No event on a template text', $this->plugin_slug).'</label>', 
+                        array($this, 'arlo_simple_input_callback'), 
+                        $this->plugin_slug, 'arlo_general_section', 
+                        array(
+                            'id' => 'noeventontemplate_text',
+                            'label_for' => 'arlo_noeventontemplate_text',
+                            'default_val' => __('Interested in attending? Have a suggestion about running this course near you?', $this->plugin_slug),
+                            )
+                );
                 
 		
 		// create Cron field

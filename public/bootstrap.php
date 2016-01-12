@@ -1642,6 +1642,7 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 
 $shortcodes->add('event_list_item', function($content='', $atts, $shortcode_name){
 	global $post, $wpdb;
+	$settings = get_option('arlo_settings');
 	
 	$t1 = "{$wpdb->prefix}arlo_eventtemplates";
 	$t2 = "{$wpdb->prefix}arlo_events";
@@ -1663,19 +1664,33 @@ $shortcodes->add('event_list_item', function($content='', $atts, $shortcode_name
 	$items = $wpdb->get_results($sql, ARRAY_A);
 	
 	$output = '';
-
-	foreach($items as $key => $item) {
-
-		$GLOBALS['arlo_event_list_item'] = $item;
-                
-		if (!empty($atts['show']) && $key == $atts['show']) {
-		    $output .= '</ul><div class="arlo-clear-both"></div><ul class="arlo-list arlo-show-more-hidden events">';
-		}
-
-		$output .= do_shortcode($content);
-
-		unset($GLOBALS['arlo_event_list_item']);
+	
+	if (is_array($items) && count($items)) {
+		foreach($items as $key => $item) {
+	
+			$GLOBALS['arlo_event_list_item'] = $item;
+	                
+			if (!empty($atts['show']) && $key == $atts['show']) {
+			    $output .= '</ul><div class="arlo-clear-both"></div><ul class="arlo-list arlo-show-more-hidden events">';
+			}
+	
+			$output .= do_shortcode($content);
+	
+			unset($GLOBALS['arlo_event_list_item']);
+		}	
+	} else {
+		$no_event_text = !empty($settings['noeventontemplate_text']) ? $settings['noeventontemplate_text'] : __('Interested in attending? Have a suggestion about running this course near you?', $GLOBALS['arlo_plugin_slug']);
+		
+		if (!empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) {
+			$no_event_text .= '<br /><a href="' . $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'] . '">Register your interest now</a>';
+		} 
+		
+		$output = '
+		<p class="arlo-no-results">' . 
+			$no_event_text . 
+		'</p>';
 	}
+	
 	
 	return $output;
 });
