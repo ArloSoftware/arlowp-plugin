@@ -1640,7 +1640,7 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 				//template tag select
 				
 				$items = $wpdb->get_results(
-					"SELECT 
+					"SELECT DISTINCT
 						t.id,
 						t.tag
 					FROM 
@@ -2285,8 +2285,10 @@ $shortcodes->add('upcoming_list_pagination', function($content='', $atts, $short
 	$t4 = "{$wpdb->prefix}arlo_offers";
 	$t5 = "{$wpdb->prefix}arlo_eventtemplates_categories";
 	$t6 = "{$wpdb->prefix}arlo_categories";
+	$t7 = "{$wpdb->prefix}arlo_events_tags";
 
 	$where = 'WHERE CURDATE() < DATE(e.e_startdatetime) AND e_parent_arlo_id = 0 ';
+	$join = '';
 
 	if(isset($_GET['arlo-month']) && !empty($_GET['arlo-month'])) :
 
@@ -2309,6 +2311,11 @@ $shortcodes->add('upcoming_list_pagination', function($content='', $atts, $short
 	if(isset($_GET['arlo-delivery']) && strlen($_GET['arlo-delivery']) && is_numeric($_GET['arlo-delivery'])) :
 		$where .= " AND e.e_isonline = " . $_GET['arlo-delivery'];
 	endif;	
+	
+	if(!empty($_GET['arlo-eventtag']) && is_numeric($_GET['arlo-eventtag'])) :
+		$where .= " AND etag.tag_id = '" . intval($_GET['arlo-eventtag']) . "'";
+		$join .= " LEFT JOIN $t7 etag USING (e_arlo_id) ";
+	endif;		
 
 	$items = $wpdb->get_results(
 		"SELECT DISTINCT e.e_id, e.e_locationname, c.c_arlo_id
@@ -2327,6 +2334,7 @@ $shortcodes->add('upcoming_list_pagination', function($content='', $atts, $short
 		ON et.et_arlo_id = etc.et_arlo_id AND et.active = etc.active
 		LEFT JOIN $t6 c
 		ON c.c_arlo_id = etc.c_arlo_id
+		$join
 		$where
 		GROUP BY etc.et_arlo_id, e.e_id
 		ORDER BY e.e_startdatetime", ARRAY_A);
@@ -2354,8 +2362,10 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 	$t4 = "{$wpdb->prefix}arlo_offers";
 	$t5 = "{$wpdb->prefix}arlo_eventtemplates_categories";
 	$t6 = "{$wpdb->prefix}arlo_categories";
+	$t7 = "{$wpdb->prefix}arlo_events_tags";
 
 	$where = 'WHERE CURDATE() < DATE(e.e_startdatetime)  AND e_parent_arlo_id = 0 ';
+	$join = '';
 
 	if(isset($_GET['arlo-month']) && !empty($_GET['arlo-month'])) :
 
@@ -2380,6 +2390,11 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 		$where .= " AND e.e_isonline = " . $_GET['arlo-delivery'];
 	endif;
 	
+	if(!empty($_GET['arlo-eventtag']) && is_numeric($_GET['arlo-eventtag'])) :
+		$where .= " AND etag.tag_id = '" . intval($_GET['arlo-eventtag']) . "'";
+		$join .= " LEFT JOIN $t7 etag USING (e_arlo_id) ";
+	endif;		
+	
 	$items = $wpdb->get_results(
 		"SELECT DISTINCT
 		e.*, et.et_name, et.et_post_name, et.et_descriptionsummary, et.et_registerinteresturi, o.o_formattedamounttaxexclusive, o_offeramounttaxexclusive, o.o_formattedamounttaxinclusive, o_offeramounttaxinclusive, o.o_taxrateshortcode, v.v_post_name, c.c_arlo_id
@@ -2398,6 +2413,7 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 		ON et.et_arlo_id = etc.et_arlo_id AND et.active = etc.active
 		LEFT JOIN $t6 c
 		ON c.c_arlo_id = etc.c_arlo_id
+		$join
 		$where
 	    GROUP BY etc.et_arlo_id, e.e_id
 		ORDER BY e.e_startdatetime
@@ -2455,7 +2471,9 @@ $shortcodes->add('upcoming_offer', function($content='', $atts, $shortcode_name)
 // upcoming event filters
 
 $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortcode_name){
-	global $post;
+	global $post, $wpdb, $arlo_plugin;
+
+	$active = $arlo_plugin->get_last_import();
 	
 	extract(shortcode_atts(array(
 		'filters'	=> 'category,month,location,delivery',
@@ -2523,8 +2541,6 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 
 				// location select
 
-				global $wpdb;
-
 				$t1 = "{$wpdb->prefix}arlo_events";
 
 				$items = $wpdb->get_results(
@@ -2547,6 +2563,36 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 				$filter_html .= arlo_create_filter($filter, $locations, __('location', $GLOBALS['arlo_plugin_slug']));
 
 				break;
+				
+			case 'eventtag' :
+				//event tag select
+				
+				$items = $wpdb->get_results(
+					"SELECT DISTINCT
+						t.id,
+						t.tag
+					FROM 
+						{$wpdb->prefix}arlo_events_tags AS etag
+					LEFT JOIN 
+						{$wpdb->prefix}arlo_tags AS t
+					ON
+						t.id = etag.tag_id
+					WHERE 
+						etag.active = '$active'
+					ORDER BY tag", ARRAY_A);
+
+				$tags = array();
+
+				foreach ($items as $item) {
+					$tags[] = array(
+						'string' => $item['tag'],
+						'value' => $item['id'],
+					);
+				}
+
+				$filter_html .= arlo_create_filter($filter, $tags, __('event tag', $GLOBALS['arlo_plugin_slug']));				
+				
+				break;				
 
 		endswitch;
 

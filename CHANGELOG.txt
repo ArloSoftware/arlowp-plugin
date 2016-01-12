@@ -17,6 +17,7 @@ Warning with setTimezone fn with a live online event: https://github.com/ArloSof
 Enhancement
 ------------------
 
+New select dropdown for event's tag in the [arlo_upcoming_event_filters] shortcode: https://github.com/ArloSoftware/arlowp-plugin/issues/94
 New select dropdown for template's tag in the [arlo_event_template_filters] shortcode: https://github.com/ArloSoftware/arlowp-plugin/issues/93
 Remove PHP notice errors
 

@@ -128,6 +128,9 @@ The Arlo - Training and Event Management, and online registration plugin is only
 
 = 2.1.7 =
 
+New select dropdown for event's tag in the [arlo_upcoming_event_filters] shortcode: 
+https://github.com/ArloSoftware/arlowp-plugin/issues/94
+
 New select dropdown for template's tag in the [arlo_event_template_filters] shortcode:
 https://github.com/ArloSoftware/arlowp-plugin/issues/93
 
