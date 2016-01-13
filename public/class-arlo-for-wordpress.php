@@ -30,7 +30,7 @@ class Arlo_For_Wordpress {
 	 *
 	 * @var     string
 	 */
-	const VERSION = '2.1.7';
+	const VERSION = '2.1.7.1';
 
 	/**
 	 * Minimum required PHP version
@@ -685,13 +685,13 @@ class Arlo_For_Wordpress {
 	}
 	
 	public function cron_import() {
-		//ob_start();
+		ob_start();
 		try{
 			$this->import();
 		}catch(\Exception $e){
 			var_dump($e);
 		}
-		//ob_end_clean();
+		ob_end_clean();
 	}
 	
 	public function load_demo() {
@@ -798,26 +798,19 @@ class Arlo_For_Wordpress {
 			
 			// import from arlo endpoints
 			$this->import_timezones($timestamp);
-			echo '.';
 			
 			$this->import_presenters($timestamp);
-			echo '.';
 			
 			$this->import_event_templates($timestamp);
-			echo '.';
 			
 			$this->import_events($timestamp);
-			echo '.';
 			
 			$this->import_venues($timestamp);
-			echo '.';
 			
 			$this->import_categories($timestamp);
-			echo '.';
 			
 			// now delete the old data
 			$this->import_cleanup($timestamp);
-			echo '.';
                         
 			// commit
 			$wpdb->query('COMMIT');
