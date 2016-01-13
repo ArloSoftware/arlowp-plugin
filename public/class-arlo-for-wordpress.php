@@ -30,7 +30,7 @@ class Arlo_For_Wordpress {
 	 *
 	 * @var     string
 	 */
-	const VERSION = '2.1.6';
+	const VERSION = '2.1.7';
 
 	/**
 	 * Minimum required PHP version
