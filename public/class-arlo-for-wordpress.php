@@ -757,7 +757,6 @@ class Arlo_For_Wordpress {
 		
 		// MV: Untangled the if statements. 
 		// If not forced
-		/*
 		if(!$force) {
 			// LOG THIS AS AN AUTOMATIC IMPORT
 			$this->add_import_log('Synchronization identified as automatic synchronization.', $timestamp, false);
@@ -777,7 +776,6 @@ class Arlo_For_Wordpress {
 				}
 			}
 		}
-		*/
 	
 		// excessive, but some servers are slow...
 		ini_set('max_execution_time', 3000);
