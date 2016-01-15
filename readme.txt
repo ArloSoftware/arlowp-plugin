@@ -126,6 +126,15 @@ The Arlo - Training and Event Management, and online registration plugin is only
 
 == Changelog ==
 
+= 2.1.8 =
+
+[event_next_running] shortcode returns incorrect data when the event has sessions:
+https://github.com/ArloSoftware/arlowp-plugin/issues/96
+
+= 2.1.7.1 =
+
+Fix in the import script
+
 = 2.1.7 =
 
 New select dropdown for event's tag in the [arlo_upcoming_event_filters] shortcode: 

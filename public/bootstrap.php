@@ -3312,7 +3312,8 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
         
 	$conditions = array(
 		'template_id' => $GLOBALS['arlo_eventtemplate']['et_arlo_id'],
-		'date' => 'e.e_startdatetime > NOW()'
+		'date' => 'e.e_startdatetime > NOW()',
+		'parent_id' => 'e.e_parent_arlo_id = 0',
 	);
 	
 	// merge and extract attributes

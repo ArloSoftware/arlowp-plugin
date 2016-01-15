@@ -1,3 +1,14 @@
+== 2.1.8 ==
+
+Bugfixes
+------------------
+
+[event_next_running] shortcode returns incorrect data when the event has sessions: https://github.com/ArloSoftware/arlowp-plugin/issues/96
+
+== 2.1.7.1 ==
+
+Fix in the import script
+
 == V2.1.7 ==
 
 Bugfixes
