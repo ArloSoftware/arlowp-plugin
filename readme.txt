@@ -2,8 +2,8 @@
 Contributors: ArloSoftware, adamfentosi
 Tags: online registration, event registration, training management,  event management, event plugin, training company software, training calendar, training administration, training management software, training provider, solution, events calendar, wordpress events, event ticketing, wordpress lms, class registration, conference registration,  ticket, registration, event manager, training, booking, ticketing
 Requires at least: 3.7
-Tested up to: 4.3.1
-Stable tag: 2.1.6
+Tested up to: 4.4.1
+Stable tag: 2.1.7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -125,6 +125,55 @@ The Arlo - Training and Event Management, and online registration plugin is only
 7. Arlo integration
 
 == Changelog ==
+
+= 2.1.8 =
+
+[event_next_running] shortcode returns incorrect data when the event has sessions:
+https://github.com/ArloSoftware/arlowp-plugin/issues/96
+
+= 2.1.7.1 =
+
+Fix in the import script
+
+= 2.1.7 =
+
+New select dropdown for event's tag in the [arlo_upcoming_event_filters] shortcode: 
+https://github.com/ArloSoftware/arlowp-plugin/issues/94
+
+New select dropdown for template's tag in the [arlo_event_template_filters] shortcode:
+https://github.com/ArloSoftware/arlowp-plugin/issues/93
+
+The arlo_event_template_tags is in wrong place: 
+https://github.com/ArloSoftware/arlowp-plugin/issues/85
+
+No "Register your interest" link on the template page: 
+https://github.com/ArloSoftware/arlowp-plugin/issues/92
+
+The template price isn't available as a shortcode: 
+https://github.com/ArloSoftware/arlowp-plugin/issues/91
+
+In the category list, there is no register interest link: 
+https://github.com/ArloSoftware/arlowp-plugin/issues/90
+
+JS error while reloading the templates: 
+https://github.com/ArloSoftware/arlowp-plugin/issues/89
+
+Event search doesn't return the template if it's under a category's subcategory: 
+https://github.com/ArloSoftware/arlowp-plugin/issues/88
+
+De/Activate the plugin overwrites the page settings: 
+https://github.com/ArloSoftware/arlowp-plugin/issues/87
+
+Delete the plugin doesn't remove all the db tables:
+https://github.com/ArloSoftware/arlowp-plugin/issues/84
+
+After sync, not all the tables are cleaned up:
+https://github.com/ArloSoftware/arlowp-plugin/issues/86
+
+Warning with setTimezone fn with a live online event: 
+https://github.com/ArloSoftware/arlowp-plugin/issues/83
+
+Remove PHP notices, errors
 
 = 2.1.6 =
 

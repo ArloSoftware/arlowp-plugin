@@ -1,3 +1,38 @@
+== 2.1.8 ==
+
+Bugfixes
+------------------
+
+[event_next_running] shortcode returns incorrect data when the event has sessions: https://github.com/ArloSoftware/arlowp-plugin/issues/96
+
+== 2.1.7.1 ==
+
+Fix in the import script
+
+== V2.1.7 ==
+
+Bugfixes
+------------------
+
+The arlo_event_template_tags is in wrong place: https://github.com/ArloSoftware/arlowp-plugin/issues/85
+No "Register your interest" link on the template page: https://github.com/ArloSoftware/arlowp-plugin/issues/92
+The template price isn't available as a shortcode: https://github.com/ArloSoftware/arlowp-plugin/issues/91
+In the category list, there is no register interest link: https://github.com/ArloSoftware/arlowp-plugin/issues/90
+JS error while reloading the templates: https://github.com/ArloSoftware/arlowp-plugin/issues/89
+Event search doesn't return the template if it's under a category's subcategory: https://github.com/ArloSoftware/arlowp-plugin/issues/88
+De/Activate the plugin overwrites the page settings: https://github.com/ArloSoftware/arlowp-plugin/issues/87
+Delete the plugin doesn't remove all the db tables: https://github.com/ArloSoftware/arlowp-plugin/issues/84
+After sync, not all the tables are cleaned up https://github.com/ArloSoftware/arlowp-plugin/issues/86
+Warning with setTimezone fn with a live online event: https://github.com/ArloSoftware/arlowp-plugin/issues/83
+
+Enhancement
+------------------
+
+New select dropdown for event's tag in the [arlo_upcoming_event_filters] shortcode: https://github.com/ArloSoftware/arlowp-plugin/issues/94
+New select dropdown for template's tag in the [arlo_event_template_filters] shortcode: https://github.com/ArloSoftware/arlowp-plugin/issues/93
+Remove PHP notice errors
+
+
 == V2.1.6 ==
 
 Bugfixes

@@ -9,17 +9,28 @@ $arlo_plugin_slug = $arlo_plugin->get_plugin_slug();
 add_filter( 'the_title', function($title, $id = null){
 	$settings = get_option('arlo_settings');
 	
-	$pages = array(
-		$settings['post_types']['event']['posts_page'],
-		$settings['post_types']['eventsearch']['posts_page'],
-		$settings['post_types']['upcoming']['posts_page'],
-	);
+	$pages = [];
+	
+	if (!empty($settings['post_types']['event']['posts_page'])) {
+		array_push($pages, $settings['post_types']['event']['posts_page']);
+	}
+	
+	if (!empty($settings['post_types']['eventsearch']['posts_page'])) {
+		array_push($pages, $settings['post_types']['event']['posts_page']);
+	}
+
+	if (!empty($settings['post_types']['upcoming']['posts_page'])) {
+		array_push($pages, $settings['post_types']['event']['posts_page']);
+	}
+	
+	
+	$subtitle = '';
 	
 	$cat_slug = !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : '';	
         	
 	$cat = \Arlo\Categories::get(array('slug' => $cat_slug));
-	$location = stripslashes(urldecode($_GET['arlo-location']));
-	$search = stripslashes(urldecode($_GET['arlo-search']));	
+	$location = !empty($_GET['arlo-location']) ? stripslashes(urldecode($_GET['arlo-location'])) : "";
+	$search = !empty($_GET['arlo-search']) ? stripslashes(urldecode($_GET['arlo-search'])) : "";	
                 
 	if($id === null || !in_array($id, $pages)) return $title;
 		
@@ -134,7 +145,7 @@ function arlo_create_filter($type, $items, $label=null) {
 		}
 		
 		$selected = (strlen($selected_value) && $selected_value == $item['value']) ? ' selected="selected"' : '';
-
+		
 		$filter_html .= '<option value="'.$item['value'].'"'.$selected.'>';
 		$filter_html .= $item['string'];
 		$filter_html .= '</option>';
@@ -176,7 +187,8 @@ function arlo_register_custom_post_types() {
 
 	foreach(Arlo_For_Wordpress::$post_types as $id => $type) {
 		// default slug
-		$slug = str_replace('_', '-', strtolower(trim(preg_replace('/[^A-Za-z]+/', '', $settings['post_types'][$id]['name']))));
+		
+		$slug = str_replace('_', '-', strtolower(trim(preg_replace('/[^A-Za-z]+/', '', $type['name']))));
 		$slug = 'arlo/' . $slug;
 		
 		// slug based on page, if it exists
@@ -946,7 +958,7 @@ function arlo_get_post_by_name($name, $post_type='post') {
 	);
 	
 	$posts = get_posts($args);
-	
+		
 	if( $posts ) {
 		return $posts[0];
 	}
@@ -979,13 +991,21 @@ function getTimezones() {
 	return $wpdb->get_results($sql);
 }
 
-function getTimezoneOlsonNames($timezone_id) {
+function getTimezoneOlsonNames($timezone_id = 0) {
 	global $wpdb, $arlo_plugin;
 	
 	$timezone_id = intval($timezone_id);
 	
 	$table = $wpdb->prefix . "arlo_timezones_olson";
 	$active = $arlo_plugin->get_last_import();
+	$where = '';
+	
+	if ($timezone_id > 0) {
+		$where = "
+			timezone_id = {$timezone_id}
+		AND		
+		";
+	}
 	
 	$sql = "
 	SELECT
@@ -993,8 +1013,7 @@ function getTimezoneOlsonNames($timezone_id) {
 	FROM
 		{$table}
 	WHERE
-		timezone_id = {$timezone_id}
-	AND
+		{$where}	
 		active = '{$active}'
 	";
 	return $wpdb->get_results($sql);
@@ -1040,6 +1059,7 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 	$t3 = "{$wpdb->prefix}arlo_eventtemplates_categories";
 	$t4 = "{$wpdb->prefix}arlo_categories";
 	$t5 = "{$wpdb->prefix}arlo_events";
+	$t6 = "{$wpdb->prefix}arlo_eventtemplates_tags";
 		
 	$where = "WHERE post.post_type = 'arlo_event'";
 	$join = "";
@@ -1058,6 +1078,12 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 		endif;	
 		
 	endif;	
+	
+	if(!empty($_GET['arlo-templatetag']) && is_numeric($_GET['arlo-templatetag'])) :
+		$where .= " AND ett.tag_id = '" . intval($_GET['arlo-templatetag']) . "'";
+		$join .= " LEFT JOIN $t6 ett USING (et_arlo_id) ";
+	endif;			
+	
 	
 	if (!empty($_GET['arlo-search'])) {
 		$where .= '
@@ -1169,6 +1195,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 	$t3 = "{$wpdb->prefix}arlo_eventtemplates_categories";
 	$t4 = "{$wpdb->prefix}arlo_categories";
 	$t5 = "{$wpdb->prefix}arlo_events";
+	$t6 = "{$wpdb->prefix}arlo_eventtemplates_tags";
 		
 	$where = "WHERE post.post_type = 'arlo_event' AND et.active = '{$active}'";
 	$join = "";
@@ -1181,12 +1208,18 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 		if(!empty($_GET['arlo-location'])) :
 			$where .= " AND e.e_locationname = '" . urldecode($_GET['arlo-location']) . "'";
 		endif;	
-		
+				
 		if(isset($_GET['arlo-delivery']) && strlen($_GET['arlo-delivery']) && is_numeric($_GET['arlo-delivery'])) :
 			$where .= " AND e.e_isonline = " . $_GET['arlo-delivery'];
 		endif;	
 		
 	endif;	
+	
+	if(!empty($_GET['arlo-templatetag']) && is_numeric($_GET['arlo-templatetag'])) :
+		$where .= " AND ett.tag_id = '" . intval($_GET['arlo-templatetag']) . "'";
+		$join .= " LEFT JOIN $t6 ett USING (et_arlo_id) ";
+	endif;			
+	
 	
 	if (!empty($_GET['arlo-search'])) {
 		$where .= '
@@ -1198,6 +1231,8 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 				et_descriptionsummary like "%' . $_GET['arlo-search'] . '%"
 		)
 		';
+		
+		$atts['show_child_elements'] = "true";
 	}	
 	
 		
@@ -1257,13 +1292,12 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 	if(isset($atts['group'])) {
 		switch($atts['group']) {
 			case 'category':
-				$group = '';
 				$order = "ORDER BY c.c_order ASC, etc.et_order ASC, c.c_name ASC, et.et_name ASC";
 			break;
 		}
 	}
 	
-	$items = $wpdb->get_results("SELECT et.*, post.ID as post_id, etc.c_arlo_id, c.*
+	$sql = "SELECT et.*, post.ID as post_id, etc.c_arlo_id, c.*
 		FROM $t1 et 
 		{$join}
 		LEFT JOIN $t2 post 
@@ -1275,11 +1309,13 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 		$where 
 		$group 
 		$order
-		LIMIT $offset,$limit", ARRAY_A);
+		LIMIT $offset,$limit";
+		
+	$items = $wpdb->get_results($sql, ARRAY_A);
 		
 	if(empty($items)) :
 		$no_event_text = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', $GLOBALS['arlo_plugin_slug']);
-		$output = '</table><table class="arlo-no-results"><tr><td>' . $no_event_text . '</td></tr>';
+		$output = '</table><style> .arlo table.event-templates {display: none;} </style><table class="arlo-no-results"><tr><td>' . $no_event_text . '</td></tr>';
 
 	else :
 					
@@ -1474,6 +1510,8 @@ $shortcodes->add('content_field_item', function($content='', $atts, $shortcode_n
 		'fields'	=> 'all',
 	), $atts, $shortcode_name));
 	
+	$where_fields = null;
+	
 	if (strtolower($fields) != 'all') {
 		$where_fields = explode(',', $fields);
 		$where_fields = array_map(function($field) {
@@ -1525,7 +1563,9 @@ $shortcodes->add('content_field_text', function($content='', $atts, $shortcode_n
 // event template filter shortcode
 
 $shortcodes->add('event_template_filters', function($content='', $atts, $shortcode_name){
-	global $post;
+	global $post, $wpdb, $arlo_plugin;
+
+	$active = $arlo_plugin->get_last_import();
 
 	extract(shortcode_atts(array(
 		'filters'	=> 'category,location,delivery',
@@ -1537,7 +1577,7 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 	
 	$settings = get_option('arlo_settings');  
         
-	if (!empty($settings['post_types']['event'])) {
+	if (!empty($settings['post_types']['event']['posts_page'])) {
 		$slug = get_post($settings['post_types']['event']['posts_page'])->post_name;
 	} else {
 		$slug = get_post($post)->post_name;
@@ -1554,8 +1594,10 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 				// category select
 				
 				$cats = \Arlo\Categories::getTree();
-
-				$filter_html .= arlo_create_filter('category', arlo_child_categories($cats[0]->children), __('category', $GLOBALS['arlo_plugin_slug']));
+				
+				if (is_array($cats)) {
+					$filter_html .= arlo_create_filter('category', arlo_child_categories($cats[0]->children), __('category', $GLOBALS['arlo_plugin_slug']));
+				}
 				
 				break;
 				
@@ -1571,29 +1613,57 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 
 				// location select
 
-				global $wpdb;
-
 				$t1 = "{$wpdb->prefix}arlo_events";
 
 				$items = $wpdb->get_results(
 					"SELECT e.e_locationname
 					FROM $t1 e 
+					WHERE 
+						e_locationname != ''
 					GROUP BY e.e_locationname 
 					ORDER BY e.e_locationname", ARRAY_A);
 
 				$locations = array();
 
-				$l = count($items);
-
-				for($i=0;$i<$l;$i++) :
-
-					$locations[$i]['string'] = $items[$i]['e_locationname'];
-					$locations[$i]['value'] = $items[$i]['e_locationname'];
-
-				endfor;
+				foreach ($items as $item) {
+					$locations[] = array(
+						'string' => $item['e_locationname'],
+						'value' => $item['e_locationname'],
+					);
+				}
 
 				$filter_html .= arlo_create_filter($filter, $locations, __('location', $GLOBALS['arlo_plugin_slug']));
 
+				break;
+				
+			case 'templatetag' :
+				//template tag select
+				
+				$items = $wpdb->get_results(
+					"SELECT DISTINCT
+						t.id,
+						t.tag
+					FROM 
+						{$wpdb->prefix}arlo_eventtemplates_tags AS ett
+					LEFT JOIN 
+						{$wpdb->prefix}arlo_tags AS t
+					ON
+						t.id = ett.tag_id
+					WHERE 
+						ett.active = '$active'
+					ORDER BY tag", ARRAY_A);
+
+				$tags = array();
+
+				foreach ($items as $item) {
+					$tags[] = array(
+						'string' => $item['tag'],
+						'value' => $item['id'],
+					);
+				}
+
+				$filter_html .= arlo_create_filter($filter, $tags, __('template tag', $GLOBALS['arlo_plugin_slug']));				
+				
 				break;
 
 		endswitch;
@@ -1617,6 +1687,7 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 
 $shortcodes->add('event_list_item', function($content='', $atts, $shortcode_name){
 	global $post, $wpdb;
+	$settings = get_option('arlo_settings');
 	
 	$t1 = "{$wpdb->prefix}arlo_eventtemplates";
 	$t2 = "{$wpdb->prefix}arlo_events";
@@ -1638,19 +1709,33 @@ $shortcodes->add('event_list_item', function($content='', $atts, $shortcode_name
 	$items = $wpdb->get_results($sql, ARRAY_A);
 	
 	$output = '';
-
-	foreach($items as $key => $item) {
-
-		$GLOBALS['arlo_event_list_item'] = $item;
-                
-		if (!empty($atts['show']) && $key == $atts['show']) {
-		    $output .= '</ul><div class="arlo-clear-both"></div><ul class="arlo-list arlo-show-more-hidden events">';
+	
+	if (is_array($items) && count($items)) {
+		foreach($items as $key => $item) {
+	
+			$GLOBALS['arlo_event_list_item'] = $item;
+	                
+			if (!empty($atts['show']) && $key == $atts['show']) {
+			    $output .= '</ul><div class="arlo-clear-both"></div><ul class="arlo-list arlo-show-more-hidden events">';
+			}
+	
+			$output .= do_shortcode($content);
+	
+			unset($GLOBALS['arlo_event_list_item']);
+		}	
+	} else {
+		$no_event_text = !empty($settings['noeventontemplate_text']) ? $settings['noeventontemplate_text'] : __('Interested in attending? Have a suggestion about running this course near you?', $GLOBALS['arlo_plugin_slug']);
+		
+		if (!empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) {
+			$no_event_text .= '<br /><a href="' . $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'] . '">Register your interest now</a>';
 		}
-
-		$output .= do_shortcode($content);
-
-		unset($GLOBALS['arlo_event_list_item']);
+		
+		$output = '
+		<p class="arlo-no-results">' . 
+			$no_event_text . 
+		'</p>';
 	}
+	
 	
 	return $output;
 });
@@ -1703,6 +1788,8 @@ $shortcodes->add('event_location', function($content='', $atts, $shortcode_name)
 $shortcodes->add('event_start_date', function($content='', $atts, $shortcode_name){
 	if(!isset($GLOBALS['arlo_event_list_item']['e_startdatetime']) && !isset($GLOBALS['arlo_event_session_list_item']['e_startdatetime'])) return '';
 	
+	$timezone = null;
+	
 	$event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
 	
 	$timewithtz = str_replace(' ', 'T', $event['e_startdatetime']) . $event['e_datetimeoffset'];
@@ -1710,7 +1797,7 @@ $shortcodes->add('event_start_date', function($content='', $atts, $shortcode_nam
 	$start_date = new DateTime($timewithtz);
 		
 	if($event['e_isonline']) {
-		if (is_array($GLOBALS['selected_timezone_olson_names'])) {
+		if (!empty($GLOBALS['selected_timezone_olson_names']) && is_array($GLOBALS['selected_timezone_olson_names'])) {
 			foreach ($GLOBALS['selected_timezone_olson_names'] as $TzName) {
 				try {
 					$timezone = new DateTimeZone($TzName->olson_name);
@@ -1721,13 +1808,22 @@ $shortcodes->add('event_start_date', function($content='', $atts, $shortcode_nam
 					break;
 				}
 			}
-			$start_date->setTimezone($timezone);
+			
+			if (!is_null($timezone)) {
+				$start_date->setTimezone($timezone);
+			}
+			
 		}
 	}
 
 	$format = 'D g:i A';
 
 	if(isset($atts['format'])) $format = $atts['format'];
+	
+	//if we haven't got timezone, we need to append the timezone abbrev
+	if ($event['e_isonline'] && is_null($timezone) && (preg_match('[G|g|i]', $format) === 1)) {
+		$format .= " T";
+	}
 
 	return $start_date->format($format);
 });
@@ -1738,13 +1834,15 @@ $shortcodes->add('event_end_date', function($content='', $atts, $shortcode_name)
 	if(!isset($GLOBALS['arlo_event_list_item']['e_finishdatetime']) && !isset($GLOBALS['arlo_event_session_list_item']['e_finishdatetime'])) return '';
 	
 	$event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
+	
+	$timezone = null;
 
 	$timewithtz = str_replace(' ','T',$event['e_finishdatetime']) . $event['e_datetimeoffset'];
 	
 	$end_date = new DateTime($timewithtz);
 		
 	if($event['e_isonline']) {
-		if (is_array($GLOBALS['selected_timezone_olson_names'])) {
+		if (!empty($GLOBALS['selected_timezone_olson_names']) && is_array($GLOBALS['selected_timezone_olson_names'])) {
 			foreach ($GLOBALS['selected_timezone_olson_names'] as $TzName) {
 				try {
 					$timezone = new DateTimeZone($TzName->olson_name);
@@ -1755,13 +1853,22 @@ $shortcodes->add('event_end_date', function($content='', $atts, $shortcode_name)
 					break;
 				}
 			}
-			$end_date->setTimezone($timezone);
+			
+			if (!is_null($timezone)) {
+				$end_date->setTimezone($timezone);
+			}
+			
 		}
 	}
 
 	$format = 'D g:i A';
 
 	if(isset($atts['format'])) $format = $atts['format'];
+		
+	//if we haven't got timezone, we need to append the timezone abbrev
+	if ($event['e_isonline'] && is_null($timezone) && (preg_match('[G|g|i]', $format) === 1)) {
+		$format .= " T";
+	}	
 
 	return $end_date->format($format);
 });
@@ -2178,8 +2285,10 @@ $shortcodes->add('upcoming_list_pagination', function($content='', $atts, $short
 	$t4 = "{$wpdb->prefix}arlo_offers";
 	$t5 = "{$wpdb->prefix}arlo_eventtemplates_categories";
 	$t6 = "{$wpdb->prefix}arlo_categories";
+	$t7 = "{$wpdb->prefix}arlo_events_tags";
 
 	$where = 'WHERE CURDATE() < DATE(e.e_startdatetime) AND e_parent_arlo_id = 0 ';
+	$join = '';
 
 	if(isset($_GET['arlo-month']) && !empty($_GET['arlo-month'])) :
 
@@ -2202,6 +2311,11 @@ $shortcodes->add('upcoming_list_pagination', function($content='', $atts, $short
 	if(isset($_GET['arlo-delivery']) && strlen($_GET['arlo-delivery']) && is_numeric($_GET['arlo-delivery'])) :
 		$where .= " AND e.e_isonline = " . $_GET['arlo-delivery'];
 	endif;	
+	
+	if(!empty($_GET['arlo-eventtag']) && is_numeric($_GET['arlo-eventtag'])) :
+		$where .= " AND etag.tag_id = '" . intval($_GET['arlo-eventtag']) . "'";
+		$join .= " LEFT JOIN $t7 etag USING (e_arlo_id) ";
+	endif;		
 
 	$items = $wpdb->get_results(
 		"SELECT DISTINCT e.e_id, e.e_locationname, c.c_arlo_id
@@ -2220,6 +2334,7 @@ $shortcodes->add('upcoming_list_pagination', function($content='', $atts, $short
 		ON et.et_arlo_id = etc.et_arlo_id AND et.active = etc.active
 		LEFT JOIN $t6 c
 		ON c.c_arlo_id = etc.c_arlo_id
+		$join
 		$where
 		GROUP BY etc.et_arlo_id, e.e_id
 		ORDER BY e.e_startdatetime", ARRAY_A);
@@ -2247,8 +2362,10 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 	$t4 = "{$wpdb->prefix}arlo_offers";
 	$t5 = "{$wpdb->prefix}arlo_eventtemplates_categories";
 	$t6 = "{$wpdb->prefix}arlo_categories";
+	$t7 = "{$wpdb->prefix}arlo_events_tags";
 
 	$where = 'WHERE CURDATE() < DATE(e.e_startdatetime)  AND e_parent_arlo_id = 0 ';
+	$join = '';
 
 	if(isset($_GET['arlo-month']) && !empty($_GET['arlo-month'])) :
 
@@ -2273,6 +2390,11 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 		$where .= " AND e.e_isonline = " . $_GET['arlo-delivery'];
 	endif;
 	
+	if(!empty($_GET['arlo-eventtag']) && is_numeric($_GET['arlo-eventtag'])) :
+		$where .= " AND etag.tag_id = '" . intval($_GET['arlo-eventtag']) . "'";
+		$join .= " LEFT JOIN $t7 etag USING (e_arlo_id) ";
+	endif;		
+	
 	$items = $wpdb->get_results(
 		"SELECT DISTINCT
 		e.*, et.et_name, et.et_post_name, et.et_descriptionsummary, et.et_registerinteresturi, o.o_formattedamounttaxexclusive, o_offeramounttaxexclusive, o.o_formattedamounttaxinclusive, o_offeramounttaxinclusive, o.o_taxrateshortcode, v.v_post_name, c.c_arlo_id
@@ -2291,6 +2413,7 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 		ON et.et_arlo_id = etc.et_arlo_id AND et.active = etc.active
 		LEFT JOIN $t6 c
 		ON c.c_arlo_id = etc.c_arlo_id
+		$join
 		$where
 	    GROUP BY etc.et_arlo_id, e.e_id
 		ORDER BY e.e_startdatetime
@@ -2348,7 +2471,9 @@ $shortcodes->add('upcoming_offer', function($content='', $atts, $shortcode_name)
 // upcoming event filters
 
 $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortcode_name){
-	global $post;
+	global $post, $wpdb, $arlo_plugin;
+
+	$active = $arlo_plugin->get_last_import();
 	
 	extract(shortcode_atts(array(
 		'filters'	=> 'category,month,location,delivery',
@@ -2360,7 +2485,7 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 	
 	$settings = get_option('arlo_settings');  
 		
-	if (!empty($settings['post_types']['upcoming'])) {
+	if (!empty($settings['post_types']['upcoming']['posts_page'])) {
 		$slug = get_post($settings['post_types']['upcoming']['posts_page'])->post_name;
 	} else {
 		$slug = get_post($post)->post_name;
@@ -2378,7 +2503,9 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 
 				$cats = \Arlo\Categories::getTree();
 
-				$filter_html .= arlo_create_filter($filter, arlo_child_categories($cats[0]->children), __('category', $GLOBALS['arlo_plugin_slug']));
+				if (is_array($cats)) {
+					$filter_html .= arlo_create_filter($filter, arlo_child_categories($cats[0]->children), __('category', $GLOBALS['arlo_plugin_slug']));					
+				}
 
 				break;
 				
@@ -2414,31 +2541,58 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 
 				// location select
 
-				global $wpdb;
-
 				$t1 = "{$wpdb->prefix}arlo_events";
 
 				$items = $wpdb->get_results(
 					"SELECT e.e_locationname
 					FROM $t1 e 
+					WHERE 
+						e_locationname != ''
 					GROUP BY e.e_locationname 
 					ORDER BY e.e_locationname", ARRAY_A);
 
-
 				$locations = array();
 
-				$l = count($items);
-
-				for($i=0;$i<$l;$i++) :
-
-					$locations[$i]['string'] = $items[$i]['e_locationname'];
-					$locations[$i]['value'] = $items[$i]['e_locationname'];
-
-				endfor;
+				foreach ($items as $item) {
+					$locations[] = array(
+						'string' => $item['e_locationname'],
+						'value' => $item['e_locationname'],
+					);
+				}
 
 				$filter_html .= arlo_create_filter($filter, $locations, __('location', $GLOBALS['arlo_plugin_slug']));
 
 				break;
+				
+			case 'eventtag' :
+				//event tag select
+				
+				$items = $wpdb->get_results(
+					"SELECT DISTINCT
+						t.id,
+						t.tag
+					FROM 
+						{$wpdb->prefix}arlo_events_tags AS etag
+					LEFT JOIN 
+						{$wpdb->prefix}arlo_tags AS t
+					ON
+						t.id = etag.tag_id
+					WHERE 
+						etag.active = '$active'
+					ORDER BY tag", ARRAY_A);
+
+				$tags = array();
+
+				foreach ($items as $item) {
+					$tags[] = array(
+						'string' => $item['tag'],
+						'value' => $item['id'],
+					);
+				}
+
+				$filter_html .= arlo_create_filter($filter, $tags, __('event tag', $GLOBALS['arlo_plugin_slug']));				
+				
+				break;				
 
 		endswitch;
 
@@ -2896,6 +3050,8 @@ $shortcodes->add('timezones', function($content='', $atts, $shortcode_name){
 	if(empty($items)) {
 		return '';
 	}
+	
+	$olson_names = getTimezoneOlsonNames();	
 
 	$content = '<form method="GET" class="arlo-timezone">';
 	$content .= '<select name="timezone">';
@@ -2914,6 +3070,11 @@ $shortcodes->add('timezones', function($content='', $atts, $shortcode_name){
 	
 	$content .= '</select>';
 	$content .= '</form>';
+	
+	//if there is no olson names in the database, that means we couldn't do a timezone conversion
+	if (!(is_array($olson_names) && count($olson_names))) {
+		$content = '';
+	}
 
 	return $content;
 });
@@ -3005,7 +3166,8 @@ $shortcodes->add('categories', function($content='', $atts, $shortcode_name){
         		
 	// start at
 	$start_at = (isset($atts['parent'])) ? (int)$atts['parent'] : 0;
-	if(!isset($atts['parent']) && $start_at == 0 && $slug = $_GET['arlo-category']) {
+	if(!isset($atts['parent']) && $start_at == 0 && !empty($_GET['arlo-category'])) {
+		$slug = $_GET['arlo-category'];
 		$start_at = current(explode('-', $slug));
 	}
 	
@@ -3100,11 +3262,11 @@ $shortcodes->add('event_duration', function($content='', $atts, $shortcode_name)
 $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 	if(!isset($GLOBALS['arlo_event_list_item']) || empty($GLOBALS['arlo_event_list_item']['et_arlo_id'])) return;
 	
-        $settings = get_option('arlo_settings');  
-        $price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : ARLO_PLUGIN_PREFIX . '-exclgst';
-        $price_field = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? 'o_offeramounttaxexclusive' : 'o_offeramounttaxinclusive';
-        $price_field_show = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? 'o_formattedamounttaxexclusive' : 'o_formattedamounttaxinclusive';
-        $free_text = (isset($settings['free_text'])) ? esc_attr($settings['free_text']) : __('Free', $GLOBALS['arlo_plugin_slug']);
+	$settings = get_option('arlo_settings');  
+	$price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : ARLO_PLUGIN_PREFIX . '-exclgst';
+	$price_field = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? 'o_offeramounttaxexclusive' : 'o_offeramounttaxinclusive';
+	$price_field_show = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? 'o_formattedamounttaxexclusive' : 'o_formattedamounttaxinclusive';
+	$free_text = (isset($settings['free_text'])) ? esc_attr($settings['free_text']) : __('Free', $GLOBALS['arlo_plugin_slug']);
         
         
 	// attempt to find event template offer
@@ -3150,7 +3312,8 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
         
 	$conditions = array(
 		'template_id' => $GLOBALS['arlo_eventtemplate']['et_arlo_id'],
-		'date' => 'e.e_startdatetime > NOW()'
+		'date' => 'e.e_startdatetime > NOW()',
+		'parent_id' => 'e.e_parent_arlo_id = 0',
 	);
 	
 	// merge and extract attributes
@@ -3166,11 +3329,7 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 	$removeyear = ($removeyear == "false" || $removeyear == "0" ? false : true);
 	
 	$events = \Arlo\Events::get($conditions, array('e.e_startdatetime ASC'), $limit);
-		
-	if (!is_array($events)) {
-		$events = array($events);
-	}
-	
+			
 	if ($layout == "list") {
 		$return = '<ul class="arlo-event-next-running">';
 	}
@@ -3179,6 +3338,10 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 		$return = '<a href="' . $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'] . '" title="' . __('Register interest', $GLOBALS['arlo_plugin_slug']) . '" class="' . $buttonclass . '">' . __('Register interest', $GLOBALS['arlo_plugin_slug']) . '</a>';
 	} else if (count($events)) {
 		$return_links = [];
+		
+		if (!is_array($events)) {
+			$events = array($events);
+		}		
 
 		foreach ($events as $event) {
 			if (!empty($event->e_startdatetime)) {

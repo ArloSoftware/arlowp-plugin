@@ -23,12 +23,12 @@ class Arlo_For_Wordpress_Settings {
 		$plugin = Arlo_For_Wordpress::get_instance();
 		$this->plugin_slug = $plugin->get_plugin_slug();
 		
-		if ($_GET['page'] == 'arlo-for-wordpress' && get_option('permalink_structure') != "/%postname%/") {
+		if (isset($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress' && get_option('permalink_structure') != "/%postname%/") {
 			add_action( 'admin_notices', array($plugin, "permalink_notice") );
 		}					
 		
 		$settings = get_option('arlo_settings');
-		if ($_GET['page'] == 'arlo-for-wordpress' && !empty($settings['platform_name'])) {
+		if (isset($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress' && !empty($settings['platform_name'])) {
 			$show_notice = false;
 			foreach (Arlo_For_Wordpress::$post_types as $id => $post_type) {
 				if (empty($settings['post_types'][$id]['posts_page'])) {
@@ -127,6 +127,19 @@ class Arlo_For_Wordpress_Settings {
                             'id' => 'noevent_text',
                             'label_for' => 'arlo_noevent_text',
                             'default_val' => __('No events to show', $this->plugin_slug),
+                            )
+                );
+
+		// create No events to show text field
+		add_settings_field(
+                        'arlo_noeventontemplate_text', 
+                        '<label for="arlo_noeventontemplate_text">'.__('No event on a template text', $this->plugin_slug).'</label>', 
+                        array($this, 'arlo_simple_input_callback'), 
+                        $this->plugin_slug, 'arlo_general_section', 
+                        array(
+                            'id' => 'noeventontemplate_text',
+                            'label_for' => 'arlo_noeventontemplate_text',
+                            'default_val' => __('Interested in attending? Have a suggestion about running this course near you?', $this->plugin_slug),
                             )
                 );
                 

@@ -30,7 +30,7 @@ class Arlo_For_Wordpress {
 	 *
 	 * @var     string
 	 */
-	const VERSION = '2.1.6';
+	const VERSION = '2.1.7.1';
 
 	/**
 	 * Minimum required PHP version
@@ -472,7 +472,7 @@ class Arlo_For_Wordpress {
 		
 		// run import every 15 minutes
 		$temp = wp_schedule_event( time(), 'minutes_15', 'arlo_import' ) . ': Log initiated.';
-		self::get_instance()->add_import_log($temp, $timestamp);
+		self::get_instance()->add_import_log($temp, date('Y-m-d H:i:s T'));
 
 		// now add pages
 		self::add_pages();
@@ -486,7 +486,7 @@ class Arlo_For_Wordpress {
 	 * @since    1.0.0
 	 *
 	 */
-	function set_default_options() {
+	private static function set_default_options() {
 		$settings = get_option('arlo_settings');
 		
 		if (is_array($settings) && count($settings)) {
@@ -638,9 +638,7 @@ class Arlo_For_Wordpress {
 		);
 		
 		// MV: Automatically purge the log after two weeks day. 
-		$wpdb->query(
-			$wpdb->prepare("DELETE FROM $table_name WHERE CREATED < NOW() - INTERVAL 14 DAY ORDER BY ID ASC LIMIT 10", '')
-		);
+		$wpdb->query("DELETE FROM $table_name WHERE CREATED < NOW() - INTERVAL 14 DAY ORDER BY ID ASC LIMIT 10");
 
 		if($successful) {
 			$this->set_last_import($timestamp);
@@ -780,8 +778,8 @@ class Arlo_For_Wordpress {
 		}
 	
 		// excessive, but some servers are slow...
-		ini_set('max_execution_time', 300);
-		set_time_limit(300);
+		ini_set('max_execution_time', 3000);
+		set_time_limit(3000);
 		
 		// first check valid api_client
 		if(!$this->get_api_client()) return false;
@@ -863,6 +861,7 @@ class Arlo_For_Wordpress {
 		$table_name = "{$wpdb->prefix}arlo_eventtemplates";
 		
 		if(!empty($items)) {
+		
 			foreach($items as $item) {
 				$slug = sanitize_title($item->TemplateID . ' ' . $item->Name);
 				$query = $wpdb->query(
@@ -877,7 +876,7 @@ class Arlo_For_Wordpress {
 						@$item->Description->Summary,
 						$slug,
 						$timestamp,
-						$item->RegisterInterestUri
+						!empty($item->RegisterInterestUri) ? $item->RegisterInterestUri : ''
 					)
 				);
                                 
@@ -1159,7 +1158,7 @@ class Arlo_For_Wordpress {
 		}
 		
 		//Save session information
-		if ($parent_id == 0 && isset($item->Sessions) && is_array($item->Sessions) && $item->Sessions[0]->EventID != $item->EventID ) {
+		if ($parent_id == 0 && isset($item->Sessions) && is_array($item->Sessions) && !empty($item->Sessions[0]->EventID) && $item->Sessions[0]->EventID != $item->EventID ) {
 			foreach ($item->Sessions as $session) {
 				$this->save_event_data($session, $item->EventID, $timestamp);
 			}
@@ -1275,7 +1274,7 @@ class Arlo_For_Wordpress {
 		$client = $this->get_api_client();
 		
 		$items = $client->Timezones()->getAllTimezones();
-		
+				
 		$table_name = "{$wpdb->prefix}arlo_timezones";
 		
 		if(!empty($items)) {
@@ -1527,7 +1526,7 @@ class Arlo_For_Wordpress {
 		
 		$this->set_categories_count(0, $timestamp);
 		
-		$cats = \Arlo\Categories::getTree($cat_id, null);
+		$cats = \Arlo\Categories::getTree(0, null);
 		$this->set_category_depth_level($cats, $timestamp);
 		
 		$sql = "SELECT MAX(c_depth_level) FROM {$wpdb->prefix}arlo_categories WHERE active = '{$timestamp}'";
@@ -1685,7 +1684,7 @@ class Arlo_For_Wordpress {
 					c_arlo_id = %d
 				";
 								
-				$query = $wpdb->query( $wpdb->prepare($sql, $item->SequenceIndex, $item->EventTemplateID, $item->CategoryID) );
+				$query = $wpdb->query( $wpdb->prepare($sql, !empty($item->SequenceIndex) ? $item->SequenceIndex : 0, $item->EventTemplateID, $item->CategoryID) );
 				
 		        if ($query === false) {
 		        	throw new Exception('Database insert failed: ' . $table_name);
@@ -1713,11 +1712,13 @@ class Arlo_For_Wordpress {
             'eventtemplates_categories',
             'eventtemplates_presenters',
             'eventtemplates_tags',
+            'timezones',
+            'timezones_olson'
 		);
                 		
 		foreach($tables as $table) {
 			$table = $wpdb->prefix . 'arlo_' . $table;
-			$wpdb->query($wpdb->prepare("DELETE FROM $table WHERE active <> %s", $timestamp));
+			$wpdb->query($wpdb->prepare("DELETE FROM $table WHERE active <> '%s'", $timestamp));
 		}
                 
 	}
@@ -1839,6 +1840,11 @@ class Arlo_For_Wordpress {
 		$settings = get_option('arlo_settings');
 		$timestamp = get_option('arlo_last_import');
 		
+		$events = arlo_get_post_by_name('events', 'page');
+		$upcoming = arlo_get_post_by_name('upcoming', 'page');
+		$presenters = arlo_get_post_by_name('presenters', 'page');
+		$venues = arlo_get_post_by_name('venues', 'page');
+		
 		$notice_id = self::$dismissible_notices['newpages'];
 		$user = wp_get_current_user();
 		$meta = get_user_meta($user->ID, $notice_id, true);
@@ -1852,12 +1858,8 @@ class Arlo_For_Wordpress {
 		} else {
 			if ($meta !== '0') {	
 				$import = self::get_instance()->get_import_log();
-				$events = arlo_get_post_by_name('events', 'page');
-				$upcoming = arlo_get_post_by_name('upcoming', 'page');
-				$presenters = arlo_get_post_by_name('presenters', 'page');
-				$venues = arlo_get_post_by_name('venues', 'page');			
-			
-				if (!empty($settings['platform_name'])) {		
+				
+				if (!empty($settings['platform_name']) && $events !== false && $upcoming !== false && $presenters !== false && $venues !== false) {		
 					//Get the first event template wich has event
 					$sql = "
 					SELECT 
@@ -1881,6 +1883,7 @@ class Arlo_For_Wordpress {
 					LIMIT 
 						1
 					";
+
 					$event = $wpdb->get_results($sql, ARRAY_A);
 					
 					//Get the first presenter
@@ -1921,8 +1924,7 @@ class Arlo_For_Wordpress {
 					";
 					$venue = $wpdb->get_results($sql, ARRAY_A);		
 					
-					$message = 
-					'<h3>' . __('Start editing your new pages', self::get_instance()->plugin_slug) . '</h3><p>'.
+					$message = '<h3>' . __('Start editing your new pages', self::get_instance()->plugin_slug) . '</h3><p>'.
 					
 					sprintf(__('View <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a> or <a href="%s" target="_blank">%s</a> pages', self::get_instance()->plugin_slug), 
 						get_post_permalink($event[0]['ID']),
@@ -1981,7 +1983,7 @@ class Arlo_For_Wordpress {
 			';		
 		}
 		
-		self::load_demo_notice($_SESSION['arlo-demo']);
+		self::load_demo_notice(!empty($_SESSION['arlo-demo']) ? $_SESSION['arlo-demo'] : []);
 		self::webinar_notice();
 		self::developer_notice();
 		
@@ -2066,7 +2068,7 @@ class Arlo_For_Wordpress {
 	 * @access public
 	 * @return void
 	 */
-	function add_pages() {
+	private static function add_pages() {
 		
 		$settings = get_option('arlo_settings');
 	
@@ -2082,6 +2084,7 @@ class Arlo_For_Wordpress {
 					'post_content' 	=> $page['content']
 				));
 				
+				/*
 				if(isset($page['child_post_type'])) {
 					foreach(self::$post_types as $id => $type) {
 						if($page['child_post_type'] == $id) {
@@ -2089,6 +2092,7 @@ class Arlo_For_Wordpress {
 						}
 					}
 				}
+				*/
 			}
 		}
 	
