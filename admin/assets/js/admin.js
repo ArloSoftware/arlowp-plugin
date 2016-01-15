@@ -9,13 +9,13 @@
 			selectedTemplate = event;
 		}
 		
-		$('.arlo_template_section .' + selectedTemplate).show();
+		$('.arlo_pages_section .' + selectedTemplate).show();
 
 		// show template editor on select change
 
 		$('#arlo-template-select select').on('change', function() {
 			var temp = '.'+$(this).val();
-			$('.arlo_template_section > [class^="arlo"]').hide();
+			$('.arlo_pages_section > [class^="arlo"]').hide();
 			//tinyMCE.DOM.setStyle(tinyMCE.DOM.get($(this).val() + '_ifr'), 'height', '400px');
 			$(temp).show();
 		});

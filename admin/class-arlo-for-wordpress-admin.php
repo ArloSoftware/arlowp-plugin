@@ -392,14 +392,23 @@ class Arlo_For_Wordpress_Admin {
 		foreach ( (array) $wp_settings_fields[$page][$section] as $field ) {
 			$field['args']['label_for'] = !empty($field['args']['label_for']) ? $field['args']['label_for'] : "";
 			echo '<div class="'.ARLO_PLUGIN_PREFIX.'-field-wrap cf '.ARLO_PLUGIN_PREFIX.'-'. strtolower(esc_attr($field['args']['label_for'])).'">';
-			if ( !empty($field['args']['label_for']) )
-				echo '<div class="'.ARLO_PLUGIN_PREFIX.'-label"><label for="' . esc_attr( $field['args']['label_for'] ) . '">' . $field['title'] . '</label>';
-			else
-				echo '<div class="'.ARLO_PLUGIN_PREFIX.'-label"><label>' . $field['title'] . '</label>';
+				
 			if($field['callback'][1] == 'arlo_template_callback') {
+				echo '<div class="'.ARLO_PLUGIN_PREFIX.'-label">';
+				
+				if (in_array($field['id'], array('eventsearch', 'upcoming', 'events', 'presenters', 'venues'))) {
+					echo '<label>' . __("Page setup", $this->plugin_slug) . '</label>';
+				}				
+			
 				$path = ARLO_PLUGIN_DIR.'admin/includes/codes/'.$field['id'].'.php';
 				if(file_exists($path)) include($path);
+			} else {
+				echo '<div class="'.ARLO_PLUGIN_PREFIX.'-label"><label>' . $field['title'] . '</label>';
 			}
+			
+			
+			
+			
 			echo '</div>';
 			echo '<div class="'.ARLO_PLUGIN_PREFIX.'-field">';
 			call_user_func($field['callback'], $field['args']);

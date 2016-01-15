@@ -44,13 +44,13 @@ class Arlo_For_Wordpress_Settings {
 		
 		if(isset($_GET['arlo-import'])) {
 			$_SESSION['arlo-import'] = $plugin->import(true);
-			wp_redirect( admin_url( 'options-general.php?page=arlo-for-wordpress'));
+			wp_redirect( admin_url( 'admin.php?page=arlo-for-wordpress'));
 			exit;
 		}
 		                
 		if(isset($_GET['load-demo'])) {
 			$plugin->load_demo();
-			wp_redirect( admin_url( 'options-general.php?page=arlo-for-wordpress'));
+			wp_redirect( admin_url( 'admin.php?page=arlo-for-wordpress'));
 			exit;
 		}		
 				
@@ -144,52 +144,18 @@ class Arlo_For_Wordpress_Settings {
                 );
                 
 		
-		// create Cron field
-		//add_settings_field('arlo_cron', __('Cron Status',$this->plugin_slug), array($this, 'arlo_cron_callback'), $this->plugin_slug, 'arlo_general_section', array('id'=>'arlo_cron', 'label'=>__('I have setup my own Cron jobs', $this->plugin_slug)));
-		
-
 		/*
 		 *
-		 * Post Type Settings
+		 * Page Section Settings
 		 *
 		 */ 
 		 
-		$page_setup_section_id = 'arlo_page_setup';
-		add_settings_section( $page_setup_section_id, __('Page setup', $this->plugin_slug), null, $this->plugin_slug );		 
-
-		// post type settings
-	    foreach(Arlo_For_Wordpress::$post_types as $id => $post_type) {
-	    
-	    	// post type slug
-			add_settings_field(
-				'arlo_'.$id.'_posts_page',
-				'<label for="arlo_'.$id.'_posts_page">'.__($post_type['singular_name'], $this->plugin_slug).'</label>',
-				array(
-					$this,
-					'arlo_posts_page_callback'
-				),
-				$this->plugin_slug,
-				$page_setup_section_id,
-				array(
-					'id'		=> $id,
-					'label_for' => $post_type['singular_name']
-				)
-			);
-	    }
-
-		/*
-		 *
-		 * Template Settings
-		 *
-		 */
-
-		// create a section for Templates
-		add_settings_section( 'arlo_template_section', __('Templates',$this->plugin_slug), array($this, 'arlo_template_section_callback'), $this->plugin_slug );
+		add_settings_section('arlo_pages_section', __('Pages', $this->plugin_slug), array($this, 'arlo_pages_section_callback'), $this->plugin_slug );
 
 		// loop though slug array and create each required slug field
 	    foreach(Arlo_For_Wordpress::$templates as $id => $template) {
 	    	$name = __($template['name'], $this->plugin_slug);
-			add_settings_field( $id, '<label for="'.$id.'">'.$name.'</label>', array($this, 'arlo_template_callback'), $this->plugin_slug, 'arlo_template_section', array('id'=>$id,'label_for'=>$id) );
+			add_settings_field( $id, '<label for="'.$id.'">'.$name.'</label>', array($this, 'arlo_template_callback'), $this->plugin_slug, 'arlo_pages_section', array('id'=>$id,'label_for'=>$id) );
 		}
 	}
 
@@ -200,7 +166,7 @@ class Arlo_For_Wordpress_Settings {
 	 */
 
 
-	function arlo_template_section_callback() {
+	function arlo_pages_section_callback() {
 		$settings = get_option('arlo_settings');
 		$output = '<div id="'.ARLO_PLUGIN_PREFIX.'-template-select" class="cf">';
 		$output .= '<select name="arlo_settings[template]">';
@@ -274,33 +240,40 @@ class Arlo_For_Wordpress_Settings {
                     
 	    echo $html;
 	} 	
-	
-	   
-
-	function arlo_posts_page_callback($args) {
-	    $settings = get_option('arlo_settings');
-	    $val = isset($settings['post_types'][$args['id']]['posts_page']) ? esc_attr($settings['post_types'][$args['id']]['posts_page']) : 0;
-
-		$html = wp_dropdown_pages(array(
-			'id'				=> 'arlo_'.$args['id'].'_posts_page',
-		    'selected'         	=> $val,
-		    'echo'             	=> 0,
-		    'name'             	=> 'arlo_settings[post_types]['.$args['id'].'][posts_page]',
-		    'show_option_none'	=> '-- Select --',
-		    'option_none_value'	=> 0
-		));
-
-	    echo $html;
-	}
 
 	function arlo_template_callback($args) {
-	    $settings = get_option('arlo_settings');
-	    $val = isset($settings['templates'][$args['id']]['html']) ? $settings['templates'][$args['id']]['html'] : '';
-	    $this->arlo_reload_template_callback($args['id'], $settings);
-	    wp_editor($val, $args['id'], array('textarea_name'=>'arlo_settings[templates]['.$args['id'].'][html]','textarea_rows'=>'20'));
+		$id = $args['id'];
+		$settings = get_option('arlo_settings');
+		
+		/*
+		HACK because the keys in the $post_types arrays are bad, couldn't change because backward comp.
+		*/
+		if (in_array($id, array('eventsearch', 'upcoming', 'events', 'presenters', 'venues'))) {
+			$post_type_id = !in_array($id, array('eventsearch','upcoming')) ? str_replace('s', "", $id) : $id;
+		}
+	
+    	if (!empty($post_type_id) && !empty(Arlo_For_Wordpress::$post_types[$post_type_id])) {
+    		$post_type = Arlo_For_Wordpress::$post_types[$post_type_id];
+		    $val = isset($settings['post_types'][$post_type_id]['posts_page']) ? esc_attr($settings['post_types'][$post_type_id]['posts_page']) : 0;
+	
+			$select = wp_dropdown_pages(array(
+				'id'				=> 'arlo_'.$post_type_id.'_posts_page',
+			    'selected'         	=> $val,
+			    'echo'             	=> 0,
+			    'name'             	=> 'arlo_settings[post_types]['.$post_type_id.'][posts_page]',
+			    'show_option_none'	=> '-- Select --',
+			    'option_none_value'	=> 0
+			));
+	
+			echo '<div class="arlo-page-select">' . $select . '</div>';
+    	}
+	    
+	    $val = isset($settings['templates'][$id]['html']) ? $settings['templates'][$id]['html'] : '';
+	    $this->arlo_reload_template($id, $settings);
+	    wp_editor($val, $id, array('textarea_name'=>'arlo_settings[templates]['.$id.'][html]','textarea_rows'=>'20'));
 	}
 	
-	function arlo_reload_template_callback($template, $settings) {
+	function arlo_reload_template($template, $settings) {
 	    echo '<div class="cf">
 	    		<div class="' . ARLO_PLUGIN_PREFIX . '-sub-template-select">';
 	    if (!empty(Arlo_For_Wordpress::$templates[$template])) {

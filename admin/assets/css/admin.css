@@ -111,7 +111,7 @@
 	margin-bottom: 1em;
 }
 /* only hide the editors if javascript is enabled */
-.js .arlo_template_section > [class^='arlo'] {
+.js .arlo_pages_section > [class^='arlo'] {
 	display: none;
 }
 
