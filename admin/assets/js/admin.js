@@ -4,6 +4,7 @@
 	$(function () {
 	
 		var pluginSlug = 'arlo-for-wordpress';
+		var editor = null;
 	
 		//show the selected template editor
 		var selectedTemplate = $('#arlo-template-select select').val();
@@ -23,6 +24,18 @@
 		});
 
 		// basic validation
+		
+		function initCodeMirror() {
+			if (editor === null) {			
+				editor = CodeMirror.fromTextArea( 
+					document.getElementById( "arlo_customcss" ), 
+					{
+						lineNumbers: true, 
+						lineWrapping: true
+					}
+				);		
+			}
+		}
 
 		// add novalidate to disable html5 validation, the html5 validation will still work if javascript is disabled
 		$(document).ready(function() {
@@ -30,7 +43,7 @@
 			$('.arlo-section').hide();
 			
 			var tabID = document.location.hash.replace('#', '');
-			showNavTab(tabID);
+			showNavTab(tabID);			
 		});
 		
 		function showNavTab(tabID) {
@@ -43,6 +56,10 @@
 			
 			$('.arlo_' + tabID + '_section').show();
 			$('#' + pluginSlug + '-tab-' + tabID).addClass('nav-tab-active');
+			
+			if (tabID == 'customcss') {
+				initCodeMirror();
+			}
 		}
 		
 		//nav-bar

@@ -87,7 +87,7 @@ class Arlo_For_Wordpress_Settings {
                 );                
                 
         if (!empty($settings['platform_name'])) {
-			// create lat import text
+			// create last import text
 			add_settings_field(
                         'arlo_last_import', 
                         '<label for="arlo_last_import">'.__('Last import', $this->plugin_slug).'</label>', 
@@ -150,13 +150,22 @@ class Arlo_For_Wordpress_Settings {
 		 *
 		 */ 
 		 
-		add_settings_section('arlo_pages_section', __('Pages', $this->plugin_slug), array($this, 'arlo_pages_section_callback'), $this->plugin_slug );
+		add_settings_section('arlo_pages_section', null, array($this, 'arlo_pages_section_callback'), $this->plugin_slug );
 
 		// loop though slug array and create each required slug field
 	    foreach(Arlo_For_Wordpress::$templates as $id => $template) {
 	    	$name = __($template['name'], $this->plugin_slug);
 			add_settings_field( $id, '<label for="'.$id.'">'.$name.'</label>', array($this, 'arlo_template_callback'), $this->plugin_slug, 'arlo_pages_section', array('id'=>$id,'label_for'=>$id) );
 		}
+		
+		/*
+		 *
+		 * CustomCSS Section Settings
+		 *
+		 */ 
+		 
+		add_settings_section('arlo_customcss_section', null, null, $this->plugin_slug );				
+		add_settings_field( 'arlo_customcss', null, array($this, 'arlo_simple_textarea_callback'), $this->plugin_slug, 'arlo_customcss_section', array('id'=>'customcss') );
 	}
 
 	/*
@@ -191,6 +200,25 @@ class Arlo_For_Wordpress_Settings {
 	 * FIELD CALLBACKS
 	 *
 	 */
+	 
+	function arlo_simple_textarea_callback($args) {
+	    $settings = get_option('arlo_settings');
+	    $val = (isset($settings[$args['id']])) ? esc_attr($settings[$args['id']]) : (!empty($args['default_val']) ? $args['default_val'] : '' );
+	    
+	    $html = '';
+	        
+        if (!empty($args['before_html'])) {
+            $html .= $args['before_html'];
+        }
+            
+	    $html .= '<textarea cols="70" rows="30" class="' . (!empty($args['class']) ? $args['class'] : "") . '" id="arlo_'.$args['id'].'" name="arlo_settings['.$args['id'].']" >'.$val.'</textarea>';
+            
+        if (!empty($args['after_html'])) {
+            $html .= $args['after_html'];
+        }
+            
+	    echo $html;
+	}	 
         
 	function arlo_price_setting_callback() {
 		$settings = get_option('arlo_settings');
