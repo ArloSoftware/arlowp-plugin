@@ -3,6 +3,8 @@
 
 	$(function () {
 	
+		var pluginSlug = 'arlo-for-wordpress';
+	
 		//show the selected template editor
 		var selectedTemplate = $('#arlo-template-select select').val();
 		if (selectedTemplate == '') {
@@ -25,7 +27,29 @@
 		// add novalidate to disable html5 validation, the html5 validation will still work if javascript is disabled
 		$(document).ready(function() {
 			$('#arlo-settings').attr('novalidate','novalidate');
+			$('.arlo-section').hide();
+			
+			var tabID = document.location.hash.replace('#', '');
+			showNavTab(tabID);
 		});
+		
+		function showNavTab(tabID) {
+			$('.arlo-section').hide();
+			$('.nav-tab').removeClass('nav-tab-active');
+
+			if ($('.arlo_' + tabID + '_section').length == 0) {
+				tabID = 'general';
+			}
+			
+			$('.arlo_' + tabID + '_section').show();
+			$('#' + pluginSlug + '-tab-' + tabID).addClass('nav-tab-active');
+		}
+		
+		//nav-bar
+		$('.nav-tab').click(function() {
+			var tabID = $(this).attr('id').split('-').pop();
+			showNavTab(tabID);
+		});		
 
 		// on field blur
 		$('.arlo-validate').on('blur', function() {

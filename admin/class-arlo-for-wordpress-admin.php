@@ -76,7 +76,7 @@ class Arlo_For_Wordpress_Admin {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_pointers' ) );
 
-		// Add the options page and menu item.
+		// Add the admin page and menu item.
 		add_action( 'admin_menu', array( $this, 'add_plugin_admin_menu' ) );
 
 		// Add an action link pointing to the options page.
@@ -258,7 +258,7 @@ class Arlo_For_Wordpress_Admin {
 		*/
 
 
-		$this->plugin_screen_hook_suffix = add_menu_page( 'Arlo settings page', 'Arlo', 'manage_options', $this->plugin_slug, array( $this, 'display_plugin_admin_page' ), 'none', '10.4837219128727371208127' ); 
+		$this->plugin_screen_hook_suffix = add_menu_page( 'Arlo settings page', 'Arlo', 'manage_options', $this->plugin_slug, array( $this, 'display_plugin_admin_page' ), 'none', '10.4837219128727371208127' );
 	}
 
 	/**
