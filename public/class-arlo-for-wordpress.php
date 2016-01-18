@@ -272,6 +272,8 @@ class Arlo_For_Wordpress {
 		add_filter( 'cron_schedules', array( $this, 'add_cron_schedules' ) ); 
 		add_action( 'arlo_import', array( $this, 'cron_import' ) );
 		
+		//load custom css
+		add_action( 'wp_head', array( $this, 'load_custom_css' ) );
 
 		// GP: Check if the scheduled task is entered. If it does not exist set it. (This ensures it is in as long as the plugin is activated.  
 		if ( ! wp_next_scheduled('arlo_import')) {
@@ -554,6 +556,28 @@ class Arlo_For_Wordpress {
 	public function enqueue_styles() {
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css?20112015', __FILE__ ), array(), self::VERSION );
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-darktooltip', plugins_url( 'assets/css/libs/darktooltip.min.css', __FILE__ ), array(), self::VERSION );
+		
+		$customcss_load_type = get_option('arlo_customcss');
+		if ($customcss_load_type == 'file') {
+			wp_enqueue_style( $this->plugin_slug .'-custom-styles', plugins_url( 'assets/css/custom.css', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );		
+		}	
+	}
+	
+	
+	/**
+	 * Register and enqueue public-facing style sheet.
+	 *
+	 * @since    2.2.0
+	 */
+	public function load_custom_css() {
+		$customcss_load_type = get_option('arlo_customcss');
+		if ($customcss_load_type !== 'file') {
+			$settings = get_option('arlo_settings');
+			
+			if (!empty($settings['customcss'])) {
+				echo "\n<style>\n" . $settings['customcss'] . "\n</style>\n";
+			}
+		}
 	}
 
 	/**

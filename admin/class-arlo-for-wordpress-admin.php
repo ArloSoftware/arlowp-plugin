@@ -84,16 +84,6 @@ class Arlo_For_Wordpress_Admin {
 		add_filter( 'plugin_action_links_' . $plugin_basename, array( $this, 'add_action_links' ) );
 
 		add_filter ( 'user_can_richedit' , array( $this, 'disable_visual_editor') , 50 );
-
-
-		/*
-		 * Define custom functionality.
-		 *
-		 * Read more about actions and filters:
-		 * http://codex.wordpress.org/Plugin_API#Hooks.2C_Actions_and_Filters
-		 */
-		add_action( '@TODO', array( $this, 'action_method_name' ) );
-		add_filter( '@TODO', array( $this, 'filter_method_name' ) );
 		
 		add_action( 'update_option_arlo_settings', array($this, 'settings_saved') );
 		
@@ -165,7 +155,7 @@ class Arlo_For_Wordpress_Admin {
 		}
 		
 		wp_enqueue_style( $this->plugin_slug .'-admin-public-styles', plugins_url( 'assets/css/admin_public.css', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );		
-
+		
 		$screen = get_current_screen();	
 		
 		if ( $this->plugin_screen_hook_suffix == $screen->id ) {
@@ -452,6 +442,25 @@ class Arlo_For_Wordpress_Admin {
 			update_user_meta($user->ID, $notice_id, 1);			
 		}
 		
+		update_option('arlo_customcss', 'inline');
+		
+		$access_type = get_filesystem_method();
+		if($access_type === 'direct') {
+
+			$creds = request_filesystem_credentials(site_url() . '/wp-admin/', '', false, false, array());
+
+			if (WP_Filesystem($creds)) {
+				global $wp_filesystem;
+				
+				$filename = trailingslashit(plugin_dir_path( __FILE__ )).'../public/assets/css/custom.css';
+				if ($wp_filesystem->put_contents( $filename, $new['customcss'], FS_CHMOD_FILE)) {
+					update_option('arlo_customcss', 'file');
+				} 
+			}
+				
+		}
+		
+				
 		// need to check for posts-page change here
 		// loop through each post type and check if the posts-page has changed
 		foreach($new['post_types'] as $id => $post_type) {

@@ -16,7 +16,7 @@ class Arlo_For_Wordpress_Settings {
 		if (!session_id()) {
 			session_start();
 		}
-		
+				
 		// allocates the wp-options option key value pair that will store the plugin settings
 		register_setting( 'arlo_settings', 'arlo_settings' );		
 
@@ -302,6 +302,7 @@ class Arlo_For_Wordpress_Settings {
 	}
 	
 	function arlo_reload_template($template, $settings) {
+	
 	    echo '<div class="cf">
 	    		<div class="' . ARLO_PLUGIN_PREFIX . '-sub-template-select">';
 	    if (!empty(Arlo_For_Wordpress::$templates[$template])) {
