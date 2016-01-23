@@ -7,10 +7,7 @@
 		var editor = null;
 	
 		//show the selected template editor
-		var selectedTemplate = $('#arlo-template-select select').val();
-		if (selectedTemplate == '') {
-			selectedTemplate = event;
-		}
+		var selectedTemplate = 'arlo-event';
 		
 		$('.arlo_pages_section .' + selectedTemplate).show();
 
@@ -48,7 +45,7 @@
 		
 		function showNavTab(tabID) {
 			$('.arlo-section').hide();
-			$('.nav-tab').removeClass('nav-tab-active');
+			$('.nav-tab.main-tab').removeClass('nav-tab-active');
 
 			if ($('.arlo_' + tabID + '_section').length == 0) {
 				tabID = 'general';
@@ -62,11 +59,28 @@
 			}
 		}
 		
+		function showVerticalNavTab(tabID) {
+			$('.arlo_pages_section .arlo-field-wrap').hide();
+			$('.arlo_pages_section nav-tab').removeClass('nav-tab-active');
+
+			if ($('.arlo-' + tabID).length == 0) {
+				tabID = selectedTemplate;
+			}
+			
+			$('.arlo_pages_section .arlo-' + tabID).show();
+			$('#' + pluginSlug + '-pages-' + tabID).addClass('nav-tab-active');			
+		}		
+		
 		//nav-bar
-		$('.nav-tab').click(function() {
+		$('.nav-tab.main-tab').click(function() {
 			var tabID = $(this).attr('id').split('-').pop();
 			showNavTab(tabID);
 		});		
+		
+		$('.arlo_pages_section .nav-tab').click(function() {
+			var tabID = $(this).attr('id').split('-').pop();
+			showVerticalNavTab(tabID);
+		});			
 
 		// on field blur
 		$('.arlo-validate').on('blur', function() {

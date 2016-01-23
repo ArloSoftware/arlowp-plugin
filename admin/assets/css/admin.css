@@ -9,12 +9,6 @@
 	background: transparent url(../img/icon-20x20.png) no-repeat center;
 }
 
-
-/* based on desired max width - menu sidebar width: 180px as of WP 3.9 */
-.arlo-sections-wrap {
-	max-width: 820px;
-}
-
 .arlo-section {
 	position: relative;
 	border-bottom: 1px solid #ddd;
@@ -172,6 +166,23 @@ table.arlo-welcome td.logo {
 	padding-top: 15px;
 }
 
+.arlo-template-table {
+	width: 100%;
+}
+
+.arlo-template-table td {
+	padding: 0.5em;
+}
+
+.arlo-template-table td:first-of-type {
+	width: 145px;
+	vertical-align: top;
+	border-right: 1px solid #ccc;
+	padding-right: 0;
+}
+
+
+
 /* clearing for divs containing floated elements */
 
 .cf:before,
@@ -182,7 +193,24 @@ table.arlo-welcome td.logo {
 
 .cf:after {
     clear: both;
+}
+
+/* vertical tab */
+.nav-tab-wrapper.vertical-nav-tab-wrapper {
+	border-bottom: 0;
+	padding: 10px 0;
+}
+
+.nav-tab.vertical-nav-tab {
+	display: block;
+	border: 1px solid #ccc;
+	border-right: none;	
+	margin-right: 1px;
 }	
+
+.nav-tab.vertical-nav-tab.nav-tab-active {
+	border-right: 1px solid #f1f1f1;
+}
 
 /* media queries, these match the wordpress admin breakpoints as of WP 3.9 */
 

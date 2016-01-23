@@ -176,23 +176,11 @@ class Arlo_For_Wordpress_Settings {
 
 
 	function arlo_pages_section_callback() {
-		$settings = get_option('arlo_settings');
-		$output = '<div id="'.ARLO_PLUGIN_PREFIX.'-template-select" class="cf">';
-		$output .= '<select name="arlo_settings[template]">';
-		
-	    foreach(Arlo_For_Wordpress::$templates as $id => $template) {
-	    	$name = __($template['name'], $this->plugin_slug);
-	    	$selected = (!empty($settings['template']) && $settings['template'] == 'arlo-'.$id ? 'selected' : '');
-			$output .= '<option value="'.ARLO_PLUGIN_PREFIX.'-'.$id.'" ' . $selected . '>'.$name.'</option>';
-	    }
-
-		$output .= '</select></div>
+		echo '
 	    		<script type="text/javascript"> 
 	    			var arlo_blueprints = ' . json_encode($this->arlo_template_source()) . ';
 	    		</script>		
 		';
-		
-		echo $output;
 	}
 
 	/*
