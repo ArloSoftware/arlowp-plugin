@@ -384,7 +384,7 @@ class Arlo_For_Wordpress_Admin {
 
 		foreach ( (array) $wp_settings_fields[$page][$section] as $field ) {
 			$field['args']['label_for'] = !empty($field['args']['label_for']) ? $field['args']['label_for'] : "";
-			echo '<div class="'.ARLO_PLUGIN_PREFIX.'-field-wrap cf '.ARLO_PLUGIN_PREFIX.'-'. strtolower(esc_attr($field['args']['label_for'])).'">';
+			echo '<div class="' . ARLO_PLUGIN_PREFIX.'-field-wrap cf ' . ARLO_PLUGIN_PREFIX . '-' . strtolower(esc_attr($field['args']['label_for'])).'">';
 				
 			if($field['callback'][1] == 'arlo_template_callback') {
 			
@@ -395,7 +395,7 @@ class Arlo_For_Wordpress_Admin {
 								<h2 class="nav-tab-wrapper vertical-nav-tab-wrapper">';
 								    foreach(Arlo_For_Wordpress::$templates as $id => $template) {
 								    	$name = __($template['name'], $this->plugin_slug);
-										echo '<a href="#pages/'.$id.'" class="nav-tab vertical-nav-tab" id="'.ARLO_PLUGIN_PREFIX.'-pages-' . $id . '">'.$name.'</a>';
+										echo '<a href="#pages/'.$id.'" class="nav-tab vertical-nav-tab ' . $this->plugin_slug . '-pages-' . $id . '" id="' . $this->plugin_slug . '-pages-' . $id . '">'.$name.'</a>';
 								    }				
 								echo '</h2>							
 							</td>
@@ -406,10 +406,10 @@ class Arlo_For_Wordpress_Admin {
 										echo '<label>' . __("Page setup", $this->plugin_slug) . '</label>';
 									}
 									
-									$path = ARLO_PLUGIN_DIR.'admin/includes/codes/'.$field['id'].'.php';
+									$path = ARLO_PLUGIN_DIR . 'admin/includes/codes/' . $field['id'] . '.php';
 									if(file_exists($path)) include($path);																			
 								echo '</div>
-								<div class="'.ARLO_PLUGIN_PREFIX.'-field">';
+								<div class="' . ARLO_PLUGIN_PREFIX . '-field">';
 								call_user_func($field['callback'], $field['args']);
 								echo '</div>									
 							</td>
@@ -419,8 +419,8 @@ class Arlo_For_Wordpress_Admin {
 							  
 			} else {
 				echo '
-					<div class="'.ARLO_PLUGIN_PREFIX.'-label"><label>' . $field['title'] . '</label></div>
-					<div class="'.ARLO_PLUGIN_PREFIX.'-field">';
+					<div class="' . ARLO_PLUGIN_PREFIX . '-label"><label>' . $field['title'] . '</label></div>
+					<div class="' . ARLO_PLUGIN_PREFIX . '-field">';
 					call_user_func($field['callback'], $field['args']);
 				echo '</div>
 				';

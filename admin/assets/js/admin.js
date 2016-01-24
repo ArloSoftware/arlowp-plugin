@@ -5,6 +5,7 @@
 	
 		var pluginSlug = 'arlo-for-wordpress';
 		var editor = null;
+		var tabIDs = document.location.hash.replace('#', '').split('/');
 	
 		//show the selected template editor
 		var selectedTemplate = 'arlo-event';
@@ -39,13 +40,16 @@
 			$('#arlo-settings').attr('novalidate','novalidate');
 			$('.arlo-section').hide();
 			
-			var tabID = document.location.hash.replace('#', '');
-			showNavTab(tabID);			
+			showNavTab(tabIDs[0]);
+			
+			if (typeof tabIDs[1] !== 'undefined') {
+				showVerticalNavTab(tabIDs[1]);
+			}
 		});
 		
 		function showNavTab(tabID) {
 			$('.arlo-section').hide();
-			$('.nav-tab.main-tab').removeClass('nav-tab-active');
+			$('.nav-tab-wrapper.main-tab .nav-tab').removeClass('nav-tab-active');
 
 			if ($('.arlo_' + tabID + '_section').length == 0) {
 				tabID = 'general';
@@ -54,25 +58,35 @@
 			$('.arlo_' + tabID + '_section').show();
 			$('#' + pluginSlug + '-tab-' + tabID).addClass('nav-tab-active');
 			
-			if (tabID == 'customcss') {
-				initCodeMirror();
+			switch (tabID) {
+				case 'customcss':
+					initCodeMirror();
+				break;
+				
+				case 'pages':
+					if (typeof(tabIDs[1]) === 'undefined') {
+						document.location.hash += '/event';
+						showVerticalNavTab('event');
+					}
+					
+				break;
 			}
 		}
 		
 		function showVerticalNavTab(tabID) {
 			$('.arlo_pages_section .arlo-field-wrap').hide();
-			$('.arlo_pages_section nav-tab').removeClass('nav-tab-active');
+			$('.arlo_pages_section .nav-tab').removeClass('nav-tab-active');
 
 			if ($('.arlo-' + tabID).length == 0) {
 				tabID = selectedTemplate;
 			}
 			
 			$('.arlo_pages_section .arlo-' + tabID).show();
-			$('#' + pluginSlug + '-pages-' + tabID).addClass('nav-tab-active');			
+			$('.arlo-' + tabID + ' .' + pluginSlug + '-pages-' + tabID).addClass('nav-tab-active');			
 		}		
 		
 		//nav-bar
-		$('.nav-tab.main-tab').click(function() {
+		$('.nav-tab-wrapper.main-tab .nav-tab').click(function() {
 			var tabID = $(this).attr('id').split('-').pop();
 			showNavTab(tabID);
 		});		
@@ -81,63 +95,8 @@
 			var tabID = $(this).attr('id').split('-').pop();
 			showVerticalNavTab(tabID);
 		});			
-
-		// on field blur
-		$('.arlo-validate').on('blur', function() {
-			arloValidate(this);
-		});
-
-		// after set period after last keypress
-		$('.arlo-validate').on('keyup', function() {
-			var el = this;
-			delay(function(){
-				arloValidate(el);
-			}, 1000 );
-		});
-
-		// on form submit
-		$('#arlo-settings').on('submit', function(e) {
-
-			// check each field
-			$('.arlo-validate').each(function() {
-				arloValidate(this);
-			});
-
-			var valid = true;
-			
-			// if any fields are invalid...
-			if($('.arlo-validate.invalid').length > 0) {
-				valid = false;
-				$('.invalid').first().focus();
-			}
-			return valid;
-		});
-
-		// checks the input value against the specified pattern
-		function arloValidate(el) {
-
-			if($(el).attr('required') !== undefined || $(el).val() != '') {
-				var val = $(el).val();
-				var pattern = new RegExp($(el).attr('pattern'));
-				if(pattern.test(val)) {
-					$(el).removeClass('invalid');
-				} else {
-					$(el).addClass('invalid');
-				}
-			}
-		}
-
-		// delay function for keyup events
-		var delay = (function(){
-			var timer = 0;
-			return function(callback, ms){
-				clearTimeout (timer);
-				timer = setTimeout(callback, ms);
-			};
-		})();
 		
-		// show confirm message to reload the template from the blueprint
-		
+		// show confirm message to reload the template from the blueprint		
 		$('.arlo-reload-template').on('click', function() {
 			arloReloadTemplateConfirm()
 		});

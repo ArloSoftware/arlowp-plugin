@@ -19,7 +19,7 @@
 		<form id="<?php echo ARLO_PLUGIN_PREFIX; ?>-settings" method="post" action="options.php">
 			<h2 class="nav-tab-wrapper main-tab">
 				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#welcome" class="nav-tab" id="<?=$this->plugin_slug?>-tab-welcome">Welcome</a>
-				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#general" class="nav-tab nav-tab-active" id="<?=$this->plugin_slug?>-tab-general">General</a>
+				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#general" class="nav-tab" id="<?=$this->plugin_slug?>-tab-general">General</a>
 				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#pages" class="nav-tab" id="<?=$this->plugin_slug?>-tab-pages">Pages</a>
 				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#customcss" class="nav-tab" id="<?=$this->plugin_slug?>-tab-customcss">Custom CSS</a>
 			</h2>		
