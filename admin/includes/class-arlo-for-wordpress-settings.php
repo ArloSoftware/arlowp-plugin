@@ -166,6 +166,15 @@ class Arlo_For_Wordpress_Settings {
 		 
 		add_settings_section('arlo_customcss_section', null, null, $this->plugin_slug );				
 		add_settings_field( 'arlo_customcss', null, array($this, 'arlo_simple_textarea_callback'), $this->plugin_slug, 'arlo_customcss_section', array('id'=>'customcss') );
+		
+		/*
+		 *
+		 * Welcome Section Settings
+		 *
+		 */ 
+		 
+		add_settings_section('arlo_welcome_section', null, null, $this->plugin_slug );				
+		add_settings_field( 'arlo_customcss', null, array($this, 'arlo_welcome_callback'), $this->plugin_slug, 'arlo_welcome_section', array('id'=>'welcome') );
 	}
 
 	/*
@@ -182,7 +191,7 @@ class Arlo_For_Wordpress_Settings {
 	    		</script>		
 		';
 	}
-
+	
 	/*
 	 *
 	 * FIELD CALLBACKS
@@ -245,7 +254,7 @@ class Arlo_For_Wordpress_Settings {
         }
             
 	    echo $html;
-	}  
+	}  	
 	
 	function arlo_simple_text_callback($args) {
 	    $html = '';
@@ -341,6 +350,15 @@ class Arlo_For_Wordpress_Settings {
 			return file_get_contents($path);
 		}
 	}
+	
+	function arlo_welcome_callback($args) {
+	    echo '
+	    <h3>What\'s new in this release</h3>
+	    <p>
+	    bla bla bla
+	    </p>
+	    ';
+	} 	
 	
 }
 
