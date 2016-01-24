@@ -77,16 +77,16 @@
 	width: 70%;
 }
 
-.settings_page_arlo-for-wordpress p.webinar {
+.toplevel_page_arlo-for-wordpress p.webinar {
 	color: #ccc;
 }
 
-.settings_page_arlo-for-wordpress p.webinar span {
+.toplevel_page_arlo-for-wordpress p.webinar span {
 	color: #444;
 }
 
-.settings_page_arlo-for-wordpress p.webinar img, 
-.settings_page_arlo-for-wordpress p.developer img {
+.toplevel_page_arlo-for-wordpress p.webinar img, 
+.toplevel_page_arlo-for-wordpress p.developer img {
 	vertical-align: middle;
 	margin: 0px 6px;
 }

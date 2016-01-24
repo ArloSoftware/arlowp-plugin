@@ -180,7 +180,7 @@
 		}
 		
 		//dismissible admin notices
-		jQuery('.settings_page_arlo-for-wordpress .notice.is-dismissible .notice-dismiss').click(function() {
+		jQuery('.toplevel_page_arlo-for-wordpress .notice.is-dismissible .notice-dismiss').click(function() {
 			var id = jQuery(this).parent().attr('id');
 			if (id != null) {
 				var data = {
