@@ -131,8 +131,8 @@ function arlo_child_categories($cats, $depth=0) {
  */
 function arlo_create_filter($type, $items, $label=null) {
 	if(is_null($label)) $label = $type;
-	$filter_html = '<select id="arlo-filter-'.$type.'" name="arlo-'.$type.'">';
-	$filter_html .= '<option value="">'.sprintf(__('Filter by %s', $GLOBALS['arlo_plugin_slug']), $label).'</option>';
+	$filter_html = '<select id="arlo-filter-' . $type . '" name="arlo-' . $type . '">';
+	$filter_html .= '<option value="">' . $label . '</option>';
 	$selected_value = isset($_GET['arlo-' . $type]) ? urldecode($_GET['arlo-' . $type]) : '';
 		
 	foreach($items as $key => $item) {
@@ -146,7 +146,7 @@ function arlo_create_filter($type, $items, $label=null) {
 		
 		$selected = (strlen($selected_value) && $selected_value == $item['value']) ? ' selected="selected"' : '';
 		
-		$filter_html .= '<option value="'.$item['value'].'"'.$selected.'>';
+		$filter_html .= '<option value="' . $item['value'] . '"' . $selected.'>';
 		$filter_html .= $item['string'];
 		$filter_html .= '</option>';
 
@@ -1596,7 +1596,7 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 				$cats = \Arlo\Categories::getTree();
 				
 				if (is_array($cats)) {
-					$filter_html .= arlo_create_filter('category', arlo_child_categories($cats[0]->children), __('category', $GLOBALS['arlo_plugin_slug']));
+					$filter_html .= arlo_create_filter('category', arlo_child_categories($cats[0]->children), __('All categories', $GLOBALS['arlo_plugin_slug']));
 				}
 				
 				break;
@@ -1605,7 +1605,7 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 
 				// delivery select
 
-				$filter_html .= arlo_create_filter($filter, Arlo_For_Wordpress::$delivery_labels, __('delivery', $GLOBALS['arlo_plugin_slug']));
+				$filter_html .= arlo_create_filter($filter, Arlo_For_Wordpress::$delivery_labels, __('All delivery options', $GLOBALS['arlo_plugin_slug']));
 
 				break;				
 
@@ -1632,7 +1632,7 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 					);
 				}
 
-				$filter_html .= arlo_create_filter($filter, $locations, __('location', $GLOBALS['arlo_plugin_slug']));
+				$filter_html .= arlo_create_filter($filter, $locations, __('All locations', $GLOBALS['arlo_plugin_slug']));
 
 				break;
 				
@@ -1662,7 +1662,7 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 					);
 				}
 
-				$filter_html .= arlo_create_filter($filter, $tags, __('template tag', $GLOBALS['arlo_plugin_slug']));				
+				$filter_html .= arlo_create_filter($filter, $tags, __('Select tag', $GLOBALS['arlo_plugin_slug']));				
 				
 				break;
 
@@ -2504,7 +2504,7 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 				$cats = \Arlo\Categories::getTree();
 
 				if (is_array($cats)) {
-					$filter_html .= arlo_create_filter($filter, arlo_child_categories($cats[0]->children), __('category', $GLOBALS['arlo_plugin_slug']));					
+					$filter_html .= arlo_create_filter($filter, arlo_child_categories($cats[0]->children), __('All categories', $GLOBALS['arlo_plugin_slug']));					
 				}
 
 				break;
@@ -2513,7 +2513,7 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 
 				// delivery select
 
-				$filter_html .= arlo_create_filter($filter, Arlo_For_Wordpress::$delivery_labels, __('delivery', $GLOBALS['arlo_plugin_slug']));
+				$filter_html .= arlo_create_filter($filter, Arlo_For_Wordpress::$delivery_labels, __('All delivery options', $GLOBALS['arlo_plugin_slug']));
 
 				break;
 								
@@ -2533,7 +2533,7 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 
 				}
 
-				$filter_html .= arlo_create_filter($filter, $months, __('month', $GLOBALS['arlo_plugin_slug']));
+				$filter_html .= arlo_create_filter($filter, $months, __('All months', $GLOBALS['arlo_plugin_slug']));
 
 				break;
 
@@ -2560,7 +2560,7 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 					);
 				}
 
-				$filter_html .= arlo_create_filter($filter, $locations, __('location', $GLOBALS['arlo_plugin_slug']));
+				$filter_html .= arlo_create_filter($filter, $locations, __('All locations', $GLOBALS['arlo_plugin_slug']));
 
 				break;
 				
@@ -2590,7 +2590,7 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 					);
 				}
 
-				$filter_html .= arlo_create_filter($filter, $tags, __('event tag', $GLOBALS['arlo_plugin_slug']));				
+				$filter_html .= arlo_create_filter($filter, $tags, __('Select tag', $GLOBALS['arlo_plugin_slug']));				
 				
 				break;				
 
