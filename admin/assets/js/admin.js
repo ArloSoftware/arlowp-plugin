@@ -135,8 +135,8 @@
 		
 		// reload the template from the blueprint
 		function arloReloadTemplate() {
-			var template = $('#arlo-template-select > select').val();
-			var templateSufix = $(".arlo-sub-template-select > select:visible").val();			
+			var template = jQuery('.arlo-field-wrap:visible').attr('id');
+			var templateSufix = $(".arlo-sub-template-select:visible > select:visible").val();			
 			var editor = $('#' + template.replace("arlo-",""));
 			
 			if (typeof templateSufix !== "undefined" && templateSufix.length > 0) {
