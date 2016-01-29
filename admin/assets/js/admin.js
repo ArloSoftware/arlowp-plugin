@@ -67,6 +67,8 @@
 					if (typeof(tabIDs[1]) === 'undefined') {
 						document.location.hash += '/event';
 						showVerticalNavTab('event');
+					} else {
+						showVerticalNavTab(tabIDs[1]);
 					}
 					
 				break;
@@ -83,7 +85,19 @@
 			
 			$('.arlo_pages_section .arlo-' + tabID).show();
 			$('.arlo-' + tabID + ' .' + pluginSlug + '-pages-' + tabID).addClass('nav-tab-active');			
-		}		
+		}	
+		
+		//go to the pages section
+		$('#arlo-pages-setup').click(function() {
+			tabIDs = ['pages','events'];
+			showNavTab(tabIDs[0]);
+		});	
+		
+		//go to the general section
+		$('#arlo-connet-platform').click(function () {
+			tabIDs = ['general'];
+			showNavTab(tabIDs[0]);			
+		});
 		
 		//nav-bar
 		$('.nav-tab-wrapper.main-tab .nav-tab').click(function() {

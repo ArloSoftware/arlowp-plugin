@@ -40,6 +40,8 @@ class Arlo_For_Wordpress_Settings {
 			if ($show_notice) {
 				add_action( 'admin_notices', array($plugin, "posttype_notice") );
 			}
+			
+			add_action( 'admin_notices', array($plugin, "connected_platform_notice") );
 		}
 		
 		if(isset($_GET['arlo-import'])) {

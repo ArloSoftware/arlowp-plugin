@@ -2065,10 +2065,37 @@ class Arlo_For_Wordpress {
 	public static function posttype_notice() {
 		echo '
 		<div class="error notice">
-			<p><strong>' . __("Page setup required.", self::get_instance()->plugin_slug) . '</strong> ' . __('Arlo for WordPress requires you to setup the pages which will host event information.', self::get_instance()->plugin_slug ) .' '. sprintf(__('<a href="%s">Setup pages</a>', self::get_instance()->plugin_slug), admin_url('options-general.php?page=arlo-for-wordpress#arlo_noevent_text')) . '</p>
+			<p><strong>' . __("Page setup required.", self::get_instance()->plugin_slug) . '</strong> ' . __('Arlo for WordPress requires you to setup the pages which will host event information.', self::get_instance()->plugin_slug ) .' '. sprintf(__('<a href="%s" id="arlo-pages-setup">Setup pages</a>', self::get_instance()->plugin_slug), admin_url('admin.php?page=arlo-for-wordpress#pages/events')) . '</p>
 			<p>' . sprintf(__('<a target="_blank" href="%s">View documentation</a> for more information.', self::get_instance()->plugin_slug), 'http://developer.arlo.co/doc/wordpress/index#pages-and-post-types') . '</p>
 	    </div>
 		';
+	}
+	
+	public static function connected_platform_notice() {
+		$settings = get_option('arlo_settings');
+		echo '
+			<div class="notice arlo-connected-message"> 
+				<p>
+					Arlo is connected to <strong>' . $settings['platform_name'] . '</strong> <span class="arlo-block">Last synchronyzed: ' . self::get_instance()->get_last_import() . '</span> 
+					<a class="arlo-block" href="?page=arlo-for-wordpress&arlo-import">Synchronize now</a>
+				</p>
+			</div>
+		';
+		
+		if (strtolower($settings['platform_name']) === "websitetestdata") {
+			echo '
+				<div class="notice updated"> 
+					<p>
+						<strong>Connected to demo data</strong>  Your site is currently using demo event, presenter, and venue data. Start an Arlo trial to load your own events!
+					</p>
+					<p>
+						<a class="button button-primary" href="https://www.arlo.co/register">Get started with free Arlo trial</a>&nbsp;&nbsp;&nbsp;&nbsp;
+						<a class="button button-primary arlo-block" href="#general" target="_blank" id="arlo-connet-platform">Connect existing Arlo platform</a>
+					</p>
+				</div>
+			';
+			
+		}
 	}		
 	
 	

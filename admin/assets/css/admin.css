@@ -181,7 +181,20 @@ table.arlo-welcome td.logo {
 	padding-right: 0;
 }
 
+.arlo-block {
+	display: inline-block;
+}
 
+.notice.arlo-connected-message {
+	background: none;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	border: none;
+}
+
+.arlo-connected-message .arlo-block {
+	margin-left: 1em;
+}
 
 /* clearing for divs containing floated elements */
 
