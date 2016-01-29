@@ -214,7 +214,7 @@ class Arlo_For_Wordpress_Admin {
 		 * $pointerAlign: How the pointer is aligned to the target element. Optional, defaults to 'center'
 		 */
 
-		$pointer = new Feature_Pointer('arlo-1st-pointer', '#menu-settings', __('Arlo',$this->plugin_slug), __('Arlo is almost ready. Just enter your details and you&apos;re good to go.',$this->plugin_slug), 'left', 'center');
+		$pointer = new Feature_Pointer('arlo-1st-pointer', '#toplevel_page_arlo-for-wordpress', __('Arlo for WordPress',$this->plugin_slug), __('Arlo is almost ready. Just enter your details and you&apos;re good to go.',$this->plugin_slug), 'left', 'center');
 
 	}
 
@@ -272,7 +272,7 @@ class Arlo_For_Wordpress_Admin {
 
 		return array_merge(
 			array(
-				'settings' => '<a href="' . admin_url( 'options-general.php?page=' . $this->plugin_slug ) . '">' . __( 'Settings', $this->plugin_slug ) . '</a>'
+				'settings' => '<a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug ) . '">' . __( 'Settings', $this->plugin_slug ) . '</a>'
 			),
 			$links
 		);
