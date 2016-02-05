@@ -9,6 +9,10 @@
 	background: transparent url(../img/icon-20x20.png) no-repeat center;
 }
 
+.arlo-error {
+	border: 1px solid red;
+}
+
 .arlo-section {
 	position: relative;
 	border-bottom: 1px solid #ddd;
@@ -220,11 +224,13 @@ table.arlo-welcome td.logo {
 	border: 1px solid #ccc;
 	border-right: none;	
 	margin-right: 1px;
+	margin-bottom: 3px;
 }	
 
 .nav-tab.vertical-nav-tab.nav-tab-active {
 	border-right: 1px solid #f1f1f1;
 	margin-right: -1px;
+	margin-bottom: 3px;
 }
 
 /* media queries, these match the wordpress admin breakpoints as of WP 3.9 */

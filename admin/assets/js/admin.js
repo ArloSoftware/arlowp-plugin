@@ -87,16 +87,37 @@
 			$('.arlo-' + tabID + ' .' + pluginSlug + '-pages-' + tabID).addClass('nav-tab-active');			
 		}	
 		
+		function markPageSetupError() {
+			$('.arlo-page-select > select').each(function() {
+				if ($(this).val() == '' || $(this).val() == '0') {
+					$(this).addClass('arlo-error');
+				}
+			});
+		}
+		
 		//go to the pages section
-		$('#arlo-pages-setup').click(function() {
+		$('.arlo-pages-setup').click(function() {
 			tabIDs = ['pages','events'];
 			showNavTab(tabIDs[0]);
+			markPageSetupError();
+			scrollTo(0,10000);
 		});	
+		
+		//remove error from the select
+		$('.arlo-page-select > select').change(function() {
+			if ($(this).val() == '' || $(this).val() == '0') {
+				$(this).addClass('arlo-error');
+			} else {
+				$(this).removeClass('arlo-error');
+			}
+		});
 		
 		//go to the general section
 		$('#arlo-connet-platform').click(function () {
 			tabIDs = ['general'];
-			showNavTab(tabIDs[0]);			
+			showNavTab(tabIDs[0]);	
+			scrollTo(0,10000);
+			$('#arlo_platform_name').focus().select();	
 		});
 		
 		//nav-bar

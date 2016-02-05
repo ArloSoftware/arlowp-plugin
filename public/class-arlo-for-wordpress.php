@@ -1965,7 +1965,7 @@ class Arlo_For_Wordpress {
 						__('Venue information', self::get_instance()->plugin_slug), 					
 						$venues->guid,  
 						__('Venues list', self::get_instance()->plugin_slug)
-					) . '</p><p>' . __('Edit the page <a href="#arlo-template-select">templates</a> for each of these websites pages below.') . '</p>';
+					) . '</p><p>' . __('Edit the page <a href="#pages" class="arlo-pages-setup">templates</a> for each of these websites pages below.') . '</p>';
 					
 					echo '
 					<div class="' . (count($error) ? "error" : "") . ' notice is-dismissible" id="' . $notice_id . '">
@@ -2065,7 +2065,7 @@ class Arlo_For_Wordpress {
 	public static function posttype_notice() {
 		echo '
 		<div class="error notice">
-			<p><strong>' . __("Page setup required.", self::get_instance()->plugin_slug) . '</strong> ' . __('Arlo for WordPress requires you to setup the pages which will host event information.', self::get_instance()->plugin_slug ) .' '. sprintf(__('<a href="%s" id="arlo-pages-setup">Setup pages</a>', self::get_instance()->plugin_slug), admin_url('admin.php?page=arlo-for-wordpress#pages/events')) . '</p>
+			<p><strong>' . __("Page setup required.", self::get_instance()->plugin_slug) . '</strong> ' . __('Arlo for WordPress requires you to setup the pages which will host event information.', self::get_instance()->plugin_slug ) .' '. sprintf(__('<a href="%s" class="arlo-pages-setup">Setup pages</a>', self::get_instance()->plugin_slug), admin_url('admin.php?page=arlo-for-wordpress#pages/events')) . '</p>
 			<p>' . sprintf(__('<a target="_blank" href="%s">View documentation</a> for more information.', self::get_instance()->plugin_slug), 'http://developer.arlo.co/doc/wordpress/index#pages-and-post-types') . '</p>
 	    </div>
 		';
@@ -2090,7 +2090,7 @@ class Arlo_For_Wordpress {
 					</p>
 					<p>
 						<a class="button button-primary" href="https://www.arlo.co/register">Get started with free Arlo trial</a>&nbsp;&nbsp;&nbsp;&nbsp;
-						<a class="button button-primary arlo-block" href="#general" target="_blank" id="arlo-connet-platform">Connect existing Arlo platform</a>
+						<a class="button button-primary arlo-block" href="#general" id="arlo-connet-platform">Connect existing Arlo platform</a>
 					</p>
 				</div>
 			';
