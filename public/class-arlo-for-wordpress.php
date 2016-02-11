@@ -1334,7 +1334,7 @@ class Arlo_For_Wordpress {
 		);
 		
 		$table_name = "{$wpdb->prefix}arlo_presenters";
-		
+				
 		if(!empty($items)) {
 			foreach($items as $item) {
 				$slug = sanitize_title($item->PresenterID . ' ' . $item->FirstName . ' ' . $item->LastName);
