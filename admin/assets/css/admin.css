@@ -9,6 +9,15 @@
 	background: transparent url(../img/icon-20x20.png) no-repeat center;
 }
 
+.arlo-gray {
+	color: #ccc;
+}
+
+.arlo-inlineblock {
+	display: inline-block;
+	margin: 0 0.5em;
+}
+
 .arlo-error {
 	border: 1px solid red;
 }
@@ -95,6 +104,11 @@
 	margin: 0px 6px;
 }
 
+.wp-editor-wrap {
+	margin-top: 1em;
+}
+
+
 /* hide the template edit select box if no javascript */
 .no-js #arlo-template-select {
 	display: none;
@@ -157,13 +171,14 @@
 
 .arlo-reload-template {
 	cursor: pointer;
-	float: right;
+	display: inline-block;
+	line-height: 2em;
 }
 
 .arlo-sub-template-select {
-	float: right;
+	display: inline-block;
+	margin-right: 1em;
 }
-
 
 table.arlo-welcome td.logo {
 	width: 80px;
@@ -233,6 +248,35 @@ table.arlo-welcome td.logo {
 	margin-bottom: 3px;
 }
 
+.arlo-template-table .arlo-label + .arlo-field.arlo-template-field,
+.arlo-template-table .arlo-template-field .arlo-label.arlo-full-width {
+	width: 100%;
+}
+
+.arlo-template-table .arlo-template-field .arlo-label.arlo-full-width label {
+	font-weight: normal;
+}
+
+.arlo-template-table .arlo-template-field .wp-editor-wrap {
+	float: left;
+	width: 68%;
+}
+
+.arlo-template-table .arlo-template-field .arlo-shortcodes {
+	float: right;
+	width: 28%;
+}
+
+.arlo-template-table .arlo-template-field .arlo-shortcodes h4 {
+	margin-bottom: 0.5em;
+}
+
+.arlo-template-table .arlo-template-field .arlo-shortcodes .arlo-codes {
+	margin-top: 2em;
+}
+
+
+
 /* media queries, these match the wordpress admin breakpoints as of WP 3.9 */
 
 @media only screen and (min-width: 601px) {
@@ -240,6 +284,7 @@ table.arlo-welcome td.logo {
 }
 
 @media only screen and (min-width: 783px) {
+	
 	.arlo-label {
 		float: left;
 		width: 30%;
@@ -249,6 +294,16 @@ table.arlo-welcome td.logo {
 		float: left;
 		width: 70%;
 	}
+	
+	.arlo-template-table .arlo-template-field .arlo-label {
+		float: left;
+		width: 20%;
+	}
+
+	.arlo-template-table .arlo-template-field .arlo-label + .arlo-field {
+		float: left;
+		width: 80%;
+	}	
 
 	.arlo-check input {
 		margin: 6px 10px 6px 0;

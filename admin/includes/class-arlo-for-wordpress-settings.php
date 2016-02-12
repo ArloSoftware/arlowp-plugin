@@ -273,11 +273,14 @@ class Arlo_For_Wordpress_Settings {
 		$id = $args['id'];
 		$settings = get_option('arlo_settings');
 		
+		echo '<h3>' . sprintf(__('%s page', $this->plugin_slug), Arlo_For_Wordpress::$templates[$id]['name']) . '</h3>';
+		
 		/*
 		HACK because the keys in the $post_types arrays are bad, couldn't change because backward comp.
 		*/
+		
 		if (in_array($id, array('eventsearch', 'upcoming', 'events', 'presenters', 'venues'))) {
-			$post_type_id = !in_array($id, array('eventsearch','upcoming')) ? str_replace('s', "", $id) : $id;
+			$post_type_id = !in_array($id, array('eventsearch','upcoming')) ? substr($id, 0, strlen($id)-1) : $id;
 		}
 	
     	if (!empty($post_type_id) && !empty(Arlo_For_Wordpress::$post_types[$post_type_id])) {
@@ -293,38 +296,54 @@ class Arlo_For_Wordpress_Settings {
 			    'option_none_value'	=> 0
 			));
 	
-			echo '<div class="arlo-page-select">' . $select . '</div>';
+			echo '
+			<div class="arlo-label"><label>' .  __("Host page", $this->plugin_slug) . '</label></div>
+			<div class="arlo-field">
+				<span class="arlo-page-select">' . $select . '</span>
+				<span class="arlo-gray arlo-inlineblock">' . sprintf(__('Page must contain the %s shortcode', $this->plugin_slug), Arlo_For_Wordpress::$templates[$id]['shortcode']) . '</span>
+			</div>';
     	}
 	    
 	    $val = isset($settings['templates'][$id]['html']) ? $settings['templates'][$id]['html'] : '';
+	    
+	    
 	    $this->arlo_reload_template($id, $settings);
+	    
+	    echo '<div class="arlo-label arlo-full-width">
+	    		<label>
+	    		' . sprintf(__('%s page', $this->plugin_slug), Arlo_For_Wordpress::$templates[$id]['name'], Arlo_For_Wordpress::$templates[$id]['shortcode']) . '
+	    		' . (!empty(Arlo_For_Wordpress::$templates[$id]['shortcode']) ? 'shortcode <span class="arlo-gray">' . Arlo_For_Wordpress::$templates[$id]['shortcode'] . '</span>' : '') . ' content
+	    		</label>
+	    	</div>';
+	    	
 	    wp_editor($val, $id, array('textarea_name'=>'arlo_settings[templates]['.$id.'][html]','textarea_rows'=>'20'));
 	}
 	
 	function arlo_reload_template($template, $settings) {
 	
-	    echo '<div class="cf">
-	    		<div class="' . ARLO_PLUGIN_PREFIX . '-sub-template-select">';
-	    if (!empty(Arlo_For_Wordpress::$templates[$template])) {
-			$template_definition = Arlo_For_Wordpress::$templates[$template];
-			if (isset($template_definition['sub']) && is_array($template_definition['sub'])) {
-				echo '<strong>'. __('Style and layout', $this->plugin_slug) . '</strong> &nbsp;';
-			    echo '<select name="arlo_settings[subtemplate]['.$template.']">';
-			    foreach ($template_definition['sub'] as $k => $v) {
-			    	$selected = (!empty($settings['subtemplate'][$template]) && $settings['subtemplate'][$template] == $k ? 'selected' : '');
-			    	echo '<option value="' . $k . '" '.$selected.'>' . $v . '</option>';
-			    }
-		    				
-		    	echo '</select>';
-			}	    
-	    }
-	    		
 	    echo '
-	    		</div>
+	    	<div class="arlo-label">
+	    		<label>'. __('Style and layout', $this->plugin_slug) . '</label>
 	    	</div>
-	    	<div class="cf">
+	    	<div class="arlo-field">';
+				    if (!empty(Arlo_For_Wordpress::$templates[$template])) {
+						$template_definition = Arlo_For_Wordpress::$templates[$template];
+						if (isset($template_definition['sub']) && is_array($template_definition['sub'])) {
+							echo '<div class="' . ARLO_PLUGIN_PREFIX . '-sub-template-select">
+								<select name="arlo_settings[subtemplate]['.$template.']">';
+						    foreach ($template_definition['sub'] as $k => $v) {
+						    	$selected = (!empty($settings['subtemplate'][$template]) && $settings['subtemplate'][$template] == $k ? 'selected' : '');
+						    	echo '<option value="' . $k . '" '.$selected.'>' . $v . '</option>';
+						    }
+					    				
+					    	echo '</select>
+					    	</div>';
+						}	    
+				    }	    	
+				echo '
 	    		<div class="' . ARLO_PLUGIN_PREFIX . '-reload-template"><a>' . __('Reload original template', $this->plugin_slug) . '</a></div>
-	    	</div>';
+	    	</div>
+	    	<div class="cf"></div>';
 	}
 	
 	function arlo_template_source() {

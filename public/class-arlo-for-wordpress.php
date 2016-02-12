@@ -207,14 +207,17 @@ class Arlo_For_Wordpress {
 		),
 		'events' => array(
 			'id' => 'events',
-			'name' => 'Catalogue'			
+			'shortcode' => '[arlo_event_template_list]',
+			'name' => 'Catalogue'
 		),
 		'eventsearch' => array(
 			'id' => 'eventsearch',
+			'shortcode' => '[arlo_event_template_search_list]',
 			'name' => 'Event search list'
 		),
 		'upcoming' => array(
 			'id' => 'upcoming',
+			'shortcode' => '[arlo_upcoming_list]',
 			'name' => 'Upcoming event list',
 			'sub' => array(
 				'' => 'List',
@@ -227,6 +230,7 @@ class Arlo_For_Wordpress {
 		),
 		'presenters' => array(
 			'id' => 'presenters',
+			'shortcode' => '[arlo_presenter_list]',
 			'name' => 'Presenter list'
 		),
 		'venue' => array(
@@ -235,6 +239,7 @@ class Arlo_For_Wordpress {
 		),
 		'venues' => array(
 			'id' => 'venues',
+			'shortcode' => '[arlo_venue_list]',
 			'name' => 'Venue list'
 		),
     );

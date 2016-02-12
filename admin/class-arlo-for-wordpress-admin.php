@@ -378,10 +378,6 @@ class Arlo_For_Wordpress_Admin {
 		if ( ! isset( $wp_settings_fields[$page][$section] ) )
 			return;
 					
-		if ($section == 'arlo_template_section') {
-			echo '<h5>' . __('Available shortcodes', $this->plugin_slug) . '</h5>';
-		}
-
 		foreach ( (array) $wp_settings_fields[$page][$section] as $field ) {
 			$field['args']['label_for'] = !empty($field['args']['label_for']) ? $field['args']['label_for'] : "";
 			echo '<div class="' . ARLO_PLUGIN_PREFIX.'-field-wrap cf ' . ARLO_PLUGIN_PREFIX . '-' . strtolower(esc_attr($field['args']['label_for'])) . '" id="' . ARLO_PLUGIN_PREFIX . '-' . strtolower(esc_attr($field['args']['label_for'])) . '">';
@@ -401,16 +397,19 @@ class Arlo_For_Wordpress_Admin {
 							</td>
 							
 							<td>
-								<div class="'.ARLO_PLUGIN_PREFIX.'-label">';
-									if (in_array($field['id'], array('eventsearch', 'upcoming', 'events', 'presenters', 'venues'))) {
-										echo '<label>' . __("Page setup", $this->plugin_slug) . '</label>';
+								<div class="' . ARLO_PLUGIN_PREFIX . '-field ' . ARLO_PLUGIN_PREFIX . '-template-field">';
+									call_user_func($field['callback'], $field['args']);
+								
+									$path = ARLO_PLUGIN_DIR . 'admin/includes/codes/' . $field['id'] . '.php';
+									if(file_exists($path)) {
+										echo '<div class="' . ARLO_PLUGIN_PREFIX . '-shortcodes">
+											<h3>' . __( 'Recommended shortcodes', $this->plugin_slug ) . '</h3>
+											<a href="http://developer.arlo.co/doc/wordpress/shortcodes/" target="_blank">' . __( 'More about shortcodes', $this->plugin_slug ) . '</a>';
+										
+										include($path);
+										echo '</div>';
 									}
 									
-									$path = ARLO_PLUGIN_DIR . 'admin/includes/codes/' . $field['id'] . '.php';
-									if(file_exists($path)) include($path);																			
-								echo '</div>
-								<div class="' . ARLO_PLUGIN_PREFIX . '-field">';
-								call_user_func($field['callback'], $field['args']);
 								echo '</div>									
 							</td>
 						</tr>
