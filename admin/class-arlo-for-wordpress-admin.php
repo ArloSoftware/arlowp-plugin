@@ -41,6 +41,7 @@ class Arlo_For_Wordpress_Admin {
 	 */
 	protected $plugin_screen_hook_suffix = null;
 	protected $plugin_venues_screen_hook_suffix = null;
+	protected $plugin_presenters_screen_hook_suffix = null;
 
 	/**
 	 * Initialize the plugin by loading admin scripts & styles and adding a
@@ -151,7 +152,7 @@ class Arlo_For_Wordpress_Admin {
 	 */
 	public function enqueue_admin_styles() {
 
-		if ( ! isset( $this->plugin_screen_hook_suffix ) || !isset($this->plugin_venues_screen_hook_suffix) ) {
+		if ( ! isset( $this->plugin_screen_hook_suffix ) || !isset($this->plugin_venues_screen_hook_suffix) || !isset($this->plugin_presenters_screen_hook_suffix)) {
 			return;
 		}
 		
@@ -159,7 +160,7 @@ class Arlo_For_Wordpress_Admin {
 		
 		$screen = get_current_screen();	
 		
-		if ( in_array($screen->id, [$this->plugin_screen_hook_suffix, $this->plugin_venues_screen_hook_suffix])) {
+		if ( in_array($screen->id, [$this->plugin_screen_hook_suffix, $this->plugin_venues_screen_hook_suffix, $this->plugin_presenters_screen_hook_suffix])) {
 			wp_enqueue_style( $this->plugin_slug .'-admin-styles', plugins_url( 'assets/css/admin.css', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );
 			
 			if ($screen->id == $this->plugin_screen_hook_suffix) {
@@ -255,7 +256,9 @@ class Arlo_For_Wordpress_Admin {
 		*/
 		
 		$this->plugin_screen_hook_suffix = add_menu_page( 'Arlo settings page', 'Arlo settings', 'manage_options', $this->plugin_slug, array( $this, 'display_plugin_admin_page' ), 'none', '10.4837219128727371208127' );
+		$this->plugin_presenters_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Presenters', $this->plugin_slug ), __( 'Presenters', $this->plugin_slug ) , 'manage_options' , $this->plugin_slug . '-presenters' , array( $this, 'display_presenters_admin_page'));
 		$this->plugin_venues_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Venues', $this->plugin_slug ), __( 'Venues', $this->plugin_slug ) , 'manage_options' , $this->plugin_slug . '-venues' , array( $this, 'display_venues_admin_page'));
+
 	}
 
 	/**
@@ -275,10 +278,19 @@ class Arlo_For_Wordpress_Admin {
 	public function display_venues_admin_page() {
 	 	require_once 'includes/class-arlo-for-wordpress-venues.php';
  
- 		$venues = new Arlo_For_Wordpress_Venues();
+ 		$list = new Arlo_For_Wordpress_Venues();
 	
-		include_once( 'views/venues.php' );
+		include_once( 'views/list.php' );
 	}	
+	
+	public function display_presenters_admin_page() {
+	 	require_once 'includes/class-arlo-for-wordpress-presenters.php';
+ 
+ 		$list = new Arlo_For_Wordpress_Presenters();
+	
+		include_once( 'views/list.php' );
+	}	
+	
 
 	/**
 	 * Add settings action link to the plugins page.

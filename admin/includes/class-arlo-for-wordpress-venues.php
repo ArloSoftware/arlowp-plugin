@@ -9,27 +9,20 @@
  * @copyright 2016 Arlo
  */
  
-if(!class_exists('WP_List_Table')){
-	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
-}
+require_once 'class-arlo-for-wordpress-lists.php';
+ 
 
-class Arlo_For_Wordpress_Venues extends WP_List_Table  {
-	private $wpdb;
+class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 
-	public function __construct() {
-		global $wpdb;
+	public function __construct() {		
+		$this->singular = __( 'Venue', $this->plugin_slug );		
+		$this->plural = __( 'Venues', $this->plugin_slug );
+
+		parent::__construct();		
+	}
 	
-		$plugin = Arlo_For_Wordpress::get_instance();
-		$this->plugin_slug = $plugin->get_plugin_slug();
-		$this->version = Arlo_For_Wordpress::VERSION;	
-		$this->wpdb = &$wpdb;
-
-		parent::__construct( [
-			'singular' => __( 'Venue', $this->plugin_slug ),
-			'plural'   => __( 'Venues', $this->plugin_slug ),
-			'ajax'     => false
-		] );
-
+	public function set_table_name() {
+		$this->table_name = $this->wpdb->prefix . 'arlo_venues';
 	}
 	
 	public function get_columns() {
@@ -58,20 +51,6 @@ class Arlo_For_Wordpress_Venues extends WP_List_Table  {
 		);
 	}
 	
-	private function get_orderby_columnname($orderby) {
-		$orderby = (!empty($_GET['orderby']) ? $_GET['orderby'] : '');
-		$columns = $this->_column_headers[2];
-		
-		if (!empty($orderby)) {
-			foreach ($columns as $field_name => $data) {
-				if ($data[0] == $orderby)
-					return $field_name;
-			}
-		}
-		
-		return '';
-	}	
-	
 	public function column_default($item, $column_name) {
 		switch ($column_name) {
 			case 'v_name':
@@ -96,32 +75,20 @@ class Arlo_For_Wordpress_Venues extends WP_List_Table  {
 				
 				break;
 			default:
-				return print_r( $item, true ); //Show the whole array for troubleshooting purposes
+				return '';
 			}
 	}
 	
-	function column_v_name($item) {
-		$settings = get_option('arlo_settings');
-		
+	public function column_v_name($item) {
 		$actions = array(
-            'edit' => sprintf('<a href="https://my.arlo.co/%s/Venues/Venue.aspx?id=%d">Edit</a>',$settings['platform_name'],$item->v_arlo_id),
+            'edit' => sprintf('<a href="https://my.arlo.co/%s/Venues/Venue.aspx?id=%d">Edit</a>', $this->platform_name, $item->v_arlo_id),
         );
 
 		return sprintf('%1$s %2$s', $item->v_name, $this->row_actions($actions) );
-	}	
-		
-	public function prepare_items() {
-		$perpage = get_option('posts_per_page');
-		
-		$columns = $this->get_columns();
-        $hidden = $this->get_hidden_columns();
-        $sortable = $this->get_sortable_columns();
-        $this->_column_headers = array($columns, $hidden, $sortable);
-        
-        $orderby = $this->get_orderby_columnname();
-        $order = (!empty($_GET['order']) && in_array(strtolower($_GET['order']), ['asc','desc']) ? $_GET['order'] : '');
-		
-		$sql = "
+	}
+	
+	public function get_sql_query() {
+		return "
 		SELECT
 			v_arlo_id,
 			v_name,
@@ -139,26 +106,9 @@ class Arlo_For_Wordpress_Venues extends WP_List_Table  {
 			v_facilityinfoparking,
 			v_post_name
 		FROM
-			{$this->wpdb->prefix}arlo_venues
+			". $this->table_name . "
 		";
-		
-		if (!empty($orderby)) {
-			$sql .= " ORDER BY " . $orderby ." ". $order;
-		}
-		
-		$num = $this->wpdb->num_rows;
-		
-		$this->set_pagination_args( array(
-			"total_items" => $num,
-			"total_pages" => ceil($num/$perpage),
-			"per_page" => $perpage,
-      	));		
-      	
-      	$items = $this->wpdb->get_results($sql);
-      	
-      			
-		$this->items = $items;
-	}	
+	}		
 }
 
 ?>
