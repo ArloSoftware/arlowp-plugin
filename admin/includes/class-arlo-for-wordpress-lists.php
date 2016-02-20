@@ -105,6 +105,8 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
         
 		$sql = $this->get_sql_query();
 		
+		var_dump($sql);
+		
 		if (!empty($this->orderby)) {
 			$sql .= " ORDER BY " . $this->orderby ." ". $this->order;
 		}
