@@ -82,6 +82,7 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 	public function column_v_name($item) {
 		$actions = array(
             'edit' => sprintf('<a href="https://my.arlo.co/%s/Venues/Venue.aspx?id=%d">Edit</a>', $this->platform_name, $item->v_arlo_id),
+            'view' => sprintf('<a href="%s" target="_blank">View</a>', $item->guid),
         );
 
 		return sprintf('%1$s %2$s', $item->v_name, $this->row_actions($actions) );
@@ -93,6 +94,7 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 	
 		return "
 		SELECT
+			guid,
 			v_arlo_id,
 			v_name,
 			v_physicaladdressline1,
@@ -110,6 +112,10 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 			v_post_name
 		FROM
 			". $this->table_name . "
+		LEFT JOIN 
+			" . $this->wpdb->prefix . "posts
+		ON
+			post_name = v_post_name
 		WHERE
 			" . $where . "			
 		";

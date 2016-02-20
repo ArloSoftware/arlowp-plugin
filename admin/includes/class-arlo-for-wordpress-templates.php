@@ -71,6 +71,7 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 	function column_et_code($item) {
 		$actions = array(
             'edit' => sprintf('<a href="https://my.arlo.co/%s/Templates/Template.aspx?id=%d">Edit</a>', $this->platform_name, $item->et_arlo_id),
+            'view' => sprintf('<a href="%s" target="_blank">View</a>', $item->guid),
         );
         
 		return sprintf('%1$s %2$s', $item->et_code, $this->row_actions($actions) );
@@ -86,6 +87,7 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 	
 		return "
 		SELECT
+			guid,
 			et.et_arlo_id,
 			et.et_code,
 			et.et_name,
@@ -98,6 +100,10 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 			" . $this->wpdb->prefix . "arlo_events
 		USING 
 			(et_arlo_id)
+		LEFT JOIN 
+			" . $this->wpdb->prefix . "posts
+		ON
+			post_name = et_post_name			
 		WHERE
 			" . $where . "
 		GROUP BY

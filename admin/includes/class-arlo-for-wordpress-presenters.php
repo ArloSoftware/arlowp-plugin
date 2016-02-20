@@ -67,7 +67,8 @@ class Arlo_For_Wordpress_Presenters extends Arlo_For_Wordpress_Lists  {
 	
 	function column_name($item) {
 		$actions = array(
-            'edit' => sprintf('<a href="https://my.arlo.co/%s/Users/User.aspx?id=%d">Edit</a>', $this->platform_name, $item->p_arlo_id),
+            'edit' => sprintf('<a href="https://my.arlo.co/%s/Users/User.aspx?id=%d" target="_blank">Edit</a>', $this->platform_name, $item->p_arlo_id),
+            'view' => sprintf('<a href="%s" target="_blank">View</a>', $item->guid),
         );
         
 		return sprintf('%1$s %2$s', $item->p_firstname . ' ' . $item->p_lastname, $this->row_actions($actions) );
@@ -79,6 +80,7 @@ class Arlo_For_Wordpress_Presenters extends Arlo_For_Wordpress_Lists  {
 	
 		return "
 		SELECT
+			guid,
 			p_arlo_id,
 			p_firstname,
 			p_lastname,
@@ -91,6 +93,10 @@ class Arlo_For_Wordpress_Presenters extends Arlo_For_Wordpress_Lists  {
 			p_post_name
 		FROM
 			". $this->table_name . "
+		LEFT JOIN 
+			" . $this->wpdb->prefix . "posts
+		ON
+			post_name = p_post_name
 		WHERE
 			" . $where . "			
 		";
