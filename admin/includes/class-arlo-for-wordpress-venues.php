@@ -88,6 +88,9 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 	}
 	
 	public function get_sql_query() {
+		$where = $this->get_sql_where();
+		$where = implode(" AND ", $where);	
+	
 		return "
 		SELECT
 			v_arlo_id,
@@ -107,6 +110,8 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 			v_post_name
 		FROM
 			". $this->table_name . "
+		WHERE
+			" . $where . "			
 		";
 	}		
 }
