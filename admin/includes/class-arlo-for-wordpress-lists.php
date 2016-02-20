@@ -22,11 +22,15 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	protected $orderby;
 	protected $paged;
 	protected $table_name;
+	protected $active;
 	
 	const PERPAGE = 15;
 
 	public function __construct() {
 		$this->init_variables();	
+		
+		$this->_column_headers = array($this->get_columns(), $this->get_hidden_columns(), $this->get_sortable_columns());
+		
 		$this->init_sql_variables();
 		$this->set_table_name();
 
@@ -42,7 +46,8 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	
 		$plugin = Arlo_For_Wordpress::get_instance();
 		$settings = get_option('arlo_settings');
-
+		
+		$this->active = $plugin->last_imported;
 		$this->plugin_slug = $plugin->get_plugin_slug();
 		$this->version = Arlo_For_Wordpress::VERSION;	
 		$this->wpdb = &$wpdb;
@@ -60,7 +65,7 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	private function get_orderby_columnname() {
 		$orderby = (!empty($_GET['orderby']) ? $_GET['orderby'] : '');
 		$columns = $this->_column_headers[2];
-		
+				
 		if (!empty($orderby)) {
 			foreach ($columns as $field_name => $data) {
 				if ($data[0] == $orderby)
@@ -91,16 +96,18 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 		
 		return 0;
 	}
+	
+	protected function get_sql_where() {
+		return ["active = '" . $this->active . "'"];
+	}
 		
 	public function prepare_items() {
-        $this->_column_headers = array($this->get_columns(), $this->get_hidden_columns(), $this->get_sortable_columns());
         
 		$sql = $this->get_sql_query();
 		
 		if (!empty($this->orderby)) {
 			$sql .= " ORDER BY " . $this->orderby ." ". $this->order;
 		}
-		
 		
 		$limit = ($this->paged-1) * self::PERPAGE;
 		$sql .= ' LIMIT ' . $limit . ',' . self::PERPAGE;
