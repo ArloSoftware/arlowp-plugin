@@ -80,6 +80,14 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 	protected function get_sql_where() {
 		return ["et.active = '" . $this->active . "'"];
 	}
+	
+	protected function get_searchable_fields() {
+		return [
+			'et.e_name',
+			'et.e_code',
+			'et.et_descriptionsummary',
+		];
+	}	
 		
 	public function get_sql_query() {
 		$where = $this->get_sql_where();

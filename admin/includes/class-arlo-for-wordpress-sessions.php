@@ -88,7 +88,7 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 			}
 	}
 	
-	function column_e_code($item) {
+	public function column_e_code($item) {
 		$actions = array(
             'edit' => sprintf('<a href="https://my.arlo.co/%s/Courses/Course.aspx?id=%d">Edit</a>', $this->platform_name, $item->e_parent_arlo_id)
         );
@@ -100,6 +100,16 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 		return [
 			"es.active = '" . $this->active . "'",
 			"es.e_parent_arlo_id != 0"
+		];
+	}
+	
+	protected function get_searchable_fields() {
+		return [
+			'e.e_name',
+			'es.e_code',
+			'es.e_name',
+			'es.e_locationname',
+			'es.e_locationroomname',
 		];
 	}
 		

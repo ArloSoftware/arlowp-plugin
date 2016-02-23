@@ -46,6 +46,16 @@ class Arlo_For_Wordpress_Presenters extends Arlo_For_Wordpress_Lists  {
 			'name' => array( 'name', true ),
 		);
 	}
+		
+	protected function get_searchable_fields() {
+		return [
+			'p_firstname',
+			'p_lastname',
+			'p_profile',
+			'p_qualifications',
+			'p_interests',
+		];
+	}	
 	
 	public function column_default($item, $column_name) {
 		switch ($column_name) {

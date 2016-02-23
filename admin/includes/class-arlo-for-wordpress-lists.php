@@ -88,6 +88,11 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 			" . $this->table_name . "
 		";
 		
+		$where = $this->get_sql_search_where();	
+		if (count($where))
+			$sql .= "AND (" . implode(" OR ", $where) . ")";
+		
+		
 		$result = $this->wpdb->get_results($sql);
 		
 		if (is_array($result) && count($result)) {
@@ -100,10 +105,26 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	protected function get_sql_where() {
 		return ["active = '" . $this->active . "'"];
 	}
+	
+	private function get_sql_search_where() {
+		$where = array();		
+		if (!empty($_GET['s'])) {
+			$search_fields = $this->get_searchable_fields();
+			foreach ($search_fields as $field) {
+				$where[] = $field . " LIKE '%" . $_GET['s'] . "%'";
+			}
+		}
+		
+		return $where;	
+	}
 		
 	public function prepare_items() {
         
 		$sql = $this->get_sql_query();
+		
+		$where = $this->get_sql_search_where();	
+		if (count($where))
+			$sql .= "AND (" . implode(" OR ", $where) . ")";
 		
 		if (!empty($this->orderby)) {
 			$sql .= " ORDER BY " . $this->orderby ." ". $this->order;
@@ -111,6 +132,8 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 		
 		$limit = ($this->paged-1) * self::PERPAGE;
 		$sql .= ' LIMIT ' . $limit . ',' . self::PERPAGE;		
+		
+		var_dump($sql);
 		
 		$num = $this->get_num_rows();
 				
@@ -123,6 +146,10 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
       	$items = $this->wpdb->get_results($sql);
       			
 		$this->items = $items;		
+	}	
+	
+	protected function get_searchable_fields() {
+		die( 'function Arlo_For_Wordpress_Lists::get_searchable_fields() must be over-ridden in a sub-class.' );
 	}	
 	
 	public function set_table_name() {

@@ -88,6 +88,22 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 		return sprintf('%1$s %2$s', $item->v_name, $this->row_actions($actions) );
 	}
 	
+	protected function get_searchable_fields() {
+		return [
+			'v_name',
+			'v_physicaladdressline1',
+			'v_physicaladdressline2',
+			'v_physicaladdressline3',
+			'v_physicaladdresssuburb',
+			'v_physicaladdresscity',
+			'v_physicaladdressstate',
+			'v_physicaladdresspostcode',
+			'v_physicaladdresscountry',
+			'v_facilityinfodirections',
+			'v_facilityinfoparking',
+		];
+	}	
+	
 	public function get_sql_query() {
 		$where = $this->get_sql_where();
 		$where = implode(" AND ", $where);	

@@ -104,6 +104,21 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			"e.e_parent_arlo_id = 0"
 		];
 	}
+	
+	protected function get_searchable_fields() {
+		return [
+			'e_code',
+			'e_code',
+			'v_name',
+			'e_locationname',
+			'e_locationroomname',
+			'e_summary',
+			'e_sessiondescription',
+			'e_notice',
+			'e_registermessage',
+			'e_providerorganisation',
+		];
+	}	
 		
 	public function get_sql_query() {
 		$where = $this->get_sql_where();
