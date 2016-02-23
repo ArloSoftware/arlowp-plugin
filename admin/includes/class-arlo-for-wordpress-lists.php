@@ -105,14 +105,12 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
         
 		$sql = $this->get_sql_query();
 		
-		var_dump($sql);
-		
 		if (!empty($this->orderby)) {
 			$sql .= " ORDER BY " . $this->orderby ." ". $this->order;
 		}
 		
 		$limit = ($this->paged-1) * self::PERPAGE;
-		$sql .= ' LIMIT ' . $limit . ',' . self::PERPAGE;
+		$sql .= ' LIMIT ' . $limit . ',' . self::PERPAGE;		
 		
 		$num = $this->get_num_rows();
 				

@@ -12,11 +12,11 @@
 require_once 'class-arlo-for-wordpress-lists.php';
  
 
-class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
+class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 
 	public function __construct() {		
-		$this->singular = __( 'Event', $this->plugin_slug );		
-		$this->plural = __( 'Events', $this->plugin_slug );
+		$this->singular = __( 'Session', $this->plugin_slug );		
+		$this->plural = __( 'Sessions', $this->plugin_slug );
 
 		parent::__construct();		
 	}
@@ -27,20 +27,17 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 	
 	public function get_columns() {
 		return $columns = [
-			'e_code'    => __( 'Code', $this->plugin_slug ),
-			'e_name'    => __( 'Name', $this->plugin_slug ),
+			'e_code'    => __( 'Event code', $this->plugin_slug ),
+			'event_name'    => __( 'Event name', $this->plugin_slug ),
+			'e_name'    => __( 'Session name', $this->plugin_slug ),
 			'e_startdatetime'    => __( 'Start date', $this->plugin_slug ),
 			'e_finishdatetime'    => __( 'Finish date', $this->plugin_slug ),
 			'v_name' => __( 'Venue name', $this->plugin_slug ),
 			'e_locationname' => __( 'Location name', $this->plugin_slug ),
-			'e_roomname' => __( 'Room name', $this->plugin_slug ),
+			'e_locationroomname' => __( 'Room name', $this->plugin_slug ),
 			'e_placesremaining' => __( 'Places remaining', $this->plugin_slug ),
 			'e_summary' => __( 'Summary', $this->plugin_slug ),
 			'e_sessiondescription' => __( 'Description', $this->plugin_slug ),
-			'e_notice' => __( 'Notice', $this->plugin_slug ),
-			'e_register' => __( 'Register link', $this->plugin_slug ),
-			'e_provider' => __( 'Provider', $this->plugin_slug ),
-			//'e_isonline' => __( 'Online', $this->plugin_slug ),
 		];
 	}	
 	
@@ -59,7 +56,7 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			'e_locationroomname' => array( 'e_locationroomname', true ),
 			'e_placesremaining' => array( 'e_placesremaining', true ),
 			'e_summary' => array( 'e_summary', true ),
-			'e_sessiondescription' => array( 'e_sessiondescription', true ),			
+			'e_sessiondescription' => array( 'e_sessiondescription', true ),
 		);
 	}
 	
@@ -67,9 +64,10 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 		switch ($column_name) {
 			case 'e_code':
 			case 'e_name':
+			case 'event_name':
 			case 'v_name':
 			case 'e_locationname':
-			case 'e_roomname':
+			case 'e_locationroomname':
 			case 'e_placesremaining':
 				return $item->$column_name;
 			case 'e_summary':
@@ -92,7 +90,7 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 	
 	function column_e_code($item) {
 		$actions = array(
-            'edit' => sprintf('<a href="https://my.arlo.co/%s/Courses/Course.aspx?id=%d">Edit</a>', $this->platform_name, $item->e_arlo_id)
+            'edit' => sprintf('<a href="https://my.arlo.co/%s/Courses/Course.aspx?id=%d">Edit</a>', $this->platform_name, $item->e_parent_arlo_id)
         );
         
 		return sprintf('%1$s %2$s', $item->e_code, $this->row_actions($actions) );
@@ -100,8 +98,8 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 	
 	protected function get_sql_where() {
 		return [
-			"e.active = '" . $this->active . "'",
-			"e.e_parent_arlo_id = 0"
+			"es.active = '" . $this->active . "'",
+			"es.e_parent_arlo_id != 0"
 		];
 	}
 		
@@ -111,27 +109,27 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 	
 		return "
 		SELECT
-			e.e_arlo_id,
-			e.e_code,
-			e.e_name,
-			e.e_startdatetime,
-			e.e_finishdatetime,
-			e_timezone,
+			e.e_name AS event_name,
+			es.e_parent_arlo_id,
+			es.e_arlo_id,
+			es.e_code,
+			es.e_name,
+			es.e_startdatetime,
+			es.e_finishdatetime,
+			es.e_timezone,
 			v_name,
-			e_locationname,
-			e_locationroomname,
-			e_isfull,
-			e_placesremaining,
-			e_summary,
-			e_sessiondescription,
-			e_notice,
-			e_registermessage,
-			e_registeruri,
-			e_providerorganisation,
-			e_providerwebsite,
-			e_isonline
+			es.e_locationname,
+			es.e_locationroomname,
+			es.e_isfull,
+			es.e_placesremaining,
+			es.e_summary,
+			es.e_sessiondescription
 		FROM
-			" . $this->table_name . " AS e
+			" . $this->table_name . " AS es
+		LEFT JOIN 
+			" . $this->wpdb->prefix . "arlo_events AS e
+		ON
+			es.e_parent_arlo_id = e.e_arlo_id
 		LEFT JOIN 
 			" . $this->wpdb->prefix . "arlo_venues
 		ON
