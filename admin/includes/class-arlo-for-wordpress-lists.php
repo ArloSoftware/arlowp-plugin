@@ -80,19 +80,20 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 		die( 'function Arlo_For_Wordpress_Lists::column_default() must be over-ridden in a sub-class.' );
 	}	
 	
-	private function get_num_rows() {
+	private function get_num_rows() {	
+		$where = $this->get_sql_where_expression();	
+		$groupby = $this->get_sql_groupby_expression();	
+	
 		$sql = "
 		SELECT 
 			COUNT(1) as num
 		FROM
 			" . $this->table_name . "
+		WHERE
+			" . $where . "
+		" . (!empty($groupby) ? "GROUP BY " . $groupby : "") . "
 		";
-		
-		$where = $this->get_sql_search_where();	
-		if (count($where))
-			$sql .= "AND (" . implode(" OR ", $where) . ")";
-		
-		
+				
 		$result = $this->wpdb->get_results($sql);
 		
 		if (is_array($result) && count($result)) {
@@ -102,11 +103,15 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 		return 0;
 	}
 	
-	protected function get_sql_where() {
+	protected function get_sql_groupby_expression() {
+		return '';
+	}
+	
+	protected function get_sql_where_array() {
 		return ["active = '" . $this->active . "'"];
 	}
 	
-	private function get_sql_search_where() {
+	private function get_sql_search_where_array() {
 		$where = array();		
 		if (!empty($_GET['s'])) {
 			$search_fields = $this->get_searchable_fields();
@@ -117,23 +122,25 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 		
 		return $where;	
 	}
+	
+	protected function get_sql_where_expression() {
+		$where = $this->get_sql_where_array();
+		$where = implode(" AND ", $where);
+		
+		$search_where = $this->get_sql_search_where_array();
+		if (count($search_where)) {
+			$where .= " AND (" . implode(" OR ", $search_where) . ")";
+		}
+		
+		return !empty($where) ? $where : '1';
+	}	
 		
 	public function prepare_items() {
         
 		$sql = $this->get_sql_query();
-		
-		$where = $this->get_sql_search_where();	
-		if (count($where))
-			$sql .= "AND (" . implode(" OR ", $where) . ")";
-		
-		if (!empty($this->orderby)) {
-			$sql .= " ORDER BY " . $this->orderby ." ". $this->order;
-		}
-		
+				
 		$limit = ($this->paged-1) * self::PERPAGE;
 		$sql .= ' LIMIT ' . $limit . ',' . self::PERPAGE;		
-		
-		var_dump($sql);
 		
 		$num = $this->get_num_rows();
 				

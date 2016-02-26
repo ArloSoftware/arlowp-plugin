@@ -77,21 +77,26 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 		return sprintf('%1$s %2$s', $item->et_code, $this->row_actions($actions) );
 	}
 	
-	protected function get_sql_where() {
+	protected function get_sql_where_array() {
 		return ["et.active = '" . $this->active . "'"];
 	}
 	
 	protected function get_searchable_fields() {
 		return [
-			'et.e_name',
-			'et.e_code',
+			'et.et_name',
+			'et.et_code',
 			'et.et_descriptionsummary',
 		];
 	}	
+	
+	protected function get_sql_groupby_expression() {
+		return 'et.et_arlo_id';
+	}
+	
 		
 	public function get_sql_query() {
-		$where = $this->get_sql_where();
-		$where = implode(" AND ", $where);
+		$where = $this->get_sql_where_expression();
+		$groupby = $this->get_sql_groupby_expression();	
 	
 		return "
 		SELECT
@@ -114,8 +119,7 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 			post_name = et_post_name			
 		WHERE
 			" . $where . "
-		GROUP BY
-			et.et_arlo_id
+		" . (!empty($groupby) ? "GROUP BY " . $groupby : "") . "
 		";
 	}		
 }

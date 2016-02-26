@@ -96,7 +96,7 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 		return sprintf('%1$s %2$s', $item->e_code, $this->row_actions($actions) );
 	}
 	
-	protected function get_sql_where() {
+	protected function get_sql_where_array() {
 		return [
 			"es.active = '" . $this->active . "'",
 			"es.e_parent_arlo_id != 0"
@@ -114,8 +114,7 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 	}
 		
 	public function get_sql_query() {
-		$where = $this->get_sql_where();
-		$where = implode(" AND ", $where);
+		$where = $this->get_sql_where_expression();
 	
 		return "
 		SELECT

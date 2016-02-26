@@ -85,8 +85,7 @@ class Arlo_For_Wordpress_Presenters extends Arlo_For_Wordpress_Lists  {
 	}
 	
 	public function get_sql_query() {
-		$where = $this->get_sql_where();
-		$where = implode(" AND ", $where);	
+		$where = $this->get_sql_where_expression();
 	
 		return "
 		SELECT
