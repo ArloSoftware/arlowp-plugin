@@ -22,7 +22,7 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 	}
 	
 	public function set_table_name() {
-		$this->table_name = $this->wpdb->prefix . 'arlo_venues';
+		$this->table_name = $this->wpdb->prefix . 'arlo_venues AS v';
 	}
 	
 	public function get_columns() {
@@ -105,27 +105,26 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 	}	
 	
 	public function get_sql_query() {
-		$where = $this->get_sql_where();
-		$where = implode(" AND ", $where);	
+		$where = $this->get_sql_where_expression();
 	
 		return "
 		SELECT
 			guid,
-			v_arlo_id,
-			v_name,
-			v_physicaladdressline1,
-			v_physicaladdressline2,
-			v_physicaladdressline3,
-			v_physicaladdressline4,
-			v_physicaladdresssuburb,
-			v_physicaladdresscity,
-			v_physicaladdressstate,
-			v_physicaladdresspostcode,
-			v_physicaladdresscountry,
-			v_viewuri,
-			v_facilityinfodirections,
-			v_facilityinfoparking,
-			v_post_name
+			v.v_arlo_id,
+			v.v_name,
+			v.v_physicaladdressline1,
+			v.v_physicaladdressline2,
+			v.v_physicaladdressline3,
+			v.v_physicaladdressline4,
+			v.v_physicaladdresssuburb,
+			v.v_physicaladdresscity,
+			v.v_physicaladdressstate,
+			v.v_physicaladdresspostcode,
+			v.v_physicaladdresscountry,
+			v.v_viewuri,
+			v.v_facilityinfodirections,
+			v.v_facilityinfoparking,
+			v.v_post_name
 		FROM
 			". $this->table_name . "
 		LEFT JOIN 

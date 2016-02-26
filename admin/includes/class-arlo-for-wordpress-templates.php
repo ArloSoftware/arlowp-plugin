@@ -22,7 +22,7 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 	}
 	
 	public function set_table_name() {
-		$this->table_name = $this->wpdb->prefix . 'arlo_eventtemplates';
+		$this->table_name = $this->wpdb->prefix . 'arlo_eventtemplates AS et';
 	}
 	
 	public function get_columns() {
@@ -52,7 +52,6 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 	public function column_default($item, $column_name) {
 		switch ($column_name) {
 			case 'et_code':
-			case 'et_event_num':
 				return $item->$column_name;
 			case 'et_name':
 			case 'et_descriptionsummary':
@@ -61,8 +60,13 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 				break;
 			case 'et_registerinteresturi':
 				if (!empty($item->$column_name)) 		
-					return '<a href="'.$item->$column_name.'" target="_blank">' . __( 'Register interest', $this->plugin_slug ) . '</a>';
+					return '<a href="' . $item->$column_name . '" target="_blank">' . __( 'Register interest', $this->plugin_slug ) . '</a>';
 				break;
+			case 'et_event_num':
+				if (intval($item->$column_name) > 0)
+					return '<a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug . '-events&et_id=' . $item->et_arlo_id)  .'" >' . $item->$column_name . '</a>';
+				else 
+					return 0;
 			default:
 				return '';
 			}
@@ -108,7 +112,7 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 			et.et_registerinteresturi,
 			COUNT(e_arlo_id) as et_event_num
 		FROM
-			" . $this->table_name . " AS et
+			" . $this->table_name . "
 		LEFT JOIN 
 			" . $this->wpdb->prefix . "arlo_events
 		USING 

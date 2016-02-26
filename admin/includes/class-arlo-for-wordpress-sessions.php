@@ -22,7 +22,7 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 	}
 	
 	public function set_table_name() {
-		$this->table_name = $this->wpdb->prefix . 'arlo_events';
+		$this->table_name = $this->wpdb->prefix . 'arlo_events AS es';
 	}
 	
 	public function get_columns() {
@@ -126,7 +126,7 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 			es.e_startdatetime,
 			es.e_finishdatetime,
 			es.e_timezone,
-			v_name,
+			v.v_name,
 			es.e_locationname,
 			es.e_locationroomname,
 			es.e_isfull,
@@ -134,13 +134,13 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 			es.e_summary,
 			es.e_sessiondescription
 		FROM
-			" . $this->table_name . " AS es
+			" . $this->table_name . "
 		LEFT JOIN 
 			" . $this->wpdb->prefix . "arlo_events AS e
 		ON
 			es.e_parent_arlo_id = e.e_arlo_id
 		LEFT JOIN 
-			" . $this->wpdb->prefix . "arlo_venues
+			" . $this->wpdb->prefix . "arlo_venues AS v
 		ON
 			e.v_id = v_arlo_id
 		WHERE

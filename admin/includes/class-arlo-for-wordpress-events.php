@@ -22,7 +22,7 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 	}
 	
 	public function set_table_name() {
-		$this->table_name = $this->wpdb->prefix . 'arlo_events';
+		$this->table_name = $this->wpdb->prefix . 'arlo_events AS e';
 	}
 	
 	public function get_columns() {
@@ -130,26 +130,31 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			e.e_name,
 			e.e_startdatetime,
 			e.e_finishdatetime,
-			e_timezone,
-			v_name,
-			e_locationname,
-			e_locationroomname,
-			e_isfull,
-			e_placesremaining,
-			e_summary,
-			e_sessiondescription,
-			e_notice,
-			e_registermessage,
-			e_registeruri,
-			e_providerorganisation,
-			e_providerwebsite,
-			e_isonline
+			e.e_timezone,
+			v.v_name,
+			e.e_locationname,
+			e.e_locationroomname,
+			e.e_isfull,
+			e.e_placesremaining,
+			e.e_summary,
+			e.e_sessiondescription,
+			e.e_notice,
+			e.e_registermessage,
+			e.e_registeruri,
+			e.e_providerorganisation,
+			e.e_providerwebsite,
+			e.e_isonline,
+			et.et_name
 		FROM
-			" . $this->table_name . " AS e
+			" . $this->table_name . "
 		LEFT JOIN 
-			" . $this->wpdb->prefix . "arlo_venues
+			" . $this->wpdb->prefix . "arlo_eventtemplates AS et
+		USING
+			(et_arlo_id)
+		LEFT JOIN 
+			" . $this->wpdb->prefix . "arlo_venues AS v
 		ON
-			e.v_id = v_arlo_id
+			e.v_id = v.v_arlo_id
 		WHERE
 			" . $where . "
 		";

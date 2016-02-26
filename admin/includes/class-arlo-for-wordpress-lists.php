@@ -23,6 +23,11 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	protected $paged;
 	protected $table_name;
 	protected $active;
+	protected $plugin_slug;
+	
+	protected static $filter_column_mapping = array(
+		'et_id' => 'et_arlo_id'
+	);	
 	
 	const PERPAGE = 15;
 
@@ -46,9 +51,9 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	
 		$plugin = Arlo_For_Wordpress::get_instance();
 		$settings = get_option('arlo_settings');
-		
+				
 		$this->active = $plugin->last_imported;
-		$this->plugin_slug = $plugin->get_plugin_slug();
+		$this->plugin_slug = $plugin->plugin_slug;
 		$this->version = Arlo_For_Wordpress::VERSION;	
 		$this->wpdb = &$wpdb;
 		$this->platform_name = $settings['platform_name'];	
@@ -82,7 +87,6 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	
 	private function get_num_rows() {	
 		$where = $this->get_sql_where_expression();	
-		$groupby = $this->get_sql_groupby_expression();	
 	
 		$sql = "
 		SELECT 
@@ -91,9 +95,8 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 			" . $this->table_name . "
 		WHERE
 			" . $where . "
-		" . (!empty($groupby) ? "GROUP BY " . $groupby : "") . "
 		";
-				
+		
 		$result = $this->wpdb->get_results($sql);
 		
 		if (is_array($result) && count($result)) {
@@ -118,6 +121,10 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 			foreach ($search_fields as $field) {
 				$where[] = $field . " LIKE '%" . $_GET['s'] . "%'";
 			}
+		}
+		
+		if (!empty($_GET['et_id']) && !empty(self::$filter_column_mapping['et_id']) && intval($_GET['et_id'] > 0)) {
+			$where[] = ' et.' . self::$filter_column_mapping['et_id'] .' = ' . intval($_GET['et_id']);
 		}
 		
 		return $where;	

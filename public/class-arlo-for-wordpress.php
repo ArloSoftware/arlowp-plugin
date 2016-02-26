@@ -55,7 +55,7 @@ class Arlo_For_Wordpress {
 	 *
 	 * @var      string
 	 */
-	protected $plugin_slug = 'arlo-for-wordpress';
+	public $plugin_slug = 'arlo-for-wordpress';
 
 	/**
 	 * Instance of this class.
