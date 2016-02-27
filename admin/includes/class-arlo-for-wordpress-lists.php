@@ -44,6 +44,8 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 			'plural'   => $this->plural,
 			'ajax'     => false
 		] );
+		
+		$this->prepare_items();
 	}
 	
 	private function init_variables() {
@@ -79,6 +81,10 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 		}
 		
 		return '';
+	}
+	
+	public function get_title() {
+		return get_admin_page_title();
 	}	
 	
 	public function column_default($item, $column_name) {
@@ -86,24 +92,11 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	}	
 	
 	private function get_num_rows() {	
-		$where = $this->get_sql_where_expression();	
-	
-		$sql = "
-		SELECT 
-			COUNT(1) as num
-		FROM
-			" . $this->table_name . "
-		WHERE
-			" . $where . "
-		";
-		
+		$sql = $this->get_sql_query();
+			
 		$result = $this->wpdb->get_results($sql);
-		
-		if (is_array($result) && count($result)) {
-			return intval($result[0]->num);
-		}
-		
-		return 0;
+				
+		return $this->wpdb->num_rows;
 	}
 	
 	protected function get_sql_groupby_expression() {

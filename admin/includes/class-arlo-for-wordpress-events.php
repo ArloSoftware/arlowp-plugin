@@ -21,6 +21,16 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 		parent::__construct();		
 	}
 	
+	public function get_title() {
+		$title = parent::get_title();
+		
+		if (!empty($_GET['et_id']) && !empty(self::$filter_column_mapping['et_id']) && intval($_GET['et_id'] > 0) && !empty($this->items[0]->et_name)) {
+			$title .= ' for template: ' . $this->items[0]->et_name;
+		}
+		
+		return $title;
+	}	
+		
 	public function set_table_name() {
 		$this->table_name = $this->wpdb->prefix . 'arlo_events AS e';
 	}
@@ -119,6 +129,7 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			'e_providerorganisation',
 		];
 	}	
+	
 		
 	public function get_sql_query() {
 		$where = $this->get_sql_where_expression();
