@@ -92,11 +92,6 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 			'et.et_descriptionsummary',
 		];
 	}	
-	
-	protected function get_sql_groupby_expression() {
-		return 'et.et_arlo_id';
-	}
-	
 		
 	public function get_sql_query() {
 		$where = $this->get_sql_where_expression();
@@ -123,7 +118,8 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 			post_name = et_post_name			
 		WHERE
 			" . $where . "
-		" . (!empty($groupby) ? "GROUP BY " . $groupby : "") . "
+		GROUP BY
+			et.et_arlo_id
 		";
 	}		
 }

@@ -99,10 +99,6 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 		return $this->wpdb->num_rows;
 	}
 	
-	protected function get_sql_groupby_expression() {
-		return '';
-	}
-	
 	protected function get_sql_where_array() {
 		return ["active = '" . $this->active . "'"];
 	}
