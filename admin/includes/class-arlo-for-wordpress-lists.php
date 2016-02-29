@@ -27,7 +27,8 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	
 	protected static $filter_column_mapping = array(
 		'et_id' => 'et.et_arlo_id',
-		'ep_e_id' => 'ep.e_arlo_id'
+		'ep_e_id' => 'ep.e_arlo_id',
+		'v_e_id' => 'e.e_arlo_id',
 	);	
 	
 	const PERPAGE = 15;
@@ -120,6 +121,10 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 		if (!empty($_GET['ep_e_id']) && !empty(self::$filter_column_mapping['ep_e_id']) && intval($_GET['ep_e_id'] > 0)) {
 			$where[] = self::$filter_column_mapping['ep_e_id'] .' = ' . intval($_GET['ep_e_id']);
 		}
+
+		if (!empty($_GET['v_e_id']) && !empty(self::$filter_column_mapping['v_e_id']) && intval($_GET['v_e_id'] > 0)) {
+			$where[] = self::$filter_column_mapping['v_e_id'] .' = ' . intval($_GET['v_e_id']);
+		}
 		
 		
 		return $where;	
@@ -140,7 +145,7 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	public function prepare_items() {
         
 		$sql = $this->get_sql_query();
-				
+		
 		$limit = ($this->paged-1) * self::PERPAGE;
 		$sql .= ' LIMIT ' . $limit . ',' . self::PERPAGE;
 		

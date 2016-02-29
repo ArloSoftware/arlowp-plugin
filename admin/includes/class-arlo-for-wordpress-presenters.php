@@ -34,8 +34,7 @@ class Arlo_For_Wordpress_Presenters extends Arlo_For_Wordpress_Lists  {
 		
 		return $title;
 	}	
-	
-	
+
 	public function get_columns() {
 		return $columns = [
 			'name'    => __( 'Name', $this->plugin_slug ),

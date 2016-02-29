@@ -78,7 +78,6 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 		switch ($column_name) {
 			case 'e_code':
 			case 'e_name':
-			case 'v_name':
 			case 'e_locationname':
 			case 'e_roomname':
 			case 'e_placesremaining':
@@ -96,6 +95,9 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 				if (!empty($item->e_registeruri)) 		
 					return '<a href="'.$item->e_registeruri.'" target="_blank">' . $item->e_registermessage . '</a>';
 				break;
+			case 'v_name':				
+				if (!empty($item->$column_name))
+					return '<a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug . '-venues&v_e_id=' . $item->e_arlo_id)  .'" >' . $item->$column_name . '</a>';			
 			case 'presenter':
 				if (!empty($item->$column_name))
 					return '<a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug . '-presenters&ep_e_id=' . $item->e_arlo_id)  .'" >' . $item->$column_name . '</a>';

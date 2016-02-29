@@ -25,6 +25,16 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 		$this->table_name = $this->wpdb->prefix . 'arlo_venues AS v';
 	}
 	
+	public function get_title() {
+		$title = parent::get_title();
+		
+		if (!empty($_GET['v_e_id']) && !empty(self::$filter_column_mapping['v_e_id']) && intval($_GET['v_e_id'] > 0) && !empty($this->items[0]->e_name)) {
+			$title .= ' for event: ' . $this->items[0]->e_name;
+		}
+		
+		return $title;
+	}	
+	
 	public function get_columns() {
 		return $columns = [
 			'v_name'    => __( 'Venue name', $this->plugin_slug ),
@@ -88,6 +98,12 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 		return sprintf('%1$s %2$s', $item->v_name, $this->row_actions($actions) );
 	}
 	
+	protected function get_sql_where_array() {
+		return [
+			"v.active = '" . $this->active . "'",
+		];
+	}
+	
 	protected function get_searchable_fields() {
 		return [
 			'v_name',
@@ -124,9 +140,14 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 			v.v_viewuri,
 			v.v_facilityinfodirections,
 			v.v_facilityinfoparking,
-			v.v_post_name
+			v.v_post_name,
+			e.e_name
 		FROM
 			". $this->table_name . "
+		LEFT JOIN 
+			" . $this->wpdb->prefix . "arlo_events AS e
+		ON
+			v.v_arlo_id = e.v_id							
 		LEFT JOIN 
 			" . $this->wpdb->prefix . "posts
 		ON
