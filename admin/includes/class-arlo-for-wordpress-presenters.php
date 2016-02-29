@@ -19,11 +19,22 @@ class Arlo_For_Wordpress_Presenters extends Arlo_For_Wordpress_Lists  {
 		$this->plural = __( 'Presenters', $this->plugin_slug );
 
 		parent::__construct();		
-	}
+	}	
 	
 	public function set_table_name() {
 		$this->table_name = $this->wpdb->prefix . 'arlo_presenters';
 	}
+	
+	public function get_title() {
+		$title = parent::get_title();
+		
+		if (!empty($_GET['ep_e_id']) && !empty(self::$filter_column_mapping['ep_e_id']) && intval($_GET['ep_e_id'] > 0) && !empty($this->items[0]->e_name)) {
+			$title .= ' for event: ' . $this->items[0]->e_name;
+		}
+		
+		return $title;
+	}	
+	
 	
 	public function get_columns() {
 		return $columns = [
@@ -46,6 +57,12 @@ class Arlo_For_Wordpress_Presenters extends Arlo_For_Wordpress_Lists  {
 			'name' => array( 'name', true ),
 		);
 	}
+	
+	protected function get_sql_where_array() {
+		return [
+			"p.active = '" . $this->active . "'",
+		];
+	}	
 		
 	protected function get_searchable_fields() {
 		return [
@@ -85,7 +102,7 @@ class Arlo_For_Wordpress_Presenters extends Arlo_For_Wordpress_Lists  {
 	}
 	
 	public function get_sql_query() {
-		$where = $this->get_sql_where_expression();
+		$where = $this->get_sql_where_expression();		
 	
 		return "
 		SELECT
@@ -99,15 +116,26 @@ class Arlo_For_Wordpress_Presenters extends Arlo_For_Wordpress_Lists  {
 			p_twitterid,
 			p_facebookid,
 			p_linkedinid,
-			p_post_name
+			p_post_name,
+			e.e_name
 		FROM
-			". $this->table_name . "
+			". $this->table_name . " AS p
+		LEFT JOIN 
+			" . $this->wpdb->prefix . "arlo_events_presenters AS ep
+		USING
+			(p_arlo_id)
+		LEFT JOIN 
+			" . $this->wpdb->prefix . "arlo_events AS e
+		USING
+			(e_arlo_id)			
 		LEFT JOIN 
 			" . $this->wpdb->prefix . "posts
 		ON
 			post_name = p_post_name
 		WHERE
-			" . $where . "			
+			" . $where . "	
+		GROUP BY
+			p_arlo_id		
 		";
 	}		
 }

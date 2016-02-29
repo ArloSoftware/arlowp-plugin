@@ -50,6 +50,7 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			'e_notice' => __( 'Notice', $this->plugin_slug ),
 			'e_register' => __( 'Register link', $this->plugin_slug ),
 			'e_provider' => __( 'Provider', $this->plugin_slug ),
+			'presenter' => __( 'Presenters', $this->plugin_slug ),
 			//'e_isonline' => __( 'Online', $this->plugin_slug ),
 		];
 	}	
@@ -95,6 +96,9 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 				if (!empty($item->e_registeruri)) 		
 					return '<a href="'.$item->e_registeruri.'" target="_blank">' . $item->e_registermessage . '</a>';
 				break;
+			case 'presenter':
+				if (!empty($item->$column_name))
+					return '<a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug . '-presenters&ep_e_id=' . $item->e_arlo_id)  .'" >' . $item->$column_name . '</a>';
 			default:
 				return '';
 			}
@@ -155,7 +159,8 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			e.e_providerorganisation,
 			e.e_providerwebsite,
 			e.e_isonline,
-			et.et_name
+			et.et_name,
+			GROUP_CONCAT(CONCAT_WS(' ', p.p_firstname, p.p_lastname) ORDER BY ep.p_order, p.p_firstname SEPARATOR ', ') AS presenter
 		FROM
 			" . $this->table_name . "
 		LEFT JOIN 
@@ -163,11 +168,21 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 		USING
 			(et_arlo_id)
 		LEFT JOIN 
+			" . $this->wpdb->prefix . "arlo_events_presenters AS ep
+		USING
+			(e_arlo_id)			
+		LEFT JOIN 
+			" . $this->wpdb->prefix . "arlo_presenters AS p
+		USING
+			(p_arlo_id)
+		LEFT JOIN 
 			" . $this->wpdb->prefix . "arlo_venues AS v
 		ON
 			e.v_id = v.v_arlo_id
 		WHERE
 			" . $where . "
+		GROUP BY
+			e.e_arlo_id
 		";
 	}		
 }
