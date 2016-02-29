@@ -25,6 +25,16 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 		$this->table_name = $this->wpdb->prefix . 'arlo_events AS es';
 	}
 	
+	public function get_title() {
+		$title = parent::get_title();
+		
+		if (!empty($_GET['e_parent_id']) && !empty(self::$filter_column_mapping['e_parent_id']) && intval($_GET['e_parent_id'] > 0) && !empty($this->items[0]->event_name)) {
+			$title .= ' for event: ' . $this->items[0]->event_name;
+		}
+		
+		return $title;
+	}		
+	
 	public function get_columns() {
 		return $columns = [
 			'e_code'    => __( 'Event code', $this->plugin_slug ),
@@ -65,7 +75,6 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 			case 'e_code':
 			case 'e_name':
 			case 'event_name':
-			case 'v_name':
 			case 'e_locationname':
 			case 'e_locationroomname':
 			case 'e_placesremaining':
@@ -79,6 +88,10 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 			case 'e_finishdatetime':
 				return $item->$column_name . " " . $item->e_timezone;
 			break;
+			case 'v_name':				
+				if (!empty($item->$column_name))
+					return '<a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug . '-venues&v_e_id=' . $item->e_arlo_id)  .'" >' . $item->$column_name . '</a>';			
+				break;			
 			case 'e_register':
 				if (!empty($item->e_registeruri)) 		
 					return '<a href="'.$item->e_registeruri.'" target="_blank">' . $item->e_registermessage . '</a>';
@@ -90,7 +103,7 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 	
 	public function column_e_code($item) {
 		$actions = array(
-            'edit' => sprintf('<a href="https://my.arlo.co/%s/Courses/Course.aspx?id=%d">Edit</a>', $this->platform_name, $item->e_parent_arlo_id)
+            'edit' => sprintf('<a href="https://my.arlo.co/%s/Console/#/events/%d" target="_blank">Edit</a>', $this->platform_name, $item->e_parent_arlo_id)
         );
         
 		return sprintf('%1$s %2$s', $item->e_code, $this->row_actions($actions) );
@@ -142,7 +155,7 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 		LEFT JOIN 
 			" . $this->wpdb->prefix . "arlo_venues AS v
 		ON
-			e.v_id = v_arlo_id
+			es.v_id = v_arlo_id
 		WHERE
 			" . $where . "
 		";

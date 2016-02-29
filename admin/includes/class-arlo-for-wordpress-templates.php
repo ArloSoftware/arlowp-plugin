@@ -74,7 +74,7 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 	
 	function column_et_code($item) {
 		$actions = array(
-            'edit' => sprintf('<a href="https://my.arlo.co/%s/Templates/Template.aspx?id=%d">Edit</a>', $this->platform_name, $item->et_arlo_id),
+            'edit' => sprintf('<a href="https://my.arlo.co/%s/Courses/Course.aspx?id=%d" target="_blank">Edit</a>', $this->platform_name, $item->et_arlo_id),
             'view' => sprintf('<a href="%s" target="_blank">View</a>', $item->guid),
         );
         

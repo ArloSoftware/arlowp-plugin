@@ -29,6 +29,7 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 		'et_id' => 'et.et_arlo_id',
 		'ep_e_id' => 'ep.e_arlo_id',
 		'v_e_id' => 'e.e_arlo_id',
+		'e_parent_id' => 'es.e_parent_arlo_id',
 	);	
 	
 	const PERPAGE = 15;
@@ -124,6 +125,10 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 
 		if (!empty($_GET['v_e_id']) && !empty(self::$filter_column_mapping['v_e_id']) && intval($_GET['v_e_id'] > 0)) {
 			$where[] = self::$filter_column_mapping['v_e_id'] .' = ' . intval($_GET['v_e_id']);
+		}
+
+		if (!empty($_GET['e_parent_id']) && !empty(self::$filter_column_mapping['e_parent_id']) && intval($_GET['e_parent_id'] > 0)) {
+			$where[] = self::$filter_column_mapping['e_parent_id'] .' = ' . intval($_GET['e_parent_id']);
 		}
 		
 		

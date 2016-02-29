@@ -91,7 +91,7 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 	
 	public function column_v_name($item) {
 		$actions = array(
-            'edit' => sprintf('<a href="https://my.arlo.co/%s/Venues/Venue.aspx?id=%d">Edit</a>', $this->platform_name, $item->v_arlo_id),
+            'edit' => sprintf('<a href="https://my.arlo.co/%s/Venues/Venue.aspx?id=%d" target="_blank">Edit</a>', $this->platform_name, $item->v_arlo_id),
             'view' => sprintf('<a href="%s" target="_blank">View</a>', $item->guid),
         );
 

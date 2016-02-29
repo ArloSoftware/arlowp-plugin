@@ -76,9 +76,20 @@ class Arlo_For_Wordpress_Presenters extends Arlo_For_Wordpress_Lists  {
 	public function column_default($item, $column_name) {
 		switch ($column_name) {
 			case 'p_twitterid':
+				if (!empty($item->$column_name)) {
+					return '<a href="http://twitter.com/' . $item->$column_name . '" target="_blank">Twitter</a>';
+				}
+				break;
 			case 'p_facebookid':
+				if (!empty($item->$column_name)) {
+					return '<a href="http://www.facebook.com/' . $item->$column_name . '" target="_blank">Facebook</a>';
+				}
+				break;
 			case 'p_linkedinid':
-				return $item->$column_name;
+				if (!empty($item->$column_name)) {
+					return '<a href="http://www.linkedin.com/' . $item->$column_name . '" target="_blank">LinkedIn</a>';
+				}
+				break;
 			case 'p_profile':
 			case 'p_qualifications':
 			case 'p_interests':

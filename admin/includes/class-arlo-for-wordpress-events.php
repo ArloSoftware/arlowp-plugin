@@ -49,8 +49,9 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			'e_sessiondescription' => __( 'Description', $this->plugin_slug ),
 			'e_notice' => __( 'Notice', $this->plugin_slug ),
 			'e_register' => __( 'Register link', $this->plugin_slug ),
-			'e_provider' => __( 'Provider', $this->plugin_slug ),
+			'e_providerorganisation' => __( 'Provider', $this->plugin_slug ),
 			'presenter' => __( 'Presenters', $this->plugin_slug ),
+			'e_session_num' => __( 'Num. of sessions', $this->plugin_slug ),
 			//'e_isonline' => __( 'Online', $this->plugin_slug ),
 		];
 	}	
@@ -95,12 +96,27 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 				if (!empty($item->e_registeruri)) 		
 					return '<a href="'.$item->e_registeruri.'" target="_blank">' . $item->e_registermessage . '</a>';
 				break;
+			case 'e_providerorganisation':				
+				if (!empty($item->$column_name)) {
+					if (!empty($item->e_providerwebsite)) {
+						return '<a href="' . $item->e_providerwebsite  .'" target="_blank">' . $item->$column_name . '</a>';					
+					} else {
+						return $item->$column_name;
+					}					
+				}
+				break;
 			case 'v_name':				
 				if (!empty($item->$column_name))
 					return '<a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug . '-venues&v_e_id=' . $item->e_arlo_id)  .'" >' . $item->$column_name . '</a>';			
+				break;
 			case 'presenter':
 				if (!empty($item->$column_name))
 					return '<a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug . '-presenters&ep_e_id=' . $item->e_arlo_id)  .'" >' . $item->$column_name . '</a>';
+				break;
+			case 'e_session_num':
+				if (!empty($item->$column_name))
+					return '<a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug . '-sessions&e_parent_id=' . $item->e_arlo_id)  .'" >' . $item->$column_name . '</a>';					
+				break;
 			default:
 				return '';
 			}
@@ -108,7 +124,7 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 	
 	function column_e_code($item) {
 		$actions = array(
-            'edit' => sprintf('<a href="https://my.arlo.co/%s/Courses/Course.aspx?id=%d">Edit</a>', $this->platform_name, $item->e_arlo_id)
+            'edit' => sprintf('<a href="https://my.arlo.co/%s/Courses/ScheduleItem.aspx?id=%d" target="_blank">Edit</a>', $this->platform_name, $item->e_arlo_id)
         );
         
 		return sprintf('%1$s %2$s', $item->e_code, $this->row_actions($actions) );
@@ -124,7 +140,7 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 	protected function get_searchable_fields() {
 		return [
 			'e_code',
-			'e_code',
+			'e_name',
 			'v_name',
 			'e_locationname',
 			'e_locationroomname',
@@ -162,6 +178,7 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			e.e_providerwebsite,
 			e.e_isonline,
 			et.et_name,
+			(SELECT COUNT(1) FROM " . $this->wpdb->prefix . "arlo_events WHERE e_parent_arlo_id = e.e_arlo_id) as e_session_num,
 			GROUP_CONCAT(CONCAT_WS(' ', p.p_firstname, p.p_lastname) ORDER BY ep.p_order, p.p_firstname SEPARATOR ', ') AS presenter
 		FROM
 			" . $this->table_name . "
