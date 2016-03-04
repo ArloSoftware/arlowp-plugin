@@ -279,7 +279,11 @@ class Arlo_For_Wordpress {
 		
 		//load custom css
 		add_action( 'wp_head', array( $this, 'load_custom_css' ) );
-
+		
+		//add canonical urls for the filtered lists
+		add_action( 'wp_head', array( $this, 'add_canonical_urls' ) );
+		
+		
 		// GP: Check if the scheduled task is entered. If it does not exist set it. (This ensures it is in as long as the plugin is activated.  
 		if ( ! wp_next_scheduled('arlo_import')) {
 			// wp_clear_scheduled_hook( 'arlo_import' );
@@ -295,6 +299,8 @@ class Arlo_For_Wordpress {
 		// the_post action - allows us to inject Arlo-specific data as required
 		// consider this later
 		//add_action( 'the_posts', array( $this, 'the_posts_action' ) );
+		
+		
 	}
 
 	/**
@@ -568,6 +574,15 @@ class Arlo_For_Wordpress {
 		}	
 	}
 	
+	/**
+	 * Add canonical urls for the filtered lists (upcoming, category).
+	 * SEO compatibility
+	 *
+	 * @since    2.2.0
+	 */
+	public function add_canonical_urls() {
+
+	}	
 	
 	/**
 	 * Register and enqueue public-facing style sheet.

@@ -31,7 +31,23 @@
         });		
                 
         $('.arlo-filters > select').change(function() {
-            $('.arlo-filters').submit();
+        	var filters = {
+        		'cat-': 'arlo-filter-category',
+        		'month-': 'arlo-filter-month',
+        		'location-': 'arlo-filter-location',
+        		'delivery-': 'arlo-filter-delivery',
+        		'tag-': 'arlo-filter-eventtag'
+        	}, 
+        	url = '/'+ $('#arlo-page').val() + '/';
+        	
+        	for (var i in filters) {
+        		if (filters.hasOwnProperty(i) && $('#' + filters[i]).length == 1 && $('#' + filters[i]).val().trim() != '') {
+        			url += i + $('#' + filters[i]).val().trim() + '/'; 
+        		} 
+        	}
+        	
+        	document.location = url;
+        	
         });
         
    		//if boxed (grid) layout, make the boxes' height even
