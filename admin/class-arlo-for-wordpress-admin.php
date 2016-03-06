@@ -109,6 +109,7 @@ class Arlo_For_Wordpress_Admin {
 			if ($plugin_version != $plugin::VERSION) {
 				$plugin::update_data_model();
 				update_option('arlo_plugin_version', $plugin::VERSION);
+				flush_rewrite_rules();
 			}
 		} else {
 			update_option('arlo_plugin_version', $plugin::VERSION);
