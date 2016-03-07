@@ -16,11 +16,11 @@ add_filter( 'the_title', function($title, $id = null){
 	}
 	
 	if (!empty($settings['post_types']['eventsearch']['posts_page'])) {
-		array_push($pages, $settings['post_types']['event']['posts_page']);
+		array_push($pages, $settings['post_types']['eventsearch']['posts_page']);
 	}
 
 	if (!empty($settings['post_types']['upcoming']['posts_page'])) {
-		array_push($pages, $settings['post_types']['event']['posts_page']);
+		array_push($pages, $settings['post_types']['upcoming']['posts_page']);
 	}
 	
 	
@@ -29,11 +29,19 @@ add_filter( 'the_title', function($title, $id = null){
 	$arlo_category = isset($_GET['arlo-category']) && !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : get_query_var('arlo-category', '');
 	
 	$cat_slug = !empty($arlo_category) ? $arlo_category : '';	
-        	
-	$cat = \Arlo\Categories::get(array('slug' => $cat_slug));
-	$location = !empty($_GET['arlo-location']) ? stripslashes(urldecode($_GET['arlo-location'])) : "";
-	$search = !empty($_GET['arlo-search']) ? stripslashes(urldecode($_GET['arlo-search'])) : "";	
-                
+	
+	$cat = null;
+	
+	if (!empty($cat_slug))
+		$cat = \Arlo\Categories::get(array('slug' => $cat_slug));
+		
+		
+	$location = !empty($_GET['arlo-location']) ? $_GET['arlo-location'] : get_query_var('arlo-location', '');
+	$search = !empty($_GET['arlo-search']) ? $_GET['arlo-search'] : get_query_var('arlo-search', '');	
+		
+	$location = stripslashes(urldecode($location));
+	$search = stripslashes(urldecode($search));
+	
 	if($id === null || !in_array($id, $pages)) return $title;
 		
 	if(!$cat && empty($location) && empty($search)) return $title;
@@ -230,11 +238,11 @@ function arlo_register_custom_post_types() {
 					add_rewrite_rule('^' . $slug . '/(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(tag-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-category=$matches[2]&arlo-month=$matches[4]&arlo-location=$matches[6]&arlo-delivery=$matches[8]&arlo-eventtag=$matches[10]&paged=$matches[12]','top');
 				break;			
 				case 'event':					
-					//add_rewrite_rule('^' . $slug . '/(\d+-([^/]*)?/?$','index.php?arlo_event=$matches[1]','top');
+					add_rewrite_rule('^' . $slug . '/(\d+-[^/]*)?/?$','index.php?arlo_event=$matches[1]','top');
 					add_rewrite_rule('^' . $slug . '/(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(tag-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-category=$matches[2]&arlo-month=$matches[4]&arlo-location=$matches[6]&arlo-delivery=$matches[8]&arlo-templatetag=$matches[10]&paged=$matches[12]','top');
 				break;
 				case 'eventsearch':
-					//add_rewrite_rule('^' . $slug . '/search/([^/]*)?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-search=$matches[1]&paged=$matches[3]','top');
+					add_rewrite_rule('^' . $slug . '/search/([^/]*)?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-search=$matches[1]&paged=$matches[3]','top');
 					add_rewrite_rule('^' . $slug . '/page/([^/]*)/?','index.php?page_id=' . $page_id . '&paged=$matches[1]','top');
 				break;
 				case 'presenter':
@@ -262,6 +270,25 @@ function arlo_register_custom_post_types() {
 	
 	// flush cached rewrite rules if we've just updated the arlo settings
 	if(isset($_GET['settings-updated'])) flush_rewrite_rules();
+}
+
+/**
+ * If there is a search term for arlo-search, we need to redirect to a friendlier url.
+ *
+ * @since    2.2.0
+ *
+ */
+ 
+ function set_search_redirect() {
+	$settings = get_option('arlo_settings');
+	if (strpos($_SERVER['QUERY_STRING'], 'arlo-search') !== false && !empty($_GET['arlo-search'])) {
+		if(isset($settings['post_types']['eventsearch']['posts_page']) && $settings['post_types']['eventsearch']['posts_page'] != 0) {
+			$slug = substr(substr(str_replace(get_home_url(), '', get_permalink($settings['post_types']['eventsearch']['posts_page'])), 0, -1), 1);
+			$location = '/' . $slug . '/search/' . urlencode(stripslashes_deep($_GET['arlo-search'])) . '/';
+			wp_redirect( $location );
+			exit();
+		}
+	}
 }
 
 /**
@@ -1076,6 +1103,7 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 	$arlo_delivery = isset($_GET['arlo-delivery']) && !empty($_GET['arlo-delivery']) ? $_GET['arlo-delivery'] : get_query_var('arlo-delivery', '');
 	$arlo_templatetag = isset($_GET['arlo-templatetag']) && !empty($_GET['arlo-templatetag']) ? $_GET['arlo-templatetag'] : get_query_var('arlo-templatetag', '');
 	$arlo_search = isset($_GET['arlo-search']) && !empty($_GET['arlo-search']) ? $_GET['arlo-search'] : get_query_var('arlo-search', '');
+	$arlo_search = esc_sql(stripslashes(urldecode($arlo_search)));
 
 	
 	if(!empty($arlo_location) || (isset($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) ) :
@@ -1219,6 +1247,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 	$arlo_delivery = isset($_GET['arlo-delivery']) && !empty($_GET['arlo-delivery']) ? $_GET['arlo-delivery'] : get_query_var('arlo-delivery', '');
 	$arlo_templatetag = isset($_GET['arlo-templatetag']) && !empty($_GET['arlo-templatetag']) ? $_GET['arlo-templatetag'] : get_query_var('arlo-templatetag', '');
 	$arlo_search = isset($_GET['arlo-search']) && !empty($_GET['arlo-search']) ? $_GET['arlo-search'] : get_query_var('arlo-search', '');
+	$arlo_search = esc_sql(stripslashes(urldecode($arlo_search)));
 
 	
 	if(!empty($arlo_location) || (isset($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) ) :

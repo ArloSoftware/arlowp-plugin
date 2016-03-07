@@ -300,7 +300,7 @@ class Arlo_For_Wordpress {
 		// consider this later
 		//add_action( 'the_posts', array( $this, 'the_posts_action' ) );
 		
-		
+		add_action( 'init', 'set_search_redirect');
 	}
 
 	/**

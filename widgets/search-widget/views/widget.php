@@ -13,11 +13,11 @@
 		
 		$slug = get_post($settings['post_types']['eventsearch']['posts_page'])->post_name;
 			
-		$search_term = !empty($_GET['arlo-search']) ? stripslashes(esc_attr(urldecode($_GET['arlo-search']))) : '';
-	
+		$search_term = !empty($_GET['arlo-search']) ? $_GET['arlo-search'] : get_query_var('arlo-search', '');
+		
 		echo '
 		<form class="arlo-search-widget" action="'.site_url().'/'.$slug.'/">
-			<input type="text" class="search-field" name="arlo-search" value="' . $search_term . '">
+			<input type="text" class="search-field" name="arlo-search" value="' . stripslashes(esc_attr(urldecode($search_term))) . '">
 		</form>
 		';	
 	}
