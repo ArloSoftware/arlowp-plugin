@@ -2,9 +2,24 @@
 
 /* Plugin Prefix is specified in arlo-for-wordpress.php */
 
-/* based on desired max width - menu sidebar width: 180px as of WP 3.9 */
-.arlo-sections-wrap {
-	max-width: 820px;
+
+#adminmenu .toplevel_page_arlo-for-wordpress.current a.current .wp-menu-image {
+	opacity: 1;
+	filter: alpha(opacity=100);
+	background: transparent url(../img/icon-20x20.png) no-repeat center;
+}
+
+.arlo-gray {
+	color: #ccc;
+}
+
+.arlo-inlineblock {
+	display: inline-block;
+	margin: 0 0.5em;
+}
+
+.arlo-error {
+	border: 1px solid red;
 }
 
 .arlo-section {
@@ -75,19 +90,24 @@
 	width: 70%;
 }
 
-.settings_page_arlo-for-wordpress p.webinar {
+.toplevel_page_arlo-for-wordpress p.webinar {
 	color: #ccc;
 }
 
-.settings_page_arlo-for-wordpress p.webinar span {
+.toplevel_page_arlo-for-wordpress p.webinar span {
 	color: #444;
 }
 
-.settings_page_arlo-for-wordpress p.webinar img, 
-.settings_page_arlo-for-wordpress p.developer img {
+.toplevel_page_arlo-for-wordpress p.webinar img, 
+.toplevel_page_arlo-for-wordpress p.developer img {
 	vertical-align: middle;
 	margin: 0px 6px;
 }
+
+.wp-editor-wrap {
+	margin-top: 1em;
+}
+
 
 /* hide the template edit select box if no javascript */
 .no-js #arlo-template-select {
@@ -103,7 +123,7 @@
 	margin-bottom: 1em;
 }
 /* only hide the editors if javascript is enabled */
-.js .arlo_template_section > [class^='arlo'] {
+.js .arlo_pages_section > [class^='arlo'] {
 	display: none;
 }
 
@@ -151,17 +171,48 @@
 
 .arlo-reload-template {
 	cursor: pointer;
-	float: right;
+	display: inline-block;
+	line-height: 2em;
 }
 
 .arlo-sub-template-select {
-	float: right;
+	display: inline-block;
+	margin-right: 1em;
 }
-
 
 table.arlo-welcome td.logo {
 	width: 80px;
 	padding-top: 15px;
+}
+
+.arlo-template-table {
+	width: 100%;
+}
+
+.arlo-template-table td {
+	padding: 0.5em;
+}
+
+.arlo-template-table td:first-of-type {
+	width: 190px;
+	vertical-align: top;
+	border-right: 1px solid #ccc;
+	padding-right: 0;
+}
+
+.arlo-block {
+	display: inline-block;
+}
+
+.notice.arlo-connected-message {
+	background: none;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	border: none;
+}
+
+.arlo-connected-message .arlo-block {
+	margin-left: 1em;
 }
 
 /* clearing for divs containing floated elements */
@@ -174,7 +225,57 @@ table.arlo-welcome td.logo {
 
 .cf:after {
     clear: both;
+}
+
+/* vertical tab */
+.nav-tab-wrapper.vertical-nav-tab-wrapper {
+	border-bottom: 0;
+	padding: 10px 0;
+}
+
+.nav-tab.vertical-nav-tab {
+	float: none;
+	display: block;
+	border: 1px solid #ccc;
+	border-right: none;	
+	margin-right: 1px;
+	margin-bottom: 3px;
 }	
+
+.nav-tab.vertical-nav-tab.nav-tab-active {
+	border-right: 1px solid #f1f1f1;
+	margin-right: -1px;
+	margin-bottom: 3px;
+}
+
+.arlo-template-table .arlo-label + .arlo-field.arlo-template-field,
+.arlo-template-table .arlo-template-field .arlo-label.arlo-full-width {
+	width: 100%;
+}
+
+.arlo-template-table .arlo-template-field .arlo-label.arlo-full-width label {
+	font-weight: normal;
+}
+
+.arlo-template-table .arlo-template-field .wp-editor-wrap {
+	float: left;
+	width: 68%;
+}
+
+.arlo-template-table .arlo-template-field .arlo-shortcodes {
+	float: right;
+	width: 28%;
+}
+
+.arlo-template-table .arlo-template-field .arlo-shortcodes h4 {
+	margin-bottom: 0.5em;
+}
+
+.arlo-template-table .arlo-template-field .arlo-shortcodes .arlo-codes {
+	margin-top: 2em;
+}
+
+
 
 /* media queries, these match the wordpress admin breakpoints as of WP 3.9 */
 
@@ -183,6 +284,7 @@ table.arlo-welcome td.logo {
 }
 
 @media only screen and (min-width: 783px) {
+	
 	.arlo-label {
 		float: left;
 		width: 30%;
@@ -192,6 +294,16 @@ table.arlo-welcome td.logo {
 		float: left;
 		width: 70%;
 	}
+	
+	.arlo-template-table .arlo-template-field .arlo-label {
+		float: left;
+		width: 20%;
+	}
+
+	.arlo-template-table .arlo-template-field .arlo-label + .arlo-field {
+		float: left;
+		width: 80%;
+	}	
 
 	.arlo-check input {
 		margin: 6px 10px 6px 0;

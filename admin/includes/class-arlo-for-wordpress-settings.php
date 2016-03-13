@@ -16,12 +16,13 @@ class Arlo_For_Wordpress_Settings {
 		if (!session_id()) {
 			session_start();
 		}
-		
+				
 		// allocates the wp-options option key value pair that will store the plugin settings
 		register_setting( 'arlo_settings', 'arlo_settings' );		
 
 		$plugin = Arlo_For_Wordpress::get_instance();
 		$this->plugin_slug = $plugin->get_plugin_slug();
+		$this->version = Arlo_For_Wordpress::VERSION;
 		
 		if (isset($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress' && get_option('permalink_structure') != "/%postname%/") {
 			add_action( 'admin_notices', array($plugin, "permalink_notice") );
@@ -40,17 +41,19 @@ class Arlo_For_Wordpress_Settings {
 			if ($show_notice) {
 				add_action( 'admin_notices', array($plugin, "posttype_notice") );
 			}
+			
+			add_action( 'admin_notices', array($plugin, "connected_platform_notice") );
 		}
 		
 		if(isset($_GET['arlo-import'])) {
 			$_SESSION['arlo-import'] = $plugin->import(true);
-			wp_redirect( admin_url( 'options-general.php?page=arlo-for-wordpress'));
+			wp_redirect( admin_url( 'admin.php?page=arlo-for-wordpress'));
 			exit;
 		}
 		                
 		if(isset($_GET['load-demo'])) {
 			$plugin->load_demo();
-			wp_redirect( admin_url( 'options-general.php?page=arlo-for-wordpress'));
+			wp_redirect( admin_url( 'admin.php?page=arlo-for-wordpress'));
 			exit;
 		}		
 				
@@ -87,7 +90,7 @@ class Arlo_For_Wordpress_Settings {
                 );                
                 
         if (!empty($settings['platform_name'])) {
-			// create lat import text
+			// create last import text
 			add_settings_field(
                         'arlo_last_import', 
                         '<label for="arlo_last_import">'.__('Last import', $this->plugin_slug).'</label>', 
@@ -144,53 +147,37 @@ class Arlo_For_Wordpress_Settings {
                 );
                 
 		
-		// create Cron field
-		//add_settings_field('arlo_cron', __('Cron Status',$this->plugin_slug), array($this, 'arlo_cron_callback'), $this->plugin_slug, 'arlo_general_section', array('id'=>'arlo_cron', 'label'=>__('I have setup my own Cron jobs', $this->plugin_slug)));
-		
-
 		/*
 		 *
-		 * Post Type Settings
+		 * Page Section Settings
 		 *
 		 */ 
 		 
-		$page_setup_section_id = 'arlo_page_setup';
-		add_settings_section( $page_setup_section_id, __('Page setup', $this->plugin_slug), null, $this->plugin_slug );		 
-
-		// post type settings
-	    foreach(Arlo_For_Wordpress::$post_types as $id => $post_type) {
-	    
-	    	// post type slug
-			add_settings_field(
-				'arlo_'.$id.'_posts_page',
-				'<label for="arlo_'.$id.'_posts_page">'.__($post_type['singular_name'], $this->plugin_slug).'</label>',
-				array(
-					$this,
-					'arlo_posts_page_callback'
-				),
-				$this->plugin_slug,
-				$page_setup_section_id,
-				array(
-					'id'		=> $id,
-					'label_for' => $post_type['singular_name']
-				)
-			);
-	    }
-
-		/*
-		 *
-		 * Template Settings
-		 *
-		 */
-
-		// create a section for Templates
-		add_settings_section( 'arlo_template_section', __('Templates',$this->plugin_slug), array($this, 'arlo_template_section_callback'), $this->plugin_slug );
+		add_settings_section('arlo_pages_section', null, array($this, 'arlo_pages_section_callback'), $this->plugin_slug );
 
 		// loop though slug array and create each required slug field
 	    foreach(Arlo_For_Wordpress::$templates as $id => $template) {
 	    	$name = __($template['name'], $this->plugin_slug);
-			add_settings_field( $id, '<label for="'.$id.'">'.$name.'</label>', array($this, 'arlo_template_callback'), $this->plugin_slug, 'arlo_template_section', array('id'=>$id,'label_for'=>$id) );
+			add_settings_field( $id, '<label for="'.$id.'">'.$name.'</label>', array($this, 'arlo_template_callback'), $this->plugin_slug, 'arlo_pages_section', array('id'=>$id,'label_for'=>$id) );
 		}
+		
+		/*
+		 *
+		 * CustomCSS Section Settings
+		 *
+		 */ 
+		 
+		add_settings_section('arlo_customcss_section', null, null, $this->plugin_slug );				
+		add_settings_field( 'arlo_customcss', null, array($this, 'arlo_simple_textarea_callback'), $this->plugin_slug, 'arlo_customcss_section', array('id'=>'customcss') );
+		
+		/*
+		 *
+		 * Welcome Section Settings
+		 *
+		 */ 
+		 
+		add_settings_section('arlo_welcome_section', null, null, $this->plugin_slug );				
+		add_settings_field( 'arlo_customcss', null, array($this, 'arlo_welcome_callback'), $this->plugin_slug, 'arlo_welcome_section', array('id'=>'welcome') );
 	}
 
 	/*
@@ -200,31 +187,38 @@ class Arlo_For_Wordpress_Settings {
 	 */
 
 
-	function arlo_template_section_callback() {
-		$settings = get_option('arlo_settings');
-		$output = '<div id="'.ARLO_PLUGIN_PREFIX.'-template-select" class="cf">';
-		$output .= '<select name="arlo_settings[template]">';
-		
-	    foreach(Arlo_For_Wordpress::$templates as $id => $template) {
-	    	$name = __($template['name'], $this->plugin_slug);
-	    	$selected = (!empty($settings['template']) && $settings['template'] == 'arlo-'.$id ? 'selected' : '');
-			$output .= '<option value="'.ARLO_PLUGIN_PREFIX.'-'.$id.'" ' . $selected . '>'.$name.'</option>';
-	    }
-
-		$output .= '</select></div>
+	function arlo_pages_section_callback() {
+		echo '
 	    		<script type="text/javascript"> 
 	    			var arlo_blueprints = ' . json_encode($this->arlo_template_source()) . ';
 	    		</script>		
 		';
-		
-		echo $output;
 	}
-
+	
 	/*
 	 *
 	 * FIELD CALLBACKS
 	 *
 	 */
+	 
+	function arlo_simple_textarea_callback($args) {
+	    $settings = get_option('arlo_settings');
+	    $val = (isset($settings[$args['id']])) ? esc_attr($settings[$args['id']]) : (!empty($args['default_val']) ? $args['default_val'] : '' );
+	    
+	    $html = '';
+	        
+        if (!empty($args['before_html'])) {
+            $html .= $args['before_html'];
+        }
+            
+	    $html .= '<textarea cols="70" rows="30" class="' . (!empty($args['class']) ? $args['class'] : "") . '" id="arlo_'.$args['id'].'" name="arlo_settings['.$args['id'].']" >'.$val.'</textarea>';
+            
+        if (!empty($args['after_html'])) {
+            $html .= $args['after_html'];
+        }
+            
+	    echo $html;
+	}	 
         
 	function arlo_price_setting_callback() {
 		$settings = get_option('arlo_settings');
@@ -263,7 +257,7 @@ class Arlo_For_Wordpress_Settings {
         }
             
 	    echo $html;
-	}  
+	}  	
 	
 	function arlo_simple_text_callback($args) {
 	    $html = '';
@@ -274,55 +268,82 @@ class Arlo_For_Wordpress_Settings {
                     
 	    echo $html;
 	} 	
-	
-	   
-
-	function arlo_posts_page_callback($args) {
-	    $settings = get_option('arlo_settings');
-	    $val = isset($settings['post_types'][$args['id']]['posts_page']) ? esc_attr($settings['post_types'][$args['id']]['posts_page']) : 0;
-
-		$html = wp_dropdown_pages(array(
-			'id'				=> 'arlo_'.$args['id'].'_posts_page',
-		    'selected'         	=> $val,
-		    'echo'             	=> 0,
-		    'name'             	=> 'arlo_settings[post_types]['.$args['id'].'][posts_page]',
-		    'show_option_none'	=> '-- Select --',
-		    'option_none_value'	=> 0
-		));
-
-	    echo $html;
-	}
 
 	function arlo_template_callback($args) {
-	    $settings = get_option('arlo_settings');
-	    $val = isset($settings['templates'][$args['id']]['html']) ? $settings['templates'][$args['id']]['html'] : '';
-	    $this->arlo_reload_template_callback($args['id'], $settings);
-	    wp_editor($val, $args['id'], array('textarea_name'=>'arlo_settings[templates]['.$args['id'].'][html]','textarea_rows'=>'20'));
+		$id = $args['id'];
+		$settings = get_option('arlo_settings');
+		
+		echo '<h3>' . sprintf(__('%s page', $this->plugin_slug), Arlo_For_Wordpress::$templates[$id]['name']) . '</h3>';
+		
+		/*
+		HACK because the keys in the $post_types arrays are bad, couldn't change because backward comp.
+		*/
+		
+		if (in_array($id, array('eventsearch', 'upcoming', 'events', 'presenters', 'venues'))) {
+			$post_type_id = !in_array($id, array('eventsearch','upcoming')) ? substr($id, 0, strlen($id)-1) : $id;
+		}
+	
+    	if (!empty($post_type_id) && !empty(Arlo_For_Wordpress::$post_types[$post_type_id])) {
+    		$post_type = Arlo_For_Wordpress::$post_types[$post_type_id];
+		    $val = isset($settings['post_types'][$post_type_id]['posts_page']) ? esc_attr($settings['post_types'][$post_type_id]['posts_page']) : 0;
+	
+			$select = wp_dropdown_pages(array(
+				'id'				=> 'arlo_'.$post_type_id.'_posts_page',
+			    'selected'         	=> $val,
+			    'echo'             	=> 0,
+			    'name'             	=> 'arlo_settings[post_types]['.$post_type_id.'][posts_page]',
+			    'show_option_none'	=> '-- Select --',
+			    'option_none_value'	=> 0
+			));
+	
+			echo '
+			<div class="arlo-label"><label>' .  __("Host page", $this->plugin_slug) . '</label></div>
+			<div class="arlo-field">
+				<span class="arlo-page-select">' . $select . '</span>
+				<span class="arlo-gray arlo-inlineblock">' . sprintf(__('Page must contain the %s shortcode', $this->plugin_slug), Arlo_For_Wordpress::$templates[$id]['shortcode']) . '</span>
+			</div>';
+    	}
+	    
+	    $val = isset($settings['templates'][$id]['html']) ? $settings['templates'][$id]['html'] : '';
+	    
+	    
+	    $this->arlo_reload_template($id, $settings);
+	    
+	    echo '<div class="arlo-label arlo-full-width">
+	    		<label>
+	    		' . sprintf(__('%s page', $this->plugin_slug), Arlo_For_Wordpress::$templates[$id]['name'], Arlo_For_Wordpress::$templates[$id]['shortcode']) . '
+	    		' . (!empty(Arlo_For_Wordpress::$templates[$id]['shortcode']) ? 'shortcode <span class="arlo-gray">' . Arlo_For_Wordpress::$templates[$id]['shortcode'] . '</span>' : '') . ' content
+	    		</label>
+	    	</div>';
+	    	
+	    wp_editor($val, $id, array('textarea_name'=>'arlo_settings[templates]['.$id.'][html]','textarea_rows'=>'20'));
 	}
 	
-	function arlo_reload_template_callback($template, $settings) {
-	    echo '<div class="cf">
-	    		<div class="' . ARLO_PLUGIN_PREFIX . '-sub-template-select">';
-	    if (!empty(Arlo_For_Wordpress::$templates[$template])) {
-			$template_definition = Arlo_For_Wordpress::$templates[$template];
-			if (isset($template_definition['sub']) && is_array($template_definition['sub'])) {
-				echo '<strong>'. __('Style and layout', $this->plugin_slug) . '</strong> &nbsp;';
-			    echo '<select name="arlo_settings[subtemplate]['.$template.']">';
-			    foreach ($template_definition['sub'] as $k => $v) {
-			    	$selected = (!empty($settings['subtemplate'][$template]) && $settings['subtemplate'][$template] == $k ? 'selected' : '');
-			    	echo '<option value="' . $k . '" '.$selected.'>' . $v . '</option>';
-			    }
-		    				
-		    	echo '</select>';
-			}	    
-	    }
-	    		
+	function arlo_reload_template($template, $settings) {
+	
 	    echo '
-	    		</div>
+	    	<div class="arlo-label">
+	    		<label>'. __('Style and layout', $this->plugin_slug) . '</label>
 	    	</div>
-	    	<div class="cf">
+	    	<div class="arlo-field">';
+				    if (!empty(Arlo_For_Wordpress::$templates[$template])) {
+						$template_definition = Arlo_For_Wordpress::$templates[$template];
+						if (isset($template_definition['sub']) && is_array($template_definition['sub'])) {
+							echo '<div class="' . ARLO_PLUGIN_PREFIX . '-sub-template-select">
+								<select name="arlo_settings[subtemplate]['.$template.']">';
+						    foreach ($template_definition['sub'] as $k => $v) {
+						    	$selected = (!empty($settings['subtemplate'][$template]) && $settings['subtemplate'][$template] == $k ? 'selected' : '');
+						    	echo '<option value="' . $k . '" '.$selected.'>' . $v . '</option>';
+						    }
+					    				
+					    	echo '</select>
+					    	</div>';
+						}	    
+				    }	    	
+				echo '
 	    		<div class="' . ARLO_PLUGIN_PREFIX . '-reload-template"><a>' . __('Reload original template', $this->plugin_slug) . '</a></div>
-	    	</div>';
+	    	</div>
+	    	<div class="cf"></div>';
 	}
 	
 	function arlo_template_source() {
@@ -352,6 +373,15 @@ class Arlo_For_Wordpress_Settings {
 		}
 	}
 	
+	function arlo_welcome_callback($args) {
+		
+	    echo '
+	    <h3>What\'s new in this release</h3>
+	    <h4>Version ' . $this->version . '</h4>
+	    <p>
+	    </p>
+	    ';
+	} 		
 }
 
 ?>

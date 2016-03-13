@@ -186,7 +186,7 @@ class Arlo_For_Wordpress {
 	 */
     public static $delivery_labels = array(
         0 => 'Workshop',
-        1 => 'Online (Webinar)',
+        1 => 'Online',
     );
     
 	/**
@@ -207,14 +207,17 @@ class Arlo_For_Wordpress {
 		),
 		'events' => array(
 			'id' => 'events',
-			'name' => 'Catalogue'			
+			'shortcode' => '[arlo_event_template_list]',
+			'name' => 'Catalogue'
 		),
 		'eventsearch' => array(
 			'id' => 'eventsearch',
+			'shortcode' => '[arlo_event_template_search_list]',
 			'name' => 'Event search list'
 		),
 		'upcoming' => array(
 			'id' => 'upcoming',
+			'shortcode' => '[arlo_upcoming_list]',
 			'name' => 'Upcoming event list',
 			'sub' => array(
 				'' => 'List',
@@ -227,6 +230,7 @@ class Arlo_For_Wordpress {
 		),
 		'presenters' => array(
 			'id' => 'presenters',
+			'shortcode' => '[arlo_presenter_list]',
 			'name' => 'Presenter list'
 		),
 		'venue' => array(
@@ -235,6 +239,7 @@ class Arlo_For_Wordpress {
 		),
 		'venues' => array(
 			'id' => 'venues',
+			'shortcode' => '[arlo_venue_list]',
 			'name' => 'Venue list'
 		),
     );
@@ -272,6 +277,8 @@ class Arlo_For_Wordpress {
 		add_filter( 'cron_schedules', array( $this, 'add_cron_schedules' ) ); 
 		add_action( 'arlo_import', array( $this, 'cron_import' ) );
 		
+		//load custom css
+		add_action( 'wp_head', array( $this, 'load_custom_css' ) );
 
 		// GP: Check if the scheduled task is entered. If it does not exist set it. (This ensures it is in as long as the plugin is activated.  
 		if ( ! wp_next_scheduled('arlo_import')) {
@@ -554,6 +561,28 @@ class Arlo_For_Wordpress {
 	public function enqueue_styles() {
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css?20112015', __FILE__ ), array(), self::VERSION );
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-darktooltip', plugins_url( 'assets/css/libs/darktooltip.min.css', __FILE__ ), array(), self::VERSION );
+		
+		$customcss_load_type = get_option('arlo_customcss');
+		if ($customcss_load_type == 'file') {
+			wp_enqueue_style( $this->plugin_slug .'-custom-styles', plugins_url( 'assets/css/custom.css', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );		
+		}	
+	}
+	
+	
+	/**
+	 * Register and enqueue public-facing style sheet.
+	 *
+	 * @since    2.2.0
+	 */
+	public function load_custom_css() {
+		$customcss_load_type = get_option('arlo_customcss');
+		if ($customcss_load_type !== 'file') {
+			$settings = get_option('arlo_settings');
+			
+			if (!empty($settings['customcss'])) {
+				echo "\n<style>\n" . $settings['customcss'] . "\n</style>\n";
+			}
+		}
 	}
 
 	/**
@@ -1941,7 +1970,7 @@ class Arlo_For_Wordpress {
 						__('Venue information', self::get_instance()->plugin_slug), 					
 						$venues->guid,  
 						__('Venues list', self::get_instance()->plugin_slug)
-					) . '</p><p>' . __('Edit the page <a href="#arlo-template-select">templates</a> for each of these websites pages below.') . '</p>';
+					) . '</p><p>' . __('Edit the page <a href="#pages" class="arlo-pages-setup">templates</a> for each of these websites pages below.') . '</p>';
 					
 					echo '
 					<div class="' . (count($error) ? "error" : "") . ' notice is-dismissible" id="' . $notice_id . '">
@@ -2041,10 +2070,37 @@ class Arlo_For_Wordpress {
 	public static function posttype_notice() {
 		echo '
 		<div class="error notice">
-			<p><strong>' . __("Page setup required.", self::get_instance()->plugin_slug) . '</strong> ' . __('Arlo for WordPress requires you to setup the pages which will host event information.', self::get_instance()->plugin_slug ) .' '. sprintf(__('<a href="%s">Setup pages</a>', self::get_instance()->plugin_slug), admin_url('options-general.php?page=arlo-for-wordpress#arlo_noevent_text')) . '</p>
+			<p><strong>' . __("Page setup required.", self::get_instance()->plugin_slug) . '</strong> ' . __('Arlo for WordPress requires you to setup the pages which will host event information.', self::get_instance()->plugin_slug ) .' '. sprintf(__('<a href="%s" class="arlo-pages-setup">Setup pages</a>', self::get_instance()->plugin_slug), admin_url('admin.php?page=arlo-for-wordpress#pages/events')) . '</p>
 			<p>' . sprintf(__('<a target="_blank" href="%s">View documentation</a> for more information.', self::get_instance()->plugin_slug), 'http://developer.arlo.co/doc/wordpress/index#pages-and-post-types') . '</p>
 	    </div>
 		';
+	}
+	
+	public static function connected_platform_notice() {
+		$settings = get_option('arlo_settings');
+		echo '
+			<div class="notice arlo-connected-message"> 
+				<p>
+					Arlo is connected to <strong>' . $settings['platform_name'] . '</strong> <span class="arlo-block">Last synchronyzed: ' . self::get_instance()->get_last_import() . '</span> 
+					<a class="arlo-block" href="?page=arlo-for-wordpress&arlo-import">Synchronize now</a>
+				</p>
+			</div>
+		';
+		
+		if (strtolower($settings['platform_name']) === "websitetestdata") {
+			echo '
+				<div class="notice updated"> 
+					<p>
+						<strong>Connected to demo data</strong>  Your site is currently using demo event, presenter, and venue data. Start an Arlo trial to load your own events!
+					</p>
+					<p>
+						<a class="button button-primary" href="https://www.arlo.co/register">Get started with free Arlo trial</a>&nbsp;&nbsp;&nbsp;&nbsp;
+						<a class="button button-primary arlo-block" href="#general" id="arlo-connet-platform">Connect existing Arlo platform</a>
+					</p>
+				</div>
+			';
+			
+		}
 	}		
 	
 	

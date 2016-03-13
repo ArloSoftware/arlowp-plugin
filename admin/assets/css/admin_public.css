@@ -1,0 +1,11 @@
+#toplevel_page_arlo-for-wordpress .wp-menu-image {
+	background: transparent url(../img/icon-20x20.png) no-repeat center;
+	opacity: .6;
+	filter: alpha(opacity=60);	
+}
+
+#toplevel_page_arlo-for-wordpress:hover .wp-menu-image {
+	background: transparent url(../img/icon-20x20-blue.png) no-repeat center;
+	opacity: 1;
+	filter: alpha(opacity=100);	
+}
