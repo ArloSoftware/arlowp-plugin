@@ -1,0 +1,197 @@
+<?php
+/**
+ * Arlo For Wordpress
+ *
+ * @package   Arlo_For_Wordpress_Admin
+ * @author    Arlo <info@arlo.co>
+ * @license   GPL-2.0+
+ * @link      http://arlo.co
+ * @copyright 2016 Arlo
+ */
+ 
+if(!class_exists('WP_List_Table')){
+	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
+}
+
+class Arlo_For_Wordpress_Lists extends WP_List_Table  {
+	protected $wpdb;
+	protected $singular;
+	protected $plural;
+	protected $platform_name;
+	protected $order;
+	protected $orderby;
+	protected $paged;
+	protected $table_name;
+	protected $active;
+	protected $plugin_slug;
+	
+	protected static $filter_column_mapping = array(
+		'et_id' => 'et.et_arlo_id',
+		'ep_e_id' => 'ep.e_arlo_id',
+		'v_e_id' => 'e.e_arlo_id',
+		'e_parent_id' => 'es.e_parent_arlo_id',
+	);	
+	
+	const PERPAGE = 15;
+
+	public function __construct() {
+		$this->init_variables();	
+		
+		$this->_column_headers = array($this->get_columns(), $this->get_hidden_columns(), $this->get_sortable_columns());
+		
+		$this->init_sql_variables();
+		$this->set_table_name();
+
+		parent::__construct( [
+			'singular' => $this->singular,
+			'plural'   => $this->plural,
+			'ajax'     => false
+		] );
+		
+		$this->prepare_items();
+	}
+	
+	private function init_variables() {
+		global $wpdb;		
+	
+		$plugin = Arlo_For_Wordpress::get_instance();
+		$settings = get_option('arlo_settings');
+				
+		$this->active = $plugin->last_imported;
+		$this->plugin_slug = $plugin->plugin_slug;
+		$this->version = Arlo_For_Wordpress::VERSION;	
+		$this->wpdb = &$wpdb;
+		$this->platform_name = $settings['platform_name'];	
+	}
+	
+	private function init_sql_variables() {
+		$this->orderby = $this->get_orderby_columnname();
+		$this->order = (!empty($_GET['order']) && in_array(strtolower($_GET['order']), ['asc','desc']) ? $_GET['order'] : '');
+		
+		$this->paged = !empty($_GET["paged"]) ? intval($_GET["paged"]) : 1;	
+		$this->paged = ($this->paged <= 0 ? 1 : $this->paged);
+	}
+	
+	private function get_orderby_columnname() {
+		$orderby = (!empty($_GET['orderby']) ? $_GET['orderby'] : '');
+		$columns = $this->_column_headers[2];
+				
+		if (!empty($orderby)) {
+			foreach ($columns as $field_name => $data) {
+				if ($data[0] == $orderby)
+					return $field_name;
+			}
+		}
+		
+		return '';
+	}
+	
+	public function get_title() {
+		return get_admin_page_title();
+	}	
+	
+	public function column_default($item, $column_name) {
+		die( 'function Arlo_For_Wordpress_Lists::column_default() must be over-ridden in a sub-class.' );
+	}	
+	
+	private function get_num_rows() {	
+		$sql = $this->get_sql_query();
+			
+		$result = $this->wpdb->get_results($sql);
+				
+		return $this->wpdb->num_rows;
+	}
+	
+	protected function get_sql_where_array() {
+		return ["active = '" . $this->active . "'"];
+	}
+	
+	private function get_sql_search_where_array() {
+		$where = array();		
+		if (!empty($_GET['s'])) {
+			$search_fields = $this->get_searchable_fields();
+			foreach ($search_fields as $field) {
+				$where[] = $field . " LIKE '%" . $_GET['s'] . "%'";
+			}
+		}
+		
+		if (!empty($_GET['et_id']) && !empty(self::$filter_column_mapping['et_id']) && intval($_GET['et_id'] > 0)) {
+			$where[] = self::$filter_column_mapping['et_id'] .' = ' . intval($_GET['et_id']);
+		}
+		
+		if (!empty($_GET['ep_e_id']) && !empty(self::$filter_column_mapping['ep_e_id']) && intval($_GET['ep_e_id'] > 0)) {
+			$where[] = self::$filter_column_mapping['ep_e_id'] .' = ' . intval($_GET['ep_e_id']);
+		}
+
+		if (!empty($_GET['v_e_id']) && !empty(self::$filter_column_mapping['v_e_id']) && intval($_GET['v_e_id'] > 0)) {
+			$where[] = self::$filter_column_mapping['v_e_id'] .' = ' . intval($_GET['v_e_id']);
+		}
+
+		if (!empty($_GET['e_parent_id']) && !empty(self::$filter_column_mapping['e_parent_id']) && intval($_GET['e_parent_id'] > 0)) {
+			$where[] = self::$filter_column_mapping['e_parent_id'] .' = ' . intval($_GET['e_parent_id']);
+		}
+		
+		
+		return $where;	
+	}
+	
+	protected function get_sql_where_expression() {
+		$where = $this->get_sql_where_array();
+		$where = implode(" AND ", $where);
+		
+		$search_where = $this->get_sql_search_where_array();
+		if (count($search_where)) {
+			$where .= " AND (" . implode(" OR ", $search_where) . ")";
+		}
+		
+		return !empty($where) ? $where : '1';
+	}	
+		
+	public function prepare_items() {
+        
+		$sql = $this->get_sql_query();
+		
+		if (!empty($this->orderby)) {
+			$sql .= ' ORDER BY ' . $this->orderby . ' ' . $this->order;
+		}		
+		
+		$limit = ($this->paged-1) * self::PERPAGE;
+		$sql .= ' LIMIT ' . $limit . ',' . self::PERPAGE;
+		
+		//var_dump($sql);
+		
+		$num = $this->get_num_rows();
+				
+		$this->set_pagination_args( array(
+			"total_items" => $num,
+			"total_pages" => ceil($num / self::PERPAGE),
+			"per_page" => self::PERPAGE,
+      	));		
+      	
+      	$items = $this->wpdb->get_results($sql);
+      			
+		$this->items = $items;		
+	}	
+	
+	protected function get_searchable_fields() {
+		die( 'function Arlo_For_Wordpress_Lists::get_searchable_fields() must be over-ridden in a sub-class.' );
+	}	
+	
+	public function set_table_name() {
+		die( 'function Arlo_For_Wordpress_Lists::set_table_name() must be over-ridden in a sub-class.' );
+	}	
+	
+	public function get_columns() {
+		die( 'function Arlo_For_Wordpress_Lists::get_columns() must be over-ridden in a sub-class.' );
+	}	
+	
+	public function get_hidden_columns() {
+        die( 'function Arlo_For_Wordpress_Lists::get_hidden_columns() must be over-ridden in a sub-class.' );
+    }	
+	
+	public function get_sortable_columns() {
+		die( 'function Arlo_For_Wordpress_Lists::get_sortable_columns() must be over-ridden in a sub-class.' );
+	}	
+}
+
+?>

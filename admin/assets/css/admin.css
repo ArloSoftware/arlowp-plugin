@@ -18,6 +18,15 @@
 	margin: 0 0.5em;
 }
 
+.arlo-list-ellipsis {
+	height: 2.4em;
+	line-height: 1.2em;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
 .arlo-error {
 	border: 1px solid red;
 }
