@@ -38,14 +38,10 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 	public function get_columns() {
 		return $columns = [
 			'e_code'    => __( 'Event code', $this->plugin_slug ),
-			'event_name'    => __( 'Event name', $this->plugin_slug ),
-			'e_name'    => __( 'Session name', $this->plugin_slug ),
+			'event_name'    => __( 'Name', $this->plugin_slug ),
 			'e_startdatetime'    => __( 'Start date', $this->plugin_slug ),
 			'e_finishdatetime'    => __( 'Finish date', $this->plugin_slug ),
 			'v_name' => __( 'Venue name', $this->plugin_slug ),
-			'e_locationname' => __( 'Location name', $this->plugin_slug ),
-			'e_locationroomname' => __( 'Room name', $this->plugin_slug ),
-			'e_placesremaining' => __( 'Places remaining', $this->plugin_slug ),
 			'e_summary' => __( 'Summary', $this->plugin_slug ),
 			'e_sessiondescription' => __( 'Description', $this->plugin_slug ),
 		];
@@ -58,12 +54,10 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 	public function get_sortable_columns() {
 		return array(
 			'e_code' => array( 'e_code', true ),
-			'e_name' => array( 'e_name', true ),
 			'e_startdatetime' => array( 'e_startdatetime', true ),
 			'e_finishdatetime' => array( 'e_finishdatetime', true ),
 			'v_name' => array( 'v_name', true ),
 			'e_locationname' => array( 'e_locationname', true ),
-			'e_locationroomname' => array( 'e_locationroomname', true ),
 			'e_placesremaining' => array( 'e_placesremaining', true ),
 			'e_summary' => array( 'e_summary', true ),
 			'e_sessiondescription' => array( 'e_sessiondescription', true ),
@@ -73,10 +67,7 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 	public function column_default($item, $column_name) {
 		switch ($column_name) {
 			case 'e_code':
-			case 'e_name':
-			case 'event_name':
 			case 'e_locationname':
-			case 'e_locationroomname':
 			case 'e_placesremaining':
 				return $item->$column_name;
 			case 'e_summary':
@@ -88,10 +79,21 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 			case 'e_finishdatetime':
 				return $item->$column_name . " " . $item->e_timezone;
 			break;
-			case 'v_name':				
-				if (!empty($item->$column_name))
-					return '<a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug . '-venues&v_e_id=' . $item->e_arlo_id)  .'" >' . $item->$column_name . '</a>';			
-				break;			
+			case 'v_name':
+				$field = '';				
+				if (!empty($item->$column_name)) {
+					$field = '<div class="arlo-venue-name"><a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug . '-venues&v_e_id=' . $item->e_arlo_id)  .'" >' . $item->$column_name . '</a></div>';			
+				}
+
+				if (!empty($item->e_locationname)) {
+					$field .= '<div class="arlo-location">' . $item->e_locationname . (!empty($item->e_locationroomname) ? ' (' . $item->e_locationroomname . ')' : '') . '</div>';
+				} elseif (!empty($item->e_locationroomname)) {
+					$field .= '<div class="arlo-locationroom">' . $item->e_locationroomname . '</div>';
+				}
+				
+				return $field;
+			case 'event_name':
+				return '<div class="arlo-session-name">' . $item->e_name . '</div><div class="arlo-session-event-name">' . $item->event_name . '</div>';
 			case 'e_register':
 				if (!empty($item->e_registeruri)) 		
 					return '<a href="'.$item->e_registeruri.'" target="_blank">' . $item->e_registermessage . '</a>';
