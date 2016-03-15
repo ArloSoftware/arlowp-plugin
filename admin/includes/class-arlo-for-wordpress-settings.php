@@ -145,8 +145,7 @@ class Arlo_For_Wordpress_Settings {
                             'default_val' => __('Interested in attending? Have a suggestion about running this course near you?', $this->plugin_slug),
                             )
                 );
-                
-		
+                		 		
 		/*
 		 *
 		 * Page Section Settings
@@ -160,6 +159,16 @@ class Arlo_For_Wordpress_Settings {
 	    	$name = __($template['name'], $this->plugin_slug);
 			add_settings_field( $id, '<label for="'.$id.'">'.$name.'</label>', array($this, 'arlo_template_callback'), $this->plugin_slug, 'arlo_pages_section', array('id'=>$id,'label_for'=>$id) );
 		}
+		
+		/*
+		 *
+		 * Regions Section Settings
+		 *
+		 */ 
+		 
+		add_settings_section('arlo_regions_section', null, null, $this->plugin_slug );				
+		add_settings_field( 'arlo_regions', null, array($this, 'arlo_regions_callback'), $this->plugin_slug, 'arlo_regions_section', array('id'=>'regions') );
+		
 		
 		/*
 		 *
@@ -372,6 +381,66 @@ class Arlo_For_Wordpress_Settings {
 			return file_get_contents($path);
 		}
 	}
+	
+	function arlo_regions_callback($args) {
+		
+	    echo '
+	    <h3>Regions</h3>
+	    <p>Please specify your available regions in Arlo</p>
+	    <div id="arlo-regions-header">
+			<div class="arlo-order-number">#</div>
+			<div class="arlo-region-id">Region ID</div>
+			<div class="arlo-region-name">Region name</div>
+	    </div>
+		<ul id="arlo-regions">
+		  <li>
+			<div class="arlo-order-number">1.</div>
+			<div class="arlo-region-id"><input type="text" name="arlo_settings[regionid][]"></div>
+			<div class="arlo-region-controls">
+				<i class="icons8-minus icons8 size-21"></i>
+				<i class="icons8-plus icons8 size-21"></i>
+			</div>			
+			<div class="arlo-region-name"><input type="text" name="arlo_settings[regionname][]"></div>
+		  </li>
+		  <li>
+			<div class="arlo-order-number">1.</div>
+			<div class="arlo-region-id"><input type="text" name="arlo_settings[regionid][]"></div>
+			<div class="arlo-region-controls">
+				<i class="icons8-minus icons8 size-21"></i>
+				<i class="icons8-plus icons8 size-21"></i>
+			</div>			
+			<div class="arlo-region-name"><input type="text" name="arlo_settings[regionname][]"></div>
+		  </li>
+		  <li>
+			<div class="arlo-order-number">1.</div>
+			<div class="arlo-region-id"><input type="text" name="arlo_settings[regionid][]"></div>
+			<div class="arlo-region-controls">
+				<i class="icons8-minus icons8 size-21"></i>
+				<i class="icons8-plus icons8 size-21"></i>
+			</div>			
+			<div class="arlo-region-name"><input type="text" name="arlo_settings[regionname][]"></div>
+		  </li>
+		  <li>
+			<div class="arlo-order-number">1.</div>
+			<div class="arlo-region-id"><input type="text" name="arlo_settings[regionid][]"></div>
+			<div class="arlo-region-controls">
+				<i class="icons8-minus icons8 size-21"></i>
+				<i class="icons8-plus icons8 size-21"></i>
+			</div>			
+			<div class="arlo-region-name"><input type="text" name="arlo_settings[regionname][]"></div>
+		  </li>
+		  <li>
+			<div class="arlo-order-number">1.</div>
+			<div class="arlo-region-id"><input type="text" name="arlo_settings[regionid][]"></div>
+			<div class="arlo-region-controls">
+				<i class="icons8-minus icons8 size-21"></i>
+				<i class="icons8-plus icons8 size-21"></i>
+			</div>			
+			<div class="arlo-region-name"><input type="text" name="arlo_settings[regionname][]"></div>
+		  </li>		  		  		  		    
+		</ul>	    
+	    ';
+	} 	
 	
 	function arlo_welcome_callback($args) {
 		

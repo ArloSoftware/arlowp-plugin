@@ -45,6 +45,17 @@
 			if (typeof tabIDs[1] !== 'undefined') {
 				showVerticalNavTab(tabIDs[1]);
 			}
+			
+			$( "#arlo-regions" ).sortable({
+				placeholder: "arlo-region-highlight",
+				update: function( event, ui ) {
+					$("#arlo-regions li .arlo-order-number").each(function(index) {
+						
+						$(this).html((index + 1) + '.');
+					})
+				}
+		    });
+		    $( "#arlo-regions" ).disableSelection();			
 		});
 		
 		function showNavTab(tabID) {
