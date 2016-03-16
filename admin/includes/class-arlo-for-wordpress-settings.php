@@ -383,6 +383,7 @@ class Arlo_For_Wordpress_Settings {
 	}
 	
 	function arlo_regions_callback($args) {
+		$regions = get_option('arlo_regions', array());
 		
 	    echo '
 	    <h3>Regions</h3>
@@ -392,9 +393,38 @@ class Arlo_For_Wordpress_Settings {
 			<div class="arlo-region-id">Region ID</div>
 			<div class="arlo-region-name">Region name</div>
 	    </div>
-		<ul id="arlo-regions">
-		  <li>
-			<div class="arlo-order-number">1.</div>
+	    <div id="arlo-region-empty">
+			<ul>
+				<li>
+					<div class="arlo-order-number">1.</div>
+					<div class="arlo-region-id"><input type="text" name="arlo_settings[regionid][]"></div>
+					<div class="arlo-region-controls">
+						<i class="icons8-minus icons8 size-21"></i>
+						<i class="icons8-plus icons8 size-21"></i>
+					</div>			
+					<div class="arlo-region-name"><input type="text" name="arlo_settings[regionname][]"></div>
+				</li>
+			</ul>	    	
+	    </div>
+		<ul id="arlo-regions">';
+		$key = 0;
+		if (is_array($regions) && count($regions)) {
+			foreach($regions as $regionid => $regionname) {
+				echo '<li>
+					<div class="arlo-order-number">' . (++$key) . '</div>
+					<div class="arlo-region-id"><input type="text" name="arlo_settings[regionid][]" value="'.$regionid.'"></div>
+					<div class="arlo-region-controls">
+						<i class="icons8-minus icons8 size-21"></i>
+						<i class="icons8-plus icons8 size-21"></i>
+					</div>			
+					<div class="arlo-region-name"><input type="text" name="arlo_settings[regionname][]" value="' . $regionname . '"></div>
+				  </li>
+				 ';
+			}
+		}
+		
+		echo '<li>
+			<div class="arlo-order-number">' . ($key + 1) . '</div>
 			<div class="arlo-region-id"><input type="text" name="arlo_settings[regionid][]"></div>
 			<div class="arlo-region-controls">
 				<i class="icons8-minus icons8 size-21"></i>
@@ -402,42 +432,6 @@ class Arlo_For_Wordpress_Settings {
 			</div>			
 			<div class="arlo-region-name"><input type="text" name="arlo_settings[regionname][]"></div>
 		  </li>
-		  <li>
-			<div class="arlo-order-number">1.</div>
-			<div class="arlo-region-id"><input type="text" name="arlo_settings[regionid][]"></div>
-			<div class="arlo-region-controls">
-				<i class="icons8-minus icons8 size-21"></i>
-				<i class="icons8-plus icons8 size-21"></i>
-			</div>			
-			<div class="arlo-region-name"><input type="text" name="arlo_settings[regionname][]"></div>
-		  </li>
-		  <li>
-			<div class="arlo-order-number">1.</div>
-			<div class="arlo-region-id"><input type="text" name="arlo_settings[regionid][]"></div>
-			<div class="arlo-region-controls">
-				<i class="icons8-minus icons8 size-21"></i>
-				<i class="icons8-plus icons8 size-21"></i>
-			</div>			
-			<div class="arlo-region-name"><input type="text" name="arlo_settings[regionname][]"></div>
-		  </li>
-		  <li>
-			<div class="arlo-order-number">1.</div>
-			<div class="arlo-region-id"><input type="text" name="arlo_settings[regionid][]"></div>
-			<div class="arlo-region-controls">
-				<i class="icons8-minus icons8 size-21"></i>
-				<i class="icons8-plus icons8 size-21"></i>
-			</div>			
-			<div class="arlo-region-name"><input type="text" name="arlo_settings[regionname][]"></div>
-		  </li>
-		  <li>
-			<div class="arlo-order-number">1.</div>
-			<div class="arlo-region-id"><input type="text" name="arlo_settings[regionid][]"></div>
-			<div class="arlo-region-controls">
-				<i class="icons8-minus icons8 size-21"></i>
-				<i class="icons8-plus icons8 size-21"></i>
-			</div>			
-			<div class="arlo-region-name"><input type="text" name="arlo_settings[regionname][]"></div>
-		  </li>		  		  		  		    
 		</ul>	    
 	    ';
 	} 	

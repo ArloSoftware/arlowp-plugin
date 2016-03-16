@@ -144,7 +144,7 @@
 	margin-left: 1em;
 }
 
-#arlo-regions .arlo-order-number {
+#arlo-regions li {
 	cursor: move;
 }
 
@@ -186,6 +186,10 @@
 
 #arlo-regions li:last-of-type .arlo-region-controls i.icons8-plus {
 	display: inline-block;
+}
+
+#arlo-region-empty {
+	display: none;
 }
 
 

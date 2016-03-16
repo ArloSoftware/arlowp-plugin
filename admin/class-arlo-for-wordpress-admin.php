@@ -543,6 +543,17 @@ class Arlo_For_Wordpress_Admin {
 				
 		}
 		
+		//normalize regions
+		$regions = array();
+		if (is_array($new['regionid']) && count($new['regionid'])) {
+			foreach($new['regionid'] as $key => $regionid) {
+				if (!empty($regionid) && !empty($new['regionname'][$key])) {
+					$regions[$regionid] = $new['regionname'][$key];
+				}
+			}
+		}
+		
+		update_option('arlo_regions', $regions);
 				
 		// need to check for posts-page change here
 		// loop through each post type and check if the posts-page has changed

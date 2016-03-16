@@ -34,6 +34,13 @@
 				);		
 			}
 		}
+		
+		function reNumberRegions() {
+			$("#arlo-regions li .arlo-order-number").each(function(index) {				
+				$(this).html((index + 1) + '.');
+			})
+
+		}
 
 		// add novalidate to disable html5 validation, the html5 validation will still work if javascript is disabled
 		$(document).ready(function() {
@@ -48,14 +55,23 @@
 			
 			$( "#arlo-regions" ).sortable({
 				placeholder: "arlo-region-highlight",
-				update: function( event, ui ) {
-					$("#arlo-regions li .arlo-order-number").each(function(index) {
-						
-						$(this).html((index + 1) + '.');
-					})
-				}
+				update: reNumberRegions
 		    });
-		    $( "#arlo-regions" ).disableSelection();			
+		    $( "#arlo-regions" ).disableSelection();	
+		    
+		    $('#arlo-regions').on('click', 'li .icons8-minus', function () {
+		    	$(this).parentsUntil("li").parent().remove();
+		    	reNumberRegions();
+		    });
+		    
+		    $('#arlo-regions').on('click', 'li .icons8-plus', function () {
+		    	var newElement = $('#arlo-region-empty ul li').clone();
+		    	if (newElement.length == 1) {
+		    		$('#arlo-regions').append(newElement);
+		    		reNumberRegions();
+		    	}
+		    });
+		    
 		});
 		
 		function showNavTab(tabID) {
