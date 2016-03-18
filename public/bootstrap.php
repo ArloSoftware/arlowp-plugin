@@ -553,6 +553,7 @@ function install_table_arlo_eventtemplate() {
 		et_post_name VARCHAR(255) NULL,
 		active DATETIME NULL,
 		et_registerinteresturi TEXT NULL,
+		et_viewuri TEXT NULL,
 		PRIMARY KEY  (et_id),
 		KEY et_arlo_id (et_arlo_id))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
@@ -1538,6 +1539,15 @@ $shortcodes->add('event_template_permalink', function($content='', $atts, $short
 	
 	return get_permalink($et_id);
 });
+
+// event view uri shortcode
+
+$shortcodes->add('event_template_link', function($content='', $atts, $shortcode_name){
+	if(!isset($GLOBALS['arlo_eventtemplate']['et_viewuri'])) return '';
+
+	return $GLOBALS['arlo_eventtemplate']['et_viewuri'];
+});
+
 
 // event template summary shortcode
 

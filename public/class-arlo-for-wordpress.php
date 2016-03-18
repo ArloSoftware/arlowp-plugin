@@ -911,8 +911,8 @@ class Arlo_For_Wordpress {
 				$query = $wpdb->query(
 					$wpdb->prepare( 
 						"INSERT INTO $table_name 
-						(et_arlo_id, et_code, et_name, et_descriptionsummary, et_post_name, active, et_registerinteresturi) 
-						VALUES ( %d, %s, %s, %s, %s, %s, %s ) 
+						(et_arlo_id, et_code, et_name, et_descriptionsummary, et_post_name, active, et_registerinteresturi, et_viewuri) 
+						VALUES ( %d, %s, %s, %s, %s, %s, %s, %s ) 
 						", 
 					    $item->TemplateID,
 						@$item->Code,
@@ -920,7 +920,8 @@ class Arlo_For_Wordpress {
 						@$item->Description->Summary,
 						$slug,
 						$timestamp,
-						!empty($item->RegisterInterestUri) ? $item->RegisterInterestUri : ''
+						!empty($item->RegisterInterestUri) ? $item->RegisterInterestUri : '',
+						!empty($item->ViewUri) ? $item->ViewUri : ''
 					)
 				);
                                 
