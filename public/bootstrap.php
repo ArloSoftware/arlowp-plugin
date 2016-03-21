@@ -553,8 +553,10 @@ function install_table_arlo_eventtemplate() {
 		et_post_name VARCHAR(255) NULL,
 		active DATETIME NULL,
 		et_registerinteresturi TEXT NULL,
+		et_region VARCHAR(5) NULL,
 		PRIMARY KEY  (et_id),
-		KEY et_arlo_id (et_arlo_id))
+		KEY et_arlo_id (et_arlo_id),
+		KEY et_region (et_region))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
@@ -626,10 +628,12 @@ function install_table_arlo_events() {
 		e_providerwebsite VARCHAR(255) NULL,
 		e_isonline TINYINT(1) NOT NULL DEFAULT FALSE,
 		e_parent_arlo_id INT(11) NOT NULL,
+		e_region VARCHAR(5) NOT NULL,
 		active DATETIME NULL,
 		PRIMARY KEY  (e_id),
 		KEY et_arlo_id (et_arlo_id),
 		KEY e_arlo_id (e_arlo_id),
+		KEY e_region (e_region),
 		KEY v_id (v_id))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
@@ -739,11 +743,13 @@ function install_table_arlo_offers() {
 		o_message TEXT NULL,
 		o_order INT(11) NULL,
 		o_replaces INT(11) NULL,
+		o_region VARCHAR(5) NOT NULL,
 		active DATETIME NULL,
 		PRIMARY KEY  (o_id),
 		KEY o_arlo_id (o_arlo_id),
 		KEY et_id (et_id),
 		KEY e_id (e_id),
+		KEY o_region (o_region),
 		KEY o_order (o_order))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
