@@ -721,7 +721,7 @@ class Arlo_For_Wordpress {
 		$transport = new \ArloAPI\Transports\Wordpress();
 		$transport->setRequestTimeout(30);
 		
-		$client = new \ArloAPI\Client($platform_name, $transport);
+		$client = new \ArloAPI\Client($platform_name, $transport, self::VERSION);
 		
 		$this->__set('api_client', $client);
 		

@@ -7,7 +7,7 @@ class Client
 	/**  Location for overloaded data.  */
     private $data = array();
 	
-	public function __construct($platform_name, $transport = null)
+	public function __construct($platform_name, $transport = null, $plugin_version = '')
 	{
 		/*
 		// for future use
@@ -17,6 +17,7 @@ class Client
 		}*/
 		
 		$this->__set('platform_name', $platform_name);
+		$this->__set('plugin_version', $plugin_version);
 		$this->__set('transport', $transport);
 	}
 	
@@ -52,7 +53,7 @@ class Client
         if(!$this->__get($name)) {
        		require_once __DIR__ . '/Resources/' . $name . '.php';
        		$class = "ArloAPI\\Resources\\$name";
-       		$this->__set($name, new $class($this->__get('platform_name'), $this->__get('transport')));
+       		$this->__set($name, new $class($this->__get('platform_name'), $this->__get('transport'), $this->__get('plugin_version')));
         }
         
         return $this->__get($name);    

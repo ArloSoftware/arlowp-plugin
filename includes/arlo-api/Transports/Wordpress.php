@@ -19,7 +19,7 @@ class Wordpress extends Transport
 	 *
 	 * @return void
 	 */
-	public function request($platform_name, $path, $post_data=null, $public=true) {
+	public function request($platform_name, $path, $post_data=null, $public=true, $plugin_version = '') {
 		$args = func_get_args();
 		$cache_key = md5(serialize($args));
 		
@@ -31,6 +31,9 @@ class Wordpress extends Transport
 		
 		try {
 			$response = wp_remote_request( $url, array(
+				'headers' => array(
+					'X-Plugin-Version' => $plugin_version,
+				),
 				'compress'    => true,
                                 'decompress'  => true,
                                 'stream'      => false,

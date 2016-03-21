@@ -7,11 +7,12 @@ class Resource
 	/**  Location for overloaded data.  */
     protected $data = array();
     
-	public function __construct($platform_name, $transport)
+	public function __construct($platform_name, $transport, $plugin_version)
 	{
 		$this->__set('platform_name', $platform_name);
 		$this->__set('transport', $transport);
 		$this->__set('api_path', $this->apiPath);
+		$this->__set('plugin_version', $plugin_version);
 	}
 	
 	/**  Local Setter  */
@@ -42,10 +43,11 @@ class Resource
     	$platform_name = $this->__get('platform_name');
     	$transport = $this->__get('transport');
     	$path = $this->__get('api_path');
+    	$plugin_version = $this->__get('plugin_version');
     	
     	if($get_data) $path .= '?' . $get_data;
     	
-    	$response = $transport->request($platform_name, $path, $post_data, $public);
+    	$response = $transport->request($platform_name, $path, $post_data, $public, $plugin_version);
     
 		// reset api_path if it has been overidden
 		$this->__set('api_path', $this->apiPath);
