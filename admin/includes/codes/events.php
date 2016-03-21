@@ -8,8 +8,10 @@
 			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/#arlo_group_divider" target="_blank">[arlo_group_divider]</a></li>
 			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_code" target="_blank">[arlo_event_template_code]</a></li>
 			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_name" target="_blank">[arlo_event_template_name]</a></li>
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_link" target="_blank">[arlo_event_template_link]</a></li>
 			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_summary" target="_blank">[arlo_event_template_summary]</a></li>
 			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_permalink" target="_blank">[arlo_event_template_permalink]</a></li>
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_next_running" target="_blank">[arlo_event_next_running]</a></li>
 			<li>
 				<a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_content_field_item" target="_blank">[arlo_content_field_item]</a>
 				<ul>
