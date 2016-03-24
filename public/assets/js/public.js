@@ -32,6 +32,8 @@
                 
         $('.arlo-filters > select').change(function() {
         	var filters = {
+        		'region-': 'arlo-filter-region',
+        		'search-': 'arlo-filter-search',
         		'cat-': 'arlo-filter-category',
         		'month-': 'arlo-filter-month',
         		'location-': 'arlo-filter-location',

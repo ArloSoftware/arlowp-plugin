@@ -1,4 +1,5 @@
 <ul class="arlo-codes">
+	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_template_search_region_selector" target="_blank">[arlo_template_search_region_selector]</a></li>
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_list_item" target="_blank">[arlo_event_template_list_item]</a></li>
 	<li>
 		<ul>

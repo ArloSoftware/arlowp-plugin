@@ -131,6 +131,51 @@ function arlo_child_categories($cats, $depth=0) {
 }
 
 /**
+ * arlo_create_region_selector function.
+ * 
+ * @access public
+ * @param string $page_name
+ * @return string
+ */
+function arlo_create_region_selector($page_name) {
+	global $post;
+	
+	$valid_page_names = ['upcoming', 'event', 'eventsearch'];
+	$arlo_search = isset($_GET['arlo-search']) && !empty($_GET['arlo-search']) ? $_GET['arlo-search'] : get_query_var('arlo-search', '');
+	
+	var_dump($arlo_search);
+	
+	if (!in_array($page_name, $valid_page_names)) return "";
+
+	$settings = get_option('arlo_settings');  
+	$regions = get_option('arlo_regions');  
+		
+	if (!empty($settings['post_types'][$page_name]['posts_page'])) {
+		$slug = get_post($settings['post_types'][$page_name]['posts_page'])->post_name;
+	} else {
+		$slug = get_post($post)->post_name;
+	}
+
+	$regionselector_html = '<form class="arlo-filters" method="get" action="'.site_url().'/'.$slug.'">';
+	
+	if ($page_name == 'eventsearch' && !empty($arlo_search)) {
+		$regionselector_html .= '<input type="hidden" id="arlo-filter-search" name="arlo-search" value="' . urlencode($arlo_search) . '">';
+		
+	}
+
+	$regionselector_html .= arlo_create_filter('region', $regions , __('All region', $GLOBALS['arlo_plugin_slug']));					
+	
+	$regionselector_html .= '<div class="arlo-filters-buttons"><input type="hidden" id="arlo-page" value="' . $slug . '"> ';
+
+	$regionselector_html .= '</form>';
+
+	return $regionselector_html;
+	
+}
+
+
+
+/**
  * arlo_create_filter function.
  * 
  * @access public
@@ -235,15 +280,15 @@ function arlo_register_custom_post_types() {
 		if($page_id) {
 			switch($id) {
 				case 'upcoming':
-					add_rewrite_rule('^' . $slug . '/(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(tag-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-category=$matches[2]&arlo-month=$matches[4]&arlo-location=$matches[6]&arlo-delivery=$matches[8]&arlo-eventtag=$matches[10]&paged=$matches[12]','top');
+					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(tag-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-delivery=$matches[10]&arlo-eventtag=$matches[12]&paged=$matches[14]','top');
 				break;			
 				case 'event':					
 					add_rewrite_rule('^' . $slug . '/(\d+-[^/]*)?/?$','index.php?arlo_event=$matches[1]','top');
-					add_rewrite_rule('^' . $slug . '/(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(tag-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-category=$matches[2]&arlo-month=$matches[4]&arlo-location=$matches[6]&arlo-delivery=$matches[8]&arlo-templatetag=$matches[10]&paged=$matches[12]','top');
+					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(tag-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-delivery=$matches[10]&arlo-templatetag=$matches[12]&paged=$matches[14]','top');
 				break;
 				case 'eventsearch':
+					//add_rewrite_rule('^' . $slug . '(region-([^/]*))?/search/([^/]*)?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-search=$matches[4]&paged=$matches[5]','top');
 					add_rewrite_rule('^' . $slug . '/search/([^/]*)?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-search=$matches[1]&paged=$matches[3]','top');
-					add_rewrite_rule('^' . $slug . '/page/([^/]*)/?','index.php?page_id=' . $page_id . '&paged=$matches[1]','top');
 				break;
 				case 'presenter':
 					add_rewrite_rule('^' . $slug . '/page/([^/]*)/?','index.php?page_id=' . $page_id . '&paged=$matches[1]','top');
@@ -258,7 +303,7 @@ function arlo_register_custom_post_types() {
 	}
 	
 	// these should possibly be in there own function?
-
+	add_rewrite_tag('%arlo-region%', '([^&]+)');
 	add_rewrite_tag('%arlo-category%', '([^&]+)');
 	add_rewrite_tag('%arlo-month%', '([^&]+)');
 	add_rewrite_tag('%arlo-location%', '([^&]+)');
@@ -1074,6 +1119,17 @@ $shortcodes->add('event_template_search_list', function($content='', $atts, $sho
 	return $content;
 });
 
+// upcoming event list region selector shortcode
+
+$shortcodes->add('template_search_region_selector', function($content='', $atts, $shortcode_name){
+	return arlo_create_region_selector("eventsearch");
+});
+
+// upcoming event list region selector shortcode
+
+$shortcodes->add('template_region_selector', function($content='', $atts, $shortcode_name){
+	return arlo_create_region_selector("event");
+});
 
 // event template list shortcode
 $shortcodes->add('event_template_list', function($content='', $atts, $shortcode_name){
@@ -2315,6 +2371,11 @@ $shortcodes->add('suggest_templates', function($content='', $atts, $shortcode_na
 });
 
 
+// upcoming event list region selector shortcode
+
+$shortcodes->add('upcoming_region_selector', function($content='', $atts, $shortcode_name){
+	return arlo_create_region_selector("upcoming");
+});
 
 // upcoming event list shortcode
 
