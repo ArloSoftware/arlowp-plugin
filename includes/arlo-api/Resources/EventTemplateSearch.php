@@ -12,7 +12,7 @@ class EventTemplateSearch extends Resource
 {
 	protected $apiPath = '/resources/eventtemplatesearch';
 
-	public function search($fields = array(), $count = 20, $skip=0) {
+	public function search($fields = array(), $count = 20, $skip = 0, $region) {
 		$data = array(
 			'fields=' . implode(',', $fields),
 			'top=' . $count,
@@ -20,6 +20,10 @@ class EventTemplateSearch extends Resource
 			'skip=' . $skip,
 			'format=json'
 		);
+		
+		if (!empty($region)) {
+			$data[] = 'region=' . $region;
+		}
 		
 		$results = $this->request(implode('&', $data));
 		
@@ -37,21 +41,28 @@ class EventTemplateSearch extends Resource
 	 *
 	 * @return array
 	 */
-	public function getAllEventTemplates($fields=array()) {
-		$maxCount = 200;
-	
-		$result = $this->search($fields, $maxCount);
+	public function getAllEventTemplates($fields = array(), $regions = array()) {
+		$maxCount = 10;
 		
-		$items = $result->Items;
+		if (!(is_array($regions) && count($regions))) {
+			$regions = [''];
+		}		
 		
-		// get items over and above the max 200 imposed by the API
-		// Dirty... but is a limitation of the public API
-		if($result->TotalCount > $maxCount) {
-			$iterate = ceil($result->TotalCount/$maxCount)-1;// we've already gone once - minus 1
+		foreach($regions as $region) {
+			$result = $this->search($fields, $maxCount, 0, $region);
+				
+			$items[$region] = $result->Items;
 			
-			for($i=1;$i<=$iterate;$i++) {
-				$items = array_merge($items, $this->search($fields, $maxCount, $i*$maxCount)->Items);
+			// get items over and above the max 200 imposed by the API
+			// Dirty... but is a limitation of the public API
+			if($result->TotalCount > $maxCount) {
+				$iterate = ceil($result->TotalCount/$maxCount)-1;// we've already gone once - minus 1
+				
+				for($i=1;$i<=$iterate;$i++) {
+					$items[$region] = array_merge($items[$region], $this->search($fields, $maxCount, $i*$maxCount, $region)->Items);
+				}
 			}
+			
 		}
 		
 		return $items;

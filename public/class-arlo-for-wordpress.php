@@ -884,10 +884,16 @@ class Arlo_For_Wordpress {
 	
 	private function import_event_templates($timestamp) {
 		global $wpdb;
-	
+		
+		$regions = get_option('arlo_regions');
+		
+		if (!(is_array($regions))) {
+			$regions = [];
+		}
+			
 		$client = $this->get_api_client();
 		
-		$items = $client->EventTemplateSearch()->getAllEventTemplates(
+		$regionalized_items = $client->EventTemplateSearch()->getAllEventTemplates(
 			array(
 				'TemplateID',
 				'Code',
@@ -899,200 +905,207 @@ class Arlo_For_Wordpress {
 				'RegisterInterestUri',
 				'Categories',
 				'Tags',
-			)
+			), 
+			array_keys($regions)
 		);
 		
 		$table_name = "{$wpdb->prefix}arlo_eventtemplates";
 		
-		if(!empty($items)) {
-		
-			foreach($items as $item) {
-				$slug = sanitize_title($item->TemplateID . ' ' . $item->Name);
-				$query = $wpdb->query(
-					$wpdb->prepare( 
-						"INSERT INTO $table_name 
-						(et_arlo_id, et_code, et_name, et_descriptionsummary, et_post_name, active, et_registerinteresturi) 
-						VALUES ( %d, %s, %s, %s, %s, %s, %s ) 
-						", 
-					    $item->TemplateID,
-						@$item->Code,
-						$item->Name,
-						@$item->Description->Summary,
-						$slug,
-						$timestamp,
-						!empty($item->RegisterInterestUri) ? $item->RegisterInterestUri : ''
-					)
-				);
-                                
-                if ($query === false) {
-                    throw new Exception('Database insert failed: ' . $table_name);
-                }
+		if(!empty($regionalized_items)) {
 				
-				$template_event_id = $wpdb->insert_id;
-				
-				//save the tags
-				if (isset($item->Tags) && is_array($item->Tags)) {
-					$exisiting_tags = [];
-					$sql = "
-					SELECT 
-						id, 
-						tag
-					FROM
-						{$wpdb->prefix}arlo_tags 
-					WHERE 
-						tag IN ('" . implode("', '", $item->Tags) . "')
-					AND
-						active = '{$timestamp}'
-					";
-					$rows = $wpdb->get_results($sql, ARRAY_A);
-					foreach ($rows as $row) {
-						$exisiting_tags[$row['tag']] = $row['id'];
-					}
-					unset($rows);
+			foreach($regionalized_items as $region => $items) {
+			
+				foreach ($items as $item) {
+					//$slug = (!empty($region) ? $region . '/' : '') . sanitize_title($item->TemplateID . ' ' . $item->Name);
+					$slug = sanitize_title($item->TemplateID . ' ' . $item->Name);
+					$query = $wpdb->query(
+						$wpdb->prepare( 
+							"INSERT INTO $table_name 
+							(et_arlo_id, et_code, et_name, et_descriptionsummary, et_post_name, active, et_registerinteresturi, et_region) 
+							VALUES ( %d, %s, %s, %s, %s, %s, %s, %s) 
+							", 
+						    $item->TemplateID,
+							@$item->Code,
+							$item->Name,
+							@$item->Description->Summary,
+							$slug,
+							$timestamp,
+							!empty($item->RegisterInterestUri) ? $item->RegisterInterestUri : null,
+							(!empty($region) ? $region : null)
+						)
+					);
+	                                
+	                if ($query === false) {
+	                    throw new Exception('Database insert failed: ' . $table_name);
+	                }
 					
-					foreach ($item->Tags as $tag) {
-						if (empty($exisiting_tags[$tag])) {
-							$query = $wpdb->query( $wpdb->prepare( 
-								"INSERT INTO {$wpdb->prefix}arlo_tags
-								(tag, active) 
-								VALUES ( %s, %s ) 
-								", 
-								$tag,
-								$timestamp
-							) );
-														
-							if ($query === false) {
-								throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_tags' );
+					$template_event_id = $wpdb->insert_id;				
+					
+					//save the tags
+					if (isset($item->Tags) && is_array($item->Tags)) {
+						$exisiting_tags = [];
+						$sql = "
+						SELECT 
+							id, 
+							tag
+						FROM
+							{$wpdb->prefix}arlo_tags 
+						WHERE 
+							tag IN ('" . implode("', '", $item->Tags) . "')
+						AND
+							active = '{$timestamp}'
+						";
+						$rows = $wpdb->get_results($sql, ARRAY_A);
+						foreach ($rows as $row) {
+							$exisiting_tags[$row['tag']] = $row['id'];
+						}
+						unset($rows);
+						
+						foreach ($item->Tags as $tag) {
+							if (empty($exisiting_tags[$tag])) {
+								$query = $wpdb->query( $wpdb->prepare( 
+									"INSERT INTO {$wpdb->prefix}arlo_tags
+									(tag, active) 
+									VALUES ( %s, %s ) 
+									", 
+									$tag,
+									$timestamp
+								) );
+															
+								if ($query === false) {
+									throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_tags' );
+								} else {
+									$exisiting_tags[$tag] = $wpdb->insert_id;
+								}
+							}
+													
+							if (!empty($exisiting_tags[$tag])) {
+								$query = $wpdb->query( $wpdb->prepare( 
+									"REPLACE INTO {$wpdb->prefix}arlo_eventtemplates_tags
+									(et_arlo_id, tag_id, active) 
+									VALUES ( %d, %d, %s ) 
+									", 
+									$item->TemplateID,
+									$exisiting_tags[$tag],
+									$timestamp
+								) );
+								
+								if ($query === false) {
+									throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_events_tags' );
+								}
 							} else {
-								$exisiting_tags[$tag] = $wpdb->insert_id;
+								throw new Exception('Couldn\'t find tag: ' . $tag );
 							}
 						}
-												
-						if (!empty($exisiting_tags[$tag])) {
+					}
+					
+					// create associated custom post, if it dosen't exist
+					if(!arlo_get_post_by_name($slug, 'arlo_event')) {
+						wp_insert_post(array(
+							'post_title'    => $item->Name,
+							'post_content'  => @$item->Description->Summary,
+							'post_status'   => 'publish',
+							'post_author'   => 1,
+							'post_type'		=> 'arlo_event',
+							'post_name'		=> $slug
+						));
+					}
+					
+					// need to insert associated data here
+					// advertised offers
+					if(isset($item->BestAdvertisedOffers) && !empty($item->BestAdvertisedOffers)) {
+						$offers = array_reverse($item->BestAdvertisedOffers);
+						foreach($offers as $key => $offer) {
 							$query = $wpdb->query( $wpdb->prepare( 
-								"REPLACE INTO {$wpdb->prefix}arlo_eventtemplates_tags
-								(et_arlo_id, tag_id, active) 
+								"INSERT INTO {$wpdb->prefix}arlo_offers 
+								(o_arlo_id, et_id, e_id, o_label, o_isdiscountoffer, o_currencycode, o_offeramounttaxexclusive, o_offeramounttaxinclusive, o_formattedamounttaxexclusive, o_formattedamounttaxinclusive, o_taxrateshortcode, o_taxratename, o_taxratepercentage, o_message, o_order, o_replaces, o_region, active) 
+								VALUES ( %d, %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, %s, %s, %s ) 
+								", 
+								$offer->OfferID+1,
+							    $template_event_id,
+								null,
+								@$offer->Label,
+								@$offer->IsDiscountOffer,
+								@$offer->OfferAmount->CurrencyCode,
+								@$offer->OfferAmount->AmountTaxExclusive,
+								@$offer->OfferAmount->AmountTaxInclusive,
+								@$offer->OfferAmount->FormattedAmountTaxExclusive,
+								@$offer->OfferAmount->FormattedAmountTaxInclusive,
+								@$offer->OfferAmount->TaxRate->ShortName,
+								@$offer->OfferAmount->TaxRate->Name,
+								@$offer->OfferAmount->TaxRate->RatePercent,
+								@$offer->Message,
+								$key+1,
+								(isset($offer->ReplacesOfferID)) ? $offer->ReplacesOfferID+1 : null,
+								(!empty($region) ? $region : 'NULL'),
+								$timestamp
+							) );
+								                                                        
+		                    if ($query === false) {
+		                        throw new Exception('Database insert failed: ' . $table_name);
+		                    }
+						}
+					}	
+					
+					// content fields
+					if(isset($item->Description->ContentFields) && !empty($item->Description->ContentFields)) {
+						foreach($item->Description->ContentFields as $index => $content) {
+							$query = $wpdb->query( $wpdb->prepare( 
+								"INSERT INTO {$wpdb->prefix}arlo_contentfields 
+								(et_id, cf_fieldname, cf_text, cf_order, e_contenttype, active) 
+								VALUES ( %d, %s, %s, %s, %s, %s ) 
+								", 
+							    $template_event_id,
+								@$content->FieldName,
+								@$content->Content->Text,
+								$index,
+								@$content->Content->ContentType,
+								$timestamp
+							) );
+	                        if ($query === false) {
+	                            throw new Exception('Database insert failed: ' . $table_name);
+	                        }
+						}
+					}
+					
+					// prsenters
+					if(isset($item->AdvertisedPresenters) && !empty($item->AdvertisedPresenters)) {
+						foreach($item->AdvertisedPresenters as $index => $presenter) {
+							$query = $wpdb->query( $wpdb->prepare( 
+								"REPLACE INTO {$wpdb->prefix}arlo_eventtemplates_presenters 
+								(et_arlo_id, p_arlo_id, p_order, active) 
+								VALUES ( %d, %d, %d, %s ) 
+								", 
+							    $item->TemplateID,
+							    $presenter->PresenterID,
+							    $index,
+							    $timestamp
+							) );
+	                                                        
+	                        if ($query === false) {
+	                            throw new Exception('Database insert failed: ' . $table_name);
+	                        }
+						}
+					}
+					
+					// categories
+					if(isset($item->Categories) && !empty($item->Categories)) {
+						foreach($item->Categories as $index => $category) {
+							$query = $wpdb->query( $wpdb->prepare( 
+								"REPLACE INTO {$wpdb->prefix}arlo_eventtemplates_categories 
+								(et_arlo_id, c_arlo_id, active) 
 								VALUES ( %d, %d, %s ) 
 								", 
-								$item->TemplateID,
-								$exisiting_tags[$tag],
-								$timestamp
+							    $item->TemplateID,
+							    $category->CategoryID,
+							    $timestamp
 							) );
-							
-							if ($query === false) {
-								throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_events_tags' );
-							}
-						} else {
-							throw new Exception('Couldn\'t find tag: ' . $tag );
+	                                                        
+	                        if ($query === false) {
+	                            throw new Exception('Database insert failed: ' . $table_name);
+	                        }
 						}
-					}
-				}				
-				
-				// create associated custom post, if it dosen't exist
-				if(!arlo_get_post_by_name($slug, 'arlo_event')) {
-					wp_insert_post(array(
-						'post_title'    => $item->Name,
-						'post_content'  => @$item->Description->Summary,
-						'post_status'   => 'publish',
-						'post_author'   => 1,
-						'post_type'		=> 'arlo_event',
-						'post_name'		=> $slug
-					));
-				}
-				
-				// need to insert associated data here
-				// advertised offers
-				if(isset($item->BestAdvertisedOffers) && !empty($item->BestAdvertisedOffers)) {
-					$offers = array_reverse($item->BestAdvertisedOffers);
-					foreach($offers as $key => $offer) {
-						$query = $wpdb->query( $wpdb->prepare( 
-							"INSERT INTO {$wpdb->prefix}arlo_offers 
-							(o_arlo_id, et_id, e_id, o_label, o_isdiscountoffer, o_currencycode, o_offeramounttaxexclusive, o_offeramounttaxinclusive, o_formattedamounttaxexclusive, o_formattedamounttaxinclusive, o_taxrateshortcode, o_taxratename, o_taxratepercentage, o_message, o_order, o_replaces, active) 
-							VALUES ( %d, %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, %s, %s ) 
-							", 
-							$offer->OfferID+1,
-						    $template_event_id,
-							null,
-							@$offer->Label,
-							@$offer->IsDiscountOffer,
-							@$offer->OfferAmount->CurrencyCode,
-							@$offer->OfferAmount->AmountTaxExclusive,
-							@$offer->OfferAmount->AmountTaxInclusive,
-							@$offer->OfferAmount->FormattedAmountTaxExclusive,
-							@$offer->OfferAmount->FormattedAmountTaxInclusive,
-							@$offer->OfferAmount->TaxRate->ShortName,
-							@$offer->OfferAmount->TaxRate->Name,
-							@$offer->OfferAmount->TaxRate->RatePercent,
-							@$offer->Message,
-							$key+1,
-							(isset($offer->ReplacesOfferID)) ? $offer->ReplacesOfferID+1 : null,
-							$timestamp
-						) );
-                                                        
-	                    if ($query === false) {
-	                        throw new Exception('Database insert failed: ' . $table_name);
-	                    }
-					}
-				}
-				
-				// content fields
-				if(isset($item->Description->ContentFields) && !empty($item->Description->ContentFields)) {
-					foreach($item->Description->ContentFields as $index => $content) {
-						$query = $wpdb->query( $wpdb->prepare( 
-							"INSERT INTO {$wpdb->prefix}arlo_contentfields 
-							(et_id, cf_fieldname, cf_text, cf_order, e_contenttype, active) 
-							VALUES ( %d, %s, %s, %s, %s, %s ) 
-							", 
-						    $template_event_id,
-							@$content->FieldName,
-							@$content->Content->Text,
-							$index,
-							@$content->Content->ContentType,
-							$timestamp
-						) );
-                        if ($query === false) {
-                            throw new Exception('Database insert failed: ' . $table_name);
-                        }
-					}
-				}
-				
-				// prsenters
-				if(isset($item->AdvertisedPresenters) && !empty($item->AdvertisedPresenters)) {
-					foreach($item->AdvertisedPresenters as $index => $presenter) {
-						$query = $wpdb->query( $wpdb->prepare( 
-							"REPLACE INTO {$wpdb->prefix}arlo_eventtemplates_presenters 
-							(et_arlo_id, p_arlo_id, p_order, active) 
-							VALUES ( %d, %d, %d, %s ) 
-							", 
-						    $item->TemplateID,
-						    $presenter->PresenterID,
-						    $index,
-						    $timestamp
-						) );
-                                                        
-                        if ($query === false) {
-                            throw new Exception('Database insert failed: ' . $table_name);
-                        }
-					}
-				}
-				
-				// categories
-				if(isset($item->Categories) && !empty($item->Categories)) {
-					foreach($item->Categories as $index => $category) {
-						$query = $wpdb->query( $wpdb->prepare( 
-							"REPLACE INTO {$wpdb->prefix}arlo_eventtemplates_categories 
-							(et_arlo_id, c_arlo_id, active) 
-							VALUES ( %d, %d, %s ) 
-							", 
-						    $item->TemplateID,
-						    $category->CategoryID,
-						    $timestamp
-						) );
-                                                        
-                        if ($query === false) {
-                            throw new Exception('Database insert failed: ' . $table_name);
-                        }
-					}
+					}													
 				}
 			}
 		}

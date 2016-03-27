@@ -46,7 +46,8 @@ class Wordpress extends Transport
 			if(empty($response) || !isset($response['response']) || empty($response['body'])) {
 				throw new \Exception('Invalid Arlo Response.');
 			} else if($response['response']['code'] != 200) {
-				throw new \Exception('Error code ' . $response['response']['code'] . ': ' . $response['response']['message']);
+				$body = json_decode($response['body'], true);			
+				throw new \Exception('Error code ' . $response['response']['code'] . ': ' . $response['response']['message'] . (!empty($body['Message']) ?  ' ' . $body['Message'] : ''));
 			}
 		} catch(\Exception $e) {
 			// trigger an error
