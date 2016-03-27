@@ -143,12 +143,10 @@ function arlo_create_region_selector($page_name) {
 	$valid_page_names = ['upcoming', 'event', 'eventsearch'];
 	$arlo_search = isset($_GET['arlo-search']) && !empty($_GET['arlo-search']) ? $_GET['arlo-search'] : get_query_var('arlo-search', '');
 	
-	var_dump($arlo_search);
-	
-	if (!in_array($page_name, $valid_page_names)) return "";
-
 	$settings = get_option('arlo_settings');  
 	$regions = get_option('arlo_regions');  
+	
+	if (!in_array($page_name, $valid_page_names) || !(is_array($regions) && count($regions))) return "";
 		
 	if (!empty($settings['post_types'][$page_name]['posts_page'])) {
 		$slug = get_post($settings['post_types'][$page_name]['posts_page'])->post_name;
@@ -159,8 +157,7 @@ function arlo_create_region_selector($page_name) {
 	$regionselector_html = '<form class="arlo-filters" method="get" action="'.site_url().'/'.$slug.'">';
 	
 	if ($page_name == 'eventsearch' && !empty($arlo_search)) {
-		$regionselector_html .= '<input type="hidden" id="arlo-filter-search" name="arlo-search" value="' . urlencode($arlo_search) . '">';
-		
+		$regionselector_html .= '<input type="hidden" id="arlo-filter-search" name="arlo-search" value="' . urlencode($arlo_search) . '">';		
 	}
 
 	$regionselector_html .= arlo_create_filter('region', $regions , __('All region', $GLOBALS['arlo_plugin_slug']));					
