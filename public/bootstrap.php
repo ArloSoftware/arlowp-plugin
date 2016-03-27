@@ -167,7 +167,6 @@ function arlo_create_region_selector($page_name) {
 	$regionselector_html .= '</form>';
 
 	return $regionselector_html;
-	
 }
 
 
