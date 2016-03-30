@@ -53,9 +53,9 @@ add_filter( 'the_title', function($title, $id = null){
 			$subtitle .= ' (' . $location . ')';
 		}
 	} else if (!empty($location)) {
-		$subtitle = $location;		
+		$subtitle = htmlentities($location);		
 	} else if (!empty($search)) {
-		$subtitle = $search;
+		$subtitle = htmlentities($search);
 	}
 	
 	// append category name to events page
