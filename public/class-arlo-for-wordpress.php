@@ -916,7 +916,7 @@ class Arlo_For_Wordpress {
 			foreach($regionalized_items as $region => $items) {
 			
 				foreach ($items as $item) {
-					//$slug = (!empty($region) ? $region . '/' : '') . sanitize_title($item->TemplateID . ' ' . $item->Name);
+					$slug = (!empty($region) ? $region . '/' : '') . sanitize_title($item->TemplateID . ' ' . $item->Name);
 					$slug = sanitize_title($item->TemplateID . ' ' . $item->Name);
 					$query = $wpdb->query(
 						$wpdb->prepare( 
@@ -1008,7 +1008,7 @@ class Arlo_For_Wordpress {
 							'post_author'   => 1,
 							'post_type'		=> 'arlo_event',
 							'post_name'		=> $slug
-						));
+						), true);						
 					}
 					
 					// need to insert associated data here
@@ -1113,7 +1113,7 @@ class Arlo_For_Wordpress {
 		return $items;
 	}
 	
-	private function save_event_data($item = array(), $parent_id = 0, $timestamp) {
+	private function save_event_data($item = array(), $parent_id = 0, $timestamp, $region) {
 		global $wpdb;
 		
 		$table_name = "{$wpdb->prefix}arlo_events";
@@ -1121,8 +1121,8 @@ class Arlo_For_Wordpress {
 		$query = $wpdb->query(
 			$wpdb->prepare( 
 				"INSERT INTO $table_name 
-				(e_arlo_id, et_arlo_id, e_parent_arlo_id, e_code, e_name, e_startdatetime, e_finishdatetime, e_datetimeoffset, e_timezone, e_timezone_id, v_id, e_locationname, e_locationroomname, e_locationvisible , e_isfull, e_placesremaining, e_summary, e_sessiondescription, e_notice, e_viewuri, e_registermessage, e_registeruri, e_providerorganisation, e_providerwebsite, e_isonline, active) 
-				VALUES ( %d, %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) 
+				(e_arlo_id, et_arlo_id, e_parent_arlo_id, e_code, e_name, e_startdatetime, e_finishdatetime, e_datetimeoffset, e_timezone, e_timezone_id, v_id, e_locationname, e_locationroomname, e_locationvisible , e_isfull, e_placesremaining, e_summary, e_sessiondescription, e_notice, e_viewuri, e_registermessage, e_registeruri, e_providerorganisation, e_providerwebsite, e_isonline, e_region, active) 
+				VALUES ( %d, %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) 
 				", 
 			    $item->EventID,
 				$item->EventTemplateID,
@@ -1149,6 +1149,7 @@ class Arlo_For_Wordpress {
 				@$item->Provider->Name,
 				@$item->Provider->WebsiteUri,
 				@$item->Location->IsOnline,
+				(!empty($region) ? $region : 'NULL'),
 				$timestamp
 			)
 		);
@@ -1166,8 +1167,8 @@ class Arlo_For_Wordpress {
 			foreach($offers as $key => $offer) {
 				$query = $wpdb->query( $wpdb->prepare( 
 					"INSERT INTO {$wpdb->prefix}arlo_offers 
-					(o_arlo_id, et_id, e_id, o_label, o_isdiscountoffer, o_currencycode, o_offeramounttaxexclusive, o_offeramounttaxinclusive, o_formattedamounttaxexclusive, o_formattedamounttaxinclusive, o_taxrateshortcode, o_taxratename, o_taxratepercentage, o_message, o_order, o_replaces, active) 
-					VALUES ( %d, %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, %s, %s ) 
+					(o_arlo_id, et_id, e_id, o_label, o_isdiscountoffer, o_currencycode, o_offeramounttaxexclusive, o_offeramounttaxinclusive, o_formattedamounttaxexclusive, o_formattedamounttaxinclusive, o_taxrateshortcode, o_taxratename, o_taxratepercentage, o_message, o_order, o_replaces, o_region, active) 
+					VALUES ( %d, %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, %s, %s, %s ) 
 					", 
 					$offer->OfferID+1,
 				    null,
@@ -1185,6 +1186,7 @@ class Arlo_For_Wordpress {
 					@$offer->Message,
 					$key+1,
 					(isset($offer->ReplacesOfferID)) ? $offer->ReplacesOfferID+1 : null,
+					(!empty($region) ? $region : 'NULL'),
 					$timestamp
 				) );
 				
@@ -1226,10 +1228,16 @@ class Arlo_For_Wordpress {
 	
 	private function import_events($timestamp) {
 		global $wpdb;
+		
+		$regions = get_option('arlo_regions');
+		
+		if (!(is_array($regions))) {
+			$regions = [];
+		}		
 	
 		$client = $this->get_api_client();
 		
-		$items = $client->EventSearch()->getAllEvents(
+		$regionalized_items = $client->EventSearch()->getAllEvents(
 			array(
 				'EventID',
 				'EventTemplateID',
@@ -1254,72 +1262,77 @@ class Arlo_For_Wordpress {
 				'TemplateCode',
 				'Tags',
 				'Sessions'
-			)
+			), 
+			array_keys($regions)
 		);
-		
-		if(!empty($items)) {
-			foreach($items as $item) {
 				
-				$event_id = $this->save_event_data($item, 0, $timestamp);
+		if(!empty($regionalized_items)) {
 				
-				//save the tags
-				if (isset($item->Tags) && is_array($item->Tags)) {
-					$exisiting_tags = [];
-					$sql = "
-					SELECT 
-						id, 
-						tag
-					FROM
-						{$wpdb->prefix}arlo_tags 
-					WHERE 
-						tag IN ('" . implode("', '", $item->Tags) . "')
-					AND
-						active = '{$timestamp}'
-					";
-					$rows = $wpdb->get_results($sql, ARRAY_A);
-					foreach ($rows as $row) {
-						$exisiting_tags[$row['tag']] = $row['id'];
-					}
-					unset($rows);
+			foreach($regionalized_items as $region => $items) {
+			
+				foreach($items as $item) {
 					
-					foreach ($item->Tags as $tag) {
-						if (empty($exisiting_tags[$tag])) {
-							$query = $wpdb->query( $wpdb->prepare( 
-								"INSERT INTO {$wpdb->prefix}arlo_tags
-								(tag, active) 
-								VALUES ( %s, %s ) 
-								", 
-								$tag,
-								$timestamp
-							) );
-														
-							if ($query === false) {
-								throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_tags' );
+					$event_id = $this->save_event_data($item, 0, $timestamp, $region);
+					
+					//save the tags
+					if (isset($item->Tags) && is_array($item->Tags)) {
+						$exisiting_tags = [];
+						$sql = "
+						SELECT 
+							id, 
+							tag
+						FROM
+							{$wpdb->prefix}arlo_tags 
+						WHERE 
+							tag IN ('" . implode("', '", $item->Tags) . "')
+						AND
+							active = '{$timestamp}'
+						";
+						$rows = $wpdb->get_results($sql, ARRAY_A);
+						foreach ($rows as $row) {
+							$exisiting_tags[$row['tag']] = $row['id'];
+						}
+						unset($rows);
+						
+						foreach ($item->Tags as $tag) {
+							if (empty($exisiting_tags[$tag])) {
+								$query = $wpdb->query( $wpdb->prepare( 
+									"INSERT INTO {$wpdb->prefix}arlo_tags
+									(tag, active) 
+									VALUES ( %s, %s ) 
+									", 
+									$tag,
+									$timestamp
+								) );
+															
+								if ($query === false) {
+									throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_tags' );
+								} else {
+									$exisiting_tags[$tag] = $wpdb->insert_id;
+								}
+							}
+													
+							if (!empty($exisiting_tags[$tag])) {
+								$query = $wpdb->query( $wpdb->prepare( 
+									"REPLACE INTO {$wpdb->prefix}arlo_events_tags
+									(e_arlo_id, tag_id, active) 
+									VALUES ( %d, %d, %s ) 
+									", 
+									$item->EventID,
+									$exisiting_tags[$tag],
+									$timestamp
+								) );
+								
+								if ($query === false) {
+									throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_events_tags' );
+								}
 							} else {
-								$exisiting_tags[$tag] = $wpdb->insert_id;
+								throw new Exception('Couldn\'t find tag: ' . $tag );
 							}
 						}
-												
-						if (!empty($exisiting_tags[$tag])) {
-							$query = $wpdb->query( $wpdb->prepare( 
-								"REPLACE INTO {$wpdb->prefix}arlo_events_tags
-								(e_arlo_id, tag_id, active) 
-								VALUES ( %d, %d, %s ) 
-								", 
-								$item->EventID,
-								$exisiting_tags[$tag],
-								$timestamp
-							) );
-							
-							if ($query === false) {
-								throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_events_tags' );
-							}
-						} else {
-							throw new Exception('Couldn\'t find tag: ' . $tag );
-						}
-					}
+					}				
 				}				
-			}				
+			}
 		}
 		
 		return $items;
