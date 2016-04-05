@@ -1303,6 +1303,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 	global $wpdb, $wp_query, $arlo_plugin;
 
 	$settings = get_option('arlo_settings');  
+	$regions = get_option('arlo_regions');
 	
 	if (isset($atts['show_only_at_bottom']) && $atts['show_only_at_bottom'] == "true" && isset($GLOBALS['categories_count']) && $GLOBALS['categories_count']) {
 		$GLOBALS['show_only_at_bottom'] = true;
@@ -1331,7 +1332,8 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 	$arlo_templatetag = isset($_GET['arlo-templatetag']) && !empty($_GET['arlo-templatetag']) ? $_GET['arlo-templatetag'] : get_query_var('arlo-templatetag', '');
 	$arlo_search = isset($_GET['arlo-search']) && !empty($_GET['arlo-search']) ? $_GET['arlo-search'] : get_query_var('arlo-search', '');
 	$arlo_search = esc_sql(stripslashes(urldecode($arlo_search)));
-
+	$arlo_region = get_query_var('arlo-region', '');
+	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
 	
 	if(!empty($arlo_location) || (isset($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) ) :
 
@@ -1366,7 +1368,11 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 		';
 		
 		$atts['show_child_elements'] = "true";
-	}			
+	}	
+	
+	if (!empty($arlo_region)) {
+		$where .= ' AND et.et_region = "' . $arlo_region . '"';
+	}		
 			
 	if(!empty($arlo_category) || !empty($atts['category'])) {
 
@@ -2485,6 +2491,7 @@ $shortcodes->add('upcoming_list_pagination', function($content='', $atts, $short
 $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_name){
 	global $wpdb;
 	$settings = get_option('arlo_settings');
+	$regions = get_option('arlo_regions');
 
 	$limit = isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page');
 	$page = !empty($_GET['paged']) ? intval($_GET['paged']) : intval(get_query_var('paged'));
@@ -2508,6 +2515,9 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 	$arlo_category = isset($_GET['arlo-category']) && !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : get_query_var('arlo-category', '');
 	$arlo_delivery = isset($_GET['arlo-delivery']) && !empty($_GET['arlo-delivery']) ? $_GET['arlo-delivery'] : get_query_var('arlo-delivery', '');
 	$arlo_eventtag = isset($_GET['arlo-eventtag']) && !empty($_GET['arlo-eventtag']) ? $_GET['arlo-eventtag'] : get_query_var('arlo-eventtag', '');
+	$arlo_region = get_query_var('arlo-region', '');
+	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+	
 
 	if(!empty($arlo_month)) :
 		$dates = explode(':',urldecode($arlo_month));
@@ -2530,7 +2540,11 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 	if(!empty($arlo_eventtag)) :
 		$where .= " AND etag.tag_id = '" . intval($arlo_eventtag) . "'";
 		$join .= " LEFT JOIN $t7 etag USING (e_arlo_id) ";
-	endif;		
+	endif;	
+	
+	if (!empty($arlo_region)) {
+		$where .= ' AND et.et_region = "' . $arlo_region . '" AND e.e_region = "' . $arlo_region . '"';
+	}		
 	
 	$sql = "SELECT DISTINCT
 		e.*, et.et_name, et.et_post_name, et.et_descriptionsummary, et.et_registerinteresturi, o.o_formattedamounttaxexclusive, o_offeramounttaxexclusive, o.o_formattedamounttaxinclusive, o_offeramounttaxinclusive, o.o_taxrateshortcode, v.v_post_name, c.c_arlo_id
@@ -3448,12 +3462,22 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_name){
 	if(!isset($GLOBALS['arlo_eventtemplate']) || empty($GLOBALS['arlo_eventtemplate']['et_arlo_id'])) return;
 	$return = "";
-        
+	
+	
+	$regions = get_option('arlo_regions');
+	$arlo_region = get_query_var('arlo-region', '');
+	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+	
+
 	$conditions = array(
 		'template_id' => $GLOBALS['arlo_eventtemplate']['et_arlo_id'],
 		'date' => 'e.e_startdatetime > NOW()',
 		'parent_id' => 'e.e_parent_arlo_id = 0',
 	);
+	
+	if (!empty($arlo_region)) {
+		$conditions['region'] = 'e.e_region = "' . $arlo_region . '"';
+	}
 	
 	// merge and extract attributes
 	extract(shortcode_atts(array(
