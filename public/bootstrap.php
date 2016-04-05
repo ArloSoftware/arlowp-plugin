@@ -3274,15 +3274,19 @@ $shortcodes->add('group_divider', function($content='', $atts, $shortcode_name){
 function category_ul($items, $counts) {
 	$post_types = arlo_get_option('post_types');
 	$events_url = get_page_link($post_types['event']['posts_page']);
-
+	
 	if(!is_array($items) || empty($items)) return '';
+	
+	$regions = get_option('arlo_regions');	
+	$arlo_region = get_query_var('arlo-region', '');
+	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
 	
 	$html = '<ul class="arlo-category-list">';
 	
 	foreach($items as $cat) {
 		$html .= '<li>';
 		$html .= '<a href="';
-		$html .= $events_url;
+		$html .= $events_url . (!empty($arlo_region) ? 'region-' . $arlo_region . '/' : '');
 		
 		if($cat->c_parent_id != 0) {
 			$html .= 'cat-' . $cat->c_slug;
@@ -3304,9 +3308,9 @@ function category_ul($items, $counts) {
 	
 $shortcodes->add('categories', function($content='', $atts, $shortcode_name){
 	$return = '';
-
+	
 	$arlo_category = isset($_GET['arlo-category']) && !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : get_query_var('arlo-category', '');
-
+	
 	// calculate depth
 	$depth = (isset($atts['depth'])) ? (int)$atts['depth'] : 1;
 	if($depth == 0) $depth = null;
