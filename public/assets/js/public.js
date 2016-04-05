@@ -1,5 +1,7 @@
 (function ( $ ) {
 	"use strict";
+	
+	var uriRegion;
 
 	$(function () {
 
@@ -32,7 +34,6 @@
                 
         $('.arlo-filters > select').change(function() {
         	var filters = {
-        		'region-': 'arlo-filter-region',
         		'search-': 'arlo-filter-search',
         		'cat-': 'arlo-filter-category',
         		'month-': 'arlo-filter-month',
@@ -54,7 +55,6 @@
         	}
         	
         	document.location = url;
-        	
         });
         
    		//if boxed (grid) layout, make the boxes' height even
@@ -73,6 +73,48 @@
 			gravity: 'north'
 		});
 
+	});
+	
+	function getUriRegion() {
+		try {
+			
+			var patt = new RegExp("region-([^/]*)");
+			var region = patt.exec(window.location.href);
+			
+			if (region[1] != null) {
+				return region[1];
+			} else {
+				return null;
+			}
+			
+		}
+		catch (e) {
+		    return null;
+		}
+	}        
+    
+	function initRegionChanger() {
+		uriRegion = getUriRegion();
+		
+		if (uriRegion != null) {
+			$("#arlo-filter-region").bind("change", function () {
+				changeRegion(uriRegion, jQuery("#arlo-filter-region").val());
+			});		
+		}
+		
+	}        
+    
+    function changeRegion(uriRegion, newRegion) {
+
+	    //Manually set cookie
+    	$.cookie("arlo-region", newRegion, { path: "/" });
+    	$.cookie("arlo-regionch", "1", { path: "/" });
+
+	    window.location.href = window.location.href.replace("/region-" + uriRegion + "/", "/region-" + newRegion + "/");
+	}	
+	
+	$(document).ready(function() {
+		initRegionChanger();
 	});
 
 }(jQuery));

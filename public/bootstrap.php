@@ -141,31 +141,14 @@ function arlo_create_region_selector($page_name) {
 	global $post;
 	
 	$valid_page_names = ['upcoming', 'event', 'eventsearch'];
-	$arlo_search = isset($_GET['arlo-search']) && !empty($_GET['arlo-search']) ? $_GET['arlo-search'] : get_query_var('arlo-search', '');
 	
 	$settings = get_option('arlo_settings');  
 	$regions = get_option('arlo_regions');  
 	
 	if (!in_array($page_name, $valid_page_names) || !(is_array($regions) && count($regions))) return "";
 		
-	if (!empty($settings['post_types'][$page_name]['posts_page'])) {
-		$slug = get_post($settings['post_types'][$page_name]['posts_page'])->post_name;
-	} else {
-		$slug = get_post($post)->post_name;
-	}
-
-	$regionselector_html = '<form class="arlo-filters" method="get" action="'.site_url().'/'.$slug.'">';
+	$regionselector_html .= arlo_create_filter('region', $regions);					
 	
-	if ($page_name == 'eventsearch' && !empty($arlo_search)) {
-		$regionselector_html .= '<input type="hidden" id="arlo-filter-search" name="arlo-search" value="' . urlencode($arlo_search) . '">';		
-	}
-
-	$regionselector_html .= arlo_create_filter('region', $regions , __('All region', $GLOBALS['arlo_plugin_slug']));					
-	
-	$regionselector_html .= '<div class="arlo-filters-buttons"><input type="hidden" id="arlo-page" value="' . $slug . '"> ';
-
-	$regionselector_html .= '</form>';
-
 	return $regionselector_html;
 }
 
@@ -181,9 +164,11 @@ function arlo_create_region_selector($page_name) {
  * @return void
  */
 function arlo_create_filter($type, $items, $label=null) {
-	if(is_null($label)) $label = $type;
 	$filter_html = '<select id="arlo-filter-' . $type . '" name="arlo-' . $type . '">';
-	$filter_html .= '<option value="">' . $label . '</option>';
+	
+	if (!is_null($label))
+		$filter_html .= '<option value="">' . $label . '</option>';
+	
 	$selected_value = (isset($_GET['arlo-' . $type]) ? urldecode($_GET['arlo-' . $type]) : get_query_var('arlo-' . $type, ''));
 		
 	foreach($items as $key => $item) {
@@ -298,6 +283,7 @@ function arlo_register_custom_post_types() {
 	}
 	
 	// these should possibly be in there own function?
+	add_rewrite_tag('%page_id%', '([^&]+)');
 	add_rewrite_tag('%arlo-region%', '([^&]+)');
 	add_rewrite_tag('%arlo-category%', '([^&]+)');
 	add_rewrite_tag('%arlo-month%', '([^&]+)');
@@ -328,6 +314,46 @@ function arlo_register_custom_post_types() {
 			wp_redirect( $location );
 			exit();
 		}
+	}
+}
+
+/**
+ * If there is at least one region, and the url doesn't contain any region information, we have to construct the url with region, 
+ * and set the cookie according to the default (first) region
+ *
+ * @since    2.2.0
+ *
+ */
+ 
+ function set_region_redirect() {
+ 	global $post;
+	$regions = get_option('arlo_regions');
+	$settings = get_option('arlo_settings');
+	$selected_region = get_query_var('arlo-region', '');
+	$page_id = get_query_var('page_id', '');
+	$arlo_regionalized_page_ids = [];
+	
+	$obj = get_queried_object();
+	
+	$page_id = (empty($obj->ID) ? $page_id : $obj->ID);
+		
+	foreach(Arlo_For_Wordpress::$post_types as $id => $post) {
+		if (isset($post['regionalized']) && is_bool($post['regionalized']) && $post['regionalized']) {
+			$arlo_page_ids[intval($settings['post_types'][$id]['posts_page'])] = $id;
+		}
+	}
+	
+	if (array_key_exists($page_id, $arlo_page_ids) && is_array($regions) && count($regions) && empty($selected_region)) {
+		$first_region_id = reset(array_keys($regions));
+		
+		setcookie("arlo-region", $first_region_id);	
+		
+		$slug = substr(substr(str_replace(get_home_url(), '', get_permalink($settings['post_types'][$arlo_page_ids[$page_id]]['posts_page'])), 0, -1), 1);
+		
+		$location = str_replace($slug, $slug.'/region-' . $first_region_id , $_SERVER['REQUEST_URI']);
+		
+		wp_redirect($location);
+		exit();		
 	}
 }
 

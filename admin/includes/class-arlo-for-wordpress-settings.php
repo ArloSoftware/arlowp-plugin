@@ -186,7 +186,7 @@ class Arlo_For_Wordpress_Settings {
 		 */ 
 		 
 		add_settings_section('arlo_welcome_section', null, null, $this->plugin_slug );				
-		add_settings_field( 'arlo_customcss', null, array($this, 'arlo_welcome_callback'), $this->plugin_slug, 'arlo_welcome_section', array('id'=>'welcome') );
+		add_settings_field( 'arlo_welcome', null, array($this, 'arlo_welcome_callback'), $this->plugin_slug, 'arlo_welcome_section', array('id'=>'welcome') );
 	}
 
 	/*

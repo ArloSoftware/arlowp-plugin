@@ -86,12 +86,14 @@ class Arlo_For_Wordpress {
 		'upcoming' => array(
 			'slug' => 'upcomingevents',
 			'name' => 'Upcoming events',
-			'singular_name' => 'Upcoming event list'
+			'singular_name' => 'Upcoming event list',
+			'regionalized' => true
 		),
 		'event' => array(
 			'slug' => 'event',
 			'name' => 'Events',
-			'singular_name' => 'Catalogue'
+			'singular_name' => 'Catalogue',
+			'regionalized' => true
 		),
 		'venue' => array(
 			'slug' => 'venue',
@@ -106,7 +108,8 @@ class Arlo_For_Wordpress {
 		'eventsearch' => array(
 			'slug' => 'eventsearch',
 			'name' => 'Event search',
-			'singular_name' => 'Event search'
+			'singular_name' => 'Event search',
+			'regionalized' => true
 		),
     );
     
@@ -301,6 +304,8 @@ class Arlo_For_Wordpress {
 		//add_action( 'the_posts', array( $this, 'the_posts_action' ) );
 		
 		add_action( 'init', 'set_search_redirect');
+		
+		add_action( 'parse_query', 'set_region_redirect');
 	}
 
 	/**
@@ -608,6 +613,7 @@ class Arlo_For_Wordpress {
 	public function enqueue_scripts() {
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script', plugins_url( 'assets/js/public.js?15112015', __FILE__ ), array( 'jquery' ), self::VERSION );
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script-darktooltip', plugins_url( 'assets/js/libs/jquery.darktooltip.min.js', __FILE__ ), array( 'jquery' ), self::VERSION );
+		wp_enqueue_script( $this->plugin_slug . '-plugin-script-cookie', plugins_url( 'assets/js/libs/jquery.cookie.js', __FILE__ ), array( 'jquery' ), self::VERSION );
 		wp_localize_script( $this->plugin_slug . '-plugin-script', 'objectL10n', array(
 			'showmoredates' => __( 'Show me more dates', $this->plugin_slug ),
 		) );
