@@ -1415,6 +1415,7 @@ $shortcodes->add('event_template_tags', function($content='', $atts, $shortcode_
 	// merge and extract attributes
 	extract(shortcode_atts(array(
 		'layout' => '',
+		'prefix' => 'arlo-',
 	), $atts, $shortcode_name));
 	
 	$items = $wpdb->get_results("
@@ -1448,6 +1449,17 @@ $shortcodes->add('event_template_tags', function($content='', $atts, $shortcode_
 			
 			$output .= '</ul>';
 		break;
+		
+		case 'class':
+		
+			$classes = [];
+			foreach($tags as $tag) {
+				$classes[] = sanitize_title($prefix . $tag);
+			}
+			
+			$output = implode(' ', $classes);
+			
+		break;
 	
 		default:
 			$output = '<div class="arlo-template_tags-list">' . implode(', ', $tags) . '</div>';
@@ -1471,6 +1483,7 @@ $shortcodes->add('event_tags', function($content='', $atts, $shortcode_name){
 	// merge and extract attributes
 	extract(shortcode_atts(array(
 		'layout' => '',
+		'prefix' => 'arlo-',
 	), $atts, $shortcode_name));
 	
 	$items = $wpdb->get_results("
@@ -1504,6 +1517,17 @@ $shortcodes->add('event_tags', function($content='', $atts, $shortcode_name){
 			
 			$output .= '</ul>';
 		break;
+		
+		case 'class':
+		
+			$classes = [];
+			foreach($tags as $tag) {
+				$classes[] = sanitize_title($prefix . $tag);
+			}
+			
+			$output = implode(' ', $classes);
+			
+		break;		
 	
 		default:
 			$output = '<div class="arlo-event_tags-list">' . implode(', ', $tags) . '</div>';

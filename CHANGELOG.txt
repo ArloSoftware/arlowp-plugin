@@ -8,6 +8,7 @@ Bugfixes
 Enhancement
 ------------------
 
+New option (class) for "layout" attribute and new "prefix" attribute for [arlo_event_template_tags] and [arlo_event_tags] shortcodes
 New [arlo_event_template_link] shortcode for externally hosted event
 New, restructured admin settings page
 New events, templates, session, venues, presenters lists
