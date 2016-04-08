@@ -379,7 +379,14 @@ class Arlo_For_Wordpress_Settings {
 	    <h3>What\'s new in this release</h3>
 	    <h4>Version ' . $this->version . '</h4>
 	    <p>
+	    	<ul>
+	    		<li>New, restructed admin settings page</li>
+	    		<li>New events, templates, session, venues, presenters lists</li>
+	    		<li>New <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_link" target="_blank">[arlo_event_template_link]</a> shortcode for externally hosted event</li>
+	    		<li>SEO friendly urls for filters</li>
+	    	</ul>
 	    </p>
+	    <p>If you are experiencing problems with the URLs, please save the Arlo settings page and resynchronize the data</p>
 	    ';
 	} 		
 }
