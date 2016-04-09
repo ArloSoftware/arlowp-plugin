@@ -283,6 +283,8 @@ class Arlo_For_Wordpress {
 		//add canonical urls for the filtered lists
 		add_action( 'wp_head', array( $this, 'add_canonical_urls' ) );
 		
+		//add meta description
+		add_action( 'wp_head', array( $this, 'add_meta_description' ) );
 		
 		// GP: Check if the scheduled task is entered. If it does not exist set it. (This ensures it is in as long as the plugin is activated.  
 		if ( ! wp_next_scheduled('arlo_import')) {
@@ -581,8 +583,38 @@ class Arlo_For_Wordpress {
 	 * @since    2.2.0
 	 */
 	public function add_canonical_urls() {
-
+		
 	}	
+	
+	/**
+	 * Add meta descriptions for the template
+	 * SEO compatibility
+	 *
+	 * @since    2.2.0
+	 */
+	public function add_meta_description() {
+		$settings = get_option('arlo_settings');
+		$page_id = get_query_var('page_id', '');
+		$obj = get_queried_object();
+		
+		$page_id = (empty($obj->ID) ? $page_id : $obj->ID);
+		
+		if (!empty($obj->post_type) && $obj->post_type == 'arlo_event' && !empty($obj->post_content)) {
+			$ellipsis = '';
+			$desc = strip_tags($obj->post_content);
+			if (strlen($desc) >= 150) {
+				$end_pos = strpos($desc, " ", 140);
+				$ellipsis = '...';
+			} else {
+				$end_pos = strlen($desc);
+			}
+			$desc = substr($desc, 0, $end_pos) . $ellipsis;
+			
+			echo '<meta description="' . htmlspecialchars($desc, ENT_COMPAT, 'UTF-8') . '">';
+		}
+	}	
+	
+	
 	
 	/**
 	 * Register and enqueue public-facing style sheet.

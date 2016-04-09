@@ -385,6 +385,7 @@ class Arlo_For_Wordpress_Settings {
 	    		<li>New <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_link" target="_blank">[arlo_event_template_link]</a> shortcode for externally hosted event</li>
 	    		<li>SEO friendly urls for filters</li>
 	    		<li>New option (class) for "layout" attribute and new "prefix" attribute for <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_tags" target="_blank">[arlo_event_template_tags]</a> and <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_tags" target="_blank">[arlo_event_tags]</a> shortcodes</li>
+	    		<li>Meta description for event template, generated from the template summary</li>
 	    		<li></li>
 	    	</ul>
 	    </p>

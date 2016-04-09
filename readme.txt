@@ -141,6 +141,8 @@ SEO friendly urls for filters
 
 New option (class) for "layout" attribute and new "prefix" attribute for [arlo_event_template_tags] and [arlo_event_tags] shortcodes
 
+Meta description for event template generated, from the template summary
+
 = 2.1.7.1 =
 
 Fix in the import script

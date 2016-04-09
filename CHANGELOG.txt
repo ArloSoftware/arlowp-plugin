@@ -13,6 +13,7 @@ New [arlo_event_template_link] shortcode for externally hosted event
 New, restructured admin settings page
 New events, templates, session, venues, presenters lists
 SEO friendly urls for filters
+Meta description for event template, generated from the template summary
 
 
 == V2.1.7.1 ==
