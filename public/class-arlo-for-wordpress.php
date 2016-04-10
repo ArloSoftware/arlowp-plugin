@@ -583,7 +583,53 @@ class Arlo_For_Wordpress {
 	 * @since    2.2.0
 	 */
 	public function add_canonical_urls() {
+		$settings = get_option('arlo_settings');
+		$page_id = get_query_var('page_id', '');
+		$obj = get_queried_object();
 		
+		$page_id = (empty($obj->ID) ? $page_id : $obj->ID);	
+		
+		$filter_enabled_page_ids = [];
+		
+		$filter_enabled_arlo_pages = ['upcoming', 'event'];
+				
+		foreach($filter_enabled_arlo_pages as $page) {
+			if (!empty($settings['post_types'][$page]['posts_page'])) {
+				$filter_enabled_page_ids[] = intval($settings['post_types'][$page]['posts_page']);
+			}			
+		}
+				
+		if (in_array($page_id, $filter_enabled_page_ids)) {
+			$url = get_home_url() . '/' .$obj->post_name;
+			//has to be the same order as in public.js to construct the same order
+			
+			
+			if (!empty($_GET['arlo-category'])) {
+				$url .= '/cat-' . urlencode($_GET['arlo-category']);
+			}
+			
+			if (!empty($_GET['arlo-month'])) {
+				$url .= '/month-' . urlencode($_GET['arlo-month']);
+			}
+			
+			if (!empty($_GET['arlo-location'])) {
+				$url .= '/location-' . urlencode($_GET['arlo-location']);
+			}
+
+			if (!empty($_GET['arlo-delivery'])) {
+				$url .= '/delivery-' . urlencode($_GET['arlo-delivery']);
+			}
+
+			if (!empty($_GET['arlo-eventtag'])) {
+				$url .= '/tag-' . urlencode($_GET['arlo-eventtag']);
+			}
+			
+			if (!empty($_GET['arlo-templatetag'])) {
+				$url .= '/tag-' . urlencode($_GET['arlo-templatetag']);
+			}
+			
+			echo '<link rel="canonical" href="' . $url . '/" />';
+		}
 	}	
 	
 	/**
