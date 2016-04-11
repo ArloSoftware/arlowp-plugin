@@ -235,11 +235,11 @@ function arlo_register_custom_post_types() {
 		if($page_id) {
 			switch($id) {
 				case 'upcoming':
-					add_rewrite_rule('^' . $slug . '/(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(tag-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-category=$matches[2]&arlo-month=$matches[4]&arlo-location=$matches[6]&arlo-delivery=$matches[8]&arlo-eventtag=$matches[10]&paged=$matches[12]','top');
+					add_rewrite_rule('^' . $slug . '/(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(eventtag-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-category=$matches[2]&arlo-month=$matches[4]&arlo-location=$matches[6]&arlo-delivery=$matches[8]&arlo-eventtag=$matches[10]&paged=$matches[12]','top');
 				break;			
 				case 'event':					
 					add_rewrite_rule('^' . $slug . '/(\d+-[^/]*)?/?$','index.php?arlo_event=$matches[1]','top');
-					add_rewrite_rule('^' . $slug . '/(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(tag-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-category=$matches[2]&arlo-month=$matches[4]&arlo-location=$matches[6]&arlo-delivery=$matches[8]&arlo-templatetag=$matches[10]&paged=$matches[12]','top');
+					add_rewrite_rule('^' . $slug . '/(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(templatetag-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-category=$matches[2]&arlo-month=$matches[4]&arlo-location=$matches[6]&arlo-delivery=$matches[8]&arlo-templatetag=$matches[10]&paged=$matches[12]','top');
 				break;
 				case 'eventsearch':
 					add_rewrite_rule('^' . $slug . '/search/([^/]*)?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-search=$matches[1]&paged=$matches[3]','top');

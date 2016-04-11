@@ -621,11 +621,11 @@ class Arlo_For_Wordpress {
 			}
 
 			if (!empty($_GET['arlo-eventtag'])) {
-				$url .= '/tag-' . urlencode($_GET['arlo-eventtag']);
+				$url .= '/eventtag-' . urlencode($_GET['arlo-eventtag']);
 			}
 			
 			if (!empty($_GET['arlo-templatetag'])) {
-				$url .= '/tag-' . urlencode($_GET['arlo-templatetag']);
+				$url .= '/templatetag-' . urlencode($_GET['arlo-templatetag']);
 			}
 			
 			echo '<link rel="canonical" href="' . $url . '/" />';
@@ -689,6 +689,10 @@ class Arlo_For_Wordpress {
 		wp_localize_script( $this->plugin_slug . '-plugin-script', 'objectL10n', array(
 			'showmoredates' => __( 'Show me more dates', $this->plugin_slug ),
 		) );
+		wp_localize_script( $this->plugin_slug . '-plugin-script', 'WPUrls', array(
+			'home_url' => get_home_url(),
+		) );
+		
 	}
 	
 	/**  Local Setter  */
