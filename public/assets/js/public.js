@@ -43,7 +43,7 @@
         	
         	for (var i in filters) {
         		if (filters.hasOwnProperty(i) && $('#' + filters[i]).length == 1 && $('#' + filters[i]).val().trim() != '') {
-        			url += i + $('#' + filters[i]).val().trim() + '/'; 
+        			url += i + encodeURIComponent($('#' + filters[i]).val()) + '/'; 
         		} 
         	}
         	

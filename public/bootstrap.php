@@ -1095,6 +1095,7 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 	$t4 = "{$wpdb->prefix}arlo_categories";
 	$t5 = "{$wpdb->prefix}arlo_events";
 	$t6 = "{$wpdb->prefix}arlo_eventtemplates_tags";
+	$t7 = "{$wpdb->prefix}arlo_tags";
 		
 	$where = "WHERE post.post_type = 'arlo_event'";
 	$join = "";
@@ -1122,11 +1123,17 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 		
 	endif;	
 	
-	if(!empty($arlo_templatetag) && is_numeric($arlo_templatetag)) :
-		$where .= " AND ett.tag_id = '" . intval($arlo_templatetag) . "'";
+	if(!empty($arlo_templatetag)) :
 		$join .= " LEFT JOIN $t6 ett USING (et_arlo_id) ";
-	endif;			
-	
+		
+		
+		if (!is_numeric($arlo_templatetag)) {
+			$where .= " AND tag.tag = '" . urldecode($arlo_templatetag) . "'";
+			$join .= " LEFT JOIN $t7 tag ON tag.id = ett.tag_id ";
+		} else {
+			$where .= " AND ett.tag_id = " . intval($arlo_templatetag);
+		}
+	endif;					
 	
 	if (!empty($arlo_search)) {
 		$where .= '
@@ -1239,6 +1246,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 	$t4 = "{$wpdb->prefix}arlo_categories";
 	$t5 = "{$wpdb->prefix}arlo_events";
 	$t6 = "{$wpdb->prefix}arlo_eventtemplates_tags";
+	$t7 = "{$wpdb->prefix}arlo_tags";
 		
 	$where = "WHERE post.post_type = 'arlo_event' AND et.active = '{$active}'";
 	$join = "";
@@ -1266,9 +1274,16 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 		
 	endif;	
 	
-	if(!empty($arlo_templatetag) && is_numeric($arlo_templatetag)) :
-		$where .= " AND ett.tag_id = '" . intval($arlo_templatetag) . "'";
+	if(!empty($arlo_templatetag)) :
 		$join .= " LEFT JOIN $t6 ett USING (et_arlo_id) ";
+		
+		
+		if (!is_numeric($arlo_templatetag)) {
+			$where .= " AND tag.tag = '" . urldecode($arlo_templatetag) . "'";
+			$join .= " LEFT JOIN $t7 tag ON tag.id = ett.tag_id ";
+		} else {
+			$where .= " AND ett.tag_id = " . intval($arlo_templatetag);
+		}
 	endif;			
 	
 	
@@ -1331,6 +1346,9 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 	} else if (!(isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true")) {
 		$where .= ' AND (c.c_parent_id = (SELECT c_arlo_id FROM ' . $t4 . ' WHERE c_parent_id = 0 AND active = "' . $active . '") OR c.c_parent_id IS NULL)';
 	}	
+	
+	// grouping
+	$group = "GROUP BY et.et_arlo_id";	
 		
 	//ordering
 	$order = "ORDER BY et.et_name ASC";
@@ -1734,11 +1752,11 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 					ORDER BY tag", ARRAY_A);
 
 				$tags = array();
-
+				
 				foreach ($items as $item) {
 					$tags[] = array(
 						'string' => $item['tag'],
-						'value' => $item['id'],
+						'value' => $item['tag'],
 					);
 				}
 
@@ -2366,6 +2384,7 @@ $shortcodes->add('upcoming_list_pagination', function($content='', $atts, $short
 	$t5 = "{$wpdb->prefix}arlo_eventtemplates_categories";
 	$t6 = "{$wpdb->prefix}arlo_categories";
 	$t7 = "{$wpdb->prefix}arlo_events_tags";
+	$t8 = "{$wpdb->prefix}arlo_tags";
 
 	$where = 'WHERE CURDATE() < DATE(e.e_startdatetime) AND e_parent_arlo_id = 0 ';
 	$join = '';
@@ -2394,9 +2413,15 @@ $shortcodes->add('upcoming_list_pagination', function($content='', $atts, $short
 		$where .= " AND e.e_isonline = " . intval($arlo_delivery);
 	endif;	
 	
-	if(!empty($arlo_eventtag) && is_numeric($arlo_eventtag)) :
-		$where .= " AND etag.tag_id = '" . intval($arlo_eventtag) . "'";
+	if(!empty($arlo_eventtag)) :
 		$join .= " LEFT JOIN $t7 etag USING (e_arlo_id) ";
+
+		if (!is_numeric($arlo_eventtag)) {
+			$where .= " AND tag.tag = '" . urldecode($arlo_eventtag) . "'";
+			$join .= " LEFT JOIN $t8 tag ON tag.id = etag.tag_id ";
+		} else {
+			$where .= " AND etag.tag_id = " . intval($arlo_eventtag);
+		}
 	endif;		
 
 	$items = $wpdb->get_results(
@@ -2420,7 +2445,7 @@ $shortcodes->add('upcoming_list_pagination', function($content='', $atts, $short
 		$where
 		GROUP BY etc.et_arlo_id, e.e_id
 		ORDER BY e.e_startdatetime", ARRAY_A);
-
+		
 	$num = $wpdb->num_rows;
 
 	return arlo_pagination($num,$limit);
@@ -2445,6 +2470,7 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 	$t5 = "{$wpdb->prefix}arlo_eventtemplates_categories";
 	$t6 = "{$wpdb->prefix}arlo_categories";
 	$t7 = "{$wpdb->prefix}arlo_events_tags";
+	$t8 = "{$wpdb->prefix}arlo_tags";
 
 	$where = 'WHERE CURDATE() < DATE(e.e_startdatetime)  AND e_parent_arlo_id = 0 ';
 	$join = '';
@@ -2472,10 +2498,16 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 	if(!empty($arlo_delivery)) :
 		$where .= " AND e.e_isonline = " . intval($arlo_delivery);
 	endif;	
-	
+		
 	if(!empty($arlo_eventtag)) :
-		$where .= " AND etag.tag_id = '" . intval($arlo_eventtag) . "'";
 		$join .= " LEFT JOIN $t7 etag USING (e_arlo_id) ";
+
+		if (!is_numeric($arlo_eventtag)) {
+			$where .= " AND tag.tag = '" . urldecode($arlo_eventtag) . "'";
+			$join .= " LEFT JOIN $t8 AS tag ON tag.id = etag.tag_id ";
+		} else {
+			$where .= " AND etag.tag_id = " . intval($arlo_eventtag);
+		}
 	endif;		
 	
 	$sql = "SELECT DISTINCT
@@ -2500,7 +2532,7 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 	    GROUP BY etc.et_arlo_id, e.e_id
 		ORDER BY e.e_startdatetime
 		LIMIT $offset, $limit";
-		
+						
 	$items = $wpdb->get_results($sql, ARRAY_A);
 
 	if(empty($items)) :
@@ -2670,7 +2702,7 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 				foreach ($items as $item) {
 					$tags[] = array(
 						'string' => $item['tag'],
-						'value' => $item['id'],
+						'value' => $item['tag'],
 					);
 				}
 
