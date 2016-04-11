@@ -616,16 +616,29 @@ class Arlo_For_Wordpress {
 				$url .= '/location-' . urlencode($_GET['arlo-location']);
 			}
 
-			if (!empty($_GET['arlo-delivery'])) {
+			if (isset($_GET['arlo-delivery'])) {
 				$url .= '/delivery-' . urlencode($_GET['arlo-delivery']);
 			}
 
 			if (!empty($_GET['arlo-eventtag'])) {
-				$url .= '/tag-' . urlencode($_GET['arlo-eventtag']);
+				if (is_numeric($_GET['arlo-eventtag'])) {
+					$tag = self::get_tag_by_id($_GET['arlo-eventtag']);
+					if (!empty($tag['tag'])) {
+						$_GET['arlo-eventtag'] = $tag['tag'];
+					}
+				}
+				$url .= '/eventtag-' . urlencode($_GET['arlo-eventtag']);
 			}
 			
 			if (!empty($_GET['arlo-templatetag'])) {
-				$url .= '/tag-' . urlencode($_GET['arlo-templatetag']);
+				if (is_numeric($_GET['arlo-templatetag'])) {
+					$tag = self::get_tag_by_id($_GET['arlo-templatetag']);
+					if (!empty($tag['tag'])) {
+						$_GET['arlo-templatetag'] = $tag['tag'];
+					}					
+				}
+			
+				$url .= '/templatetag-' . urlencode($_GET['arlo-templatetag']);
 			}
 			
 			echo '<link rel="canonical" href="' . $url . '/" />';
@@ -689,6 +702,10 @@ class Arlo_For_Wordpress {
 		wp_localize_script( $this->plugin_slug . '-plugin-script', 'objectL10n', array(
 			'showmoredates' => __( 'Show me more dates', $this->plugin_slug ),
 		) );
+		wp_localize_script( $this->plugin_slug . '-plugin-script', 'WPUrls', array(
+			'home_url' => get_home_url(),
+		) );
+		
 	}
 	
 	/**  Local Setter  */
@@ -915,7 +932,7 @@ class Arlo_For_Wordpress {
 			
 			// lets put it all in a transaction
 			$wpdb->query('START TRANSACTION');
-			
+						
 			// import from arlo endpoints
 			$this->import_timezones($timestamp);
 			
@@ -983,7 +1000,7 @@ class Arlo_For_Wordpress {
 		$table_name = "{$wpdb->prefix}arlo_eventtemplates";
 		
 		if(!empty($items)) {
-		
+			
 			foreach($items as $item) {
 				$slug = sanitize_title($item->TemplateID . ' ' . $item->Name);
 				$query = $wpdb->query(
@@ -2198,9 +2215,7 @@ class Arlo_For_Wordpress {
 	}		
 	
 	
-	public static function dismissible_notice_callback() {
-		global $wp_db;
-		
+	public static function dismissible_notice_callback() {		
 		$user = wp_get_current_user();
 		
 		if (in_array($_POST['id'], self::$dismissible_notices)) {
@@ -2210,6 +2225,22 @@ class Arlo_For_Wordpress {
 		echo $_POST['id'];
 		wp_die();
 	}
+	
+	public static function get_tag_by_id($tag_id) {
+		global $wpdb;		
+		
+		$tag = $wpdb->get_row(
+		"SELECT 
+			id, 
+			tag
+		FROM 
+			" . $wpdb->prefix . "arlo_tags
+		WHERE 
+			id = " . intval($tag_id), ARRAY_A);
+			
+
+		return $tag;
+	}	
 		
 
 	/**
