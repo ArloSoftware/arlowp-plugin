@@ -92,7 +92,7 @@ class Arlo_For_Wordpress_Admin {
 		
 		add_action( 'update_option_arlo_settings', array($this, 'settings_saved') );
 		
-		$this->check_plugin_version($plugin);
+		add_action( 'admin_init', array($this, 'check_plugin_version') );
 	}
 	
 	/**
@@ -103,13 +103,16 @@ class Arlo_For_Wordpress_Admin {
 	 * @return    null
 	 */
 	public static function check_plugin_version($plugin) {
+		global $wp_rewrite;
+ 		$plugin = Arlo_For_Wordpress::get_instance();
+ 		
 		$plugin_version = get_option('arlo_plugin_version');
 		
 		if (!empty($plugin_version)) {
 			if ($plugin_version != $plugin::VERSION) {
 				$plugin::update_data_model();
+				$wp_rewrite->flush_rules();
 				update_option('arlo_plugin_version', $plugin::VERSION);
-				flush_rewrite_rules();
 			}
 		} else {
 			update_option('arlo_plugin_version', $plugin::VERSION);
