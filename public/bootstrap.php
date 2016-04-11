@@ -285,7 +285,7 @@ function arlo_register_custom_post_types() {
 		if(isset($settings['post_types']['eventsearch']['posts_page']) && $settings['post_types']['eventsearch']['posts_page'] != 0) {
 			$slug = substr(substr(str_replace(get_home_url(), '', get_permalink($settings['post_types']['eventsearch']['posts_page'])), 0, -1), 1);
 			$location = '/' . $slug . '/search/' . urlencode(stripslashes_deep($_GET['arlo-search'])) . '/';
-			wp_redirect( $location );
+			wp_redirect( get_home_url() . $location );
 			exit();
 		}
 	}
