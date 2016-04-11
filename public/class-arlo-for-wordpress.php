@@ -616,7 +616,7 @@ class Arlo_For_Wordpress {
 				$url .= '/location-' . urlencode($_GET['arlo-location']);
 			}
 
-			if (!empty($_GET['arlo-delivery'])) {
+			if (isset($_GET['arlo-delivery'])) {
 				$url .= '/delivery-' . urlencode($_GET['arlo-delivery']);
 			}
 
