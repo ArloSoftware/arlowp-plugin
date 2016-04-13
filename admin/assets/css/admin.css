@@ -9,6 +9,11 @@
 	background: transparent url(../img/icon-20x20.png) no-repeat center;
 }
 
+.arlo-whatsnew-list {
+	list-style: disc;
+	margin-left: 2em;
+}
+
 .arlo-gray {
 	color: #ccc;
 }

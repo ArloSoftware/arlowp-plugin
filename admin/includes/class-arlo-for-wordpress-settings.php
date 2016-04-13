@@ -379,17 +379,16 @@ class Arlo_For_Wordpress_Settings {
 	    <h3>What\'s new in this release</h3>
 	    <h4>Version ' . $this->version . '</h4>
 	    <p>
-	    	<ul>
-	    		<li>New, restructed admin settings page</li>
-	    		<li>New events, templates, session, venues, presenters lists</li>
+	    	<ul class="arlo-whatsnew-list">
+	    		<li>New plugin settings page layout</li>
+	    		<li>New list pages on the admin site for events, templates, sessions, venues and presenters</li>
 	    		<li>New <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_link" target="_blank">[arlo_event_template_link]</a> shortcode for externally hosted event</li>
-	    		<li>SEO friendly urls for filters</li>
-	    		<li>New option (class) for "layout" attribute and new "prefix" attribute for <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_tags" target="_blank">[arlo_event_template_tags]</a> and <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_tags" target="_blank">[arlo_event_tags]</a> shortcodes</li>
-	    		<li>Meta description for event template, generated from the template summary</li>
-	    		<li></li>
+	    		<li>New SEO friendly URL\'s compatible with filters</li>
+	    		<li>New SEO friendly event summary meta descriptions on event template pages</li>
+	    		<li>New option ("class") for "layout" attribute and new "prefix" attribute for <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_tags" target="_blank">[arlo_event_template_tags]</a> and <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_tags" target="_blank">[arlo_event_tags]</a> shortcodes</li>
 	    	</ul>
 	    </p>
-	    <p>If you are experiencing problems with the URLs, please save the Arlo settings page and resynchronize the data</p>
+	    <p>If you are experiencing problems with the URLs, please save changes to the Arlo settings page and resynchronize the data under the general tab.</p>
 	    ';
 	} 		
 }

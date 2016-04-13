@@ -558,7 +558,6 @@ class Arlo_For_Wordpress {
 		$locale = apply_filters( 'plugin_locale', get_locale(), $domain );
 		
 		load_textdomain( $domain, trailingslashit( WP_LANG_DIR ) . $domain . '/' . $domain . '-' . $locale . '.mo' );
-
 	}
 
 	/**
@@ -567,7 +566,7 @@ class Arlo_For_Wordpress {
 	 * @since    1.0.0
 	 */
 	public function enqueue_styles() {
-		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css?20112015', __FILE__ ), array(), self::VERSION );
+		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css?20160413', __FILE__ ), array(), self::VERSION );
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-darktooltip', plugins_url( 'assets/css/libs/darktooltip.min.css', __FILE__ ), array(), self::VERSION );
 		
 		$customcss_load_type = get_option('arlo_customcss');
@@ -616,7 +615,7 @@ class Arlo_For_Wordpress {
 				$url .= '/location-' . urlencode($_GET['arlo-location']);
 			}
 
-			if (isset($_GET['arlo-delivery'])) {
+			if (isset($_GET['arlo-delivery']) && is_numeric($_GET['arlo-delivery'])) {
 				$url .= '/delivery-' . urlencode($_GET['arlo-delivery']);
 			}
 
@@ -697,7 +696,7 @@ class Arlo_For_Wordpress {
 	 * @since    1.0.0
 	 */
 	public function enqueue_scripts() {
-		wp_enqueue_script( $this->plugin_slug . '-plugin-script', plugins_url( 'assets/js/public.js?15112015', __FILE__ ), array( 'jquery' ), self::VERSION );
+		wp_enqueue_script( $this->plugin_slug . '-plugin-script', plugins_url( 'assets/js/public.js?20160413', __FILE__ ), array( 'jquery' ), self::VERSION );
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script-darktooltip', plugins_url( 'assets/js/libs/jquery.darktooltip.min.js', __FILE__ ), array( 'jquery' ), self::VERSION );
 		wp_localize_script( $this->plugin_slug . '-plugin-script', 'objectL10n', array(
 			'showmoredates' => __( 'Show me more dates', $this->plugin_slug ),

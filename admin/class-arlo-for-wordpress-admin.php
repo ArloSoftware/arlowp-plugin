@@ -163,12 +163,12 @@ class Arlo_For_Wordpress_Admin {
 			return;
 		}
 		
-		wp_enqueue_style( $this->plugin_slug .'-admin-public-styles', plugins_url( 'assets/css/admin_public.css', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );		
+		wp_enqueue_style( $this->plugin_slug .'-admin-public-styles', plugins_url( 'assets/css/admin_public.css?20160413', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );		
 		
 		$screen = get_current_screen();	
 		
 		if ( in_array($screen->id, [$this->plugin_screen_hook_suffix, $this->plugin_venues_screen_hook_suffix, $this->plugin_presenters_screen_hook_suffix, $this->plugin_templates_screen_hook_suffix, $this->plugin_events_screen_hook_suffix, $this->plugin_sessions_screen_hook_suffix])) {
-			wp_enqueue_style( $this->plugin_slug .'-admin-styles', plugins_url( 'assets/css/admin.css', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );
+			wp_enqueue_style( $this->plugin_slug .'-admin-styles', plugins_url( 'assets/css/admin.css?20160413', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );
 			
 			if ($screen->id == $this->plugin_screen_hook_suffix) {
 				wp_enqueue_style( $this->plugin_slug .'-codemirror', plugins_url( 'assets/css/libs/codemirror.css', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );
@@ -199,7 +199,7 @@ class Arlo_For_Wordpress_Admin {
 			wp_enqueue_script( $this->plugin_slug . '-lsapiclient', plugins_url( 'assets/js/lib/ls-apiclient-1.2.0.min.js', __FILE__ ), array( 'jquery' ), Arlo_For_Wordpress::VERSION, true );
 			wp_enqueue_script( $this->plugin_slug . '-codemirror', plugins_url( 'assets/js/lib/codemirror.js', __FILE__ ), array(), Arlo_For_Wordpress::VERSION, true );
 			wp_enqueue_script( $this->plugin_slug . '-codemirror-css', plugins_url( 'assets/js/lib/codemirror-css.js', __FILE__ ), array(), Arlo_For_Wordpress::VERSION, true );
-			wp_enqueue_script( $this->plugin_slug . '-admin-script', plugins_url( 'assets/js/admin.js', __FILE__ ), array( 'jquery' ), Arlo_For_Wordpress::VERSION, true );		
+			wp_enqueue_script( $this->plugin_slug . '-admin-script', plugins_url( 'assets/js/admin.js?20160413', __FILE__ ), array( 'jquery' ), Arlo_For_Wordpress::VERSION, true );		
 		}
 
 	}

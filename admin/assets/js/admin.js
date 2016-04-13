@@ -52,7 +52,7 @@
 			$('.nav-tab-wrapper.main-tab .nav-tab').removeClass('nav-tab-active');
 
 			if ($('.arlo_' + tabID + '_section').length == 0) {
-				tabID = 'general';
+				tabID = 'welcome';
 			}
 			
 			$('.arlo_' + tabID + '_section').show();
