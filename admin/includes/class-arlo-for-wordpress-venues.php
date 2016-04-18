@@ -153,7 +153,9 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 		ON
 			post_name = v_post_name
 		WHERE
-			" . $where . "			
+			" . $where . "	
+		GROUP BY
+			v.v_arlo_id		
 		";
 	}		
 }
