@@ -1172,7 +1172,7 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 		} 
 		
 		if (isset($GLOBALS['show_child_elements']) && $GLOBALS['show_child_elements']) {
-			$cats = \Arlo\Categories::getTree($cat_id, null);
+			//$cats = \Arlo\Categories::getTree($cat_id, null);
 			
 			$categories_tree = arlo_child_categories($cats);
 			
@@ -1328,7 +1328,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 		if (isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true") {
 			$GLOBALS['show_child_elements'] = true;
 		
-			$cats = \Arlo\Categories::getTree($cat_id, null);
+			//$cats = \Arlo\Categories::getTree($cat_id, null);
 			
 			$categories_tree = arlo_child_categories($cats);
 			
@@ -1691,7 +1691,7 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 
 				// category select
 				
-				$cats = \Arlo\Categories::getTree();
+				//$cats = \Arlo\Categories::getTree();
 				
 				if (is_array($cats)) {
 					$filter_html .= arlo_create_filter('category', arlo_child_categories($cats[0]->children), __('All categories', $GLOBALS['arlo_plugin_slug']));
@@ -2617,7 +2617,7 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 
 				// category select
 
-				$cats = \Arlo\Categories::getTree();
+				//$cats = \Arlo\Categories::getTree();
 
 				if (is_array($cats)) {
 					$filter_html .= arlo_create_filter($filter, arlo_child_categories($cats[0]->children), __('All categories', $GLOBALS['arlo_plugin_slug']));					
@@ -3270,10 +3270,10 @@ $shortcodes->add('categories', function($content='', $atts, $shortcode_name){
 	$return = '';
 
 	$arlo_category = isset($_GET['arlo-category']) && !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : get_query_var('arlo-category', '');
-
+	
 	// calculate depth
 	$depth = (isset($atts['depth'])) ? (int)$atts['depth'] : 1;
-	if($depth == 0) $depth = null;
+	//if($depth == 0) $depth = null;
 	
 	// show title?
 	$title = (isset($atts['title'])) ? $atts['title'] : null;
@@ -3287,16 +3287,8 @@ $shortcodes->add('categories', function($content='', $atts, $shortcode_name){
 		$slug = $arlo_category;
 		$start_at = current(explode('-', $slug));
 	}
-	
-	$tree = \Arlo\Categories::getTree($start_at, $depth);
-	
+		
 	$GLOBALS['categories_count'] = count($tree);
-	
-	if(empty($tree)) return;
-	
-	if($start_at == 0) {
-		$tree = $tree[0]->children;
-	}
 	
 	if($title) {
 		$conditions = array('id' => $start_at);
@@ -3310,7 +3302,21 @@ $shortcodes->add('categories', function($content='', $atts, $shortcode_name){
 		$return .= sprintf($title, $current->c_name);
 	}
 	
-	$return .= category_ul($tree, $counts);
+	if ($depth > 0) {
+		if ($start_at == 0) {
+			$root = \Arlo\Categories::getTree($start_at, 1);	
+					
+			if (!empty($root)) {
+				$start_at = $root[0]->c_arlo_id;
+			}
+		}
+		
+		$tree = \Arlo\Categories::getTree($start_at, $depth);	
+				
+		if(!empty($tree)) {		
+			$return .= category_ul($tree, $counts);	
+		}	
+	}
 	
 	return $return;
 });

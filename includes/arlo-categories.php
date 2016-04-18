@@ -60,15 +60,16 @@ class Categories extends Singleton {
 	}
 	
 	//$categories = \Arlo\Categories::getTree();
-	static function getTree($start_id=0, $depth=null, $level = 0) {
+	static function getTree($start_id = 0, $depth = 1, $level = 0) {
 		$result = null;
 		$conditions = array('parent_id' => $start_id);
 		
-		foreach(self::get($conditions) as $item) {
-			if($depth === null || $depth >= 1) {
-				$new_depth = ($depth === null) ? null : $depth-1;
-				$item->depth_level = $level;
-				$item->children = self::getTree($item->c_arlo_id, $new_depth, $level+1);
+		$categories = self::get($conditions);
+				
+		foreach($categories as $item) {		
+			$item->depth_level = $level;	
+			if($depth - 1 > $level) {
+				$item->children = self::getTree($item->c_arlo_id, $depth, $level+1);
 			}
 			$result[] = $item;
 		}
