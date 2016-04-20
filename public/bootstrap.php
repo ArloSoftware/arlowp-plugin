@@ -2602,9 +2602,9 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 	$settings = get_option('arlo_settings');  
 		
 	if (!empty($settings['post_types']['upcoming']['posts_page'])) {
-		$slug = get_post($settings['post_types']['upcoming']['posts_page'])->post_name;
+		$slug = str_replace(get_home_url(), "", get_page_link(get_post($settings['post_types']['upcoming']['posts_page'])->ID));
 	} else {
-		$slug = get_post($post)->post_name;
+		$slug = str_replace(get_home_url(), "", get_page_link());
 	}
 	
 	$filter_html = '<form class="arlo-filters" method="get" action="'.site_url().'/'.$slug.'">';

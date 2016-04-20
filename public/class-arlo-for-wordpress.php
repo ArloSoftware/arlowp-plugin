@@ -696,7 +696,7 @@ class Arlo_For_Wordpress {
 	 * @since    1.0.0
 	 */
 	public function enqueue_scripts() {
-		wp_enqueue_script( $this->plugin_slug . '-plugin-script', plugins_url( 'assets/js/public.js?20160413', __FILE__ ), array( 'jquery' ), self::VERSION );
+		wp_enqueue_script( $this->plugin_slug . '-plugin-script', plugins_url( 'assets/js/public.js?20160420', __FILE__ ), array( 'jquery' ), self::VERSION );
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script-darktooltip', plugins_url( 'assets/js/libs/jquery.darktooltip.min.js', __FILE__ ), array( 'jquery' ), self::VERSION );
 		wp_localize_script( $this->plugin_slug . '-plugin-script', 'objectL10n', array(
 			'showmoredates' => __( 'Show me more dates', $this->plugin_slug ),
