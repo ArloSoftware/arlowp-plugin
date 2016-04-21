@@ -551,7 +551,7 @@ function install_table_arlo_eventtemplate() {
 		et_name VARCHAR(255) NULL,
 		et_descriptionsummary TEXT NULL,
 		et_post_name VARCHAR(255) NULL,
-		active DATETIME NULL,
+		active INT(10) unsigned DEFAULT NULL,
 		et_registerinteresturi TEXT NULL,
 		et_viewuri TEXT NULL,
 		PRIMARY KEY  (et_id),
@@ -579,7 +579,7 @@ function install_table_arlo_contentfields() {
 		cf_text TEXT NULL,
 		cf_order INT(11) NULL,
 		e_contenttype VARCHAR(255) NULL,
-		active DATETIME NULL,
+		active INT(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (cf_id),
 		KEY cf_order (cf_order),
 		KEY et_id (et_id))
@@ -627,7 +627,7 @@ function install_table_arlo_events() {
 		e_providerwebsite VARCHAR(255) NULL,
 		e_isonline TINYINT(1) NOT NULL DEFAULT FALSE,
 		e_parent_arlo_id INT(11) NOT NULL,
-		active DATETIME NULL,
+		active INT(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (e_id),
 		KEY et_arlo_id (et_arlo_id),
 		KEY e_arlo_id (e_arlo_id),
@@ -668,7 +668,7 @@ function install_table_arlo_venues() {
 		v_facilityinfodirections TEXT NULL,
 		v_facilityinfoparking TEXT NULL,
 		v_post_name VARCHAR(255) NULL,
-		active DATETIME NULL,
+		active INT(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (v_id),
 		KEY v_arlo_id (v_arlo_id))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
@@ -701,7 +701,7 @@ function install_table_arlo_presenters() {
 		p_facebookid VARCHAR(255) NULL,
 		p_linkedinid VARCHAR(255) NULL,
 		p_post_name VARCHAR(255) NULL,
-		active DATETIME NULL,
+		active INT(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (p_id),
 		KEY p_arlo_id (p_arlo_id))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
@@ -740,7 +740,7 @@ function install_table_arlo_offers() {
 		o_message TEXT NULL,
 		o_order INT(11) NULL,
 		o_replaces INT(11) NULL,
-		active DATETIME NULL,
+		active INT(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (o_id),
 		KEY o_arlo_id (o_arlo_id),
 		KEY et_id (et_id),
@@ -768,7 +768,7 @@ function install_table_arlo_eventtemplates_presenters() {
 		et_arlo_id INT(11) NULL,
 		p_arlo_id INT(11) NULL,
 		p_order INT(11) NULL COMMENT 'Order of the presenters for the event template.',
-		active datetime DEFAULT NULL,
+		active INT(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (et_arlo_id,p_arlo_id),
 		KEY cf_order (p_order),
 		KEY fk_et_id_idx (et_arlo_id ASC),
@@ -796,7 +796,7 @@ function install_table_arlo_tags() {
 	$sql = "CREATE TABLE " . $wpdb->prefix . "arlo_tags (
   		id mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   		tag varchar(255) NOT NULL,
-		active datetime NOT NULL,
+		active INT(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (id))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci";
 		
@@ -805,7 +805,7 @@ function install_table_arlo_tags() {
 	$sql = "CREATE TABLE " . $wpdb->prefix . "arlo_events_tags (
 		e_arlo_id int(11) NOT NULL,
 		tag_id mediumint(8) unsigned NOT NULL,
-		active datetime NOT NULL,
+		active INT(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (e_arlo_id,tag_id))
   		CHARACTER SET utf8 COLLATE=utf8_general_ci";
   		
@@ -814,7 +814,7 @@ function install_table_arlo_tags() {
 	$sql = "CREATE TABLE " . $wpdb->prefix . "arlo_eventtemplates_tags (
 		et_arlo_id int(11) NOT NULL,
 		tag_id mediumint(8) unsigned NOT NULL,
-		active datetime NOT NULL,
+		active INT(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (et_arlo_id,tag_id))
   		CHARACTER SET utf8 COLLATE=utf8_general_ci";
 
@@ -836,7 +836,7 @@ function install_table_arlo_events_presenters() {
 		e_arlo_id INT(11) NULL,
 		p_arlo_id INT(11) NULL,
 		p_order INT(11) NULL COMMENT 'Order of the presenters for the event.',
-		active datetime DEFAULT NULL,
+		active INT(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (e_arlo_id,p_arlo_id),		
 		KEY fk_e_id_idx (e_arlo_id ASC),
 		KEY fk_p_id_idx (p_arlo_id ASC))
@@ -869,7 +869,7 @@ function install_table_arlo_categories() {
 		c_order bigint(20) DEFAULT NULL,
 		c_depth_level tinyint(3) unsigned NOT NULL DEFAULT '0',
 		c_parent_id INT(11) DEFAULT NULL,
-		active datetime DEFAULT NULL,
+		active INT(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (c_id),
 		UNIQUE KEY c_arlo_id (c_arlo_id),
 		KEY c_parent_id (c_parent_id))
@@ -895,7 +895,7 @@ function install_table_arlo_eventtemplates_categories() {
 		et_arlo_id INT(11) NULL,
 		c_arlo_id INT(11) NULL,
 		et_order SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0',
-		active datetime DEFAULT NULL,
+		active INT(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (et_arlo_id,c_arlo_id),
 		KEY fk_et_id_idx (et_arlo_id ASC),
 		KEY fk_c_id_idx (c_arlo_id ASC))
@@ -921,7 +921,7 @@ function install_table_arlo_timezones() {
 		CREATE TABLE " . $table_name . " (
 		id tinyint(3) unsigned NOT NULL,
 		name varchar(256) NOT NULL,
-		active datetime NOT NULL,
+		active INT(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (id)) 
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;	
   	";
@@ -930,7 +930,7 @@ function install_table_arlo_timezones() {
 		CREATE TABLE IF NOT EXISTS " . $table_name . "_olson (
 		timezone_id int(11) NOT NULL,
 		olson_name varchar(255) NOT NULL,
-		active datetime NOT NULL,
+		active INT(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (timezone_id,olson_name)
 		) CHARACTER SET utf8 COLLATE=utf8_general_ci;
 	";
@@ -960,9 +960,20 @@ function install_table_arlo_import_log() {
 		  PRIMARY KEY  (id)) 
 		  CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
-	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
-    dbDelta($sql);
+        dbDelta($sql);
+        
+        
+        $table_name = $wpdb->prefix . "arlo_import_lock";
+        
+        $sql = "CREATE TABLE $table_name (
+            import_id int(10) unsigned NOT NULL,
+            lock_acquired datetime NOT NULL,
+            lock_expired datetime NOT NULL
+            ) CHARACTER SET utf8 COLLATE=utf8_general_ci;";
+        
+        dbDelta($sql);
 }
 
 /**
@@ -1011,7 +1022,7 @@ function getTimezones() {
 	global $wpdb, $arlo_plugin;
 	
 	$table = $wpdb->prefix . "arlo_timezones";
-	$active = $arlo_plugin->get_last_import();
+	$active = $arlo_plugin->get_import_id();
 	
 	$sql = "
 	SELECT
@@ -1020,7 +1031,7 @@ function getTimezones() {
 	FROM
 		{$table}
 	WHERE
-		active = '{$active}'
+		active = {$active}
 	ORDER BY name
 	";
 	return $wpdb->get_results($sql);
@@ -1032,7 +1043,7 @@ function getTimezoneOlsonNames($timezone_id = 0) {
 	$timezone_id = intval($timezone_id);
 	
 	$table = $wpdb->prefix . "arlo_timezones_olson";
-	$active = $arlo_plugin->get_last_import();
+	$active = $arlo_plugin->get_import_id();
 	$where = '';
 	
 	if ($timezone_id > 0) {
@@ -1049,7 +1060,7 @@ function getTimezoneOlsonNames($timezone_id = 0) {
 		{$table}
 	WHERE
 		{$where}	
-		active = '{$active}'
+		active = {$active}
 	";
 	return $wpdb->get_results($sql);
 }
@@ -1083,7 +1094,7 @@ $shortcodes->add('event_template_list', function($content='', $atts, $shortcode_
 $shortcodes->add('event_template_list_pagination', function($content='', $atts, $shortcode_name){
 	global $wpdb, $wp_query, $arlo_plugin;
 
-	$active = $arlo_plugin->get_last_import();
+	$active = $arlo_plugin->get_import_id();
 	
 	if (isset($GLOBALS['show_only_at_bottom']) && $GLOBALS['show_only_at_bottom']) return;
 	
@@ -1188,7 +1199,7 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 		
 		$where .= ')';
 	} else if (!(isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true")) {
-		$where .= ' AND (c.c_parent_id = (SELECT c_arlo_id FROM ' . $t4 . ' WHERE c_parent_id = 0 AND active = "' . $active . '") OR c.c_parent_id IS NULL)';
+		$where .= ' AND (c.c_parent_id = (SELECT c_arlo_id FROM ' . $t4 . ' WHERE c_parent_id = 0 AND active = ' . $active . ') OR c.c_parent_id IS NULL)';
 	}
 	
 	// grouping
@@ -1234,7 +1245,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 		return;
 	}
 
-	$active = $arlo_plugin->get_last_import();
+	$active = $arlo_plugin->get_import_id();
 
 	$limit = !empty($atts['limit']) ? $atts['limit'] : get_option('posts_per_page');
 	$page = !empty($_GET['paged']) ? intval($_GET['paged']) : intval(get_query_var('paged'));
@@ -1248,7 +1259,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 	$t6 = "{$wpdb->prefix}arlo_eventtemplates_tags";
 	$t7 = "{$wpdb->prefix}arlo_tags";
 		
-	$where = "WHERE post.post_type = 'arlo_event' AND et.active = '{$active}'";
+	$where = "WHERE post.post_type = 'arlo_event' AND et.active = {$active}";
 	$join = "";
 	
 	$arlo_location = isset($_GET['arlo-location']) && !empty($_GET['arlo-location']) ? $_GET['arlo-location'] : get_query_var('arlo-location', '');
@@ -1344,7 +1355,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 		
 		$where .= ')';
 	} else if (!(isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true")) {
-		$where .= ' AND (c.c_parent_id = (SELECT c_arlo_id FROM ' . $t4 . ' WHERE c_parent_id = 0 AND active = "' . $active . '") OR c.c_parent_id IS NULL)';
+		$where .= ' AND (c.c_parent_id = (SELECT c_arlo_id FROM ' . $t4 . ' WHERE c_parent_id = 0 AND active = ' . $active . ') OR c.c_parent_id IS NULL)';
 	}	
 	
 	// grouping
@@ -1375,7 +1386,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 		$group 
 		$order
 		LIMIT $offset,$limit";
-		
+                
 	$items = $wpdb->get_results($sql, ARRAY_A);
 		
 	if(empty($items)) :
@@ -1428,7 +1439,7 @@ $shortcodes->add('event_template_tags', function($content='', $atts, $shortcode_
 	$output = '';
 	$tags = [];
 	
-	$active = $arlo_plugin->get_last_import();
+	$active = $arlo_plugin->get_import_id();
 		
 	// merge and extract attributes
 	extract(shortcode_atts(array(
@@ -1448,9 +1459,9 @@ $shortcodes->add('event_template_tags', function($content='', $atts, $shortcode_
 		WHERE
 			ett.et_arlo_id = {$GLOBALS['arlo_eventtemplate']['et_arlo_id']}
 		AND	
-			t.active = '{$active}'
+			t.active = {$active}
 		AND
-			ett.active = '{$active}'
+			ett.active = {$active}
 		", ARRAY_A);	
 	
 	foreach ($items as $t) {
@@ -1496,7 +1507,7 @@ $shortcodes->add('event_tags', function($content='', $atts, $shortcode_name){
 	$output = '';
 	$tags = [];
 	
-	$active = $arlo_plugin->get_last_import();
+	$active = $arlo_plugin->get_import_id();
 		
 	// merge and extract attributes
 	extract(shortcode_atts(array(
@@ -1516,9 +1527,9 @@ $shortcodes->add('event_tags', function($content='', $atts, $shortcode_name){
 		WHERE
 			et.e_arlo_id = {$GLOBALS['arlo_event_list_item']['e_arlo_id']}
 		AND	
-			t.active = '{$active}'
+			t.active = {$active}
 		AND
-			et.active = '{$active}'
+			et.active = {$active}
 		", ARRAY_A);	
 		
 	foreach ($items as $t) {
@@ -1663,7 +1674,7 @@ $shortcodes->add('content_field_text', function($content='', $atts, $shortcode_n
 $shortcodes->add('event_template_filters', function($content='', $atts, $shortcode_name){
 	global $post, $wpdb, $arlo_plugin;
 
-	$active = $arlo_plugin->get_last_import();
+	$active = $arlo_plugin->get_import_id();
 
 	extract(shortcode_atts(array(
 		'filters'	=> 'category,location,delivery',
@@ -1748,7 +1759,7 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 					ON
 						t.id = ett.tag_id
 					WHERE 
-						ett.active = '$active'
+						ett.active = $active
 					ORDER BY tag", ARRAY_A);
 
 				$tags = array();
@@ -2094,7 +2105,7 @@ $shortcodes->add('event_presenters', function($content='', $atts, $shortcode_nam
 
 	$e_arlo_id = $GLOBALS['arlo_event_list_item']['e_arlo_id'];
 		
-	$active = $arlo_plugin->get_last_import();
+	$active = $arlo_plugin->get_import_id();
 
 	$t1 = "{$wpdb->prefix}arlo_events_presenters";
 	$t2 = "{$wpdb->prefix}arlo_presenters";
@@ -2102,7 +2113,7 @@ $shortcodes->add('event_presenters', function($content='', $atts, $shortcode_nam
 	$items = $wpdb->get_results("SELECT p.p_firstname, p.p_lastname, p.p_post_name FROM $t1 exp 
 			INNER JOIN $t2 p
 			ON exp.p_arlo_id = p.p_arlo_id AND exp.active = p.active
-		WHERE exp.e_arlo_id = $e_arlo_id AND p.active = '$active'
+		WHERE exp.e_arlo_id = $e_arlo_id AND p.active = $active
 		GROUP BY p.p_arlo_id ORDER BY exp.p_order", ARRAY_A);
 
 	// merge and extract attributes
@@ -2258,7 +2269,7 @@ $shortcodes->add('suggest_templates', function($content='', $atts, $shortcode_na
 		'onlyscheduled' => 'false'
 	), $atts, $shortcode_name));
 	
-	$active = $arlo_plugin->get_last_import();
+	$active = $arlo_plugin->get_import_id();
 	
 	switch ($base) {
 		case 'tag': 
@@ -2272,11 +2283,11 @@ $shortcodes->add('suggest_templates', function($content='', $atts, $shortcode_na
 						LEFT JOIN 
 							{$wpdb->prefix}arlo_tags AS t
 						ON
-							ett.tag_id = t.id AND t.active = '{$active}'
+							ett.tag_id = t.id AND t.active = {$active}
 						WHERE
 							t.tag LIKE '{$tagprefix}%'
 						AND
-							ett.active = '{$active}'
+							ett.active = {$active}
 						AND
 							ett.et_arlo_id = {$GLOBALS['arlo_eventtemplate']['et_arlo_id']}
 						)
@@ -2297,7 +2308,7 @@ $shortcodes->add('suggest_templates', function($content='', $atts, $shortcode_na
 						FROM 
 							{$wpdb->prefix}arlo_eventtemplates_categories AS ecc
 						WHERE
-							ecc.active = '{$active}'
+							ecc.active = {$active}
 						AND
 							ecc.et_arlo_id = {$GLOBALS['arlo_eventtemplate']['et_arlo_id']}
 						)
@@ -2333,7 +2344,7 @@ $shortcodes->add('suggest_templates', function($content='', $atts, $shortcode_na
 			{$wpdb->prefix}arlo_eventtemplates AS et
 		{$join}
 		WHERE 
-			et.active = '{$active}'
+			et.active = {$active}
 		AND
 			et.et_arlo_id != {$GLOBALS['arlo_eventtemplate']['et_arlo_id']}
 		AND
@@ -2589,7 +2600,7 @@ $shortcodes->add('upcoming_offer', function($content='', $atts, $shortcode_name)
 $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortcode_name){
 	global $post, $wpdb, $arlo_plugin;
 
-	$active = $arlo_plugin->get_last_import();
+	$active = $arlo_plugin->get_import_id();
 	
 	extract(shortcode_atts(array(
 		'filters'	=> 'category,month,location,delivery',
@@ -2694,7 +2705,7 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 					ON
 						t.id = etag.tag_id
 					WHERE 
-						etag.active = '$active'
+						etag.active = $active
 					ORDER BY tag", ARRAY_A);
 
 				$tags = array();

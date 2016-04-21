@@ -724,6 +724,29 @@ class Arlo_For_Wordpress {
     }
 
 	/* API & import functionality */
+    
+	public function set_import_id($import_id) {
+		update_option('arlo_import_id', $import_id);
+                               
+		$this->import_id = $import_id;
+	}    
+        
+	public function get_import_id() {	
+                global $wpdb;
+                
+                //need to access the db directly, get_option('arlo_import_id'); can return a cached (old) value
+                $table_name = "{$wpdb->prefix}options";
+                
+                $sql = "SELECT option_value
+			FROM $table_name 
+                        WHERE option_name = 'arlo_import_id'";
+                
+                $import_id = $wpdb->get_var($sql);
+            
+		$this->import_id = $import_id;
+                
+		return $this->import_id;
+	}            
 	
 	public function get_import_log($limit=1) {
 		global $wpdb;
@@ -758,7 +781,7 @@ class Arlo_For_Wordpress {
 		return false;
 	}
 	
-	public function add_import_log($message, $timestamp, $successful=true) {
+	public function add_import_log($message, $timestamp, $successful = true, $utimestamp = null) {
 		global $wpdb;
 		
 		$table_name = "{$wpdb->prefix}arlo_import_log";
@@ -779,7 +802,7 @@ class Arlo_For_Wordpress {
 		$wpdb->query("DELETE FROM $table_name WHERE CREATED < NOW() - INTERVAL 14 DAY ORDER BY ID ASC LIMIT 10");
 
 		if($successful) {
-			$this->set_last_import($timestamp);
+			$this->set_last_import($utimestamp);
 		}
 	}
 	
@@ -883,13 +906,129 @@ class Arlo_For_Wordpress {
 		
 		$_SESSION['arlo-import'] = $this->import(true);
 	}
+        
+        public function GUIDv4 ($trim = true) {
+            // Windows
+            if (function_exists('com_create_guid') === true) {
+                if ($trim === true)
+                    return trim(com_create_guid(), '{}');
+                else
+                    return com_create_guid();
+            }
+
+            // OSX/Linux
+            if (function_exists('openssl_random_pseudo_bytes') === true) {
+                $data = openssl_random_pseudo_bytes(16);
+                $data[6] = chr(ord($data[6]) & 0x0f | 0x40);    // set version to 0100
+                $data[8] = chr(ord($data[8]) & 0x3f | 0x80);    // set bits 6-7 to 10
+                return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+            }
+        }
+        
+        public function get_random_int() {
+            $guid = explode("-", $this->GUIDv4());
+            
+            return hexdec($guid[0]);
+        }
+        
+        public function clear_import_lock() {
+            global $wpdb;
+            $table_name = "{$wpdb->prefix}arlo_import_lock";
+          
+            $query = $wpdb->query(
+                'DELETE FROM  
+                    ' . $table_name
+            );
+        }     
+        
+        public function get_import_lock_entries_number() {
+            global $wpdb;
+            $table_name = "{$wpdb->prefix}arlo_import_lock";
+            
+            $sql = '
+                    SELECT 
+                        lock_acquired
+                    FROM
+                        ' . $table_name . '
+                    WHERE
+                        lock_expired > NOW()';
+		               
+            $wpdb->get_results($sql);
+            
+            return $wpdb->num_rows;
+        }
+        
+        public function cleanup_import_lock() {
+            global $wpdb;
+            $table_name = "{$wpdb->prefix}arlo_import_lock";
+          
+            $wpdb->query(
+                'DELETE FROM  
+                    ' . $table_name . '
+                WHERE 
+                    lock_expired < NOW()
+                '
+            );
+        }
+        
+        public function add_import_lock($import_id) {
+            global $wpdb;
+            
+            $table_lock = "{$wpdb->prefix}arlo_import_lock";
+            $table_log = "{$wpdb->prefix}arlo_import_log";
+            
+            $query = $wpdb->query(
+                    'INSERT INTO ' . $table_lock . ' (import_id, lock_acquired, lock_expired)
+                    SELECT ' . $import_id . ', NOW(), ADDTIME(NOW(), "00:10:00.00") FROM ' . $table_log . ' WHERE (SELECT count(1) FROM ' . $table_lock . ') = 0 LIMIT 1');
+                        
+            return $query !== false && $query == 1;
+        }
+        
+        public function acquire_import_lock($import_id) {
+                if ($this->get_import_lock_entries_number() == 0) {
+                    $this->cleanup_import_lock();
+                    if ($this->add_import_lock($import_id)) {
+                        return true;
+                    }
+                }
+                
+                return false;
+        }
+        
+        public function check_import_lock($import_id) {
+            global $wpdb;
+            	$table_name = "{$wpdb->prefix}arlo_import_lock";
+                
+                $sql = '
+                    SELECT 
+                        lock_acquired
+                    FROM
+                        ' . $table_name . '
+                    WHERE
+                        import_id = ' . $import_id . '
+                    AND    
+                        lock_expired > NOW()';
+		               
+                $wpdb->get_results($sql);
+                
+                if ($wpdb->num_rows == 1) {
+                    return true;
+                }
+            
+                return false;
+        }
 	
 	public function import($force=false) {
-		// check for last sucessful import. Continue if imported mor than an hour ago or forced. Otherwise, return.
+                global $wpdb;
             
-		$timestamp = date('Y-m-d H:i:s T');
-		$this->add_import_log('Synchronization Started', $timestamp, false);
+		// check for last sucessful import. Continue if imported mor than an hour ago or forced. Otherwise, return.
+		$now = DateTime::createFromFormat('U.u', microtime(true));
+                $timestamp = $now->format("Y-m-d H:i:s");
+                $utimestamp = $now->format("Y-m-d H:i:s.u T ");
 		$last = $this->get_last_import();
+                $import_id = $this->get_random_int();
+                                
+                $this->add_import_log($import_id . ' Synchronization Started: ' . $utimestamp, $timestamp, false);
 		
 		set_time_limit(300);
 		
@@ -897,23 +1036,23 @@ class Arlo_For_Wordpress {
 		// If not forced
 		if(!$force) {
 			// LOG THIS AS AN AUTOMATIC IMPORT
-			$this->add_import_log('Synchronization identified as automatic synchronization.', $timestamp, false);
+			$this->add_import_log($import_id . ' Synchronization identified as automatic synchronization.', $timestamp, false);
 			if(!empty($last)) {
 				// LOG THAT A PREVIOUS SUCCESSFUL IMPORT HAS BEEN FOUND
-				$this->add_import_log('Previous succesful synchronization found.', $timestamp, false);
+				$this->add_import_log($import_id . ' Previous succesful synchronization found.', $timestamp, false);
 				if(strtotime('-1 hour') > strtotime($last)) {
 					// LOG THE FACT THAT PREVIOUS SUCCESSFUL IMPORT IS MORE THAN AN HOUR AGO
-					$this->add_import_log('Synchronization more than an hour old. Synchronization required.', $timestamp, false);
+					$this->add_import_log($import_id . ' Synchronization more than an hour old. Synchronization required.', $timestamp, false);
 				}
 				else {
 					// LOG THE FACT THAT PREVIOUS SUCCESSFUL IMPORT IS MORE THAN AN HOUR AGO
-					$this->add_import_log('Synchronization less than an hour old. Synchronization stopped.', $timestamp, false);
+					$this->add_import_log($import_id . ' Synchronization less than an hour old. Synchronization stopped.', $timestamp, false);
 					// LOG DATA USED TO DECIDE IMPORT NOT REQUIRED.
 					$this->add_import_log($last . '-'  . strtotime($last) . '-' . strtotime('-1 hour') . '-'  . !$force, $timestamp, false);
 					return false;
 				}
 			}
-		}
+		}              
 	
 		// excessive, but some servers are slow...
 		ini_set('max_execution_time', 3000);
@@ -921,57 +1060,78 @@ class Arlo_For_Wordpress {
 		
 		// first check valid api_client
 		if(!$this->get_api_client()) return false;
-		
+                
+                //if an import is already running, exit
+                if (!$this->acquire_import_lock($import_id)) {
+                    $this->add_import_log($import_id . ' Synchronization LOCK found', $timestamp, true, $utimestamp);
+                    return false;
+                }                 
+                //sleep(300);
+                
 		// need to check for valid platform name here - return false if none found
 		// can we ping tha API?
-	
-		
+                
 		try {
-			global $wpdb;
-			
 			// lets put it all in a transaction
 			$wpdb->query('START TRANSACTION');
 						
 			// import from arlo endpoints
-			$this->import_timezones($timestamp);
+			$this->import_timezones($import_id);
 			
-			$this->import_presenters($timestamp);
+			$this->import_presenters($import_id);
 			
-			$this->import_event_templates($timestamp);
+			$this->import_event_templates($import_id);
 			
-			$this->import_events($timestamp);
+			$this->import_events($import_id);
 			
-			$this->import_venues($timestamp);
+			$this->import_venues($import_id);
 			
-			$this->import_categories($timestamp);
-			
-			// now delete the old data
-			$this->import_cleanup($timestamp);
+			$this->import_categories($import_id);
                         
-			// commit
-			$wpdb->query('COMMIT');
+                        // now delete the old data
+			$this->import_cleanup($import_id);
+                        
+                        // delete unneeded custom posts
+                        $this->delete_custom_posts('eventtemplates','et_post_name','event');
+
+                        $this->delete_custom_posts('presenters','p_post_name','presenter');
+
+                        $this->delete_custom_posts('venues','v_post_name','venue');   
+                        
+                        $now = DateTime::createFromFormat('U.u', microtime(true));
+                        $timestamp = $now->format("Y-m-d H:i:s");
+                        $utimestamp = $now->format("Y-m-d H:i:s.u T ");
+                        			
+                        if ($this->get_import_lock_entries_number() == 1 && $this->check_import_lock($import_id)) {
+                            // update logs
+                            $this->add_import_log($import_id . ' Synchronization successful', $timestamp, true, $utimestamp);
+                            
+                            // commit
+                            $wpdb->query('COMMIT');                            
+                        } else {
+                            // rollback
+                            $wpdb->query('ROLLBACK');                            
+                            
+                            $this->add_import_log($import_id . ' Synchronization died because of a database LOCK', $timestamp, true, $utimestamp);
+                        }
+                        
 		} catch(\Exception $e) {
 			// rollback
 			$wpdb->query('ROLLBACK');
                         
-			$this->add_import_log('Synchronization failed: ' . $e->getMessage(), $timestamp, false);
+			$this->add_import_log($import_id . ' Synchronization failed: ' . $e->getMessage(), $timestamp, false);
 			
 			return false;
 		}
                 
-		// delete unneeded custom posts
-
-		$this->delete_custom_posts('eventtemplates','et_post_name','event');
-
-		$this->delete_custom_posts('presenters','p_post_name','presenter');
-
-		$this->delete_custom_posts('venues','v_post_name','venue');
+                //set import id
+                $this->set_import_id($import_id);                        
 			
 		// flush the rewrite rules
-		flush_rewrite_rules(true);
-		
-		// update logs
-		$this->add_import_log('Synchronization successful', $timestamp);
+		flush_rewrite_rules(true);	
+              	wp_cache_flush();
+                
+                $this->clear_import_lock();                
 		
 		return true;
 	}
@@ -1832,7 +1992,7 @@ class Arlo_For_Wordpress {
 		}
 	}
 		
-	private function import_cleanup($timestamp) {
+	private function import_cleanup($import_id) {
 		global $wpdb;
 		
 		// need to delete posts and join rows no longer needed
@@ -1847,19 +2007,24 @@ class Arlo_For_Wordpress {
 			'presenters',
 			'venues',
 			'categories',
-            'events_presenters',
-            'eventtemplates_categories',
-            'eventtemplates_presenters',
-            'eventtemplates_tags',
-            'timezones',
-            'timezones_olson'
+                        'events_presenters',
+                        'eventtemplates_categories',
+                        'eventtemplates_presenters',
+                        'eventtemplates_tags',
+                        'timezones',
+                        'timezones_olson'
 		);
                 		
 		foreach($tables as $table) {
 			$table = $wpdb->prefix . 'arlo_' . $table;
-			$wpdb->query($wpdb->prepare("DELETE FROM $table WHERE active <> '%s'", $timestamp));
+			$wpdb->query($wpdb->prepare("DELETE FROM $table WHERE active <> %s", $import_id));
 		}
                 
+       		$now = DateTime::createFromFormat('U.u', microtime(true));
+                $timestamp = $now->format("Y-m-d H:i:s");
+                $utimestamp = $now->format("Y-m-d H:i:s.u T ");
+
+                $this->add_import_log($import_id . ' Database cleanup: ' . $utimestamp, $timestamp, false);                
 	}
 
 	private function delete_custom_posts($table, $column, $post_type) {
@@ -1967,7 +2132,7 @@ class Arlo_For_Wordpress {
 		
 		echo '
 		<div class="' . ($import[0]->successful !== "1" ? "error" : "updated") . ' notice">
-        	<p>' . $import[0]->message . '</p>
+        	<p>' . preg_replace('#^\d+#', '', $import[0]->message) . '</p>
 	    </div>
 		';
 		
@@ -2191,7 +2356,7 @@ class Arlo_For_Wordpress {
 		echo '
 			<div class="notice arlo-connected-message"> 
 				<p>
-					Arlo is connected to <strong>' . $settings['platform_name'] . '</strong> <span class="arlo-block">Last synchronyzed: ' . self::get_instance()->get_last_import() . '</span> 
+					Arlo is connected to <strong>' . $settings['platform_name'] . '</strong> <span class="arlo-block">Last synchronized: ' . self::get_instance()->get_last_import() . '</span> 
 					<a class="arlo-block" href="?page=arlo-for-wordpress&arlo-import">Synchronize now</a>
 				</p>
 			</div>

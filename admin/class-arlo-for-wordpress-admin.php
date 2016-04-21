@@ -109,6 +109,16 @@ class Arlo_For_Wordpress_Admin {
 		$plugin_version = get_option('arlo_plugin_version');
 		
 		if (!empty($plugin_version)) {
+                        $import_id  = get_option('arlo_import_id',"");
+                        $last_import = $plugin->get_last_import();
+                        
+                        if (empty($import_id)) {
+                            if (empty($last_import)) {
+                                $last_import = date("Y");
+                            }
+                            $plugin->set_import_id(date("Y", strtotime($last_import)));
+                        }
+                        
 			if ($plugin_version != $plugin::VERSION) {
 				$plugin::update_data_model();
 				$wp_rewrite->flush_rules();

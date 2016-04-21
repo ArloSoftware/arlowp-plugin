@@ -57,7 +57,7 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 		$plugin = Arlo_For_Wordpress::get_instance();
 		$settings = get_option('arlo_settings');
 				
-		$this->active = $plugin->last_imported;
+		$this->active = $plugin->import_id;
 		$this->plugin_slug = $plugin->plugin_slug;
 		$this->version = Arlo_For_Wordpress::VERSION;	
 		$this->wpdb = &$wpdb;
