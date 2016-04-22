@@ -1063,7 +1063,7 @@ class Arlo_For_Wordpress {
                 
                 //if an import is already running, exit
                 if (!$this->acquire_import_lock($import_id)) {
-                    $this->add_import_log($import_id . ' Synchronization LOCK found', $timestamp, true, $utimestamp);
+                    $this->add_import_log($import_id . ' Synchronization LOCK found', $timestamp, false, $utimestamp);
                     return false;
                 }                 
                 //sleep(300);
