@@ -116,6 +116,7 @@ function arlo_child_categories($cats, $depth=0) {
 	$space = ($depth > 0) ? ' ' : '';
 
 	$output = array();
+	
 
 	foreach($cats as $cat) {
 
@@ -973,7 +974,8 @@ function install_table_arlo_import_log() {
             lock_expired datetime NOT NULL
             ) CHARACTER SET utf8 COLLATE=utf8_general_ci;";
         
-        dbDelta($sql);
+		dbDelta($sql);
+        
 }
 
 /**
@@ -1183,7 +1185,7 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 		} 
 		
 		if (isset($GLOBALS['show_child_elements']) && $GLOBALS['show_child_elements']) {
-			//$cats = \Arlo\Categories::getTree($cat_id, null);
+			$cats = \Arlo\Categories::getTree($cat_id, null);
 			
 			$categories_tree = arlo_child_categories($cats);
 			
@@ -1339,8 +1341,8 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 		if (isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true") {
 			$GLOBALS['show_child_elements'] = true;
 		
-			//$cats = \Arlo\Categories::getTree($cat_id, null);
-			
+			$cats = \Arlo\Categories::getTree($cat_id, null);
+						
 			$categories_tree = arlo_child_categories($cats);
 			
 			$ids = array_map(function($item) {
@@ -1700,12 +1702,14 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 
 			case 'category' :
 
-				// category select
-				
-				//$cats = \Arlo\Categories::getTree();
+				//root category select
+				$cats = \Arlo\Categories::getTree(0, 1);	
+				if (!empty($cats)) {
+					$cats = \Arlo\Categories::getTree($cats[0]->c_arlo_id, 100);
+				}
 				
 				if (is_array($cats)) {
-					$filter_html .= arlo_create_filter('category', arlo_child_categories($cats[0]->children), __('All categories', $GLOBALS['arlo_plugin_slug']));
+					$filter_html .= arlo_create_filter('category', arlo_child_categories($cats), __('All categories', $GLOBALS['arlo_plugin_slug']));
 				}
 				
 				break;
@@ -2628,10 +2632,14 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 
 				// category select
 
-				//$cats = \Arlo\Categories::getTree();
+				//root category select
+				$cats = \Arlo\Categories::getTree(0, 1);	
+				if (!empty($cats)) {
+					$cats = \Arlo\Categories::getTree($cats[0]->c_arlo_id, 100);
+				}
 
 				if (is_array($cats)) {
-					$filter_html .= arlo_create_filter($filter, arlo_child_categories($cats[0]->children), __('All categories', $GLOBALS['arlo_plugin_slug']));					
+					$filter_html .= arlo_create_filter($filter, arlo_child_categories($cats), __('All categories', $GLOBALS['arlo_plugin_slug']));					
 				}
 
 				break;
