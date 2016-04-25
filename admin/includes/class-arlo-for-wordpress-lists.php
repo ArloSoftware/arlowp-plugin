@@ -15,8 +15,8 @@ if(!class_exists('WP_List_Table')){
 
 class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	protected $wpdb;
-	protected $singular;
-	protected $plural;
+	public $singular;
+	public $plural;
 	protected $platform_name;
 	protected $order;
 	protected $orderby;
@@ -192,6 +192,15 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	public function get_sortable_columns() {
 		die( 'function Arlo_For_Wordpress_Lists::get_sortable_columns() must be over-ridden in a sub-class.' );
 	}	
+	
+	public function get_new_link() {
+		die( 'function Arlo_For_Wordpress_Lists::get_new_link() must be over-ridden in a sub-class.' );
+	}	
+
+	public function get_list_link() {
+		die( 'function Arlo_For_Wordpress_Lists::get_list_link() must be over-ridden in a sub-class.' );
+	}	
+	
 }
 
 ?>

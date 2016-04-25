@@ -157,7 +157,16 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 		GROUP BY
 			v.v_arlo_id		
 		";
-	}		
+	}	
+	
+	public function get_new_link() {
+		return sprintf('https://my.arlo.co/%s/Venues/Venue.aspx?i=1', $this->platform_name );
+	}
+	
+	public function get_list_link() {
+		return sprintf('https://my.arlo.co/%s/Venues/Venues.aspx', $this->platform_name );
+	}
+		
 }
 
 ?>

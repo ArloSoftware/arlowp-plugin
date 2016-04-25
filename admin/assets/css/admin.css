@@ -118,6 +118,10 @@
 	margin: 0px 6px;
 }
 
+.arlo-middle {
+	vertical-align: middle;
+}
+
 .wp-editor-wrap {
 	margin-top: 1em;
 }

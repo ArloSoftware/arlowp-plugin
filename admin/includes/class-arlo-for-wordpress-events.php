@@ -135,7 +135,7 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
         
 		return sprintf('%1$s %2$s', $item->e_code, $this->row_actions($actions) );
 	}
-	
+		
 	protected function get_sql_where_array() {
 		return [
 			"e.active = '" . $this->active . "'",
@@ -214,7 +214,15 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 		GROUP BY
 			e.e_arlo_id
 		";
-	}		
+	}	
+	
+	public function get_new_link() {
+		return sprintf('https://my.arlo.co/%s/Console/#/events/new/', $this->platform_name );
+	}
+	
+	public function get_list_link() {
+		return sprintf('https://my.arlo.co/%s/Courses/Courses2.aspx', $this->platform_name );
+	}			
 }
 
 ?>

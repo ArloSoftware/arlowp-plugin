@@ -147,7 +147,16 @@ class Arlo_For_Wordpress_Presenters extends Arlo_For_Wordpress_Lists  {
 		GROUP BY
 			p_arlo_id		
 		";
-	}		
+	}	
+	
+	public function get_new_link() {
+		return sprintf('https://my.arlo.co/%s/Users/User.aspx?i=1&r=p', $this->platform_name );
+	}
+	
+	public function get_list_link() {
+		return sprintf('https://my.arlo.co/%s/Users/Contacts2.aspx?t=presenters', $this->platform_name );
+	}
+		
 }
 
 ?>
