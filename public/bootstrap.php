@@ -7,6 +7,8 @@ $arlo_plugin_slug = $arlo_plugin->get_plugin_slug();
  * Add event category to title when filtered by a category
  */
 add_filter( 'the_title', function($title, $id = null){
+	$title = htmlentities($title, ENT_QUOTES, "UTF-8");
+
 	$settings = get_option('arlo_settings');
 	
 	$pages = [];
@@ -22,7 +24,6 @@ add_filter( 'the_title', function($title, $id = null){
 	if (!empty($settings['post_types']['upcoming']['posts_page'])) {
 		array_push($pages, $settings['post_types']['upcoming']['posts_page']);
 	}
-	
 	
 	$subtitle = '';
 	
@@ -53,18 +54,19 @@ add_filter( 'the_title', function($title, $id = null){
 			$subtitle .= ' (' . $location . ')';
 		}
 	} else if (!empty($location)) {
-		$subtitle = htmlentities($location);		
+		$subtitle = $location;		
 	} else if (!empty($search)) {
-		$subtitle = htmlentities($search);
+		$subtitle = $search;
 	}
 	
 	// append category name to events page
 	if (!empty($subtitle)) {
+		$subtitle = htmlentities($subtitle, ENT_QUOTES, "UTF-8");
 		$subtitle = '<span class="cat-title-ext">' . (!empty($title) ? ': ':'') . $subtitle . ' </span>';
 	}
-
         
 	return $title . $subtitle;
+	
 }, 10, 2);
 
 /*
@@ -157,8 +159,8 @@ function arlo_create_filter($type, $items, $label=null) {
 		
 		$selected = (strlen($selected_value) && urldecode($selected_value) == $item['value']) ? ' selected="selected"' : '';
 		
-		$filter_html .= '<option value="' . $item['value'] . '"' . $selected.'>';
-		$filter_html .= $item['string'];
+		$filter_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>';
+		$filter_html .= htmlentities($item['string'], ENT_QUOTES, "UTF-8");
 		$filter_html .= '</option>';
 
 	}
@@ -1470,31 +1472,33 @@ $shortcodes->add('event_template_tags', function($content='', $atts, $shortcode_
 		$tags[] = $t['tag'];
 	}
 	
-	switch($layout) {
-		case 'list':
-			$output = '<ul class="arlo-template_tags-list">';
+	if (count($tags)) {
+		switch($layout) {
+			case 'list':
+				$output = '<ul class="arlo-template_tags-list">';
+				
+				foreach($tags as $tag) {
+					$output .= '<li>' . htmlentities($tag, ENT_QUOTES, "UTF-8") . '</li>';
+				}
+				
+				$output .= '</ul>';
+			break;
 			
-			foreach($tags as $tag) {
-				$output .= '<li>' . $tag . '</li>';
-			}
+			case 'class':
 			
-			$output .= '</ul>';
-		break;
+				$classes = [];
+				foreach($tags as $tag) {
+					$classes[] = htmlentities(sanitize_title($prefix . $tag), ENT_QUOTES, "UTF-8");
+				}
+				
+				$output = implode(' ', $classes);
+				
+			break;
 		
-		case 'class':
-		
-			$classes = [];
-			foreach($tags as $tag) {
-				$classes[] = sanitize_title($prefix . $tag);
-			}
-			
-			$output = implode(' ', $classes);
-			
-		break;
-	
-		default:
-			$output = '<div class="arlo-template_tags-list">' . implode(', ', $tags) . '</div>';
-		break;
+			default:	
+				$output = '<div class="arlo-template_tags-list">' . implode(', ', array_map(function($tag) { return htmlentities($tag, ENT_QUOTES, "UTF-8"); }, $tags)) . '</div>';
+			break;
+		}	
 	}
 	
 	return $output;
@@ -1538,32 +1542,35 @@ $shortcodes->add('event_tags', function($content='', $atts, $shortcode_name){
 		$tags[] = $t['tag'];
 	}
 	
-	switch($layout) {
-		case 'list':
-			$output = '<ul class="arlo-event_tags-list">';
+	if (count($tags)) {
+		switch($layout) {
+			case 'list':
+				$output = '<ul class="arlo-event_tags-list">';
+				
+				foreach($tags as $tag) {
+					$output .= '<li>' . htmlentities($tag, ENT_QUOTES, "UTF-8") . '</li>';
+				}
+				
+				$output .= '</ul>';
+			break;
 			
-			foreach($tags as $tag) {
-				$output .= '<li>' . $tag . '</li>';
-			}
+			case 'class':
 			
-			$output .= '</ul>';
-		break;
+				$classes = [];
+				foreach($tags as $tag) {
+					$classes[] = htmlentities(sanitize_title($prefix . $tag), ENT_QUOTES, "UTF-8");
+				}
+				
+				$output = implode(' ', $classes);
+				
+			break;		
 		
-		case 'class':
-		
-			$classes = [];
-			foreach($tags as $tag) {
-				$classes[] = sanitize_title($prefix . $tag);
-			}
-			
-			$output = implode(' ', $classes);
-			
-		break;		
-	
-		default:
-			$output = '<div class="arlo-event_tags-list">' . implode(', ', $tags) . '</div>';
-		break;
+			default:
+					$output = '<div class="arlo-event_tags-list">' . implode(', ', array_map(function($tag) { return htmlentities($tag, ENT_QUOTES, "UTF-8"); }, $tags)) . '</div>';
+			break;
+		}	
 	}
+
 	
 	return $output;
 });
@@ -1574,7 +1581,7 @@ $shortcodes->add('event_tags', function($content='', $atts, $shortcode_name){
 $shortcodes->add('event_template_code', function($content='', $atts, $shortcode_name){
 	if(!isset($GLOBALS['arlo_eventtemplate']['et_code'])) return '';
 	
-	return $GLOBALS['arlo_eventtemplate']['et_code'];
+	return htmlentities($GLOBALS['arlo_eventtemplate']['et_code'], ENT_QUOTES, "UTF-8");
 });
 
 // event template name shortcode
@@ -1582,7 +1589,7 @@ $shortcodes->add('event_template_code', function($content='', $atts, $shortcode_
 $shortcodes->add('event_template_name', function($content='', $atts, $shortcode_name){
 	if(!isset($GLOBALS['arlo_eventtemplate']['et_name'])) return '';
 
-	return $GLOBALS['arlo_eventtemplate']['et_name'];
+	return htmlentities($GLOBALS['arlo_eventtemplate']['et_name'], ENT_QUOTES, "UTF-8");
 });
 
 // event template permalink shortcode
@@ -1600,7 +1607,7 @@ $shortcodes->add('event_template_permalink', function($content='', $atts, $short
 $shortcodes->add('event_template_link', function($content='', $atts, $shortcode_name){
 	if(!isset($GLOBALS['arlo_eventtemplate']['et_viewuri'])) return '';
 
-	return $GLOBALS['arlo_eventtemplate']['et_viewuri'];
+	return htmlentities($GLOBALS['arlo_eventtemplate']['et_viewuri'], ENT_QUOTES, "UTF-8");
 });
 
 
@@ -1660,7 +1667,7 @@ $shortcodes->add('content_field_item', function($content='', $atts, $shortcode_n
 $shortcodes->add('content_field_name', function($content='', $atts, $shortcode_name){
 	if(!isset($GLOBALS['arlo_content_field_item']['cf_fieldname'])) return '';
 
-	return $GLOBALS['arlo_content_field_item']['cf_fieldname'];
+	return htmlentities($GLOBALS['arlo_content_field_item']['cf_fieldname'], ENT_QUOTES, "UTF-8");
 });
 
 // content field text shortcode
@@ -1788,7 +1795,7 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 
 	$filter_html .= '<div class="arlo-filters-buttons"><input type="hidden" id="arlo-page" value="' . $slug . '">';
         
-	$filter_html .= '<a href="'.get_page_link().'" class="' . $buttonclass . '">'.$resettext.'</a></div>';
+	$filter_html .= '<a href="' . get_page_link() . '" class="' . esc_attr($buttonclass) . '">' . htmlentities($resettext, ENT_QUOTES, "UTF-8") . '</a></div>';
 
 	$filter_html .= '</form>';
 	
@@ -1859,7 +1866,7 @@ $shortcodes->add('event_list_item', function($content='', $atts, $shortcode_name
 $shortcodes->add('event_code', function($content='', $atts, $shortcode_name){
 	if(!isset($GLOBALS['arlo_event_list_item']['e_code'])) return '';
 
-	return $GLOBALS['arlo_event_list_item']['e_code'];
+	return htmlentities($GLOBALS['arlo_event_list_item']['e_code'], ENT_QUOTES, "UTF-8");
 });
 
 
@@ -1870,7 +1877,7 @@ $shortcodes->add('event_name', function($content='', $atts, $shortcode_name){
 	
 	$event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
 
-	return $event['e_name'];
+	return htmlentities($event['e_name'], ENT_QUOTES, "UTF-8");
 });
 
 // event location shortcode
@@ -1880,7 +1887,7 @@ $shortcodes->add('event_location', function($content='', $atts, $shortcode_name)
 	
 	$event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
 
-	$location = $event['e_locationname'];
+	$location = htmlentities($event['e_locationname'], ENT_QUOTES, "UTF-8");
 
 	if($event['e_isonline'] || $event['v_id'] == 0 || $event['e_locationvisible'] == 0) {
 
@@ -1991,7 +1998,7 @@ $shortcodes->add('event_end_date', function($content='', $atts, $shortcode_name)
 $shortcodes->add('event_session_description', function($content='', $atts, $shortcode_name){
 	if(!isset($GLOBALS['arlo_event_list_item']['e_sessiondescription'])) return '';
 
-	return $GLOBALS['arlo_event_list_item']['e_sessiondescription'];
+	return htmlentities($GLOBALS['arlo_event_list_item']['e_sessiondescription'], ENT_QUOTES, "UTF-8");
 });
 
 // event registration shortcode
@@ -2000,7 +2007,7 @@ $shortcodes->add('event_registration', function($content='', $atts, $shortcode_n
 	$isfull = $GLOBALS['arlo_event_list_item']['e_isfull'];
 	$registeruri = $GLOBALS['arlo_event_list_item']['e_registeruri'];
 	$registermessage = $GLOBALS['arlo_event_list_item']['e_registermessage'];
-	$placesremaining = $GLOBALS['arlo_event_list_item']['e_placesremaining'];
+	$placesremaining = intval($GLOBALS['arlo_event_list_item']['e_placesremaining']);
         
 	$class = (!empty($atts['class']) ? $atts['class'] : 'button' );
 
@@ -2008,7 +2015,7 @@ $shortcodes->add('event_registration', function($content='', $atts, $shortcode_n
 	$registration .= (($isfull) ? '<span class="arlo-event-full">' . __('Event is full', $GLOBALS['arlo_plugin_slug']) . '</span>' : '');
 	// test if there is a register uri string, if so display the button
 	if(!is_null($registeruri) && $registeruri != '') {
-		$registration .= '<a class="' . $class . ' ' . (($isfull) ? 'arlo-waiting-list' : 'arlo-register') . '" href="'. $registeruri . '" target="_blank">';
+		$registration .= '<a class="' . $class . ' ' . (($isfull) ? 'arlo-waiting-list' : 'arlo-register') . '" href="'. esc_attr($registeruri) . '" target="_blank">';
 		$registration .= (($isfull) ? __('Join waiting list', $GLOBALS['arlo_plugin_slug']) : __($registermessage, $GLOBALS['arlo_plugin_slug'])) . '</a>';
 	} else {
 		$registration .= $registermessage;
@@ -2146,7 +2153,7 @@ $shortcodes->add('event_presenters', function($content='', $atts, $shortcode_nam
 
 			$link_end = ($link) ? '</a>' : '' ;
 
-			$output .= '<li>'.$link_start.$item['p_firstname'].' '.$item['p_lastname'].$link_end.'</li>';
+			$output .= '<li>' . $link_start . htmlentities($item['p_firstname'], ENT_QUOTES, "UTF-8") . ' ' . htmlentities($item['p_lastname'], ENT_QUOTES, "UTF-8") . $link_end . '</li>';
 
 		}
 
@@ -2165,7 +2172,7 @@ $shortcodes->add('event_presenters', function($content='', $atts, $shortcode_nam
 
 			$link_end = ($link) ? '</a>' : '' ;
 
-			$presenters[] = $link_start.$item['p_firstname'].' '.$item['p_lastname'].$link_end;
+			$presenters[] = $link_start . htmlentities($item['p_firstname'], ENT_QUOTES, "UTF-8") . ' ' . htmlentities($item['p_lastname'], ENT_QUOTES, "UTF-8") . $link_end;
 
 		}
 
@@ -2184,9 +2191,9 @@ $shortcodes->add('event_provider', function($content='', $atts, $shortcode_name)
 	$e_arlo_id = $GLOBALS['arlo_event_list_item']['e_arlo_id'];
 		
 	if (!empty($GLOBALS['arlo_event_list_item']['e_providerwebsite'])) {
-		$output = '<a href="' . $GLOBALS['arlo_event_list_item']['e_providerwebsite'] . '" target="_blank">' . $GLOBALS['arlo_event_list_item']['e_providerorganisation'] . "</a>";
+		$output = '<a href="' . esc_attr($GLOBALS['arlo_event_list_item']['e_providerwebsite']) . '" target="_blank">' . htmlentities($GLOBALS['arlo_event_list_item']['e_providerorganisation'], ENT_QUOTES, "UTF-8") . "</a>";
 	} else {
-		$output = $GLOBALS['arlo_event_list_item']['e_providerorganisation'];
+		$output = htmlentities($GLOBALS['arlo_event_list_item']['e_providerorganisation'], ENT_QUOTES, "UTF-8");
 	}	
 
 	return $output;
@@ -2239,8 +2246,8 @@ $shortcodes->add('event_session_list_item', function($content='', $atts, $shortc
 					
 	$items = $wpdb->get_results($sql, ARRAY_A);
 	if (is_array($items) && count($items)) {
-		$output .= '<div data-tooltip="#' . ARLO_PLUGIN_PREFIX . '_session_tooltip_' . $GLOBALS['arlo_event_list_item']['e_arlo_id'] . '" class="' . ARLO_PLUGIN_PREFIX . '-tooltip-button">'.$label.'</div>
-		<div class="' . ARLO_PLUGIN_PREFIX . '-tooltip-html" id="' . ARLO_PLUGIN_PREFIX . '_session_tooltip_' . $GLOBALS['arlo_event_list_item']['e_arlo_id'] . '"><h5>' . $header . '</h5>';
+		$output .= '<div data-tooltip="#' . ARLO_PLUGIN_PREFIX . '_session_tooltip_' . $GLOBALS['arlo_event_list_item']['e_arlo_id'] . '" class="' . ARLO_PLUGIN_PREFIX . '-tooltip-button">' . htmlentities($label, ENT_QUOTES, "UTF-8") . '</div>
+		<div class="' . ARLO_PLUGIN_PREFIX . '-tooltip-html" id="' . ARLO_PLUGIN_PREFIX . '_session_tooltip_' . $GLOBALS['arlo_event_list_item']['e_arlo_id'] . '"><h5>' . htmlentities($header, ENT_QUOTES, "UTF-8") . '</h5>';
 		
 		foreach($items as $key => $item) {
 	
@@ -2587,14 +2594,16 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 
 $shortcodes->add('upcoming_offer', function($content='', $atts, $shortcode_name){
 	$settings = get_option('arlo_settings');  
-	$price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : ARLO_PLUGIN_PREFIX . '-exclgst';
-	$free_text = (isset($settings['free_text'])) ? esc_attr($settings['free_text']) : __('Free', $GLOBALS['arlo_plugin_slug']);
+	$price_setting = (isset($settings['price_setting'])) ? $settings['price_setting'] : ARLO_PLUGIN_PREFIX . '-exclgst';
+	$free_text = (isset($settings['free_text'])) ? $settings['free_text'] : __('Free', $GLOBALS['arlo_plugin_slug']);
             
 	$amount = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $GLOBALS['arlo_event_list_item']['o_offeramounttaxexclusive'] : $GLOBALS['arlo_event_list_item']['o_offeramounttaxinclusive'];
 	$famount = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $GLOBALS['arlo_event_list_item']['o_formattedamounttaxexclusive'] : $GLOBALS['arlo_event_list_item']['o_formattedamounttaxinclusive'];
 	$tax = $GLOBALS['arlo_event_list_item']['o_taxrateshortcode'];
 
-	$offer = ($amount > 0) ? '<span class="arlo-amount">'.$famount .'</span> <span class="arlo-price-tax">'. ($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__(' excl. %s', $GLOBALS['arlo_plugin_slug']), $tax) : sprintf(__(' incl. %s', $GLOBALS['arlo_plugin_slug']), $tax)) . '</span>' : '<span class="arlo-amount">'.$free_text.'</span>';
+	$offer = ($amount > 0) ? '<span class="arlo-amount">' . $famount .'</span> <span class="arlo-price-tax">'. 
+			($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__(' excl. %s', $GLOBALS['arlo_plugin_slug']), $tax) : sprintf(__(' incl. %s', $GLOBALS['arlo_plugin_slug']), $tax)). '</span>' 
+			: '<span class="arlo-amount">' . htmlentities($free_text, ENT_QUOTES, "UTF-8") . '</span>';
 
 	return $offer;
 });
@@ -2734,7 +2743,7 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 	endforeach;
 
 	$filter_html .= '<div class="arlo-filters-buttons"><input type="hidden" id="arlo-page" value="' . $slug . '"> ';    
-	$filter_html .= '<a href="'.get_page_link().'" class="' . $buttonclass . '">'.$resettext.'</a></div>';
+	$filter_html .= '<a href="'.get_page_link().'" class="' . esc_attr($buttonclass) . '">' . htmlentities($resettext, ENT_QUOTES, "UTF-8") . '</a></div>';
 
 	$filter_html .= '</form>';
 	
@@ -2812,7 +2821,7 @@ $shortcodes->add('venue_list_item', function($content='', $atts, $shortcode_name
 $shortcodes->add('venue_name', function($content='', $atts, $shortcode_name){
 	if(!isset($GLOBALS['arlo_venue_list_item']['v_name'])) return '';
 
-	return $GLOBALS['arlo_venue_list_item']['v_name'];
+	return htmlentities($GLOBALS['arlo_venue_list_item']['v_name'], ENT_QUOTES, "UTF-8");
 });
 
 // venue permalink shortcode
@@ -2849,7 +2858,7 @@ $shortcodes->add('venue_map', function($content='', $atts, $shortcode_name){
 		$map .= '&zoom=' . $zoom . '"';
 		$map .= ' height="' . $height . '"';
 		$map .= ' width="' . $width . '"';
-		$map .= ' alt="' .sprintf(__('Map of %s', $GLOBALS['arlo_plugin_slug']), $name) . '"'; 
+		$map .= ' alt="' . esc_attr(sprintf(__('Map of %s', $GLOBALS['arlo_plugin_slug']), $name)) . '"'; 
 		$map .= ' />';
 
 		return $map;
@@ -2870,15 +2879,15 @@ $shortcodes->add('venue_address', function($content='', $atts, $shortcode_name){
 	
 	//consrtuct array
 	$address = array(
-		'line1' => $GLOBALS['arlo_venue_list_item']['v_physicaladdressline1'],
-		'line2' => $GLOBALS['arlo_venue_list_item']['v_physicaladdressline2'],
-		'line3' => $GLOBALS['arlo_venue_list_item']['v_physicaladdressline3'],
-		'line4' => $GLOBALS['arlo_venue_list_item']['v_physicaladdressline4'],
-		'suburb' => $GLOBALS['arlo_venue_list_item']['v_physicaladdresssuburb'],
-		'city' => $GLOBALS['arlo_venue_list_item']['v_physicaladdresscity'],
-		'state' => $GLOBALS['arlo_venue_list_item']['v_physicaladdressstate'],
-		'post_code' => $GLOBALS['arlo_venue_list_item']['v_physicaladdresspostcode'],
-		'country' => $GLOBALS['arlo_venue_list_item']['v_physicaladdresscountry'],
+		'line1' => htmlentities($GLOBALS['arlo_venue_list_item']['v_physicaladdressline1'], ENT_QUOTES, "UTF-8"),
+		'line2' => htmlentities($GLOBALS['arlo_venue_list_item']['v_physicaladdressline2'], ENT_QUOTES, "UTF-8"),
+		'line3' => htmlentities($GLOBALS['arlo_venue_list_item']['v_physicaladdressline3'], ENT_QUOTES, "UTF-8"),
+		'line4' => htmlentities($GLOBALS['arlo_venue_list_item']['v_physicaladdressline4'], ENT_QUOTES, "UTF-8"),
+		'suburb' => htmlentities($GLOBALS['arlo_venue_list_item']['v_physicaladdresssuburb'], ENT_QUOTES, "UTF-8"),
+		'city' => htmlentities($GLOBALS['arlo_venue_list_item']['v_physicaladdresscity'], ENT_QUOTES, "UTF-8"),
+		'state' => htmlentities($GLOBALS['arlo_venue_list_item']['v_physicaladdressstate'], ENT_QUOTES, "UTF-8"),
+		'post_code' => htmlentities($GLOBALS['arlo_venue_list_item']['v_physicaladdresspostcode'], ENT_QUOTES, "UTF-8"),
+		'country' => htmlentities($GLOBALS['arlo_venue_list_item']['v_physicaladdresscountry'], ENT_QUOTES, "UTF-8"),
 	);
 	
 	// check if we want to show all items
@@ -3003,7 +3012,7 @@ $shortcodes->add('presenter_name', function($content='', $atts, $shortcode_name)
 	$first_name = $GLOBALS['arlo_presenter_list_item']['p_firstname'];
 	$last_name = $GLOBALS['arlo_presenter_list_item']['p_lastname'];
 
-	return $first_name . ' ' . $last_name;
+	return htmlentities($first_name . ' ' . $last_name, ENT_QUOTES, "UTF-8");
 });
 
 // presenter permalink shortcode
@@ -3019,7 +3028,7 @@ $shortcodes->add('presenter_permalink', function($content='', $atts, $shortcode_
 $shortcodes->add('presenter_link', function($content='', $atts, $shortcode_name){
 	if(!isset($GLOBALS['arlo_presenter_list_item']['p_viewuri'])) return '';
 
-	return $GLOBALS['arlo_presenter_list_item']['p_viewuri'];
+	return htmlentities($GLOBALS['arlo_presenter_list_item']['p_viewuri'], ENT_QUOTES, "UTF-8");
 });
 
 // presenter profile shortcode
@@ -3067,9 +3076,9 @@ $shortcodes->add('presenter_social_link', function($content='', $atts, $shortcod
 	$li_link = 'https://www.linkedin.com/';
 	$tw_link = 'https://twitter.com/';
 
-	$fb_id = $GLOBALS['arlo_presenter_list_item']['p_facebookid'];
-	$li_id = $GLOBALS['arlo_presenter_list_item']['p_linkedinid'];
-	$tw_id = $GLOBALS['arlo_presenter_list_item']['p_twitterid'];
+	$fb_id = htmlentities($GLOBALS['arlo_presenter_list_item']['p_facebookid'], ENT_QUOTES, "UTF-8");
+	$li_id = htmlentities($GLOBALS['arlo_presenter_list_item']['p_linkedinid'], ENT_QUOTES, "UTF-8");
+	$tw_id = htmlentities($GLOBALS['arlo_presenter_list_item']['p_twitterid'], ENT_QUOTES, "UTF-8");
 
 	$network = trim(strtolower($network));
 
@@ -3151,7 +3160,7 @@ $shortcodes->add('presenter_events_list', function($content='', $atts, $shortcod
 
 			$permalink = get_permalink($et_id);
 
-			$events .= '<li><a href="'.$permalink.'">'.$item['et_name'].'</a></li>';
+			$events .= '<li><a href="'.$permalink.'">' . htmlentities($item['et_name'], ENT_QUOTES, "UTF-8") . '</a></li>';
 
 		}
 
@@ -3199,7 +3208,7 @@ $shortcodes->add('timezones', function($content='', $atts, $shortcode_name){
 			$GLOBALS['selected_timezone_olson_names'] = $olson_names;
 		}
 		
-		$content .= '<option value="' . $timezone->id . '" ' . ($selected ? 'selected' : '') . '>'. $timezone->name . '</option>';
+		$content .= '<option value="' . $timezone->id . '" ' . ($selected ? 'selected' : '') . '>'. htmlentities($timezone->name, ENT_QUOTES, "UTF-8") . '</option>';
 	}
 	
 	$content .= '</select>';
@@ -3243,7 +3252,7 @@ $shortcodes->add('suggest_datelocation', function($content='', $atts, $shortcode
 		return '';
 	}
 
-	$content = '<a href="' . $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'] . '" class="arlo-register-interest">' . $text . '</a>';
+	$content = '<a href="' . $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'] . '" class="arlo-register-interest">' . htmlentities($text, ENT_QUOTES, "UTF-8") . '</a>';
 
 	return $content;
 });
@@ -3268,11 +3277,11 @@ function category_ul($items, $counts) {
 		$html .= $events_url;
 		
 		if($cat->c_parent_id != 0) {
-			$html .= 'cat-' . $cat->c_slug;
+			$html .= 'cat-' . esc_attr($cat->c_slug);
 		}
 		
 		$html .= '">';
-		$html .= $cat->c_name . ( !is_null($counts) ?  sprintf($counts, $cat->c_template_num) : '' );
+		$html .= htmlentities($cat->c_name, ENT_QUOTES, "UTF-8") . ( !is_null($counts) ?  sprintf($counts, $cat->c_template_num) : '' );
 		$html .= '</a>';
 		if(isset($cat->children)) {
 			$html .= category_ul($cat->children, $counts);
@@ -3405,10 +3414,10 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 	if(!isset($GLOBALS['arlo_event_list_item']) || empty($GLOBALS['arlo_event_list_item']['et_arlo_id'])) return;
 	
 	$settings = get_option('arlo_settings');  
-	$price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : ARLO_PLUGIN_PREFIX . '-exclgst';
+	$price_setting = (isset($settings['price_setting'])) ? $settings['price_setting'] : ARLO_PLUGIN_PREFIX . '-exclgst';
 	$price_field = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? 'o_offeramounttaxexclusive' : 'o_offeramounttaxinclusive';
 	$price_field_show = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? 'o_formattedamounttaxexclusive' : 'o_formattedamounttaxinclusive';
-	$free_text = (isset($settings['free_text'])) ? esc_attr($settings['free_text']) : __('Free', $GLOBALS['arlo_plugin_slug']);
+	$free_text = (isset($settings['free_text'])) ? $settings['free_text'] : __('Free', $GLOBALS['arlo_plugin_slug']);
         
         
 	// attempt to find event template offer
@@ -3441,7 +3450,7 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 	
 	// if $0.00, return "Free"
 	if((float)$offer->$price_field == 0) {
-		return $free_text;
+		return htmlentities($free_text, ENT_QUOTES, "UTF-8");
 	}
 	
 	return '<span class="arlo-from-text">' . __('From', $GLOBALS['arlo_plugin_slug']) . '</span> ' . $offer->$price_field_show;
@@ -3477,7 +3486,7 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 	}
 	
 	if(count($events) == 0 && !empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) {
-		$return = '<a href="' . $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'] . '" title="' . __('Register interest', $GLOBALS['arlo_plugin_slug']) . '" class="' . $buttonclass . '">' . __('Register interest', $GLOBALS['arlo_plugin_slug']) . '</a>';
+		$return = '<a href="' . $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'] . '" title="' . __('Register interest', $GLOBALS['arlo_plugin_slug']) . '" class="' . esc_attr($buttonclass) . '">' . __('Register interest', $GLOBALS['arlo_plugin_slug']) . '</a>';
 	} else if (count($events)) {
 		$return_links = [];
 		
@@ -3492,9 +3501,9 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 	            }	
 	            
 	            if ($event->e_registeruri && !$event->e_isfull) {
-	                $return_links[] = ($layout == 'list' ? "<li>" : "") . '<a href="' . $event->e_registeruri . '" class="' . $dateclass . ' arlo-register">' . date($format, strtotime($event->e_startdatetime)) . '</a>' . ($layout == 'list' ? "</li>" : "");
+	                $return_links[] = ($layout == 'list' ? "<li>" : "") . '<a href="' . $event->e_registeruri . '" class="' . esc_attr($dateclass) . ' arlo-register">' . date($format, strtotime($event->e_startdatetime)) . '</a>' . ($layout == 'list' ? "</li>" : "");
 	            } else {
-	                $return_links[] = ($layout == 'list' ? "<li>" : "") . '<span class="' . $dateclass . '">' . date($format, strtotime($event->e_startdatetime)) . '</span>' . ($layout == 'list' ? "</li>" : "");
+	                $return_links[] = ($layout == 'list' ? "<li>" : "") . '<span class="' . esc_attr($dateclass) . '">' . date($format, strtotime($event->e_startdatetime)) . '</span>' . ($layout == 'list' ? "</li>" : "");
 	            }
 	        }	
 		}	
