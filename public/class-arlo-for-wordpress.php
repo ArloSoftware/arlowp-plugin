@@ -30,7 +30,7 @@ class Arlo_For_Wordpress {
 	 *
 	 * @var     string
 	 */
-	const VERSION = '2.2';
+	const VERSION = '2.2.1';
 
 	/**
 	 * Minimum required PHP version
@@ -457,14 +457,45 @@ class Arlo_For_Wordpress {
 	
 	
 	/**
-	 * Update data model
+	 * Run update scripts according to the version of the plugin
 	 *
-	 * @since    2.1.6
+	 * @since    2.2.1
 	 *
 	 * @return   null
 	 */
-	public static function update_data_model() {
+	public static function update($version) {
 		arlo_add_datamodel();
+
+		switch($version) {
+			case '2.2.1': 
+				//Add [arlo_no_event_text] shortcode to the templates
+				$update_templates = ['eventsearch', 'events'];
+				$saved_templates = arlo_get_option('templates');
+				
+				foreach ($update_templates as $id) {
+					if (!empty($saved_templates[$id]['html'])) {
+						$content = $saved_templates[$id]['html'];
+						
+						if (strpos($content, "arlo_no_event_text") === false) {
+							$shortcode = "\n[arlo_no_event_text]\n";
+							$append_after = "[arlo_category_footer]";						
+						
+							//try to find the [arlo_category_footer], and append before
+							$pos = strpos($content, $append_after);
+							if ($pos !== false) {
+								$pos += strlen($append_after);
+							} else {
+								$pos = strlen($content);
+							}
+							
+							$saved_templates[$id]['html'] = substr_replace($content, $shortcode, $pos, 0);
+						}
+					}
+				}	
+				
+				arlo_set_option('templates', $saved_templates);				
+			break;
+		}
 	}	
 	
 

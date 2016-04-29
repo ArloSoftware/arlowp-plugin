@@ -44,8 +44,7 @@ add_filter( 'the_title', function($title, $id = null){
 		
 	$location = stripslashes(urldecode($location));
 	$search = stripslashes(urldecode($search));
-	
-	
+		
 	if($id === null || !in_array($id, $pages) || $id != $post->ID || !in_the_loop() ) return $title;
 		
 	if(!$cat && empty($location) && empty($search)) return $title;
@@ -490,7 +489,7 @@ function arlo_flush_permalinks() {
  * @param mixed $default (default: null)
  * @return void
  */
-function arlo_get_option($key, $default=null) {
+function arlo_get_option($key, $default = null) {
 	$settings = get_option('arlo_settings', array());
 	
 	if(isset($settings[$key])) {
@@ -499,6 +498,25 @@ function arlo_get_option($key, $default=null) {
 	
 	return $default;
 }
+
+
+/**
+ * arlo_set_option function.
+ * 
+ * @access public
+ * @param mixed $key
+ * @param mixed $value (default: null)
+ * @return boolean
+ */
+function arlo_set_option($key, $value = null) {
+	$settings = get_option('arlo_settings', array());
+	
+	$settings[$key] = $value;
+	
+	return update_option('arlo_settings', $settings);
+}
+
+
 
 /**
  * arlo_add_datamodel function.
@@ -1397,13 +1415,12 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 	$items = $wpdb->get_results($sql, ARRAY_A);
 		
 	if(empty($items)) :
-		$no_event_text = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', $GLOBALS['arlo_plugin_slug']);
-		$output = '</table><style> .arlo table.event-templates {display: none;} </style><table class="arlo-no-results"><tr><td>' . $no_event_text . '</td></tr>';
+		$GLOBALS['no_event_text'] = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', $GLOBALS['arlo_plugin_slug']);
 
 	else :
-					
-		$output = '';
 			
+		$output = $GLOBALS['no_event_text'] = '';			
+		
 		$previous = null;
 	
 		foreach($items as $item) {
@@ -3551,6 +3568,15 @@ $shortcodes->add('category_footer', function($content='', $atts, $shortcode_name
 	
 	return $category->c_footer;
 });
+
+
+// no_event_text
+$shortcodes->add('no_event_text', function($content='', $atts, $shortcode_name){
+	if (!empty($GLOBALS['no_event_text'])) {
+		return '<span class="arlo-no-results">' . $GLOBALS['no_event_text'] . '</span>';
+	}
+});
+
 
 // label
 $shortcodes->add('label', function($content='', $atts, $shortcode_name){

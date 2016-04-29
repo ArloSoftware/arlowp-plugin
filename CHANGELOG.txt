@@ -1,3 +1,16 @@
+== V2.2.1 ==
+
+Bugfixes
+------------------
+
+
+
+Enhancement
+------------------
+
+[arlo_no_event_text] shortcode to display a text if there is no event
+
+
 == V2.2 ==
 
 Bugfixes
