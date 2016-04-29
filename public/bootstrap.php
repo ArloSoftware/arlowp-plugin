@@ -7,6 +7,8 @@ $arlo_plugin_slug = $arlo_plugin->get_plugin_slug();
  * Add event category to title when filtered by a category
  */
 add_filter( 'the_title', function($title, $id = null){
+	global $post;
+	
 	$title = htmlentities($title, ENT_QUOTES, "UTF-8");
 
 	$settings = get_option('arlo_settings');
@@ -43,7 +45,8 @@ add_filter( 'the_title', function($title, $id = null){
 	$location = stripslashes(urldecode($location));
 	$search = stripslashes(urldecode($search));
 	
-	if($id === null || !in_array($id, $pages)) return $title;
+	
+	if($id === null || !in_array($id, $pages) || $id != $post->ID || !in_the_loop() ) return $title;
 		
 	if(!$cat && empty($location) && empty($search)) return $title;
 	
