@@ -9,8 +9,8 @@ $arlo_plugin_slug = $arlo_plugin->get_plugin_slug();
 add_filter( 'the_title', function($title, $id = null){
 	global $post;
 	
-	$title = htmlentities($title, ENT_QUOTES, "UTF-8");
-
+	$title = htmlentities($title, ENT_QUOTES, "UTF-8", false);
+	
 	$settings = get_option('arlo_settings');
 	
 	$pages = [];
