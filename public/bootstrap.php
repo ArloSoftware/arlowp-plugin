@@ -162,7 +162,7 @@ function arlo_create_filter($type, $items, $label=null) {
 		$selected = (strlen($selected_value) && urldecode($selected_value) == $item['value']) ? ' selected="selected"' : '';
 		
 		$filter_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>';
-		$filter_html .= htmlentities($item['string'], ENT_QUOTES, "UTF-8");
+		$filter_html .= htmlentities($item['string'], ENT_QUOTES, "UTF-8", false);
 		$filter_html .= '</option>';
 
 	}
