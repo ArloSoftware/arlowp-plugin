@@ -2,8 +2,8 @@
 Contributors: ArloSoftware, adamfentosi
 Tags: online registration, event registration, training management,  event management, event plugin, training company software, training calendar, training administration, training management software, training provider, solution, events calendar, wordpress events, event ticketing, wordpress lms, class registration, conference registration,  ticket, registration, event manager, training, booking, ticketing
 Requires at least: 3.7
-Tested up to: 4.4.2
-Stable tag: 2.2
+Tested up to: 4.5.2
+Stable tag: 2.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -125,6 +125,20 @@ The Arlo - Training and Event Management, and online registration plugin is only
 7. Arlo integration
 
 == Changelog ==
+
+= 2.2.1 =
+
+[arlo_no_event_text] shortcode to display a text if there is no event
+
+Danish translation
+
+Escape all the output to ensure security
+
+New import concurrency management to avoid duplicate data with double import (usually happened on a shared hosting)
+
+Fix for admin list venue page to not show multiple data
+
+Fix for categories list depth parameter problem
 
 = 2.2 =
 

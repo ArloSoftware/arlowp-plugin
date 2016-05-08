@@ -2,13 +2,17 @@
 
 Bugfixes
 ------------------
-
+New import concurrency management to avoid duplicate data with double import (usually happened on a shared hosting)
+Fix for admin list venue page to not show multiple data
+Fix for categories list depth parameter problem
 
 
 Enhancement
 ------------------
 
 [arlo_no_event_text] shortcode to display a text if there is no event
+Danish translation
+Escape all the output to ensure security
 
 
 == V2.2 ==
