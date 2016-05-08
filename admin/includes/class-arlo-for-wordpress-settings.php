@@ -380,6 +380,14 @@ class Arlo_For_Wordpress_Settings {
 	    <h4>Version ' . $this->version . '</h4>
 	    <p>
 	    	<ul class="arlo-whatsnew-list">
+	    		<li>New <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_no_event_text" target="_blank">[arlo_no_event_text]</a> shortcode to display a message when there is no event</li>
+	    		<li>Danish translation</li>
+	    		<li>Many minor bug fixes and security enhancements</li>
+	    	</ul>
+	    </p>	    
+	    <h4>Version 2.2</h4>
+	    <p>
+	    	<ul class="arlo-whatsnew-list">
 	    		<li>New plugin settings page layout</li>
 	    		<li>New list pages on the admin site for events, templates, sessions, venues and presenters</li>
 	    		<li>New <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_link" target="_blank">[arlo_event_template_link]</a> shortcode for externally hosted event</li>
