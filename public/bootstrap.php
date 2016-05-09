@@ -71,7 +71,7 @@ add_filter( 'the_title', function($title, $id = null){
  * Trick WP to treat custom post types as pages
  */
 add_action('parse_query', function($wp_query){
-	if (isset($wp_query->query['post_type']) && in_array($wp_query->query['post_type'], array('arlo_event', 'arlo_presenter', 'arlo_venue'))) {
+	if (isset($wp_query->query['post_type']) && in_array($wp_query->query['post_type'], array('arlo_event', 'arlo_presenter', 'arlo_venue', 'arlo_region'))) {
 		$wp_query->is_single = false;
 		$wp_query->is_page = true;
 	}
@@ -343,17 +343,26 @@ function arlo_register_custom_post_types() {
 		}
 	}
 	
-	if (array_key_exists($page_id, $arlo_page_ids) && is_array($regions) && count($regions) && empty($selected_region)) {
-		$first_region_id = reset(array_keys($regions));
-		
-		setcookie("arlo-region", $first_region_id);	
-		
-		$slug = substr(substr(str_replace(get_home_url(), '', get_permalink($settings['post_types'][$arlo_page_ids[$page_id]]['posts_page'])), 0, -1), 1);
-		
-		$location = str_replace($slug, $slug.'/region-' . $first_region_id , $_SERVER['REQUEST_URI']);
-		
-		wp_redirect($location);
-		exit();		
+	if (array_key_exists($page_id, $arlo_page_ids) && is_array($regions) && count($regions)) {
+		if (empty($selected_region)) {
+			//try to read the region from a cookie
+			if (!empty($_COOKIE['arlo-region']) && in_array($_COOKIE['arlo-region'], array_keys($regions))) {
+				$selected_region = $_COOKIE['arlo-region'];
+			} else {
+				$selected_region = reset(array_keys($regions));
+			}
+			
+			setcookie("arlo-region", $selected_region, time()+60*60*24*30, '/');	
+			
+			$slug = substr(substr(str_replace(get_home_url(), '', get_permalink($settings['post_types'][$arlo_page_ids[$page_id]]['posts_page'])), 0, -1), 1);
+			
+			$location = str_replace($slug, $slug.'/region-' . $selected_region , $_SERVER['REQUEST_URI']);
+			
+			wp_redirect($location);
+			exit();				
+		} else {
+			setcookie("arlo-region", $selected_region, time()+60*60*24*30, '/');	
+		}
 	}
 }
 

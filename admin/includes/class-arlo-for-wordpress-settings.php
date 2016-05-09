@@ -388,6 +388,7 @@ class Arlo_For_Wordpress_Settings {
 	    echo '
 	    <h3>Regions</h3>
 	    <p>Please specify your available regions in Arlo</p>
+		<p><strong>Please note, when you change the regions, you have to re-synchronize the data</strong></p>
 	    <div id="arlo-regions-header">
 			<div class="arlo-order-number">#</div>
 			<div class="arlo-region-id">Region ID</div>

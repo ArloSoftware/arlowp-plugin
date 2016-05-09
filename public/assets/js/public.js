@@ -108,7 +108,6 @@
 
 	    //Manually set cookie
     	$.cookie("arlo-region", newRegion, { path: "/" });
-    	$.cookie("arlo-regionch", "1", { path: "/" });
 
 	    window.location.href = window.location.href.replace("/region-" + uriRegion + "/", "/region-" + newRegion + "/");
 	}	

@@ -515,6 +515,7 @@ class Arlo_For_Wordpress_Admin {
 		
 	public function settings_saved($old) {
 		$new = get_option('arlo_settings', array());
+		$old_regions = get_option('arlo_regions', array());
 	
 		if($old['platform_name'] != $new['platform_name'] && !empty($new['platform_name'])) {
 			$plugin = Arlo_For_Wordpress::get_instance();
@@ -553,6 +554,20 @@ class Arlo_For_Wordpress_Admin {
 			}
 		}
 		
+		if ($regions != $old_regions) {
+			$this->delete_region_posts();
+			foreach ($regions as $region_id => $region_name) {
+				wp_insert_post(array(
+					'post_title'    => sprintf(__('Region %s', $this->plugin_slug), $region_id),
+					'post_content'  => "region-".$region_id,
+					'post_status'   => 'publish',
+					'post_author'   => 1,
+					'post_type'		=> 'arlo_event',
+					'post_parent'	=> $new['post_types']['event']['posts_page']
+				), true);
+			}
+		}
+		
 		update_option('arlo_regions', $regions);
 				
 		// need to check for posts-page change here
@@ -564,6 +579,15 @@ class Arlo_For_Wordpress_Admin {
 					'post_type'			=> 'arlo_' . $id,
 					'post_status'		=> 'publish' // only there to ensure we don't create a loop if a user has tampered
 				));
+				
+				$regions = get_posts(array(
+					'posts_per_page'	=> -1,
+					'post_type'			=> 'arlo_region',
+					'post_status'		=> 'publish',
+					'post_parent'		=> $old['post_types'][$id]['posts_page']
+				));
+				
+				$posts = array_merge($posts, $regions);
 			
 				// update all posts of this type to have this parent id
 				foreach($posts as $post) {
@@ -572,7 +596,22 @@ class Arlo_For_Wordpress_Admin {
 						'post_parent'	=> $new['post_types'][$id]['posts_page']
 					));
 				}
+				
+				
 			}
+		}
+	}
+		
+	function delete_region_posts() {
+		//get the region posts
+		$posts = get_posts(array(
+			'post_type'	=> 'arlo_region'
+		));
+				
+		//delete the region posts
+		foreach($posts as $post) {
+			print_r($post->ID);
+			var_dump(wp_delete_post($post->ID, true));
 		}
 	}
 

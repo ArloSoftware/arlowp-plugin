@@ -1006,16 +1006,37 @@ class Arlo_For_Wordpress {
 					}
 					
 					// create associated custom post, if it dosen't exist
-					if(!arlo_get_post_by_name($slug, 'arlo_event')) {
-						wp_insert_post(array(
-							'post_title'    => $item->Name,
-							'post_content'  => @$item->Description->Summary,
-							'post_status'   => 'publish',
-							'post_author'   => 1,
-							'post_type'		=> 'arlo_event',
-							'post_name'		=> $slug
-						), true);						
+					$post_config_array = array(
+						'post_title'    => $item->Name,
+						'post_content'  => @$item->Description->Summary,
+						'post_status'   => 'publish',
+						'post_author'   => 1,
+						'post_type'		=> 'arlo_event',
+						'post_name'		=> $slug
+					);
+					
+					//find the region post
+					$posts = get_posts(array(
+						'post_type'	=> 'arlo_event',
+						'posts_per_page' => -1
+					));
+					
+					if ($posts != null && is_array($posts)) {
+						foreach ($posts as $post) {
+							if ($post->post_content == "region-".$region) {
+								$post_config_array['post_parent'] = $post->ID;	
+								break;
+							}
+						}
 					}
+
+					$post = arlo_get_post_by_name($slug, 'arlo_event');
+					
+					if(!$post) {					
+						wp_insert_post($post_config_array, true);						
+					} else {
+						wp_update_post($post_config_array);				
+	  				}
 					
 					// need to insert associated data here
 					// advertised offers
