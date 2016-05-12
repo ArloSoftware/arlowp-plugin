@@ -1268,7 +1268,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 	if (isset($atts['show_only_at_bottom']) && $atts['show_only_at_bottom'] == "true" && isset($GLOBALS['categories_count']) && $GLOBALS['categories_count']) {
 		$GLOBALS['show_only_at_bottom'] = true;
 		return;
-	}
+	} 
 
 	$active = $arlo_plugin->get_import_id();
 
@@ -3335,8 +3335,6 @@ $shortcodes->add('categories', function($content='', $atts, $shortcode_name){
 		$slug = $arlo_category;
 		$start_at = current(explode('-', $slug));
 	}
-		
-	$GLOBALS['categories_count'] = count($tree);
 	
 	if($title) {
 		$conditions = array('id' => $start_at);
@@ -3360,6 +3358,8 @@ $shortcodes->add('categories', function($content='', $atts, $shortcode_name){
 		}
 		
 		$tree = \Arlo\Categories::getTree($start_at, $depth);	
+		
+		$GLOBALS['categories_count'] = count($tree);		
 				
 		if(!empty($tree)) {		
 			$return .= category_ul($tree, $counts);	
