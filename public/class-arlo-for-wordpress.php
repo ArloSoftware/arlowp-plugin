@@ -602,7 +602,7 @@ class Arlo_For_Wordpress {
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-darktooltip', plugins_url( 'assets/css/libs/darktooltip.min.css', __FILE__ ), array(), self::VERSION );
 		
 		$customcss_load_type = get_option('arlo_customcss');
-		if ($customcss_load_type == 'file') {
+		if ($customcss_load_type == 'file' && file_exists(plugin_dir_path( __FILE__ ) . 'assets/css/custom.css')) {
 			wp_enqueue_style( $this->plugin_slug .'-custom-styles', plugins_url( 'assets/css/custom.css', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );		
 		}	
 	}
@@ -713,7 +713,8 @@ class Arlo_For_Wordpress {
 	 */
 	public function load_custom_css() {
 		$customcss_load_type = get_option('arlo_customcss');
-		if ($customcss_load_type !== 'file') {
+				
+		if ($customcss_load_type !== 'file' || !file_exists(plugin_dir_path( __FILE__ ) . 'assets/css/custom.css')) {
 			$settings = get_option('arlo_settings');
 			
 			if (!empty($settings['customcss'])) {
