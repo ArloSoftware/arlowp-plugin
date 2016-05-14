@@ -1826,26 +1826,6 @@ class Arlo_For_Wordpress {
 		foreach($items as $item) {
 			$post_names[] = $item[$column];
 		}
-		
-		if ($post_type == 'event') {
-			//get the region posts
-			$region_posts = get_posts(array(
-				'posts_per_page'	=> -1,
-				'post_type'	=> 'arlo_event',
-				'meta_query' => array(
-					array(
-						'key' => 'arlo_region',
-						'value' => 'arlo_region',
-					)
-				)			
-			));
-							
-			//add the region posts to the array to not delete them
-			foreach($region_posts as $post) {
-				$post_names[] = $post->post_name;
-			}		
-		}
-		
 
 		$args = array(
 			'post_type' => 'arlo_' . $post_type,
