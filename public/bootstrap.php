@@ -264,7 +264,7 @@ function arlo_register_custom_post_types() {
 					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(tag-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-delivery=$matches[10]&arlo-eventtag=$matches[12]&paged=$matches[14]','top');
 				break;			
 				case 'event':					
-					add_rewrite_rule('^' . $slug . '/(\d+-[^/]*)?/?$','index.php?arlo_event=$matches[1]','top');
+					add_rewrite_rule('^' . $slug . '/(\d+-[^/]*)+/?(region-([^/]*))?/?$','index.php?arlo_event=$matches[1]&arlo-region=$matches[3]','top');
 					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(tag-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-delivery=$matches[10]&arlo-templatetag=$matches[12]&paged=$matches[14]','top');
 				break;
 				case 'eventsearch':
@@ -1350,12 +1350,16 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 		$where .= " AND e.e_parent_arlo_id = 0";
 		
 		if(!empty($arlo_location)) :
-			$where .= " AND e.e_locationname = '" . urldecode($arlo_location) . "'";
+			$where .= " AND e.e_locationname = '" . urldecode($arlo_location) . "'";			
 		endif;	
 		
 		if(isset($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) :
 			$where .= " AND e.e_isonline = " . $arlo_delivery;
 		endif;	
+		
+		if (!empty($arlo_region)) {
+			$where .= ' AND e.e_region = "' . $arlo_region . '"';
+		}								
 		
 	endif;	
 	
@@ -1631,10 +1635,20 @@ $shortcodes->add('event_template_name', function($content='', $atts, $shortcode_
 
 $shortcodes->add('event_template_permalink', function($content='', $atts, $shortcode_name){        
 	if(!isset($GLOBALS['arlo_eventtemplate']['et_post_name'])) return '';
-
+	
+	$regions = get_option('arlo_regions');
+	$region_link_suffix = '';
+	
+	$arlo_region = get_query_var('arlo-region', '');
+	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
+	
+	if (!empty($arlo_region)) {
+		$region_link_suffix = 'region-' . $arlo_region . '/';
+	}
+	
 	$et_id = arlo_get_post_by_name($GLOBALS['arlo_eventtemplate']['et_post_name'], 'arlo_event');
 	
-	return get_permalink($et_id);
+	return get_permalink($et_id) . $region_link_suffix;
 });
 
 // event template summary shortcode
@@ -1832,6 +1846,10 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 $shortcodes->add('event_list_item', function($content='', $atts, $shortcode_name){
 	global $post, $wpdb;
 	$settings = get_option('arlo_settings');
+	$regions = get_option('arlo_regions');
+	
+	$arlo_region = get_query_var('arlo-region', '');
+	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
 	
 	$t1 = "{$wpdb->prefix}arlo_eventtemplates";
 	$t2 = "{$wpdb->prefix}arlo_events";
@@ -1840,15 +1858,32 @@ $shortcodes->add('event_list_item', function($content='', $atts, $shortcode_name
 	$t5 = "{$wpdb->prefix}arlo_presenters";
 	$t6 = "{$wpdb->prefix}arlo_offers";
 	
+	if (!empty($arlo_region)) {
+		$where .= ' AND ' . $t1 . '.et_region = "' . $arlo_region . '" AND ' . $t2 . '.e_region = "' . $arlo_region . '"';
+	}					
+	
 	$sql = 
-		"SELECT $t2.*, $t3.v_post_name FROM $t2
-		LEFT JOIN $t3
-		ON $t2.v_id = $t3.v_arlo_id
-		LEFT JOIN $t1
-		ON $t2.et_arlo_id = $t1.et_arlo_id
-		WHERE $t1.et_post_name = '$post->post_name'
-		AND $t2.e_parent_arlo_id = 0
-		ORDER BY $t2.e_startdatetime";
+		"SELECT 
+			$t2.*, 
+			$t3.v_post_name 
+		FROM 
+			$t2
+		LEFT JOIN 
+			$t3
+		ON 
+			$t2.v_id = $t3.v_arlo_id
+		LEFT JOIN 
+			$t1
+		ON 
+			$t2.et_arlo_id = $t1.et_arlo_id
+		WHERE 
+			$t1.et_post_name = '$post->post_name'
+		AND 
+			$t2.e_parent_arlo_id = 0
+		$where
+		ORDER BY 
+			$t2.e_startdatetime";
+		
 		
 	$items = $wpdb->get_results($sql, ARRAY_A);
 	
@@ -2244,12 +2279,21 @@ $shortcodes->add('event_session_list_item', function($content='', $atts, $shortc
 	if(!isset($GLOBALS['arlo_event_list_item']['e_arlo_id'])) return '';
 	global $post, $wpdb;
 	
+	$regions = get_option('arlo_regions');
+	
+	$arlo_region = get_query_var('arlo-region', '');
+	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');		
+	
 	$output = '';
 	
 	extract(shortcode_atts(array(
 		'label'	=> __('Session information', $GLOBALS['arlo_plugin_slug']),
 		'header' => __('Sessions', $GLOBALS['arlo_plugin_slug']),
-	), $atts, $shortcode_name));	
+	), $atts, $shortcode_name));
+	
+	if (!empty($arlo_region)) {
+		$where = ' AND e_region = "' . $arlo_region . '"';
+	}		
 	
 	$sql = "
 		SELECT 
@@ -2265,6 +2309,7 @@ $shortcodes->add('event_session_list_item', function($content='', $atts, $shortc
 			{$wpdb->prefix}arlo_events
 		WHERE 
 			e_parent_arlo_id = {$GLOBALS['arlo_event_list_item']['e_arlo_id']}
+			{$where}
 		ORDER BY 
 			e_startdatetime";
 					
@@ -2296,12 +2341,17 @@ $shortcodes->add('suggest_templates', function($content='', $atts, $shortcode_na
 	if (empty($GLOBALS['arlo_eventtemplate']['et_arlo_id'])) return '';
 
 	$settings = get_option('arlo_settings');  
+	$regions = get_option('arlo_regions');
+	
+	$arlo_region = get_query_var('arlo-region', '');
+	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');		
 	
 	extract(shortcode_atts(array(
 		'limit'	=> 5,
 		'base' => 'category',
 		'tagprefix'	=> 'group_',
-		'onlyscheduled' => 'false'
+		'onlyscheduled' => 'false',
+		'regionalized' => 'false'
 	), $atts, $shortcode_name));
 	
 	$active = $arlo_plugin->get_last_import();
@@ -2366,6 +2416,10 @@ $shortcodes->add('suggest_templates', function($content='', $atts, $shortcode_na
 			(et_arlo_id)
 		";
 	} 
+	
+	if (!empty($arlo_region) && $regionalized === "true") {
+		$where .= ' AND ' . $t1 . '.et_region = "' . $arlo_region . '"';
+	}	
 	
 	$sql = "
 		SELECT 

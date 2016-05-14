@@ -540,8 +540,7 @@ class Arlo_For_Wordpress_Admin {
 				if ($wp_filesystem->put_contents( $filename, $new['customcss'], FS_CHMOD_FILE)) {
 					update_option('arlo_customcss', 'file');
 				} 
-			}
-				
+			}	
 		}
 		
 		//normalize regions
@@ -551,20 +550,6 @@ class Arlo_For_Wordpress_Admin {
 				if (!empty($regionid) && !empty($new['regionname'][$key])) {
 					$regions[$regionid] = $new['regionname'][$key];
 				}
-			}
-		}
-		
-		if ($regions != $old_regions) {
-			$this->delete_region_posts();
-			foreach ($regions as $region_id => $region_name) {
-				wp_insert_post(array(
-					'post_title'    => sprintf(__('Region %s', $this->plugin_slug), $region_id),
-					'post_content'  => "region-".$region_id,
-					'post_status'   => 'publish',
-					'post_author'   => 1,
-					'post_type'		=> 'arlo_event',
-					'post_parent'	=> $new['post_types']['event']['posts_page']
-				), true);
 			}
 		}
 		
@@ -578,13 +563,6 @@ class Arlo_For_Wordpress_Admin {
 					'posts_per_page'	=> -1,
 					'post_type'			=> 'arlo_' . $id,
 					'post_status'		=> 'publish' // only there to ensure we don't create a loop if a user has tampered
-				));
-				
-				$regions = get_posts(array(
-					'posts_per_page'	=> -1,
-					'post_type'			=> 'arlo_region',
-					'post_status'		=> 'publish',
-					'post_parent'		=> $old['post_types'][$id]['posts_page']
 				));
 				
 				$posts = array_merge($posts, $regions);
@@ -601,18 +579,4 @@ class Arlo_For_Wordpress_Admin {
 			}
 		}
 	}
-		
-	function delete_region_posts() {
-		//get the region posts
-		$posts = get_posts(array(
-			'post_type'	=> 'arlo_region'
-		));
-				
-		//delete the region posts
-		foreach($posts as $post) {
-			print_r($post->ID);
-			var_dump(wp_delete_post($post->ID, true));
-		}
-	}
-
 }

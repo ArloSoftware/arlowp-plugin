@@ -812,7 +812,7 @@ class Arlo_For_Wordpress {
 			$this->add_import_log('Synchronization identified as automatic synchronization.', $timestamp, false);
 			if(!empty($last)) {
 				// LOG THAT A PREVIOUS SUCCESSFUL IMPORT HAS BEEN FOUND
-				$this->add_import_log('Previous succesful synchronization found.', $timestamp, false);
+				$this->add_import_log('Previous successful synchronization found.', $timestamp, false);
 				if(strtotime('-1 hour') > strtotime($last)) {
 					// LOG THE FACT THAT PREVIOUS SUCCESSFUL IMPORT IS MORE THAN AN HOUR AGO
 					$this->add_import_log('Synchronization more than an hour old. Synchronization required.', $timestamp, false);
@@ -917,12 +917,23 @@ class Arlo_For_Wordpress {
 		
 		$table_name = "{$wpdb->prefix}arlo_eventtemplates";
 		
+		//find the region post
+		$region_posts = get_posts(array(
+			'post_type'	=> 'arlo_event',
+			'posts_per_page' => -1,
+			'meta_query' => array(
+				array(
+					'key' => 'arlo_region',
+					'value' => 'arlo_region',
+				)
+			)						
+		));
+				
 		if(!empty($regionalized_items)) {
 				
 			foreach($regionalized_items as $region => $items) {
 			
 				foreach ($items as $item) {
-					$slug = (!empty($region) ? $region . '/' : '') . sanitize_title($item->TemplateID . ' ' . $item->Name);
 					$slug = sanitize_title($item->TemplateID . ' ' . $item->Name);
 					$query = $wpdb->query(
 						$wpdb->prepare( 
@@ -1013,23 +1024,8 @@ class Arlo_For_Wordpress {
 						'post_author'   => 1,
 						'post_type'		=> 'arlo_event',
 						'post_name'		=> $slug
-					);
+					);					
 					
-					//find the region post
-					$posts = get_posts(array(
-						'post_type'	=> 'arlo_event',
-						'posts_per_page' => -1
-					));
-					
-					if ($posts != null && is_array($posts)) {
-						foreach ($posts as $post) {
-							if ($post->post_content == "region-".$region) {
-								$post_config_array['post_parent'] = $post->ID;	
-								break;
-							}
-						}
-					}
-
 					$post = arlo_get_post_by_name($slug, 'arlo_event');
 					
 					if(!$post) {					
@@ -1037,7 +1033,7 @@ class Arlo_For_Wordpress {
 					} else {
 						wp_update_post($post_config_array);				
 	  				}
-					
+	  									
 					// need to insert associated data here
 					// advertised offers
 					if(isset($item->BestAdvertisedOffers) && !empty($item->BestAdvertisedOffers)) {
@@ -1140,7 +1136,7 @@ class Arlo_For_Wordpress {
 		return $items;
 	}
 	
-	private function save_event_data($item = array(), $parent_id = 0, $timestamp, $region) {
+	private function save_event_data($item = array(), $parent_id = 0, $timestamp, $region = '') {
 		global $wpdb;
 		
 		$table_name = "{$wpdb->prefix}arlo_events";
@@ -1246,7 +1242,7 @@ class Arlo_For_Wordpress {
 		//Save session information
 		if ($parent_id == 0 && isset($item->Sessions) && is_array($item->Sessions) && !empty($item->Sessions[0]->EventID) && $item->Sessions[0]->EventID != $item->EventID ) {
 			foreach ($item->Sessions as $session) {
-				$this->save_event_data($session, $item->EventID, $timestamp);
+				$this->save_event_data($session, $item->EventID, $timestamp, $region);
 			}
 		}	
 		
@@ -1824,16 +1820,32 @@ class Arlo_For_Wordpress {
 		global $wpdb;
 
 		$table = $wpdb->prefix . 'arlo_' . $table;
-
 		$items = $wpdb->get_results("SELECT $column FROM $table", ARRAY_A);
 
 		$post_names = array();
-
 		foreach($items as $item) {
-
 			$post_names[] = $item[$column];
-
 		}
+		
+		if ($post_type == 'event') {
+			//get the region posts
+			$region_posts = get_posts(array(
+				'posts_per_page'	=> -1,
+				'post_type'	=> 'arlo_event',
+				'meta_query' => array(
+					array(
+						'key' => 'arlo_region',
+						'value' => 'arlo_region',
+					)
+				)			
+			));
+							
+			//add the region posts to the array to not delete them
+			foreach($region_posts as $post) {
+				$post_names[] = $post->post_name;
+			}		
+		}
+		
 
 		$args = array(
 			'post_type' => 'arlo_' . $post_type,
