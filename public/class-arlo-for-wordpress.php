@@ -2118,19 +2118,30 @@ class Arlo_For_Wordpress {
 	}
 	
 	public static function redirect_proxy() {
+		$settings = get_option('arlo_settings');
+		
 		if(!isset($_GET['object_post_type']) || !isset($_GET['arlo_id'])) return;
 		
 		switch($_GET['object_post_type']) {
 			case 'event':
-				$event = \Arlo\EventTemplates::get(array('id' => $_GET['arlo_id']), array(), 1);
-				
-				if(!$event) return;
-				
-				$post = arlo_get_post_by_name($event->et_post_name, 'arlo_event');
-				
-				if(!$post) return;
-				
-				$location = get_permalink($post->ID);
+				//check if it's a private event				
+				if (!empty($_GET['e']) || !empty($_GET['t']) && !empty($settings['platform_name'])) {
+					$url = 'http://' . $settings['platform_name'] . '.arlo.co/events/' . intval($_GET['arlo_id']) . '-fake-redirect-url?';
+					$url .= (!empty($_GET['e']) ? 'e=' . $_GET['e'] : '');
+					$url .= (!empty($_GET['t']) ? 't=' . $_GET['t'] : '');
+					
+					$location = $url;
+				} else {
+					$event = \Arlo\EventTemplates::get(array('id' => $_GET['arlo_id']), array(), 1);
+					
+					if(!$event) return;
+					
+					$post = arlo_get_post_by_name($event->et_post_name, 'arlo_event');
+					
+					if(!$post) return;
+					
+					$location = get_permalink($post->ID);					
+				}
 			break;
 			
 			case 'venue':
@@ -2167,7 +2178,6 @@ class Arlo_For_Wordpress {
 	}
 	
 	public static function import_notice() {
-	
 		$import = self::get_instance()->get_import_log();
 		
 		if (strpos($import[0]->message, "404") !== false ) {
