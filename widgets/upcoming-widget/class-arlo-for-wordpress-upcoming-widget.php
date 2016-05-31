@@ -276,12 +276,20 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 		$t2 = "{$wpdb->prefix}arlo_eventtemplates";
 		$t3 = "{$wpdb->prefix}arlo_venues";
 		$upcoming_array = $wpdb->get_results(
-			"SELECT e.e_startdatetime, e.e_locationname, et.et_name, et.et_post_name
-			FROM $t1 e 
-			LEFT JOIN $t2 et 
-			ON e.et_arlo_id = et.et_arlo_id
-			WHERE CURDATE() < DATE(e.e_startdatetime)
-			ORDER BY e.e_startdatetime
+			"SELECT 
+				e.e_startdatetime, e.e_locationname, et.et_name, et.et_post_name
+			FROM 
+				$t1 e 
+			LEFT JOIN 
+				$t2 et 
+			ON 
+				e.et_arlo_id = et.et_arlo_id
+			WHERE 
+				CURDATE() < DATE(e.e_startdatetime)
+			AND
+				e_parent_arlo_id = 0
+			ORDER BY 
+				e.e_startdatetime
 			LIMIT 0,$qty");
 		return $upcoming_array;
 	}
