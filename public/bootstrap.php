@@ -331,19 +331,22 @@ function arlo_register_custom_post_types() {
 	$settings = get_option('arlo_settings');
 	$selected_region = get_query_var('arlo-region', '');
 	$page_id = get_query_var('page_id', '');
-	$arlo_regionalized_page_ids = [];
 	
-	$obj = get_queried_object();
-	
-	$page_id = (empty($obj->ID) ? $page_id : $obj->ID);
-		
+	$page_obj = get_queried_object();
+	$page_type = '';
+			
+	if (!empty($page_obj)) {
+		$page_type = $page_obj->post_type;
+		$page_id = $page_obj->ID;
+	}
+			
 	foreach(Arlo_For_Wordpress::$post_types as $id => $post) {
 		if (isset($post['regionalized']) && is_bool($post['regionalized']) && $post['regionalized']) {
 			$arlo_page_ids[intval($settings['post_types'][$id]['posts_page'])] = $id;
 		}
 	}
 	
-	if (array_key_exists($page_id, $arlo_page_ids) && is_array($regions) && count($regions)) {
+	if ((array_key_exists($page_id, $arlo_page_ids) || $page_type == 'arlo_event') && is_array($regions) && count($regions)) {
 		if (empty($selected_region)) {
 			//try to read the region from a cookie
 			if (!empty($_COOKIE['arlo-region']) && in_array($_COOKIE['arlo-region'], array_keys($regions))) {
@@ -354,9 +357,13 @@ function arlo_register_custom_post_types() {
 			
 			setcookie("arlo-region", $selected_region, time()+60*60*24*30, '/');	
 			
-			$slug = substr(substr(str_replace(get_home_url(), '', get_permalink($settings['post_types'][$arlo_page_ids[$page_id]]['posts_page'])), 0, -1), 1);
+			if ($page_type == 'arlo_event') {
+				$slug = substr(substr(str_replace(get_home_url(), '', get_post_permalink($page_id)), 0, -1), 1);	
+			} else {
+				$slug = substr(substr(str_replace(get_home_url(), '', get_permalink($settings['post_types'][$arlo_page_ids[$page_id]]['posts_page'])), 0, -1), 1);	
+			}
 			
-			$location = str_replace($slug, $slug.'/region-' . $selected_region , $_SERVER['REQUEST_URI']);
+			$location = str_replace($slug, $slug.'/region-' . $selected_region , $_SERVER['REQUEST_URI']);			
 			
 			wp_redirect($location);
 			exit();				
@@ -2698,7 +2705,7 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 
 	$filters_array = explode(',',$filters);
 	
-	$settings = get_option('arlo_settings');  
+	$settings = get_option('arlo_settings');
 		
 	if (!empty($settings['post_types']['upcoming']['posts_page'])) {
 		$slug = get_post($settings['post_types']['upcoming']['posts_page'])->post_name;

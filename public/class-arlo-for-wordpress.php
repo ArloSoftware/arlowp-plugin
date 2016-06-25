@@ -305,7 +305,7 @@ class Arlo_For_Wordpress {
 		
 		add_action( 'init', 'set_search_redirect');
 		
-		add_action( 'parse_query', 'set_region_redirect');
+		add_action( 'wp', 'set_region_redirect');
 	}
 
 	/**
@@ -1293,7 +1293,7 @@ class Arlo_For_Wordpress {
 			), 
 			array_keys($regions)
 		);
-				
+						
 		if(!empty($regionalized_items)) {
 				
 			foreach($regionalized_items as $region => $items) {
