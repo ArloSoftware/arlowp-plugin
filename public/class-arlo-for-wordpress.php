@@ -1274,14 +1274,19 @@ class Arlo_For_Wordpress {
 							throw new Exception('Couldn\'t find tag: ' . $tag );
 						}
 					}
-				}				
+				}	
+				
+				$content = '';
+				if (!empty($item->Description->Summary)) {
+					$content = $item->Description->Summary;
+				}
 				
 				// create associated custom post, if it dosen't exist
 				$post = arlo_get_post_by_name($slug, 'arlo_event');
 				if(!$post) {
 					wp_insert_post(array(
 						'post_title'    => $item->Name,
-						'post_content'  => @$item->Description->Summary,
+						'post_content'  => $content,
 						'post_status'   => 'publish',
 						'post_author'   => 1,
 						'post_type'		=> 'arlo_event',
@@ -1291,7 +1296,7 @@ class Arlo_For_Wordpress {
 					wp_update_post(array(
 						'ID' 			=> $post->ID,
 						'post_title'    => $item->Name,
-						'post_content'  => @$item->Description->Summary,
+						'post_content'  => $content,
 						'post_status'   => 'publish',
 						'post_author'   => 1,
 						'post_type'		=> 'arlo_event',
