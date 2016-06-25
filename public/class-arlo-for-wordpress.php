@@ -1016,10 +1016,15 @@ class Arlo_For_Wordpress {
 						}
 					}
 					
+					$content = '';
+					if (!empty($item->Description->Summary)) {
+						$content = $item->Description->Summary;
+					}
+					
 					// create associated custom post, if it dosen't exist
 					$post_config_array = array(
 						'post_title'    => $item->Name,
-						'post_content'  => @$item->Description->Summary,
+						'post_content'  => $content,
 						'post_status'   => 'publish',
 						'post_author'   => 1,
 						'post_type'		=> 'arlo_event',
