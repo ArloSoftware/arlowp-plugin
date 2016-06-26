@@ -49,6 +49,10 @@ if ( ! defined( 'WPINC' ) ) {
  * - replace `class-arlo-for-wordpress.php` with the name of the plugin's class file
  *
  */
+ 
+//load extra functions
+require_once( plugin_dir_path( __FILE__ ) . 'includes/functions.php' ); 
+ 
 // load API files
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-api/Client.php' );
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-api/Transports/Wordpress.php' );

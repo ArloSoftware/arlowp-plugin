@@ -12,7 +12,7 @@ class EventSearch extends Resource
 {
 	protected $apiPath = '/resources/eventsearch';
 
-	public function search($template_id = null, $fields = array(), $count = 20, $group_by = null, $skip=0) {
+	public function search($template_id = null, $fields = array(), $count = 20, $group_by = null, $skip=0, $region) {
 		$templates = $template_id;
 		
 		if(is_array($templates)) {
@@ -27,10 +27,14 @@ class EventSearch extends Resource
 			'format=json'
 		);
 		
+		if (!empty($region)) {
+			$data[] = 'region=' . $region;
+		}
+		
 		if(!is_null($templates)) {
 			$data[] = 'filter=templateid=' . $templates;
 		}
-		
+				
 		$results = $this->request(implode('&', $data));
 		
 		$ordered = [];
@@ -75,22 +79,29 @@ class EventSearch extends Resource
 	 *
 	 * @return array
 	 */
-	public function getAllEvents($fields=array()) {
+	public function getAllEvents($fields=array(), $regions = array()) {
 		$maxCount = 200;
-	
-		$result = $this->search(null, $fields, $maxCount);
 		
-		$items = $result->Items;
-		
-		// get items over and above the max 200 imposed by the API
-		// Dirty... but is a limitation of the public API
-		if($result->TotalCount > $maxCount) {
-			$iterate = ceil($result->TotalCount/$maxCount)-1;// we've already gone once - minus 1
-			
-			for($i=1;$i<=$iterate;$i++) {
-				$items = array_merge($items, $this->search(null, $fields, $maxCount, null, $i*$maxCount)->Items);
-			}
+		if (!(is_array($regions) && count($regions))) {
+			$regions = [''];
 		}
+		
+		foreach($regions as $region) {
+			$result = $this->search(null, $fields, $maxCount, null, 0, $region);
+			
+			$items[$region] = $result->Items;
+			
+			// get items over and above the max 200 imposed by the API
+			// Dirty... but is a limitation of the public API
+			if($result->TotalCount > $maxCount) {
+				$iterate = ceil($result->TotalCount/$maxCount)-1;// we've already gone once - minus 1
+				
+				for($i=1;$i<=$iterate;$i++) {
+					$items[$region] = array_merge($items, $this->search(null, $fields, $maxCount, null, $i*$maxCount)->Items, $region);
+				}
+			}		
+		}				
+	
 		
 		return $items;
 	}

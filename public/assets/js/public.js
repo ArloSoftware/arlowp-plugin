@@ -1,5 +1,7 @@
 (function ( $ ) {
 	"use strict";
+	
+	var uriRegion;
 
 	$(function () {
 
@@ -32,6 +34,7 @@
                 
         $('.arlo-filters > select').change(function() {
         	var filters = {
+        		'search-': 'arlo-filter-search',
         		'cat-': 'arlo-filter-category',
         		'month-': 'arlo-filter-month',
         		'location-': 'arlo-filter-location',
@@ -39,16 +42,19 @@
         		'eventtag-': 'arlo-filter-eventtag',
         		'templatetag-': 'arlo-filter-templatetag',
         	}, 
-        	url = WPUrls.home_url + '/'+ $('#arlo-page').val() + '/';
+        	url = WPUrls.home_url + '/'+ $('#arlo-page').val();
         	
         	for (var i in filters) {
         		if (filters.hasOwnProperty(i) && $('#' + filters[i]).length == 1 && $('#' + filters[i]).val().trim() != '') {
-        			url += i + encodeURIComponent($('#' + filters[i]).val()) + '/'; 
+        			if (i == 'search-') {
+        				url += 'search/' + encodeURIComponent($('#' + filters[i]).val().trim()) + '/'; 
+        			} else {
+        				url += i + encodeURIComponent($('#' + filters[i]).val().trim()) + '/'; 
+        			}
         		} 
         	}
         	
         	document.location = url;
-        	
         });
         
    		//if boxed (grid) layout, make the boxes' height even
@@ -67,6 +73,47 @@
 			gravity: 'north'
 		});
 
+	});
+	
+	function getUriRegion() {
+		try {
+			
+			var patt = new RegExp("region-([^/]*)");
+			var region = patt.exec(window.location.href);
+			
+			if (region[1] != null) {
+				return region[1];
+			} else {
+				return null;
+			}
+			
+		}
+		catch (e) {
+		    return null;
+		}
+	}        
+    
+	function initRegionChanger() {
+		uriRegion = getUriRegion();
+		
+		if (uriRegion != null) {
+			$("#arlo-filter-region").bind("change", function () {
+				changeRegion(uriRegion, jQuery("#arlo-filter-region").val());
+			});		
+		}
+		
+	}        
+    
+    function changeRegion(uriRegion, newRegion) {
+
+	    //Manually set cookie
+    	$.cookie("arlo-region", newRegion, { path: "/" });
+
+	    window.location.href = window.location.href.replace("/region-" + uriRegion + "/", "/region-" + newRegion + "/");
+	}	
+	
+	$(document).ready(function() {
+		initRegionChanger();
 	});
 
 }(jQuery));

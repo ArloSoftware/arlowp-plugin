@@ -1,4 +1,5 @@
 <ul class="arlo-codes">
+	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/upcomingeventrelated#arlo_upcoming_region_selector" target="_blank">[arlo_upcoming_region_selector]</a></li>
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/categoryrelated#arlo_category_header" target="_blank">[arlo_category_header]</a></li>
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/upcomingeventrelated#arlo_upcoming_event_filters" target="_blank">[arlo_upcoming_event_filters]</a></li>
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/upcomingeventrelated#arlo_upcoming_list_item" target="_blank">[arlo_upcoming_list_item]</a></li>

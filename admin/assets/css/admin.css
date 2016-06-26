@@ -126,6 +126,81 @@
 	margin-top: 1em;
 }
 
+/* regions */
+
+#arlo-regions, #arlo-regions-header {
+	width: 480px;
+}
+
+#arlo-regions-header {
+	margin-bottom: 3em;
+}
+
+#arlo-regions-header > div {
+	float: left;
+	text-align: center;
+	margin-left: 1em;
+}
+
+#arlo-regions li {
+	clear:both;
+	height: 2em;
+	padding: 0.3em 0;
+}
+
+#arlo-regions li > div {
+	float: left;
+	margin-left: 1em;
+}
+
+#arlo-regions li {
+	cursor: move;
+}
+
+#arlo-regions .arlo-region-name,
+#arlo-regions .arlo-region-controls {
+	float: right;
+}
+
+#arlo-regions .arlo-region-highlight {
+	height: 1.7em;
+	border: 1px dotted #333;
+}
+
+.arlo-order-number {
+	width: 30px;
+	text-align: center;
+	vertical-align: middle;
+}
+
+.arlo-region-id, .arlo-region-name {
+	width: 170px;
+}
+
+.arlo-region-controls {
+	width: 50px;
+}
+
+.arlo-region-controls i {
+	margin-left: 0.2em;
+	margin-top: 0.2em;
+	display: inline-block;
+	cursor: pointer;
+	float: left;
+}
+
+.arlo-region-controls i.icons8-plus {
+	display: none;
+}
+
+#arlo-regions li:last-of-type .arlo-region-controls i.icons8-plus {
+	display: inline-block;
+}
+
+#arlo-region-empty {
+	display: none;
+}
+
 
 /* hide the template edit select box if no javascript */
 .no-js #arlo-template-select {

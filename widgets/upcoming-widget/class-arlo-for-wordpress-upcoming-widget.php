@@ -272,25 +272,39 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 
 	public function arlo_widget_get_upcoming_list($qty) {
 		global $wpdb;
+		
+		$regions = get_option('arlo_regions');	
+		$arlo_region = get_query_var('arlo-region', '');
+		$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');		
+		
+		if (!empty($arlo_region)) {
+			$where['region'] = ' e_region = "' . $arlo_region . '"';
+		}
+		
+		$where['date'] = " CURDATE() < DATE(e.e_startdatetime) ";
+		$where['event'] = "e_parent_arlo_id = 0";
+				
 		$t1 = "{$wpdb->prefix}arlo_events";
 		$t2 = "{$wpdb->prefix}arlo_eventtemplates";
 		$t3 = "{$wpdb->prefix}arlo_venues";
-		$upcoming_array = $wpdb->get_results(
-			"SELECT 
-				e.e_startdatetime, e.e_locationname, et.et_name, et.et_post_name
-			FROM 
-				$t1 e 
-			LEFT JOIN 
-				$t2 et 
-			ON 
-				e.et_arlo_id = et.et_arlo_id
-			WHERE 
-				CURDATE() < DATE(e.e_startdatetime)
-			AND
-				e_parent_arlo_id = 0
-			ORDER BY 
-				e.e_startdatetime
-			LIMIT 0,$qty");
+		
+		$sql = "
+		SELECT 
+			e.e_startdatetime, e.e_locationname, et.et_name, et.et_post_name
+		FROM 
+			$t1 e 
+		LEFT JOIN 
+			$t2 et 
+		ON 
+			e.et_arlo_id = et.et_arlo_id
+		WHERE
+			" . implode(" AND ", $where) . "
+		ORDER BY 
+			e.e_startdatetime
+		LIMIT 0, $qty";
+					
+		$upcoming_array = $wpdb->get_results($sql);
+
 		return $upcoming_array;
 	}
 

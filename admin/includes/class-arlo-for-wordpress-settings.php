@@ -145,8 +145,7 @@ class Arlo_For_Wordpress_Settings {
                             'default_val' => __('Interested in attending? Have a suggestion about running this course near you?', $this->plugin_slug),
                             )
                 );
-                
-		
+                		 		
 		/*
 		 *
 		 * Page Section Settings
@@ -160,6 +159,16 @@ class Arlo_For_Wordpress_Settings {
 	    	$name = __($template['name'], $this->plugin_slug);
 			add_settings_field( $id, '<label for="'.$id.'">'.$name.'</label>', array($this, 'arlo_template_callback'), $this->plugin_slug, 'arlo_pages_section', array('id'=>$id,'label_for'=>$id) );
 		}
+		
+		/*
+		 *
+		 * Regions Section Settings
+		 *
+		 */ 
+		 
+		add_settings_section('arlo_regions_section', null, null, $this->plugin_slug );				
+		add_settings_field( 'arlo_regions', null, array($this, 'arlo_regions_callback'), $this->plugin_slug, 'arlo_regions_section', array('id'=>'regions') );
+		
 		
 		/*
 		 *
@@ -177,7 +186,7 @@ class Arlo_For_Wordpress_Settings {
 		 */ 
 		 
 		add_settings_section('arlo_welcome_section', null, null, $this->plugin_slug );				
-		add_settings_field( 'arlo_customcss', null, array($this, 'arlo_welcome_callback'), $this->plugin_slug, 'arlo_welcome_section', array('id'=>'welcome') );
+		add_settings_field( 'arlo_welcome', null, array($this, 'arlo_welcome_callback'), $this->plugin_slug, 'arlo_welcome_section', array('id'=>'welcome') );
 	}
 
 	/*
@@ -372,6 +381,61 @@ class Arlo_For_Wordpress_Settings {
 			return file_get_contents($path);
 		}
 	}
+	
+	function arlo_regions_callback($args) {
+		$regions = get_option('arlo_regions', array());
+		
+	    echo '
+	    <h3>Regions</h3>
+	    <p>Please specify your available regions in Arlo</p>
+		<p><strong>Please note, when you change the regions, you have to re-synchronize the data</strong></p>
+	    <div id="arlo-regions-header">
+			<div class="arlo-order-number">#</div>
+			<div class="arlo-region-id">Region ID</div>
+			<div class="arlo-region-name">Region name</div>
+	    </div>
+	    <div id="arlo-region-empty">
+			<ul>
+				<li>
+					<div class="arlo-order-number">1.</div>
+					<div class="arlo-region-id"><input type="text" name="arlo_settings[regionid][]"></div>
+					<div class="arlo-region-controls">
+						<i class="icons8-minus icons8 size-21"></i>
+						<i class="icons8-plus icons8 size-21"></i>
+					</div>			
+					<div class="arlo-region-name"><input type="text" name="arlo_settings[regionname][]"></div>
+				</li>
+			</ul>	    	
+	    </div>
+		<ul id="arlo-regions">';
+		$key = 0;
+		if (is_array($regions) && count($regions)) {
+			foreach($regions as $regionid => $regionname) {
+				echo '<li>
+					<div class="arlo-order-number">' . (++$key) . '</div>
+					<div class="arlo-region-id"><input type="text" name="arlo_settings[regionid][]" value="'.$regionid.'"></div>
+					<div class="arlo-region-controls">
+						<i class="icons8-minus icons8 size-21"></i>
+						<i class="icons8-plus icons8 size-21"></i>
+					</div>			
+					<div class="arlo-region-name"><input type="text" name="arlo_settings[regionname][]" value="' . $regionname . '"></div>
+				  </li>
+				 ';
+			}
+		}
+		
+		echo '<li>
+			<div class="arlo-order-number">' . ($key + 1) . '</div>
+			<div class="arlo-region-id"><input type="text" name="arlo_settings[regionid][]"></div>
+			<div class="arlo-region-controls">
+				<i class="icons8-minus icons8 size-21"></i>
+				<i class="icons8-plus icons8 size-21"></i>
+			</div>			
+			<div class="arlo-region-name"><input type="text" name="arlo_settings[regionname][]"></div>
+		  </li>
+		</ul>	    
+	    ';
+	} 	
 	
 	function arlo_welcome_callback($args) {
 		

@@ -182,6 +182,8 @@ class Arlo_For_Wordpress_Admin {
 			
 			if ($screen->id == $this->plugin_screen_hook_suffix) {
 				wp_enqueue_style( $this->plugin_slug .'-codemirror', plugins_url( 'assets/css/libs/codemirror.css', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );
+				wp_enqueue_style( $this->plugin_slug .'-jquery-ui', plugins_url( 'assets/css/libs/jquery-ui.min.css', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );
+				wp_enqueue_style( $this->plugin_slug .'-icons8', plugins_url( 'assets/fonts/icons8/Arlo-WP.css', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );
 			}
 		}
 
@@ -207,6 +209,7 @@ class Arlo_For_Wordpress_Admin {
 		$screen = get_current_screen();
 		if ( $this->plugin_screen_hook_suffix == $screen->id ) {
 			wp_enqueue_script( $this->plugin_slug . '-lsapiclient', plugins_url( 'assets/js/lib/ls-apiclient-1.2.0.min.js', __FILE__ ), array( 'jquery' ), Arlo_For_Wordpress::VERSION, true );
+			wp_enqueue_script( $this->plugin_slug . '-jquery-ui', plugins_url( 'assets/js/lib/jquery-ui.min.js', __FILE__ ), array( 'jquery' ), Arlo_For_Wordpress::VERSION, true );
 			wp_enqueue_script( $this->plugin_slug . '-codemirror', plugins_url( 'assets/js/lib/codemirror.js', __FILE__ ), array(), Arlo_For_Wordpress::VERSION, true );
 			wp_enqueue_script( $this->plugin_slug . '-codemirror-css', plugins_url( 'assets/js/lib/codemirror-css.js', __FILE__ ), array(), Arlo_For_Wordpress::VERSION, true );
 			wp_enqueue_script( $this->plugin_slug . '-admin-script', plugins_url( 'assets/js/admin.js?20160413', __FILE__ ), array( 'jquery' ), Arlo_For_Wordpress::VERSION, true );		
@@ -525,6 +528,7 @@ class Arlo_For_Wordpress_Admin {
 		
 	public function settings_saved($old) {
 		$new = get_option('arlo_settings', array());
+		$old_regions = get_option('arlo_regions', array());
 	
 		if($old['platform_name'] != $new['platform_name'] && !empty($new['platform_name'])) {
 			$plugin = Arlo_For_Wordpress::get_instance();
@@ -549,10 +553,20 @@ class Arlo_For_Wordpress_Admin {
 				if ($wp_filesystem->put_contents( $filename, $new['customcss'], FS_CHMOD_FILE)) {
 					update_option('arlo_customcss', 'file');
 				} 
-			}
-				
+			}	
 		}
 		
+		//normalize regions
+		$regions = array();
+		if (is_array($new['regionid']) && count($new['regionid'])) {
+			foreach($new['regionid'] as $key => $regionid) {
+				if (!empty($regionid) && !empty($new['regionname'][$key])) {
+					$regions[$regionid] = $new['regionname'][$key];
+				}
+			}
+		}
+		
+		update_option('arlo_regions', $regions);
 				
 		// need to check for posts-page change here
 		// loop through each post type and check if the posts-page has changed
@@ -563,6 +577,8 @@ class Arlo_For_Wordpress_Admin {
 					'post_type'			=> 'arlo_' . $id,
 					'post_status'		=> 'publish' // only there to ensure we don't create a loop if a user has tampered
 				));
+				
+				$posts = array_merge($posts, $regions);
 			
 				// update all posts of this type to have this parent id
 				foreach($posts as $post) {
@@ -571,8 +587,9 @@ class Arlo_For_Wordpress_Admin {
 						'post_parent'	=> $new['post_types'][$id]['posts_page']
 					));
 				}
+				
+				
 			}
 		}
 	}
-
 }
