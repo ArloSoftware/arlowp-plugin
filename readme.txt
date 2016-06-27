@@ -3,7 +3,7 @@ Contributors: ArloSoftware, adamfentosi
 Tags: online registration, event registration, training management,  event management, event plugin, training company software, training calendar, training administration, training management software, training provider, solution, events calendar, wordpress events, event ticketing, wordpress lms, class registration, conference registration,  ticket, registration, event manager, training, booking, ticketing
 Requires at least: 3.7
 Tested up to: 4.5.2
-Stable tag: 2.2.1
+Stable tag: 2.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -125,6 +125,24 @@ The Arlo - Training and Event Management, and online registration plugin is only
 7. Arlo integration
 
 == Changelog ==
+
+= 2.3 =
+
+Regionalized plugin
+
+New region selector shortcodes [arlo_upcoming_region_selector], [arlo_template_search_region_selector], [arlo_template_region_selector]
+
+Fix [arlo_event_template_link] shortcode: https://github.com/ArloSoftware/arlowp-plugin/issues/117
+
+Fix when the upcoming events widget contains sessions: https://github.com/ArloSoftware/arlowp-plugin/issues/116
+
+Fix the private event link with the WordPress Arlo Theme: https://github.com/ArloSoftware/arlowp-plugin/issues/115
+
+Fix cache issue when the browser caches the custom.css file: https://github.com/ArloSoftware/arlowp-plugin/issues/113
+
+The [arlo_content_field_item] shortcode field can show data from previous import: https://github.com/ArloSoftware/arlowp-plugin/issues/100
+
+Fix show_only_at_bottom parameter in [arlo_event_template_list_item] shortcode: https://github.com/ArloSoftware/arlowp-plugin/issues/110
 
 = 2.2.1 =
 

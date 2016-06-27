@@ -6,6 +6,16 @@ Enhancement
 Regionalized plugin
 New region selector shortcodes [arlo_upcoming_region_selector], [arlo_template_search_region_selector], [arlo_template_region_selector]
 
+Bugfixes
+------------------
+Fix [arlo_event_template_link] shortcode: https://github.com/ArloSoftware/arlowp-plugin/issues/117
+Fix when the upcoming events widget contains sessions: https://github.com/ArloSoftware/arlowp-plugin/issues/116
+Fix the private event link with the WordPress Arlo Theme: https://github.com/ArloSoftware/arlowp-plugin/issues/115
+Fix cache issue when the browser caches the custom.css file: https://github.com/ArloSoftware/arlowp-plugin/issues/113
+The [arlo_content_field_item] shortcode field can show data from previous import: https://github.com/ArloSoftware/arlowp-plugin/issues/100
+Fix show_only_at_bottom parameter in [arlo_event_template_list_item] shortcode: https://github.com/ArloSoftware/arlowp-plugin/issues/110
+
+
 == V2.2.1 ==
 
 Bugfixes
