@@ -80,7 +80,7 @@ class EventSearch extends Resource
 	 * @return array
 	 */
 	public function getAllEvents($fields=array(), $regions = array()) {
-		$maxCount = 200;
+		$maxCount = 100;
 		
 		if (!(is_array($regions) && count($regions))) {
 			$regions = [''];
@@ -91,7 +91,7 @@ class EventSearch extends Resource
 			
 			$items[$region] = $result->Items;
 			
-			// get items over and above the max 200 imposed by the API
+			// get items over and above the max 100 imposed by the API
 			// Dirty... but is a limitation of the public API
 			if($result->TotalCount > $maxCount) {
 				$iterate = ceil($result->TotalCount/$maxCount)-1;// we've already gone once - minus 1
