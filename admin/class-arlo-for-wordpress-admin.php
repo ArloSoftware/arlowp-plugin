@@ -552,6 +552,7 @@ class Arlo_For_Wordpress_Admin {
 				$filename = trailingslashit(plugin_dir_path( __FILE__ )).'../public/assets/css/custom.css';
 				if ($wp_filesystem->put_contents( $filename, $new['customcss'], FS_CHMOD_FILE)) {
 					update_option('arlo_customcss', 'file');
+					update_option('arlo_customcss_timestamp', time());
 				} 
 			}	
 		}

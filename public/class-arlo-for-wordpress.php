@@ -608,7 +608,8 @@ class Arlo_For_Wordpress {
 		
 		$customcss_load_type = get_option('arlo_customcss');
 		if ($customcss_load_type == 'file' && file_exists(plugin_dir_path( __FILE__ ) . 'assets/css/custom.css')) {
-			wp_enqueue_style( $this->plugin_slug .'-custom-styles', plugins_url( 'assets/css/custom.css', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );		
+			$customcss_timestamp = get_option('arlo_customcss_timestamp');
+			wp_enqueue_style( $this->plugin_slug .'-custom-styles', plugins_url( 'assets/css/custom.css', __FILE__ ), array(), $customcss_timestamp );		
 		}	
 	}
 	
