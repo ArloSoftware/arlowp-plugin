@@ -2732,28 +2732,85 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 		$where .= ' AND et.et_region = "' . $arlo_region . '" AND e.e_region = "' . $arlo_region . '"';
 	}		
 	
-	$sql = "SELECT DISTINCT
-		e.*, et.et_name, et.et_post_name, et.et_descriptionsummary, et.et_registerinteresturi, o.o_formattedamounttaxexclusive, o_offeramounttaxexclusive, o.o_formattedamounttaxinclusive, o_offeramounttaxinclusive, o.o_taxrateshortcode, v.v_post_name, c.c_arlo_id
-		FROM $t1 e 
-		LEFT JOIN $t2 et 
-		ON e.et_arlo_id = et.et_arlo_id 
-		LEFT JOIN $t3 v
-		ON e.v_id = v.v_arlo_id
-		INNER JOIN 
-		(SELECT * 
-		FROM $t4
-		WHERE o_order = 1
+	$sql = "
+	SELECT DISTINCT
+		e.e_id,
+		e.e_arlo_id,
+		e.et_arlo_id,
+		e.e_code,
+		e.e_name,
+		e.e_startdatetime,
+		e.e_finishdatetime,
+		e.e_datetimeoffset,
+		e.e_timezone,
+		e.e_timezone_id,
+		e.v_id,
+		e.e_locationname,
+		e.e_locationroomname,
+		e.e_locationvisible,
+		e.e_isfull,
+		e.e_placesremaining,
+		e.e_summary,
+		e.e_sessiondescription,
+		e.e_notice,
+		e.e_viewuri,
+		e.e_registermessage,
+		e.e_registeruri,
+		e.e_providerorganisation,
+		e.e_providerwebsite,
+		e.e_isonline,
+		e.e_parent_arlo_id,
+		e.e_region,
+		et.et_name, 
+		et.et_post_name, 
+		et.et_descriptionsummary, 
+		et.et_registerinteresturi, 
+		et.et_viewuri,
+		o.o_formattedamounttaxexclusive, 
+		o_offeramounttaxexclusive, 
+		o.o_formattedamounttaxinclusive, 
+		o_offeramounttaxinclusive, 
+		o.o_taxrateshortcode, 
+		v.v_post_name, 
+		c.c_arlo_id
+	FROM 
+		$t1 e 
+	LEFT JOIN 
+		$t2 et 
+	ON 
+		e.et_arlo_id = et.et_arlo_id 
+	LEFT JOIN 
+		$t3 v
+	ON
+		e.v_id = v.v_arlo_id
+	INNER JOIN 
+		(SELECT 
+			* 
+		FROM 
+			$t4
+		WHERE 
+			o_order = 1
 		) o
-		ON e.e_id = o.e_id
-		LEFT JOIN $t5 etc
-		ON et.et_arlo_id = etc.et_arlo_id AND et.active = etc.active
-		LEFT JOIN $t6 c
-		ON c.c_arlo_id = etc.c_arlo_id
-		$join
-		$where
-	    GROUP BY etc.et_arlo_id, e.e_id
-		ORDER BY e.e_startdatetime
-		LIMIT $offset, $limit";
+	ON 
+		e.e_id = o.e_id
+	LEFT JOIN 
+		$t5 etc
+	ON 
+		et.et_arlo_id = etc.et_arlo_id 
+	AND 
+		et.active = etc.active
+	LEFT JOIN 
+		$t6 c
+	ON 
+		c.c_arlo_id = etc.c_arlo_id
+	$join
+	$where
+	GROUP BY 
+		etc.et_arlo_id, e.e_id
+	ORDER BY 
+		e.e_startdatetime
+	LIMIT 
+		$offset, $limit";
 						
 	$items = $wpdb->get_results($sql, ARRAY_A);
 
