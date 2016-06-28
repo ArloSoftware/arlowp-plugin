@@ -1063,12 +1063,12 @@ class Arlo_For_Wordpress {
             
 		// check for last sucessful import. Continue if imported mor than an hour ago or forced. Otherwise, return.
 		$now = DateTime::createFromFormat('U.u', microtime(true));
-                $timestamp = $now->format("Y-m-d H:i:s");
-                $utimestamp = $now->format("Y-m-d H:i:s.u T ");
+        $timestamp = $now->format("Y-m-d H:i:s");
+        $utimestamp = $now->format("Y-m-d H:i:s.u T ");
 		$last = $this->get_last_import();
-                $import_id = $this->get_random_int();
-                                
-                $this->add_import_log($import_id . ' Synchronization Started: ' . $utimestamp, $timestamp, false);
+        $import_id = $this->get_random_int();
+                        
+        $this->add_import_log($import_id . ' Synchronization Started: ' . $utimestamp, $timestamp, false);
 		
 		set_time_limit(300);
 		
@@ -1576,66 +1576,67 @@ class Arlo_For_Wordpress {
 			foreach($regionalized_items as $region => $items) {
 			
 				foreach($items as $item) {
-					
-					$event_id = $this->save_event_data($item, 0, $timestamp, $region);
-					
-					//save the tags
-					if (isset($item->Tags) && is_array($item->Tags)) {
-						$exisiting_tags = [];
-						$sql = "
-						SELECT 
-							id, 
-							tag
-						FROM
-							{$wpdb->prefix}arlo_tags 
-						WHERE 
-							tag IN ('" . implode("', '", $item->Tags) . "')
-						AND
-							active = '{$timestamp}'
-						";
-						$rows = $wpdb->get_results($sql, ARRAY_A);
-						foreach ($rows as $row) {
-							$exisiting_tags[$row['tag']] = $row['id'];
-						}
-						unset($rows);
+					if (!empty($item->EventID) && is_numeric($item->EventID) && $item->EventID > 0) {
+						$event_id = $this->save_event_data($item, 0, $timestamp, $region);
 						
-						foreach ($item->Tags as $tag) {
-							if (empty($exisiting_tags[$tag])) {
-								$query = $wpdb->query( $wpdb->prepare( 
-									"INSERT INTO {$wpdb->prefix}arlo_tags
-									(tag, active) 
-									VALUES ( %s, %s ) 
-									", 
-									$tag,
-									$timestamp
-								) );
-															
-								if ($query === false) {
-									throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_tags' );
+						//save the tags
+						if (isset($item->Tags) && is_array($item->Tags)) {
+							$exisiting_tags = [];
+							$sql = "
+							SELECT 
+								id, 
+								tag
+							FROM
+								{$wpdb->prefix}arlo_tags 
+							WHERE 
+								tag IN ('" . implode("', '", $item->Tags) . "')
+							AND
+								active = '{$timestamp}'
+							";
+							$rows = $wpdb->get_results($sql, ARRAY_A);
+							foreach ($rows as $row) {
+								$exisiting_tags[$row['tag']] = $row['id'];
+							}
+							unset($rows);
+							
+							foreach ($item->Tags as $tag) {
+								if (empty($exisiting_tags[$tag])) {
+									$query = $wpdb->query( $wpdb->prepare( 
+										"INSERT INTO {$wpdb->prefix}arlo_tags
+										(tag, active) 
+										VALUES ( %s, %s ) 
+										", 
+										$tag,
+										$timestamp
+									) );
+																
+									if ($query === false) {
+										throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_tags' );
+									} else {
+										$exisiting_tags[$tag] = $wpdb->insert_id;
+									}
+								}
+														
+								if (!empty($exisiting_tags[$tag])) {
+									$query = $wpdb->query( $wpdb->prepare( 
+										"REPLACE INTO {$wpdb->prefix}arlo_events_tags
+										(e_arlo_id, tag_id, active) 
+										VALUES ( %d, %d, %s ) 
+										", 
+										$item->EventID,
+										$exisiting_tags[$tag],
+										$timestamp
+									) );
+									
+									if ($query === false) {
+										throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_events_tags' );
+									}
 								} else {
-									$exisiting_tags[$tag] = $wpdb->insert_id;
+									throw new Exception('Couldn\'t find tag: ' . $tag );
 								}
 							}
-													
-							if (!empty($exisiting_tags[$tag])) {
-								$query = $wpdb->query( $wpdb->prepare( 
-									"REPLACE INTO {$wpdb->prefix}arlo_events_tags
-									(e_arlo_id, tag_id, active) 
-									VALUES ( %d, %d, %s ) 
-									", 
-									$item->EventID,
-									$exisiting_tags[$tag],
-									$timestamp
-								) );
-								
-								if ($query === false) {
-									throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_events_tags' );
-								}
-							} else {
-								throw new Exception('Couldn\'t find tag: ' . $tag );
-							}
-						}
-					}				
+						}					
+					}
 				}				
 			}
 		}
