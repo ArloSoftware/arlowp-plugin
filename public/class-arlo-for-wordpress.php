@@ -511,22 +511,22 @@ class Arlo_For_Wordpress {
 				$saved_templates = arlo_get_option('templates');
 
 				//Add [arlo_template_region_selector] shortcode to the event template
-				if (!empty($saved_templates['event']['html'])) {
+				if (!empty($saved_templates['event']['html']) && strpos($saved_templates['event']['html'], "[arlo_template_region_selector]") === false) {
 					$saved_templates['event']['html'] = "[arlo_template_region_selector]\n" . $saved_templates['event']['html'];
 				}
 				
 				//Add [arlo_template_region_selector] shortcode to the catalogue template
-				if (!empty($saved_templates['events']['html'])) {
+				if (!empty($saved_templates['events']['html']) && strpos($saved_templates['event']['html'], "[arlo_template_region_selector]") === false) {
 					$saved_templates['events']['html'] = "[arlo_template_region_selector]\n" . $saved_templates['events']['html'];
 				}
 								
 				//Add [arlo_template_search_region_selector] shortcode to the event search template
-				if (!empty($saved_templates['eventsearch']['html'])) {
+				if (!empty($saved_templates['eventsearch']['html']) && strpos($saved_templates['event']['html'], "[arlo_template_search_region_selector]") === false) {
 					$saved_templates['eventsearch']['html'] = "[arlo_template_search_region_selector]\n" . $saved_templates['eventsearch']['html'];
 				}				
 
 				//Add [arlo_upcoming_region_selector] shortcode to the upcoming events list template
-				if (!empty($saved_templates['upcoming']['html'])) {
+				if (!empty($saved_templates['upcoming']['html']) && strpos($saved_templates['event']['html'], "[arlo_upcoming_region_selector]") === false) {
 					$saved_templates['upcoming']['html'] = "[arlo_upcoming_region_selector]\n" . $saved_templates['upcoming']['html'];
 				}
 				
