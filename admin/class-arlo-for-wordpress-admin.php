@@ -120,7 +120,7 @@ class Arlo_For_Wordpress_Admin {
             }
                         
 			if ($plugin_version != $plugin::VERSION) {
-				$plugin::update($plugin::VERSION);
+				$plugin::update($plugin::VERSION, $plugin_version);
 				$wp_rewrite->flush_rules();
 				update_option('arlo_plugin_version', $plugin::VERSION);
 			}

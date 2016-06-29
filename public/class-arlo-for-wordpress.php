@@ -460,7 +460,6 @@ class Arlo_For_Wordpress {
 
 	}
 	
-	
 	/**
 	 * Run update scripts according to the version of the plugin
 	 *
@@ -468,9 +467,17 @@ class Arlo_For_Wordpress {
 	 *
 	 * @return   null
 	 */
-	public static function update($version) {
-		arlo_add_datamodel();
-
+	public static function update($new_version, $old_version) {
+		if (version_compare($old_version, '2.2.1') < 0) {
+			self::run_update('2.2.1');
+		}	
+		
+		if (version_compare($old_version, '2.3') < 0) {
+			self::run_update('2.3');
+		}
+	}	
+	
+	private static function run_update($version) {
 		switch($version) {
 			case '2.2.1': 
 				//Add [arlo_no_event_text] shortcode to the templates
@@ -496,12 +503,37 @@ class Arlo_For_Wordpress {
 							$saved_templates[$id]['html'] = substr_replace($content, $shortcode, $pos, 0);
 						}
 					}
-				}	
+				}
 				
-				arlo_set_option('templates', $saved_templates);				
+				arlo_set_option('templates', $saved_templates);
 			break;
-		}
-	}	
+			case '2.3': 
+				$saved_templates = arlo_get_option('templates');
+
+				//Add [arlo_template_region_selector] shortcode to the event template
+				if (!empty($saved_templates['event']['html'])) {
+					$saved_templates['event']['html'] = "[arlo_template_region_selector]\n" . $saved_templates['event']['html'];
+				}
+				
+				//Add [arlo_template_region_selector] shortcode to the catalogue template
+				if (!empty($saved_templates['events']['html'])) {
+					$saved_templates['events']['html'] = "[arlo_template_region_selector]\n" . $saved_templates['events']['html'];
+				}
+								
+				//Add [arlo_template_search_region_selector] shortcode to the event search template
+				if (!empty($saved_templates['eventsearch']['html'])) {
+					$saved_templates['eventsearch']['html'] = "[arlo_template_search_region_selector]\n" . $saved_templates['eventsearch']['html'];
+				}				
+
+				//Add [arlo_upcoming_region_selector] shortcode to the upcoming events list template
+				if (!empty($saved_templates['upcoming']['html'])) {
+					$saved_templates['upcoming']['html'] = "[arlo_upcoming_region_selector]\n" . $saved_templates['upcoming']['html'];
+				}
+				
+				arlo_set_option('templates', $saved_templates);
+			break;
+		}	
+	}
 	
 
 	/**
