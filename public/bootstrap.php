@@ -2235,26 +2235,46 @@ $shortcodes->add('event_offers', function($content='', $atts, $shortcode_name){
 	global $wpdb;
 
 	$e_id = $GLOBALS['arlo_event_list_item']['e_id'];
+	
+	$regions = get_option('arlo_regions');	
+	
+	$arlo_region = get_query_var('arlo-region', '');
+	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
 
 	$t1 = "{$wpdb->prefix}arlo_offers";
-
-	$offers_array = $wpdb->get_results(
-		"SELECT offer.*,
+	
+	$sql = "
+	SELECT 
+		offer.*,
 		replaced_by.o_label AS replacement_label,
 		replaced_by.o_isdiscountoffer AS replacement_discount,
 		replaced_by.o_currencycode AS replacement_currency_code,
 		replaced_by.o_formattedamounttaxexclusive AS replacement_amount,
 		replaced_by.o_message AS replacement_message
-		FROM `wp_arlo_offers` AS offer
-		LEFT JOIN `wp_arlo_offers` AS replaced_by ON offer.o_arlo_id = replaced_by.o_replaces AND offer.e_id = replaced_by.e_id
-		WHERE offer.o_replaces = 0 AND offer.e_id = $e_id
-		ORDER BY offer.o_order", ARRAY_A);
+	FROM 
+		wp_arlo_offers AS offer
+	LEFT JOIN 
+		wp_arlo_offers AS replaced_by 
+	ON 
+		offer.o_arlo_id = replaced_by.o_replaces 
+	AND 
+		offer.e_id = replaced_by.e_id	
+	" . (!empty($arlo_region) ? " AND replaced_by.o_region = '" . $arlo_region . "'" : "") . "				
+	WHERE 
+		offer.o_replaces = 0 
+	AND 
+		offer.e_id = $e_id
+	" . (!empty($arlo_region) ? " AND offer.o_region = '" . $arlo_region . "'" : "") . "		
+	ORDER BY 
+		offer.o_order";
+		
+	$offers_array = $wpdb->get_results($sql, ARRAY_A);
 
 	$offers = '<ul class="arlo-list arlo-event-offers">';
         
-        $settings = get_option('arlo_settings');  
-        $price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : ARLO_PLUGIN_PREFIX . '-exclgst';      
-        $free_text = (isset($settings['free_text'])) ? esc_attr($settings['free_text']) : __('Free', $GLOBALS['arlo_plugin_slug']);
+    $settings = get_option('arlo_settings');  
+    $price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : ARLO_PLUGIN_PREFIX . '-exclgst';      
+    $free_text = (isset($settings['free_text'])) ? esc_attr($settings['free_text']) : __('Free', $GLOBALS['arlo_plugin_slug']);
 
 
 	foreach($offers_array as $offer) {
@@ -3714,13 +3734,21 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 	$price_field = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? 'o_offeramounttaxexclusive' : 'o_offeramounttaxinclusive';
 	$price_field_show = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? 'o_formattedamounttaxexclusive' : 'o_formattedamounttaxinclusive';
 	$free_text = (isset($settings['free_text'])) ? $settings['free_text'] : __('Free', $GLOBALS['arlo_plugin_slug']);
-        
+	
+	$regions = get_option('arlo_regions');	
+	
+	$arlo_region = get_query_var('arlo-region', '');
+	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
         
 	// attempt to find event template offer
 	$conditions = array(
 		'event_template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id'],
 		'discounts' => false
 	);
+	
+	if (!empty($arlo_region)) {
+		$conditions['region'] = $arlo_region; 
+	}
 	
 	$offer = \Arlo\Offers::get($conditions, array("o.{$price_field} ASC"), 1);
 	
@@ -3738,6 +3766,10 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 			'event_id' => $event->e_id,
 			'discounts' => false
 		);
+		
+		if (!empty($arlo_region)) {
+			$conditions['region'] = $arlo_region; 
+		}		
 		
 		$offer = \Arlo\Offers::get($conditions, array("o.{$price_field} ASC"), 1);
 	}
