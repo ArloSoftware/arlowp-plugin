@@ -278,7 +278,7 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 		$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');		
 		
 		if (!empty($arlo_region)) {
-			$where['region'] = ' e_region = "' . $arlo_region . '"';
+			$where['region'] = ' e_region = "' . $arlo_region . '" AND et_region = "' . $arlo_region . '"';
 		}
 		
 		$where['date'] = " CURDATE() < DATE(e.e_startdatetime) ";
@@ -290,11 +290,14 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 		
 		$sql = "
 		SELECT 
-			e.e_startdatetime, e.e_locationname, et.et_name, et.et_post_name
+			e.e_startdatetime, 
+			e.e_locationname, 
+			et.et_name, 
+			et.et_post_name
 		FROM 
-			$t1 e 
+			$t1 AS e 
 		LEFT JOIN 
-			$t2 et 
+			$t2 AS et
 		ON 
 			e.et_arlo_id = et.et_arlo_id
 		WHERE
@@ -302,7 +305,7 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 		ORDER BY 
 			e.e_startdatetime
 		LIMIT 0, $qty";
-					
+		
 		$upcoming_array = $wpdb->get_results($sql);
 
 		return $upcoming_array;
