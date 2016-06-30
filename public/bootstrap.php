@@ -409,21 +409,39 @@ function arlo_the_content($content) {
  * @return   string The content replaced by the filtered event template
  */
 function arlo_the_content_event($content) {
+	global $post, $wpdb;
+	
 	$templates = arlo_get_option('templates');
 	$content = $templates['event']['html'];
-
-	global $post, $wpdb;
-
+	$regions = get_option('arlo_regions');	
+	
+	$arlo_region = get_query_var('arlo-region', '');
+	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
+	
 	$t1 = "{$wpdb->prefix}arlo_eventtemplates";
-	$t2 = "{$wpdb->prefix}posts";
-
-	$item = $wpdb->get_row(
-		"SELECT et.*, post.ID as post_id
-		FROM $t1 et 
-		LEFT JOIN $t2 post 
-		ON et.et_post_name = post.post_name 
-		WHERE post.post_type = 'arlo_event' AND post.ID = $post->ID
-		ORDER BY et.et_name ASC", ARRAY_A);
+	$t2 = "{$wpdb->prefix}posts";	
+	
+	$sql = "
+	SELECT 
+		et.*, 
+		post.ID as post_id
+	FROM 
+		$t1 et 
+	LEFT JOIN 
+		$t2 post 
+	ON 
+		et.et_post_name = post.post_name 
+	WHERE 
+		post.post_type = 'arlo_event' 
+	AND 
+		post.ID = $post->ID
+	" . (!empty($arlo_region) ? " AND et.et_region = '" . $arlo_region . "'" : "") . "
+	ORDER 
+		BY et.et_name ASC
+	";
+	
+	
+	$item = $wpdb->get_row($sql, ARRAY_A);	
 
 	$GLOBALS['arlo_eventtemplate'] = $item;
 
@@ -3521,11 +3539,11 @@ $shortcodes->add('suggest_datelocation', function($content='', $atts, $shortcode
 		ON $t2.et_arlo_id = $t1.et_arlo_id AND $t2.e_parent_arlo_id = 0
 		WHERE $t1.et_post_name = '$post->post_name'
 		", ARRAY_A);
-	
+			
 	if(empty($items)) {
 		return '';
 	}
-
+	
 	$content = '<a href="' . $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'] . '" class="arlo-register-interest">' . htmlentities($text, ENT_QUOTES, "UTF-8") . '</a>';
 
 	return $content;
