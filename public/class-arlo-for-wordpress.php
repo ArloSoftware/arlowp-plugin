@@ -2242,7 +2242,7 @@ class Arlo_For_Wordpress {
 		$import = self::get_instance()->get_import_log();
 		
 		if (strpos($import[0]->message, "404") !== false ) {
-			$import[0]->message = __('The given platform name is not exists', self::get_instance()->plugin_slug);
+			$import[0]->message = __('The provided platform name does not exist.', self::get_instance()->plugin_slug);
 		}
 		
 		echo '
