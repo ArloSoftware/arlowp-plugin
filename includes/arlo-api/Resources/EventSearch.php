@@ -97,7 +97,7 @@ class EventSearch extends Resource
 				$iterate = ceil($result->TotalCount/$maxCount)-1;// we've already gone once - minus 1
 				
 				for($i=1;$i<=$iterate;$i++) {
-					$items[$region] = array_merge($items, $this->search(null, $fields, $maxCount, null, $i*$maxCount, $region)->Items);
+					$items[$region] = array_merge($items[$region], $this->search(null, $fields, $maxCount, null, $i*$maxCount, $region)->Items);
 				}
 			}		
 		}				

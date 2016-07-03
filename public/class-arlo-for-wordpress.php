@@ -1091,7 +1091,7 @@ class Arlo_For_Wordpress {
         }
 	
 	public function import($force=false) {
-                global $wpdb;
+		global $wpdb;
             
 		// check for last sucessful import. Continue if imported mor than an hour ago or forced. Otherwise, return.
 		$now = DateTime::createFromFormat('U.u', microtime(true));
