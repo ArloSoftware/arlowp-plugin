@@ -48,7 +48,7 @@
         		page = '/' + page;
         	}
         	
-        	if (page.indexOf('/') !== page.length-1) {
+        	if (page[page.length-1] != '/') {
         		page = page + '/';
         	}
         	
