@@ -387,8 +387,8 @@ class Arlo_For_Wordpress_Settings {
 		
 	    echo '
 	    <h3>Regions</h3>
-	    <p>Please specify your available regions in Arlo</p>
-		<p><strong>Please note, when you change the regions, you have to re-synchronize the data</strong></p>
+	    <p>Please specify your available regions in Arlo.</p>
+		<p><strong>Please note, when you change the regions, you have to re-synchronize the data.</strong></p>
 	    <div id="arlo-regions-header">
 			<div class="arlo-order-number">#</div>
 			<div class="arlo-region-id">Region ID</div>
@@ -433,7 +433,9 @@ class Arlo_For_Wordpress_Settings {
 			</div>			
 			<div class="arlo-region-name"><input type="text" name="arlo_settings[regionname][]"></div>
 		  </li>
-		</ul>	    
+		</ul>
+		
+		<p>For more information, please visit our <a href="http://developer.arlo.co/doc/wordpress/settings#regions" target="_blank">documentation</a></p>
 	    ';
 	} 	
 	
@@ -442,6 +444,17 @@ class Arlo_For_Wordpress_Settings {
 	    echo '
 	    <h3>What\'s new in this release</h3>
 	    <h4>Version ' . $this->version . '</h4>
+	    <p>
+	    	<ul class="arlo-whatsnew-list">
+	    		<li>Regionalized plugin, for more information, please visit our <a href="http://developer.arlo.co/doc/wordpress/settings#regions" target="_blank">documentation</a></li>
+	    		<li>New region selector shortcodes 
+	    		<a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/upcomingeventrelated#arlo_upcoming_region_selector" target="_blank">[arlo_upcoming_region_selector]</a>, 
+	    		<a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_template_search_region_selector" target="_blank">[arlo_template_search_region_selector]</a>, 
+	    		<a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_template_region_selector" target="_blank">[arlo_template_region_selector]</a></li>
+	    		<li>Many minor bug fixes and enhancements</li>
+	    	</ul>
+	    </p>	
+	    <h4>Version 2.2.1</h4>
 	    <p>
 	    	<ul class="arlo-whatsnew-list">
 	    		<li>New <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_no_event_text" target="_blank">[arlo_no_event_text]</a> shortcode to display a message when there is no event</li>
