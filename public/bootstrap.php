@@ -352,7 +352,7 @@ function arlo_register_custom_post_types() {
 		}
 	}
 	
-	if ((array_key_exists($page_id, $arlo_page_ids) || $page_type == 'arlo_event') && is_array($regions) && count($regions) && !empty($settings['post_types'][$arlo_page_ids[$page_id]]['posts_page'])) {
+	if (((array_key_exists($page_id, $arlo_page_ids) && !empty($settings['post_types'][$arlo_page_ids[$page_id]]['posts_page'])) || $page_type == 'arlo_event') && is_array($regions) && count($regions)) {
 		if (empty($selected_region)) {
 			//try to read the region from a cookie
 			if (!empty($_COOKIE['arlo-region']) && in_array($_COOKIE['arlo-region'], array_keys($regions))) {
