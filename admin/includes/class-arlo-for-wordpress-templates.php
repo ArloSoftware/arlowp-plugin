@@ -32,6 +32,7 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 			'et_descriptionsummary'    => __( 'Description', $this->plugin_slug ),
 			'et_registerinteresturi'    => __( 'Register interest', $this->plugin_slug ),
 			'et_event_num' => __( 'Num. of events', $this->plugin_slug ),
+			'et_region' => __( 'Regions', $this->plugin_slug ),
 		];
 	}	
 	
@@ -52,6 +53,7 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 	public function column_default($item, $column_name) {
 		switch ($column_name) {
 			case 'et_code':
+			case 'et_region':
 				return $item->$column_name;
 			case 'et_name':
 			case 'et_descriptionsummary':
@@ -105,13 +107,18 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 			et.et_name,
 			et.et_descriptionsummary,
 			et.et_registerinteresturi,
-			COUNT(e_arlo_id) as et_event_num
+			COUNT(DISTINCT e_arlo_id) as et_event_num,
+			GROUP_CONCAT(DISTINCT et.et_region) AS et_region
 		FROM
 			" . $this->table_name . "
 		LEFT JOIN 
-			" . $this->wpdb->prefix . "arlo_events
-		USING 
-			(et_arlo_id)
+			" . $this->wpdb->prefix . "arlo_events AS e
+		ON 
+			et.et_arlo_id = e.et_arlo_id
+		AND
+			et.et_region = e.e_region
+		AND
+			e_parent_arlo_id = 0
 		LEFT JOIN 
 			" . $this->wpdb->prefix . "posts
 		ON

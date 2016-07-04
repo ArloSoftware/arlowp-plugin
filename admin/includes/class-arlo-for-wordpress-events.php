@@ -46,6 +46,7 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			'e_sessiondescription' => __( 'Description', $this->plugin_slug ),
 			'e_notice' => __( 'Notice', $this->plugin_slug ),
 			'e_session_num' => __( 'Num. of sessions', $this->plugin_slug ),
+			'e_region' => __( 'Regions', $this->plugin_slug ),
 			//'e_isonline' => __( 'Online', $this->plugin_slug ),
 		];
 	}	
@@ -71,6 +72,7 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 		switch ($column_name) {
 			case 'e_code':
 			case 'e_placesremaining':
+			case 'e_region':
 				return $item->$column_name;
 			case 'e_name':
 				$field = '<div class="arlo-event-name">' . $item->e_name . (is_numeric($item->e_placesremaining) && $item->e_placesremaining > 0 ? ' (' . $item->e_placesremaining . ')' : '') . '</div>';
@@ -183,9 +185,10 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			e.e_providerorganisation,
 			e.e_providerwebsite,
 			e.e_isonline,
+			(SELECT GROUP_CONCAT(e_region) FROM " . $this->wpdb->prefix . "arlo_events WHERE e_arlo_id = e.e_arlo_id GROUP BY e_arlo_id) AS e_region,
 			et.et_name,
-			(SELECT COUNT(1) FROM " . $this->wpdb->prefix . "arlo_events WHERE e_parent_arlo_id = e.e_arlo_id) as e_session_num,
-			GROUP_CONCAT(CONCAT_WS(' ', p.p_firstname, p.p_lastname) ORDER BY ep.p_order, p.p_firstname SEPARATOR ', ') AS presenters,
+			(SELECT COUNT(1) FROM " . $this->wpdb->prefix . "arlo_events WHERE e_parent_arlo_id = e.e_arlo_id AND e_region = e.e_region) as e_session_num,
+			GROUP_CONCAT(DISTINCT CONCAT_WS(' ', p.p_firstname, p.p_lastname) ORDER BY ep.p_order, p.p_firstname SEPARATOR ', ') AS presenters,
 			posts.guid
 		FROM
 			" . $this->table_name . "

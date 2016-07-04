@@ -44,6 +44,7 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 			'v_name' => __( 'Venue name', $this->plugin_slug ),
 			'e_summary' => __( 'Summary', $this->plugin_slug ),
 			'e_sessiondescription' => __( 'Description', $this->plugin_slug ),
+			'e_region' => __( 'Regions', $this->plugin_slug ),
 		];
 	}	
 	
@@ -69,6 +70,7 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 			case 'e_code':
 			case 'e_locationname':
 			case 'e_placesremaining':
+			case 'e_region':
 				return $item->$column_name;
 			case 'e_summary':
 			case 'e_sessiondescription':
@@ -147,7 +149,8 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 			es.e_isfull,
 			es.e_placesremaining,
 			es.e_summary,
-			es.e_sessiondescription
+			es.e_sessiondescription,
+			GROUP_CONCAT(DISTINCT es.e_region) as e_region
 		FROM
 			" . $this->table_name . "
 		LEFT JOIN 
@@ -160,6 +163,8 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 			es.v_id = v_arlo_id
 		WHERE
 			" . $where . "
+		GROUP BY 
+			es.e_arlo_id
 		";
 	}	
 	
