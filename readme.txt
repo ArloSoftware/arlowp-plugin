@@ -132,6 +132,8 @@ Regionalized plugin
 
 New region selector shortcodes [arlo_upcoming_region_selector], [arlo_template_search_region_selector], [arlo_template_region_selector]
 
+New "regionalized" option for the [arlo_suggest_templates] shortcode
+
 Fix [arlo_event_template_link] shortcode: https://github.com/ArloSoftware/arlowp-plugin/issues/117
 
 Fix when the upcoming events widget contains sessions: https://github.com/ArloSoftware/arlowp-plugin/issues/116

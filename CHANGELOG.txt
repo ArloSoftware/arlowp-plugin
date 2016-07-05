@@ -5,6 +5,7 @@ Enhancement
 
 Regionalized plugin
 New region selector shortcodes [arlo_upcoming_region_selector], [arlo_template_search_region_selector], [arlo_template_region_selector]
+New "regionalized" option for the [arlo_suggest_templates] shortcode
 
 Bugfixes
 ------------------
