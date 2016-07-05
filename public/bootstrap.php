@@ -3802,9 +3802,14 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 	if(!isset($GLOBALS['arlo_eventtemplate']) || empty($GLOBALS['arlo_eventtemplate']['et_arlo_id'])) return;
 	$return = "";
 	
-	$regions = get_option('arlo_regions');
-	$arlo_region = get_query_var('arlo-region', '');
-	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+	if (!empty($GLOBALS['arlo_eventtemplate']['et_region'])) {
+		$arlo_region = $GLOBALS['arlo_eventtemplate']['et_region'];
+	} else {
+		$regions = get_option('arlo_regions');
+		$arlo_region = get_query_var('arlo-region', '');
+		$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+	}
+
 
 	$conditions = array(
 		'template_id' => $GLOBALS['arlo_eventtemplate']['et_arlo_id'],
