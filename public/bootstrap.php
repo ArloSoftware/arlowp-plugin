@@ -1788,6 +1788,11 @@ $shortcodes->add('content_field_item', function($content='', $atts, $shortcode_n
 	
 	$active = $arlo_plugin->get_import_id();
 	
+	$regions = get_option('arlo_regions');
+	
+	$arlo_region = get_query_var('arlo-region', '');
+	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');		
+	
 	extract(shortcode_atts(array(
 		'fields'	=> 'all',
 	), $atts, $shortcode_name));
@@ -1814,6 +1819,7 @@ $shortcodes->add('content_field_item', function($content='', $atts, $shortcode_n
 		$t2
 	ON 
 		$t1.et_id = $t2.et_id
+	" . (!empty($arlo_region) ? " AND $t1.et_region = '" . $arlo_region . "'" : "" ) . "
 	WHERE 
 		$t1.et_post_name = '$post->post_name'
 		" . (is_array($where_fields) && count($where_fields) > 0 ? " AND cf_fieldname IN (" . implode(',', $where_fields) . ") " : "") . "
@@ -2605,7 +2611,7 @@ $shortcodes->add('suggest_templates', function($content='', $atts, $shortcode_na
 			RAND()
 		LIMIT 
 			$limit";
-	
+				
 	$items = $wpdb->get_results($sql, ARRAY_A);
 		
 	$output = '';
@@ -3794,7 +3800,6 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 	$regions = get_option('arlo_regions');
 	$arlo_region = get_query_var('arlo-region', '');
 	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
-	
 
 	$conditions = array(
 		'template_id' => $GLOBALS['arlo_eventtemplate']['et_arlo_id'],
