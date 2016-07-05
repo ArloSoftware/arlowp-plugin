@@ -19,7 +19,7 @@
 	<div class="<?php echo ARLO_PLUGIN_PREFIX; ?>-sections-wrap">	
 		<form action="" method="get" >
 			<input type="hidden" name="page" value="<?=$_GET['page']?>">
-<?
+<?php
 		$list->search_box( __( 'Search' ), 'arlo-search' );
 		$list->display();	
 ?>
