@@ -1749,11 +1749,15 @@ $shortcodes->add('event_template_name', function($content='', $atts, $shortcode_
 $shortcodes->add('event_template_permalink', function($content='', $atts, $shortcode_name){        
 	if(!isset($GLOBALS['arlo_eventtemplate']['et_post_name'])) return '';
 	
-	$regions = get_option('arlo_regions');
 	$region_link_suffix = '';
-	
-	$arlo_region = get_query_var('arlo-region', '');
-	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
+
+	if (!empty($GLOBALS['arlo_eventtemplate']['et_region'])) {
+		$arlo_region = $GLOBALS['arlo_eventtemplate']['et_region'];
+	} else {
+		$regions = get_option('arlo_regions');
+		$arlo_region = get_query_var('arlo-region', '');
+		$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+	}
 	
 	if (!empty($arlo_region)) {
 		$region_link_suffix = 'region-' . $arlo_region . '/';
@@ -2585,11 +2589,12 @@ $shortcodes->add('suggest_templates', function($content='', $atts, $shortcode_na
 	} 
 	
 	if (!empty($arlo_region) && $regionalized === "true") {
-		$where .= ' AND ' . $t1 . '.et_region = "' . $arlo_region . '"';
+		$where .= ' AND et.et_region = "' . $arlo_region . '"';
 	}	
 	
 	$sql = "
 		SELECT 
+			et.et_region,
 			et.et_arlo_id,
 			et.et_code,
 			et.et_name,
@@ -2611,7 +2616,7 @@ $shortcodes->add('suggest_templates', function($content='', $atts, $shortcode_na
 			RAND()
 		LIMIT 
 			$limit";
-				
+
 	$items = $wpdb->get_results($sql, ARRAY_A);
 		
 	$output = '';
@@ -2827,6 +2832,7 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 		et.et_post_name, 
 		et.et_descriptionsummary, 
 		et.et_registerinteresturi, 
+		et.et_region,
 		et.et_viewuri,
 		o.o_formattedamounttaxexclusive, 
 		o_offeramounttaxexclusive, 
@@ -3795,7 +3801,6 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_name){
 	if(!isset($GLOBALS['arlo_eventtemplate']) || empty($GLOBALS['arlo_eventtemplate']['et_arlo_id'])) return;
 	$return = "";
-	
 	
 	$regions = get_option('arlo_regions');
 	$arlo_region = get_query_var('arlo-region', '');
