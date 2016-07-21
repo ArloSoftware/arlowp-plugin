@@ -1053,7 +1053,7 @@ class Arlo_For_Wordpress {
             
             $query = $wpdb->query(
                     'INSERT INTO ' . $table_lock . ' (import_id, lock_acquired, lock_expired)
-                    SELECT ' . $import_id . ', NOW(), ADDTIME(NOW(), "00:10:00.00") FROM ' . $table_log . ' WHERE (SELECT count(1) FROM ' . $table_lock . ') = 0 LIMIT 1');
+                    SELECT ' . $import_id . ', NOW(), ADDTIME(NOW(), "00:05:00.00") FROM ' . $table_log . ' WHERE (SELECT count(1) FROM ' . $table_lock . ') = 0 LIMIT 1');
                         
             return $query !== false && $query == 1;
         }
