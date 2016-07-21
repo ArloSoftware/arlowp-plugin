@@ -393,7 +393,7 @@ function arlo_the_content($content) {
 	
 	$post_type = str_replace('arlo_', '', get_post_type($post));
 
-	if(function_exists('arlo_the_content_'.$post_type)) {
+	if(function_exists('arlo_the_content_'.$post_type) && in_the_loop()) {
 		return call_user_func_array('arlo_the_content_'.$post_type, func_get_args());
 	}
 
