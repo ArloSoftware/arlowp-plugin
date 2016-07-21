@@ -446,6 +446,14 @@ class Arlo_For_Wordpress_Settings {
 	    <h4>Version ' . $this->version . '</h4>
 	    <p>
 	    	<ul class="arlo-whatsnew-list">
+	    		<li>Important fix to solve the compatibility issue with some external plugin</li>
+	    		<li>Enhancement of the plugin update mechanism</li>
+	    		<li>Few minor bugfixes</li>
+	    	</ul>
+	    </p>
+	    <h4>Version 2.3</h4>	
+	    <p>
+	    	<ul class="arlo-whatsnew-list">
 	    		<li>Regionalized plugin, for more information, please visit our <a href="http://developer.arlo.co/doc/wordpress/settings#regions" target="_blank">documentation</a></li>
 	    		<li>New region selector shortcodes 
 	    		<a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/upcomingeventrelated#arlo_upcoming_region_selector" target="_blank">[arlo_upcoming_region_selector]</a>, 

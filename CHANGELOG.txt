@@ -2,6 +2,18 @@
 
 Enhancement
 ------------------
+Enhancement of the plugin update mechanism
+
+Bugfixes
+------------------
+
+Important fix to solve the compatibility issue with some external plugin
+Few minor bugfixes
+
+== V2.3 ==
+
+Enhancement
+------------------
 
 Regionalized plugin
 New region selector shortcodes [arlo_upcoming_region_selector], [arlo_template_search_region_selector], [arlo_template_region_selector]
