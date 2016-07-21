@@ -639,6 +639,7 @@ function arlo_add_datamodel() {
 	install_table_arlo_categories();
 	install_table_arlo_eventtemplates_categories();
 	install_table_arlo_timezones();
+
 	return;
 }
 

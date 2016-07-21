@@ -468,6 +468,8 @@ class Arlo_For_Wordpress {
 	 * @return   null
 	 */
 	public static function update($new_version, $old_version) {
+		arlo_add_datamodel();	
+	
 		if (version_compare($old_version, '2.2.1') < 0) {
 			self::run_update('2.2.1');
 		}	
