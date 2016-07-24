@@ -523,7 +523,6 @@ class Arlo_For_Wordpress_Admin {
 		}
 
 		return $default;
-
 	}
 		
 	public function settings_saved($old) {
