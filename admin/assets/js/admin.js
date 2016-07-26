@@ -53,6 +53,10 @@
 			$('#arlo-settings').attr('novalidate','novalidate');
 			$('.arlo-section').hide();
 			
+			if (ArloImmediateTaskIDs != null && ArloImmediateTaskIDs.length > 0) {
+				kickOffScheduler();
+			}
+			
 			showNavTab(tabIDs[0]);
 			
 			if (typeof tabIDs[1] !== 'undefined') {
@@ -245,6 +249,16 @@
 			arloApiClient.getResources().getEventSearchResource().searchEvents(eventSearchOptions, callback);
 			
 			
+		}
+		
+		function kickOffScheduler() {
+			var data = {
+				action: 'start_scheduler'
+			}
+				
+			jQuery.post(ajaxurl, data, function(response) {
+				console.log(response);
+			});
 		}
 		
 		//dismissible admin notices

@@ -76,7 +76,22 @@ class Scheduler {
 	}
 	
 	public function get_task_data($task_id = null) {
-		$task_id = (!empty($task_id) && is_numeric($task_id) ? $task_id : null);
+		return $this->get_tasks(0, null, $task_id, 1);
+	}
+	
+	public function get_running_tasks() {
+		return $this->get_tasks(1);
+	}
+	
+	public function get_next_immediate_tasks() {	
+		return $this->get_tasks(0, -1, null, 1);
+	}
+	
+	public function get_tasks($status = null, $priority = null, $task_id = null, $limit = null) {
+		$task_id = (isset($task_id) && is_numeric($task_id) ? $task_id : null);
+		$status = (isset($status) && is_numeric($status) ? [$status] : (is_array($status) ? $status : null));
+		$priority = (isset($priority) && is_numeric($priority) ? $priority : null);
+		$limit = (isset($limit) && is_numeric($limit) ? $limit : null);
 		
 		$sql = "
 		SELECT
@@ -87,15 +102,16 @@ class Scheduler {
 		FROM
 			{$this->table}
 		WHERE 	
-			task_status <= 2
+			1
+			".(!is_null($status) ? "AND task_status IN (" . implode(",", $status) . ")" : "") . "
+			".(!is_null($priority) ? "AND task_priority = " . $priority : "") . "
 			".(!is_null($task_id) ? "AND task_id = " . $task_id : "") . "
 		ORDER BY
 			task_priority,
 			task_created
-		LIMIT 1
-		";
-		
-		return $this->wpdb->get_results($sql);		
+		" . (!is_null($limit) ? "LIMIT " . $limit : "");
+							
+		return $this->wpdb->get_results($sql);
 	}
 	
 	public function run_task($task_id = null) {
@@ -112,8 +128,7 @@ class Scheduler {
 		if (!empty($task[0]->task_task)) {
 
 			switch ($task[0]->task_task) {
-				case 'import': 
-					$this->update_task($task[0]->task_id, 1, "Import is running");
+				case 'import':
 					if ($this->plugin->import($task[0]->task_priority == -1, $task[0]->task_id)) {
 						$this->update_task($task[0]->task_id, 3, "Import finished");
 					} else {

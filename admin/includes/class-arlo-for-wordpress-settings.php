@@ -29,47 +29,49 @@ class Arlo_For_Wordpress_Settings {
 		}					
 		
 		$settings = get_option('arlo_settings');
-		if (isset($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress' && !empty($settings['platform_name'])) {
-			$show_notice = false;
-			foreach (Arlo_For_Wordpress::$post_types as $id => $post_type) {
-				if (empty($settings['post_types'][$id]['posts_page'])) {
-					$show_notice = true;
-					break;				
+		
+		if(isset($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress') {		
+		
+			if (!empty($settings['platform_name'])) {
+				$show_notice = false;
+				foreach (Arlo_For_Wordpress::$post_types as $id => $post_type) {
+					if (empty($settings['post_types'][$id]['posts_page'])) {
+						$show_notice = true;
+						break;				
+					}
 				}
-			}
-			
-			if ($show_notice) {
-				add_action( 'admin_notices', array($plugin, "posttype_notice") );
-			}
-			
-			add_action( 'admin_notices', array($plugin, "connected_platform_notice") );
-		}
-		
-		if(isset($_GET['arlo-import'])) {
-			$scheduler = $plugin->get_scheduler();
-			$scheduler->set_task("import", -1);
-			
-			//$_SESSION['arlo-import'] = $plugin->import(true);			
-			wp_redirect( admin_url( 'admin.php?page=arlo-for-wordpress'));
-			exit;
-		}
-		                
-		if(isset($_GET['load-demo'])) {
-			$plugin->load_demo();
-			wp_redirect( admin_url( 'admin.php?page=arlo-for-wordpress'));
-			exit;
-		}		
 				
-		if(isset($_SESSION['arlo-import'])) {
-			add_action( 'admin_notices', array($plugin, "import_notice") );
-		}
+				if ($show_notice) {
+					add_action( 'admin_notices', array($plugin, "posttype_notice") );
+				}
+				
+				add_action( 'admin_notices', array($plugin, "connected_platform_notice") );
+			}
 		
-		if (!empty($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress') {
+			if (isset($_GET['arlo-import'])) {
+				$scheduler = $plugin->get_scheduler();
+				$scheduler->set_task("import", -1);
+			
+				wp_redirect( admin_url( 'admin.php?page=arlo-for-wordpress'));
+				exit;
+			}
+			
+			if (isset($_GET['load-demo'])) {
+				$plugin->load_demo();
+				wp_redirect( admin_url( 'admin.php?page=arlo-for-wordpress'));
+				exit;
+			}
+			
+			if (isset($_SESSION['arlo-import'])) {
+				add_action( 'admin_notices', array($plugin, "import_notice") );
+			}
+			
 			add_action( 'admin_notices', array($plugin, "welcome_notice") );
-		}		
-		
-		
-
+			
+			add_action( 'admin_print_scripts', array($this, "arlo_check_currnet_tasks") );			
+						
+		}
+		                 
 		/*
 		 *
 		 * General Settings
@@ -375,6 +377,36 @@ class Arlo_For_Wordpress_Settings {
 		}
 		
 		return $templates;
+	}
+	
+	function arlo_check_currnet_tasks() {
+		global $wpdb;
+		
+		$plugin = Arlo_For_Wordpress::get_instance();
+		$scheduler = $plugin->get_scheduler();
+		
+		$next_immediate_task = $scheduler->get_next_immediate_tasks();
+		$next_immediate_task_ids = [];
+		
+		$running_task = $scheduler->get_running_tasks();
+		$running_task_ids = [];
+		
+		
+		foreach ($next_immediate_task as $task) {
+			$next_immediate_task_ids[] = $task->task_id;
+		}
+		
+		foreach ($running_task as $task) {
+			$running_task_ids[] = $task->task_id;
+		}		
+		
+		echo "
+		<script type='text/javascript'>
+			var ArloImmediateTaskIDs = " . wp_json_encode($next_immediate_task_ids) . ";
+			var ArloRunningTaskIDs = " . wp_json_encode($running_task_ids) . ";
+		</script>
+		";
+		
 	}
 	                                                                                                                                                      
 	function arlo_get_blueprint($name) {

@@ -306,6 +306,8 @@ class Arlo_For_Wordpress {
 	
 		add_action( 'wp_ajax_dismissible_notice', array($this, 'dismissible_notice_callback'));
 		
+		add_action( 'wp_ajax_start_scheduler', array($this, 'start_scheduler_callback'));
+		
 		// the_post action - allows us to inject Arlo-specific data as required
 		// consider this later
 		//add_action( 'the_posts', array( $this, 'the_posts_action' ) );
@@ -1187,19 +1189,22 @@ class Arlo_For_Wordpress {
 			// lets put it all in a transaction
 			$wpdb->query('START TRANSACTION');
 			
+			$scheduler = $this->get_scheduler();
+			
 			$import_tasks = [
-			'import_timezones',
-			'import_presenters',
-			'import_event_templates',
-			'import_event_templates',
-			'import_events',
-			'import_venues',
-			'import_categories',
-			'import_cleanup',
-			'import_finish',
+				'import_timezones',
+				'import_presenters',
+				'import_event_templates',
+				'import_event_templates',
+				'import_events',
+				'import_venues',
+				'import_categories',
+				'import_cleanup',
+				'import_finish',
 			];
 			
 			foreach ($import_tasks as $i => $task) {
+				$scheduler->update_task($task_id, 1, "Import is running: task " . $i . "/" . count($import_tasks) . ": " . $task);
 				call_user_func(array('Arlo_For_Wordpress', $task), $import_id);
 			}
 			
@@ -2550,6 +2555,12 @@ class Arlo_For_Wordpress {
 	}		
 	
 	
+	public static function start_scheduler_callback() {		
+		do_action("arlo_scheduler");
+		
+		wp_die();
+	}
+	
 	public static function dismissible_notice_callback() {		
 		$user = wp_get_current_user();
 		
@@ -2559,7 +2570,7 @@ class Arlo_For_Wordpress {
 		
 		echo $_POST['id'];
 		wp_die();
-	}
+	}	
 	
 	public static function get_tag_by_id($tag_id) {
 		global $wpdb;		
