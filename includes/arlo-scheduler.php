@@ -98,7 +98,8 @@ class Scheduler {
 			task_id,
 			task_task,
 			task_status,
-			task_priority
+			task_priority,
+			task_status_text
 		FROM
 			{$this->table}
 		WHERE 	

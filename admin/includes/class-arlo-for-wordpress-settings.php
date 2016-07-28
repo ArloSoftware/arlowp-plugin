@@ -51,7 +51,6 @@ class Arlo_For_Wordpress_Settings {
 			if (isset($_GET['arlo-import'])) {
 				$scheduler = $plugin->get_scheduler();
 				$scheduler->set_task("import", -1);
-			
 				wp_redirect( admin_url( 'admin.php?page=arlo-for-wordpress'));
 				exit;
 			}
@@ -68,7 +67,7 @@ class Arlo_For_Wordpress_Settings {
 			
 			add_action( 'admin_notices', array($plugin, "welcome_notice") );
 			
-			add_action( 'admin_print_scripts', array($this, "arlo_check_currnet_tasks") );			
+			add_action( 'admin_print_scripts', array($this, "arlo_check_current_tasks") );			
 						
 		}
 		                 
@@ -379,7 +378,7 @@ class Arlo_For_Wordpress_Settings {
 		return $templates;
 	}
 	
-	function arlo_check_currnet_tasks() {
+	function arlo_check_current_tasks() {
 		global $wpdb;
 		
 		$plugin = Arlo_For_Wordpress::get_instance();

@@ -6,6 +6,7 @@
 		var pluginSlug = 'arlo-for-wordpress';
 		var editor = null;
 		var tabIDs = document.location.hash.replace('#', '').split('/');
+		var taskQueryStack = {};
 	
 		//show the selected template editor
 		var selectedTemplate = 'arlo-event';
@@ -57,6 +58,18 @@
 				kickOffScheduler();
 			}
 			
+			var ArloTasksIDs = ArloRunningTaskIDs.concat(ArloImmediateTaskIDs);
+			
+			if (ArloTasksIDs != null && ArloTasksIDs.length > 0) {
+				for(var i in ArloTasksIDs) {
+					if (ArloTasksIDs.hasOwnProperty(i)) {
+						createTaskPlaceholder(ArloTasksIDs[i]);	
+					}
+				}
+			}
+			
+			
+			
 			showNavTab(tabIDs[0]);
 			
 			if (typeof tabIDs[1] !== 'undefined') {
@@ -83,6 +96,50 @@
 		    });
 		    
 		});
+		
+		function createTaskPlaceholder(taskID) {
+			var header = $('.arlo-wrap > h2');
+			
+			var content = $("<div>").addClass("notice arlo-task").attr("id", "arlo-task-" + taskID).html("<p>Task: <span class='desc'></span></p>");
+			header.after(content);
+			getTaskInfo(taskID);
+			taskQueryStack[taskID] = setInterval(function() { getTaskInfo(taskID) }, 1500);
+		}
+		
+		function getTaskInfo(taskID) {
+			var data = {
+				action: 'arlo_get_task_info',
+				taskID: taskID
+			}
+				
+			jQuery.post(ajaxurl, data, function(response) {
+				var task = {};
+				if (response[0] != null) {
+					task = response[0];
+					if (task.task_id == taskID) {
+						var taskPlaceholder = $("#arlo-task-" + taskID);
+						
+						taskPlaceholder.find(".desc").html(task.task_status_text);
+						
+						if (task.task_status > 1) {
+							taskPlaceholder.addClass("is-dismissible");
+							
+							taskPlaceholder.addClass(task.task_status == 3 ? "notice-success" : "notice-error");
+							
+							clearInterval(taskQueryStack[taskID]);
+							
+							setTimeout(function() {
+								if (task.task_status == 3) {
+									taskPlaceholder.fadeOut(function() {
+										$(this).remove()
+									});								
+								}
+							}, 6000)
+						}
+					}
+				}
+			}, 'json');
+		}
 		
 		function showNavTab(tabID) {
 			$('.arlo-section').hide();
@@ -257,7 +314,6 @@
 			}
 				
 			jQuery.post(ajaxurl, data, function(response) {
-				console.log(response);
 			});
 		}
 		
