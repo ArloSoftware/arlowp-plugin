@@ -95,6 +95,8 @@
 		    	reNumberRegions();
 		    });
 		    
+		    getLastImportLog();
+		    
 		});
 		
 		function createTaskPlaceholder(taskID) {
@@ -110,33 +112,77 @@
 			var data = {
 				action: 'arlo_get_task_info',
 				taskID: taskID
-			}
-				
-			jQuery.post(ajaxurl, data, function(response) {
-				var task = {};
-				if (response[0] != null) {
-					task = response[0];
-					if (task.task_id == taskID) {
-						var taskPlaceholder = $("#arlo-task-" + taskID);
-						
-						taskPlaceholder.find(".desc").html(task.task_status_text);
-						
-						if (task.task_status > 1) {
-							taskPlaceholder.addClass("is-dismissible");
+			};
+			
+			jQuery.ajax({
+				url: ajaxurl,
+				data: data,
+				method: 'post',
+				dataType: 'json',
+				error: function(jqXHR) {
+					if (jqXHR.status != 200) {
+						clearInterval(taskQueryStack[taskID]);
+					}
+				}, 
+				success: function(response) {
+					var task = {};
+					if (response[0] != null) {
+						task = response[0];
+						if (task.task_id == taskID) {
+							var taskPlaceholder = $("#arlo-task-" + taskID);
 							
-							taskPlaceholder.addClass(task.task_status == 3 ? "notice-success" : "notice-error");
+							taskPlaceholder.find(".desc").html(task.task_status_text);
 							
-							clearInterval(taskQueryStack[taskID]);
-							
-							setTimeout(function() {
-								if (task.task_status == 3) {
-									taskPlaceholder.fadeOut(function() {
-										$(this).remove()
-									});								
-								}
-							}, 6000)
+							switch(task.task_status) {
+								case "1": 
+									if (task.task_task == 'import') {
+										$('.arlo-sync-button').fadeOut();
+									}																		
+								break;
+								case "2":
+								case "3":
+									if (task.task_task == 'import') {
+										$('.arlo-sync-button').fadeIn();
+										getLastImportLog(function(response) {
+											if (response.successful == 1) {
+												jQuery('.arlo-last-sync-date').fadeOut().html(response.last_import).fadeIn();
+											} else {
+												taskPlaceholder.find(".desc").after(": <span>" + response.message.replace(/\d{4,}/, '') + "</span>");
+											}
+										});
+									}
+									
+									taskPlaceholder.addClass("is-dismissible");
+									taskPlaceholder.find(".desc").after('<button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button>');
+									
+									taskPlaceholder.addClass(task.task_status == 3 ? "notice-success" : "notice-error");
+									
+									clearInterval(taskQueryStack[taskID]);
+									
+									setTimeout(function() {
+										if (task.task_status == 3) {
+											taskPlaceholder.fadeOut(function() {
+												$(this).remove()
+											});								
+										}
+									}, 10000);
+																		
+								break;
+							}							
 						}
 					}
+				}			
+			});
+		}
+		
+		function getLastImportLog(callback) {
+			var data = {
+				action: 'arlo_get_last_import_log'
+			};
+			
+			jQuery.post(ajaxurl, data, function(response) {
+				if (jQuery.isFunction(callback)) {
+					callback(response);
 				}
 			}, 'json');
 		}

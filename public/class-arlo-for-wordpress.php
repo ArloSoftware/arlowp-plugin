@@ -310,6 +310,10 @@ class Arlo_For_Wordpress {
 		
 		add_action( 'wp_ajax_arlo_get_task_info', array($this, 'arlo_get_task_info_callback'));
 		
+		add_action( 'wp_ajax_arlo_get_last_import_log', array($this, 'arlo_get_last_import_log_callback'));
+		
+		
+		
 		// the_post action - allows us to inject Arlo-specific data as required
 		// consider this later
 		//add_action( 'the_posts', array( $this, 'the_posts_action' ) );
@@ -957,13 +961,26 @@ class Arlo_For_Wordpress {
 	}
 	
 	public function cron_scheduler() {
-		ob_start();
 		try{
+			$this->clean_up_tasks();
 			$this->run_task_scheduler();
 		}catch(\Exception $e){
 			var_dump($e);
 		}
-		ob_end_clean();
+	}
+	
+	public function clean_up_tasks() {
+		$scheduler = $this->get_scheduler();
+		
+		$running_tasks = $scheduler->get_running_tasks();
+		
+		foreach ($running_tasks as $task) {
+			$ts = strtotime($task->task_modified);
+			$now = time();
+			if ($now - $ts > 8*60) {
+				$scheduler->update_task($task->task_id, 2, "Import doesn't respond within 8 minutes, stopped by the scheduler");
+			}
+		}
 	}
 
 	public function run_task_scheduler() {
@@ -1183,7 +1200,7 @@ class Arlo_For_Wordpress {
                 
         //if an import is already running, exit
         if (!$this->acquire_import_lock($import_id)) {
-            $this->add_import_log($import_id . ' Synchronization LOCK found', $timestamp, false, $utimestamp);
+            $this->add_import_log($import_id . ' Synchronization LOCK found, please wait 5 minutes and try again', $timestamp, false, $utimestamp);
             return false;
         }
                 
@@ -1193,7 +1210,6 @@ class Arlo_For_Wordpress {
 			$import_tasks = [
 				'import_timezones',
 				'import_presenters',
-				'import_event_templates',
 				'import_event_templates',
 				'import_events',
 				'import_venues',
@@ -2238,16 +2254,16 @@ class Arlo_For_Wordpress {
         $utimestamp = $now->format("Y-m-d H:i:s.u T ");
         			
         if ($this->get_import_lock_entries_number() == 1 && $this->check_import_lock($import_id)) {
-            // update logs
-            $this->add_import_log($import_id . ' Synchronization successful', $timestamp, true, $utimestamp);
-            
             //clean up the old entries
-			$this->import_cleanup($import_id);
+			$this->import_cleanup($import_id);        
+        
+            // update logs
+            $this->add_import_log($import_id . ' Synchronization successful', $timestamp, true, $utimestamp);            
 			
 	        //set import id
 	        $this->set_import_id($import_id);
         } else {
-            $this->add_import_log($import_id . ' Synchronization died because of a database LOCK', $timestamp, true, $utimestamp);
+            $this->add_import_log($import_id . ' Synchronization died because of a database LOCK, please wait 5 minutes and try again.', $timestamp, true, $utimestamp);
         }
 	}	
 	
@@ -2558,8 +2574,8 @@ class Arlo_For_Wordpress {
 		echo '
 			<div class="notice arlo-connected-message"> 
 				<p>
-					Arlo is connected to <strong>' . $settings['platform_name'] . '</strong> <span class="arlo-block">Last synchronized: ' . self::get_instance()->get_last_import() . '</span> 
-					<a class="arlo-block" href="?page=arlo-for-wordpress&arlo-import">Synchronize now</a>
+					Arlo is connected to <strong>' . $settings['platform_name'] . '</strong> <span class="arlo-block">Last synchronized: <span class="arlo-last-sync-date">' . self::get_instance()->get_last_import() . '</span></span> 
+					<a class="arlo-block arlo-sync-button" href="?page=arlo-for-wordpress&arlo-import">Synchronize now</a>
 				</p>
 			</div>
 		';
@@ -2586,6 +2602,34 @@ class Arlo_For_Wordpress {
 		
 		wp_die();
 	}
+	
+	public static function arlo_get_last_import_log_callback() {
+		global $wpdb;
+		$plugin = Arlo_For_Wordpress::get_instance();
+		
+		$sql = "
+		SELECT
+			message,
+			created,
+			successful
+		FROM
+			{$wpdb->prefix}arlo_import_log
+		ORDER BY
+			id DESC
+		LIMIT 
+			1
+		";
+		
+		$log = $wpdb->get_results($sql, ARRAY_A);
+		
+		if (count($log)) {
+			$log[0]['last_import'] = $plugin->get_last_import();
+			echo wp_json_encode($log[0]);
+		}
+		
+		wp_die();
+	}
+	
 	
 	public static function arlo_get_task_info_callback() {
 		$task_id = intval($_POST['taskID']);
