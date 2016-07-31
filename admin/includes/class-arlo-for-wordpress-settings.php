@@ -60,15 +60,10 @@ class Arlo_For_Wordpress_Settings {
 				wp_redirect( admin_url( 'admin.php?page=arlo-for-wordpress'));
 				exit;
 			}
-			
-			if (isset($_SESSION['arlo-import'])) {
-				add_action( 'admin_notices', array($plugin, "import_notice") );
-			}
-			
+						
 			add_action( 'admin_notices', array($plugin, "welcome_notice") );
 			
 			add_action( 'admin_print_scripts', array($this, "arlo_check_current_tasks") );			
-						
 		}
 		                 
 		/*

@@ -1138,17 +1138,6 @@ function install_table_arlo_import_log() {
 }
 
 /**
- * arlo_import_from_api function.
- * 
- * @access public
- * @return void
- */
-function arlo_import_from_api() {
-	$plugin = Arlo_For_Wordpress::get_instance();
-	$plugin->import();
-}
-
-/**
  * arlo_get_post_by_name function.
  * 
  * @access public

@@ -531,7 +531,8 @@ class Arlo_For_Wordpress_Admin {
 	
 		if($old['platform_name'] != $new['platform_name'] && !empty($new['platform_name'])) {
 			$plugin = Arlo_For_Wordpress::get_instance();
-			$_SESSION['arlo-import'] = $plugin->import(true);
+			$scheduler = $plugin->get_scheduler();
+			$scheduler->set_task("import", -1);
 		} else if (empty($new['platform_name'])) {
 			$notice_id = Arlo_For_Wordpress::$dismissible_notices['welcome'];
 			$user = wp_get_current_user();

@@ -1038,121 +1038,120 @@ class Arlo_For_Wordpress {
 		
 		$_SESSION['arlo-demo'] = $error;
 		
-		$_SESSION['arlo-import'] = $this->import(true);
+		$scheduler = $this->get_scheduler();
+		$scheduler->set_task("import", -1);
 	}
         
-        public function GUIDv4 ($trim = true) {
-            // Windows
-            if (function_exists('com_create_guid') === true) {
-                if ($trim === true)
-                    return trim(com_create_guid(), '{}');
-                else
-                    return com_create_guid();
-            }
+    public function GUIDv4 ($trim = true) {
+        // Windows
+        if (function_exists('com_create_guid') === true) {
+            if ($trim === true)
+                return trim(com_create_guid(), '{}');
+            else
+                return com_create_guid();
+        }
 
-            // OSX/Linux
-            if (function_exists('openssl_random_pseudo_bytes') === true) {
-                $data = openssl_random_pseudo_bytes(16);
-                $data[6] = chr(ord($data[6]) & 0x0f | 0x40);    // set version to 0100
-                $data[8] = chr(ord($data[8]) & 0x3f | 0x80);    // set bits 6-7 to 10
-                return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
-            }
+        // OSX/Linux
+        if (function_exists('openssl_random_pseudo_bytes') === true) {
+            $data = openssl_random_pseudo_bytes(16);
+            $data[6] = chr(ord($data[6]) & 0x0f | 0x40);    // set version to 0100
+            $data[8] = chr(ord($data[8]) & 0x3f | 0x80);    // set bits 6-7 to 10
+            return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
         }
+    }
+    
+    public function get_random_int() {
+        $guid = explode("-", $this->GUIDv4());
         
-        public function get_random_int() {
-            $guid = explode("-", $this->GUIDv4());
-            
-            return hexdec($guid[0]);
-        }
+        return hexdec($guid[0]);
+    }
+    
+    public function clear_import_lock() {
+        global $wpdb;
+        $table_name = "{$wpdb->prefix}arlo_import_lock";
+      
+        $query = $wpdb->query(
+            'DELETE FROM  
+                ' . $table_name
+        );
+    }     
+    
+    public function get_import_lock_entries_number() {
+        global $wpdb;
+        $table_name = "{$wpdb->prefix}arlo_import_lock";
         
-        public function clear_import_lock() {
-            global $wpdb;
-            $table_name = "{$wpdb->prefix}arlo_import_lock";
-          
-            $query = $wpdb->query(
-                'DELETE FROM  
-                    ' . $table_name
-            );
-        }     
-        
-        public function get_import_lock_entries_number() {
-            global $wpdb;
-            $table_name = "{$wpdb->prefix}arlo_import_lock";
-            
-            $sql = '
-                    SELECT 
-                        lock_acquired
-                    FROM
-                        ' . $table_name . '
-                    WHERE
-                        lock_expired > NOW()';
-		               
-            $wpdb->get_results($sql);
-            
-            return $wpdb->num_rows;
-        }
-        
-        public function cleanup_import_lock() {
-            global $wpdb;
-            $table_name = "{$wpdb->prefix}arlo_import_lock";
-          
-            $wpdb->query(
-                'DELETE FROM  
+        $sql = '
+                SELECT 
+                    lock_acquired
+                FROM
                     ' . $table_name . '
-                WHERE 
-                    lock_expired < NOW()
-                '
-            );
-        }
+                WHERE
+                    lock_expired > NOW()';
+	               
+        $wpdb->get_results($sql);
         
-        public function add_import_lock($import_id) {
-            global $wpdb;
-            
-            $table_lock = "{$wpdb->prefix}arlo_import_lock";
-            $table_log = "{$wpdb->prefix}arlo_import_log";
-            
-            $query = $wpdb->query(
-                    'INSERT INTO ' . $table_lock . ' (import_id, lock_acquired, lock_expired)
-                    SELECT ' . $import_id . ', NOW(), ADDTIME(NOW(), "00:05:00.00") FROM ' . $table_log . ' WHERE (SELECT count(1) FROM ' . $table_lock . ') = 0 LIMIT 1');
-                        
-            return $query !== false && $query == 1;
-        }
+        return $wpdb->num_rows;
+    }
+    
+    public function cleanup_import_lock() {
+        global $wpdb;
+        $table_name = "{$wpdb->prefix}arlo_import_lock";
+      
+        $wpdb->query(
+            'DELETE FROM  
+                ' . $table_name . '
+            WHERE 
+                lock_expired < NOW()
+            '
+        );
+    }
+    
+    public function add_import_lock($import_id) {
+        global $wpdb;
         
-        public function acquire_import_lock($import_id) {
-                if ($this->get_import_lock_entries_number() == 0) {
-                    $this->cleanup_import_lock();
-                    if ($this->add_import_lock($import_id)) {
-                        return true;
-                    }
-                }
-                
-                return false;
-        }
+        $table_lock = "{$wpdb->prefix}arlo_import_lock";
+        $table_log = "{$wpdb->prefix}arlo_import_log";
         
-        public function check_import_lock($import_id) {
-            global $wpdb;
-            	$table_name = "{$wpdb->prefix}arlo_import_lock";
-                
-                $sql = '
-                    SELECT 
-                        lock_acquired
-                    FROM
-                        ' . $table_name . '
-                    WHERE
-                        import_id = ' . $import_id . '
-                    AND    
-                        lock_expired > NOW()';
-		               
-                $wpdb->get_results($sql);
-                
-                if ($wpdb->num_rows == 1) {
+        $query = $wpdb->query(
+                'INSERT INTO ' . $table_lock . ' (import_id, lock_acquired, lock_expired)
+                SELECT ' . $import_id . ', NOW(), ADDTIME(NOW(), "00:05:00.00") FROM ' . $table_log . ' WHERE (SELECT count(1) FROM ' . $table_lock . ') = 0 LIMIT 1');
+                    
+        return $query !== false && $query == 1;
+    }
+    
+    public function acquire_import_lock($import_id) {
+            if ($this->get_import_lock_entries_number() == 0) {
+                $this->cleanup_import_lock();
+                if ($this->add_import_lock($import_id)) {
                     return true;
                 }
+            }
             
-                return false;
-        }
+            return false;
+    }
+    
+    public function check_import_lock($import_id) {
+        global $wpdb;
+        	$table_name = "{$wpdb->prefix}arlo_import_lock";
+            
+            $sql = '
+                SELECT 
+                    lock_acquired
+                FROM
+                    ' . $table_name . '
+                WHERE
+                    import_id = ' . $import_id . '
+                AND    
+                    lock_expired > NOW()';
+	               
+            $wpdb->get_results($sql);
+            
+            if ($wpdb->num_rows == 1) {
+                return true;
+            }
         
-        
+            return false;
+    }
         
         	
 	public function import($force = false, $task_id = 0) {
@@ -2340,23 +2339,7 @@ class Arlo_For_Wordpress {
 		wp_redirect( $location, 301 );
 		exit;
 	}
-	
-	public static function import_notice() {
-		$import = self::get_instance()->get_import_log();
 		
-		if (strpos($import[0]->message, "404") !== false ) {
-			$import[0]->message = __('The provided platform name does not exist.', self::get_instance()->plugin_slug);
-		}
-		
-		echo '
-		<div class="' . ($import[0]->successful !== "1" ? "error" : "updated") . ' notice">
-        	<p>' . preg_replace('#^\d+#', '', $import[0]->message) . '</p>
-	    </div>
-		';
-		
-		unset($_SESSION['arlo-import']);
-	}	
-	
 	public static function load_demo_notice($error = []) {
 		global $wpdb;
 		$settings = get_option('arlo_settings');
@@ -2378,7 +2361,7 @@ class Arlo_For_Wordpress {
 		        	<button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button>
 			 	</div>';
 		} else {
-			if ($meta !== '0') {	
+			if ($meta !== '0') {
 				$import = self::get_instance()->get_import_log();
 				
 				if (!empty($settings['platform_name']) && $events !== false && $upcoming !== false && $presenters !== false && $venues !== false) {		
@@ -2407,6 +2390,12 @@ class Arlo_For_Wordpress {
 					";
 
 					$event = $wpdb->get_results($sql, ARRAY_A);
+					$event_link = '';
+					if (count($event)) {
+						$event_link = sprintf('<a href="%s" target="_blank">%s</a>,',
+						get_post_permalink($event[0]['ID']),
+						__('Event', self::get_instance()->plugin_slug));
+					}					
 					
 					//Get the first presenter
 					$sql = "
@@ -2426,6 +2415,12 @@ class Arlo_For_Wordpress {
 						1
 					";
 					$presenter = $wpdb->get_results($sql, ARRAY_A);		
+					$presenter_link = '';
+					if (count($event)) {
+						$presenter_link = sprintf('<a href="%s" target="_blank">%s</a>,',
+						get_post_permalink($presenter[0]['ID']),
+						__('Presenter profile', self::get_instance()->plugin_slug));
+					}					
 					
 					//Get the first venue
 					$sql = "
@@ -2444,23 +2439,27 @@ class Arlo_For_Wordpress {
 					LIMIT 
 						1
 					";
-					$venue = $wpdb->get_results($sql, ARRAY_A);		
+					$venue = $wpdb->get_results($sql, ARRAY_A);							
+					$venue_link = '';
+					if (count($event)) {
+						$venue_link = sprintf('<a href="%s" target="_blank">%s</a>,',
+						get_post_permalink($venue[0]['ID']),
+						__('Venue information', self::get_instance()->plugin_slug));
+					}					
+					
 					
 					$message = '<h3>' . __('Start editing your new pages', self::get_instance()->plugin_slug) . '</h3><p>'.
-					
-					sprintf(__('View <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a> or <a href="%s" target="_blank">%s</a> pages', self::get_instance()->plugin_slug), 
-						get_post_permalink($event[0]['ID']),
-						__('Event', self::get_instance()->plugin_slug),
+											
+					sprintf(__('View %s <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, %s <a href="%s" target="_blank">%s</a> %s or <a href="%s" target="_blank">%s</a> pages', self::get_instance()->plugin_slug), 
+						$event_link,
 						$events->guid, 
 						__('Catalogue', self::get_instance()->plugin_slug), 
 						$upcoming->guid,  
 						$upcoming->post_title,
-						get_post_permalink($presenter[0]['ID']),
-						__('Presenter profile', self::get_instance()->plugin_slug), 
+						$presenter_link,
 						$presenters->guid, 
-						__('Presenters list', self::get_instance()->plugin_slug), 
-						get_post_permalink($venue[0]['ID']),
-						__('Venue information', self::get_instance()->plugin_slug), 					
+						__('Presenters list', self::get_instance()->plugin_slug), 						
+						$venue_link,
 						$venues->guid,  
 						__('Venues list', self::get_instance()->plugin_slug)
 					) . '</p><p>' . __('Edit the page <a href="#pages" class="arlo-pages-setup">templates</a> for each of these websites pages below.') . '</p>';
@@ -2623,7 +2622,12 @@ class Arlo_For_Wordpress {
 		$log = $wpdb->get_results($sql, ARRAY_A);
 		
 		if (count($log)) {
+			if (strpos($log[0]['message'], "Error code 404") !== false ) {
+				$log[0]['message'] = __('The provided platform name does not exist.', self::get_instance()->plugin_slug);
+			}
+				
 			$log[0]['last_import'] = $plugin->get_last_import();
+			
 			echo wp_json_encode($log[0]);
 		}
 		

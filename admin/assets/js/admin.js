@@ -359,8 +359,7 @@
 				action: 'start_scheduler'
 			}
 				
-			jQuery.post(ajaxurl, data, function(response) {
-			});
+			jQuery.post(ajaxurl, data);
 		}
 		
 		//dismissible admin notices
@@ -372,8 +371,7 @@
 					id: id
 				}
 				
-				jQuery.post(ajaxurl, data, function(response) {
-				});
+				jQuery.post(ajaxurl, data);
 			}
 		})		
 		
