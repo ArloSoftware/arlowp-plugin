@@ -6,6 +6,7 @@ class Scheduler {
 	
 	private $max_simultaneous_task = 1;
 	private $table = '';
+	private $table_data = '';
 	private $wpdb;
 	
 	public function __construct($plugin) {
@@ -13,6 +14,7 @@ class Scheduler {
 		
 		$this->wpdb = &$wpdb; 		
 		$this->table = $this->wpdb->prefix . 'arlo_async_tasks';
+		$this->tabledata = $this->wpdb->prefix . 'arlo_async_task_data';
 		$this->plugin = $plugin;
 	}
 
@@ -67,6 +69,29 @@ class Scheduler {
 		$query = $this->wpdb->query($this->wpdb->prepare($sql, $task_status, $task_status_text, $task_id));
 	}	
 	
+	public function update_task_data($task_id, $data = array(), $overwrite_data = false) {	
+		if (!$overwrite_data) {
+			$task = $this->get_task_data($task_id);
+			
+			$task_data = (!empty($task[0]->task_data_text) ? json_decode($task[0]->task_data_text, true) : [] ) ;
+			$data = array_merge($task_data, $data);
+		}
+	
+		$data = json_encode($data);
+	
+		$sql = "
+		INSERT INTO 	
+			{$this->tabledata}
+		SET
+			data_task_id = %d,
+			data_text = '%s'
+		ON DUPLICATE KEY UPDATE 
+			data_text = '%s'
+		";
+				
+		$query = $this->wpdb->query($this->wpdb->prepare($sql, $task_id, $data, $data));		
+	}
+	
 	public function check_empty_slot_for_task() {
 		return $this->max_simultaneous_task > $this->get_running_tasks_count;
 	}
@@ -76,7 +101,7 @@ class Scheduler {
 	}
 	
 	public function get_task_data($task_id = null) {
-		return $this->get_tasks(0, null, $task_id, 1);
+		return $this->get_tasks(null, null, $task_id, 1);
 	}
 	
 	public function get_running_tasks() {
@@ -99,9 +124,14 @@ class Scheduler {
 			task_task,
 			task_status,
 			task_priority,
-			task_status_text
+			task_status_text,
+			data_text AS task_data_text
 		FROM
 			{$this->table}
+		LEFT JOIN 
+			{$this->tabledata}
+		ON
+			data_task_id = task_id
 		WHERE 	
 			1
 			".(!is_null($status) ? "AND task_status IN (" . implode(",", $status) . ")" : "") . "
@@ -111,7 +141,7 @@ class Scheduler {
 			task_priority,
 			task_created
 		" . (!is_null($limit) ? "LIMIT " . $limit : "");
-							
+		
 		return $this->wpdb->get_results($sql);
 	}
 	
@@ -130,9 +160,7 @@ class Scheduler {
 
 			switch ($task[0]->task_task) {
 				case 'import':
-					if ($this->plugin->import($task[0]->task_priority == -1, $task[0]->task_id)) {
-						$this->update_task($task[0]->task_id, 3, "Import finished");
-					} else {
+					if (!$this->plugin->import($task[0]->task_priority == -1, $task[0]->task_id)) {
 						$this->update_task($task[0]->task_id, 2, "Import failed");
 					}
 					
