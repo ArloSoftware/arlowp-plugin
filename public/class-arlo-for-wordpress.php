@@ -961,6 +961,8 @@ class Arlo_For_Wordpress {
 	
 	public function cron_scheduler() {
 		try{
+			//necessary to avoid multiple scripts running on a forced import.
+			sleep(2);
 			$this->clean_up_tasks();
 			$this->run_task_scheduler();
 		}catch(\Exception $e){
@@ -976,6 +978,8 @@ class Arlo_For_Wordpress {
 		foreach ($running_tasks as $task) {
 			$ts = strtotime($task->task_modified);
 			$now = time();
+			
+			throw new Exception('asdasd ' . $now . ' ' . $ts . ' ' . $now - $ts);
 			if ($now - $ts > 8*60) {
 				$scheduler->update_task($task->task_id, 2, "Import doesn't respond within 8 minutes, stopped by the scheduler");
 			}
@@ -1080,12 +1084,13 @@ class Arlo_For_Wordpress {
         $table_name = "{$wpdb->prefix}arlo_import_lock";
         
         $sql = '
-                SELECT 
-                    lock_acquired
-                FROM
-                    ' . $table_name . '
-                WHERE
-                    lock_expired > NOW()';
+            SELECT 
+                lock_acquired
+            FROM
+                ' . $table_name . '
+            WHERE
+                lock_expired > NOW()
+            ';
 	               
         $wpdb->get_results($sql);
         
@@ -1119,75 +1124,94 @@ class Arlo_For_Wordpress {
     }
     
     public function acquire_import_lock($import_id) {
-            if ($this->get_import_lock_entries_number() == 0) {
-                $this->cleanup_import_lock();
-                if ($this->add_import_lock($import_id)) {
-                    return true;
-                }
+    	$lock_entries_num = $this->get_import_lock_entries_number();
+        if ($lock_entries_num == 0) {
+            $this->cleanup_import_lock();
+            if ($this->add_import_lock($import_id)) {
+                return true;
             }
-            
-            return false;
+        } else if ($lock_entries_num == 1) {
+        	return $this->check_import_lock($import_id);
+        }
+        
+        return false;
     }
     
     public function check_import_lock($import_id) {
         global $wpdb;
-        	$table_name = "{$wpdb->prefix}arlo_import_lock";
-            
-            $sql = '
-                SELECT 
-                    lock_acquired
-                FROM
-                    ' . $table_name . '
-                WHERE
-                    import_id = ' . $import_id . '
-                AND    
-                    lock_expired > NOW()';
-	               
-            $wpdb->get_results($sql);
-            
-            if ($wpdb->num_rows == 1) {
-                return true;
-            }
+    	$table_name = "{$wpdb->prefix}arlo_import_lock";
         
-            return false;
+        $sql = '
+            SELECT 
+                lock_acquired
+            FROM
+                ' . $table_name . '
+            WHERE
+                import_id = ' . $import_id . '
+            AND    
+                lock_expired > NOW()';
+               
+        $wpdb->get_results($sql);
+        
+        if ($wpdb->num_rows == 1) {
+            return true;
+        }
+    
+        return false;
     }
         
         	
 	public function import($force = false, $task_id = 0) {
 		global $wpdb;
-            
-		// check for last sucessful import. Continue if imported mor than an hour ago or forced. Otherwise, return.
-		$now = DateTime::createFromFormat('U.u', microtime(true));
-        $timestamp = $now->format("Y-m-d H:i:s");
-        $utimestamp = $now->format("Y-m-d H:i:s.u T ");
-		$last = $this->get_last_import();
-        $import_id = $this->get_random_int();
-                        
-        $this->add_import_log($import_id . ' Synchronization Started: ' . $utimestamp, $timestamp, false);
+		$task_id = intval($task_id);
+		$scheduler = $this->get_scheduler();
 		
-		set_time_limit(300);
-		
-		// MV: Untangled the if statements. 
-		// If not forced
-		if(!$force) {
-			// LOG THIS AS AN AUTOMATIC IMPORT
-			$this->add_import_log($import_id . ' Synchronization identified as automatic synchronization.', $timestamp, false);
-			if(!empty($last)) {
-				// LOG THAT A PREVIOUS SUCCESSFUL IMPORT HAS BEEN FOUND
-				$this->add_import_log($import_id . ' Previous succesful synchronization found.', $timestamp, false);
-				if(strtotime('-1 hour') > strtotime($last)) {
-					// LOG THE FACT THAT PREVIOUS SUCCESSFUL IMPORT IS MORE THAN AN HOUR AGO
-					$this->add_import_log($import_id . ' Synchronization more than an hour old. Synchronization required.', $timestamp, false);
-				}
-				else {
-					// LOG THE FACT THAT PREVIOUS SUCCESSFUL IMPORT IS MORE THAN AN HOUR AGO
-					$this->add_import_log($import_id . ' Synchronization less than an hour old. Synchronization stopped.', $timestamp, false);
-					// LOG DATA USED TO DECIDE IMPORT NOT REQUIRED.
-					$this->add_import_log($last . '-'  . strtotime($last) . '-' . strtotime('-1 hour') . '-'  . !$force, $timestamp, false);
+		if ($task_id > 0) {
+			$task = $scheduler->get_task_data($task_id);
+			
+			if (empty($task['task_data_text'])) {
+				// check for last sucessful import. Continue if imported mor than an hour ago or forced. Otherwise, return.
+				$now = DateTime::createFromFormat('U.u', microtime(true));
+		        $timestamp = $now->format("Y-m-d H:i:s");
+		        $utimestamp = $now->format("Y-m-d H:i:s.u T ");
+				$last = $this->get_last_import();
+		        $import_id = $this->get_random_int();
+		                        
+		        $this->add_import_log($import_id . ' Synchronization Started: ' . $utimestamp, $timestamp, false);
+		        
+		        $scheduler->update_task_data($task_id, ['import_id' => $import_id]);
+								
+				// MV: Untangled the if statements. 
+				// If not forced
+				if(!$force) {
+					// LOG THIS AS AN AUTOMATIC IMPORT
+					$this->add_import_log($import_id . ' Synchronization identified as automatic synchronization.', $timestamp, false);
+					if(!empty($last)) {
+						// LOG THAT A PREVIOUS SUCCESSFUL IMPORT HAS BEEN FOUND
+						$this->add_import_log($import_id . ' Previous succesful synchronization found.', $timestamp, false);
+						if(strtotime('-1 hour') > strtotime($last)) {
+							// LOG THE FACT THAT PREVIOUS SUCCESSFUL IMPORT IS MORE THAN AN HOUR AGO
+							$this->add_import_log($import_id . ' Synchronization more than an hour old. Synchronization required.', $timestamp, false);
+						}
+						else {
+							// LOG THE FACT THAT PREVIOUS SUCCESSFUL IMPORT IS MORE THAN AN HOUR AGO
+							$this->add_import_log($import_id . ' Synchronization less than an hour old. Synchronization stopped.', $timestamp, false);
+							// LOG DATA USED TO DECIDE IMPORT NOT REQUIRED.
+							$this->add_import_log($last . '-'  . strtotime($last) . '-' . strtotime('-1 hour') . '-'  . !$force, $timestamp, false);
+							return false;
+						}
+					}
+				} 				
+			} else {
+				$task['task_data_text'] = json_decode($task['task_data_text']);
+				if (empty($task['task_data_text']->import_id)) {
 					return false;
+				} else {
+					$import_id = $task['task_data_text']->import_id;
 				}
+				
 			}
-		}              
+		}
 	
 		// excessive, but some servers are slow...
 		ini_set('max_execution_time', 3000);
@@ -1203,8 +1227,9 @@ class Arlo_For_Wordpress {
         }
                 
 		try {			
-			$scheduler = $this->get_scheduler();
 			
+			$current_subtask = ((!empty($task['task_data_text']) && !empty($task['task_data_text']->finished_subtask)) ? intval($task['task_data_text']->finished_subtask) + 1 : 0 );
+						
 			$import_tasks = [
 				'import_timezones',
 				'import_presenters',
@@ -1215,11 +1240,22 @@ class Arlo_For_Wordpress {
 				'import_finish',
 			];
 			
-			foreach ($import_tasks as $i => $task) {
-				$scheduler->update_task($task_id, 1, "Import is running: task " . $i . "/" . count($import_tasks) . ": " . $task);
+			$task = $import_tasks[$current_subtask];
+			
+			if (!empty($task)) {
+				$scheduler->update_task($task_id, 1, "Import is running: task " . $current_subtask . "/" . count($import_tasks) . ": " . $task);
 				call_user_func(array('Arlo_For_Wordpress', $task), $import_id);
-				echo $i;
-			}
+				$scheduler-> update_task_data($task_id, ['finished_subtask' => $current_subtask]);
+				
+				//kick off next
+				if ($current_subtask == count($import_tasks)) {
+					//finish task
+					$this->update_task($task_id, 3, "Import finished");				
+				} else {
+					wp_schedule_single_event(time(), 'arlo_scheduler');
+				}
+				
+			}			
 		} catch(\Exception $e) {
 			$wpdb->query('ROLLBACK');	
 			

@@ -686,6 +686,16 @@ function install_table_arlo_async_tasks() {
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
     dbDelta($sql);
+    
+    $sql = "
+	  CREATE TABLE " . $wpdb->prefix . "arlo_async_tasks (
+	  data_task_id int(11) NOT NULL,
+	  data_text text NOT NULL,
+	  PRIMARY KEY  (data_task_id)
+	) CHARSET=utf8;  
+    ";
+    
+    dbDelta($sql);
 }
 
 /**
