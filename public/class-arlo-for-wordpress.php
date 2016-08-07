@@ -965,8 +965,6 @@ class Arlo_For_Wordpress {
         
 		$url = get_site_url() . '/wp-cron.php?doing_wp_cron=1';        
 	
-		$this->add_import_log($url, $timestamp, false);
-		
 		$ch = curl_init($url);
 
 		curl_setopt($ch, CURLOPT_TIMEOUT, 5);  
@@ -1231,16 +1229,16 @@ class Arlo_For_Wordpress {
 					}
 				} 				
 			} else {
+
 				$task->task_data_text = json_decode($task->task_data_text);
 				if (empty($task->task_data_text->import_id)) {
 					return false;
 				} else {
 					$import_id = $task->task_data_text->import_id;
-				}
-				
+				}				
 			}
 		}
-			
+
 		// excessive, but some servers are slow...
 		ini_set('max_execution_time', 3000);
 		set_time_limit(3000);
@@ -1257,7 +1255,6 @@ class Arlo_For_Wordpress {
 		try {			
 			
 			$current_subtask = ((!empty($task->task_data_text) && isset($task->task_data_text->finished_subtask)) ? intval($task->task_data_text->finished_subtask) + 1 : 0 );
-									
 			$import_tasks = [
 				'import_timezones',
 				'import_presenters',
@@ -1270,11 +1267,7 @@ class Arlo_For_Wordpress {
 			
 			$task = $import_tasks[$current_subtask];
 			
-			$this->add_import_log("schedule another 111", $timestamp, false);
-			
 			if (!empty($task)) {
-			
-				$this->add_import_log("schedule another 222", $timestamp, false);
 			
 				$scheduler->update_task($task_id, 1, "Import is running: task " . ($current_subtask + 1) . "/" . count($import_tasks) . ": " . $task);
 				call_user_func(array('Arlo_For_Wordpress', $task), $import_id);
@@ -1286,12 +1279,10 @@ class Arlo_For_Wordpress {
 				} else {
 					//kick off next
 					$scheduler->update_task($task_id, 1);
-					$this->add_import_log("schedule another", $timestamp, false);
 					
 					wp_schedule_single_event(time(), 'arlo_scheduler', ['fake_data' => mt_rand(1000,9999)]);
 					sleep(2);
 					$this->call_wp_cron();
-					$this->add_import_log("schedule another 444444", $timestamp, false);
 				}
 			} else {
 				$scheduler->update_task($task_id, 4, "Import finished");

@@ -76,8 +76,7 @@ class Scheduler {
 			
 			$task_data = (!empty($task[0]->task_data_text) ? json_decode($task[0]->task_data_text, true) : [] ) ;
 			$data = array_merge($task_data, $data);
-		}
-		
+		}		
 		$data = json_encode($data);
 	
 		$sql = "
@@ -89,7 +88,6 @@ class Scheduler {
 		ON DUPLICATE KEY UPDATE 
 			data_text = '%s'
 		";
-		
 		$query = $this->wpdb->query($this->wpdb->prepare($sql, $task_id, $data, $data));		
 	}
 	

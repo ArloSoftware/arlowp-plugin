@@ -688,7 +688,7 @@ function install_table_arlo_async_tasks() {
     dbDelta($sql);
     
     $sql = "
-	  CREATE TABLE " . $wpdb->prefix . "arlo_async_tasks (
+	  CREATE TABLE " . $wpdb->prefix . "arlo_async_task_data (
 	  data_task_id int(11) NOT NULL,
 	  data_text text NOT NULL,
 	  PRIMARY KEY  (data_task_id)
