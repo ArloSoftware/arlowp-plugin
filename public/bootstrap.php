@@ -674,7 +674,7 @@ function install_table_arlo_async_tasks() {
 	  task_id INT(11) NOT NULL AUTO_INCREMENT,
 	  task_priority TINYINT(4) NOT NULL DEFAULT '0',
 	  task_task VARCHAR(255) DEFAULT NULL,
-	  task_status TINYINT(4) NOT NULL DEFAULT '0' COMMENT '0:scheduled, 1:in_progress, 2:failed, 3: completed',
+	  task_status TINYINT(4) NOT NULL DEFAULT '0' COMMENT '0:scheduled, 1:paused, 2:in_progress, 3: failed, 4: completed',
 	  task_status_text VARCHAR(255) DEFAULT NULL,
 	  task_created TIMESTAMP NULL DEFAULT NULL,
 	  task_modified TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,

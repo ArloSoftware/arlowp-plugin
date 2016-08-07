@@ -19,21 +19,19 @@ class Scheduler {
 	}
 
 	
-	private function get_running_tasks_count() {
-		global $wpdb;
-		
+	private function get_running_tasks_count() {		
 		$sql = "
 		SELECT 
-			1
+			COUNT(1) AS num
 		FROM
 			{$this->table}
 		WHERE
 			task_status = 2
 		";
 		
-		 $result = $this->wpdb->get_results($sql); 
-		
-		return $this->wpdb->num_rows($sql);
+		$result = $this->wpdb->get_results($sql); 
+				
+		return $result[0]->num;
 	}
 	
 	public function set_task($task = '', $priority = 0) {
@@ -55,18 +53,21 @@ class Scheduler {
 		}
 	}	
 	
-	public function update_task($task_id = 0, $task_status = 0, $task_status_text = '') {
+	public function update_task($task_id = 0, $task_status = null, $task_status_text = '') {
+		$task_status = (is_null($task_status) ? 'task_status' : intval($task_status));
+		$task_status_text = (empty($task_status_text) ? 'task_status_text' : "'" . $this->wpdb->_real_escape($task_status_text) . "'");
+	
 		$sql = "
 		UPDATE 	
 			{$this->table}
 		SET
-			task_status = %d,
-			task_status_text = '%s'
+			task_status = {$task_status},
+			task_status_text = {$task_status_text}
 		WHERE
-			task_id = %d
+			task_id = " . (intval($task_id)) . "
 		";
-
-		$query = $this->wpdb->query($this->wpdb->prepare($sql, $task_status, $task_status_text, $task_id));
+		
+		$query = $this->wpdb->query($sql);		
 	}	
 	
 	public function update_task_data($task_id, $data = array(), $overwrite_data = false) {	
@@ -76,11 +77,11 @@ class Scheduler {
 			$task_data = (!empty($task[0]->task_data_text) ? json_decode($task[0]->task_data_text, true) : [] ) ;
 			$data = array_merge($task_data, $data);
 		}
-	
+		
 		$data = json_encode($data);
 	
 		$sql = "
-		INSERT INTO 	
+		INSERT INTO
 			{$this->tabledata}
 		SET
 			data_task_id = %d,
@@ -88,16 +89,24 @@ class Scheduler {
 		ON DUPLICATE KEY UPDATE 
 			data_text = '%s'
 		";
-				
+		
 		$query = $this->wpdb->query($this->wpdb->prepare($sql, $task_id, $data, $data));		
 	}
 	
 	public function check_empty_slot_for_task() {
-		return $this->max_simultaneous_task > $this->get_running_tasks_count;
+		return $this->max_simultaneous_task > $this->get_running_tasks_count();
 	}
 	
-	public function get_next_task() {		
-		return $this->get_task_data(); 
+	public function get_next_task() {
+		$task = $this->get_next_paused_tasks();
+		if (empty($task)) {
+			$task = $this->get_next_immediate_tasks();
+			if (empty($task)) {
+				$task = $this->get_tasks(0, 0, null, 1);
+			}
+		}
+		
+		return $task;
 	}
 	
 	public function get_task_data($task_id = null) {
@@ -105,11 +114,20 @@ class Scheduler {
 	}
 	
 	public function get_running_tasks() {
+		return $this->get_tasks(2);
+	}
+	
+	public function get_paused_tasks() {
 		return $this->get_tasks(1);
 	}
+
 	
 	public function get_next_immediate_tasks() {	
 		return $this->get_tasks(0, -1, null, 1);
+	}
+	
+	public function get_next_paused_tasks() {	
+		return $this->get_tasks(1, null, null, 1);
 	}
 	
 	public function get_tasks($status = null, $priority = null, $task_id = null, $limit = null) {
@@ -150,7 +168,7 @@ class Scheduler {
 		
 		if ($this->check_empty_slot_for_task()) {
 			$task = !is_null($task_id) ? $this->get_task_data($task_id) : $this->get_next_task();
-
+			
 			$this->process_task($task);
 		}
 	}
@@ -161,7 +179,7 @@ class Scheduler {
 			switch ($task[0]->task_task) {
 				case 'import':
 					if (!$this->plugin->import($task[0]->task_priority == -1, $task[0]->task_id)) {
-						$this->update_task($task[0]->task_id, 2, "Import failed");
+						$this->update_task($task[0]->task_id, 3, "Import failed");
 					}
 					
 				break;

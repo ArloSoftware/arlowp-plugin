@@ -135,12 +135,13 @@
 							
 							switch(task.task_status) {
 								case "1": 
+								case "2": 
 									if (task.task_task == 'import') {
 										$('.arlo-sync-button').fadeOut();
 									}																		
 								break;
-								case "2":
 								case "3":
+								case "4":
 									if (task.task_task == 'import') {
 										$('.arlo-sync-button').fadeIn();
 										getLastImportLog(function(response) {
@@ -155,12 +156,12 @@
 									taskPlaceholder.addClass("is-dismissible");
 									taskPlaceholder.find(".desc").after('<button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button>');
 									
-									taskPlaceholder.addClass(task.task_status == 3 ? "notice-success" : "notice-error");
+									taskPlaceholder.addClass(task.task_status == 4 ? "notice-success" : "notice-error");
 									
 									clearInterval(taskQueryStack[taskID]);
 									
 									setTimeout(function() {
-										if (task.task_status == 3) {
+										if (task.task_status == 4) {
 											taskPlaceholder.fadeOut(function() {
 												$(this).remove()
 											});								

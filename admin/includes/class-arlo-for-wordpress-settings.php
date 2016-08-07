@@ -37,7 +37,7 @@ class Arlo_For_Wordpress_Settings {
 				foreach (Arlo_For_Wordpress::$post_types as $id => $post_type) {
 					if (empty($settings['post_types'][$id]['posts_page'])) {
 						$show_notice = true;
-						break;				
+						break;
 					}
 				}
 				
@@ -51,9 +51,14 @@ class Arlo_For_Wordpress_Settings {
 			if (isset($_GET['arlo-import'])) {
 				$scheduler = $plugin->get_scheduler();
 				$scheduler->set_task("import", -1);
-				//do_action('arlo_scheduler');
 				wp_redirect( admin_url( 'admin.php?page=arlo-for-wordpress'));
 				exit;
+			}
+			
+			if (isset($_GET['arlo-run-scheduler'])) {
+				do_action('arlo_scheduler');
+				wp_redirect( admin_url( 'admin.php?page=arlo-for-wordpress'));
+				exit;				
 			}
 			
 			if (isset($_GET['load-demo'])) {
@@ -386,6 +391,7 @@ class Arlo_For_Wordpress_Settings {
 		$running_task = $scheduler->get_running_tasks();
 		$running_task_ids = [];
 		
+		$running_task = array_merge($running_task, $scheduler->get_paused_tasks());
 		
 		foreach ($next_immediate_task as $task) {
 			$next_immediate_task_ids[] = $task->task_id;
