@@ -2150,13 +2150,17 @@ $shortcodes->add('event_start_date', function($content='', $atts, $shortcode_nam
 	$format = 'D g:i A';
 
 	if(isset($atts['format'])) $format = $atts['format'];
-	
+		
 	//if we haven't got timezone, we need to append the timezone abbrev
 	if ($event['e_isonline'] && is_null($timezone) && (preg_match('[G|g|i]', $format) === 1)) {
 		$format .= " T";
 	}
+	
+	if (strpos($format, '%') === false) {
+		$format = date_format_to_strftime_format($format);
+	}	
 
-	return $start_date->format($format);
+	return strftime($format, $start_date->getTimestamp());
 });
 
 // event end date shortcode
@@ -2200,8 +2204,12 @@ $shortcodes->add('event_end_date', function($content='', $atts, $shortcode_name)
 	if ($event['e_isonline'] && is_null($timezone) && (preg_match('[G|g|i]', $format) === 1)) {
 		$format .= " T";
 	}	
+	
+	if (strpos($format, '%') === false) {
+		$format = date_format_to_strftime_format($format);
+	}
 
-	return $end_date->format($format);
+	return strftime($format, $end_date->getTimestamp());
 });
 
 // event session description shortcode
@@ -2895,7 +2903,7 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 
 			if(is_null($previous) || date('m',strtotime($item['e_startdatetime'])) != date('m',strtotime($previous['e_startdatetime']))) {
 
-				$item['show_divider'] = date('F', strtotime($item['e_startdatetime']));
+				$item['show_divider'] = strftime('%B', strtotime($item['e_startdatetime']));
 
 			}
 
@@ -2998,7 +3006,7 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 
 				for ($x = $currentMonth; $x < $currentMonth + 12; $x++) {
 					$date = mktime(0, 0, 0, $x, 1);
-					$months[$x]['string'] = date('F', $date);
+					$months[$x]['string'] = strftime('%B', $date);
 					$months[$x]['value'] = date('Ym01', $date) . ':' . date('Ymt', $date);
 
 				}
@@ -3811,7 +3819,6 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 		$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
 	}
 
-
 	$conditions = array(
 		'template_id' => $GLOBALS['arlo_eventtemplate']['et_arlo_id'],
 		'date' => 'e.e_startdatetime > NOW()',
@@ -3831,6 +3838,10 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 		'limit' => 1,
 		'removeyear' => "true"
 	), $atts, $shortcode_name));
+	
+	if (strpos($format, '%') === false) {
+		$format = date_format_to_strftime_format($format);
+	}
         
 	$removeyear = ($removeyear == "false" || $removeyear == "0" ? false : true);
 	
@@ -3852,13 +3863,13 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 		foreach ($events as $event) {
 			if (!empty($event->e_startdatetime)) {
 	            if(date('y', strtotime($event->e_startdatetime)) == date('y') && $removeyear) {
-	            	$format = trim(preg_replace('/\s+/', ' ', str_replace(["Y", "y"], "", $format)));
+	            	$format = trim(preg_replace('/\s+/', ' ', str_replace(["%Y", "%y", "Y", "y", "%g", "%G"], "", $format)));
 	            }	
 	            
 	            if ($event->e_registeruri && !$event->e_isfull) {
-	                $return_links[] = ($layout == 'list' ? "<li>" : "") . '<a href="' . $event->e_registeruri . '" class="' . esc_attr($dateclass) . ' arlo-register">' . date($format, strtotime($event->e_startdatetime)) . '</a>' . ($layout == 'list' ? "</li>" : "");
+	                $return_links[] = ($layout == 'list' ? "<li>" : "") . '<a href="' . $event->e_registeruri . '" class="' . esc_attr($dateclass) . ' arlo-register">' . strftime($format, strtotime($event->e_startdatetime)) . '</a>' . ($layout == 'list' ? "</li>" : "");
 	            } else {
-	                $return_links[] = ($layout == 'list' ? "<li>" : "") . '<span class="' . esc_attr($dateclass) . '">' . date($format, strtotime($event->e_startdatetime)) . '</span>' . ($layout == 'list' ? "</li>" : "");
+	                $return_links[] = ($layout == 'list' ? "<li>" : "") . '<span class="' . esc_attr($dateclass) . '">' . strftime($format, strtotime($event->e_startdatetime)) . '</span>' . ($layout == 'list' ? "</li>" : "");
 	            }
 	        }	
 		}	
