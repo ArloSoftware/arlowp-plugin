@@ -1265,11 +1265,22 @@ class Arlo_For_Wordpress {
 				'import_finish',
 			];
 			
+			$import_tasks_desc = [
+				'import_timezones' => "Importing time zones",
+				'import_presenters' => "Importing presenters",
+				'import_event_templates' => "Importing event templates",
+				'import_events' => "Importing events",
+				'import_venues' => "Importing venues",
+				'import_categories' => "Importing categories",
+				'import_finish' => "Finalize the import",
+			];
+			
+			
 			$task = $import_tasks[$current_subtask];
 			
 			if (!empty($task)) {
 			
-				$scheduler->update_task($task_id, 1, "Import is running: task " . ($current_subtask + 1) . "/" . count($import_tasks) . ": " . $task);
+				$scheduler->update_task($task_id, 1, "Import is running: task " . ($current_subtask + 1) . "/" . count($import_tasks) . ": " . $import_tasks_desc[$task]);
 				call_user_func(array('Arlo_For_Wordpress', $task), $import_id);
 				$scheduler-> update_task_data($task_id, ['finished_subtask' => $current_subtask]);
 								

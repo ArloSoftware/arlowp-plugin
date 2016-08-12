@@ -105,7 +105,6 @@
 			var content = $("<div>").addClass("notice arlo-task").attr("id", "arlo-task-" + taskID).html("<p>Task: <span class='desc'></span></p>");
 			header.after(content);
 			getTaskInfo(taskID);
-			taskQueryStack[taskID] = setInterval(function() { getTaskInfo(taskID) }, 1500);
 		}
 		
 		function getTaskInfo(taskID) {
@@ -119,11 +118,6 @@
 				data: data,
 				method: 'post',
 				dataType: 'json',
-				error: function(jqXHR) {
-					if (jqXHR.status != 200) {
-						clearInterval(taskQueryStack[taskID]);
-					}
-				}, 
 				success: function(response) {
 					var task = {};
 					if (response[0] != null) {
@@ -134,11 +128,13 @@
 							taskPlaceholder.find(".desc").html(task.task_status_text);
 							
 							switch(task.task_status) {
+								case "0":
 								case "1": 
 								case "2": 
 									if (task.task_task == 'import') {
 										$('.arlo-sync-button').fadeOut();
-									}																		
+									}	
+									setTimeout(function() { getTaskInfo(taskID) }, 2000);				
 								break;
 								case "3":
 								case "4":
@@ -157,9 +153,7 @@
 									taskPlaceholder.find(".desc").after('<button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button>');
 									
 									taskPlaceholder.addClass(task.task_status == 4 ? "notice-success" : "notice-error");
-									
-									clearInterval(taskQueryStack[taskID]);
-									
+																		
 									setTimeout(function() {
 										if (task.task_status == 4) {
 											taskPlaceholder.fadeOut(function() {

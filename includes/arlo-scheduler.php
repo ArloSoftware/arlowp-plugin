@@ -34,6 +34,22 @@ class Scheduler {
 		return $result[0]->num;
 	}
 	
+	private function get_running_paused_tasks_count() {		
+		$sql = "
+		SELECT 
+			COUNT(1) AS num
+		FROM
+			{$this->table}
+		WHERE
+			task_status IN (1,2)
+		";
+		
+		$result = $this->wpdb->get_results($sql); 
+				
+		return $result[0]->num;
+	}
+	
+	
 	public function set_task($task = '', $priority = 0) {
 		if (empty($task)) return false;
 	
@@ -97,6 +113,7 @@ class Scheduler {
 	
 	public function get_next_task() {
 		$task = $this->get_next_paused_tasks();
+		
 		if (empty($task)) {
 			$task = $this->get_next_immediate_tasks();
 			if (empty($task)) {
@@ -120,8 +137,11 @@ class Scheduler {
 	}
 
 	
-	public function get_next_immediate_tasks() {	
-		return $this->get_tasks(0, -1, null, 1);
+	public function get_next_immediate_tasks() {
+		if ($this->get_running_paused_tasks_count() == 0) {
+			return $this->get_tasks(0, -1, null, 1);
+		}
+		return [];
 	}
 	
 	public function get_next_paused_tasks() {	
@@ -157,7 +177,7 @@ class Scheduler {
 			task_priority,
 			task_created
 		" . (!is_null($limit) ? "LIMIT " . $limit : "");
-		
+				
 		return $this->wpdb->get_results($sql);
 	}
 	
@@ -166,7 +186,7 @@ class Scheduler {
 		
 		if ($this->check_empty_slot_for_task()) {
 			$task = !is_null($task_id) ? $this->get_task_data($task_id) : $this->get_next_task();
-			
+						
 			$this->process_task($task);
 		}
 	}
