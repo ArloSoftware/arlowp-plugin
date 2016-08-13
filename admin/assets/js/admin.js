@@ -102,7 +102,7 @@
 		function createTaskPlaceholder(taskID) {
 			var header = $('.arlo-wrap > h2');
 			
-			var content = $("<div>").addClass("notice arlo-task").attr("id", "arlo-task-" + taskID).html("<p>Task: <span class='desc'></span></p>");
+			var content = $("<div>").addClass("notice arlo-task").attr("id", "arlo-task-" + taskID).html("<p>Background task: <span class='desc'></span></p>");
 			header.after(content);
 			getTaskInfo(taskID);
 		}

@@ -1,3 +1,21 @@
+== V2.3.5 ==
+
+Enhancement
+------------------
+New asynchronous import, for more information, please visit: http://developer.arlo.co/doc/wordpress/import
+
+Bugfixes
+------------------
+Support localization for dates and times: https://github.com/ArloSoftware/arlowp-plugin/issues/141
+
+
+== V2.3.1 ==
+
+Bugfixes
+------------------
+
+Important fix to solve the compatibility issue with some external plugin: https://github.com/ArloSoftware/arlowp-plugin/issues/139
+
 == V2.3 ==
 
 Enhancement
