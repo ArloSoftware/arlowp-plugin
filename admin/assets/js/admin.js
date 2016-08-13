@@ -6,6 +6,7 @@
 		var pluginSlug = 'arlo-for-wordpress';
 		var editor = null;
 		var tabIDs = document.location.hash.replace('#', '').split('/');
+		var taskQueryStack = {};
 	
 		//show the selected template editor
 		var selectedTemplate = 'arlo-event';
@@ -53,6 +54,22 @@
 			$('#arlo-settings').attr('novalidate','novalidate');
 			$('.arlo-section').hide();
 			
+			if (ArloImmediateTaskIDs != null && ArloImmediateTaskIDs.length > 0) {
+				kickOffScheduler();
+			}
+			
+			var ArloTasksIDs = ArloRunningTaskIDs.concat(ArloImmediateTaskIDs);
+			
+			if (ArloTasksIDs != null && ArloTasksIDs.length > 0) {
+				for(var i in ArloTasksIDs) {
+					if (ArloTasksIDs.hasOwnProperty(i)) {
+						createTaskPlaceholder(ArloTasksIDs[i]);	
+					}
+				}
+			}
+			
+			
+			
 			showNavTab(tabIDs[0]);
 			
 			if (typeof tabIDs[1] !== 'undefined') {
@@ -78,7 +95,92 @@
 		    	reNumberRegions();
 		    });
 		    
+		    getLastImportLog();
+		    
 		});
+		
+		function createTaskPlaceholder(taskID) {
+			var header = $('.arlo-wrap > h2');
+			
+			var content = $("<div>").addClass("notice arlo-task").attr("id", "arlo-task-" + taskID).html("<p>Task: <span class='desc'></span></p>");
+			header.after(content);
+			getTaskInfo(taskID);
+		}
+		
+		function getTaskInfo(taskID) {
+			var data = {
+				action: 'arlo_get_task_info',
+				taskID: taskID
+			};
+			
+			jQuery.ajax({
+				url: ajaxurl,
+				data: data,
+				method: 'post',
+				dataType: 'json',
+				success: function(response) {
+					var task = {};
+					if (response[0] != null) {
+						task = response[0];
+						if (task.task_id == taskID) {
+							var taskPlaceholder = $("#arlo-task-" + taskID);
+							
+							taskPlaceholder.find(".desc").html(task.task_status_text);
+							
+							switch(task.task_status) {
+								case "0":
+								case "1": 
+								case "2": 
+									if (task.task_task == 'import') {
+										$('.arlo-sync-button').fadeOut();
+									}	
+									setTimeout(function() { getTaskInfo(taskID) }, 2000);				
+								break;
+								case "3":
+								case "4":
+									if (task.task_task == 'import') {
+										$('.arlo-sync-button').fadeIn();
+										getLastImportLog(function(response) {
+											if (response.successful == 1) {
+												jQuery('.arlo-last-sync-date').fadeOut().html(response.last_import).fadeIn();
+											} else {
+												taskPlaceholder.find(".desc").after(": <span>" + response.message.replace(/\d{4,}/, '') + "</span>");
+											}
+										});
+									}
+									
+									taskPlaceholder.addClass("is-dismissible");
+									taskPlaceholder.find(".desc").after('<button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button>');
+									
+									taskPlaceholder.addClass(task.task_status == 4 ? "notice-success" : "notice-error");
+																		
+									setTimeout(function() {
+										if (task.task_status == 4) {
+											taskPlaceholder.fadeOut(function() {
+												$(this).remove()
+											});								
+										}
+									}, 10000);
+																		
+								break;
+							}							
+						}
+					}
+				}			
+			});
+		}
+		
+		function getLastImportLog(callback) {
+			var data = {
+				action: 'arlo_get_last_import_log'
+			};
+			
+			jQuery.post(ajaxurl, data, function(response) {
+				if (jQuery.isFunction(callback)) {
+					callback(response);
+				}
+			}, 'json');
+		}
 		
 		function showNavTab(tabID) {
 			$('.arlo-section').hide();
@@ -247,6 +349,14 @@
 			
 		}
 		
+		function kickOffScheduler() {
+			var data = {
+				action: 'start_scheduler'
+			}
+				
+			jQuery.post(ajaxurl, data);
+		}
+		
 		//dismissible admin notices
 		jQuery('.toplevel_page_arlo-for-wordpress .notice.is-dismissible .notice-dismiss').click(function() {
 			var id = jQuery(this).parent().attr('id');
@@ -256,8 +366,7 @@
 					id: id
 				}
 				
-				jQuery.post(ajaxurl, data, function(response) {
-				});
+				jQuery.post(ajaxurl, data);
 			}
 		})		
 		

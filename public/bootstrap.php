@@ -618,7 +618,6 @@ function arlo_set_option($key, $value = null) {
 }
 
 
-
 /**
  * arlo_add_datamodel function.
  * 
@@ -626,6 +625,7 @@ function arlo_set_option($key, $value = null) {
  * @return void
  */
 function arlo_add_datamodel() {
+	install_table_arlo_async_tasks();
 	install_table_arlo_eventtemplate();
 	install_table_arlo_contentfields();
 	install_table_arlo_tags();
@@ -658,6 +658,44 @@ function core_set_charset() {
 	if ( !empty($wpdb->charset) )
 		return "DEFAULT CHARACTER SET $wpdb->charset";
 	return '';
+}
+
+/**
+ * install_table_arlo_async_tasks function.
+ * 
+ * @access public
+ * @return void
+ */
+function install_table_arlo_async_tasks() {	
+	global $wpdb, $current_user;
+	$table_name = $wpdb->prefix . "arlo_async_tasks";
+
+	$sql = "CREATE TABLE " . $table_name . " (
+	  task_id INT(11) NOT NULL AUTO_INCREMENT,
+	  task_priority TINYINT(4) NOT NULL DEFAULT '0',
+	  task_task VARCHAR(255) DEFAULT NULL,
+	  task_status TINYINT(4) NOT NULL DEFAULT '0' COMMENT '0:scheduled, 1:paused, 2:in_progress, 3: failed, 4: completed',
+	  task_status_text VARCHAR(255) DEFAULT NULL,
+	  task_created TIMESTAMP NULL DEFAULT NULL,
+	  task_modified TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+	  PRIMARY KEY  (task_id),
+	  KEY task_status (task_status),
+	  KEY task_priority (task_priority)
+	) CHARSET=utf8";
+
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+
+    dbDelta($sql);
+    
+    $sql = "
+	  CREATE TABLE " . $wpdb->prefix . "arlo_async_task_data (
+	  data_task_id int(11) NOT NULL,
+	  data_text text NOT NULL,
+	  PRIMARY KEY  (data_task_id)
+	) CHARSET=utf8;  
+    ";
+    
+    dbDelta($sql);
 }
 
 /**
@@ -1107,17 +1145,6 @@ function install_table_arlo_import_log() {
         
 		dbDelta($sql);
         
-}
-
-/**
- * arlo_import_from_api function.
- * 
- * @access public
- * @return void
- */
-function arlo_import_from_api() {
-	$plugin = Arlo_For_Wordpress::get_instance();
-	$plugin->import();
 }
 
 /**
