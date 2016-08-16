@@ -1839,8 +1839,14 @@ $shortcodes->add('content_field_item', function($content='', $atts, $shortcode_n
 	}
 	
 	$t1 = "{$wpdb->prefix}arlo_eventtemplates";
-	$t2 = "{$wpdb->prefix}arlo_contentfields";
-	
+	$t2 = "{$wpdb->prefix}arlo_contentfields";	
+
+	if (!empty($GLOBALS['arlo_event_list_item']['et_id'])) {
+		$where = $t1 . ".et_id = " . $GLOBALS['arlo_event_list_item']['et_id'];
+	} else {
+		$where = $t1 . ".et_post_name = '" . $post->post_name . "'";
+	}
+			
 	$sql = "
 	SELECT 
 		$t2.cf_fieldname, 
@@ -1853,7 +1859,7 @@ $shortcodes->add('content_field_item', function($content='', $atts, $shortcode_n
 		$t1.et_id = $t2.et_id
 	" . (!empty($arlo_region) ? " AND $t1.et_region = '" . $arlo_region . "'" : "" ) . "
 	WHERE 
-		$t1.et_post_name = '$post->post_name'
+		" . $where . "
 		" . (is_array($where_fields) && count($where_fields) > 0 ? " AND cf_fieldname IN (" . implode(',', $where_fields) . ") " : "") . "
 	AND 
 		$t1.active = $active
@@ -1861,7 +1867,7 @@ $shortcodes->add('content_field_item', function($content='', $atts, $shortcode_n
 		$t2.active = $active
 	ORDER BY 
 		$t2.cf_order";
-		
+				
 	$items = $wpdb->get_results($sql, ARRAY_A);
 
 	$output = '';
