@@ -630,6 +630,7 @@ function arlo_add_datamodel() {
 	install_table_arlo_contentfields();
 	install_table_arlo_tags();
 	install_table_arlo_events();
+	install_table_arlo_onlineactivities();
 	install_table_arlo_venues();
 	install_table_arlo_presenters();
 	install_table_arlo_offers();
@@ -813,6 +814,43 @@ function install_table_arlo_events() {
  * @access public
  * @return void
  */
+
+function install_table_arlo_onlineactivities() {	
+	global $wpdb, $current_user;
+	$table_name = $wpdb->prefix . "arlo_onlineactivities";
+
+	$sql = "CREATE TABLE " . $table_name . " (
+		oa_id INT(11) NOT NULL AUTO_INCREMENT,
+		oa_arlo_id INT(11) NOT NULL,
+		oat_arlo_id INT(11) NULL,
+		oa_code VARCHAR(255) NULL,
+		oa_name VARCHAR(255) NULL,
+		oa_delivery_description VARCHAR(255) NULL,
+		oa_viewuri VARCHAR(255) NULL,
+		oa_reference_terms VARCHAR(255) NULL,
+		oa_credits VARCHAR(255) NULL,		
+		oa_registermessage VARCHAR(255) NULL,
+		oa_registeruri VARCHAR(255) NULL,
+		oa_region VARCHAR(5) NOT NULL,		
+		active INT(10) unsigned DEFAULT NULL,
+		PRIMARY KEY  (oa_id),
+		KEY oat_arlo_id (oat_arlo_id),
+		KEY oa_arlo_id (oa_arlo_id),
+		KEY oa_region (oa_region))
+		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
+
+	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+
+	dbDelta($sql);
+}
+
+
+/**
+ * install_table_arlo_venues function.
+ * 
+ * @access public
+ * @return void
+ */
 function install_table_arlo_venues() {	
 	global $wpdb, $current_user;
 	$table_name = $wpdb->prefix . "arlo_venues";
@@ -895,6 +933,7 @@ function install_table_arlo_offers() {
 		o_arlo_id INT,
 		et_id INT,
 		e_id INT,
+		oa_id INT,
 		o_label VARCHAR(255) NULL,
 		o_isdiscountoffer TINYINT(1) NOT NULL DEFAULT FALSE,
 		o_currencycode VARCHAR(255) NULL,
@@ -914,13 +953,14 @@ function install_table_arlo_offers() {
 		KEY o_arlo_id (o_arlo_id),
 		KEY et_id (et_id),
 		KEY e_id (e_id),
+		KEY oa_id (oa_id),
 		KEY o_region (o_region),
 		KEY o_order (o_order))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
-    dbDelta($sql);
+    var_dump(dbDelta($sql));
 }
 
 /**
@@ -979,7 +1019,16 @@ function install_table_arlo_tags() {
 		PRIMARY KEY  (e_arlo_id,tag_id))
   		CHARACTER SET utf8 COLLATE=utf8_general_ci";
   		
-	dbDelta($sql);  		
+	dbDelta($sql);  	
+	
+	$sql = "CREATE TABLE " . $wpdb->prefix . "arlo_onlineactivities_tags (
+		oa_arlo_id int(11) NOT NULL,
+		tag_id mediumint(8) unsigned NOT NULL,
+		active INT(10) unsigned DEFAULT NULL,
+		PRIMARY KEY  (oa_arlo_id,tag_id))
+  		CHARACTER SET utf8 COLLATE=utf8_general_ci";
+  		
+	dbDelta($sql);		
 
 	$sql = "CREATE TABLE " . $wpdb->prefix . "arlo_eventtemplates_tags (
 		et_arlo_id int(11) NOT NULL,

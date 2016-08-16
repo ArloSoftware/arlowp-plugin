@@ -60,6 +60,7 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-api/Transports/Wordpr
 // Include Arlo classes
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-event-templates.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-events.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-online-activities.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-categories.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-offers.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-venues.php');
