@@ -1277,7 +1277,6 @@ class Arlo_For_Wordpress {
 				'import_finish' => "Finalize the import",
 			];
 			
-			
 			$task = $import_tasks[$current_subtask];
 			
 			if (!empty($task)) {
@@ -1772,7 +1771,7 @@ class Arlo_For_Wordpress {
 			), 
 			array_keys($regions)
 		);
-						
+										
 		if(!empty($regionalized_items)) {
 			
 			$wpdb->query('START TRANSACTION');
@@ -1780,7 +1779,8 @@ class Arlo_For_Wordpress {
 			foreach($regionalized_items as $region => $items) {
 			
 				foreach($items as $item) {
-					if (!empty($item->OnlineActivityID) && is_numeric($item->OnlineActivityID) && $item->OnlineActivityID > 0) {
+					//TODO: This field has to be an integer, but the API returns a wrong value!!!
+					if (!empty($item->OnlineActivityID) /* && is_numeric($item->OnlineActivityID) && $item->OnlineActivityID > 0*/) {
 						
 						$table_name = "{$wpdb->prefix}arlo_onlineactivities";
 						
@@ -1788,7 +1788,7 @@ class Arlo_For_Wordpress {
 							$wpdb->prepare( 
 								"INSERT INTO $table_name 
 								(oa_arlo_id, oat_arlo_id, oa_code, oa_name, oa_delivery_description, oa_viewuri, oa_reference_terms, oa_credits, oa_registermessage, oa_registeruri, oa_region, active) 
-								VALUES ( %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
+								VALUES ( %s, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
 								", 
 							    $item->OnlineActivityID,
 								$item->TemplateID,
@@ -2296,6 +2296,8 @@ class Arlo_For_Wordpress {
 			'presenters',
 			'venues',
 			'categories',
+			'onlineactivities',
+			'onlineactivities_tags',
             'events_presenters',
             'eventtemplates_categories',
             'eventtemplates_presenters',
