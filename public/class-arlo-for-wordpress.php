@@ -1796,7 +1796,7 @@ class Arlo_For_Wordpress {
 								$item->Name,
 								@$item->DeliveryDescription,
 								$item->ViewUri,
-								json_decode($item->ReferenceTerms),
+								json_encode($item->ReferenceTerms),
 								@$item->Credits,
 								@$item->RegistrationInfo->RegisterMessage,
 								@$item->RegistrationInfo->RegisterUri,

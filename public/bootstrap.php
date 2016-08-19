@@ -3997,6 +3997,219 @@ $shortcodes->add('category_footer', function($content='', $atts, $shortcode_name
 	return $category->c_footer;
 });
 
+//online activity list item shortcode
+
+$shortcodes->add('oa_list_item', function($content='', $atts, $shortcode_name){
+	global $post, $wpdb;
+	$settings = get_option('arlo_settings');
+	$regions = get_option('arlo_regions');
+	
+	$arlo_region = get_query_var('arlo-region', '');
+	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
+	
+	$t1 = "{$wpdb->prefix}arlo_eventtemplates";
+	$t2 = "{$wpdb->prefix}arlo_onlineactivities";
+	$t6 = "{$wpdb->prefix}arlo_offers";
+	
+	if (!empty($arlo_region)) {
+		$where .= ' AND ' . $t1 . '.et_region = "' . $arlo_region . '" AND ' . $t2 . '.oa_region = "' . $arlo_region . '"';
+	}					
+	
+	$sql = 
+		"SELECT 
+			oa_id,
+			oa_arlo_id,
+			oat_arlo_id,
+			oa_code,
+			oa_reference_terms,
+			oa_credits,
+			oa_name,
+			oa_delivery_description,
+			oa_viewuri,
+			oa_registermessage,
+			oa_registeruri
+		FROM 
+			$t2
+		LEFT JOIN 
+			$t1
+		ON 
+			$t1.et_arlo_id = $t2.oat_arlo_id
+		WHERE 
+			$t1.et_post_name = '$post->post_name'
+		$where
+		";
+	
+	echo $sql;
+		
+	$items = $wpdb->get_results($sql, ARRAY_A);
+	
+	$output = '';
+	
+	if (is_array($items) && count($items)) {
+		
+		$GLOBALS['no_event_text'] = '';
+		
+		foreach($items as $key => $item) {
+	
+			$GLOBALS['arlo_oa_list_item'] = $item;
+	                	
+			$output .= do_shortcode($content);
+	
+			unset($GLOBALS['arlo_oa_list_item']);
+		}	
+	} else if (empty($GLOBALS['no_event_text'])) {
+		
+		$no_event_text = !empty($settings['noeventontemplate_text']) ? $settings['noeventontemplate_text'] : __('Interested in attending? Have a suggestion about running this course near you?', $GLOBALS['arlo_plugin_slug']);
+		
+		if (!empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) {
+			$no_event_text .= '<br /><a href="' . $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'] . '">Register your interest now</a>';
+		}
+		
+		$output = '
+		<p class="arlo-no-results">' . 
+			$no_event_text . 
+		'</p>';
+	}
+	
+	
+	return $output;
+});
+
+
+// online activity code shortcode
+$shortcodes->add('oa_code', function($content='', $atts, $shortcode_name){
+	if(!isset($GLOBALS['arlo_oa_list_item']['oa_code'])) return '';
+
+	return htmlentities($GLOBALS['arlo_oa_list_item']['oa_code'], ENT_QUOTES, "UTF-8");
+});
+
+// online activity name shortcode
+$shortcodes->add('oa_name', function($content='', $atts, $shortcode_name){
+	if(!isset($GLOBALS['arlo_oa_list_item']['oa_name'])) return '';
+
+	return htmlentities($GLOBALS['arlo_oa_list_item']['oa_name'], ENT_QUOTES, "UTF-8");
+});
+
+// online activity registration shortcode
+
+$shortcodes->add('oa_registration', function($content='', $atts, $shortcode_name){
+	$registeruri = $GLOBALS['arlo_oa_list_item']['oa_registeruri'];
+	$registermessage = $GLOBALS['arlo_oa_list_item']['oa_registermessage'];
+        
+	$class = (!empty($atts['class']) ? $atts['class'] : 'button' );
+
+	$registration = '<div class="arlo-oa-registration">';
+	// test if there is a register uri string, if so display the button
+	if(!is_null($registeruri) && $registeruri != '') {
+		$registration .= '<a class="' . $class . ' arlo-register" href="'. esc_attr($registeruri) . '" target="_blank">' . __($registermessage, $GLOBALS['arlo_plugin_slug']) . '</a>';
+	} else {
+		$registration .= $registermessage;
+	}
+	
+	$registration .= '</div>';
+
+	return $registration;
+});
+
+// online activity offers shortcode
+
+$shortcodes->add('oa_offers', function($content='', $atts, $shortcode_name){
+	global $wpdb;
+
+	$oa_id = $GLOBALS['arlo_oa_list_item']['oa_id'];
+	
+	$regions = get_option('arlo_regions');	
+	
+	$arlo_region = get_query_var('arlo-region', '');
+	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
+
+	$t1 = "{$wpdb->prefix}arlo_offers";
+	
+	$sql = "
+	SELECT 
+		offer.*,
+		replaced_by.o_label AS replacement_label,
+		replaced_by.o_isdiscountoffer AS replacement_discount,
+		replaced_by.o_currencycode AS replacement_currency_code,
+		replaced_by.o_formattedamounttaxexclusive AS replacement_amount,
+		replaced_by.o_message AS replacement_message
+	FROM 
+		wp_arlo_offers AS offer
+	LEFT JOIN 
+		wp_arlo_offers AS replaced_by 
+	ON 
+		offer.o_arlo_id = replaced_by.o_replaces 
+	AND 
+		offer.oa_id = replaced_by.oa_id	
+	" . (!empty($arlo_region) ? " AND replaced_by.o_region = '" . $arlo_region . "'" : "") . "				
+	WHERE 
+		offer.o_replaces = 0 
+	AND 
+		offer.oa_id = $oa_id
+	" . (!empty($arlo_region) ? " AND offer.o_region = '" . $arlo_region . "'" : "") . "		
+	ORDER BY 
+		offer.o_order";
+		
+	$offers_array = $wpdb->get_results($sql, ARRAY_A);
+
+	$offers = '<ul class="arlo-list arlo-event-offers">';
+        
+    $settings = get_option('arlo_settings');  
+    $price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : ARLO_PLUGIN_PREFIX . '-exclgst';      
+    $free_text = (isset($settings['free_text'])) ? esc_attr($settings['free_text']) : __('Free', $GLOBALS['arlo_plugin_slug']);
+
+
+	foreach($offers_array as $offer) {
+
+		extract($offer);
+                
+		$amount = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $o_offeramounttaxexclusive : $o_offeramounttaxinclusive;
+		$famount = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $o_formattedamounttaxexclusive : $o_formattedamounttaxinclusive;
+
+		// set to true if there is a replacement offer returned for this event offer
+		$replaced = (!is_null($replacement_amount) && $replacement_amount != '');
+
+		$offers .= '<li><span';
+		// if the offer is discounted
+		if($o_isdiscountoffer) {
+			$offers .= ' class="discount"';
+		// if the offer is replace by another offer
+		} elseif($replaced) {
+			$offers .= ' class="replaced"';
+		}
+		$offers .= '>';
+		// display label if there is one
+		$offers .= (!is_null($o_label) || $o_label != '') ? $o_label.' ':'';
+		if($amount > 0) {
+			$offers .= '<span class="amount">'.$famount.'</span> ';
+			// only include the excl. tax if the offer is not replaced			
+			$offers .= $replaced ? '' : '<span class="arlo-price-tax">' . ($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode) : sprintf(__('incl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode) . '</span>');
+		} else {
+			$offers .= '<span class="amount free">'.$free_text.'</span> ';
+		}
+		// display message if there is one
+		$offers .= (!is_null($o_message) || $o_message != '') ? ' '.$o_message:'';
+		// if a replacement offer exists
+		if($replaced) {
+			$offers .= '</span><span ' . $replacement_discount ? 'class="discount"' : '' . '>';
+			
+			// display replacement offer label if there is one
+			$offers .= (!is_null($replacement_label) || $replacement_label != '') ? $replacement_label.' ':'';
+			$offers .= '<span class="amount">'.$replacement_amount.'</span> <span class="arlo-price-tax">'.($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode) : sprintf(__('incl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode)) . '</span>';
+			// display replacement offer message if there is one
+			$offers .= (!is_null($replacement_message) || $replacement_message != '') ? ' '.$replacement_message:'';
+
+		} // end if
+
+		$offers .= '</span></li>';
+
+	} // end foreach
+
+	$offers .= '</ul>';
+
+	return $offers;
+});
+
 
 // no_event_text
 $shortcodes->add('no_event_text', function($content='', $atts, $shortcode_name){
@@ -4005,7 +4218,6 @@ $shortcodes->add('no_event_text', function($content='', $atts, $shortcode_name){
 	}
 });
 
-
 // label
 $shortcodes->add('label', function($content='', $atts, $shortcode_name){
 	return $content;
@@ -4013,5 +4225,10 @@ $shortcodes->add('label', function($content='', $atts, $shortcode_name){
 
 // event list wrapper
 $shortcodes->add('event_list', function($content='', $atts, $shortcode_name){
+		return $content;
+});
+
+// event list wrapper
+$shortcodes->add('oa_list', function($content='', $atts, $shortcode_name){
 		return $content;
 });
