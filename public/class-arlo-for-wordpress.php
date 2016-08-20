@@ -1486,7 +1486,7 @@ class Arlo_For_Wordpress {
 								@$offer->Message,
 								$key+1,
 								(isset($offer->ReplacesOfferID)) ? $offer->ReplacesOfferID+1 : null,
-								(!empty($region) ? $region : 'NULL'),
+								(!empty($region) ? $region : ''),
 								$timestamp
 							) );
 								                                                        
@@ -1600,7 +1600,7 @@ class Arlo_For_Wordpress {
 				@$item->Provider->Name,
 				@$item->Provider->WebsiteUri,
 				@$item->Location->IsOnline,
-				(!empty($region) ? $region : 'NULL'),
+				(!empty($region) ? $region : ''),
 				$timestamp
 			)
 		);
@@ -1637,7 +1637,7 @@ class Arlo_For_Wordpress {
 					@$offer->Message,
 					$key+1,
 					(isset($offer->ReplacesOfferID)) ? $offer->ReplacesOfferID+1 : null,
-					(!empty($region) ? $region : 'NULL'),
+					(!empty($region) ? $region : ''),
 					$timestamp
 				) );
 				
