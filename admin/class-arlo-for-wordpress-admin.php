@@ -277,6 +277,7 @@ class Arlo_For_Wordpress_Admin {
 		
 		$this->plugin_screen_hook_suffix = add_menu_page( 'Arlo settings page', 'Arlo settings', 'manage_options', $this->plugin_slug, array( $this, 'display_plugin_admin_page' ), 'none', '10.4837219128727371208127' );
 		$this->plugin_events_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Events', $this->plugin_slug ), __( 'Events', $this->plugin_slug ) , 'manage_options' , $this->plugin_slug . '-events' , array( $this, 'display_events_admin_page'));		
+		$this->plugin_events_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Online Activities', $this->plugin_slug ), __( 'Online Activities', $this->plugin_slug ) , 'manage_options' , $this->plugin_slug . '-onlineactivities' , array( $this, 'display_oa_admin_page'));
 		$this->plugin_templates_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Templates', $this->plugin_slug ), __( 'Templates', $this->plugin_slug ) , 'manage_options' , $this->plugin_slug . '-templates' , array( $this, 'display_templates_admin_page'));		
 		$this->plugin_sessions_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Sessions', $this->plugin_slug ), __( 'Sessions', $this->plugin_slug ) , 'manage_options' , $this->plugin_slug . '-sessions' , array( $this, 'display_sessions_admin_page'));		
 		$this->plugin_presenters_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Presenters', $this->plugin_slug ), __( 'Presenters', $this->plugin_slug ) , 'manage_options' , $this->plugin_slug . '-presenters' , array( $this, 'display_presenters_admin_page'));
@@ -335,6 +336,14 @@ class Arlo_For_Wordpress_Admin {
 	 	require_once 'includes/class-arlo-for-wordpress-sessions.php';
  
  		$list = new Arlo_For_Wordpress_Sessions();
+	
+		include_once( 'views/list.php' );
+	}		
+
+	public function display_oa_admin_page() {
+	 	require_once 'includes/class-arlo-for-wordpress-onlineactivities.php';
+ 
+ 		$list = new Arlo_For_Wordpress_OnlineActivities();
 	
 		include_once( 'views/list.php' );
 	}		
