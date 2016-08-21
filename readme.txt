@@ -54,7 +54,7 @@ Arlo for WordPress providers you with the building blocks to create great lookin
 * [Arlo categories](https://developer.arlo.co/doc/wordpress/widgets#widget-categories) 
 
 = Get started today! =
-Sign-up for a [free Arlo trial](https://www.arlo.co/try-arlo) and then install the "Arlo training and event management system" plugin now!
+Sign-up for a [free Arlo trial](https://www.arlo.co/register) and then install the "Arlo training and event management system" plugin now!
  
 [youtube http://www.youtube.com/watch?v=6MWDFKjYNPY]
 
@@ -96,7 +96,7 @@ Yes! The Arlo Training and Event Management plugin works out-of-the-box with nea
 
 = Can I use the plugin without an Arlo platform? =
 
-Unfortunately no, you have to sign up for a [free Arlo trial](https://www.arlo.co/try-arlo). 
+Unfortunately no, you have to sign up for a [free Arlo trial](https://www.arlo.co/register). 
 
 = Where can I find documentation? =
 
