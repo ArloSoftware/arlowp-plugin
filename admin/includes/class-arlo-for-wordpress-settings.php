@@ -484,6 +484,14 @@ class Arlo_For_Wordpress_Settings {
 	    <h4>Version ' . $this->version . '</h4>
 	    <p>
 	    	<ul class="arlo-whatsnew-list">
+	    		<li>New asynchronous import, for more information, please visit our <a href="http://developer.arlo.co/doc/wordpress/import" target="_blank">documentation</a>.</li>
+	    		<li>Support localization for dates and times</li>
+	    		<li>Few minor bugfixes</li>
+	    	</ul>
+	    </p>		
+		<h4>Version 2.3.1</h4>
+	    <p>
+	    	<ul class="arlo-whatsnew-list">
 	    		<li>Important fix to solve the compatibility issue with some external plugin</li>
 	    		<li>Enhancement of the plugin update mechanism</li>
 	    		<li>Few minor bugfixes</li>
@@ -498,25 +506,6 @@ class Arlo_For_Wordpress_Settings {
 	    		<a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_template_search_region_selector" target="_blank">[arlo_template_search_region_selector]</a>, 
 	    		<a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_template_region_selector" target="_blank">[arlo_template_region_selector]</a></li>
 	    		<li>Many minor bug fixes and enhancements</li>
-	    	</ul>
-	    </p>	
-	    <h4>Version 2.2.1</h4>
-	    <p>
-	    	<ul class="arlo-whatsnew-list">
-	    		<li>New <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_no_event_text" target="_blank">[arlo_no_event_text]</a> shortcode to display a message when there is no event</li>
-	    		<li>Danish translation</li>
-	    		<li>Many minor bug fixes and security enhancements</li>
-	    	</ul>
-	    </p>	    
-	    <h4>Version 2.2</h4>
-	    <p>
-	    	<ul class="arlo-whatsnew-list">
-	    		<li>New plugin settings page layout</li>
-	    		<li>New list pages on the admin site for events, templates, sessions, venues and presenters</li>
-	    		<li>New <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_link" target="_blank">[arlo_event_template_link]</a> shortcode for externally hosted event</li>
-	    		<li>New SEO friendly URL\'s compatible with filters</li>
-	    		<li>New SEO friendly event summary meta descriptions on event template pages</li>
-	    		<li>New option ("class") for "layout" attribute and new "prefix" attribute for <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_tags" target="_blank">[arlo_event_template_tags]</a> and <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_tags" target="_blank">[arlo_event_tags]</a> shortcodes</li>
 	    	</ul>
 	    </p>
 	    <p>If you are experiencing problems with the URLs, please save changes to the Arlo settings page and resynchronize the data under the general tab.</p>
