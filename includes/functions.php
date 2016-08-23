@@ -45,7 +45,18 @@ function date_format_to($format, $syntax) {
 		},
 		$from
 	);
-	return preg_replace( $pattern, $to, $format );
+	$new_format = preg_replace( $pattern, $to, $format );
+
+	if ($syntax == 'strf') {
+		if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') {
+    		$new_format = preg_replace('#(?<!%)((?:%%)*)%e#', '\1%#d', $new_format);
+			$new_format = preg_replace('#(?<!%)((?:%%)*)%l#', '\1%I', $new_format);
+		} else if (strtoupper(substr(PHP_OS, 0, 3)) == 'DAR') {
+			$new_format = preg_replace('#(?<!%)((?:%%)*)%P#', '\1%p', $new_format);
+		}
+	}
+
+	return $new_format;
 }
 
 function strftime_format_to_date_format( $strf_format ) {
