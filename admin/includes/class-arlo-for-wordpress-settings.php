@@ -484,6 +484,12 @@ class Arlo_For_Wordpress_Settings {
 	    <h4>Version ' . $this->version . '</h4>
 	    <p>
 	    	<ul class="arlo-whatsnew-list">
+	    		<li>Fix start and end date times when the dates are returning a UTC value</li>
+	    	</ul>
+	    </p>				
+		<h4>Version 2.3.5</h4>
+	    <p>
+	    	<ul class="arlo-whatsnew-list">
 	    		<li>New asynchronous import, for more information, please visit our <a href="http://developer.arlo.co/doc/wordpress/import" target="_blank">documentation</a>.</li>
 	    		<li>Support localization for dates and times</li>
 	    		<li>Few minor bugfixes</li>
