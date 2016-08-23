@@ -2192,8 +2192,13 @@ $shortcodes->add('event_start_date', function($content='', $atts, $shortcode_nam
 	if (strpos($format, '%') === false) {
 		$format = date_format_to_strftime_format($format);
 	}	
+	
+	//windows doesn't support %e
+	if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') {
+    	$format = preg_replace('#(?<!%)((?:%%)*)%e#', '\1%#d', $format);
+	}
 
-	return strftime($format, $start_date->getTimestamp());
+	return strftime($format, $start_date->getTimestamp() + $start_date->getOffset());
 });
 
 // event end date shortcode
@@ -2241,8 +2246,13 @@ $shortcodes->add('event_end_date', function($content='', $atts, $shortcode_name)
 	if (strpos($format, '%') === false) {
 		$format = date_format_to_strftime_format($format);
 	}
+	
+	//windows doesn't support %e
+	if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') {
+    	$format = preg_replace('#(?<!%)((?:%%)*)%e#', '\1%#d', $format);
+	}
 
-	return strftime($format, $end_date->getTimestamp());
+	return strftime($format, $end_date->getTimestamp() + $end_date->getOffset());
 });
 
 // event session description shortcode
