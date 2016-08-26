@@ -571,8 +571,8 @@ class Arlo_For_Wordpress {
 					if (!empty($saved_templates[$id]['html'])) {
 						$content = $saved_templates[$id]['html'];
 						
-						if (strpos($content, "[event_template_register_interest]") === false) {
-							$shortcode = "\n[event_template_register_interest]\n";
+						if (strpos($content, "[arlo_event_template_register_interest]") === false) {
+							$shortcode = "\n[arlo_event_template_register_interest]\n";
 							$append_before = [
 								"[arlo_suggest_datelocation",
 								"[arlo_content_field_item",
@@ -589,7 +589,6 @@ class Arlo_For_Wordpress {
 							if ($pos === false) {
 								$pos = strlen($content);
 							}
-							
 							
 							$saved_templates[$id]['html'] = substr_replace($content, $shortcode, $pos, 0);
 						}
