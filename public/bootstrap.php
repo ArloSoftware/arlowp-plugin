@@ -4097,7 +4097,15 @@ $shortcodes->add('oa_name', function($content='', $atts, $shortcode_name){
 	return htmlentities($GLOBALS['arlo_oa_list_item']['oa_name'], ENT_QUOTES, "UTF-8");
 });
 
-// online activity code shortcode
+$shortcodes->add('oa_delivery_description', function($content='', $atts, $shortcode_name){
+	if(!isset($GLOBALS['arlo_oa_list_item']['oa_delivery_description'])) return '';
+
+	return htmlentities($GLOBALS['arlo_oa_list_item']['oa_delivery_description'], ENT_QUOTES, "UTF-8");
+});
+
+
+
+// online activity credits shortcode
 $shortcodes->add('oa_credits', function($content='', $atts, $shortcode_name){
 	if(!isset($GLOBALS['arlo_oa_list_item']['oa_credits'])) return '';
 	$output = '';
