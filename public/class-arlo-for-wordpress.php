@@ -1840,7 +1840,7 @@ class Arlo_For_Wordpress {
 								@$item->DeliveryDescription,
 								$item->ViewUri,
 								json_encode($item->ReferenceTerms),
-								@$item->Credits,
+								json_encode($item->Credits),
 								@$item->RegistrationInfo->RegisterMessage,
 								@$item->RegistrationInfo->RegisterUri,
 								(!empty($region) ? $region : 'NULL'),

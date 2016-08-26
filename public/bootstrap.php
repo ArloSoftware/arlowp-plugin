@@ -4091,6 +4091,30 @@ $shortcodes->add('oa_name', function($content='', $atts, $shortcode_name){
 	return htmlentities($GLOBALS['arlo_oa_list_item']['oa_name'], ENT_QUOTES, "UTF-8");
 });
 
+// online activity code shortcode
+$shortcodes->add('oa_credits', function($content='', $atts, $shortcode_name){
+	if(!isset($GLOBALS['arlo_oa_list_item']['oa_credits'])) return '';
+	$output = '';
+	
+	// merge and extract attributes
+	extract(shortcode_atts(array(
+		'layout' => 'list',
+	), $atts, $shortcode_name));
+	
+	$credits = json_decode($GLOBALS['arlo_oa_list_item']['oa_credits']);
+	switch($layout) {
+		default:
+			$output .= '<ul class="arlo-oa-credits">';
+			foreach ($credits as $credit) {
+				$output .= '<li>' . htmlentities($credit->Type, ENT_QUOTES, "UTF-8") . ': ' . htmlentities($credit->Value, ENT_QUOTES, "UTF-8") . '</li>';
+			}
+			$output .= '</ul>';
+		break;
+	}
+
+	return $output;
+});
+
 // online activity registration shortcode
 
 $shortcodes->add('oa_registration', function($content='', $atts, $shortcode_name){
