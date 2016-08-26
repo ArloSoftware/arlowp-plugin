@@ -4103,6 +4103,26 @@ $shortcodes->add('oa_delivery_description', function($content='', $atts, $shortc
 	return htmlentities($GLOBALS['arlo_oa_list_item']['oa_delivery_description'], ENT_QUOTES, "UTF-8");
 });
 
+$shortcodes->add('oa_reference_term', function($content='', $atts, $shortcode_name){
+	if(!isset($GLOBALS['arlo_oa_list_item']['oa_reference_terms'])) return '';
+	
+	$output = '';
+	
+	// merge and extract attributes
+	extract(shortcode_atts(array(
+		'type' => 'singular',
+	), $atts, $shortcode_name));
+	
+	$type = ucfirst(strtolower($type));
+	
+	$terms = json_decode($GLOBALS['arlo_oa_list_item']['oa_reference_terms']);
+	
+	if (!empty($terms->$type)) {
+		$output = $terms->$type;
+	}
+
+	return $output;
+});
 
 
 // online activity credits shortcode
