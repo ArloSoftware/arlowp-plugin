@@ -4013,9 +4013,11 @@ $shortcodes->add('category_footer', function($content='', $atts, $shortcode_name
 //online activity list item shortcode
 
 $shortcodes->add('oa_list_item', function($content='', $atts, $shortcode_name){
-	global $post, $wpdb;
+	global $post, $wpdb, $arlo_plugin;
 	$settings = get_option('arlo_settings');
 	$regions = get_option('arlo_regions');
+	
+	$active = $arlo_plugin->get_import_id();
 	
 	$arlo_region = get_query_var('arlo-region', '');
 	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
@@ -4047,8 +4049,12 @@ $shortcodes->add('oa_list_item', function($content='', $atts, $shortcode_name){
 			$t1
 		ON 
 			$t1.et_arlo_id = $t2.oat_arlo_id
+		AND
+			$t1.active = " . $active . "
 		WHERE 
 			$t1.et_post_name = '$post->post_name'
+		AND
+			$t2.active = ". $active ."
 		$where
 		";
 	

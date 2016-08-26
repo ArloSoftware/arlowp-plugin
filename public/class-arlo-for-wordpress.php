@@ -1821,8 +1821,7 @@ class Arlo_For_Wordpress {
 			foreach($regionalized_items as $region => $items) {
 			
 				foreach($items as $item) {
-					//TODO: This field has to be an integer, but the API returns a wrong value!!!
-					if (!empty($item->OnlineActivityID) /* && is_numeric($item->OnlineActivityID) && $item->OnlineActivityID > 0*/) {
+					if (!empty($item->OnlineActivityID)) {
 						
 						$table_name = "{$wpdb->prefix}arlo_onlineactivities";
 						
