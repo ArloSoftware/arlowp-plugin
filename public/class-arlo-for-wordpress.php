@@ -30,7 +30,7 @@ class Arlo_For_Wordpress {
 	 *
 	 * @var     string
 	 */
-	const VERSION = '2.3.5';
+	const VERSION = '2.4';
 
 	/**
 	 * Minimum required PHP version
@@ -494,6 +494,11 @@ class Arlo_For_Wordpress {
 		if (version_compare($old_version, '2.3.5') < 0) {
 			self::run_update('2.3.5');
 		}
+		
+		if (version_compare($old_version, '2.4') < 0) {
+			self::run_update('2.4');
+		}
+		
 	}	
 	
 	private static function run_update($version) {
@@ -555,6 +560,44 @@ class Arlo_For_Wordpress {
 			case '2.3.5':
 				wp_clear_scheduled_hook( 'arlo_import' );
 			break;
+			
+			case '2.4': 
+				
+				//Add [event_template_register_interest] shortcode to the event template
+				$update_templates = ['event'];
+				$saved_templates = arlo_get_option('templates');
+				
+				foreach ($update_templates as $id) {
+					if (!empty($saved_templates[$id]['html'])) {
+						$content = $saved_templates[$id]['html'];
+						
+						if (strpos($content, "[event_template_register_interest]") === false) {
+							$shortcode = "\n[event_template_register_interest]\n";
+							$append_before = [
+								"[arlo_suggest_datelocation",
+								"[arlo_content_field_item",
+								"<h3>Similar courses",
+							];
+							foreach ($append_before as $target) {
+								//try to find the given shortcode, and append before
+								$pos = strpos($content, $target);
+								if ($pos !== false) {
+									break;
+								}
+							}
+							
+							if ($pos === false) {
+								$pos = strlen($content);
+							}
+							
+							
+							$saved_templates[$id]['html'] = substr_replace($content, $shortcode, $pos, 0);
+						}
+					}
+				}
+				
+				arlo_set_option('templates', $saved_templates);
+			break;			
 		}	
 	}
 	
@@ -1490,7 +1533,7 @@ class Arlo_For_Wordpress {
 				$table_name = $wpdb->prefix . "arlo_events_tags";			
 			break;
 			case "oa":
-				$field = "oa_arlo_id";
+				$field = "oa_id";
 				$table_name = $wpdb->prefix . "arlo_onlineactivities_tags";
 			break;			
 			default: 
