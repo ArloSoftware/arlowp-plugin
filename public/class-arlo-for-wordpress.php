@@ -294,7 +294,7 @@ class Arlo_For_Wordpress {
 		
 		// GP: Check if the scheduled task is entered. If it does not exist set it. (This ensures it is in as long as the plugin is activated.  
 		if ( ! wp_next_scheduled('arlo_set_import')) {
-			wp_schedule_event( time(), 'hourly', 'arlo_set_import' );
+			wp_schedule_event( time(), 'minutes_75', 'arlo_set_import' );
 		}
 		
 		if ( ! wp_next_scheduled('arlo_scheduler')) {
@@ -620,7 +620,7 @@ class Arlo_For_Wordpress {
 		self::set_default_options();
 		
 		// run import every 15 minutes
-		$temp = wp_schedule_event( time(), 'minutes_15', 'arlo_scheduler' ) . ': Log initiated.';
+		//$temp = wp_schedule_event( time(), 'minutes_5', 'arlo_scheduler' ) . ': Log initiated.';
 		self::get_instance()->add_import_log($temp, date('Y-m-d H:i:s T'));
 
 		// now add pages
@@ -2422,13 +2422,21 @@ class Arlo_For_Wordpress {
 	
 	public function add_cron_schedules($schedules) {
 		$schedules = [
+			'minutes_5' => [
+				'interval' => 300,
+				'display' => __('Once every 5 minutes')
+				],
 			'minutes_15' => [
 				'interval' => 900,
 				'display' => __('Once every 15 minutes')
-				],
+				],				
 			'hourly' => [
 				'interval' => 3600,
 				'display' => __('Once every hour')
+				],
+			'minutes_75' => [
+				'interval' => 4500,
+				'display' => __('Every 75 minutes')
 				]
 			];
 		return $schedules;
