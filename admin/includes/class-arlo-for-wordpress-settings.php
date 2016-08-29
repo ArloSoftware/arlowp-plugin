@@ -484,6 +484,13 @@ class Arlo_For_Wordpress_Settings {
 	    <h4>Version ' . $this->version . '</h4>
 	    <p>
 	    	<ul class="arlo-whatsnew-list">
+	    		<li>Online Activities</li>
+	    	</ul>
+	    </p>
+	    
+	    <h4>Version 2.3.5</h4>
+	    <p>
+	    	<ul class="arlo-whatsnew-list">
 	    		<li>Important fix to solve the compatibility issue with some external plugin</li>
 	    		<li>Enhancement of the plugin update mechanism</li>
 	    		<li>Few minor bugfixes</li>
