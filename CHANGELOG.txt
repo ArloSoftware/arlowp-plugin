@@ -1,4 +1,17 @@
+== V2.3.6 ==
+
+Enhancement
+------------------
+Online Acticities
+
+Bugfixes
+------------------
+
+Price can be missing on the event template page, if WP is using other db prefix than 'wp_' https://github.com/ArloSoftware/arlowp-plugin/issues/150
+Automated sync doesn't run every hour https://github.com/ArloSoftware/arlowp-plugin/issues/151
+
 == V2.3.5.1 ==
+
 Bugfixes
 ------------------
 Fix start and end date times when the dates are returning a UTC value https://github.com/ArloSoftware/arlowp-plugin/issues/149
