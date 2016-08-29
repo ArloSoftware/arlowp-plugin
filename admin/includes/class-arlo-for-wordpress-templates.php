@@ -65,10 +65,16 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 					return '<a href="' . $item->$column_name . '" target="_blank">' . __( 'Register interest', $this->plugin_slug ) . '</a>';
 				break;
 			case 'et_event_num':
+				$retval = '0';
 				if (intval($item->$column_name) > 0)
-					return '<a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug . '-events&et_id=' . $item->et_arlo_id)  .'" >' . $item->$column_name . '</a>';
-				else 
-					return 0;
+					$retval = '<a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug . '-events&et_id=' . $item->et_arlo_id)  .'" >' . $item->$column_name . '</a>';
+				
+				if (intval($item->oa_id) > 0) {
+					$retval .= ' / <a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug . '-onlineactivities&et_id=' . $item->et_arlo_id)  .'" >' . __( 'OA', $this->plugin_slug ) . '</a>';
+				}
+				
+				return $retval;
+					
 			default:
 				return '';
 			}
@@ -107,7 +113,8 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 			et.et_name,
 			et.et_descriptionsummary,
 			et.et_registerinteresturi,
-			COUNT(DISTINCT e_arlo_id) as et_event_num,
+			COUNT(DISTINCT e_arlo_id) AS et_event_num,
+			oa_id,
 			GROUP_CONCAT(DISTINCT et.et_region) AS et_region
 		FROM
 			" . $this->table_name . "
@@ -119,6 +126,10 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 			et.et_region = e.e_region
 		AND
 			e_parent_arlo_id = 0
+		LEFT JOIN
+			" . $this->wpdb->prefix . "arlo_onlineactivities AS oa
+		ON
+			et.et_arlo_id = oat_arlo_id
 		LEFT JOIN 
 			" . $this->wpdb->prefix . "posts
 		ON

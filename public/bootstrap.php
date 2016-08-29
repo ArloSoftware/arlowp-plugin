@@ -630,6 +630,7 @@ function arlo_add_datamodel() {
 	install_table_arlo_contentfields();
 	install_table_arlo_tags();
 	install_table_arlo_events();
+	install_table_arlo_onlineactivities();
 	install_table_arlo_venues();
 	install_table_arlo_presenters();
 	install_table_arlo_offers();
@@ -689,8 +690,8 @@ function install_table_arlo_async_tasks() {
     
     $sql = "
 	  CREATE TABLE " . $wpdb->prefix . "arlo_async_task_data (
-	  data_task_id int(11) NOT NULL,
-	  data_text text NOT NULL,
+	  data_task_id INT(11) NOT NULL,
+	  data_text TEXT NOT NULL,
 	  PRIMARY KEY  (data_task_id)
 	) CHARSET=utf8;  
     ";
@@ -813,6 +814,42 @@ function install_table_arlo_events() {
  * @access public
  * @return void
  */
+
+function install_table_arlo_onlineactivities() {	
+	global $wpdb, $current_user;
+	$table_name = $wpdb->prefix . "arlo_onlineactivities";
+
+	$sql = "CREATE TABLE " . $table_name . " (
+		oa_id INT(11) NOT NULL AUTO_INCREMENT,
+		oat_arlo_id INT(11) NULL,
+		oa_arlo_id VARCHAR(64) NOT NULL,
+		oa_code VARCHAR(255) NULL,
+		oa_name VARCHAR(255) NULL,
+		oa_delivery_description VARCHAR(255) NULL,
+		oa_viewuri VARCHAR(255) NULL,
+		oa_reference_terms VARCHAR(255) NULL,
+		oa_credits VARCHAR(255) NULL,		
+		oa_registermessage VARCHAR(255) NULL,
+		oa_registeruri VARCHAR(255) NULL,
+		oa_region VARCHAR(5) NOT NULL,		
+		active INT(10) unsigned DEFAULT NULL,
+		PRIMARY KEY  (oa_id),
+		KEY oat_arlo_id (oat_arlo_id),
+		KEY oa_region (oa_region))
+		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
+
+	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+
+	dbDelta($sql);
+}
+
+
+/**
+ * install_table_arlo_venues function.
+ * 
+ * @access public
+ * @return void
+ */
 function install_table_arlo_venues() {	
 	global $wpdb, $current_user;
 	$table_name = $wpdb->prefix . "arlo_venues";
@@ -895,6 +932,7 @@ function install_table_arlo_offers() {
 		o_arlo_id INT,
 		et_id INT,
 		e_id INT,
+		oa_id INT,
 		o_label VARCHAR(255) NULL,
 		o_isdiscountoffer TINYINT(1) NOT NULL DEFAULT FALSE,
 		o_currencycode VARCHAR(255) NULL,
@@ -914,13 +952,12 @@ function install_table_arlo_offers() {
 		KEY o_arlo_id (o_arlo_id),
 		KEY et_id (et_id),
 		KEY e_id (e_id),
+		KEY oa_id (oa_id),
 		KEY o_region (o_region),
 		KEY o_order (o_order))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-
-    dbDelta($sql);
 }
 
 /**
@@ -964,8 +1001,8 @@ function install_table_arlo_tags() {
 	$charset_collate = core_set_charset();
 
 	$sql = "CREATE TABLE " . $wpdb->prefix . "arlo_tags (
-  		id mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
-  		tag varchar(255) NOT NULL,
+  		id MEDIUMINT(8) unsigned NOT NULL AUTO_INCREMENT,
+  		tag VARCHAR(255) NOT NULL,
 		active INT(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (id))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci";
@@ -973,17 +1010,26 @@ function install_table_arlo_tags() {
 	dbDelta($sql);
 
 	$sql = "CREATE TABLE " . $wpdb->prefix . "arlo_events_tags (
-		e_arlo_id int(11) NOT NULL,
-		tag_id mediumint(8) unsigned NOT NULL,
+		e_arlo_id INT(11) NOT NULL,
+		tag_id MEDIUMINT(8) unsigned NOT NULL,
 		active INT(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (e_arlo_id,tag_id))
   		CHARACTER SET utf8 COLLATE=utf8_general_ci";
   		
-	dbDelta($sql);  		
+	dbDelta($sql);  	
+	
+	$sql = "CREATE TABLE " . $wpdb->prefix . "arlo_onlineactivities_tags (
+		oa_id INT(11) NOT NULL,
+		tag_id MEDIUMINT(8) unsigned NOT NULL,
+		active INT(10) unsigned DEFAULT NULL,
+		PRIMARY KEY  (oa_id,tag_id))
+  		CHARACTER SET utf8 COLLATE=utf8_general_ci";
+  		
+	dbDelta($sql);		
 
 	$sql = "CREATE TABLE " . $wpdb->prefix . "arlo_eventtemplates_tags (
-		et_arlo_id int(11) NOT NULL,
-		tag_id mediumint(8) unsigned NOT NULL,
+		et_arlo_id INT(11) NOT NULL,
+		tag_id MEDIUMINT(8) unsigned NOT NULL,
 		active INT(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (et_arlo_id,tag_id))
   		CHARACTER SET utf8 COLLATE=utf8_general_ci";
@@ -1031,13 +1077,13 @@ function install_table_arlo_categories() {
 	$sql = "CREATE TABLE " . $table_name . " (
 		c_id INT(11) NOT NULL AUTO_INCREMENT,
 		c_arlo_id INT(11) NOT NULL,
-		c_name varchar(255) NOT NULL DEFAULT '',
-		c_slug varchar(255) NOT NULL DEFAULT '',
-		c_header text,
-		c_footer text,
+		c_name VARCHAR(255) NOT NULL DEFAULT '',
+		c_slug VARCHAR(255) NOT NULL DEFAULT '',
+		c_header TEXT,
+		c_footer TEXT,
 		c_template_num SMALLINT UNSIGNED NOT NULL DEFAULT '0',
-		c_order bigint(20) DEFAULT NULL,
-		c_depth_level tinyint(3) unsigned NOT NULL DEFAULT '0',
+		c_order BIGINT(20) DEFAULT NULL,
+		c_depth_level TINYINT(3) unsigned NOT NULL DEFAULT '0',
 		c_parent_id INT(11) DEFAULT NULL,
 		active INT(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (c_id),
@@ -1089,8 +1135,8 @@ function install_table_arlo_timezones() {
 
 	$sql = "
 		CREATE TABLE " . $table_name . " (
-		id tinyint(3) unsigned NOT NULL,
-		name varchar(256) NOT NULL,
+		id TINYINT(3) unsigned NOT NULL,
+		name VARCHAR(256) NOT NULL,
 		active INT(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (id)) 
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;	
@@ -1098,8 +1144,8 @@ function install_table_arlo_timezones() {
   			
 	$sql2 = " 
 		CREATE TABLE IF NOT EXISTS " . $table_name . "_olson (
-		timezone_id int(11) NOT NULL,
-		olson_name varchar(255) NOT NULL,
+		timezone_id INT(11) NOT NULL,
+		olson_name VARCHAR(255) NOT NULL,
 		active INT(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (timezone_id,olson_name)
 		) CHARACTER SET utf8 COLLATE=utf8_general_ci;
@@ -1123,10 +1169,10 @@ function install_table_arlo_import_log() {
 	$table_name = $wpdb->prefix . "arlo_import_log";
 
 	$sql = "CREATE TABLE $table_name (
-		  id int(11) unsigned NOT NULL AUTO_INCREMENT,
-		  message text,
-		  created datetime DEFAULT NULL,
-		  successful tinyint(1) DEFAULT NULL,
+		  id INT(11) unsigned NOT NULL AUTO_INCREMENT,
+		  message TEXT,
+		  created DATETIME DEFAULT NULL,
+		  successful TINYINT(1) DEFAULT NULL,
 		  PRIMARY KEY  (id)) 
 		  CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
@@ -1138,9 +1184,9 @@ function install_table_arlo_import_log() {
         $table_name = $wpdb->prefix . "arlo_import_lock";
         
         $sql = "CREATE TABLE $table_name (
-            import_id int(10) unsigned NOT NULL,
-            lock_acquired datetime NOT NULL,
-            lock_expired datetime NOT NULL
+            import_id INT(10) unsigned NOT NULL,
+            lock_acquired DATETIME NOT NULL,
+            lock_expired DATETIME NOT NULL
             ) CHARACTER SET utf8 COLLATE=utf8_general_ci;";
         
 		dbDelta($sql);
@@ -1684,6 +1730,28 @@ $shortcodes->add('event_template_tags', function($content='', $atts, $shortcode_
 	return $output;
 });
 
+$shortcodes->add('event_template_register_interest', function($content='', $atts, $shortcode_name){
+	global $post, $wpdb;
+	$settings = get_option('arlo_settings');
+	
+	$output = '';
+	
+	if (!empty($GLOBALS['no_event']) && !empty($GLOBALS['no_onlineactivity'])) {
+		$no_event_text = !empty($settings['noeventontemplate_text']) ? $settings['noeventontemplate_text'] : __('Interested in attending? Have a suggestion about running this course near you?', $GLOBALS['arlo_plugin_slug']);
+		
+		if (!empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) {
+			$no_event_text .= '<br /><a href="' . $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'] . '">Register your interest now</a>';
+		}
+		
+		$output = '
+		<p class="arlo-no-results">' . 
+			$no_event_text . 
+		'</p>';	
+	}
+
+	return $output;
+});
+
 // event template tags shortcode
 
 $shortcodes->add('event_tags', function($content='', $atts, $shortcode_name){
@@ -2075,6 +2143,7 @@ $shortcodes->add('event_list_item', function($content='', $atts, $shortcode_name
 	$output = '';
 	
 	if (is_array($items) && count($items)) {
+		unset($GLOBALS['no_event']);
 		foreach($items as $key => $item) {
 	
 			$GLOBALS['arlo_event_list_item'] = $item;
@@ -2088,16 +2157,7 @@ $shortcodes->add('event_list_item', function($content='', $atts, $shortcode_name
 			unset($GLOBALS['arlo_event_list_item']);
 		}	
 	} else {
-		$no_event_text = !empty($settings['noeventontemplate_text']) ? $settings['noeventontemplate_text'] : __('Interested in attending? Have a suggestion about running this course near you?', $GLOBALS['arlo_plugin_slug']);
-		
-		if (!empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) {
-			$no_event_text .= '<br /><a href="' . $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'] . '">Register your interest now</a>';
-		}
-		
-		$output = '
-		<p class="arlo-no-results">' . 
-			$no_event_text . 
-		'</p>';
+		$GLOBALS['no_event'] = 1;
 	}
 	
 	
@@ -3948,6 +4008,268 @@ $shortcodes->add('category_footer', function($content='', $atts, $shortcode_name
 	return $category->c_footer;
 });
 
+//online activity list item shortcode
+
+$shortcodes->add('oa_list_item', function($content='', $atts, $shortcode_name){
+	global $post, $wpdb, $arlo_plugin;
+	$settings = get_option('arlo_settings');
+	$regions = get_option('arlo_regions');
+	
+	$active = $arlo_plugin->get_import_id();
+	
+	$arlo_region = get_query_var('arlo-region', '');
+	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
+	
+	$t1 = "{$wpdb->prefix}arlo_eventtemplates";
+	$t2 = "{$wpdb->prefix}arlo_onlineactivities";
+	$t6 = "{$wpdb->prefix}arlo_offers";
+	
+	if (!empty($arlo_region)) {
+		$where .= ' AND ' . $t1 . '.et_region = "' . $arlo_region . '" AND ' . $t2 . '.oa_region = "' . $arlo_region . '"';
+	}					
+	
+	$sql = 
+		"SELECT 
+			oa_id,
+			oa_arlo_id,
+			oat_arlo_id,
+			oa_code,
+			oa_reference_terms,
+			oa_credits,
+			oa_name,
+			oa_delivery_description,
+			oa_viewuri,
+			oa_registermessage,
+			oa_registeruri
+		FROM 
+			$t2
+		LEFT JOIN 
+			$t1
+		ON 
+			$t1.et_arlo_id = $t2.oat_arlo_id
+		AND
+			$t1.active = " . $active . "
+		WHERE 
+			$t1.et_post_name = '$post->post_name'
+		AND
+			$t2.active = ". $active ."
+		$where
+		";
+	
+	$items = $wpdb->get_results($sql, ARRAY_A);
+	
+	$output = '';
+	
+	if (is_array($items) && count($items)) {
+	
+		unset($GLOBALS['no_onlineactivity']);
+		
+		foreach($items as $key => $item) {
+	
+			$GLOBALS['arlo_oa_list_item'] = $item;
+	                	
+			$output .= do_shortcode($content);
+	
+			unset($GLOBALS['arlo_oa_list_item']);
+		}	
+	} else {
+		$GLOBALS['no_onlineactivity'] = 1;
+	}
+	
+	
+	return $output;
+});
+
+
+// online activity code shortcode
+$shortcodes->add('oa_code', function($content='', $atts, $shortcode_name){
+	if(!isset($GLOBALS['arlo_oa_list_item']['oa_code'])) return '';
+
+	return htmlentities($GLOBALS['arlo_oa_list_item']['oa_code'], ENT_QUOTES, "UTF-8");
+});
+
+// online activity name shortcode
+$shortcodes->add('oa_name', function($content='', $atts, $shortcode_name){
+	if(!isset($GLOBALS['arlo_oa_list_item']['oa_name'])) return '';
+
+	return htmlentities($GLOBALS['arlo_oa_list_item']['oa_name'], ENT_QUOTES, "UTF-8");
+});
+
+$shortcodes->add('oa_delivery_description', function($content='', $atts, $shortcode_name){
+	if(!isset($GLOBALS['arlo_oa_list_item']['oa_delivery_description'])) return '';
+
+	return htmlentities($GLOBALS['arlo_oa_list_item']['oa_delivery_description'], ENT_QUOTES, "UTF-8");
+});
+
+$shortcodes->add('oa_reference_term', function($content='', $atts, $shortcode_name){
+	if(!isset($GLOBALS['arlo_oa_list_item']['oa_reference_terms'])) return '';
+	
+	$output = '';
+	
+	// merge and extract attributes
+	extract(shortcode_atts(array(
+		'type' => 'singular',
+	), $atts, $shortcode_name));
+	
+	$type = ucfirst(strtolower($type));
+	
+	$terms = json_decode($GLOBALS['arlo_oa_list_item']['oa_reference_terms']);
+	
+	if (!empty($terms->$type)) {
+		$output = $terms->$type;
+	}
+
+	return $output;
+});
+
+
+// online activity credits shortcode
+$shortcodes->add('oa_credits', function($content='', $atts, $shortcode_name){
+	if(!isset($GLOBALS['arlo_oa_list_item']['oa_credits'])) return '';
+	$output = '';
+	
+	// merge and extract attributes
+	extract(shortcode_atts(array(
+		'layout' => 'list',
+	), $atts, $shortcode_name));
+	
+	$credits = json_decode($GLOBALS['arlo_oa_list_item']['oa_credits']);
+	
+	if (is_array($credits) && count($credits)) {
+		switch($layout) {
+			default:
+				$output .= '<ul class="arlo-oa-credits">';
+				foreach ($credits as $credit) {
+					$output .= '<li>' . htmlentities($credit->Type, ENT_QUOTES, "UTF-8") . ': ' . htmlentities($credit->Value, ENT_QUOTES, "UTF-8") . '</li>';
+				}
+				$output .= '</ul>';
+			break;
+		}	
+	}	
+
+	return $output;
+});
+
+// online activity registration shortcode
+
+$shortcodes->add('oa_registration', function($content='', $atts, $shortcode_name){
+	$registeruri = $GLOBALS['arlo_oa_list_item']['oa_registeruri'];
+	$registermessage = $GLOBALS['arlo_oa_list_item']['oa_registermessage'];
+        
+	$class = (!empty($atts['class']) ? $atts['class'] : 'button' );
+
+	$registration = '<div class="arlo-oa-registration">';
+	// test if there is a register uri string, if so display the button
+	if(!is_null($registeruri) && $registeruri != '') {
+		$registration .= '<a class="' . $class . ' arlo-register" href="'. esc_attr($registeruri) . '" target="_blank">' . __($registermessage, $GLOBALS['arlo_plugin_slug']) . '</a>';
+	} else {
+		$registration .= $registermessage;
+	}
+	
+	$registration .= '</div>';
+
+	return $registration;
+});
+
+// online activity offers shortcode
+
+$shortcodes->add('oa_offers', function($content='', $atts, $shortcode_name){
+	global $wpdb;
+
+	$oa_id = $GLOBALS['arlo_oa_list_item']['oa_id'];
+	
+	$regions = get_option('arlo_regions');	
+	
+	$arlo_region = get_query_var('arlo-region', '');
+	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
+
+	$t1 = "{$wpdb->prefix}arlo_offers";
+	
+	$sql = "
+	SELECT 
+		offer.*,
+		replaced_by.o_label AS replacement_label,
+		replaced_by.o_isdiscountoffer AS replacement_discount,
+		replaced_by.o_currencycode AS replacement_currency_code,
+		replaced_by.o_formattedamounttaxexclusive AS replacement_amount,
+		replaced_by.o_message AS replacement_message
+	FROM 
+		wp_arlo_offers AS offer
+	LEFT JOIN 
+		wp_arlo_offers AS replaced_by 
+	ON 
+		offer.o_arlo_id = replaced_by.o_replaces 
+	AND 
+		offer.oa_id = replaced_by.oa_id	
+	" . (!empty($arlo_region) ? " AND replaced_by.o_region = '" . $arlo_region . "'" : "") . "				
+	WHERE 
+		offer.o_replaces = 0 
+	AND 
+		offer.oa_id = $oa_id
+	" . (!empty($arlo_region) ? " AND offer.o_region = '" . $arlo_region . "'" : "") . "		
+	ORDER BY 
+		offer.o_order";
+		
+	$offers_array = $wpdb->get_results($sql, ARRAY_A);
+
+	$offers = '<ul class="arlo-list arlo-event-offers">';
+        
+    $settings = get_option('arlo_settings');  
+    $price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : ARLO_PLUGIN_PREFIX . '-exclgst';      
+    $free_text = (isset($settings['free_text'])) ? esc_attr($settings['free_text']) : __('Free', $GLOBALS['arlo_plugin_slug']);
+
+
+	foreach($offers_array as $offer) {
+
+		extract($offer);
+                
+		$amount = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $o_offeramounttaxexclusive : $o_offeramounttaxinclusive;
+		$famount = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $o_formattedamounttaxexclusive : $o_formattedamounttaxinclusive;
+
+		// set to true if there is a replacement offer returned for this event offer
+		$replaced = (!is_null($replacement_amount) && $replacement_amount != '');
+
+		$offers .= '<li><span';
+		// if the offer is discounted
+		if($o_isdiscountoffer) {
+			$offers .= ' class="discount"';
+		// if the offer is replace by another offer
+		} elseif($replaced) {
+			$offers .= ' class="replaced"';
+		}
+		$offers .= '>';
+		// display label if there is one
+		$offers .= (!is_null($o_label) || $o_label != '') ? $o_label.' ':'';
+		if($amount > 0) {
+			$offers .= '<span class="amount">'.$famount.'</span> ';
+			// only include the excl. tax if the offer is not replaced			
+			$offers .= $replaced ? '' : '<span class="arlo-price-tax">' . ($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode) : sprintf(__('incl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode) . '</span>');
+		} else {
+			$offers .= '<span class="amount free">'.$free_text.'</span> ';
+		}
+		// display message if there is one
+		$offers .= (!is_null($o_message) || $o_message != '') ? ' '.$o_message:'';
+		// if a replacement offer exists
+		if($replaced) {
+			$offers .= '</span><span ' . $replacement_discount ? 'class="discount"' : '' . '>';
+			
+			// display replacement offer label if there is one
+			$offers .= (!is_null($replacement_label) || $replacement_label != '') ? $replacement_label.' ':'';
+			$offers .= '<span class="amount">'.$replacement_amount.'</span> <span class="arlo-price-tax">'.($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode) : sprintf(__('incl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode)) . '</span>';
+			// display replacement offer message if there is one
+			$offers .= (!is_null($replacement_message) || $replacement_message != '') ? ' '.$replacement_message:'';
+
+		} // end if
+
+		$offers .= '</span></li>';
+
+	} // end foreach
+
+	$offers .= '</ul>';
+
+	return $offers;
+});
+
 
 // no_event_text
 $shortcodes->add('no_event_text', function($content='', $atts, $shortcode_name){
@@ -3956,7 +4278,6 @@ $shortcodes->add('no_event_text', function($content='', $atts, $shortcode_name){
 	}
 });
 
-
 // label
 $shortcodes->add('label', function($content='', $atts, $shortcode_name){
 	return $content;
@@ -3964,5 +4285,10 @@ $shortcodes->add('label', function($content='', $atts, $shortcode_name){
 
 // event list wrapper
 $shortcodes->add('event_list', function($content='', $atts, $shortcode_name){
+		return $content;
+});
+
+// event list wrapper
+$shortcodes->add('oa_list', function($content='', $atts, $shortcode_name){
 		return $content;
 });

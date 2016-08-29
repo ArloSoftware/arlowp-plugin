@@ -32,8 +32,28 @@
 		</li>
 		[/arlo_event_list_item]
 		[/arlo_event_list]
+		
+		[arlo_oa_list]
+			[arlo_oa_list_item]
+			<li class="arlo-cf arlo-online-activity">
+				<div class="arlo-left arlo-cal">[arlo_oa_reference_term]</div>
+				<div class="arlo-left">
+					[arlo_oa_code] - [arlo_oa_name]
+					[arlo_oa_credits]
+					
+					[arlo_oa_delivery_description label="Delivery: " wrap='<div class="arlo-delivery-desc">%s</div>']
+					[arlo_oa_offers]
+				</div>
+				<div class="arlo-right">
+					[arlo_oa_registration]
+				</div>
+			</li>
+			[/arlo_oa_list_item]
+		[/arlo_oa_list]		
+		
 	</ul>
 	<div class="arlo-clear-both"></div>
+	[arlo_event_template_register_interest]
 	[arlo_suggest_datelocation wrap="<div class='arlo-suggest'>%s</div>"]
 	
 	[arlo_content_field_item]

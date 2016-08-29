@@ -54,6 +54,11 @@
 	padding: 6px 0px;
 }
 
+.arlo-onlineactivity .arlo-oa-credits {
+	margin-left: 1em;
+	list-style: none;
+}
+
 .arlo-event-details {
 	max-width: 50%;
 }

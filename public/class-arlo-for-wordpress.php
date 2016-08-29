@@ -30,7 +30,8 @@ class Arlo_For_Wordpress {
 	 *
 	 * @var     string
 	 */
-	const VERSION = '2.3.5.1';
+
+	const VERSION = '2.3.6';
 
 	/**
 	 * Minimum required PHP version
@@ -494,6 +495,11 @@ class Arlo_For_Wordpress {
 		if (version_compare($old_version, '2.3.5') < 0) {
 			self::run_update('2.3.5');
 		}
+		
+		if (version_compare($old_version, '2.4') < 0) {
+			self::run_update('2.4');
+		}
+		
 	}	
 	
 	private static function run_update($version) {
@@ -555,6 +561,43 @@ class Arlo_For_Wordpress {
 			case '2.3.5':
 				wp_clear_scheduled_hook( 'arlo_import' );
 			break;
+			
+			case '2.4': 
+				
+				//Add [event_template_register_interest] shortcode to the event template
+				$update_templates = ['event'];
+				$saved_templates = arlo_get_option('templates');
+				
+				foreach ($update_templates as $id) {
+					if (!empty($saved_templates[$id]['html'])) {
+						$content = $saved_templates[$id]['html'];
+						
+						if (strpos($content, "[arlo_event_template_register_interest]") === false) {
+							$shortcode = "\n[arlo_event_template_register_interest]\n";
+							$append_before = [
+								"[arlo_suggest_datelocation",
+								"[arlo_content_field_item",
+								"<h3>Similar courses",
+							];
+							foreach ($append_before as $target) {
+								//try to find the given shortcode, and append before
+								$pos = strpos($content, $target);
+								if ($pos !== false) {
+									break;
+								}
+							}
+							
+							if ($pos === false) {
+								$pos = strlen($content);
+							}
+							
+							$saved_templates[$id]['html'] = substr_replace($content, $shortcode, $pos, 0);
+						}
+					}
+				}
+				
+				arlo_set_option('templates', $saved_templates);
+			break;			
 		}	
 	}
 	
@@ -660,7 +703,7 @@ class Arlo_For_Wordpress {
 	 * @since    1.0.0
 	 */
 	public function enqueue_styles() {
-		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css?20160814', __FILE__ ), array(), self::VERSION );
+		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css?20160829', __FILE__ ), array(), self::VERSION );
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-darktooltip', plugins_url( 'assets/css/libs/darktooltip.min.css', __FILE__ ), array(), self::VERSION );
 		
 		$customcss_load_type = get_option('arlo_customcss');
@@ -1260,6 +1303,7 @@ class Arlo_For_Wordpress {
 				'import_presenters',
 				'import_event_templates',
 				'import_events',
+				'import_onlineactivities',
 				'import_venues',
 				'import_categories',
 				'import_finish',
@@ -1270,11 +1314,11 @@ class Arlo_For_Wordpress {
 				'import_presenters' => "Importing presenters",
 				'import_event_templates' => "Importing event templates",
 				'import_events' => "Importing events",
+				'import_onlineactivities' => "Importing online activities",
 				'import_venues' => "Importing venues",
 				'import_categories' => "Importing categories",
 				'import_finish' => "Finalize the import",
 			];
-			
 			
 			$task = $import_tasks[$current_subtask];
 			
@@ -1377,66 +1421,8 @@ class Arlo_For_Wordpress {
 	                    throw new Exception('Database insert failed: ' . $table_name);
 	                }
 					
-					$template_event_id = $wpdb->insert_id;				
-					
-					//save the tags
-					if (isset($item->Tags) && is_array($item->Tags)) {
-						$exisiting_tags = [];
-						$sql = "
-						SELECT 
-							id, 
-							tag
-						FROM
-							{$wpdb->prefix}arlo_tags 
-						WHERE 
-							tag IN ('" . implode("', '", $item->Tags) . "')
-						AND
-							active = '{$timestamp}'
-						";
-						$rows = $wpdb->get_results($sql, ARRAY_A);
-						foreach ($rows as $row) {
-							$exisiting_tags[$row['tag']] = $row['id'];
-						}
-						unset($rows);
-						
-						foreach ($item->Tags as $tag) {
-							if (empty($exisiting_tags[$tag])) {
-								$query = $wpdb->query( $wpdb->prepare( 
-									"INSERT INTO {$wpdb->prefix}arlo_tags
-									(tag, active) 
-									VALUES ( %s, %s ) 
-									", 
-									$tag,
-									$timestamp
-								) );
-															
-								if ($query === false) {
-									throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_tags' );
-								} else {
-									$exisiting_tags[$tag] = $wpdb->insert_id;
-								}
-							}
-													
-							if (!empty($exisiting_tags[$tag])) {
-								$query = $wpdb->query( $wpdb->prepare( 
-									"REPLACE INTO {$wpdb->prefix}arlo_eventtemplates_tags
-									(et_arlo_id, tag_id, active) 
-									VALUES ( %d, %d, %s ) 
-									", 
-									$item->TemplateID,
-									$exisiting_tags[$tag],
-									$timestamp
-								) );
-								
-								if ($query === false) {
-									throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_events_tags' );
-								}
-							} else {
-								throw new Exception('Couldn\'t find tag: ' . $tag );
-							}
-						}
-					}
-					
+					$this->save_tags($item->Tags, $template_event_id, 'template', $timestamp);
+										
 					$content = '';
 					if (!empty($item->Description->Summary)) {
 						$content = $item->Description->Summary;
@@ -1463,37 +1449,7 @@ class Arlo_For_Wordpress {
 					// need to insert associated data here
 					// advertised offers
 					if(isset($item->BestAdvertisedOffers) && !empty($item->BestAdvertisedOffers)) {
-						$offers = array_reverse($item->BestAdvertisedOffers);
-						foreach($offers as $key => $offer) {
-							$query = $wpdb->query( $wpdb->prepare( 
-								"INSERT INTO {$wpdb->prefix}arlo_offers 
-								(o_arlo_id, et_id, e_id, o_label, o_isdiscountoffer, o_currencycode, o_offeramounttaxexclusive, o_offeramounttaxinclusive, o_formattedamounttaxexclusive, o_formattedamounttaxinclusive, o_taxrateshortcode, o_taxratename, o_taxratepercentage, o_message, o_order, o_replaces, o_region, active) 
-								VALUES ( %d, %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, %s, %s, %s ) 
-								", 
-								$offer->OfferID+1,
-							    $template_event_id,
-								null,
-								@$offer->Label,
-								@$offer->IsDiscountOffer,
-								@$offer->OfferAmount->CurrencyCode,
-								@$offer->OfferAmount->AmountTaxExclusive,
-								@$offer->OfferAmount->AmountTaxInclusive,
-								@$offer->OfferAmount->FormattedAmountTaxExclusive,
-								@$offer->OfferAmount->FormattedAmountTaxInclusive,
-								@$offer->OfferAmount->TaxRate->ShortName,
-								@$offer->OfferAmount->TaxRate->Name,
-								@$offer->OfferAmount->TaxRate->RatePercent,
-								@$offer->Message,
-								$key+1,
-								(isset($offer->ReplacesOfferID)) ? $offer->ReplacesOfferID+1 : null,
-								(!empty($region) ? $region : ''),
-								$timestamp
-							) );
-								                                                        
-		                    if ($query === false) {
-		                        throw new Exception('Database insert failed: ' . $table_name);
-		                    }
-						}
+						$this->save_advertised_offer($item->BestAdvertisedOffers, $timestamp, $region, $template_event_id);
 					}	
 					
 					// content fields
@@ -1564,6 +1520,131 @@ class Arlo_For_Wordpress {
 		return $items;
 	}
 	
+	private function save_tags($tags, $id, $type = '', $timestamp) {
+		global $wpdb;
+		
+		switch ($type) {
+			case "template":
+				$field = "et_arlo_id";
+				$table_name = $wpdb->prefix . "arlo_eventtemplates_tags";			
+			break;		
+			case "event":
+				$field = "e_arlo_id";
+				$table_name = $wpdb->prefix . "arlo_events_tags";			
+			break;
+			case "oa":
+				$field = "oa_id";
+				$table_name = $wpdb->prefix . "arlo_onlineactivities_tags";
+			break;			
+			default: 
+				throw new Exception('Tag type failed: ' . $type);
+			break;		
+		}
+		
+		if (isset($tags) && is_array($tags)) {
+			$exisiting_tags = [];
+			$sql = "
+			SELECT 
+				id, 
+				tag
+			FROM
+				{$wpdb->prefix}arlo_tags 
+			WHERE 
+				tag IN ('" . implode("', '", $tags) . "')
+			AND
+				active = '{$timestamp}'
+			";
+			$rows = $wpdb->get_results($sql, ARRAY_A);
+			foreach ($rows as $row) {
+				$exisiting_tags[$row['tag']] = $row['id'];
+			}
+			unset($rows);
+			
+			foreach ($tags as $tag) {
+				if (empty($exisiting_tags[$tag])) {
+					$query = $wpdb->query( $wpdb->prepare( 
+						"INSERT INTO {$wpdb->prefix}arlo_tags
+						(tag, active) 
+						VALUES ( %s, %s ) 
+						", 
+						$tag,
+						$timestamp
+					) );
+												
+					if ($query === false) {
+						throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_tags ' . $type );
+					} else {
+						$exisiting_tags[$tag] = $wpdb->insert_id;
+					}
+				}
+										
+				if (!empty($exisiting_tags[$tag])) {
+					$query = $wpdb->query( $wpdb->prepare( 
+						"REPLACE INTO {$table_name}
+						(" . $field . ", tag_id, active) 
+						VALUES ( %d, %d, %s ) 
+						", 
+						$id,
+						$exisiting_tags[$tag],
+						$timestamp
+					) );
+					
+					if ($query === false) {
+						throw new Exception('Database insert failed: ' . $table_name );
+					}
+				} else {
+					throw new Exception('Couldn\'t find tag: ' . $tag );
+				}
+			}
+		}		
+	
+	}
+	
+	private function save_advertised_offer($advertised_offer, $timestamp, $region = '', $template_id = null, $event_id = null, $oa_id = null) {
+		global $wpdb;
+		
+		if(isset($advertised_offer) && !empty($advertised_offer)) {
+			$template_id = (intval($template_id) > 0 ? $template_id : null);
+			$event_id = (intval($event_id) > 0 ? $event_id : null);
+			$oa_id = (intval($oa_id) > 0 ? $oa_id : null);
+		
+			$offers = array_reverse($advertised_offer);
+			foreach($offers as $key => $offer) {
+				$query = $wpdb->query( $wpdb->prepare( 
+					"INSERT INTO {$wpdb->prefix}arlo_offers 
+					(o_arlo_id, et_id, e_id, oa_id, o_label, o_isdiscountoffer, o_currencycode, o_offeramounttaxexclusive, o_offeramounttaxinclusive, o_formattedamounttaxexclusive, o_formattedamounttaxinclusive, o_taxrateshortcode, o_taxratename, o_taxratepercentage, o_message, o_order, o_replaces, o_region, active) 
+					VALUES ( %d, %d, %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, %s, %s, %s ) 
+					", 
+					$offer->OfferID+1,
+				    $template_id,
+					$event_id,
+					$oa_id,
+					@$offer->Label,
+					@$offer->IsDiscountOffer,
+					@$offer->OfferAmount->CurrencyCode,
+					@$offer->OfferAmount->AmountTaxExclusive,
+					@$offer->OfferAmount->AmountTaxInclusive,
+					@$offer->OfferAmount->FormattedAmountTaxExclusive,
+					@$offer->OfferAmount->FormattedAmountTaxInclusive,
+					@$offer->OfferAmount->TaxRate->ShortName,
+					@$offer->OfferAmount->TaxRate->Name,
+					@$offer->OfferAmount->TaxRate->RatePercent,
+					@$offer->Message,
+					$key+1,
+					(isset($offer->ReplacesOfferID)) ? $offer->ReplacesOfferID+1 : null,
+					(!empty($region) ? $region : 'NULL'),
+					$timestamp
+				) );
+				
+				if ($query === false) {
+					throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_offers');
+				}
+			}
+		}	
+	
+	
+	}
+	
 	private function save_event_data($item = array(), $parent_id = 0, $timestamp, $region = '') {
 		global $wpdb;
 		
@@ -1611,40 +1692,8 @@ class Arlo_For_Wordpress {
 		
 		$event_id = $wpdb->insert_id;
 		
-		// need to insert associated data here
-		// advertised offers
 		if(isset($item->AdvertisedOffers) && !empty($item->AdvertisedOffers)) {
-			$offers = array_reverse($item->AdvertisedOffers);
-			foreach($offers as $key => $offer) {
-				$query = $wpdb->query( $wpdb->prepare( 
-					"INSERT INTO {$wpdb->prefix}arlo_offers 
-					(o_arlo_id, et_id, e_id, o_label, o_isdiscountoffer, o_currencycode, o_offeramounttaxexclusive, o_offeramounttaxinclusive, o_formattedamounttaxexclusive, o_formattedamounttaxinclusive, o_taxrateshortcode, o_taxratename, o_taxratepercentage, o_message, o_order, o_replaces, o_region, active) 
-					VALUES ( %d, %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, %s, %s, %s ) 
-					", 
-					$offer->OfferID+1,
-				    null,
-					$event_id,
-					@$offer->Label,
-					@$offer->IsDiscountOffer,
-					@$offer->OfferAmount->CurrencyCode,
-					@$offer->OfferAmount->AmountTaxExclusive,
-					@$offer->OfferAmount->AmountTaxInclusive,
-					@$offer->OfferAmount->FormattedAmountTaxExclusive,
-					@$offer->OfferAmount->FormattedAmountTaxInclusive,
-					@$offer->OfferAmount->TaxRate->ShortName,
-					@$offer->OfferAmount->TaxRate->Name,
-					@$offer->OfferAmount->TaxRate->RatePercent,
-					@$offer->Message,
-					$key+1,
-					(isset($offer->ReplacesOfferID)) ? $offer->ReplacesOfferID+1 : null,
-					(!empty($region) ? $region : ''),
-					$timestamp
-				) );
-				
-				if ($query === false) {
-					throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_offers');
-				}
-			}
+			$this->save_advertised_offer($item->AdvertisedOffers, $timestamp, $region, null, $event_id);
 		}
 		
 		// prsenters
@@ -1727,63 +1776,88 @@ class Arlo_For_Wordpress {
 					if (!empty($item->EventID) && is_numeric($item->EventID) && $item->EventID > 0) {
 						$event_id = $this->save_event_data($item, 0, $timestamp, $region);
 						
-						//save the tags
-						if (isset($item->Tags) && is_array($item->Tags)) {
-							$exisiting_tags = [];
-							$sql = "
-							SELECT 
-								id, 
-								tag
-							FROM
-								{$wpdb->prefix}arlo_tags 
-							WHERE 
-								tag IN ('" . implode("', '", $item->Tags) . "')
-							AND
-								active = '{$timestamp}'
-							";
-							$rows = $wpdb->get_results($sql, ARRAY_A);
-							foreach ($rows as $row) {
-								$exisiting_tags[$row['tag']] = $row['id'];
-							}
-							unset($rows);
-							
-							foreach ($item->Tags as $tag) {
-								if (empty($exisiting_tags[$tag])) {
-									$query = $wpdb->query( $wpdb->prepare( 
-										"INSERT INTO {$wpdb->prefix}arlo_tags
-										(tag, active) 
-										VALUES ( %s, %s ) 
-										", 
-										$tag,
-										$timestamp
-									) );
-																
-									if ($query === false) {
-										throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_tags' );
-									} else {
-										$exisiting_tags[$tag] = $wpdb->insert_id;
-									}
-								}
-														
-								if (!empty($exisiting_tags[$tag])) {
-									$query = $wpdb->query( $wpdb->prepare( 
-										"REPLACE INTO {$wpdb->prefix}arlo_events_tags
-										(e_arlo_id, tag_id, active) 
-										VALUES ( %d, %d, %s ) 
-										", 
-										$item->EventID,
-										$exisiting_tags[$tag],
-										$timestamp
-									) );
-									
-									if ($query === false) {
-										throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_events_tags' );
-									}
-								} else {
-									throw new Exception('Couldn\'t find tag: ' . $tag );
-								}
-							}
-						}					
+						$this->save_tags($item->Tags, $item->EventID, 'event', $timestamp);
+					}
+				}				
+			}
+			
+			$wpdb->query('COMMIT');
+		}
+		
+		return $items;
+	}	
+	
+	private function import_onlineactivities($timestamp) {
+		global $wpdb;
+		
+		$regions = get_option('arlo_regions');
+		
+		if (!(is_array($regions))) {
+			$regions = [];
+		}		
+	
+		$client = $this->get_api_client();
+		
+		$regionalized_items = $client->OnlineActivitySearch()->getAllOnlineActivities(
+			array(
+				'OnlineActivityID',
+				'TemplateID',
+				'Name',
+				'Code',
+				'DeliveryDescription',
+				'ViewUri',
+				'ReferenceTerms',
+				'Credits',
+				'RegistrationInfo',
+				'AdvertisedOffers',
+				'Tags'
+			), 
+			array_keys($regions)
+		);
+										
+		if(!empty($regionalized_items)) {
+			
+			$wpdb->query('START TRANSACTION');
+				
+			foreach($regionalized_items as $region => $items) {
+			
+				foreach($items as $item) {
+					if (!empty($item->OnlineActivityID)) {
+						
+						$table_name = "{$wpdb->prefix}arlo_onlineactivities";
+						
+						$query = $wpdb->query(
+							$wpdb->prepare( 
+								"INSERT INTO $table_name 
+								(oa_arlo_id, oat_arlo_id, oa_code, oa_name, oa_delivery_description, oa_viewuri, oa_reference_terms, oa_credits, oa_registermessage, oa_registeruri, oa_region, active) 
+								VALUES ( %s, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
+								", 
+							    $item->OnlineActivityID,
+								$item->TemplateID,
+								@$item->Code,
+								$item->Name,
+								@$item->DeliveryDescription,
+								$item->ViewUri,
+								json_encode($item->ReferenceTerms),
+								json_encode($item->Credits),
+								@$item->RegistrationInfo->RegisterMessage,
+								@$item->RegistrationInfo->RegisterUri,
+								(!empty($region) ? $region : 'NULL'),
+								$timestamp
+							)
+						);
+				                        
+						if ($query === false) {					
+							throw new Exception('Database insert failed: ' . $table_name);
+						}	
+						
+						$oa_id = $wpdb->insert_id;	
+						
+						$this->save_tags($item->Tags, $oa_id, 'oa', $timestamp);						
+						
+						if(isset($item->AdvertisedOffers) && !empty($item->AdvertisedOffers)) {
+							$this->save_advertised_offer($item->AdvertisedOffers, $timestamp, $region, null, null, $oa_id);
+						}
 					}
 				}				
 			}
@@ -1793,6 +1867,7 @@ class Arlo_For_Wordpress {
 		
 		return $items;
 	}
+	
 	
 	private function import_timezones($timestamp) {
 		global $wpdb;
@@ -2263,6 +2338,8 @@ class Arlo_For_Wordpress {
 			'presenters',
 			'venues',
 			'categories',
+			'onlineactivities',
+			'onlineactivities_tags',
             'events_presenters',
             'eventtemplates_categories',
             'eventtemplates_presenters',

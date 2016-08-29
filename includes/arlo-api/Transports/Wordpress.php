@@ -28,7 +28,7 @@ class Wordpress extends Transport
 		}
 		
 		$url = $this->getRemoteURL($platform_name, $public) . $path;
-		
+				
 		try {
 			$response = wp_remote_request( $url, array(
 				'headers' => array(

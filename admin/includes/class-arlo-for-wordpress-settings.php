@@ -484,6 +484,13 @@ class Arlo_For_Wordpress_Settings {
 	    <h4>Version ' . $this->version . '</h4>
 	    <p>
 	    	<ul class="arlo-whatsnew-list">
+	    		<li>Online Activities</li>
+	    	</ul>
+	    </p>
+	    
+	    <h4>Version 2.3.5.1</h4>
+	    <p>
+	    	<ul class="arlo-whatsnew-list">	    
 	    		<li>Fix start and end date times when the dates are returning a UTC value</li>
 	    	</ul>
 	    </p>				
