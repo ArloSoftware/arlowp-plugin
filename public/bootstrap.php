@@ -958,8 +958,6 @@ function install_table_arlo_offers() {
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-
-    var_dump(dbDelta($sql));
 }
 
 /**
@@ -4136,15 +4134,18 @@ $shortcodes->add('oa_credits', function($content='', $atts, $shortcode_name){
 	), $atts, $shortcode_name));
 	
 	$credits = json_decode($GLOBALS['arlo_oa_list_item']['oa_credits']);
-	switch($layout) {
-		default:
-			$output .= '<ul class="arlo-oa-credits">';
-			foreach ($credits as $credit) {
-				$output .= '<li>' . htmlentities($credit->Type, ENT_QUOTES, "UTF-8") . ': ' . htmlentities($credit->Value, ENT_QUOTES, "UTF-8") . '</li>';
-			}
-			$output .= '</ul>';
-		break;
-	}
+	
+	if (is_array($credits) && count($credits)) {
+		switch($layout) {
+			default:
+				$output .= '<ul class="arlo-oa-credits">';
+				foreach ($credits as $credit) {
+					$output .= '<li>' . htmlentities($credit->Type, ENT_QUOTES, "UTF-8") . ': ' . htmlentities($credit->Value, ENT_QUOTES, "UTF-8") . '</li>';
+				}
+				$output .= '</ul>';
+			break;
+		}	
+	}	
 
 	return $output;
 });
