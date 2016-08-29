@@ -2365,9 +2365,9 @@ $shortcodes->add('event_offers', function($content='', $atts, $shortcode_name){
 		replaced_by.o_formattedamounttaxexclusive AS replacement_amount,
 		replaced_by.o_message AS replacement_message
 	FROM 
-		wp_arlo_offers AS offer
+		{$wpdb->prefix}arlo_offers AS offer
 	LEFT JOIN 
-		wp_arlo_offers AS replaced_by 
+		{$wpdb->prefix}arlo_offers AS replaced_by 
 	ON 
 		offer.o_arlo_id = replaced_by.o_replaces 
 	AND 
@@ -4194,9 +4194,9 @@ $shortcodes->add('oa_offers', function($content='', $atts, $shortcode_name){
 		replaced_by.o_formattedamounttaxexclusive AS replacement_amount,
 		replaced_by.o_message AS replacement_message
 	FROM 
-		wp_arlo_offers AS offer
+		{$wpdb->prefix}arlo_offers AS offer
 	LEFT JOIN 
-		wp_arlo_offers AS replaced_by 
+		{$wpdb->prefix}arlo_offers AS replaced_by 
 	ON 
 		offer.o_arlo_id = replaced_by.o_replaces 
 	AND 
