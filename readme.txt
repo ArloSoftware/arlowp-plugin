@@ -2,7 +2,7 @@
 Contributors: ArloSoftware, adamfentosi
 Tags: online registration, event registration, training management,  event management, event plugin, training company software, training calendar, training administration, training management software, training provider, solution, events calendar, wordpress events, event ticketing, wordpress lms, class registration, conference registration,  ticket, registration, event manager, training, booking, ticketing
 Requires at least: 3.7
-Tested up to: 4.5.3
+Tested up to: 4.6
 Stable tag: 2.3.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -54,7 +54,7 @@ Arlo for WordPress providers you with the building blocks to create great lookin
 * [Arlo categories](https://developer.arlo.co/doc/wordpress/widgets#widget-categories) 
 
 = Get started today! =
-Sign-up for a [free Arlo trial](https://www.arlo.co/try-arlo) and then install the "Arlo training and event management system" plugin now!
+Sign-up for a [free Arlo trial](https://www.arlo.co/register) and then install the "Arlo training and event management system" plugin now!
  
 [youtube http://www.youtube.com/watch?v=6MWDFKjYNPY]
 
@@ -96,7 +96,7 @@ Yes! The Arlo Training and Event Management plugin works out-of-the-box with nea
 
 = Can I use the plugin without an Arlo platform? =
 
-Unfortunately no, you have to sign up for a [free Arlo trial](https://www.arlo.co/try-arlo). 
+Unfortunately no, you have to sign up for a [free Arlo trial](https://www.arlo.co/register). 
 
 = Where can I find documentation? =
 
@@ -125,6 +125,10 @@ The Arlo - Training and Event Management, and online registration plugin is only
 7. Arlo integration
 
 == Changelog ==
+
+= 2.3.5.1 = 
+
+Fix start and end date times when the dates are returning a UTC value
 
 = 2.3.5 =
 

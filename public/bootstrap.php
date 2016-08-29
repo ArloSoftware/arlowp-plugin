@@ -2253,7 +2253,7 @@ $shortcodes->add('event_start_date', function($content='', $atts, $shortcode_nam
 		$format = date_format_to_strftime_format($format);
 	}	
 
-	return strftime($format, $start_date->getTimestamp());
+	return strftime($format, $start_date->getTimestamp() + $start_date->getOffset());
 });
 
 // event end date shortcode
@@ -2302,7 +2302,7 @@ $shortcodes->add('event_end_date', function($content='', $atts, $shortcode_name)
 		$format = date_format_to_strftime_format($format);
 	}
 
-	return strftime($format, $end_date->getTimestamp());
+	return strftime($format, $end_date->getTimestamp() + $end_date->getOffset());
 });
 
 // event session description shortcode

@@ -30,6 +30,7 @@ class Arlo_For_Wordpress {
 	 *
 	 * @var     string
 	 */
+
 	const VERSION = '2.3.6';
 
 	/**
@@ -1680,7 +1681,7 @@ class Arlo_For_Wordpress {
 				@$item->Provider->Name,
 				@$item->Provider->WebsiteUri,
 				@$item->Location->IsOnline,
-				(!empty($region) ? $region : 'NULL'),
+				(!empty($region) ? $region : ''),
 				$timestamp
 			)
 		);

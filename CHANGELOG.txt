@@ -1,3 +1,8 @@
+== V2.3.5.1 ==
+Bugfixes
+------------------
+Fix start and end date times when the dates are returning a UTC value https://github.com/ArloSoftware/arlowp-plugin/issues/149
+
 == V2.3.5 ==
 
 Enhancement

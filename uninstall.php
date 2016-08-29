@@ -39,7 +39,9 @@ function arlo_delete_tables()
 {
     global $wpdb;
 	$sql="
-	DROP TABLE IF EXISTS " . 
+	DROP TABLE IF EXISTS " .
+		$wpdb->prefix . "arlo_async_tasks," .
+		$wpdb->prefix . "arlo_async_task_data," . 
 		$wpdb->prefix . "arlo_categories," . 
 		$wpdb->prefix . "arlo_contentfields, " . 
 		$wpdb->prefix . "arlo_events, " . 		
