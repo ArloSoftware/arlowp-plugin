@@ -958,6 +958,8 @@ function install_table_arlo_offers() {
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+	
+	dbDelta($sql);
 }
 
 /**
