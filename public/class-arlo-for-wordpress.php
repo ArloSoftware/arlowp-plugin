@@ -1440,8 +1440,12 @@ class Arlo_For_Wordpress {
 	                if ($query === false) {
 	                    throw new Exception('Database insert failed: ' . $table_name);
 	                }
-					
-					$this->save_tags($item->Tags, $template_event_id, 'template', $timestamp);
+	                
+	                $template_event_id = $wpdb->insert_id;
+	                
+					if (isset($item->Tags) && !empty($item->Tags)) {
+						$this->save_tags($item->Tags, $template_event_id, 'template', $timestamp);
+					}
 										
 					$content = '';
 					if (!empty($item->Description->Summary)) {
@@ -1795,8 +1799,9 @@ class Arlo_For_Wordpress {
 				foreach($items as $item) {
 					if (!empty($item->EventID) && is_numeric($item->EventID) && $item->EventID > 0) {
 						$event_id = $this->save_event_data($item, 0, $timestamp, $region);
-						
-						$this->save_tags($item->Tags, $item->EventID, 'event', $timestamp);
+						if (isset($item->Tags) && !empty($item->Tags)) {
+							$this->save_tags($item->Tags, $item->EventID, 'event', $timestamp);
+						}
 					}
 				}				
 			}
@@ -1873,7 +1878,9 @@ class Arlo_For_Wordpress {
 						
 						$oa_id = $wpdb->insert_id;	
 						
-						$this->save_tags($item->Tags, $oa_id, 'oa', $timestamp);						
+						if (isset($item->Tags) && !empty($item->Tags)) {
+							$this->save_tags($item->Tags, $oa_id, 'oa', $timestamp);
+						}
 						
 						if(isset($item->AdvertisedOffers) && !empty($item->AdvertisedOffers)) {
 							$this->save_advertised_offer($item->AdvertisedOffers, $timestamp, $region, null, null, $oa_id);
@@ -2249,7 +2256,7 @@ class Arlo_For_Wordpress {
 				active = '%s'
 			";
 			$query = $wpdb->query( $wpdb->prepare($sql, $cat->depth_level, $cat->c_arlo_id, $timestamp) );
-			if (is_array($cat->children)) {
+			if (isset($cat->children) && is_array($cat->children)) {
 				$this->set_category_depth_level($cat->children, $timestamp);
 			}
 		}
