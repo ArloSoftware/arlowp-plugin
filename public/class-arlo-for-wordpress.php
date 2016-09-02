@@ -560,6 +560,7 @@ class Arlo_For_Wordpress {
 			
 			case '2.3.5':
 				wp_clear_scheduled_hook( 'arlo_import' );
+				wp_schedule_event( time(), 'minutes_5', 'arlo_scheduler' );
 			break;
 			
 			case '2.4': 
@@ -595,6 +596,8 @@ class Arlo_For_Wordpress {
 						}
 					}
 				}
+				
+				wp_schedule_event( time(), 'minutes_5', 'arlo_scheduler' );
 				
 				arlo_set_option('templates', $saved_templates);
 			break;			
@@ -1006,7 +1009,7 @@ class Arlo_For_Wordpress {
 		$now = DateTime::createFromFormat('U.u', microtime(true));
         $timestamp = $now->format("Y-m-d H:i:s");	
         
-		$url = get_site_url() . '/wp-cron.php?doing_wp_cron=1';        
+		$url = get_site_url() . '/wp-cron.php';        
 	
 		$ch = curl_init($url);
 
@@ -1334,9 +1337,26 @@ class Arlo_For_Wordpress {
 				} else {
 					//kick off next
 					$scheduler->update_task($task_id, 1);
+					$fake_data = mt_rand(1000,9999);
+					wp_schedule_single_event(time(), 'arlo_scheduler', ['fake_data' => $fake_data]);
 					
-					wp_schedule_single_event(time(), 'arlo_scheduler', ['fake_data' => mt_rand(1000,9999)]);
-					sleep(2);
+					$i = 0;
+					do {
+						sleep(1);
+						$cron_fake_datas = [];
+						foreach (_get_cron_array() as $timestamp => $crons) {
+							foreach ($crons as $cron_name => $cron_args) {
+								if ($cron_name == 'arlo_scheduler') {
+									foreach ($cron_args as $cron) {
+										if (is_array($cron['args']) && !empty($cron['args']['fake_data'])) {
+											$cron_fake_datas[] = $cron['args']['fake_data'];
+										}
+									}
+								}
+							}
+						}
+					} while (!in_array($fake_data, $cron_fake_datas) && $i++ <= 10);
+										
 					$this->call_wp_cron();
 				}
 			} else {
