@@ -1361,7 +1361,7 @@ class Arlo_For_Wordpress {
 					} while (!in_array($fake_data, $cron_fake_datas) && $i++ <= 10);
 					sleep(1);
 					
-					//$this->call_wp_cron();
+					$this->call_wp_cron();
 				}
 			} else {
 				$scheduler->update_task($task_id, 4, "Import finished");
