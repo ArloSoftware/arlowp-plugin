@@ -161,6 +161,7 @@ class Scheduler {
 			task_status,
 			task_priority,
 			task_status_text,
+			task_modified,
 			data_text AS task_data_text
 		FROM
 			{$this->table}

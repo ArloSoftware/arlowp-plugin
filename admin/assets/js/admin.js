@@ -146,7 +146,7 @@
 											} else {
 												taskPlaceholder.find(".desc").after(": <span>" + response.message.replace(/\d{4,}/, '') + "</span>");
 											}
-										});
+										}, task.task_status == 4);
 									}
 									
 									taskPlaceholder.addClass("is-dismissible");
@@ -170,10 +170,14 @@
 			});
 		}
 		
-		function getLastImportLog(callback) {
+		function getLastImportLog(callback, sucessful) {
 			var data = {
 				action: 'arlo_get_last_import_log'
 			};
+			
+			if (sucessful) {
+				data.sucessful = 1;
+			} 
 			
 			jQuery.post(ajaxurl, data, function(response) {
 				if (jQuery.isFunction(callback)) {

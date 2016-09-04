@@ -1013,17 +1013,17 @@ class Arlo_For_Wordpress {
 	
 		$ch = curl_init($url);
 
-		curl_setopt($ch, CURLOPT_TIMEOUT, 5);  
-		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);  
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);  
-		curl_exec($ch);  
+		curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_exec($ch);
 		
 		if($errno = curl_errno($ch)) {
 			$error_message = curl_strerror($errno);
 			$this->add_import_log($url . ' ' . $error_message, $timestamp, false);
 		} else {
 			$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE); 
-			$this->add_import_log($url . $httpcode, $timestamp, false);
+			$this->add_import_log($url . ' ' .  $httpcode, $timestamp, false);
 		}
 		 
 		curl_close($ch);
@@ -1043,13 +1043,14 @@ class Arlo_For_Wordpress {
 	public function clean_up_tasks() {
 		$scheduler = $this->get_scheduler();
 		
-		$running_tasks = $scheduler->get_running_tasks();
+		$paused_tasks = $scheduler->get_paused_tasks();
+		$this->add_import_log($url . ' ' .  $httpcode, $timestamp, false);
 				
-		foreach ($running_tasks as $task) {
+		foreach ($paused_tasks as $task) {
 			$ts = strtotime($task->task_modified);
 			$now = time();			
-			if ($now - $ts > 8*60) {
-				$scheduler->update_task($task->task_id, 3, "Import doesn't respond within 8 minutes, stopped by the scheduler");
+			if ($now - $ts > 10*60) {
+				$scheduler->update_task($task->task_id, 3, "Import doesn't respond within 10 minutes, stopped by the scheduler");
 			}
 		}
 	}
@@ -1323,13 +1324,14 @@ class Arlo_For_Wordpress {
 				'import_finish' => "Finalize the import",
 			];
 			
-			$task = $import_tasks[$current_subtask];
+			$subtask = $import_tasks[$current_subtask];
 			
-			if (!empty($task)) {
+			if (!empty($subtask)) {
 			
-				$scheduler->update_task($task_id, 1, "Import is running: task " . ($current_subtask + 1) . "/" . count($import_tasks) . ": " . $import_tasks_desc[$task]);
-				call_user_func(array('Arlo_For_Wordpress', $task), $import_id);
+				$scheduler->update_task($task_id, 2, "Import is running: task " . ($current_subtask + 1) . "/" . count($import_tasks) . ": " . $import_tasks_desc[$subtask]);
+				call_user_func(array('Arlo_For_Wordpress', $subtask), $import_id);
 				$scheduler-> update_task_data($task_id, ['finished_subtask' => $current_subtask]);
+				$scheduler->update_task($task_id, 1);
 								
 				if ($current_subtask + 1 == count($import_tasks)) {
 					//finish task
@@ -1340,6 +1342,7 @@ class Arlo_For_Wordpress {
 					$fake_data = mt_rand(1000,9999);
 					wp_schedule_single_event(time(), 'arlo_scheduler', ['fake_data' => $fake_data]);
 					
+					sleep(1);
 					$i = 0;
 					do {
 						sleep(1);
@@ -1356,8 +1359,9 @@ class Arlo_For_Wordpress {
 							}
 						}
 					} while (!in_array($fake_data, $cron_fake_datas) && $i++ <= 10);
-										
-					$this->call_wp_cron();
+					sleep(1);
+					
+					//$this->call_wp_cron();
 				}
 			} else {
 				$scheduler->update_task($task_id, 4, "Import finished");
@@ -2793,7 +2797,10 @@ class Arlo_For_Wordpress {
 	
 	public static function arlo_get_last_import_log_callback() {
 		global $wpdb;
+		$sucessful = isset($_POST['sucessful']) ? true : false;
+		
 		$plugin = Arlo_For_Wordpress::get_instance();
+		
 		
 		$sql = "
 		SELECT
@@ -2802,6 +2809,7 @@ class Arlo_For_Wordpress {
 			successful
 		FROM
 			{$wpdb->prefix}arlo_import_log
+			". ($sucessful ? "WHERE successful = 1" : "") ."
 		ORDER BY
 			id DESC
 		LIMIT 
