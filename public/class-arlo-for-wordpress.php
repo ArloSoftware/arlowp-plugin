@@ -1448,7 +1448,7 @@ class Arlo_For_Wordpress {
 	                $template_event_id = $wpdb->insert_id;
 	                
 					if (isset($item->Tags) && !empty($item->Tags)) {
-						$this->save_tags($item->Tags, $template_event_id, 'template', $timestamp);
+						$this->save_tags($item->Tags, $item->TemplateID, 'template', $timestamp);
 					}
 										
 					$content = '';
