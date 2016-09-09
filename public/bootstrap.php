@@ -787,6 +787,7 @@ function install_table_arlo_events() {
 		e_summary VARCHAR(255) NULL,
 		e_sessiondescription VARCHAR(255) NULL,
 		e_notice TEXT NULL,
+		e_credits VARCHAR(255) NULL,
 		e_viewuri VARCHAR(255) NULL,
 		e_registermessage VARCHAR(255) NULL,
 		e_registeruri VARCHAR(255) NULL,
@@ -794,7 +795,7 @@ function install_table_arlo_events() {
 		e_providerwebsite VARCHAR(255) NULL,
 		e_isonline TINYINT(1) NOT NULL DEFAULT FALSE,
 		e_parent_arlo_id INT(11) NOT NULL,
-		e_region VARCHAR(5) NOT NULL,		
+		e_region VARCHAR(5) NOT NULL,	
 		active INT(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (e_id),
 		KEY et_arlo_id (et_arlo_id),
@@ -2315,6 +2316,33 @@ $shortcodes->add('event_session_description', function($content='', $atts, $shor
 	return htmlentities($GLOBALS['arlo_event_list_item']['e_sessiondescription'], ENT_QUOTES, "UTF-8");
 });
 
+// event credits shortcode
+$shortcodes->add('event_credits', function($content='', $atts, $shortcode_name){
+	if(!isset($GLOBALS['arlo_event_list_item']['e_credits'])) return '';
+	$output = '';
+	
+	// merge and extract attributes
+	extract(shortcode_atts(array(
+		'layout' => 'list',
+	), $atts, $shortcode_name));
+	
+	$credits = json_decode($GLOBALS['arlo_event_list_item']['e_credits']);
+	
+	if (is_array($credits) && count($credits)) {
+		switch($layout) {
+			default:
+				$output .= '<ul class="arlo-event-credits">';
+				foreach ($credits as $credit) {
+					$output .= '<li>' . htmlentities($credit->Type, ENT_QUOTES, "UTF-8") . ': ' . htmlentities($credit->Value, ENT_QUOTES, "UTF-8") . '</li>';
+				}
+				$output .= '</ul>';
+			break;
+		}	
+	}	
+
+	return $output;
+});
+
 // event registration shortcode
 
 $shortcodes->add('event_registration', function($content='', $atts, $shortcode_name){
@@ -2932,6 +2960,7 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 		e.e_isonline,
 		e.e_parent_arlo_id,
 		e.e_region,
+		e.e_credits,
 		et.et_id,
 		et.et_name, 
 		et.et_post_name, 

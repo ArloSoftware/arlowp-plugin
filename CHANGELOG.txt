@@ -4,6 +4,7 @@ Enhancement
 ------------------
 Online Acticities
 [arlo_content_field_item] shortcode is available within the [arlo_upcoming_list_item] shortcode
+New [arlo_event_credits] shortcode
 
 Bugfixes
 ------------------
