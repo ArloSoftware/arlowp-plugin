@@ -2932,6 +2932,7 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 		e.e_isonline,
 		e.e_parent_arlo_id,
 		e.e_region,
+		et.et_id,
 		et.et_name, 
 		et.et_post_name, 
 		et.et_descriptionsummary, 

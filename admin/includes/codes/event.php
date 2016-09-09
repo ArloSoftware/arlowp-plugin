@@ -67,13 +67,13 @@
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_register_interest" target="_blank">[arlo_event_template_register_interest]</a></li>
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_suggest_datelocation" target="_blank">[arlo_suggest_datelocation]</a></li>
 	<li>
-		<a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_content_field_item" target="_blank">[arlo_content_field_list_item]</a>
+		<a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_content_field_item" target="_blank">[arlo_content_field_item]</a>
 		<ul>
 			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_content_field_name" target="_blank">[arlo_content_field_name]</a></li>
 			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_content_field_text" target="_blank">[arlo_content_field_text]</a></li>
 		</ul>
 	</li>
-	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_content_field_item" target="_blank">[/arlo_content_field_list_item]</a></li>
+	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_content_field_item" target="_blank">[/arlo_content_field_item]</a></li>
 	<li>
 		<a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_suggest_templates" target="_blank">[arlo_suggest_templates]</a>
 		<ul>
