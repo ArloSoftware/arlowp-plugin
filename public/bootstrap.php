@@ -716,6 +716,7 @@ function install_table_arlo_eventtemplate() {
 		et_name VARCHAR(255) NULL,
 		et_descriptionsummary TEXT NULL,
 		et_post_name VARCHAR(255) NULL,
+		et_advertised_duration VARCHAR(255) NULL,
 		active INT(10) unsigned DEFAULT NULL,
 		et_registerinteresturi TEXT NULL,
 		et_viewuri TEXT NULL,
@@ -1884,6 +1885,17 @@ $shortcodes->add('event_template_summary', function($content='', $atts, $shortco
 	return $GLOBALS['arlo_eventtemplate']['et_descriptionsummary'];
 });
 
+// event template advertised duration shortcode
+
+$shortcodes->add('event_template_advertised_duration', function($content='', $atts, $shortcode_name){
+	if(!isset($GLOBALS['arlo_eventtemplate']['et_advertised_duration'])) return '';
+
+	return $GLOBALS['arlo_eventtemplate']['et_advertised_duration'];
+});
+
+
+
+
 // content field shortcode
 
 $shortcodes->add('content_field_item', function($content='', $atts, $shortcode_name){
@@ -2968,6 +2980,7 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 		et.et_registerinteresturi, 
 		et.et_region,
 		et.et_viewuri,
+		et.et_advertised_duration,
 		o.o_formattedamounttaxexclusive, 
 		o_offeramounttaxexclusive, 
 		o.o_formattedamounttaxinclusive, 

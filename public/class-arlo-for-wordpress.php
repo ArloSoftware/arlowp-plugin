@@ -1403,6 +1403,7 @@ class Arlo_For_Wordpress {
 				'Name',
 				'Description',
 				'AdvertisedPresenters',
+				'AdvertisedDuration',
 				'BestAdvertisedOffers',
 				'ViewUri',
 				'RegisterInterestUri',
@@ -1426,13 +1427,14 @@ class Arlo_For_Wordpress {
 					$query = $wpdb->query(
 						$wpdb->prepare( 
 							"INSERT INTO $table_name 
-							(et_arlo_id, et_code, et_name, et_descriptionsummary, et_post_name, active, et_registerinteresturi, et_viewuri, et_region) 
-							VALUES ( %d, %s, %s, %s, %s, %s, %s, %s, %s) 
+							(et_arlo_id, et_code, et_name, et_descriptionsummary, et_advertised_duration, et_post_name, active, et_registerinteresturi, et_viewuri, et_region) 
+							VALUES ( %d, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
 							", 
 						    $item->TemplateID,
 							@$item->Code,
 							$item->Name,
 							@$item->Description->Summary,
+							@$item->AdvertisedDuration,
 							$slug,
 							$timestamp,
 							!empty($item->RegisterInterestUri) ? $item->RegisterInterestUri : '',
