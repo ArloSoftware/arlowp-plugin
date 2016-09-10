@@ -181,6 +181,37 @@ class Scheduler {
 				
 		return $this->wpdb->get_results($sql);
 	}
+		
+	public function delete_running_tasks() {
+		return $this->delete_tasks(2);
+	}
+	
+	public function delete_paused_tasks() {
+		return $this->delete_tasks(1);
+	}
+	
+	private function delete_tasks($status = null, $priority = null, $task_id = null, $limit = null) {
+		$task_id = (isset($task_id) && is_numeric($task_id) ? $task_id : null);
+		$status = (isset($status) && is_numeric($status) ? [$status] : (is_array($status) ? $status : null));
+		$priority = (isset($priority) && is_numeric($priority) ? $priority : null);
+		$limit = (isset($limit) && is_numeric($limit) ? $limit : null);
+		
+		$sql = "
+		DELETE tasks, tasks_data FROM
+			{$this->table} AS tasks
+		LEFT JOIN 
+			{$this->tabledata} AS tasks_data
+		ON
+			data_task_id = task_id
+		WHERE 	
+			1
+			".(!is_null($status) ? "AND task_status IN (" . implode(",", $status) . ")" : "") . "
+			".(!is_null($priority) ? "AND task_priority = " . $priority : "") . "
+			".(!is_null($task_id) ? "AND task_id = " . $task_id : "") . "
+		" . (!is_null($limit) ? "LIMIT " . $limit : "");
+				
+		return $this->wpdb->get_results($sql);
+	}
 	
 	public function run_task($task_id = null) {
 		$task_id = (!empty($task_id) && is_numeric($task_id) ? $task_id : null);

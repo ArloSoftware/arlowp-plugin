@@ -684,6 +684,8 @@ class Arlo_For_Wordpress {
 		wp_clear_scheduled_hook( 'arlo_scheduler' );
 		wp_clear_scheduled_hook( 'arlo_set_import' );
 		wp_clear_scheduled_hook( 'arlo_import' );
+		
+		self::delete_running_tasks();
 	}
 
 	/**
@@ -1053,6 +1055,14 @@ class Arlo_For_Wordpress {
 				$scheduler->update_task($task->task_id, 3, "Import doesn't respond within 10 minutes, stopped by the scheduler");
 			}
 		}
+	}
+	
+	private function delete_running_tasks() {
+		$plugin = self::get_instance();
+		$scheduler = $plugin->get_scheduler();
+		
+		$scheduler->delete_running_tasks();
+		$scheduler->delete_paused_tasks();
 	}
 
 	public function run_task_scheduler() {
