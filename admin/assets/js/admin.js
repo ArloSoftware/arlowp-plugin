@@ -104,15 +104,45 @@
 			
 			var content = $("<div>").addClass("notice arlo-task").attr("id", "arlo-task-" + taskID).html("<p>Background task: <span class='desc'></span></p>");
 			header.after(content);
+			
+			var taskPlaceholder = $("#arlo-task-" + taskID);
+
+			taskPlaceholder.addClass("is-dismissible");
+			taskPlaceholder.find(".desc").after('<button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button>');							
+			
+			//terminate background task
+			taskPlaceholder.find("button").click(function() {
+				if (!(taskPlaceholder.hasClass('notice-success') || taskPlaceholder.hasClass('notice-error'))) {
+					var message = "Do you really want to terminate the current running background process?";
+					if (confirm(message)) {
+						terminateTask(taskID);
+					}				
+				}
+			});
+			
 			getTaskInfo(taskID);
+		}
+		
+		function terminateTask(taskID) {
+			var data = {
+				action: 'arlo_terminate_task',
+				taskID: taskID
+			},
+			taskPlaceholder = $("#arlo-task-" + taskID);
+			
+			if (taskPlaceholder.length > 0 && !(taskPlaceholder.hasClass('notice-success') || taskPlaceholder.hasClass('notice-error'))) {
+				jQuery.post(ajaxurl, data);
+			}
 		}
 		
 		function getTaskInfo(taskID) {
 			var data = {
 				action: 'arlo_get_task_info',
 				taskID: taskID
-			};
-			
+			},
+			taskPlaceholder = $("#arlo-task-" + taskID);
+						
+						
 			jQuery.ajax({
 				url: ajaxurl,
 				data: data,
@@ -122,18 +152,16 @@
 					var task = {};
 					if (response[0] != null) {
 						task = response[0];
-						if (task.task_id == taskID) {
-							var taskPlaceholder = $("#arlo-task-" + taskID);
-							
+						if (task.task_id == taskID) {							
 							taskPlaceholder.find(".desc").html(task.task_status_text);
-							
+														
 							switch(task.task_status) {
 								case "0":
 								case "1": 
 								case "2": 
 									if (task.task_task == 'import') {
-										$('.arlo-sync-button').fadeOut();
-									}	
+										$('.arlo-sync-button').fadeOut('fast');
+									}
 									setTimeout(function() { getTaskInfo(taskID) }, 2000);				
 								break;
 								case "3":
@@ -148,10 +176,7 @@
 											}
 										}, task.task_status == 4);
 									}
-									
-									taskPlaceholder.addClass("is-dismissible");
-									taskPlaceholder.find(".desc").after('<button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button>');
-									
+																		
 									taskPlaceholder.addClass(task.task_status == 4 ? "notice-success" : "notice-error");
 																		
 									setTimeout(function() {

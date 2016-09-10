@@ -311,6 +311,8 @@ class Arlo_For_Wordpress {
 		
 		add_action( 'wp_ajax_arlo_get_task_info', array($this, 'arlo_get_task_info_callback'));
 		
+		add_action( 'wp_ajax_arlo_terminate_task', array($this, 'arlo_terminate_task_callback'));
+		
 		add_action( 'wp_ajax_arlo_get_last_import_log', array($this, 'arlo_get_last_import_log_callback'));
 		
 		
@@ -2844,6 +2846,23 @@ class Arlo_For_Wordpress {
 		
 		wp_die();
 	}
+	
+	
+	public static function arlo_terminate_task_callback() {
+		$task_id = intval($_POST['taskID']);
+		if ($task_id > 0) {
+			$plugin = Arlo_For_Wordpress::get_instance();
+			$scheduler = $plugin->get_scheduler();
+			
+			$scheduler->update_task($task_id, 4, "Import terminated by the user");
+			$task = $scheduler->get_tasks(null, null, $task_id);
+			
+			echo $task_id;
+		}
+		
+		wp_die();
+	}
+	
 	
 	
 	public static function arlo_get_task_info_callback() {
