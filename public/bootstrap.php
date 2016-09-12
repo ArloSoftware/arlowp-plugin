@@ -1329,7 +1329,7 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 	$t6 = "{$wpdb->prefix}arlo_eventtemplates_tags";
 	$t7 = "{$wpdb->prefix}arlo_tags";
 		
-	$where = "WHERE post.post_type = 'arlo_event'";
+	$where = "WHERE post.post_type = 'arlo_event' AND et.active = " . $active;
 	$join = "";
 	
 	$arlo_location = isset($_GET['arlo-location']) && !empty($_GET['arlo-location']) ? $_GET['arlo-location'] : get_query_var('arlo-location', '');
@@ -1342,7 +1342,7 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 	
 	if(!empty($arlo_location) || (isset($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) ) :
 
-		$join .= " LEFT JOIN $t5 e USING (et_arlo_id)";
+		$join .= " LEFT JOIN $t5 e ON e.et_arlo_id = et.et_arlo_id AND e.active = et.active";
 		$where .= " AND e.e_parent_arlo_id = 0";
 		
 		if(!empty($arlo_location)) :
@@ -1360,12 +1360,12 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 	endif;	
 	
 	if(!empty($arlo_templatetag)) :
-		$join .= " LEFT JOIN $t6 ett USING (et_arlo_id) ";
+		$join .= " LEFT JOIN $t6 ett ON et.et_arlo_id = ett.et_arlo_id AND ett.active = et.active";
 		
 		
 		if (!is_numeric($arlo_templatetag)) {
 			$where .= " AND tag.tag = '" . urldecode($arlo_templatetag) . "'";
-			$join .= " LEFT JOIN $t7 tag ON tag.id = ett.tag_id ";
+			$join .= " LEFT JOIN $t7 tag ON tag.id = ett.tag_id AND ett.active = tag.active";
 		} else {
 			$where .= " AND ett.tag_id = " . intval($arlo_templatetag);
 		}
@@ -1401,6 +1401,8 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 			{$wpdb->prefix}arlo_categories
 		WHERE 
 			c_slug = '{$cat_slug}'
+		AND
+			active = {$active}
 		");
 		
 		if (is_null($cat_id)) {
@@ -1499,7 +1501,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 	
 	if(!empty($arlo_location) || (isset($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) ) :
 
-		$join .= " LEFT JOIN $t5 e USING (et_arlo_id)";
+		$join .= " LEFT JOIN $t5 e ON e.et_arlo_id = et.et_arlo_id AND e.active = et.active";
 		$where .= " AND e.e_parent_arlo_id = 0";
 		
 		if(!empty($arlo_location)) :
@@ -1517,12 +1519,12 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 	endif;	
 	
 	if(!empty($arlo_templatetag)) :
-		$join .= " LEFT JOIN $t6 ett USING (et_arlo_id) ";
+		$join .= " LEFT JOIN $t6 ett ON ett.et_arlo_id = et.et_arlo_id AND ett.active = et.active";
 		
 		
 		if (!is_numeric($arlo_templatetag)) {
 			$where .= " AND tag.tag = '" . urldecode($arlo_templatetag) . "'";
-			$join .= " LEFT JOIN $t7 tag ON tag.id = ett.tag_id ";
+			$join .= " LEFT JOIN $t7 tag ON tag.id = ett.tag_id AND ett.active = tag.active";
 		} else {
 			$where .= " AND ett.tag_id = " . intval($arlo_templatetag);
 		}
@@ -1565,6 +1567,8 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 			{$wpdb->prefix}arlo_categories
 		WHERE 
 			c_slug = '{$cat_slug}'
+		AND
+			active = {$active}
 		");
 		
 		if (is_null($cat_id)) {
@@ -2042,12 +2046,18 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 				$t1 = "{$wpdb->prefix}arlo_events";
 
 				$items = $wpdb->get_results(
-					"SELECT e.e_locationname
-					FROM $t1 e 
+					"SELECT 
+						DISTINCT(e.e_locationname)
+					FROM 
+						$t1 e 
 					WHERE 
 						e_locationname != ''
-					GROUP BY e.e_locationname 
-					ORDER BY e.e_locationname", ARRAY_A);
+					AND
+						e.active = {$active}
+					GROUP BY 
+						e.e_locationname 
+					ORDER BY 
+						e.e_locationname", ARRAY_A);
 
 				$locations = array();
 
@@ -2075,6 +2085,8 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 						{$wpdb->prefix}arlo_tags AS t
 					ON
 						t.id = ett.tag_id
+					AND
+						t.active = ett.active
 					WHERE 
 						ett.active = $active
 					ORDER BY tag", ARRAY_A);
@@ -2112,9 +2124,11 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 // event list item shortcode
 
 $shortcodes->add('event_list_item', function($content='', $atts, $shortcode_name){
-	global $post, $wpdb;
+	global $post, $wpdb, $arlo_plugin;
 	$settings = get_option('arlo_settings');
 	$regions = get_option('arlo_regions');
+	
+	$active = $arlo_plugin->get_import_id();
 	
 	$arlo_region = get_query_var('arlo-region', '');
 	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
@@ -2144,7 +2158,11 @@ $shortcodes->add('event_list_item', function($content='', $atts, $shortcode_name
 			$t1
 		ON 
 			$t2.et_arlo_id = $t1.et_arlo_id
+		AND
+			$t1.active = $t2.active
 		WHERE 
+			$t1.active = $active
+		AND
 			$t1.et_post_name = '$post->post_name'
 		AND 
 			$t2.e_parent_arlo_id = 0
@@ -2387,7 +2405,9 @@ $shortcodes->add('event_registration', function($content='', $atts, $shortcode_n
 // event offers shortcode
 
 $shortcodes->add('event_offers', function($content='', $atts, $shortcode_name){
-	global $wpdb;
+	global $wpdb, $arlo_plugin;
+	
+	$active = $arlo_plugin->get_import_id();
 
 	$e_id = $GLOBALS['arlo_event_list_item']['e_id'];
 	
@@ -2412,11 +2432,15 @@ $shortcodes->add('event_offers', function($content='', $atts, $shortcode_name){
 		{$wpdb->prefix}arlo_offers AS replaced_by 
 	ON 
 		offer.o_arlo_id = replaced_by.o_replaces 
+	AND
+		offer.active = replaced_by.active
 	AND 
 		offer.e_id = replaced_by.e_id	
-	" . (!empty($arlo_region) ? " AND replaced_by.o_region = '" . $arlo_region . "'" : "") . "				
+	" . (!empty($arlo_region) ? " AND replaced_by.o_region = '" . $arlo_region . "'" : "") . "
 	WHERE 
 		offer.o_replaces = 0 
+	AND
+		offer.active = $active
 	AND 
 		offer.e_id = $e_id
 	" . (!empty($arlo_region) ? " AND offer.o_region = '" . $arlo_region . "'" : "") . "		
@@ -2495,11 +2519,27 @@ $shortcodes->add('event_presenters', function($content='', $atts, $shortcode_nam
 	$t1 = "{$wpdb->prefix}arlo_events_presenters";
 	$t2 = "{$wpdb->prefix}arlo_presenters";
 
-	$items = $wpdb->get_results("SELECT p.p_firstname, p.p_lastname, p.p_post_name FROM $t1 exp 
-			INNER JOIN $t2 p
-			ON exp.p_arlo_id = p.p_arlo_id AND exp.active = p.active
-		WHERE exp.e_arlo_id = $e_arlo_id AND p.active = $active
-		GROUP BY p.p_arlo_id ORDER BY exp.p_order", ARRAY_A);
+	$items = $wpdb->get_results("
+	SELECT 
+		p.p_firstname, 
+		p.p_lastname, 
+		p.p_post_name 
+	FROM 
+		$t1 exp 
+	INNER JOIN 
+		$t2 p
+	ON 
+		exp.p_arlo_id = p.p_arlo_id 
+	AND 
+		exp.active = p.active
+	WHERE 
+		exp.e_arlo_id = $e_arlo_id 
+	AND 
+		p.active = $active
+	GROUP BY 
+		p.p_arlo_id
+	ORDER BY 
+		exp.p_order", ARRAY_A);
 
 	// merge and extract attributes
 	extract(shortcode_atts(array(
@@ -2592,7 +2632,9 @@ $shortcodes->add('event_delivery', function($content='', $atts, $shortcode_name)
 
 $shortcodes->add('event_session_list_item', function($content='', $atts, $shortcode_name){
 	if(!isset($GLOBALS['arlo_event_list_item']['e_arlo_id'])) return '';
-	global $post, $wpdb;
+	global $post, $wpdb, $arlo_plugin;
+	
+	$active = $arlo_plugin->get_import_id();
 	
 	$regions = get_option('arlo_regions');
 	
@@ -2607,7 +2649,7 @@ $shortcodes->add('event_session_list_item', function($content='', $atts, $shortc
 	), $atts, $shortcode_name));
 	
 	if (!empty($arlo_region)) {
-		$where = ' AND e_region = "' . $arlo_region . '"';
+		$where = ' active = ' . $active . ' AND e_region = "' . $arlo_region . '"';
 	}		
 	
 	$sql = "
@@ -2696,8 +2738,10 @@ $shortcodes->add('suggest_templates', function($content='', $atts, $shortcode_na
 			$join = "		
 			LEFT JOIN 
 				{$wpdb->prefix}arlo_eventtemplates_tags AS t
-			USING
-				(et_arlo_id)
+			ON
+				t.et_arlo_id = et.et_arlo_id
+			AND
+				t.active = et.active
 			";
 		break;
 		default:
@@ -2717,8 +2761,10 @@ $shortcodes->add('suggest_templates', function($content='', $atts, $shortcode_na
 			$join = "
 			LEFT JOIN 
 				{$wpdb->prefix}arlo_eventtemplates_categories AS c
-			USING
-				(et_arlo_id)
+			ON
+				et.et_arlo_id = c.et_arlo_id
+			AND
+				c.active = et.active
 			";			
 		break;
 	}
@@ -2726,9 +2772,11 @@ $shortcodes->add('suggest_templates', function($content='', $atts, $shortcode_na
 	if ($onlyscheduled === "true") {
 		$join .= "
 		INNER JOIN 
-			{$wpdb->prefix}arlo_events
-		USING 
-			(et_arlo_id)
+			{$wpdb->prefix}arlo_events	
+		ON
+			e.et_arlo_id = et.et_arlo_id
+		AND
+			et.active = e.active
 		";
 	} 
 	
@@ -2794,9 +2842,11 @@ $shortcodes->add('upcoming_list', function($content='', $atts, $shortcode_name){
 // upcoming event list pagination shortcode
 
 $shortcodes->add('upcoming_list_pagination', function($content='', $atts, $shortcode_name){
-	global $wpdb, $wp_query;
+	global $wpdb, $wp_query, $arlo_plugin;
 	
 	$limit = isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page');
+	
+	$active = $arlo_plugin->get_import_id();
 
 	$t1 = "{$wpdb->prefix}arlo_events";
 	$t2 = "{$wpdb->prefix}arlo_eventtemplates";
@@ -2807,7 +2857,7 @@ $shortcodes->add('upcoming_list_pagination', function($content='', $atts, $short
 	$t7 = "{$wpdb->prefix}arlo_events_tags";
 	$t8 = "{$wpdb->prefix}arlo_tags";
 
-	$where = 'WHERE CURDATE() < DATE(e.e_startdatetime) AND e_parent_arlo_id = 0 ';
+	$where = 'WHERE CURDATE() < DATE(e.e_startdatetime) AND e_parent_arlo_id = 0  AND e.active = '.$active;
 	$join = '';
 		
 	$arlo_month = isset($_GET['arlo-month']) && !empty($_GET['arlo-month']) ? $_GET['arlo-month'] : get_query_var('arlo-month', '');
@@ -2835,11 +2885,11 @@ $shortcodes->add('upcoming_list_pagination', function($content='', $atts, $short
 	endif;	
 	
 	if(!empty($arlo_eventtag)) :
-		$join .= " LEFT JOIN $t7 etag USING (e_arlo_id) ";
+		$join .= " LEFT JOIN $t7 etag ON etag.e_arlo_id = e.e_arlo_id AND etag.active = e.active";
 
 		if (!is_numeric($arlo_eventtag)) {
 			$where .= " AND tag.tag = '" . urldecode($arlo_eventtag) . "'";
-			$join .= " LEFT JOIN $t8 AS tag ON tag.id = etag.tag_id ";
+			$join .= " LEFT JOIN $t8 AS tag ON tag.id = etag.tag_id AND tag.active = e.active";
 		} else {
 			$where .= " AND etag.tag_id = " . intval($arlo_eventtag);
 		}
@@ -2850,26 +2900,54 @@ $shortcodes->add('upcoming_list_pagination', function($content='', $atts, $short
 	}		
 
 	$items = $wpdb->get_results(
-		"SELECT DISTINCT e.e_id, e.e_locationname, c.c_arlo_id
-		FROM $t1 e 
-		LEFT JOIN $t2 et 
-		ON e.et_arlo_id = et.et_arlo_id 
-		LEFT JOIN $t3 v
-		ON e.v_id = v.v_arlo_id
+		"SELECT 
+			DISTINCT e.e_id, 
+			e.e_locationname, 
+			c.c_arlo_id
+		FROM 
+			$t1 e 
+		LEFT JOIN 
+			$t2 et 
+		ON 
+			e.et_arlo_id = et.et_arlo_id 
+		AND
+			e.active = et.active
+		LEFT JOIN 
+			$t3 v
+		ON 
+			e.v_id = v.v_arlo_id
+		AND
+			e.active = v.active
 		INNER JOIN 
-		(SELECT * 
-		FROM $t4
-		WHERE o_order = 1
+			(SELECT 
+				* 
+			FROM 
+				$t4
+			WHERE 
+				o_order = 1
+			AND
+				active = $active
 		) o
-		ON e.e_id = o.e_id
-		LEFT JOIN $t5 etc
-		ON et.et_arlo_id = etc.et_arlo_id AND et.active = etc.active
-		LEFT JOIN $t6 c
-		ON c.c_arlo_id = etc.c_arlo_id
+		ON 
+			e.e_id = o.e_id
+		LEFT JOIN 
+			$t5 etc
+		ON 
+			et.et_arlo_id = etc.et_arlo_id 
+		AND 
+			et.active = etc.active
+		LEFT JOIN 
+			$t6 c
+		ON 
+			c.c_arlo_id = etc.c_arlo_id
+		AND
+			c.active = etc.active
 		$join
 		$where
-		GROUP BY etc.et_arlo_id, e.e_id
-		ORDER BY e.e_startdatetime", ARRAY_A);
+		GROUP BY 
+			etc.et_arlo_id, e.e_id
+		ORDER BY 
+			e.e_startdatetime", ARRAY_A);
 		
 	$num = $wpdb->num_rows;
 
@@ -2879,13 +2957,15 @@ $shortcodes->add('upcoming_list_pagination', function($content='', $atts, $short
 // upcoming event list item shortcode
 
 $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_name){
-	global $wpdb;
+	global $wpdb, $arlo_plugin;
 	$settings = get_option('arlo_settings');
 	$regions = get_option('arlo_regions');
 
 	$limit = isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page');
 	$page = !empty($_GET['paged']) ? intval($_GET['paged']) : intval(get_query_var('paged'));
 	$offset = ($page > 0) ? $page * $limit - $limit: 0 ;
+	
+	$active = $arlo_plugin->get_import_id();	
 
 	$output = '';
 
@@ -2898,7 +2978,7 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 	$t7 = "{$wpdb->prefix}arlo_events_tags";
 	$t8 = "{$wpdb->prefix}arlo_tags";
 
-	$where = 'WHERE CURDATE() < DATE(e.e_startdatetime)  AND e_parent_arlo_id = 0 ';
+	$where = 'WHERE CURDATE() < DATE(e.e_startdatetime)  AND e_parent_arlo_id = 0 AND e.active = '.$active;
 	$join = '';
 
 	$arlo_month = isset($_GET['arlo-month']) && !empty($_GET['arlo-month']) ? $_GET['arlo-month'] : get_query_var('arlo-month', '');
@@ -2929,11 +3009,11 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 	endif;	
 		
 	if(!empty($arlo_eventtag)) :
-		$join .= " LEFT JOIN $t7 etag USING (e_arlo_id) ";
+		$join .= " LEFT JOIN $t7 etag ON etag.e_arlo_id = e.e_arlo_id AND etag.active = e.active";
 
 		if (!is_numeric($arlo_eventtag)) {
 			$where .= " AND tag.tag = '" . urldecode($arlo_eventtag) . "'";
-			$join .= " LEFT JOIN $t8 AS tag ON tag.id = etag.tag_id ";
+			$join .= " LEFT JOIN $t8 AS tag ON tag.id = etag.tag_id AND tag.active = etag.active";
 		} else {
 			$where .= " AND etag.tag_id = " . intval($arlo_eventtag);
 		}
@@ -2994,10 +3074,14 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 		$t2 et 
 	ON 
 		e.et_arlo_id = et.et_arlo_id 
+	AND
+		et.active = e.active
 	LEFT JOIN 
 		$t3 v
 	ON
 		e.v_id = v.v_arlo_id
+	AND
+		v.active = e.active
 	INNER JOIN 
 		(SELECT 
 			* 
@@ -3005,6 +3089,8 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 			$t4
 		WHERE 
 			o_order = 1
+		AND
+			active = $active
 		) o
 	ON 
 		e.e_id = o.e_id
@@ -3018,6 +3104,8 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 		$t6 c
 	ON 
 		c.c_arlo_id = etc.c_arlo_id
+	AND
+		c.active = etc.active
 	$join
 	$where
 	GROUP BY 
@@ -3160,12 +3248,18 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 				$t1 = "{$wpdb->prefix}arlo_events";
 
 				$items = $wpdb->get_results(
-					"SELECT e.e_locationname
-					FROM $t1 e 
+					"SELECT 
+						DISTINCT e.e_locationname
+					FROM 
+						$t1 e 
 					WHERE 
 						e_locationname != ''
-					GROUP BY e.e_locationname 
-					ORDER BY e.e_locationname", ARRAY_A);
+					AND
+						active = $active
+					GROUP BY 
+						e.e_locationname 
+					ORDER BY 
+						e.e_locationname", ARRAY_A);
 
 				$locations = array();
 
@@ -3193,6 +3287,8 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 						{$wpdb->prefix}arlo_tags AS t
 					ON
 						t.id = etag.tag_id
+					AND
+						t.active = etag.active
 					WHERE 
 						etag.active = $active
 					ORDER BY tag", ARRAY_A);
@@ -3233,7 +3329,9 @@ $shortcodes->add('venue_list', function($content='', $atts, $shortcode_name){
 // venue list pagination shortcode
 
 $shortcodes->add('venue_list_pagination', function($content='', $atts, $shortcode_name){
-	global $wpdb;
+	global $wpdb, $arlo_plugin;
+	
+	$active = $arlo_plugin->get_import_id();
 	
 	$limit = isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page');
 
@@ -3241,12 +3339,20 @@ $shortcodes->add('venue_list_pagination', function($content='', $atts, $shortcod
 	$t2 = "{$wpdb->prefix}posts";
 
 	$items = $wpdb->get_results(
-		"SELECT v.v_id
-		FROM $t1 v 
-		LEFT JOIN $t2 post 
-		ON v.v_post_name = post.post_name 
-		WHERE post.post_type = 'arlo_venue'
-		ORDER BY v.v_name ASC", ARRAY_A);
+		"SELECT 
+			v.v_id
+		FROM 
+			$t1 v 
+		LEFT JOIN 
+			$t2 post 
+		ON 
+			v.v_post_name = post.post_name 
+		WHERE 
+			post.post_type = 'arlo_venue'
+		AND
+			v.active = $active
+		ORDER BY 
+			v.v_name ASC", ARRAY_A);
 
 	$num = $wpdb->num_rows;
 
@@ -3256,7 +3362,9 @@ $shortcodes->add('venue_list_pagination', function($content='', $atts, $shortcod
 // venue list item shortcode
 
 $shortcodes->add('venue_list_item', function($content='', $atts, $shortcode_name){
-	global $wpdb;
+	global $wpdb, $arlo_plugin;
+	
+	$active = $arlo_plugin->get_import_id();
 
 	$limit = isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page');
 	$offset = (get_query_var('paged') && intval(get_query_var('paged')) > 0) ? intval(get_query_var('paged')) * $limit - $limit: 0 ;
@@ -3265,13 +3373,23 @@ $shortcodes->add('venue_list_item', function($content='', $atts, $shortcode_name
 	$t2 = "{$wpdb->prefix}posts";
 
 	$items = $wpdb->get_results(
-		"SELECT v.*, post.ID as post_id
-		FROM $t1 v 
-		LEFT JOIN $t2 post 
-		ON v.v_post_name = post.post_name 
-		WHERE post.post_type = 'arlo_venue'
-		ORDER BY v.v_name ASC
-		LIMIT $offset, $limit", ARRAY_A);
+		"SELECT 
+			v.*, 
+			post.ID as post_id
+		FROM 
+			$t1 v 
+		LEFT JOIN 
+			$t2 post 
+		ON 
+			v.v_post_name = post.post_name
+		WHERE 
+			post.post_type = 'arlo_venue'
+		AND
+			v.active = $active
+		ORDER BY 
+			v.v_name ASC
+		LIMIT 
+			$offset, $limit", ARRAY_A);
 
 	$output = '';
 
@@ -3421,7 +3539,9 @@ $shortcodes->add('presenter_list', function($content='', $atts, $shortcode_name)
 // presenter list pagination shortcode
 
 $shortcodes->add('presenter_list_pagination', function($content='', $atts, $shortcode_name){
-	global $wpdb;
+	global $wpdb, $arlo_plugin;
+	
+	$active = $arlo_plugin->get_import_id();
 	
 	$limit = isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page');
 
@@ -3429,12 +3549,20 @@ $shortcodes->add('presenter_list_pagination', function($content='', $atts, $shor
 	$t2 = "{$wpdb->prefix}posts";
 
 	$items = $wpdb->get_results(
-		"SELECT p.p_id
-		FROM $t1 p 
-		LEFT JOIN $t2 post 
-		ON p.p_post_name = post.post_name 
-		WHERE post.post_type = 'arlo_presenter'
-		ORDER BY p.p_lastname ASC", ARRAY_A);
+		"SELECT 
+			p.p_id
+		FROM 
+			$t1 p 
+		LEFT JOIN 
+			$t2 post 
+		ON 
+			p.p_post_name = post.post_name 
+		WHERE 
+			post.post_type = 'arlo_presenter'
+		AND
+			p.active = $active
+		ORDER BY 
+			p.p_lastname ASC", ARRAY_A);
 
 	$num = $wpdb->num_rows;
 
@@ -3444,7 +3572,9 @@ $shortcodes->add('presenter_list_pagination', function($content='', $atts, $shor
 // presenter list item shortcode
 
 $shortcodes->add('presenter_list_item', function($content='', $atts, $shortcode_name){
-	global $wpdb;
+	global $wpdb, $arlo_plugin;
+	
+	$active = $arlo_plugin->get_import_id();
 
 	$limit = isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page');
 	$offset = (get_query_var('paged') && intval(get_query_var('paged')) > 0) ? intval(get_query_var('paged')) * $limit - $limit: 0 ;
@@ -3453,13 +3583,23 @@ $shortcodes->add('presenter_list_item', function($content='', $atts, $shortcode_
 	$t2 = "{$wpdb->prefix}posts";
 
 	$items = $wpdb->get_results(
-		"SELECT p.*, post.ID as post_id
-		FROM $t1 p 
-		LEFT JOIN $t2 post 
-		ON p.p_post_name = post.post_name 
-		WHERE post.post_type = 'arlo_presenter'
-		ORDER BY p.p_lastname ASC
-		LIMIT $offset, $limit", ARRAY_A);
+		"SELECT 
+			p.*, 
+			post.ID as post_id
+		FROM 
+			$t1 p 
+		LEFT JOIN 
+			$t2 post 
+		ON 
+			p.p_post_name = post.post_name 
+		WHERE 
+			post.post_type = 'arlo_presenter'
+		AND
+			p.active = $active
+		ORDER 
+			BY p.p_lastname ASC
+		LIMIT 
+			$offset, $limit", ARRAY_A);
 
 	$output = '';
 
@@ -3601,8 +3741,9 @@ $shortcodes->add('presenter_social_link', function($content='', $atts, $shortcod
 
 // presenter events list shortcode
 $shortcodes->add('presenter_events_list', function($content='', $atts, $shortcode_name){
-	global $post, $wpdb;
+	global $post, $wpdb, $arlo_plugin;
 	$slug = get_post( $post )->post_name;
+	$active = $arlo_plugin->get_import_id();
 
 	$slug_a = explode('-', $slug);
 	$p_id = $slug_a[0];
@@ -3612,13 +3753,32 @@ $shortcodes->add('presenter_events_list', function($content='', $atts, $shortcod
 	$t3 = "{$wpdb->prefix}arlo_events_presenters";
 
 	$items = $wpdb->get_results(
-		"SELECT et.et_name, et.et_post_name 
-		FROM $t1 et
-		LEFT JOIN $t2 e ON  e.et_arlo_id = et.et_arlo_id
-		INNER JOIN $t3 exp ON exp.e_arlo_id = e.e_arlo_id AND exp.active = e.active
-		WHERE exp.p_arlo_id = $p_id AND e_parent_arlo_id = 0
-		GROUP BY et.et_name
-		ORDER BY et.et_name ASC", ARRAY_A);
+		"SELECT 
+			et.et_name, et.et_post_name 
+		FROM 
+			$t1 et
+		LEFT JOIN 
+			$t2 e 
+		ON  
+			e.et_arlo_id = et.et_arlo_id
+		AND
+			e.active = et.active
+		INNER JOIN 
+			$t3 exp 
+		ON 
+			exp.e_arlo_id = e.e_arlo_id
+		AND 
+			exp.active = e.active
+		WHERE 
+			exp.p_arlo_id = $p_id 
+		AND 
+			e_parent_arlo_id = 0
+		AND
+			e.active = $active
+		GROUP BY 
+			et.et_name
+		ORDER BY 
+			et.et_name ASC", ARRAY_A);
 
 	$events = '';
 
@@ -3645,7 +3805,9 @@ $shortcodes->add('presenter_events_list', function($content='', $atts, $shortcod
 
 // timezones
 $shortcodes->add('timezones', function($content='', $atts, $shortcode_name){
-	global $post, $wpdb;
+	global $post, $wpdb, $arlo_plugin;
+	
+	$active = $arlo_plugin->get_import_id();
 	
 	// only allow this to be used on the eventtemplate page
 	if($post->post_type != 'arlo_event') {
@@ -3656,10 +3818,26 @@ $shortcodes->add('timezones', function($content='', $atts, $shortcode_name){
 	$t1 = "{$wpdb->prefix}arlo_eventtemplates";
 	$t2 = "{$wpdb->prefix}arlo_events";
 	
-	$items = $wpdb->get_results("SELECT $t2.e_isonline, $t2.e_timezone_id FROM $t2
-		LEFT JOIN $t1
-		ON $t2.et_arlo_id = $t1.et_arlo_id AND $t2.e_isonline = 1 AND $t2.e_parent_arlo_id = 0
-		WHERE $t1.et_post_name = '$post->post_name'
+	$items = $wpdb->get_results("
+		SELECT 
+			$t2.e_isonline, 
+			$t2.e_timezone_id 
+		FROM 
+			$t2
+		LEFT JOIN 
+			$t1
+		ON 
+			$t2.et_arlo_id = $t1.et_arlo_id 
+		AND 
+			$t2.e_isonline = 1 
+		AND 
+			$t2.e_parent_arlo_id = 0
+		AND
+			$t1.active = $t2.active
+		WHERE 
+			$t1.et_post_name = '$post->post_name'
+		AND 
+			$t2.active = $active
 		", ARRAY_A);
 	
 	if(empty($items)) {
@@ -3696,7 +3874,9 @@ $shortcodes->add('timezones', function($content='', $atts, $shortcode_name){
 
 // suggest date/location
 $shortcodes->add('suggest_datelocation', function($content='', $atts, $shortcode_name){
-	global $post, $wpdb;
+	global $post, $wpdb, $arlo_plugin;
+	
+	$active = $arlo_plugin->get_import_id();
 
 	// merge and extract attributes
 	extract(shortcode_atts(array(
@@ -3714,10 +3894,24 @@ $shortcodes->add('suggest_datelocation', function($content='', $atts, $shortcode
 	$t1 = "{$wpdb->prefix}arlo_eventtemplates";
 	$t2 = "{$wpdb->prefix}arlo_events";
 	
-	$items = $wpdb->get_results("SELECT $t2.e_isonline, $t2.e_datetimeoffset FROM $t2
-		LEFT JOIN $t1
-		ON $t2.et_arlo_id = $t1.et_arlo_id AND $t2.e_parent_arlo_id = 0
-		WHERE $t1.et_post_name = '$post->post_name'
+	$items = $wpdb->get_results("
+		SELECT 
+			$t2.e_isonline, 
+			$t2.e_datetimeoffset 
+		FROM 
+			$t2
+		LEFT JOIN 
+			$t1
+		ON 
+			$t2.et_arlo_id = $t1.et_arlo_id 
+		AND 
+			$t2.e_parent_arlo_id = 0
+		AND
+			$t1.active = $t2.active
+		WHERE 
+			$t1.et_post_name = '$post->post_name'
+		AND
+			$t2.active = $active
 		", ARRAY_A);
 			
 	if(empty($items)) {
@@ -4219,7 +4413,9 @@ $shortcodes->add('oa_registration', function($content='', $atts, $shortcode_name
 // online activity offers shortcode
 
 $shortcodes->add('oa_offers', function($content='', $atts, $shortcode_name){
-	global $wpdb;
+	global $wpdb, $arlo_plugin;
+
+	$active = $arlo_plugin->get_import_id();
 
 	$oa_id = $GLOBALS['arlo_oa_list_item']['oa_id'];
 	
@@ -4244,6 +4440,8 @@ $shortcodes->add('oa_offers', function($content='', $atts, $shortcode_name){
 		{$wpdb->prefix}arlo_offers AS replaced_by 
 	ON 
 		offer.o_arlo_id = replaced_by.o_replaces 
+	AND
+		offer.active = replaced_by.active
 	AND 
 		offer.oa_id = replaced_by.oa_id	
 	" . (!empty($arlo_region) ? " AND replaced_by.o_region = '" . $arlo_region . "'" : "") . "				
@@ -4251,6 +4449,8 @@ $shortcodes->add('oa_offers', function($content='', $atts, $shortcode_name){
 		offer.o_replaces = 0 
 	AND 
 		offer.oa_id = $oa_id
+	AND
+		offer.active = $active
 	" . (!empty($arlo_region) ? " AND offer.o_region = '" . $arlo_region . "'" : "") . "		
 	ORDER BY 
 		offer.o_order";

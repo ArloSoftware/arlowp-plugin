@@ -878,16 +878,16 @@ class Arlo_For_Wordpress {
 	}    
         
 	public function get_import_id() {	
-                global $wpdb;
-                
-                //need to access the db directly, get_option('arlo_import_id'); can return a cached (old) value
-                $table_name = "{$wpdb->prefix}options";
-                
-                $sql = "SELECT option_value
+        global $wpdb;
+        
+        //need to access the db directly, get_option('arlo_import_id'); can return a cached (old) value
+        $table_name = "{$wpdb->prefix}options";
+        
+        $sql = "SELECT option_value
 			FROM $table_name 
-                        WHERE option_name = 'arlo_import_id'";
-                
-                $import_id = $wpdb->get_var($sql);
+            WHERE option_name = 'arlo_import_id'";
+	    
+	    $import_id = $wpdb->get_var($sql);
             
 		$this->import_id = $import_id;
                 
