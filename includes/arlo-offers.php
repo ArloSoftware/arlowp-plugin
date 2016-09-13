@@ -36,6 +36,15 @@ class Offers extends Singleton {
 					}
 				break;
 				
+				case 'oa_id':
+					if(is_array($value)) {
+						$where[] = "o.oa_id IN (" . implode(',', $value) . ")";
+					} else {
+						$where[] = "o.oa_id = $value";
+					}
+				break;
+				
+				
 				case 'event_template_id':
 					$join[] = "
 					LEFT JOIN {$wpdb->prefix}arlo_eventtemplates AS et USING (et_id) 

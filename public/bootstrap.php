@@ -4089,6 +4089,8 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 	$price_field_show = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? 'o_formattedamounttaxexclusive' : 'o_formattedamounttaxinclusive';
 	$free_text = (isset($settings['free_text'])) ? $settings['free_text'] : __('Free', $GLOBALS['arlo_plugin_slug']);
 	
+	$offer;
+	
 	$regions = get_option('arlo_regions');	
 	
 	$arlo_region = get_query_var('arlo-region', '');
@@ -4127,6 +4129,31 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 		
 		$offer = \Arlo\Offers::get($conditions, array("o.{$price_field} ASC"), 1);
 	}
+	
+	
+	// if none, try the associated online activity
+	if(!$offer) {
+		$conditions = array(
+			'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id']
+		);
+		
+		$oa = \Arlo\OnlineActivities::get($conditions, null, 1);
+		
+		if(empty($oa)) return;
+		
+		$conditions = array(
+			'oa_id' => $oa->oa_id,
+			'discounts' => false
+		);
+		
+		if (!empty($arlo_region)) {
+			$conditions['region'] = $arlo_region; 
+		}		
+		
+		$offer = \Arlo\Offers::get($conditions, array("o.{$price_field} ASC"), 1);
+	}	
+	
+	
 	
 	if(empty($offer)) return;
 	
