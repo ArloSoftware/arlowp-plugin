@@ -52,6 +52,7 @@ class Arlo_For_Wordpress_Settings {
 				$scheduler = $plugin->get_scheduler();
 				$scheduler->set_task("import", -1);
 				//do_action('arlo_scheduler');
+				//die();
 				wp_redirect( admin_url( 'admin.php?page=arlo-for-wordpress'));
 				exit;
 			}

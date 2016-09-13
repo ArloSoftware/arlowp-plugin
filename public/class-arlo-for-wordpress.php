@@ -2165,7 +2165,7 @@ class Arlo_For_Wordpress {
 		FROM
 			{$wpdb->prefix}arlo_eventtemplates_categories
 		WHERE
-			active = '{$timestamp}'
+			active = {$timestamp}
 		GROUP BY
 			c_arlo_id
 		";
@@ -2180,6 +2180,8 @@ class Arlo_For_Wordpress {
 					c_template_num = %d
 				WHERE
 					c_arlo_id = %d
+				AND
+					active = {$timestamp}
 				";
 				$query = $wpdb->query( $wpdb->prepare($sql, $counts['num'], $counts['c_arlo_id']) );
 				
@@ -2189,78 +2191,53 @@ class Arlo_For_Wordpress {
 			}		
 		}
 		
-		$this->set_categories_count(0, $timestamp);
-		
-		$cats = \Arlo\Categories::getTree(0, null);
+		$cats = \Arlo\Categories::getTree(0, 1000);
+				
 		$this->set_category_depth_level($cats, $timestamp);
 		
-		$sql = "SELECT MAX(c_depth_level) FROM {$wpdb->prefix}arlo_categories WHERE active = '{$timestamp}'";
+		$sql = "SELECT MAX(c_depth_level) FROM {$wpdb->prefix}arlo_categories WHERE active = {$timestamp}";
 		$max_depth = $wpdb->get_var($sql);
 		
 		$this->set_category_depth_order($cats, $max_depth, 0, $timestamp);
+				
+		for ($i = $max_depth+1; $i--; $i < 0) {
+			$sql = "
+			SELECT 
+				SUM(c_template_num) as num,
+				c_parent_id
+			FROM
+				{$wpdb->prefix}arlo_categories
+			WHERE
+				c_depth_level = {$i}
+			AND
+				active = {$timestamp}
+			GROUP BY
+				c_parent_id
+			";
+			echo $sql;
+			$cats = $wpdb->get_results($sql, ARRAY_A);
+			if (!is_null($cats)) {
+				foreach ($cats as $cat) {
+					$sql = "
+					UPDATE
+						{$wpdb->prefix}arlo_categories
+					SET
+						c_template_num = c_template_num + %d
+					WHERE
+						c_arlo_id = %d
+					AND
+						active = {$timestamp}
+					";
+					$query = $wpdb->query( $wpdb->prepare($sql, $cat['num'], $cat['c_parent_id']) );
+				}
+			}
+		}
 		
 		$wpdb->query('COMMIT');
 		
 		return $items;
 	}
-	
-	private function set_categories_count($cat_id, $timestamp) {
-		global $wpdb;
-		$cat_id = intval($cat_id);
 		
-		$where = "
-		c_arlo_id = {$cat_id}
-		";
-		
-		if ($cat_id == 0) {
-			$where = "
-			(
-			SELECT 
-				COUNT(1) 
-			FROM 
-				{$wpdb->prefix}arlo_categories
-			WHERE 
-				wpc.c_arlo_id = wp_arlo_categories.c_parent_id
-			AND
-				active = '{$timestamp}'
-			) = 0			
-			";
-		}
-		
-		$sql = "
-		SELECT 
-			c_arlo_id,
-			c_template_num,
-			c_parent_id
-		FROM 
-			{$wpdb->prefix}arlo_categories AS wpc
-		WHERE 
-			{$where}
-		AND
-			active = '{$timestamp}'
-		";
-
-		$cats = $wpdb->get_results($sql, ARRAY_A);
-		if (!is_null($cats)) {
-			foreach ($cats as $cat) {
-				if ($cat['c_parent_id'] > 0) {
-					$sql = "
-					UPDATE 
-						{$wpdb->prefix}arlo_categories
-					SET 
-						c_template_num = c_template_num + %d
-					WHERE
-						c_arlo_id = %d
-					AND
-						active = '%s'
-					";
-					$query = $wpdb->query( $wpdb->prepare($sql, $cat['c_template_num'], $cat['c_parent_id'], $timestamp) );
-					$this->set_categories_count($cat['c_parent_id'], $timestamp);
-				}
-			}		
-		}
-	}
-	
 	private function set_category_depth_level($cats, $timestamp) {
 		global $wpdb;
 		
@@ -2273,7 +2250,7 @@ class Arlo_For_Wordpress {
 			WHERE
 				c_arlo_id = %d
 			AND
-				active = '%s'
+				active = %s
 			";
 			$query = $wpdb->query( $wpdb->prepare($sql, $cat->depth_level, $cat->c_arlo_id, $timestamp) );
 			if (isset($cat->children) && is_array($cat->children)) {
@@ -2297,7 +2274,7 @@ class Arlo_For_Wordpress {
 			WHERE
 				c_arlo_id = %d
 			AND
-				active = '%s'	
+				active = %s	
 			";
 			
 			$query = $wpdb->query( $wpdb->prepare($sql, $order + $cat->c_order, $cat->c_arlo_id, $timestamp) );
@@ -2320,7 +2297,7 @@ class Arlo_For_Wordpress {
 		FROM
 			{$wpdb->prefix}arlo_categories
 		WHERE 
-			active = '{$timestamp}'
+			active = {$timestamp}
 		";
 		$category_ids = $wpdb->get_results($sql, ARRAY_A);
 		$category_ids = array_map(function($item) {
