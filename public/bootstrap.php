@@ -2488,7 +2488,7 @@ $shortcodes->add('event_offers', function($content='', $atts, $shortcode_name){
 		$offers .= (!is_null($o_message) || $o_message != '') ? ' '.$o_message:'';
 		// if a replacement offer exists
 		if($replaced) {
-			$offers .= '</span><span ' . $replacement_discount ? 'class="discount"' : '' . '>';
+			$offers .= '</span><span ' . ($replacement_discount ? 'class="discount"' : '') . '>';
 			
 			// display replacement offer label if there is one
 			$offers .= (!is_null($replacement_label) || $replacement_label != '') ? $replacement_label.' ':'';
