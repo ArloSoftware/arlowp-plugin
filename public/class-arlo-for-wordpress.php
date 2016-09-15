@@ -1519,7 +1519,7 @@ class Arlo_For_Wordpress {
 					if(isset($item->AdvertisedPresenters) && !empty($item->AdvertisedPresenters)) {
 						foreach($item->AdvertisedPresenters as $index => $presenter) {
 							$query = $wpdb->query( $wpdb->prepare( 
-								"REPLACE INTO {$wpdb->prefix}arlo_eventtemplates_presenters 
+								"INSERT INTO {$wpdb->prefix}arlo_eventtemplates_presenters 
 								(et_arlo_id, p_arlo_id, p_order, active) 
 								VALUES ( %d, %d, %d, %s ) 
 								", 
@@ -1539,7 +1539,7 @@ class Arlo_For_Wordpress {
 					if(isset($item->Categories) && !empty($item->Categories)) {
 						foreach($item->Categories as $index => $category) {
 							$query = $wpdb->query( $wpdb->prepare( 
-								"REPLACE INTO {$wpdb->prefix}arlo_eventtemplates_categories 
+								"INSERT INTO {$wpdb->prefix}arlo_eventtemplates_categories 
 								(et_arlo_id, c_arlo_id, active) 
 								VALUES ( %d, %d, %s ) 
 								", 
@@ -1622,7 +1622,7 @@ class Arlo_For_Wordpress {
 										
 				if (!empty($exisiting_tags[$tag])) {
 					$query = $wpdb->query( $wpdb->prepare( 
-						"REPLACE INTO {$table_name}
+						"INSERT INTO {$table_name}
 						(" . $field . ", tag_id, active) 
 						VALUES ( %d, %d, %s ) 
 						", 
@@ -1743,7 +1743,7 @@ class Arlo_For_Wordpress {
 		if(isset($item->Presenters) && !empty($item->Presenters)) {
 			foreach($item->Presenters as $index => $presenter) {
 				$query = $wpdb->query( $wpdb->prepare( 
-					"REPLACE INTO {$wpdb->prefix}arlo_events_presenters 
+					"INSERT INTO {$wpdb->prefix}arlo_events_presenters 
 					(e_arlo_id, p_arlo_id, p_order, active) 
 					VALUES ( %d, %d, %d, %s ) 
 					", 
@@ -2135,7 +2135,7 @@ class Arlo_For_Wordpress {
 			foreach($items as $item) {
 				$slug = sanitize_title($item->CategoryID . ' ' . $item->Name);
 				$query = $wpdb->query( $wpdb->prepare( 
-					"REPLACE INTO $table_name 
+					"INSERT INTO $table_name 
 					(c_arlo_id, c_name, c_slug, c_header, c_footer, c_order, c_parent_id, active) 
 					VALUES ( %d, %s, %s, %s, %s, %d, %d, %s ) 
 					", 

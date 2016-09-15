@@ -672,13 +672,13 @@ function install_table_arlo_async_tasks() {
 	$table_name = $wpdb->prefix . "arlo_async_tasks";
 
 	$sql = "CREATE TABLE " . $table_name . " (
-	  task_id INT(11) NOT NULL AUTO_INCREMENT,
-	  task_priority TINYINT(4) NOT NULL DEFAULT '0',
-	  task_task VARCHAR(255) DEFAULT NULL,
-	  task_status TINYINT(4) NOT NULL DEFAULT '0' COMMENT '0:scheduled, 1:paused, 2:in_progress, 3: failed, 4: completed',
-	  task_status_text VARCHAR(255) DEFAULT NULL,
-	  task_created TIMESTAMP NULL DEFAULT NULL,
-	  task_modified TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+	  task_id int(11) NOT NULL AUTO_INCREMENT,
+	  task_priority tinyint(4) NOT NULL DEFAULT '0',
+	  task_task varchar(255) DEFAULT NULL,
+	  task_status tinyint(4) NOT NULL DEFAULT '0' COMMENT '0:scheduled, 1:paused, 2:in_progress, 3: failed, 4: completed',
+	  task_status_text varchar(255) DEFAULT NULL,
+	  task_created timestamp NULL DEFAULT NULL,
+	  task_modified timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
 	  PRIMARY KEY  (task_id),
 	  KEY task_status (task_status),
 	  KEY task_priority (task_priority)
@@ -690,8 +690,8 @@ function install_table_arlo_async_tasks() {
     
     $sql = "
 	  CREATE TABLE " . $wpdb->prefix . "arlo_async_task_data (
-	  data_task_id INT(11) NOT NULL,
-	  data_text TEXT NOT NULL,
+	  data_task_id int(11) NOT NULL,
+	  data_text text NOT NULL,
 	  PRIMARY KEY  (data_task_id)
 	) CHARSET=utf8;  
     ";
@@ -710,17 +710,17 @@ function install_table_arlo_eventtemplate() {
 	$table_name = $wpdb->prefix . "arlo_eventtemplates";
 
 	$sql = "CREATE TABLE " . $table_name . " (
-		et_id INT(11) NOT NULL AUTO_INCREMENT,
-		et_arlo_id INT(11) NOT NULL,
-		et_code VARCHAR(255) NULL,
-		et_name VARCHAR(255) NULL,
-		et_descriptionsummary TEXT NULL,
-		et_post_name VARCHAR(255) NULL,
-		et_advertised_duration VARCHAR(255) NULL,
-		active INT(10) unsigned DEFAULT NULL,
-		et_registerinteresturi TEXT NULL,
-		et_viewuri TEXT NULL,
-		et_region VARCHAR(5) NULL,
+		et_id int(11) NOT NULL AUTO_INCREMENT,
+		et_arlo_id int(11) NOT NULL,
+		et_code varchar(255) NULL,
+		et_name varchar(255) NULL,
+		et_descriptionsummary text NULL,
+		et_post_name varchar(255) NULL,
+		et_advertised_duration varchar(255) NULL,
+		active int(10) unsigned DEFAULT NULL,
+		et_registerinteresturi text NULL,
+		et_viewuri text NULL,
+		et_region varchar(5) NULL,
 		PRIMARY KEY  (et_id),
 		KEY et_arlo_id (et_arlo_id),
 		KEY et_region (et_region))
@@ -741,13 +741,13 @@ function install_table_arlo_contentfields() {
 	$table_name = $wpdb->prefix . "arlo_contentfields";
 
 	$sql = "CREATE TABLE " . $table_name . " (
-		cf_id INT(11) NOT NULL AUTO_INCREMENT,
-		et_id INT(11) NOT NULL,
-		cf_fieldname VARCHAR(255) NULL,
-		cf_text TEXT NULL,
-		cf_order INT(11) NULL,
-		e_contenttype VARCHAR(255) NULL,
-		active INT(10) unsigned DEFAULT NULL,
+		cf_id int(11) NOT NULL AUTO_INCREMENT,
+		et_id int(11) NOT NULL,
+		cf_fieldname varchar(255) NULL,
+		cf_text text NULL,
+		cf_order int(11) NULL,
+		e_contenttype varchar(255) NULL,
+		active int(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (cf_id),
 		KEY cf_order (cf_order),
 		KEY et_id (et_id))
@@ -769,35 +769,35 @@ function install_table_arlo_events() {
 	$table_name = $wpdb->prefix . "arlo_events";
 
 	$sql = "CREATE TABLE " . $table_name . " (
-		e_id INT(11) NOT NULL AUTO_INCREMENT,
-		e_arlo_id INT(11) NOT NULL,
-		et_arlo_id INT(11) NULL,
-		e_code VARCHAR(255) NULL,
-		e_name VARCHAR(255) NULL,
+		e_id int(11) NOT NULL AUTO_INCREMENT,
+		e_arlo_id int(11) NOT NULL,
+		et_arlo_id int(11) NULL,
+		e_code varchar(255) NULL,
+		e_name varchar(255) NULL,
 		e_startdatetime DATETIME NOT NULL,
 		e_finishdatetime DATETIME NULL,
-		e_datetimeoffset VARCHAR(6) NULL,
-		e_timezone VARCHAR(10) NULL,
-		e_timezone_id TINYINT(3) UNSIGNED NULL,
-		v_id INT(11) NULL,
-		e_locationname VARCHAR(255) NULL,
-		e_locationroomname VARCHAR(255) NULL,
-	    e_locationvisible TINYINT(1) NOT NULL DEFAULT '0',
-		e_isfull TINYINT(1) NOT NULL DEFAULT FALSE,
-		e_placesremaining INT(11) NULL,
-		e_summary VARCHAR(255) NULL,
-		e_sessiondescription VARCHAR(255) NULL,
-		e_notice TEXT NULL,
-		e_credits VARCHAR(255) NULL,
-		e_viewuri VARCHAR(255) NULL,
-		e_registermessage VARCHAR(255) NULL,
-		e_registeruri VARCHAR(255) NULL,
-		e_providerorganisation VARCHAR(255) NULL,
-		e_providerwebsite VARCHAR(255) NULL,
-		e_isonline TINYINT(1) NOT NULL DEFAULT FALSE,
-		e_parent_arlo_id INT(11) NOT NULL,
-		e_region VARCHAR(5) NOT NULL,	
-		active INT(10) unsigned DEFAULT NULL,
+		e_datetimeoffset varchar(6) NULL,
+		e_timezone varchar(10) NULL,
+		e_timezone_id tinyint(3) UNSIGNED NULL,
+		v_id int(11) NULL,
+		e_locationname varchar(255) NULL,
+		e_locationroomname varchar(255) NULL,
+	    e_locationvisible tinyint(1) NOT NULL DEFAULT '0',
+		e_isfull tinyint(1) NOT NULL DEFAULT FALSE,
+		e_placesremaining int(11) NULL,
+		e_summary varchar(255) NULL,
+		e_sessiondescription varchar(255) NULL,
+		e_notice text NULL,
+		e_credits varchar(255) NULL,
+		e_viewuri varchar(255) NULL,
+		e_registermessage varchar(255) NULL,
+		e_registeruri varchar(255) NULL,
+		e_providerorganisation varchar(255) NULL,
+		e_providerwebsite varchar(255) NULL,
+		e_isonline tinyint(1) NOT NULL DEFAULT FALSE,
+		e_parent_arlo_id int(11) NOT NULL,
+		e_region varchar(5) NOT NULL,	
+		active int(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (e_id),
 		KEY et_arlo_id (et_arlo_id),
 		KEY e_arlo_id (e_arlo_id),
@@ -822,19 +822,19 @@ function install_table_arlo_onlineactivities() {
 	$table_name = $wpdb->prefix . "arlo_onlineactivities";
 
 	$sql = "CREATE TABLE " . $table_name . " (
-		oa_id INT(11) NOT NULL AUTO_INCREMENT,
-		oat_arlo_id INT(11) NULL,
-		oa_arlo_id VARCHAR(64) NOT NULL,
-		oa_code VARCHAR(255) NULL,
-		oa_name VARCHAR(255) NULL,
-		oa_delivery_description VARCHAR(255) NULL,
-		oa_viewuri VARCHAR(255) NULL,
-		oa_reference_terms VARCHAR(255) NULL,
-		oa_credits VARCHAR(255) NULL,		
-		oa_registermessage VARCHAR(255) NULL,
-		oa_registeruri VARCHAR(255) NULL,
-		oa_region VARCHAR(5) NOT NULL,		
-		active INT(10) unsigned DEFAULT NULL,
+		oa_id int(11) NOT NULL AUTO_INCREMENT,
+		oat_arlo_id int(11) NULL,
+		oa_arlo_id varchar(64) NOT NULL,
+		oa_code varchar(255) NULL,
+		oa_name varchar(255) NULL,
+		oa_delivery_description varchar(255) NULL,
+		oa_viewuri varchar(255) NULL,
+		oa_reference_terms varchar(255) NULL,
+		oa_credits varchar(255) NULL,		
+		oa_registermessage varchar(255) NULL,
+		oa_registeruri varchar(255) NULL,
+		oa_region varchar(5) NOT NULL,		
+		active int(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (oa_id),
 		KEY oat_arlo_id (oat_arlo_id),
 		KEY oa_region (oa_region))
@@ -857,25 +857,25 @@ function install_table_arlo_venues() {
 	$table_name = $wpdb->prefix . "arlo_venues";
 
 	$sql = "CREATE TABLE " . $table_name . " (
-		v_id INT(11) NOT NULL AUTO_INCREMENT,
-		v_arlo_id INT(11) NOT NULL,
-		v_name VARCHAR(255) NULL,
+		v_id int(11) NOT NULL AUTO_INCREMENT,
+		v_arlo_id int(11) NOT NULL,
+		v_name varchar(255) NULL,
 		v_geodatapointlatitude DECIMAL(10,6) NULL,
 		v_geodatapointlongitude DECIMAL(10,6) NULL,
-		v_physicaladdressline1 VARCHAR(255) NULL,
-		v_physicaladdressline2 VARCHAR(255) NULL,
-		v_physicaladdressline3 VARCHAR(255) NULL,
-		v_physicaladdressline4 VARCHAR(255) NULL,
-		v_physicaladdresssuburb VARCHAR(255) NULL,
-		v_physicaladdresscity VARCHAR(255) NULL,
-		v_physicaladdressstate VARCHAR(255) NULL,
-		v_physicaladdresspostcode VARCHAR(255) NULL,
-		v_physicaladdresscountry VARCHAR(255) NULL,
-		v_viewuri VARCHAR(255) NULL,
-		v_facilityinfodirections TEXT NULL,
-		v_facilityinfoparking TEXT NULL,
-		v_post_name VARCHAR(255) NULL,
-		active INT(10) unsigned DEFAULT NULL,
+		v_physicaladdressline1 varchar(255) NULL,
+		v_physicaladdressline2 varchar(255) NULL,
+		v_physicaladdressline3 varchar(255) NULL,
+		v_physicaladdressline4 varchar(255) NULL,
+		v_physicaladdresssuburb varchar(255) NULL,
+		v_physicaladdresscity varchar(255) NULL,
+		v_physicaladdressstate varchar(255) NULL,
+		v_physicaladdresspostcode varchar(255) NULL,
+		v_physicaladdresscountry varchar(255) NULL,
+		v_viewuri varchar(255) NULL,
+		v_facilityinfodirections text NULL,
+		v_facilityinfoparking text NULL,
+		v_post_name varchar(255) NULL,
+		active int(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (v_id),
 		KEY v_arlo_id (v_arlo_id))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
@@ -896,19 +896,19 @@ function install_table_arlo_presenters() {
 	$table_name = $wpdb->prefix . "arlo_presenters";
 
 	$sql = "CREATE TABLE " . $table_name . " (
-		p_id INT(11) NOT NULL AUTO_INCREMENT,
-		p_arlo_id INT(11) NOT NULL,
-		p_firstname VARCHAR(64) NULL,
-		p_lastname VARCHAR(64) NULL,
-		p_viewuri VARCHAR(255) NULL,
-		p_profile TEXT NULL,
-		p_qualifications TEXT NULL,
-		p_interests TEXT NULL,
-		p_twitterid VARCHAR(255) NULL,
-		p_facebookid VARCHAR(255) NULL,
-		p_linkedinid VARCHAR(255) NULL,
-		p_post_name VARCHAR(255) NULL,
-		active INT(10) unsigned DEFAULT NULL,
+		p_id int(11) NOT NULL AUTO_INCREMENT,
+		p_arlo_id int(11) NOT NULL,
+		p_firstname varchar(64) NULL,
+		p_lastname varchar(64) NULL,
+		p_viewuri varchar(255) NULL,
+		p_profile text NULL,
+		p_qualifications text NULL,
+		p_interests text NULL,
+		p_twitterid varchar(255) NULL,
+		p_facebookid varchar(255) NULL,
+		p_linkedinid varchar(255) NULL,
+		p_post_name varchar(255) NULL,
+		active int(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (p_id),
 		KEY p_arlo_id (p_arlo_id))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
@@ -930,26 +930,26 @@ function install_table_arlo_offers() {
 	$table_name = $wpdb->prefix . "arlo_offers";
 
 	$sql = "CREATE TABLE " . $table_name . " (
-		o_id INT(11) NOT NULL AUTO_INCREMENT,
+		o_id int(11) NOT NULL AUTO_INCREMENT,
 		o_arlo_id INT,
 		et_id INT,
 		e_id INT,
 		oa_id INT,
-		o_label VARCHAR(255) NULL,
-		o_isdiscountoffer TINYINT(1) NOT NULL DEFAULT FALSE,
-		o_currencycode VARCHAR(255) NULL,
+		o_label varchar(255) NULL,
+		o_isdiscountoffer tinyint(1) NOT NULL DEFAULT FALSE,
+		o_currencycode varchar(255) NULL,
 		o_offeramounttaxexclusive DECIMAL(15,2) NULL,
 		o_offeramounttaxinclusive DECIMAL(15,2) NULL,
-		o_formattedamounttaxexclusive VARCHAR(255) NULL,
-		o_formattedamounttaxinclusive VARCHAR(255) NULL,
-		o_taxrateshortcode VARCHAR(255) NULL,
-		o_taxratename VARCHAR(255) NULL,
+		o_formattedamounttaxexclusive varchar(255) NULL,
+		o_formattedamounttaxinclusive varchar(255) NULL,
+		o_taxrateshortcode varchar(255) NULL,
+		o_taxratename varchar(255) NULL,
 		o_taxratepercentage DECIMAL(3,2) NULL,
-		o_message TEXT NULL,
-		o_order INT(11) NULL,
-		o_replaces INT(11) NULL,
-		o_region VARCHAR(5) NOT NULL,
-		active INT(10) unsigned DEFAULT NULL,
+		o_message text NULL,
+		o_order int(11) NULL,
+		o_replaces int(11) NULL,
+		o_region varchar(5) NOT NULL,
+		active int(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (o_id),
 		KEY o_arlo_id (o_arlo_id),
 		KEY et_id (et_id),
@@ -976,11 +976,11 @@ function install_table_arlo_eventtemplates_presenters() {
 	$table_name = $wpdb->prefix . "arlo_eventtemplates_presenters";
 
 	$sql = "CREATE TABLE " . $table_name . " (
-		et_arlo_id INT(11) NULL,
-		p_arlo_id INT(11) NULL,
-		p_order INT(11) NULL COMMENT 'Order of the presenters for the event template.',
-		active INT(10) unsigned DEFAULT NULL,
-		PRIMARY KEY  (et_arlo_id,p_arlo_id),
+		et_arlo_id int(11) NULL,
+		p_arlo_id int(11) NULL,
+		p_order int(11) NULL COMMENT 'Order of the presenters for the event template.',
+		active int(10) unsigned DEFAULT NULL,
+		PRIMARY KEY  (et_arlo_id,p_arlo_id,active),
 		KEY cf_order (p_order),
 		KEY fk_et_id_idx (et_arlo_id ASC),
 		KEY fk_p_id_idx (p_arlo_id ASC))
@@ -989,6 +989,10 @@ function install_table_arlo_eventtemplates_presenters() {
 	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
 	dbDelta($sql);
+
+	//dbdelta doesn't handle primary key changes
+	$wpdb->query("ALTER TABLE {$table_name} DROP PRIMARY KEY");
+	$wpdb->query("ALTER TABLE {$table_name} ADD PRIMARY KEY (et_arlo_id,p_arlo_id,active)");
 }
 
 /**
@@ -1006,39 +1010,53 @@ function install_table_arlo_tags() {
 
 	$sql = "CREATE TABLE " . $wpdb->prefix . "arlo_tags (
   		id MEDIUMINT(8) unsigned NOT NULL AUTO_INCREMENT,
-  		tag VARCHAR(255) NOT NULL,
-		active INT(10) unsigned DEFAULT NULL,
+  		tag varchar(255) NOT NULL,
+		active int(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (id))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci";
 		
 	dbDelta($sql);
 
 	$sql = "CREATE TABLE " . $wpdb->prefix . "arlo_events_tags (
-		e_arlo_id INT(11) NOT NULL,
+		e_arlo_id int(11) NOT NULL,
 		tag_id MEDIUMINT(8) unsigned NOT NULL,
-		active INT(10) unsigned DEFAULT NULL,
-		PRIMARY KEY  (e_arlo_id,tag_id))
+		active int(10) unsigned DEFAULT NULL,
+		PRIMARY KEY  (e_arlo_id,tag_id,active))
   		CHARACTER SET utf8 COLLATE=utf8_general_ci";
   		
 	dbDelta($sql);  	
+
+	//dbdelta doesn't handle primary key changes
+	$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events_tags DROP PRIMARY KEY");
+	$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events_tags ADD PRIMARY KEY (e_arlo_id,tag_id,active)");
+	
 	
 	$sql = "CREATE TABLE " . $wpdb->prefix . "arlo_onlineactivities_tags (
-		oa_id INT(11) NOT NULL,
+		oa_id int(11) NOT NULL,
 		tag_id MEDIUMINT(8) unsigned NOT NULL,
-		active INT(10) unsigned DEFAULT NULL,
-		PRIMARY KEY  (oa_id,tag_id))
+		active int(10) unsigned DEFAULT NULL,
+		PRIMARY KEY  (oa_id,tag_id,active))
   		CHARACTER SET utf8 COLLATE=utf8_general_ci";
   		
 	dbDelta($sql);		
 
+	//dbdelta doesn't handle primary key changes
+	$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_onlineactivities_tags DROP PRIMARY KEY");
+	$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_onlineactivities_tags ADD PRIMARY KEY (oa_id,tag_id,active)");
+	
+
 	$sql = "CREATE TABLE " . $wpdb->prefix . "arlo_eventtemplates_tags (
-		et_arlo_id INT(11) NOT NULL,
+		et_arlo_id int(11) NOT NULL,
 		tag_id MEDIUMINT(8) unsigned NOT NULL,
-		active INT(10) unsigned DEFAULT NULL,
-		PRIMARY KEY  (et_arlo_id,tag_id))
+		active int(10) unsigned DEFAULT NULL,
+		PRIMARY KEY  (et_arlo_id,tag_id,active))
   		CHARACTER SET utf8 COLLATE=utf8_general_ci";
 
 	dbDelta($sql);
+
+	//dbdelta doesn't handle primary key changes
+	$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates_tags DROP PRIMARY KEY");
+	$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates_tags ADD PRIMARY KEY (et_arlo_id,tag_id,active)");
 }
 
 /**
@@ -1053,11 +1071,11 @@ function install_table_arlo_events_presenters() {
 	$table_name = $wpdb->prefix . "arlo_events_presenters";
 
 	$sql = "CREATE TABLE " . $table_name . " (
-		e_arlo_id INT(11) NULL,
-		p_arlo_id INT(11) NULL,
-		p_order INT(11) NULL COMMENT 'Order of the presenters for the event.',
-		active INT(10) unsigned DEFAULT NULL,
-		PRIMARY KEY  (e_arlo_id,p_arlo_id),		
+		e_arlo_id int(11) NULL,
+		p_arlo_id int(11) NULL,
+		p_order int(11) NULL COMMENT 'Order of the presenters for the event.',
+		active int(10) unsigned DEFAULT NULL,
+		PRIMARY KEY  (e_arlo_id,p_arlo_id,active),		
 		KEY fk_e_id_idx (e_arlo_id ASC),
 		KEY fk_p_id_idx (p_arlo_id ASC))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
@@ -1065,6 +1083,10 @@ function install_table_arlo_events_presenters() {
 	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
 	dbDelta($sql);
+
+	//dbdelta doesn't handle primary key changes
+	$wpdb->query("ALTER TABLE " . $table_name . " DROP PRIMARY KEY");
+	$wpdb->query("ALTER TABLE " . $table_name . " ADD PRIMARY KEY (e_arlo_id,p_arlo_id,active)");
 }
 
 /**
@@ -1079,25 +1101,27 @@ function install_table_arlo_categories() {
 	$table_name = $wpdb->prefix . "arlo_categories";
 
 	$sql = "CREATE TABLE " . $table_name . " (
-		c_id INT(11) NOT NULL AUTO_INCREMENT,
-		c_arlo_id INT(11) NOT NULL,
-		c_name VARCHAR(255) NOT NULL DEFAULT '',
-		c_slug VARCHAR(255) NOT NULL DEFAULT '',
+		c_id int(11) NOT NULL AUTO_INCREMENT,
+		c_arlo_id int(11) NOT NULL,
+		c_name varchar(255) NOT NULL DEFAULT '',
+		c_slug varchar(255) NOT NULL DEFAULT '',
 		c_header TEXT,
 		c_footer TEXT,
 		c_template_num SMALLINT UNSIGNED NOT NULL DEFAULT '0',
 		c_order BIGINT(20) DEFAULT NULL,
-		c_depth_level TINYINT(3) unsigned NOT NULL DEFAULT '0',
-		c_parent_id INT(11) DEFAULT NULL,
-		active INT(10) unsigned DEFAULT NULL,
-		PRIMARY KEY  (c_id),
-		UNIQUE KEY c_arlo_id (c_arlo_id),
+		c_depth_level tinyint(3) unsigned NOT NULL DEFAULT '0',
+		c_parent_id int(11) DEFAULT NULL,
+		active int(10) unsigned DEFAULT NULL,
+		PRIMARY KEY  (c_id,active),
+		UNIQUE KEY c_arlo_id_key (c_arlo_id,active),
 		KEY c_parent_id (c_parent_id))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
 	dbDelta($sql);
+
+	$wpdb->query("ALTER TABLE " . $table_name . " DROP INDEX c_arlo_id");
 }
 
 /**
@@ -1112,11 +1136,11 @@ function install_table_arlo_eventtemplates_categories() {
 	$table_name = $wpdb->prefix . "arlo_eventtemplates_categories";
 
 	$sql = "CREATE TABLE " . $table_name . " (
-		et_arlo_id INT(11) NULL,
-		c_arlo_id INT(11) NULL,
+		et_arlo_id int(11) NULL,
+		c_arlo_id int(11) NULL,
 		et_order SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0',
-		active INT(10) unsigned DEFAULT NULL,
-		PRIMARY KEY  (et_arlo_id,c_arlo_id),
+		active int(10) unsigned DEFAULT NULL,
+		PRIMARY KEY  (et_arlo_id,c_arlo_id,active),
 		KEY fk_et_id_idx (et_arlo_id ASC),
 		KEY fk_c_id_idx (c_arlo_id ASC))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
@@ -1124,6 +1148,10 @@ function install_table_arlo_eventtemplates_categories() {
 	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
 	dbDelta($sql);
+
+	//dbdelta doesn't handle primary key changes
+	$wpdb->query("ALTER TABLE " . $table_name . " DROP PRIMARY KEY");
+	$wpdb->query("ALTER TABLE " . $table_name . " ADD PRIMARY KEY (et_arlo_id,c_arlo_id,active)");	
 }
 
 /**
@@ -1139,19 +1167,19 @@ function install_table_arlo_timezones() {
 
 	$sql = "
 		CREATE TABLE " . $table_name . " (
-		id TINYINT(3) unsigned NOT NULL,
-		name VARCHAR(256) NOT NULL,
-		active INT(10) unsigned DEFAULT NULL,
+		id tinyint(3) unsigned NOT NULL,
+		name varchar(256) NOT NULL,
+		active int(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (id)) 
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;	
   	";
   			
 	$sql2 = " 
 		CREATE TABLE IF NOT EXISTS " . $table_name . "_olson (
-		timezone_id INT(11) NOT NULL,
-		olson_name VARCHAR(255) NOT NULL,
-		active INT(10) unsigned DEFAULT NULL,
-		PRIMARY KEY  (timezone_id,olson_name)
+		timezone_id int(11) NOT NULL,
+		olson_name varchar(255) NOT NULL,
+		active int(10) unsigned DEFAULT NULL,
+		PRIMARY KEY  (timezone_id,olson_name,active)
 		) CHARACTER SET utf8 COLLATE=utf8_general_ci;
 	";
 	
@@ -1159,6 +1187,10 @@ function install_table_arlo_timezones() {
 
 	dbDelta($sql);
 	dbDelta($sql2);	
+
+	//dbdelta doesn't handle primary key changes
+	$wpdb->query("ALTER TABLE " . $table_name . "_olson DROP PRIMARY KEY");
+	$wpdb->query("ALTER TABLE " . $table_name . "_olson ADD PRIMARY KEY (timezone_id,olson_name,active)");		
 }
 
 /**
@@ -1173,10 +1205,10 @@ function install_table_arlo_import_log() {
 	$table_name = $wpdb->prefix . "arlo_import_log";
 
 	$sql = "CREATE TABLE $table_name (
-		  id INT(11) unsigned NOT NULL AUTO_INCREMENT,
+		  id int(11) unsigned NOT NULL AUTO_INCREMENT,
 		  message TEXT,
 		  created DATETIME DEFAULT NULL,
-		  successful TINYINT(1) DEFAULT NULL,
+		  successful tinyint(1) DEFAULT NULL,
 		  PRIMARY KEY  (id)) 
 		  CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
@@ -1188,7 +1220,7 @@ function install_table_arlo_import_log() {
         $table_name = $wpdb->prefix . "arlo_import_lock";
         
         $sql = "CREATE TABLE $table_name (
-            import_id INT(10) unsigned NOT NULL,
+            import_id int(10) unsigned NOT NULL,
             lock_acquired DATETIME NOT NULL,
             lock_expired DATETIME NOT NULL
             ) CHARACTER SET utf8 COLLATE=utf8_general_ci;";
@@ -1625,7 +1657,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 		$group 
 		$order
 		LIMIT $offset,$limit";
-                
+
 	$items = $wpdb->get_results($sql, ARRAY_A);
 		
 	if(empty($items)) :
