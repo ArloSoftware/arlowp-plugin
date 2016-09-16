@@ -2834,6 +2834,8 @@ class Arlo_For_Wordpress {
 			$scheduler->update_task($task_id, 4, "Import terminated by the user");
 			$task = $scheduler->get_tasks(null, null, $task_id);
 			
+			$plugin->clear_import_lock();
+			
 			echo $task_id;
 		}
 		
