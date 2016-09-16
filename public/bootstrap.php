@@ -4115,6 +4115,12 @@ $shortcodes->add('event_duration', function($content='', $atts, $shortcode_name)
 $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 	if(!isset($GLOBALS['arlo_event_list_item']) || empty($GLOBALS['arlo_event_list_item']['et_arlo_id'])) return;
 	
+	// merge and extract attributes
+	extract(shortcode_atts(array(
+		'showfrom' => 'true',
+	), $atts, $shortcode_name));
+	
+	
 	$settings = get_option('arlo_settings');  
 	$price_setting = (isset($settings['price_setting'])) ? $settings['price_setting'] : ARLO_PLUGIN_PREFIX . '-exclgst';
 	$price_field = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? 'o_offeramounttaxexclusive' : 'o_offeramounttaxinclusive';
@@ -4185,8 +4191,6 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 		$offer = \Arlo\Offers::get($conditions, array("o.{$price_field} ASC"), 1);
 	}	
 	
-	
-	
 	if(empty($offer)) return;
 	
 	// if $0.00, return "Free"
@@ -4194,7 +4198,12 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 		return htmlentities($free_text, ENT_QUOTES, "UTF-8");
 	}
 	
-	return '<span class="arlo-from-text">' . __('From', $GLOBALS['arlo_plugin_slug']) . '</span> ' . $offer->$price_field_show;
+	$fromtext = '';
+	if (strtolower($showfrom) === "true") {
+		$fromtext = '<span class="arlo-from-text">' . __('From', $GLOBALS['arlo_plugin_slug']) . '</span> ';
+	}
+	
+	return $fromtext . $offer->$price_field_show;
 });
 
 // event template next running
