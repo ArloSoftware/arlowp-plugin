@@ -305,9 +305,9 @@ class Arlo_For_Wordpress {
 		add_filter('the_content', 'arlo_the_content');
 	
 	
-		add_action( 'wp_ajax_dismissible_notice', array($this, 'dismissible_notice_callback'));
+		add_action( 'wp_ajax_arlo_dismissible_notice', array($this, 'dismissible_notice_callback'));
 		
-		add_action( 'wp_ajax_start_scheduler', array($this, 'start_scheduler_callback'));
+		add_action( 'wp_ajax_arlo_start_scheduler', array($this, 'start_scheduler_callback'));
 		
 		add_action( 'wp_ajax_arlo_get_task_info', array($this, 'arlo_get_task_info_callback'));
 		

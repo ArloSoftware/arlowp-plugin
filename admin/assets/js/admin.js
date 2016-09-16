@@ -380,7 +380,7 @@
 		
 		function kickOffScheduler() {
 			var data = {
-				action: 'start_scheduler'
+				action: 'arlo_start_scheduler'
 			}
 				
 			jQuery.post(ajaxurl, data);
@@ -391,7 +391,7 @@
 			var id = jQuery(this).parent().attr('id');
 			if (id != null) {
 				var data = {
-					action: 'dismissible_notice',
+					action: 'arlo_dismissible_notice',
 					id: id
 				}
 				
