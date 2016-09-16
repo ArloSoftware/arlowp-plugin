@@ -117,6 +117,10 @@
 					if (confirm(message)) {
 						terminateTask(taskID);
 					}				
+				} else {
+					taskPlaceholder.fadeOut(function() {
+						$(this).remove();
+					});
 				}
 			});
 			
@@ -178,7 +182,7 @@
 									}
 																		
 									taskPlaceholder.addClass(task.task_status == 4 ? "notice-success" : "notice-error");
-																		
+																
 									setTimeout(function() {
 										if (task.task_status == 4) {
 											taskPlaceholder.fadeOut(function() {
@@ -186,7 +190,6 @@
 											});								
 										}
 									}, 10000);
-																		
 								break;
 							}							
 						}
