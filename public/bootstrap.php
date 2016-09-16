@@ -4218,16 +4218,6 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 		$arlo_region = get_query_var('arlo-region', '');
 		$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
 	}
-
-	$conditions = array(
-		'template_id' => $GLOBALS['arlo_eventtemplate']['et_arlo_id'],
-		'date' => 'e.e_startdatetime > NOW()',
-		'parent_id' => 'e.e_parent_arlo_id = 0',
-	);
-	
-	if (!empty($arlo_region)) {
-		$conditions['region'] = 'e.e_region = "' . $arlo_region . '"';
-	}
 	
 	// merge and extract attributes
 	extract(shortcode_atts(array(
@@ -4245,13 +4235,29 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
         
 	$removeyear = ($removeyear == "false" || $removeyear == "0" ? false : true);
 	
+	$conditions = array(
+		'template_id' => $GLOBALS['arlo_eventtemplate']['et_arlo_id'],
+		'date' => 'e.e_startdatetime > NOW()',
+		'parent_id' => 'e.e_parent_arlo_id = 0',
+	);
+	
+	$oaconditions = array(
+		'template_id' => $GLOBALS['arlo_eventtemplate']['et_arlo_id'],
+	);	
+	
+	if (!empty($arlo_region)) {
+		$conditions['region'] = 'e.e_region = "' . $arlo_region . '"';
+		$oaconditions['region'] = 'oa.oa_region = "' . $arlo_region . '"';
+	}	
+	
 	$events = \Arlo\Events::get($conditions, array('e.e_startdatetime ASC'), $limit);
+	$oa = \Arlo\OnlineActivities::get($oaconditions, null, 1);
 			
 	if ($layout == "list") {
 		$return = '<ul class="arlo-event-next-running">';
 	}
 	
-	if(count($events) == 0 && !empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) {
+	if(count($events) == 0 && count($oa) == 0 && !empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) {
 		$return = '<a href="' . $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'] . '" title="' . __('Register interest', $GLOBALS['arlo_plugin_slug']) . '" class="' . esc_attr($buttonclass) . '">' . __('Register interest', $GLOBALS['arlo_plugin_slug']) . '</a>';
 	} else if (count($events)) {
 		$return_links = [];
@@ -4275,6 +4281,11 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 		}	
 		
 		$return .= implode(($layout == 'list' ? "" : ", "), $return_links);
+	} else if (count($oa)) {
+		$reference_terms = json_decode($oa->oa_reference_terms, true);
+		
+		if (is_array($reference_terms) && isset($reference_terms['Plural']))
+			$return .= '<a href="' . $oa->oa_registeruri . '" class="arlo-register">' . $reference_terms['Plural'] . '</a>';
 	}
 	
 	if ($layout == "list") {
