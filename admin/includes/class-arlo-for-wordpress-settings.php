@@ -12,7 +12,7 @@
 class Arlo_For_Wordpress_Settings {
 
 	public function __construct() {
-	
+		
 		if (!session_id()) {
 			session_start();
 		}
@@ -46,6 +46,10 @@ class Arlo_For_Wordpress_Settings {
 				}
 				
 				add_action( 'admin_notices', array($plugin, "connected_platform_notice") );
+			}
+			
+			if (isset($_GET['arlo-donwload-sync-log'])) {
+				$plugin->download_synclog();
 			}
 		
 			if (isset($_GET['arlo-import'])) {
@@ -523,6 +527,7 @@ class Arlo_For_Wordpress_Settings {
 	    	</ul>
 	    </p>
 	    <p>If you are experiencing problems with the URLs, please save changes to the Arlo settings page and resynchronize the data under the general tab.</p>
+	    <p><a href="?page=arlo-for-wordpress&arlo-donwload-sync-log">Download synchronization log</p>
 	    ';
 	} 		
 }

@@ -1073,6 +1073,43 @@ class Arlo_For_Wordpress {
 		$scheduler->run_task();		
 	}
 	
+	public function download_synclog() {
+		global $wpdb;
+		
+        $table_name = "{$wpdb->prefix}arlo_import_lock";
+        
+        $sql = '
+            SELECT 
+                id,
+                message,
+                created, 
+                successful
+            FROM
+                ' . $wpdb->prefix . 'arlo_import_log
+            ORDER BY
+            	id DESC
+            ';
+	               
+        $entries = $wpdb->get_results($sql, 'ARRAY_N');
+        
+        if (is_array($entries) && count($entries)) {
+        
+	        header('Content-Type: text/csv; charset=utf-8');
+			header('Content-Disposition: attachment; filename=arlo_sync_log.csv');
+        
+	        $output = fopen('php://output', 'w');
+	        fputcsv($output, array('ID', 'Log', 'CreatedDateTime', 'Successful'));
+	        
+	        foreach ($entries as $entry) {
+	        	 fputcsv($output, $entry);
+	        } 
+	        
+	        fclose($output);        
+        }
+        
+		
+	}
+	
 	public function load_demo() {
 		$settings = get_option('arlo_settings');
 		$notice_id = self::$dismissible_notices['newpages'];
