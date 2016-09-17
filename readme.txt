@@ -126,6 +126,26 @@ The Arlo - Training and Event Management, and online registration plugin is only
 
 == Changelog ==
 
+= 2.3.6 = 
+
+Online Acticities
+
+[arlo_content_field_item] shortcode is available within the [arlo_upcoming_list_item] shortcode
+
+New [arlo_event_credits] shortcode
+
+New [arlo_event_template_advertised_duration] shortcode
+
+New 'showfrom' attribute for [arlo_event_price] shortcode
+
+Terminate background task
+
+Price can be missing on the event template page, if WP is using other db prefix than 'wp_' https://github.com/ArloSoftware/arlowp-plugin/issues/150
+
+Automated sync doesn't run every hour https://github.com/ArloSoftware/arlowp-plugin/issues/151
+
+Fixed category count number for [arlo_categories] shortcode
+
 = 2.3.5.1 = 
 
 Fix start and end date times when the dates are returning a UTC value
