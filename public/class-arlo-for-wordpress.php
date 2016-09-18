@@ -995,6 +995,7 @@ class Arlo_For_Wordpress {
 	
 		$transport = new \ArloAPI\Transports\Wordpress();
 		$transport->setRequestTimeout(30);
+		$transport->setUseNewUrlStructure(get_option('arlo_new_url_structure') == 1);
 		
 		$client = new \ArloAPI\Client($platform_name, $transport, self::VERSION);
 		
@@ -2921,6 +2922,33 @@ class Arlo_For_Wordpress {
 			
 
 		return $tag;
+	}	
+	
+	/**
+	 * determine_url_structure function.
+	 *
+	 * Determines if the platform is available via the new url structure
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public static function determine_url_structure($platform_name = '') {
+		$plugin = self::get_instance();
+		$client = $plugin->get_api_client();
+		
+		$new_url = $client->transport->getRemoteURL($platform_name, true, true);
+		
+		$ch = curl_init($new_url);
+
+		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_exec($ch);
+		
+		$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE); 
+							
+		// update settings
+		update_option('arlo_new_url_structure', $httpcode == 404 ? 0 : 1);
 	}	
 		
 

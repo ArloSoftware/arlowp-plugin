@@ -19,7 +19,7 @@ class Wordpress extends Transport
 	 *
 	 * @return void
 	 */
-	public function request($platform_name, $path, $post_data=null, $public=true, $plugin_version = '') {
+	public function request($platform_name, $path, $post_data=null, $public=true, $plugin_version = '', $new_url_tructure = false) {
 		$args = func_get_args();
 		$cache_key = md5(serialize($args));
 		
@@ -27,7 +27,7 @@ class Wordpress extends Transport
 			return $cached;
 		}
 		
-		$url = $this->getRemoteURL($platform_name, $public) . $path;
+		$url = $this->getRemoteURL($platform_name, $public, $new_url_tructure) . $path;
 				
 		try {
 			$response = wp_remote_request( $url, array(

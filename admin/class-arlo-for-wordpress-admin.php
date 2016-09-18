@@ -537,9 +537,12 @@ class Arlo_For_Wordpress_Admin {
 	public function settings_saved($old) {
 		$new = get_option('arlo_settings', array());
 		$old_regions = get_option('arlo_regions', array());
-	
+			
 		if($old['platform_name'] != $new['platform_name'] && !empty($new['platform_name'])) {
-			$plugin = Arlo_For_Wordpress::get_instance();
+		
+			$plugin = Arlo_For_Wordpress::get_instance();			
+			$plugin->determine_url_structure($new['platform_name']);
+			
 			$scheduler = $plugin->get_scheduler();
 			$scheduler->set_task("import", -1);
 		} else if (empty($new['platform_name'])) {
