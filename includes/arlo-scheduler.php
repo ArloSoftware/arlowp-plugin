@@ -52,15 +52,16 @@ class Scheduler {
 	
 	public function set_task($task = '', $priority = 0) {
 		if (empty($task)) return false;
+		$utc_date = gmdate("Y-m-d H:i:s"); 
 	
 		$sql = "
 		INSERT INTO
 			{$this->table} (task_priority, task_task, task_created)
 		VALUES
-			(%d, %s, NOW())
+			(%d, %s, %s)
 		";
 		
-		$query = $this->wpdb->query($this->wpdb->prepare($sql, $priority, $task));
+		$query = $this->wpdb->query($this->wpdb->prepare($sql, $priority, $task, $utc_date));
 		
 		if ($query) {
 			return $this->wpdb->insert_id;
@@ -72,13 +73,15 @@ class Scheduler {
 	public function update_task($task_id = 0, $task_status = null, $task_status_text = '') {
 		$task_status = (is_null($task_status) ? 'task_status' : intval($task_status));
 		$task_status_text = (empty($task_status_text) ? 'task_status_text' : "'" . $this->wpdb->_real_escape($task_status_text) . "'");
+		$utc_date = gmdate("Y-m-d H:i:s"); 
 	
 		$sql = "
 		UPDATE 	
 			{$this->table}
 		SET
 			task_status = {$task_status},
-			task_status_text = {$task_status_text}
+			task_status_text = {$task_status_text},
+			task_modified = '{$utc_date}'
 		WHERE
 			task_id = " . (intval($task_id)) . "
 		";

@@ -1053,7 +1053,7 @@ class Arlo_For_Wordpress {
 				
 		foreach ($paused_tasks as $task) {
 			$ts = strtotime($task->task_modified);
-			$now = time();			
+			$now = time() - date('Z');
 			if ($now - $ts > 10*60) {
 				$scheduler->update_task($task->task_id, 3, "Import doesn't respond within 10 minutes, stopped by the scheduler");
 			}

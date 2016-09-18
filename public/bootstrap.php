@@ -677,8 +677,8 @@ function install_table_arlo_async_tasks() {
 	  task_task varchar(255) DEFAULT NULL,
 	  task_status tinyint(4) NOT NULL DEFAULT '0' COMMENT '0:scheduled, 1:paused, 2:in_progress, 3: failed, 4: completed',
 	  task_status_text varchar(255) DEFAULT NULL,
-	  task_created timestamp NULL DEFAULT NULL,
-	  task_modified timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+	  task_created timestamp NULL DEFAULT NULL COMMENT 'Dates are in UTC',
+	  task_modified timestamp NULL DEFAULT NULL COMMENT 'Dates are in UTC',
 	  PRIMARY KEY  (task_id),
 	  KEY task_status (task_status),
 	  KEY task_priority (task_priority)
@@ -687,6 +687,9 @@ function install_table_arlo_async_tasks() {
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
     dbDelta($sql);
+
+	$wpdb->query("ALTER TABLE {$table_name} CHANGE task_modified task_modified TIMESTAMP NULL DEFAULT NULL COMMENT 'Dates are in UTC';");
+	$wpdb->query("ALTER TABLE {$table_name} CHANGE task_created task_created TIMESTAMP NULL DEFAULT NULL COMMENT 'Dates are in UTC';");
     
     $sql = "
 	  CREATE TABLE " . $wpdb->prefix . "arlo_async_task_data (
