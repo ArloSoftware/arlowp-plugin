@@ -1048,16 +1048,18 @@ class Arlo_For_Wordpress {
 	public function clean_up_tasks() {
 		$scheduler = $this->get_scheduler();
 		
-		$paused_tasks = $scheduler->get_paused_tasks();
+		$paused_running_tasks = array_merge($scheduler->get_paused_tasks(), $scheduler->get_running_tasks());
 		$this->add_import_log($url . ' ' .  $httpcode, $timestamp, false);
 				
-		foreach ($paused_tasks as $task) {
+		foreach ($paused_running_tasks as $task) {
 			$ts = strtotime($task->task_modified);
 			$now = time() - date('Z');
 			if ($now - $ts > 10*60) {
 				$scheduler->update_task($task->task_id, 3, "Import doesn't respond within 10 minutes, stopped by the scheduler");
 			}
 		}
+
+		
 	}
 	
 	private function delete_running_tasks() {
