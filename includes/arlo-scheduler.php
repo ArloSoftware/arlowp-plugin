@@ -223,6 +223,27 @@ class Scheduler {
 		}
 	}
 	
+	public function terminate_all_immediate_task($task_id) {
+		$task_id = (isset($task_id) && is_numeric($task_id) ? $task_id : null);
+		
+		if ($task_id > 0) {
+			$sql = "
+			UPDATE
+				{$this->table} AS tasks
+			SET
+				task_status = 4, 
+				task_status_text = 'Import is terminated by the user'
+			WHERE 
+				task_id >= {$task_id}
+			";
+			
+			return $this->wpdb->query($sql);
+		}
+		
+		return false;
+
+	}
+	
 	public function process_task($task = array()) {
 		if (!empty($task[0]->task_task)) {
 
