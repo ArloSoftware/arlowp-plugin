@@ -2948,9 +2948,9 @@ class Arlo_For_Wordpress {
 		curl_exec($ch);
 		
 		$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE); 
-							
+
 		// update settings
-		update_option('arlo_new_url_structure', $httpcode == 404 ? 0 : 1);
+		update_option('arlo_new_url_structure', $httpcode == 500 ? 1 : 0);
 	}	
 		
 
