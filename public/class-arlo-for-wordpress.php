@@ -1537,10 +1537,10 @@ class Arlo_For_Wordpress {
 	                    throw new Exception('Database insert failed: ' . $table_name);
 	                }
 	                
-	                $template_event_id = $wpdb->insert_id;
+	                $template_id = $wpdb->insert_id;
 	                
 					if (isset($item->Tags) && !empty($item->Tags)) {
-						$this->save_tags($item->Tags, $item->TemplateID, 'template', $timestamp);
+						$this->save_tags($item->Tags, $template_id, 'template', $timestamp);
 					}
 										
 					$content = '';
@@ -1569,7 +1569,7 @@ class Arlo_For_Wordpress {
 					// need to insert associated data here
 					// advertised offers
 					if(isset($item->BestAdvertisedOffers) && !empty($item->BestAdvertisedOffers)) {
-						$this->save_advertised_offer($item->BestAdvertisedOffers, $timestamp, $region, $template_event_id);
+						$this->save_advertised_offer($item->BestAdvertisedOffers, $timestamp, $region, $template_id);
 					}	
 					
 					// content fields
@@ -1580,7 +1580,7 @@ class Arlo_For_Wordpress {
 								(et_id, cf_fieldname, cf_text, cf_order, e_contenttype, active) 
 								VALUES ( %d, %s, %s, %s, %s, %s ) 
 								", 
-							    $template_event_id,
+							    $template_id,
 								@$content->FieldName,
 								@$content->Content->Text,
 								$index,
@@ -1598,10 +1598,10 @@ class Arlo_For_Wordpress {
 						foreach($item->AdvertisedPresenters as $index => $presenter) {
 							$query = $wpdb->query( $wpdb->prepare( 
 								"INSERT INTO {$wpdb->prefix}arlo_eventtemplates_presenters 
-								(et_arlo_id, p_arlo_id, p_order, active) 
+								(et_id, p_arlo_id, p_order, active) 
 								VALUES ( %d, %d, %d, %s ) 
 								", 
-							    $item->TemplateID,
+							    $template_id,
 							    $presenter->PresenterID,
 							    $index,
 							    $timestamp
@@ -1617,7 +1617,7 @@ class Arlo_For_Wordpress {
 					if(isset($item->Categories) && !empty($item->Categories)) {
 						foreach($item->Categories as $index => $category) {
 							$query = $wpdb->query( $wpdb->prepare( 
-								"INSERT INTO {$wpdb->prefix}arlo_eventtemplates_categories 
+								"REPLACE INTO {$wpdb->prefix}arlo_eventtemplates_categories 
 								(et_arlo_id, c_arlo_id, active) 
 								VALUES ( %d, %d, %s ) 
 								", 
@@ -1645,11 +1645,11 @@ class Arlo_For_Wordpress {
 		
 		switch ($type) {
 			case "template":
-				$field = "et_arlo_id";
+				$field = "et_id";
 				$table_name = $wpdb->prefix . "arlo_eventtemplates_tags";			
 			break;		
 			case "event":
-				$field = "e_arlo_id";
+				$field = "e_id";
 				$table_name = $wpdb->prefix . "arlo_events_tags";			
 			break;
 			case "oa":
@@ -1822,10 +1822,10 @@ class Arlo_For_Wordpress {
 			foreach($item->Presenters as $index => $presenter) {
 				$query = $wpdb->query( $wpdb->prepare( 
 					"INSERT INTO {$wpdb->prefix}arlo_events_presenters 
-					(e_arlo_id, p_arlo_id, p_order, active) 
+					(e_id, p_arlo_id, p_order, active) 
 					VALUES ( %d, %d, %d, %s ) 
 					", 
-				    $item->EventID,
+				    $event_id,
 				    $presenter->PresenterID,
 				    $index,
 				    $timestamp
@@ -1898,7 +1898,7 @@ class Arlo_For_Wordpress {
 					if (!empty($item->EventID) && is_numeric($item->EventID) && $item->EventID > 0) {
 						$event_id = $this->save_event_data($item, 0, $timestamp, $region);
 						if (isset($item->Tags) && !empty($item->Tags)) {
-							$this->save_tags($item->Tags, $item->EventID, 'event', $timestamp);
+							$this->save_tags($item->Tags, $event_id, 'event', $timestamp);
 						}
 					}
 				}				

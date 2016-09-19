@@ -979,13 +979,13 @@ function install_table_arlo_eventtemplates_presenters() {
 	$table_name = $wpdb->prefix . "arlo_eventtemplates_presenters";
 
 	$sql = "CREATE TABLE " . $table_name . " (
-		et_arlo_id int(11) NULL,
+		et_id int(11) NULL,
 		p_arlo_id int(11) NULL,
 		p_order int(11) NULL COMMENT 'Order of the presenters for the event template.',
 		active int(10) unsigned DEFAULT NULL,
-		PRIMARY KEY  (et_arlo_id,p_arlo_id,active),
+		PRIMARY KEY  (et_id,p_arlo_id,active),
 		KEY cf_order (p_order),
-		KEY fk_et_id_idx (et_arlo_id ASC),
+		KEY fk_et_id_idx (et_id ASC),
 		KEY fk_p_id_idx (p_arlo_id ASC))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
@@ -1012,7 +1012,7 @@ function install_table_arlo_tags() {
 	$charset_collate = core_set_charset();
 
 	$sql = "CREATE TABLE " . $wpdb->prefix . "arlo_tags (
-  		id MEDIUMINT(8) unsigned NOT NULL AUTO_INCREMENT,
+  		id mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   		tag varchar(255) NOT NULL,
 		active int(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (id))
@@ -1021,22 +1021,22 @@ function install_table_arlo_tags() {
 	dbDelta($sql);
 
 	$sql = "CREATE TABLE " . $wpdb->prefix . "arlo_events_tags (
-		e_arlo_id int(11) NOT NULL,
-		tag_id MEDIUMINT(8) unsigned NOT NULL,
+		e_id int(11) NOT NULL,
+		tag_id mediumint(8) unsigned NOT NULL,
 		active int(10) unsigned DEFAULT NULL,
-		PRIMARY KEY  (e_arlo_id,tag_id,active))
+		PRIMARY KEY  (e_id,tag_id,active))
   		CHARACTER SET utf8 COLLATE=utf8_general_ci";
   		
 	dbDelta($sql);  	
 
 	//dbdelta doesn't handle primary key changes
 	$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events_tags DROP PRIMARY KEY");
-	$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events_tags ADD PRIMARY KEY (e_arlo_id,tag_id,active)");
+	$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events_tags ADD PRIMARY KEY (e_id,tag_id,active)");
 	
 	
 	$sql = "CREATE TABLE " . $wpdb->prefix . "arlo_onlineactivities_tags (
 		oa_id int(11) NOT NULL,
-		tag_id MEDIUMINT(8) unsigned NOT NULL,
+		tag_id mediumint(8) unsigned NOT NULL,
 		active int(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (oa_id,tag_id,active))
   		CHARACTER SET utf8 COLLATE=utf8_general_ci";
@@ -1049,17 +1049,17 @@ function install_table_arlo_tags() {
 	
 
 	$sql = "CREATE TABLE " . $wpdb->prefix . "arlo_eventtemplates_tags (
-		et_arlo_id int(11) NOT NULL,
-		tag_id MEDIUMINT(8) unsigned NOT NULL,
+		et_id int(11) NOT NULL,
+		tag_id mediumint(8) unsigned NOT NULL,
 		active int(10) unsigned DEFAULT NULL,
-		PRIMARY KEY  (et_arlo_id,tag_id,active))
+		PRIMARY KEY  (et_id,tag_id,active))
   		CHARACTER SET utf8 COLLATE=utf8_general_ci";
 
 	dbDelta($sql);
 
 	//dbdelta doesn't handle primary key changes
 	$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates_tags DROP PRIMARY KEY");
-	$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates_tags ADD PRIMARY KEY (et_arlo_id,tag_id,active)");
+	$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates_tags ADD PRIMARY KEY (et_id,tag_id,active)");
 }
 
 /**
@@ -1074,12 +1074,12 @@ function install_table_arlo_events_presenters() {
 	$table_name = $wpdb->prefix . "arlo_events_presenters";
 
 	$sql = "CREATE TABLE " . $table_name . " (
-		e_arlo_id int(11) NULL,
+		e_id int(11) NULL,
 		p_arlo_id int(11) NULL,
 		p_order int(11) NULL COMMENT 'Order of the presenters for the event.',
 		active int(10) unsigned DEFAULT NULL,
-		PRIMARY KEY  (e_arlo_id,p_arlo_id,active),		
-		KEY fk_e_id_idx (e_arlo_id ASC),
+		PRIMARY KEY  (e_id,p_arlo_id,active),		
+		KEY fk_e_id_idx (e_id ASC),
 		KEY fk_p_id_idx (p_arlo_id ASC))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
@@ -1089,7 +1089,7 @@ function install_table_arlo_events_presenters() {
 
 	//dbdelta doesn't handle primary key changes
 	$wpdb->query("ALTER TABLE " . $table_name . " DROP PRIMARY KEY");
-	$wpdb->query("ALTER TABLE " . $table_name . " ADD PRIMARY KEY (e_arlo_id,p_arlo_id,active)");
+	$wpdb->query("ALTER TABLE " . $table_name . " ADD PRIMARY KEY (e_id,p_arlo_id,active)");
 }
 
 /**
@@ -1144,7 +1144,7 @@ function install_table_arlo_eventtemplates_categories() {
 		et_order SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0',
 		active int(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (et_arlo_id,c_arlo_id,active),
-		KEY fk_et_id_idx (et_arlo_id ASC),
+		KEY fk_et_id_idx (et_id ASC),
 		KEY fk_c_id_idx (c_arlo_id ASC))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
@@ -1395,7 +1395,7 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 	endif;	
 	
 	if(!empty($arlo_templatetag)) :
-		$join .= " LEFT JOIN $t6 ett ON et.et_arlo_id = ett.et_arlo_id AND ett.active = et.active";
+		$join .= " LEFT JOIN $t6 ett ON et.et_id = ett.et_id AND ett.active = et.active";
 		
 		
 		if (!is_numeric($arlo_templatetag)) {
@@ -1554,7 +1554,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 	endif;	
 	
 	if(!empty($arlo_templatetag)) :
-		$join .= " LEFT JOIN $t6 ett ON ett.et_arlo_id = et.et_arlo_id AND ett.active = et.active";
+		$join .= " LEFT JOIN $t6 ett ON ett.et_id = et.et_id AND ett.active = et.active";
 		
 		
 		if (!is_numeric($arlo_templatetag)) {
@@ -1653,9 +1653,9 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 		LEFT JOIN $t2 post 
 			ON et.et_post_name = post.post_name 
 		LEFT JOIN $t3 etc
-			ON etc.et_arlo_id=et.et_arlo_id AND etc.active = et.active
+			ON etc.et_arlo_id = et.et_arlo_id AND etc.active = et.active
 		LEFT JOIN $t4 c
-			ON c.c_arlo_id=etc.c_arlo_id AND c.active = etc.active
+			ON c.c_arlo_id = etc.c_arlo_id AND c.active = etc.active
 		$where 
 		$group 
 		$order
@@ -1730,7 +1730,7 @@ $shortcodes->add('event_template_tags', function($content='', $atts, $shortcode_
 		ON
 			tag_id = id
 		WHERE
-			ett.et_arlo_id = {$GLOBALS['arlo_eventtemplate']['et_arlo_id']}
+			ett.et_id = {$GLOBALS['arlo_eventtemplate']['et_id']}
 		AND	
 			t.active = {$active}
 		AND
@@ -1798,7 +1798,7 @@ $shortcodes->add('event_template_register_interest', function($content='', $atts
 // event template tags shortcode
 
 $shortcodes->add('event_tags', function($content='', $atts, $shortcode_name){
-	if(!isset($GLOBALS['arlo_event_list_item']['e_arlo_id'])) return '';
+	if(!isset($GLOBALS['arlo_event_list_item']['e_id'])) return '';
 	
 	global $wpdb, $arlo_plugin;
 	$output = '';
@@ -1822,7 +1822,7 @@ $shortcodes->add('event_tags', function($content='', $atts, $shortcode_name){
 		ON
 			tag_id = id
 		WHERE
-			et.e_arlo_id = {$GLOBALS['arlo_event_list_item']['e_arlo_id']}
+			et.e_id = {$GLOBALS['arlo_event_list_item']['e_id']}
 		AND	
 			t.active = {$active}
 		AND
@@ -2171,7 +2171,6 @@ $shortcodes->add('event_list_item', function($content='', $atts, $shortcode_name
 	$t1 = "{$wpdb->prefix}arlo_eventtemplates";
 	$t2 = "{$wpdb->prefix}arlo_events";
 	$t3 = "{$wpdb->prefix}arlo_venues";
-	$t4 = "{$wpdb->prefix}arlo_events_presenters";
 	$t5 = "{$wpdb->prefix}arlo_presenters";
 	$t6 = "{$wpdb->prefix}arlo_offers";
 	
@@ -2547,8 +2546,6 @@ $shortcodes->add('event_offers', function($content='', $atts, $shortcode_name){
 $shortcodes->add('event_presenters', function($content='', $atts, $shortcode_name){
 	global $wpdb, $arlo_plugin;
 
-	$e_arlo_id = $GLOBALS['arlo_event_list_item']['e_arlo_id'];
-		
 	$active = $arlo_plugin->get_import_id();
 
 	$t1 = "{$wpdb->prefix}arlo_events_presenters";
@@ -2568,7 +2565,7 @@ $shortcodes->add('event_presenters', function($content='', $atts, $shortcode_nam
 	AND 
 		exp.active = p.active
 	WHERE 
-		exp.e_arlo_id = $e_arlo_id 
+		exp.e_id = {$GLOBALS['arlo_event_list_item']['e_id']}
 	AND 
 		p.active = $active
 	GROUP BY 
@@ -2768,7 +2765,7 @@ $shortcodes->add('suggest_templates', function($content='', $atts, $shortcode_na
 						AND
 							ett.active = {$active}
 						AND
-							ett.et_arlo_id = {$GLOBALS['arlo_eventtemplate']['et_arlo_id']}
+							ett.et_id = {$GLOBALS['arlo_eventtemplate']['et_id']}
 						)
 			";
 			
@@ -2776,7 +2773,7 @@ $shortcodes->add('suggest_templates', function($content='', $atts, $shortcode_na
 			LEFT JOIN 
 				{$wpdb->prefix}arlo_eventtemplates_tags AS t
 			ON
-				t.et_arlo_id = et.et_arlo_id
+				t.et_id = et.et_id
 			AND
 				t.active = et.active
 			";
@@ -2823,6 +2820,7 @@ $shortcodes->add('suggest_templates', function($content='', $atts, $shortcode_na
 	
 	$sql = "
 		SELECT 
+			et.et_id,
 			et.et_region,
 			et.et_arlo_id,
 			et.et_code,
@@ -2922,7 +2920,7 @@ $shortcodes->add('upcoming_list_pagination', function($content='', $atts, $short
 	endif;	
 	
 	if(!empty($arlo_eventtag)) :
-		$join .= " LEFT JOIN $t7 etag ON etag.e_arlo_id = e.e_arlo_id AND etag.active = e.active";
+		$join .= " LEFT JOIN $t7 etag ON etag.e_id = e.e_id AND etag.active = e.active";
 
 		if (!is_numeric($arlo_eventtag)) {
 			$where .= " AND tag.tag = '" . urldecode($arlo_eventtag) . "'";
@@ -2982,7 +2980,7 @@ $shortcodes->add('upcoming_list_pagination', function($content='', $atts, $short
 		$join
 		$where
 		GROUP BY 
-			etc.et_arlo_id, e.e_id
+			etc.et_id, e.e_id
 		ORDER BY 
 			e.e_startdatetime", ARRAY_A);
 		
@@ -3046,7 +3044,7 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 	endif;	
 		
 	if(!empty($arlo_eventtag)) :
-		$join .= " LEFT JOIN $t7 etag ON etag.e_arlo_id = e.e_arlo_id AND etag.active = e.active";
+		$join .= " LEFT JOIN $t7 etag ON etag.e_id = e.e_id AND etag.active = e.active";
 
 		if (!is_numeric($arlo_eventtag)) {
 			$where .= " AND tag.tag = '" . urldecode($arlo_eventtag) . "'";
@@ -3146,7 +3144,7 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 	$join
 	$where
 	GROUP BY 
-		etc.et_arlo_id, e.e_id
+		etc.et_id, e.e_id
 	ORDER BY 
 		e.e_startdatetime
 	LIMIT 
@@ -3803,7 +3801,7 @@ $shortcodes->add('presenter_events_list', function($content='', $atts, $shortcod
 		INNER JOIN 
 			$t3 exp 
 		ON 
-			exp.e_arlo_id = e.e_arlo_id
+			exp.e_id = e.e_id
 		AND 
 			exp.active = e.active
 		WHERE 
