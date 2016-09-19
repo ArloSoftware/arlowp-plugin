@@ -1043,7 +1043,10 @@ class Arlo_For_Wordpress {
 	}
 	
 	public function call_wp_cron() {
-		$now = DateTime::createFromFormat('U.u', microtime(true));
+		do {
+			$now = DateTime::createFromFormat('U.u', microtime(true));
+		} while (!is_object($now));
+		
         $timestamp = $now->format("Y-m-d H:i:s");	
         
 		$url = get_site_url() . '/wp-cron.php';        
@@ -1319,7 +1322,9 @@ class Arlo_For_Wordpress {
 		$task_id = intval($task_id);
 		$scheduler = $this->get_scheduler();
 		
-		$now = DateTime::createFromFormat('U.u', microtime(true));
+		do {
+			$now = DateTime::createFromFormat('U.u', microtime(true));
+		} while (!is_object($now));
 		
         $timestamp = $now->format("Y-m-d H:i:s");
         $utimestamp = $now->format("Y-m-d H:i:s.u T ");
@@ -2419,7 +2424,10 @@ class Arlo_For_Wordpress {
 		global $wpdb;
 		
 		// need to delete posts and join rows no longer needed
-   		$now = DateTime::createFromFormat('U.u', microtime(true));
+		do {
+			$now = DateTime::createFromFormat('U.u', microtime(true));
+		} while (!is_object($now));
+		
         $timestamp = $now->format("Y-m-d H:i:s");
         $utimestamp = $now->format("Y-m-d H:i:s.u T ");	
         
@@ -2459,7 +2467,10 @@ class Arlo_For_Wordpress {
 
         $this->delete_custom_posts('venues','v_post_name','venue');        
         
-   		$now = DateTime::createFromFormat('U.u', microtime(true));
+		do {
+			$now = DateTime::createFromFormat('U.u', microtime(true));
+		} while (!is_object($now));
+		
         $timestamp = $now->format("Y-m-d H:i:s");
         $utimestamp = $now->format("Y-m-d H:i:s.u T ");        
         
@@ -2499,7 +2510,10 @@ class Arlo_For_Wordpress {
 	private function import_finish($import_id) {
 		global $wpdb;
 		
-        $now = DateTime::createFromFormat('U.u', microtime(true));
+		do {
+			$now = DateTime::createFromFormat('U.u', microtime(true));
+		} while (!is_object($now));
+		
         $timestamp = $now->format("Y-m-d H:i:s");
         $utimestamp = $now->format("Y-m-d H:i:s.u T ");
         			
