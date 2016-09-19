@@ -477,6 +477,38 @@ class Arlo_For_Wordpress {
 	}
 	
 	/**
+	 * Check the version of the plugin
+	 *
+	 * @since     2.3.6
+	 *
+	 * @return    null
+	 */
+	public static function check_plugin_version() {
+ 		$plugin = self::get_instance();
+ 		
+		$plugin_version = get_option('arlo_plugin_version');
+		
+		if (!empty($plugin_version)) {
+            $import_id  = get_option('arlo_import_id',"");
+            $last_import = $plugin->get_last_import();
+            
+            if (empty($import_id)) {
+                if (empty($last_import)) {
+                    $last_import = date("Y");
+                }
+                $plugin->set_import_id(date("Y", strtotime($last_import)));
+            }
+                        
+			if ($plugin_version != $plugin::VERSION) {
+				$plugin::update($plugin::VERSION, $plugin_version);
+				update_option('arlo_plugin_version', $plugin::VERSION);
+			}
+		} else {
+			update_option('arlo_plugin_version', $plugin::VERSION);
+		}
+	}		
+	
+	/**
 	 * Run update scripts according to the version of the plugin
 	 *
 	 * @since    2.2.1
@@ -1288,6 +1320,7 @@ class Arlo_For_Wordpress {
 		$scheduler = $this->get_scheduler();
 		
 		$now = DateTime::createFromFormat('U.u', microtime(true));
+		
         $timestamp = $now->format("Y-m-d H:i:s");
         $utimestamp = $now->format("Y-m-d H:i:s.u T ");
 		

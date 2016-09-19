@@ -91,6 +91,7 @@ register_deactivation_hook( __FILE__, array( 'Arlo_For_Wordpress', 'deactivate' 
  *   `class-arlo-for-wordpress.php`
  */
 add_action( 'plugins_loaded', array( 'Arlo_For_Wordpress', 'get_instance' ) );
+add_action( 'plugins_loaded', array( 'Arlo_For_Wordpress', 'check_plugin_version' ) );
 
 /*
  *
