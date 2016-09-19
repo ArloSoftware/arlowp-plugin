@@ -2684,7 +2684,7 @@ $shortcodes->add('event_session_list_item', function($content='', $atts, $shortc
 	), $atts, $shortcode_name));
 	
 	if (!empty($arlo_region)) {
-		$where = ' active = ' . $active . ' AND e_region = "' . $arlo_region . '"';
+		$where = ' AND e_region = "' . $arlo_region . '"';
 	}		
 	
 	$sql = "
@@ -2701,6 +2701,8 @@ $shortcodes->add('event_session_list_item', function($content='', $atts, $shortc
 			{$wpdb->prefix}arlo_events
 		WHERE 
 			e_parent_arlo_id = {$GLOBALS['arlo_event_list_item']['e_arlo_id']}
+		AND
+			active = {$active}
 			{$where}
 		ORDER BY 
 			e_startdatetime";
