@@ -473,7 +473,24 @@ class Arlo_For_Wordpress {
 			AND deleted = '0'";
 
 		return $wpdb->get_col( $sql );
-
+	}
+	
+	/**
+	 * Check the plugin version on bulk update
+	 *
+	 * @since     2.3.6
+	 *
+	 * @return    null
+	 */	
+	
+	public static function bulk_plugin_updater( $upgrader_object, $data ) {
+		if ($data['action'] == 'update' && $data['type'] == 'plugin' ) {
+			foreach($data['plugins'] as $each_plugin){
+				if (basename($each_plugin) == 'arlo-for-wordpress.php'){
+					self::check_plugin_version();
+				}
+			}
+		}
 	}
 	
 	/**

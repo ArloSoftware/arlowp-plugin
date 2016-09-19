@@ -92,6 +92,7 @@ register_deactivation_hook( __FILE__, array( 'Arlo_For_Wordpress', 'deactivate' 
  */
 add_action( 'plugins_loaded', array( 'Arlo_For_Wordpress', 'get_instance' ) );
 add_action( 'plugins_loaded', array( 'Arlo_For_Wordpress', 'check_plugin_version' ) );
+add_action( 'upgrader_process_complete', array( 'Arlo_For_Wordpress', 'bulk_plugin_updater' ), 10, 2 );
 
 /*
  *
