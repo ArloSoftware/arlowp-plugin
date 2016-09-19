@@ -527,7 +527,7 @@ class Arlo_For_Wordpress_Settings {
 	    	</ul>
 	    </p>
 	    <p>If you are experiencing problems with the URLs, please save changes to the Arlo settings page and resynchronize the data under the general tab.</p>
-	    <p><a href="?page=arlo-for-wordpress&arlo-donwload-sync-log">Download synchronization log</p>
+	    <p><a href="?page=arlo-for-wordpress&arlo-donwload-sync-log">Download synchronization log</a>/p>
 	    ';
 	} 		
 }
