@@ -625,6 +625,7 @@ function arlo_set_option($key, $value = null) {
  * @return void
  */
 function arlo_add_datamodel() {
+	
 	install_table_arlo_async_tasks();
 	install_table_arlo_eventtemplate();
 	install_table_arlo_contentfields();
@@ -640,7 +641,7 @@ function arlo_add_datamodel() {
 	install_table_arlo_categories();
 	install_table_arlo_eventtemplates_categories();
 	install_table_arlo_timezones();
-
+	
 	return;
 }
 
@@ -687,9 +688,6 @@ function install_table_arlo_async_tasks() {
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
     dbDelta($sql);
-
-	$wpdb->query("ALTER TABLE {$table_name} CHANGE task_modified task_modified TIMESTAMP NULL DEFAULT NULL COMMENT 'Dates are in UTC';");
-	$wpdb->query("ALTER TABLE {$table_name} CHANGE task_created task_created TIMESTAMP NULL DEFAULT NULL COMMENT 'Dates are in UTC';");
     
     $sql = "
 	  CREATE TABLE " . $wpdb->prefix . "arlo_async_task_data (
@@ -977,7 +975,7 @@ function install_table_arlo_eventtemplates_presenters() {
 	global $wpdb, $current_user;
 	$charset_collate = core_set_charset();
 	$table_name = $wpdb->prefix . "arlo_eventtemplates_presenters";
-
+	
 	$sql = "CREATE TABLE " . $table_name . " (
 		et_id int(11) NULL,
 		p_arlo_id int(11) NULL,
@@ -992,10 +990,6 @@ function install_table_arlo_eventtemplates_presenters() {
 	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
 	dbDelta($sql);
-
-	//dbdelta doesn't handle primary key changes
-	$wpdb->query("ALTER TABLE {$table_name} DROP PRIMARY KEY");
-	$wpdb->query("ALTER TABLE {$table_name} ADD PRIMARY KEY (et_arlo_id,p_arlo_id,active)");
 }
 
 /**
@@ -1019,7 +1013,8 @@ function install_table_arlo_tags() {
 		CHARACTER SET utf8 COLLATE=utf8_general_ci";
 		
 	dbDelta($sql);
-
+	
+	
 	$sql = "CREATE TABLE " . $wpdb->prefix . "arlo_events_tags (
 		e_id int(11) NOT NULL,
 		tag_id mediumint(8) unsigned NOT NULL,
@@ -1028,10 +1023,6 @@ function install_table_arlo_tags() {
   		CHARACTER SET utf8 COLLATE=utf8_general_ci";
   		
 	dbDelta($sql);  	
-
-	//dbdelta doesn't handle primary key changes
-	$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events_tags DROP PRIMARY KEY");
-	$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events_tags ADD PRIMARY KEY (e_id,tag_id,active)");
 	
 	
 	$sql = "CREATE TABLE " . $wpdb->prefix . "arlo_onlineactivities_tags (
@@ -1041,13 +1032,9 @@ function install_table_arlo_tags() {
 		PRIMARY KEY  (oa_id,tag_id,active))
   		CHARACTER SET utf8 COLLATE=utf8_general_ci";
   		
-	dbDelta($sql);		
-
-	//dbdelta doesn't handle primary key changes
-	$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_onlineactivities_tags DROP PRIMARY KEY");
-	$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_onlineactivities_tags ADD PRIMARY KEY (oa_id,tag_id,active)");
+	dbDelta($sql);	
 	
-
+	
 	$sql = "CREATE TABLE " . $wpdb->prefix . "arlo_eventtemplates_tags (
 		et_id int(11) NOT NULL,
 		tag_id mediumint(8) unsigned NOT NULL,
@@ -1056,10 +1043,6 @@ function install_table_arlo_tags() {
   		CHARACTER SET utf8 COLLATE=utf8_general_ci";
 
 	dbDelta($sql);
-
-	//dbdelta doesn't handle primary key changes
-	$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates_tags DROP PRIMARY KEY");
-	$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates_tags ADD PRIMARY KEY (et_id,tag_id,active)");
 }
 
 /**
@@ -1072,7 +1055,7 @@ function install_table_arlo_events_presenters() {
 	global $wpdb, $current_user;
 	$charset_collate = core_set_charset();
 	$table_name = $wpdb->prefix . "arlo_events_presenters";
-
+	
 	$sql = "CREATE TABLE " . $table_name . " (
 		e_id int(11) NULL,
 		p_arlo_id int(11) NULL,
@@ -1086,10 +1069,6 @@ function install_table_arlo_events_presenters() {
 	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
 	dbDelta($sql);
-
-	//dbdelta doesn't handle primary key changes
-	$wpdb->query("ALTER TABLE " . $table_name . " DROP PRIMARY KEY");
-	$wpdb->query("ALTER TABLE " . $table_name . " ADD PRIMARY KEY (e_id,p_arlo_id,active)");
 }
 
 /**
@@ -1102,7 +1081,7 @@ function install_table_arlo_categories() {
 	global $wpdb, $current_user;
 	$charset_collate = core_set_charset();
 	$table_name = $wpdb->prefix . "arlo_categories";
-
+	
 	$sql = "CREATE TABLE " . $table_name . " (
 		c_id int(11) NOT NULL AUTO_INCREMENT,
 		c_arlo_id int(11) NOT NULL,
@@ -1123,8 +1102,6 @@ function install_table_arlo_categories() {
 	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
 	dbDelta($sql);
-
-	$wpdb->query("ALTER TABLE " . $table_name . " DROP INDEX c_arlo_id");
 }
 
 /**
@@ -1144,17 +1121,13 @@ function install_table_arlo_eventtemplates_categories() {
 		et_order SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0',
 		active int(10) unsigned DEFAULT NULL,
 		PRIMARY KEY  (et_arlo_id,c_arlo_id,active),
-		KEY fk_et_id_idx (et_id ASC),
+		KEY fk_et_id_idx (et_arlo_id ASC),
 		KEY fk_c_id_idx (c_arlo_id ASC))
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
 	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
 	dbDelta($sql);
-
-	//dbdelta doesn't handle primary key changes
-	$wpdb->query("ALTER TABLE " . $table_name . " DROP PRIMARY KEY");
-	$wpdb->query("ALTER TABLE " . $table_name . " ADD PRIMARY KEY (et_arlo_id,c_arlo_id,active)");	
 }
 
 /**
@@ -1176,7 +1149,7 @@ function install_table_arlo_timezones() {
 		PRIMARY KEY  (id)) 
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;	
   	";
-  			
+  	
 	$sql2 = " 
 		CREATE TABLE IF NOT EXISTS " . $table_name . "_olson (
 		timezone_id int(11) NOT NULL,
@@ -1190,10 +1163,6 @@ function install_table_arlo_timezones() {
 
 	dbDelta($sql);
 	dbDelta($sql2);	
-
-	//dbdelta doesn't handle primary key changes
-	$wpdb->query("ALTER TABLE " . $table_name . "_olson DROP PRIMARY KEY");
-	$wpdb->query("ALTER TABLE " . $table_name . "_olson ADD PRIMARY KEY (timezone_id,olson_name,active)");		
 }
 
 /**

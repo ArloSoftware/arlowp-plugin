@@ -523,7 +523,7 @@ class Arlo_For_Wordpress {
 		} else {
 			update_option('arlo_plugin_version', $plugin::VERSION);
 		}
-	}		
+	}
 	
 	/**
 	 * Run update scripts according to the version of the plugin
@@ -533,6 +533,11 @@ class Arlo_For_Wordpress {
 	 * @return   null
 	 */
 	public static function update($new_version, $old_version) {
+		//pre datamodell update need to be done before
+		if (version_compare($old_version, '2.3.6') < 0) {
+			self::run_pre_data_update('2.3.6');
+		}
+		
 		arlo_add_datamodel();	
 	
 		if (version_compare($old_version, '2.2.1') < 0) {
@@ -547,10 +552,40 @@ class Arlo_For_Wordpress {
 			self::run_update('2.3.5');
 		}
 		
-		if (version_compare($old_version, '2.4') < 0) {
-			self::run_update('2.4');
+		if (version_compare($old_version, '2.3.6') < 0) {
+			self::run_update('2.3.6');
 		}
+	}
+	
+	private static function run_pre_data_update($version) {
+		global $wpdb;	
 		
+		switch($version) {
+			case '2.3.6':
+				
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_async_tasks CHANGE task_modified task_modified TIMESTAMP NULL DEFAULT NULL COMMENT 'Dates are in UTC';");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_async_tasks CHANGE task_created task_created TIMESTAMP NULL DEFAULT NULL COMMENT 'Dates are in UTC';");				
+				
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates_presenters DROP PRIMARY KEY, ADD PRIMARY KEY (et_arlo_id,p_arlo_id,active)");
+				
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events_tags DROP PRIMARY KEY, ADD PRIMARY KEY (e_arlo_id,tag_id,active)");
+				
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates_tags DROP PRIMARY KEY, ADD PRIMARY KEY (et_arlo_id,tag_id,active)");
+				
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events_presenters DROP PRIMARY KEY, ADD PRIMARY KEY (e_arlo_id,p_arlo_id,active)");
+				
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_categories DROP PRIMARY KEY, ADD PRIMARY KEY (c_id, active)");
+				
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates_categories DROP PRIMARY KEY, ADD PRIMARY KEY (et_arlo_id,c_arlo_id,active)");
+				
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_timezones_olson DROP PRIMARY KEY, ADD PRIMARY KEY (timezone_id,olson_name,active)");
+				
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates_presenters CHANGE  et_arlo_id  et_id int( 11 ) NOT NULL DEFAULT  '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events_tags CHANGE  e_arlo_id  e_id int( 11 ) NOT NULL DEFAULT  '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates_tags CHANGE  et_arlo_id  et_id int( 11 ) NOT NULL DEFAULT  '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events_presenters CHANGE  e_arlo_id  e_id int( 11 ) NOT NULL DEFAULT  '0'");											
+			break;
+		}
 	}	
 	
 	private static function run_update($version) {
@@ -614,7 +649,7 @@ class Arlo_For_Wordpress {
 				wp_schedule_event( time(), 'minutes_5', 'arlo_scheduler' );
 			break;
 			
-			case '2.4': 
+			case '2.3.6': 
 				
 				//Add [event_template_register_interest] shortcode to the event template
 				$update_templates = ['event'];
@@ -665,7 +700,7 @@ class Arlo_For_Wordpress {
 		// @TODO: Define activation functionality here
 		
 		//add data model
-		arlo_add_datamodel();
+		self::check_plugin_version();
 
 		// flush permalinks upon plugin deactivation
 		flush_rewrite_rules();
@@ -675,7 +710,7 @@ class Arlo_For_Wordpress {
 		
 		// run import every 15 minutes
 		//$temp = wp_schedule_event( time(), 'minutes_5', 'arlo_scheduler' ) . ': Log initiated.';
-		self::get_instance()->add_import_log($temp, date('Y-m-d H:i:s T'));
+		self::get_instance()->add_import_log("Plugin activated", date('Y-m-d H:i:s T'));
 
 		// now add pages
 		self::add_pages();
