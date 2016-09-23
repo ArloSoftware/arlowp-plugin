@@ -1016,6 +1016,13 @@ class Arlo_For_Wordpress {
 		global $wpdb;
 		
 		$table_name = "{$wpdb->prefix}arlo_import_log";
+
+		if (strtotime($timestamp) === false) {
+			do {
+				$now = DateTime::createFromFormat('U.u', microtime(true));
+			} while (!is_object($now));
+        	$timestamp = $now->format("Y-m-d H:i:s");
+		}
 		
 		$wpdb->query(
 			$wpdb->prepare( 
@@ -1099,9 +1106,7 @@ class Arlo_For_Wordpress {
 		do {
 			$now = DateTime::createFromFormat('U.u', microtime(true));
 		} while (!is_object($now));
-		
-        $timestamp = $now->format("Y-m-d H:i:s");	
-        
+		      
 		$url = get_site_url() . '/wp-cron.php';        
 	
 		$ch = curl_init($url);
@@ -1111,12 +1116,13 @@ class Arlo_For_Wordpress {
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_exec($ch);
 		
+		$log_message = "Kick off wp_cron.php for new subtask.";
 		if($errno = curl_errno($ch)) {
 			$error_message = curl_strerror($errno);
-			$this->add_import_log($url . ' ' . $error_message, $timestamp, false);
+			$this->add_import_log($log_message . " ERROR: " . $url . ' ' . $error_message, null, false);
 		} else {
 			$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE); 
-			$this->add_import_log($url . ' ' .  $httpcode, $timestamp, false);
+			$this->add_import_log($log_message . " HTTP_CODE: " . $httpcode, null, false);
 		}
 		 
 		curl_close($ch);
@@ -1137,7 +1143,6 @@ class Arlo_For_Wordpress {
 		$scheduler = $this->get_scheduler();
 		
 		$paused_running_tasks = array_merge($scheduler->get_paused_tasks(), $scheduler->get_running_tasks());
-		$this->add_import_log($url . ' ' .  $httpcode, $timestamp, false);
 				
 		foreach ($paused_running_tasks as $task) {
 			$ts = strtotime($task->task_modified);
@@ -1472,7 +1477,9 @@ class Arlo_For_Wordpress {
 			if (!empty($subtask)) {
 			
 				$scheduler->update_task($task_id, 2, "Import is running: task " . ($current_subtask + 1) . "/" . count($import_tasks) . ": " . $import_tasks_desc[$subtask]);
+				$this->add_import_log($import_id . ' Import subtask started: ' . $import_tasks_desc[$subtask], null, false);
 				call_user_func(array('Arlo_For_Wordpress', $subtask), $import_id);
+				$this->add_import_log($import_id . ' Import subtask ended: ' . $import_tasks_desc[$subtask], null, false);
 				$scheduler-> update_task_data($task_id, ['finished_subtask' => $current_subtask]);
 				$scheduler->update_task($task_id, 1);
 								
@@ -1538,6 +1545,8 @@ class Arlo_For_Wordpress {
 		}
 			
 		$client = $this->get_api_client();
+
+		$this->add_import_log($timestamp . ' API Call started: EventTemplateSearch', null, false);
 		
 		$regionalized_items = $client->EventTemplateSearch()->getAllEventTemplates(
 			array(
@@ -1555,11 +1564,15 @@ class Arlo_For_Wordpress {
 			), 
 			array_keys($regions)
 		);
+
+		$this->add_import_log($timestamp . ' API Call finished: EventTemplateSearch', null, false);		
 		
 		$table_name = "{$wpdb->prefix}arlo_eventtemplates";
 				
 		if(!empty($regionalized_items)) {
-				
+
+			$this->add_import_log($timestamp . ' Data process start: '.__FUNCTION__, null, false);	
+
 			// lets put it all in a transaction
 			$wpdb->query('START TRANSACTION');
 				
@@ -1688,6 +1701,7 @@ class Arlo_For_Wordpress {
 			}
 			
 			$wpdb->query('COMMIT');
+			$this->add_import_log($timestamp . ' Data process finished: '.__FUNCTION__, null, false);
 		}
 		
 		return $items;
@@ -1910,6 +1924,8 @@ class Arlo_For_Wordpress {
 		}		
 	
 		$client = $this->get_api_client();
+
+		$this->add_import_log($timestamp . ' API Call started: EventSearch', null, false);
 		
 		$regionalized_items = $client->EventSearch()->getAllEvents(
 			array(
@@ -1940,8 +1956,12 @@ class Arlo_For_Wordpress {
 			), 
 			array_keys($regions)
 		);
+
+		$this->add_import_log($timestamp . ' API Call finished: EventSearch', null, false);	
 						
 		if(!empty($regionalized_items)) {
+
+			$this->add_import_log($timestamp . ' Data process start: '.__FUNCTION__, null, false);
 			
 			$wpdb->query('START TRANSACTION');
 				
@@ -1958,6 +1978,8 @@ class Arlo_For_Wordpress {
 			}
 			
 			$wpdb->query('COMMIT');
+
+			$this->add_import_log($timestamp . ' Data process finished: '.__FUNCTION__, null, false);
 		}
 		
 		return $items;
@@ -1973,6 +1995,8 @@ class Arlo_For_Wordpress {
 		}		
 	
 		$client = $this->get_api_client();
+
+		$this->add_import_log($timestamp . ' API Call started: OnlineActivitySearch', null, false);
 		
 		$regionalized_items = $client->OnlineActivitySearch()->getAllOnlineActivities(
 			array(
@@ -1990,8 +2014,12 @@ class Arlo_For_Wordpress {
 			), 
 			array_keys($regions)
 		);
+
+		$this->add_import_log($timestamp . ' API Call finished: OnlineActivitySearch', null, false);	
 										
 		if(!empty($regionalized_items)) {
+
+			$this->add_import_log($timestamp . ' Data process start: '.__FUNCTION__, null, false);
 			
 			$wpdb->query('START TRANSACTION');
 				
@@ -2041,6 +2069,8 @@ class Arlo_For_Wordpress {
 			}
 			
 			$wpdb->query('COMMIT');
+
+			$this->add_import_log($timestamp . ' Data process finished: '.__FUNCTION__, null, false);
 		}
 		
 		return $items;
@@ -2052,12 +2082,18 @@ class Arlo_For_Wordpress {
 	
 		$client = $this->get_api_client();
 		
+		$this->add_import_log($timestamp . ' API Call started: Timezones', null, false);
+
 		$items = $client->Timezones()->getAllTimezones();
+
+		$this->add_import_log($timestamp . ' API Call finished: Timezones', null, false);	
 				
 		$table_name = "{$wpdb->prefix}arlo_timezones";
 		
 		if(!empty($items)) {
 		
+			$this->add_import_log($timestamp . ' Data process start: '.__FUNCTION__, null, false);
+
 			$wpdb->query('START TRANSACTION');
 		
 			foreach($items as $item) {
@@ -2096,6 +2132,8 @@ class Arlo_For_Wordpress {
 			}
 			
 			$wpdb->query('COMMIT');	
+
+			$this->add_import_log($timestamp . ' Data process finished: '.__FUNCTION__, null, false);
 		}
 		
 		return $items;
@@ -2105,6 +2143,8 @@ class Arlo_For_Wordpress {
 		global $wpdb;
 	
 		$client = $this->get_api_client();
+
+		$this->add_import_log($timestamp . ' API Call started: Presenters', null, false);
 		
 		$items = $client->Presenters()->getAllPresenters(
 			array(
@@ -2116,10 +2156,14 @@ class Arlo_For_Wordpress {
 				'SocialNetworkInfo',
 			)
 		);
+
+		$this->add_import_log($timestamp . ' API Call finished: Presenters', null, false);
 		
 		$table_name = "{$wpdb->prefix}arlo_presenters";
 				
 		if(!empty($items)) {
+
+			$this->add_import_log($timestamp . ' Data process start: '.__FUNCTION__, null, false);
 		
 			$wpdb->query('START TRANSACTION');
 		
@@ -2164,6 +2208,8 @@ class Arlo_For_Wordpress {
 			}
 			
 			$wpdb->query('COMMIT');
+
+			$this->add_import_log($timestamp . ' Data process finished: '.__FUNCTION__, null, false);
 		}
 		
 		return $items;
@@ -2174,6 +2220,8 @@ class Arlo_For_Wordpress {
 	
 		$client = $this->get_api_client();
 		
+		$this->add_import_log($timestamp . ' API Call started: Venues', null, false);
+
 		$items = $client->Venues()->getAllVenues(
 			array(
 				'VenueID',
@@ -2184,10 +2232,14 @@ class Arlo_For_Wordpress {
 				'ViewUri'
 			)
 		);
+
+		$this->add_import_log($timestamp . ' API Call finished: Venues', null, false);	
 		
 		$table_name = "{$wpdb->prefix}arlo_venues";
 		
 		if(!empty($items)) {
+
+			$this->add_import_log($timestamp . ' Data process start: '.__FUNCTION__, null, false);
 		
 			$wpdb->query('START TRANSACTION');
 		
@@ -2237,6 +2289,8 @@ class Arlo_For_Wordpress {
 			}
 			
 			$wpdb->query('COMMIT');
+
+			$this->add_import_log($timestamp . ' Data process finished: '.__FUNCTION__, null, false);
 		}
 		
 		return $items;
@@ -2246,6 +2300,10 @@ class Arlo_For_Wordpress {
 		global $wpdb;
 	
 		$client = $this->get_api_client();
+
+		$table_name = "{$wpdb->prefix}arlo_categories";
+
+		$this->add_import_log($timestamp . ' API Call started: Categories', null, false);
 		
 		$items = $client->Categories()->getAllCategories(
 			array(
@@ -2257,8 +2315,10 @@ class Arlo_For_Wordpress {
 				'Footer',
 			)
 		);
-		
-		$table_name = "{$wpdb->prefix}arlo_categories";
+
+		$this->add_import_log($timestamp . ' API Call finished: Categories', null, false);
+
+		$this->add_import_log($timestamp . ' Data process start: '.__FUNCTION__, null, false);
 		
 		$wpdb->query('START TRANSACTION');
 		
@@ -2345,7 +2405,7 @@ class Arlo_For_Wordpress {
 			GROUP BY
 				c_parent_id
 			";
-			echo $sql;
+
 			$cats = $wpdb->get_results($sql, ARRAY_A);
 			if (!is_null($cats)) {
 				foreach ($cats as $cat) {
@@ -2365,6 +2425,8 @@ class Arlo_For_Wordpress {
 		}
 		
 		$wpdb->query('COMMIT');
+
+		$this->add_import_log($timestamp . ' Data process finished: '.__FUNCTION__, null, false);
 		
 		return $items;
 	}
@@ -2435,6 +2497,8 @@ class Arlo_For_Wordpress {
 			return $item['c_arlo_id'];
 		}, $category_ids);
 		
+		$this->add_import_log($timestamp . ' API Call started: EventTemplateCategoryItems: ' . implode(', ', $category_ids), null, false);
+
 		$items = $client->EventTemplateCategoryItems()->getAllTemplateCategoriesItems(
 			array(
 				'CategoryID',
@@ -2443,6 +2507,8 @@ class Arlo_For_Wordpress {
 			),
 			$category_ids
 		);
+
+		$this->add_import_log($timestamp . ' API Call finished: EventTemplateCategoryItems', null, false);
 		
 		$table_name = "{$wpdb->prefix}arlo_eventtemplates_categories";
 		
@@ -2511,7 +2577,7 @@ class Arlo_For_Wordpress {
 			$wpdb->query($wpdb->prepare("DELETE FROM $table WHERE active <> %s", $import_id));
 		}   
 
-		$this->add_import_log($import_id . ' Database cleanup: ' . $utimestamp, $timestamp, false);
+		$this->add_import_log($import_id . ' Database cleanup', $timestamp, false);
         
         // delete unneeded custom posts
         $this->delete_custom_posts('eventtemplates','et_post_name','event');
@@ -2527,7 +2593,7 @@ class Arlo_For_Wordpress {
         $timestamp = $now->format("Y-m-d H:i:s");
         $utimestamp = $now->format("Y-m-d H:i:s.u T ");        
         
-		$this->add_import_log($import_id . ' Posts cleanup: ' . $utimestamp, $timestamp, false);        
+		$this->add_import_log($import_id . ' Posts cleanup ', $timestamp, false);        
 		
 		$wpdb->query('COMMIT');
 	}
