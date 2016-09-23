@@ -11,12 +11,14 @@
  */ 
 ?>
 
-<div class="wrap arlo-wrap">
+<div class="wrap arlo-wrap arlo-list">
 	<h2><?php echo esc_html( $list->get_title() ); ?></h2>
+	<?php if ($list::TABLENAME !== 'arlo_import_log') { ?>
 	<a href="<?=$list->get_new_link()?>" target="_blank" class="button button-primary">New <?=strtolower($list->singular)?></a>
 	&nbsp;&nbsp;&nbsp;
 	<a href="<?=$list->get_list_link()?>" target="_blank" class="arlo-middle">Manage <?=strtolower($list->plural)?> in Arlo</a>
-	<div class="<?php echo ARLO_PLUGIN_PREFIX; ?>-sections-wrap">	
+	<?php } ?>
+	<div class="<?php echo ARLO_PLUGIN_PREFIX; ?>-sections-wrap <?php echo $list::TABLENAME ?>">	
 		<form action="" method="get" >
 			<input type="hidden" name="page" value="<?=$_GET['page']?>">
 <?php

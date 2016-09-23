@@ -13,6 +13,7 @@ require_once 'class-arlo-for-wordpress-lists.php';
  
 
 class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
+	const TABLENAME = 'arlo_events';
 
 	public function __construct() {		
 		$this->singular = __( 'Session', $this->plugin_slug );		
@@ -22,7 +23,7 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 	}
 	
 	public function set_table_name() {
-		$this->table_name = $this->wpdb->prefix . 'arlo_events AS es';
+		$this->table_name = $this->wpdb->prefix . self::TABLENAME . ' AS es';
 	}
 	
 	public function get_title() {

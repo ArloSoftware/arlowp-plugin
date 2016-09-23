@@ -13,6 +13,7 @@ require_once 'class-arlo-for-wordpress-lists.php';
  
 
 class Arlo_For_Wordpress_OnlineActivities extends Arlo_For_Wordpress_Lists  {
+	const TABLENAME = 'arlo_onlineactivities';
 
 	public function __construct() {		
 		$this->singular = __( 'Online activity', $this->plugin_slug );		
@@ -32,7 +33,7 @@ class Arlo_For_Wordpress_OnlineActivities extends Arlo_For_Wordpress_Lists  {
 	}	
 		
 	public function set_table_name() {
-		$this->table_name = $this->wpdb->prefix . 'arlo_onlineactivities AS oa';
+		$this->table_name = $this->wpdb->prefix . self::TABLENAME . ' AS oa';
 	}
 	
 	public function get_columns() {

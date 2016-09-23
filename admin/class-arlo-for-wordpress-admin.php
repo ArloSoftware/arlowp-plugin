@@ -44,6 +44,7 @@ class Arlo_For_Wordpress_Admin {
 	protected $plugin_presenters_screen_hook_suffix = null;
 	protected $plugin_templates_screen_hook_suffix = null;
 	protected $plugin_events_screen_hook_suffix = null;
+	protected $plugin_loglist_screen_hook_suffix = null;
 	protected $plugin_sessions_screen_hook_suffix = null;
 
 	/**
@@ -169,7 +170,7 @@ class Arlo_For_Wordpress_Admin {
 	 */
 	public function enqueue_admin_styles() {
 
-		if ( ! isset( $this->plugin_screen_hook_suffix ) || !isset($this->plugin_venues_screen_hook_suffix) || !isset($this->plugin_presenters_screen_hook_suffix) || !isset($this->plugin_templates_screen_hook_suffix) || !isset($this->plugin_events_screen_hook_suffix) || !isset($this->plugin_sessions_screen_hook_suffix)) {
+		if ( ! isset( $this->plugin_screen_hook_suffix ) || !isset($this->plugin_venues_screen_hook_suffix) || !isset($this->plugin_presenters_screen_hook_suffix) || !isset($this->plugin_templates_screen_hook_suffix) || !isset($this->plugin_events_screen_hook_suffix) || !isset($this->plugin_sessions_screen_hook_suffix) || !isset($this->plugin_loglist_screen_hook_suffix)) {
 			return;
 		}
 		
@@ -177,7 +178,7 @@ class Arlo_For_Wordpress_Admin {
 		
 		$screen = get_current_screen();	
 		
-		if ( in_array($screen->id, [$this->plugin_screen_hook_suffix, $this->plugin_venues_screen_hook_suffix, $this->plugin_presenters_screen_hook_suffix, $this->plugin_templates_screen_hook_suffix, $this->plugin_events_screen_hook_suffix, $this->plugin_sessions_screen_hook_suffix])) {
+		if ( in_array($screen->id, [$this->plugin_screen_hook_suffix, $this->plugin_venues_screen_hook_suffix, $this->plugin_loglist_screen_hook_suffix, $this->plugin_presenters_screen_hook_suffix, $this->plugin_templates_screen_hook_suffix, $this->plugin_events_screen_hook_suffix, $this->plugin_sessions_screen_hook_suffix])) {
 			wp_enqueue_style( $this->plugin_slug .'-admin-styles', plugins_url( 'assets/css/admin.css?20160814', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );
 			
 			if ($screen->id == $this->plugin_screen_hook_suffix) {
@@ -282,7 +283,7 @@ class Arlo_For_Wordpress_Admin {
 		$this->plugin_sessions_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Sessions', $this->plugin_slug ), __( 'Sessions', $this->plugin_slug ) , 'manage_options' , $this->plugin_slug . '-sessions' , array( $this, 'display_sessions_admin_page'));		
 		$this->plugin_presenters_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Presenters', $this->plugin_slug ), __( 'Presenters', $this->plugin_slug ) , 'manage_options' , $this->plugin_slug . '-presenters' , array( $this, 'display_presenters_admin_page'));
 		$this->plugin_venues_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Venues', $this->plugin_slug ), __( 'Venues', $this->plugin_slug ) , 'manage_options' , $this->plugin_slug . '-venues' , array( $this, 'display_venues_admin_page'));
-		
+		$this->plugin_loglist_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Logs', $this->plugin_slug ), __( 'Logs', $this->plugin_slug ) , 'manage_options' , $this->plugin_slug . '-logs' , array( $this, 'display_loglist_admin_page'));
 
 	}
 
@@ -344,6 +345,14 @@ class Arlo_For_Wordpress_Admin {
 	 	require_once 'includes/class-arlo-for-wordpress-onlineactivities.php';
  
  		$list = new Arlo_For_Wordpress_OnlineActivities();
+	
+		include_once( 'views/list.php' );
+	}		
+
+	public function display_loglist_admin_page() {
+	 	require_once 'includes/class-arlo-for-wordpress-loglist.php';
+ 
+ 		$list = new Arlo_For_Wordpress_LogList();
 	
 		include_once( 'views/list.php' );
 	}		

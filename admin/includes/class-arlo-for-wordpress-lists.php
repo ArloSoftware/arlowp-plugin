@@ -14,14 +14,15 @@ if(!class_exists('WP_List_Table')){
 }
 
 class Arlo_For_Wordpress_Lists extends WP_List_Table  {
-	protected $wpdb;
 	public $singular;
 	public $plural;
+	public $table_name;
+
+	protected $wpdb;	
 	protected $platform_name;
 	protected $order;
 	protected $orderby;
 	protected $paged;
-	protected $table_name;
 	protected $active;
 	protected $plugin_slug;
 	

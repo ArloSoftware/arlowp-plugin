@@ -368,7 +368,17 @@ table.arlo-welcome td.logo {
 	margin-top: 2em;
 }
 
+.arlo-wrap.arlo-list .arlo_import_log #id{
+	width: 70px;
+}
 
+.arlo-wrap.arlo-list .arlo_import_log #created{
+	width: 150px;
+}
+
+.arlo-wrap.arlo-list .arlo_import_log .column-id{
+	text-align: right;
+}
 
 /* media queries, these match the wordpress admin breakpoints as of WP 3.9 */
 
