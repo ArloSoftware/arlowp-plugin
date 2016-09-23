@@ -199,8 +199,8 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			(et_arlo_id)
 		LEFT JOIN 
 			" . $this->wpdb->prefix . "arlo_events_presenters AS ep
-		USING
-			(e_arlo_id)			
+		ON
+			e.e_id = ep.e_id		
 		LEFT JOIN 
 			" . $this->wpdb->prefix . "arlo_presenters AS p
 		USING
