@@ -25,7 +25,7 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 	protected $paged;
 	protected $plugin_slug;
 	
-	const PERPAGE = 15;
+	const PERPAGE = 30;
 	const TABLENAME = 'arlo_import_log';
 
 	public function __construct() {
@@ -92,6 +92,7 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 		switch ($column_name) {
 			case 'id':
 			case 'message':
+			case 'import_id':
 			case 'created':
 				return $item->$column_name;
 			
@@ -126,6 +127,7 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 		return "
 		SELECT
 			id,
+			import_id,
 			message,
 			created
 		FROM
@@ -172,12 +174,14 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 	protected function get_searchable_fields() {
 		return [
 			'message',
+			'import_id',
 		];
 	}
 	
 	public function get_columns() {
 		return $columns = [
 			'id'    => __( 'ID', $this->plugin_slug ),
+			'import_id'    => __( 'Import ID', $this->plugin_slug ),
 			'message'    => __( 'Message', $this->plugin_slug ),
 			'created'    => __( 'Created date', $this->plugin_slug ),
 		];
@@ -190,6 +194,7 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 	public function get_sortable_columns() {
 		return array(
 			'id' => array( 'id', true ),
+			'import_id' => array( 'id', true ),
 			'created' => array( 'created', true ),
 		);
 	}		

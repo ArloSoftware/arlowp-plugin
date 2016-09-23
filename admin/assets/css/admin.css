@@ -376,6 +376,10 @@ table.arlo-welcome td.logo {
 	width: 150px;
 }
 
+.arlo-wrap.arlo-list .arlo_import_log #import_id{
+	width: 150px;
+}
+
 .arlo-wrap.arlo-list .arlo_import_log .column-id{
 	text-align: right;
 }

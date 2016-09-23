@@ -1178,10 +1178,12 @@ function install_table_arlo_import_log() {
 
 	$sql = "CREATE TABLE $table_name (
 		  id int(11) unsigned NOT NULL AUTO_INCREMENT,
+		  import_id int(11) unsigned NULL,
 		  message TEXT,
 		  created DATETIME DEFAULT NULL,
 		  successful tinyint(1) DEFAULT NULL,
-		  PRIMARY KEY  (id)) 
+		  PRIMARY KEY  (id),
+		  KEY import_id (import_id)) 
 		  CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
