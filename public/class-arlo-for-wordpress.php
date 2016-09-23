@@ -2893,6 +2893,15 @@ class Arlo_For_Wordpress {
 	    </div>
 		';
 	}
+
+	public static function wpcron_notice() {
+		echo '
+		<div class="error notice">
+			<p><strong>' . __("Your WordPress Cron is disabled.", self::get_instance()->plugin_slug) . '</strong> ' . __('Arlo for WordPress requires that the cron in WordPress is enabled.', self::get_instance()->plugin_slug ) .'</p>
+			<p>' . sprintf(__('<a target="_blank" href="%s">View documentation</a> for more information.', self::get_instance()->plugin_slug), 'http://developer.arlo.co/doc/wordpress/import#import-wordpress-cron') . '</p>
+	    </div>
+		';
+	}	
 	
 	public static function connected_platform_notice() {
 		$settings = get_option('arlo_settings');

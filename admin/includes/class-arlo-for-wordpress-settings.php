@@ -31,7 +31,10 @@ class Arlo_For_Wordpress_Settings {
 		$settings = get_option('arlo_settings');
 		
 		if(isset($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress') {		
-		
+			if ( defined('DISABLE_WP_CRON') && DISABLE_WP_CRON ) {
+				add_action( 'admin_notices', array($plugin, "wpcron_notice") );
+			}
+			
 			if (!empty($settings['platform_name'])) {
 				$show_notice = false;
 				foreach (Arlo_For_Wordpress::$post_types as $id => $post_type) {
