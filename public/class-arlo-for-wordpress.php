@@ -521,6 +521,7 @@ class Arlo_For_Wordpress {
 				update_option('arlo_plugin_version', $plugin::VERSION);
 			}
 		} else {
+			arlo_add_datamodel();
 			update_option('arlo_plugin_version', $plugin::VERSION);
 		}
 	}
