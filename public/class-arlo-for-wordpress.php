@@ -1038,16 +1038,16 @@ class Arlo_For_Wordpress {
 			)
 		);
 		
-		// MV: Automatically purge the log after two weeks day. 
 		$wpdb->query("DELETE FROM $table_name WHERE CREATED < NOW() - INTERVAL 14 DAY ORDER BY ID ASC LIMIT 10");
-
-		if($successful) {
-			$this->set_last_import($utimestamp);
-		}
 	}
 	
 	// should only be used when successful
-	public function set_last_import($timestamp) {
+	public function set_last_import() {
+		do {
+			$now = DateTime::createFromFormat('U.u', microtime(true));
+		} while (!is_object($now));
+       	$timestamp = $now->format("Y-m-d H:i:s");	
+	
 		update_option('arlo_last_import', $timestamp);
 		$this->last_imported = $timestamp;
 	}
@@ -2595,6 +2595,8 @@ class Arlo_For_Wordpress {
 			
 	        //set import id
 	        $this->set_import_id($import_id);
+	        
+	        $this->set_last_import();
         } else {
             $this->add_import_log('Synchronization died because of a database LOCK, please wait 5 minutes and try again.', $import_id);
         }
@@ -2924,7 +2926,7 @@ class Arlo_For_Wordpress {
 		echo '
 			<div class="notice arlo-connected-message"> 
 				<p>
-					Arlo is connected to <strong>' . $settings['platform_name'] . '</strong> <span class="arlo-block">Last synchronized: <span class="arlo-last-sync-date">' . self::get_instance()->get_last_import() . '</span></span> 
+					Arlo is connected to <strong>' . $settings['platform_name'] . '</strong> <span class="arlo-block">Last synchronized: <span class="arlo-last-sync-date">' . self::get_instance()->get_last_import() . ' UTC</span></span> 
 					<a class="arlo-block arlo-sync-button" href="?page=arlo-for-wordpress&arlo-import">Synchronize now</a>
 				</p>
 			</div>

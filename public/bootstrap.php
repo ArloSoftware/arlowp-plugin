@@ -1180,7 +1180,7 @@ function install_table_arlo_import_log() {
 		  id int(11) unsigned NOT NULL AUTO_INCREMENT,
 		  import_id int(11) unsigned NULL,
 		  message TEXT,
-		  created DATETIME DEFAULT NULL,
+		  created DATETIME DEFAULT NULL COMMENT 'in UTC',
 		  successful tinyint(1) DEFAULT NULL,
 		  PRIMARY KEY  (id),
 		  KEY import_id (import_id)) 

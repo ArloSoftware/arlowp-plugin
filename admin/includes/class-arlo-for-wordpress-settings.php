@@ -111,7 +111,7 @@ class Arlo_For_Wordpress_Settings {
                         array($this, 'arlo_simple_text_callback'), 
                         $this->plugin_slug, 'arlo_general_section', 
                         array(
-                            'html' => '<span class="arlo-last-sync-date">' . $plugin->get_last_import() . '</span>&nbsp;&nbsp;<a href="?page=arlo-for-wordpress&arlo-import" class="arlo-sync-button">'.__('Synchronize now', $this->plugin_slug).'</a>'
+                            'html' => '<span class="arlo-last-sync-date">' . $plugin->get_last_import() . ' UTC</span>&nbsp;&nbsp;<a href="?page=arlo-for-wordpress&arlo-import" class="arlo-sync-button">'.__('Synchronize now', $this->plugin_slug).'</a>'
                             )
                 );        
         }

@@ -174,7 +174,7 @@
 										$('.arlo-sync-button').fadeIn();
 										getLastImportLog(function(response) {
 											if (response.successful == 1) {
-												jQuery('.arlo-last-sync-date').fadeOut().html(response.last_import).fadeIn();
+												jQuery('.arlo-last-sync-date').fadeOut().html(response.last_import + ' UTC').fadeIn();
 											} else {
 												taskPlaceholder.find(".desc").after(": <span>" + response.message.replace(/\d{4,}/, '') + "</span>");
 											}
