@@ -1577,7 +1577,7 @@ class Arlo_For_Wordpress {
 					$query = $wpdb->query(
 						$wpdb->prepare( 
 							"INSERT INTO $table_name 
-							(et_arlo_id, et_code, et_name, et_descriptionsummary, et_advertised_duration, et_post_name, active, et_registerinteresturi, et_viewuri, et_region) 
+							(et_arlo_id, et_code, et_name1, et_descriptionsummary, et_advertised_duration, et_post_name, active, et_registerinteresturi, et_viewuri, et_region) 
 							VALUES ( %d, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
 							", 
 						    $item->TemplateID,
@@ -1594,6 +1594,7 @@ class Arlo_For_Wordpress {
 					);
 	                                
 	                if ($query === false) {
+	                	$this->add_import_log('SQL error: ' . $wpdb->last_error, $timestamp);
 	                    throw new Exception('Database insert failed: ' . $table_name);
 	                }
 	                
@@ -1648,6 +1649,7 @@ class Arlo_For_Wordpress {
 								$timestamp
 							) );
 	                        if ($query === false) {
+	                        	$this->add_import_log('SQL error: ' . $wpdb->last_error, $timestamp);
 	                            throw new Exception('Database insert failed: ' . $table_name);
 	                        }
 						}
@@ -1668,6 +1670,7 @@ class Arlo_For_Wordpress {
 							) );
 	                                                        
 	                        if ($query === false) {
+	                        	$this->add_import_log('SQL error: ' . $wpdb->last_error, $timestamp);
 	                            throw new Exception('Database insert failed: ' . $table_name);
 	                        }
 						}
@@ -1687,6 +1690,7 @@ class Arlo_For_Wordpress {
 							) );
 	                                                        
 	                        if ($query === false) {
+	                        	$this->add_import_log('SQL error: ' . $wpdb->last_error, $timestamp);
 	                            throw new Exception('Database insert failed: ' . $table_name);
 	                        }
 						}
@@ -1753,6 +1757,7 @@ class Arlo_For_Wordpress {
 					) );
 												
 					if ($query === false) {
+						$this->add_import_log('SQL error: ' . $wpdb->last_error, $timestamp);
 						throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_tags ' . $type );
 					} else {
 						$exisiting_tags[$tag] = $wpdb->insert_id;
@@ -1771,6 +1776,7 @@ class Arlo_For_Wordpress {
 					) );
 					
 					if ($query === false) {
+						$this->add_import_log('SQL error: ' . $wpdb->last_error, $timestamp);
 						throw new Exception('Database insert failed: ' . $table_name );
 					}
 				} else {
@@ -1818,6 +1824,7 @@ class Arlo_For_Wordpress {
 				) );
 				
 				if ($query === false) {
+					$this->add_import_log('SQL error: ' . $wpdb->last_error, $timestamp);
 					throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_offers');
 				}
 			}
@@ -1869,6 +1876,7 @@ class Arlo_For_Wordpress {
 		);
                         
 		if ($query === false) {					
+			$this->add_import_log('SQL error: ' . $wpdb->last_error, $timestamp);
 			throw new Exception('Database insert failed: ' . $table_name);
 		}	
 		
@@ -1893,6 +1901,7 @@ class Arlo_For_Wordpress {
 				) );
 				
 				if ($query === false) {
+					$this->add_import_log('SQL error: ' . $wpdb->last_error, $timestamp);
 					throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_events_presenters');
 				}
 			}
@@ -2046,6 +2055,7 @@ class Arlo_For_Wordpress {
 						);
 				                        
 						if ($query === false) {					
+							$this->add_import_log('SQL error: ' . $wpdb->last_error, $timestamp);
 							throw new Exception('Database insert failed: ' . $table_name);
 						}	
 						
@@ -2087,7 +2097,7 @@ class Arlo_For_Wordpress {
 		if(!empty($items)) {
 		
 			$this->add_import_log('Data process start: '.__FUNCTION__, $timestamp);
-
+			
 			$wpdb->query('START TRANSACTION');
 		
 			foreach($items as $item) {
@@ -2101,9 +2111,9 @@ class Arlo_For_Wordpress {
 					array(
 						'%d', '%s', '%s'
 					)
-				);
-                                
+				);				
 				if ($query === false) {
+					$this->add_import_log('SQL error: ' . $wpdb->last_error, $timestamp);
 					throw new Exception('Database insert failed: ' . $table_name);
 				} else {
 					if (is_array($item->TzNames)) {
@@ -2125,8 +2135,8 @@ class Arlo_For_Wordpress {
 				}			
 			}
 			
-			$wpdb->query('COMMIT');	
-
+			$wpdb->query('COMMIT');
+			
 			$this->add_import_log('Data process finished: '.__FUNCTION__, $timestamp);
 		}
 		
@@ -2183,6 +2193,7 @@ class Arlo_For_Wordpress {
 				) );
                                 
                 if ($query === false) {
+                	$this->add_import_log('SQL error: ' . $wpdb->last_error, $timestamp);
                     throw new Exception('Database insert failed: ' . $table_name);
                 }
 				
@@ -2265,6 +2276,7 @@ class Arlo_For_Wordpress {
 				) );
                                 
                 if ($query === false) {
+                	$this->add_import_log('SQL error: ' . $wpdb->last_error, $timestamp);
                     throw new Exception('Database insert failed: ' . $table_name);
                 }
                                 
@@ -2335,6 +2347,7 @@ class Arlo_For_Wordpress {
 				) );
                                 
                 if ($query === false) {
+                	$this->add_import_log('SQL error: ' . $wpdb->last_error, $timestamp);
                     throw new Exception('Database insert failed: ' . $table_name);
                 }               
 			}
@@ -2371,6 +2384,7 @@ class Arlo_For_Wordpress {
 				$query = $wpdb->query( $wpdb->prepare($sql, $counts['num'], $counts['c_arlo_id']) );
 				
 		        if ($query === false) {
+		        	$this->add_import_log('SQL error: ' . $wpdb->last_error, $timestamp);
 		        	throw new Exception('Database insert failed: ' . $table_name);
 		        }
 			}		
@@ -2466,6 +2480,7 @@ class Arlo_For_Wordpress {
 			
 			$query = $wpdb->query( $wpdb->prepare($sql, $order + $cat->c_order, $cat->c_arlo_id, $timestamp) );
 			if ($query === false) {
+				$this->add_import_log('SQL error: ' . $wpdb->last_error, $timestamp);
 				throw new Exception('Database update failed in set_category_depth_order()');
 			} else if (is_array($cat->children)) {
 				$this->set_category_depth_order($cat->children, $max_depth, $order, $timestamp);
@@ -2525,6 +2540,7 @@ class Arlo_For_Wordpress {
 				$query = $wpdb->query( $wpdb->prepare($sql, !empty($item->SequenceIndex) ? $item->SequenceIndex : 0, $item->EventTemplateID, $item->CategoryID) );
 				
 		        if ($query === false) {
+		        	$this->add_import_log('SQL error: ' . $wpdb->last_error, $timestamp);
 		        	throw new Exception('Database insert failed: ' . $table_name);
 		        }
 			}
