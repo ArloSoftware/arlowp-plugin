@@ -48,7 +48,9 @@ function arlo_delete_tables()
 		$wpdb->prefix . "arlo_events_presenters, " . 
 		$wpdb->prefix . "arlo_eventtemplates," . 
 		$wpdb->prefix . "arlo_eventtemplates_categories," . 		
-		$wpdb->prefix . "arlo_eventtemplates_presenters, " . 
+		$wpdb->prefix . "arlo_eventtemplates_presenters, " .
+		$wpdb->prefix . "arlo_onlineactivities, " . 
+		$wpdb->prefix . "arlo_onlineactivities_tags, " .
 		$wpdb->prefix . "arlo_offers, " . 		
 		$wpdb->prefix . "arlo_presenters, " . 
 		$wpdb->prefix . "arlo_venues, " . 
