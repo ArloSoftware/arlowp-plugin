@@ -1511,8 +1511,6 @@ class Arlo_For_Wordpress {
 				$scheduler->update_task($task_id, 4, "Import finished");
 			}
 		} catch(\Exception $e) {
-			$wpdb->query('ROLLBACK');	
-			
 			$this->add_import_log('Synchronization failed: ' . $e->getMessage(), $import_id);
 			
 			$this->clear_import_lock();
@@ -1566,9 +1564,6 @@ class Arlo_For_Wordpress {
 		if(!empty($regionalized_items)) {
 
 			$this->add_import_log('Data process start: '.__FUNCTION__, $timestamp);	
-
-			// lets put it all in a transaction
-			$wpdb->query('START TRANSACTION');
 				
 			foreach($regionalized_items as $region => $items) {
 			
@@ -1698,7 +1693,6 @@ class Arlo_For_Wordpress {
 				}
 			}
 			
-			$wpdb->query('COMMIT');
 			$this->add_import_log('Data process finished: '.__FUNCTION__, $timestamp);
 		}
 		
@@ -1966,8 +1960,6 @@ class Arlo_For_Wordpress {
 
 			$this->add_import_log('Data process start: '.__FUNCTION__, $timestamp);
 			
-			$wpdb->query('START TRANSACTION');
-				
 			foreach($regionalized_items as $region => $items) {
 			
 				foreach($items as $item) {
@@ -1980,8 +1972,6 @@ class Arlo_For_Wordpress {
 				}				
 			}
 			
-			$wpdb->query('COMMIT');
-
 			$this->add_import_log('Data process finished: '.__FUNCTION__, $timestamp);
 		}
 		
@@ -2024,8 +2014,6 @@ class Arlo_For_Wordpress {
 
 			$this->add_import_log('Data process start: '.__FUNCTION__, $timestamp);
 			
-			$wpdb->query('START TRANSACTION');
-				
 			foreach($regionalized_items as $region => $items) {
 			
 				foreach($items as $item) {
@@ -2072,8 +2060,6 @@ class Arlo_For_Wordpress {
 				}				
 			}
 			
-			$wpdb->query('COMMIT');
-
 			$this->add_import_log('Data process finished: '.__FUNCTION__, $timestamp);
 		}
 		
@@ -2098,8 +2084,6 @@ class Arlo_For_Wordpress {
 		
 			$this->add_import_log('Data process start: '.__FUNCTION__, $timestamp);
 			
-			$wpdb->query('START TRANSACTION');
-		
 			foreach($items as $item) {
 				$query = $wpdb->replace(
 					$table_name,
@@ -2135,8 +2119,6 @@ class Arlo_For_Wordpress {
 				}			
 			}
 			
-			$wpdb->query('COMMIT');
-			
 			$this->add_import_log('Data process finished: '.__FUNCTION__, $timestamp);
 		}
 		
@@ -2168,8 +2150,6 @@ class Arlo_For_Wordpress {
 		if(!empty($items)) {
 
 			$this->add_import_log('Data process start: '.__FUNCTION__, $timestamp);
-		
-			$wpdb->query('START TRANSACTION');
 		
 			foreach($items as $item) {
 				$slug = sanitize_title($item->PresenterID . ' ' . $item->FirstName . ' ' . $item->LastName);
@@ -2212,8 +2192,6 @@ class Arlo_For_Wordpress {
 				}
 			}
 			
-			$wpdb->query('COMMIT');
-
 			$this->add_import_log('Data process finished: '.__FUNCTION__, $timestamp);
 		}
 		
@@ -2245,8 +2223,6 @@ class Arlo_For_Wordpress {
 		if(!empty($items)) {
 
 			$this->add_import_log('Data process start: '.__FUNCTION__, $timestamp);
-		
-			$wpdb->query('START TRANSACTION');
 		
 			foreach($items as $item) {
 				$slug = sanitize_title($item->VenueID . ' ' . $item->Name);
@@ -2294,8 +2270,6 @@ class Arlo_For_Wordpress {
 				}
 			}
 			
-			$wpdb->query('COMMIT');
-
 			$this->add_import_log('Data process finished: '.__FUNCTION__, $timestamp);
 		}
 		
@@ -2325,8 +2299,6 @@ class Arlo_For_Wordpress {
 		$this->add_import_log('API Call finished: Categories', $timestamp);
 
 		$this->add_import_log('Data process start: '.__FUNCTION__, $timestamp);
-		
-		$wpdb->query('START TRANSACTION');
 		
 		if(!empty($items)) {
 			foreach($items as $item) {
@@ -2432,8 +2404,6 @@ class Arlo_For_Wordpress {
 			}
 		}
 		
-		$wpdb->query('COMMIT');
-
 		$this->add_import_log('Data process finished: '.__FUNCTION__, $timestamp);
 		
 		return $items;
@@ -2523,8 +2493,6 @@ class Arlo_For_Wordpress {
 		
 		if(!empty($items)) {
 		
-			$wpdb->query('START TRANSACTION');
-		
 			foreach($items as $item) {
 				$sql = "
 				UPDATE
@@ -2544,16 +2512,12 @@ class Arlo_For_Wordpress {
 		        	throw new Exception('Database insert failed: ' . $table_name);
 		        }
 			}
-			
-			$wpdb->query('COMMIT');
 		}
 	}
 		
 	private function import_cleanup($import_id) {
 		global $wpdb;
 		       
-        $wpdb->query('START TRANSACTION');	
-		
 		$tables = array(
 			'eventtemplates',
 			'contentfields',
@@ -2589,8 +2553,6 @@ class Arlo_For_Wordpress {
         $this->delete_custom_posts('venues','v_post_name','venue');           
         
 		$this->add_import_log('Posts cleanup ', $import_id);        
-		
-		$wpdb->query('COMMIT');
 	}
 
 	private function delete_custom_posts($table, $column, $post_type) {
