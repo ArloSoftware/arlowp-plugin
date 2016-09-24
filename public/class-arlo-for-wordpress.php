@@ -701,8 +701,9 @@ class Arlo_For_Wordpress {
 	private static function single_activate() {
 		// @TODO: Define activation functionality here
 		
-		//add data model
+		//check plugin version and forca data modell update
 		self::check_plugin_version();
+		arlo_add_datamodel();
 
 		// flush permalinks upon plugin deactivation
 		flush_rewrite_rules();
