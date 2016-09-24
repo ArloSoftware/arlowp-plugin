@@ -100,9 +100,13 @@ class MessageHandler extends Singleton {
 			' . $this->table . ' 
 		SET
 			dismissed = %s
+		WHERE
+			id = %d
+		AND
+			dismissed IS NULL
 		';
 		
-		$query = $this->wpdb->query($this->wpdb->prepare($sql, $utc_date));
+		$query = $this->wpdb->query($this->wpdb->prepare($sql, $utc_date, $id));
 		
 		return $query !== false;
 	}	
