@@ -1217,14 +1217,14 @@ function install_table_arlo_messages() {
 
 	$sql = "CREATE TABLE $table_name (
 		  id int(10) unsigned NOT NULL AUTO_INCREMENT,
-		  message_type enum('import_error') DEFAULT NULL,
+		  type enum('import_error') DEFAULT NULL,
 		  title varchar(255) DEFAULT NULL,
   		  message text NOT NULL,
   		  global tinyint(1) DEFAULT 0,
 		  dismissed timestamp NULL DEFAULT NULL,
  		  created timestamp NULL DEFAULT NULL,
   		  PRIMARY KEY (id),
-		  KEY message_type (message_type))
+		  KEY type (type))
 		  CHARACTER SET utf8 COLLATE=utf8_general_ci;";
 
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');

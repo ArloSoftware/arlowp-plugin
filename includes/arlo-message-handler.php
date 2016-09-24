@@ -20,9 +20,9 @@ class MessageHandler extends Singleton {
 	}
 
 	
-	public function get_message_by_type_count($message_type = null, $count_dismissed = false) {		
+	public function get_message_by_type_count($type = null, $count_dismissed = false) {		
 		$count_dismissed = (isset($count_dismissed) && $count_dismissed ? true : false );
-		$message_type = (!empty($message_type) ? $message_type : null);
+		$type = (!empty($type) ? $type : null);
 		
 		$where = ['1'];
 		
@@ -30,8 +30,8 @@ class MessageHandler extends Singleton {
 			$where[] = ' dismissed IS NULL ';
 		}
 		
-		if (!is_null($message_type)) {
-			$where[] = " message_type = '" . esc_sql($message_type) ."'";
+		if (!is_null($type)) {
+			$where[] = " type = '" . esc_sql($type) ."'";
 		}
 	
 		$sql = '
@@ -49,18 +49,18 @@ class MessageHandler extends Singleton {
 	}
 	
 	
-	public function set_message($message_type = '', $title = '', $message = '', $global = false) {
-		if (empty($message_type)) return false;
+	public function set_message($type = '', $title = '', $message = '', $global = false) {
+		if (empty($type)) return false;
 		$utc_date = gmdate("Y-m-d H:i:s"); 
 	
 		$sql = '
 		INSERT INTO
-			' . $this->table . ' (message_type, title, message, global, created)
+			' . $this->table . ' (type, title, message, global, created)
 		VALUES
 			(%s, %s, %s, %d, %s)
 		';
 		
-		$query = $this->wpdb->query($this->wpdb->prepare($sql, $message_type, $title, $message, $global, $utc_date));
+		$query = $this->wpdb->query($this->wpdb->prepare($sql, $type, $title, $message, $global, $utc_date));
 		
 		if ($query) {
 			return $this->wpdb->insert_id;
@@ -68,6 +68,26 @@ class MessageHandler extends Singleton {
 			return false;
 		}
 	}	
+	
+	public function dismiss_by_type($type = null) {
+		$type = (!empty($type) ? $type : null);
+		if (is_null($type)) return;
+		
+		$utc_date = gmdate("Y-m-d H:i:s"); 
+		
+		$sql = '
+		UPDATE
+			' . $this->table . ' 
+		SET
+			dismissed = %s
+		WHERE 
+			type = %s
+		AND
+			dismissed IS NULL
+		';
+		
+		$query = $this->wpdb->query($this->wpdb->prepare($sql, $utc_date, $type));		
+	}
 	
 	public function dismiss_message($id) {
 		$id = intval($id);
@@ -87,9 +107,9 @@ class MessageHandler extends Singleton {
 		return $query !== false;
 	}	
 	
-	public function get_messages($message_type = null, $global = false) {
+	public function get_messages($type = null, $global = false) {
 		$global = (isset($global) && is_bool($global) ? $global : null );
-		$message_type = (!empty($message_type) ? $message_type : null);
+		$type = (!empty($type) ? $type : null);
 		
 		$where = [' dismissed IS NULL '];
 		
@@ -97,14 +117,14 @@ class MessageHandler extends Singleton {
 			$where[] = ' global = ' . ($global ? 1 : 0);
 		}
 		
-		if (!is_null($message_type)) {
-			$where[] = " message_type = '" . esc_sql($message_type) ."'";
+		if (!is_null($type)) {
+			$where[] = " type = '" . esc_sql($type) ."'";
 		}		
 		
 		$sql = '
 		SELECT 
 			id,
-			message_type,
+			type,
 			title,
 			message
 		FROM

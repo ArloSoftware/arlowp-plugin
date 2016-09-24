@@ -1122,7 +1122,7 @@ class Arlo_For_Wordpress {
 		$settings = get_option('arlo_settings');
 		
 		//check last import date
-		$message_type = 'import_error';
+		$type = 'import_error';
 		$last_import = $this->get_last_import();
 		$last_import_ts = strtotime($last_import);
 		
@@ -1134,12 +1134,12 @@ class Arlo_For_Wordpress {
 				$message_handler = $this->get_message_handler();
 				
 				//create an error message, if there isn't 
-				if ($message_handler->get_message_by_type_count($message_type) == 0) {	
+				if ($message_handler->get_message_by_type_count($type) == 0) {	
 					
 					$message = '<p>The plugin couldn\'t synchronize with the Arlo platform. The last sucesfull synchonization was ' . $last_import . ' UTC.</p>
 					<p>Please check the <a href="?page=arlo-for-wordpress-logs" target="blank">logs</a> for more information.</p>';
 					
-					if ($message_handler->set_message($message_type, 'Import error', $message, true) === false) {
+					if ($message_handler->set_message($type, 'Import error', $message, true) === false) {
 						$this->add_import_log("Couldn't create Arlo 6 hours import error message");
 					}
 				}				
@@ -2640,6 +2640,9 @@ class Arlo_For_Wordpress {
 	        $this->set_import_id($import_id);
 	        
 	        $this->set_last_import();
+	        
+	        $message_handler = $this->get_message_handler();
+	        $message_handler->dismiss_by_type('import_error');	        
         } else {
             $this->add_import_log('Synchronization died because of a database LOCK, please wait 5 minutes and try again.', $import_id);
         }
@@ -2977,7 +2980,7 @@ class Arlo_For_Wordpress {
 	
 	public static function create_error_notice($message) {
 		return '
-		<div class="error notice arlo-message is-dismissible" id="arlo-message-' . $message->id . '">
+		<div class="error notice arlo-message is-dismissible arlo-' . $message->type .  '" id="arlo-message-' . $message->id . '">
 			<table>
 				<tr>
 					<td class="logo" valign="top" style="width: 60px; padding-top: 1em;">
