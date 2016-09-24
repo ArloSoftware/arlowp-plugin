@@ -655,7 +655,11 @@ class Arlo_For_Wordpress {
 			
 			case '2.3.5':
 				wp_clear_scheduled_hook( 'arlo_import' );
-				wp_schedule_event( time(), 'minutes_5', 'arlo_scheduler' );
+				
+				if ( ! wp_next_scheduled('arlo_scheduler')) {
+					wp_schedule_event( time(), 'minutes_5', 'arlo_scheduler' );
+				}
+
 			break;
 			
 			case '2.3.6': 
@@ -692,7 +696,9 @@ class Arlo_For_Wordpress {
 					}
 				}
 				
-				wp_schedule_event( time(), 'minutes_5', 'arlo_scheduler' );
+				if ( ! wp_next_scheduled('arlo_scheduler')) {
+					wp_schedule_event( time(), 'minutes_5', 'arlo_scheduler' );
+				}
 				
 				arlo_set_option('templates', $saved_templates);
 			break;			
@@ -719,7 +725,6 @@ class Arlo_For_Wordpress {
 		self::set_default_options();
 		
 		// run import every 15 minutes
-		//$temp = wp_schedule_event( time(), 'minutes_5', 'arlo_scheduler' ) . ': Log initiated.';
 		self::get_instance()->add_import_log("Plugin activated");
 
 		// now add pages
