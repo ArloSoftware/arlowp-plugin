@@ -641,6 +641,7 @@ function arlo_add_datamodel() {
 	install_table_arlo_categories();
 	install_table_arlo_eventtemplates_categories();
 	install_table_arlo_timezones();
+	install_table_arlo_messages();
 	
 	return;
 }
@@ -1201,6 +1202,34 @@ function install_table_arlo_import_log() {
         
 		dbDelta($sql);
         
+}
+
+/**
+ * install_table_arlo_import_log function.
+ * 
+ * @access public
+ * @return void
+ */
+function install_table_arlo_messages() {	
+	global $wpdb, $current_user;
+	$charset_collate = core_set_charset();
+	$table_name = $wpdb->prefix . "arlo_messages";
+
+	$sql = "CREATE TABLE $table_name (
+		  id int(10) unsigned NOT NULL AUTO_INCREMENT,
+		  message_type enum('import_error') DEFAULT NULL,
+		  title varchar(255) DEFAULT NULL,
+  		  message text NOT NULL,
+  		  global tinyint(1) DEFAULT 0,
+		  dismissed timestamp NULL DEFAULT NULL,
+ 		  created timestamp NULL DEFAULT NULL,
+  		  PRIMARY KEY (id),
+		  KEY message_type (message_type))
+		  CHARACTER SET utf8 COLLATE=utf8_general_ci;";
+
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+
+	dbDelta($sql);
 }
 
 /**

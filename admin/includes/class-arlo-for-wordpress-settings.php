@@ -29,6 +29,9 @@ class Arlo_For_Wordpress_Settings {
 		}					
 		
 		$settings = get_option('arlo_settings');
+		$message_handler = $plugin->get_message_handler();
+		
+		add_action( 'admin_notices', array($plugin, "global_notice") );
 		
 		if(isset($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress') {		
 			if ( defined('DISABLE_WP_CRON') && DISABLE_WP_CRON ) {
@@ -63,6 +66,7 @@ class Arlo_For_Wordpress_Settings {
 				wp_redirect( admin_url( 'admin.php?page=arlo-for-wordpress'));
 				exit;
 			}
+			
 			
 			if (isset($_GET['arlo-run-scheduler'])) {
 				do_action('arlo_scheduler');

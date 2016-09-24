@@ -389,8 +389,22 @@
 			jQuery.post(ajaxurl, data);
 		}
 		
+		//dismissible message
+		jQuery('.toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message .notice-dismiss').click(function() {
+			var id = jQuery(this).parent().attr('id').split('-').pop();
+			if (id != null) {
+				var data = {
+					action: 'arlo_dismiss_message',
+					id: id
+				}
+				
+				jQuery.post(ajaxurl, data);
+			}
+		})		
+		
+		
 		//dismissible admin notices
-		jQuery('.toplevel_page_arlo-for-wordpress .notice.is-dismissible .notice-dismiss').click(function() {
+		jQuery('.toplevel_page_arlo-for-wordpress .notice.is-dismissible:not(.arlo-message) .notice-dismiss').click(function() {
 			var id = jQuery(this).parent().attr('id');
 			if (id != null) {
 				var data = {

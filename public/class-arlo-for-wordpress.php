@@ -307,6 +307,8 @@ class Arlo_For_Wordpress {
 	
 		add_action( 'wp_ajax_arlo_dismissible_notice', array($this, 'dismissible_notice_callback'));
 		
+		add_action( 'wp_ajax_arlo_dismiss_message', array($this, 'dismiss_message_callback'));
+		
 		add_action( 'wp_ajax_arlo_start_scheduler', array($this, 'start_scheduler_callback'));
 		
 		add_action( 'wp_ajax_arlo_get_task_info', array($this, 'arlo_get_task_info_callback'));
@@ -314,7 +316,6 @@ class Arlo_For_Wordpress {
 		add_action( 'wp_ajax_arlo_terminate_task', array($this, 'arlo_terminate_task_callback'));
 		
 		add_action( 'wp_ajax_arlo_get_last_import_log', array($this, 'arlo_get_last_import_log_callback'));
-		
 		
 		
 		// the_post action - allows us to inject Arlo-specific data as required
@@ -953,6 +954,15 @@ class Arlo_For_Wordpress {
 
         return null;
     }
+    
+    private static function get_now_utc() {
+		do {
+			//this returns, check php doc 
+			$now = DateTime::createFromFormat('U.u', microtime(true));
+		} while (!is_object($now));
+		
+		return $now;    
+    }
 
 	/* API & import functionality */
     
@@ -1018,9 +1028,7 @@ class Arlo_For_Wordpress {
 		$table_name = "{$wpdb->prefix}arlo_import_log";
 
 		if (strtotime($timestamp) === false) {
-			do {
-				$now = DateTime::createFromFormat('U.u', microtime(true));
-			} while (!is_object($now));
+			$now = self::get_now_utc();
         	$timestamp = $now->format("Y-m-d H:i:s");
 		}
 
@@ -1043,9 +1051,7 @@ class Arlo_For_Wordpress {
 	
 	// should only be used when successful
 	public function set_last_import() {
-		do {
-			$now = DateTime::createFromFormat('U.u', microtime(true));
-		} while (!is_object($now));
+		$now = self::get_now_utc();
        	$timestamp = $now->format("Y-m-d H:i:s");	
 	
 		update_option('arlo_last_import', $timestamp);
@@ -1074,6 +1080,18 @@ class Arlo_For_Wordpress {
 		return $scheduler;
 	}
 	
+	public function get_message_handler() {
+		if($message_handler = $this->__get('message_handler')) {
+			return $message_handler;
+		}
+		
+		$message_handler = new \Arlo\MessageHandler($this);
+		
+		$this->__set('message_handler', $message_handler);
+		
+		return $message_handler;
+	}	
+	
 	public function get_api_client() {
 		if(get_option('arlo_test_api')) {
 			define('ARLO_TEST_API', true);
@@ -1100,8 +1118,33 @@ class Arlo_For_Wordpress {
 	
 	public function cron_set_import() {
 		$scheduler = $this->get_scheduler();
+		//$scheduler->set_task("import");
+		$settings = get_option('arlo_settings');
 		
-		$scheduler->set_task("import");
+		//check last import date
+		$message_type = 'import_error';
+		$last_import = $this->get_last_import();
+		$last_import_ts = strtotime($last_import);
+		
+		if (!empty($settings['platform_name']) && !empty($last_import) && $last_import_ts !== false) {
+			$now = self::get_now_utc();
+			
+			//older than 6 hours
+			if (intval($now->format("U")) - $last_import_ts > 60 * 60 * 6) {
+				$message_handler = $this->get_message_handler();
+				
+				//create an error message, if there isn't 
+				if ($message_handler->get_message_by_type_count($message_type) == 0) {	
+					
+					$message = '<p>The plugin couldn\'t synchronize with the Arlo platform. The last sucesfull synchonization was ' . $last_import . ' UTC.</p>
+					<p>Please check the <a href="?page=arlo-for-wordpress-logs" target="blank">logs</a> for more information.</p>';
+					
+					if ($message_handler->set_message($message_type, 'Import error', $message, true) === false) {
+						$this->add_import_log("Couldn't create Arlo 6 hours import error message");
+					}
+				}				
+			}
+		}
 	}
 	
 	public function call_wp_cron() {	      
@@ -2921,6 +2964,36 @@ class Arlo_For_Wordpress {
 		';
 	}	
 	
+	public static function global_notice() {
+		$plugin = self::get_instance();
+		$message_handler = $plugin->get_message_handler();
+		$messages = $message_handler->get_messages('import_error', true);
+		
+		foreach ($messages as $message) {
+			echo self::create_error_notice($message);
+		}
+	}
+
+	
+	public static function create_error_notice($message) {
+		return '
+		<div class="error notice arlo-message is-dismissible" id="arlo-message-' . $message->id . '">
+			<table>
+				<tr>
+					<td class="logo" valign="top" style="width: 60px; padding-top: 1em;">
+						<a href="http://www.arlo.co" target="_blank"><img src="' . plugins_url( '/assets/img/icon-128x128.png', __FILE__) . '" style="width: 48px"></a>
+					</td>
+					<td>
+						<p><strong>' . __( $message->title, self::get_instance()->plugin_slug) . '</strong></p>
+						' . __( $message->message, self::get_instance()->plugin_slug) . '
+					</td>
+				</tr>
+			</table>
+	    </div>
+		';
+	}	
+	
+	
 	public static function connected_platform_notice() {
 		$settings = get_option('arlo_settings');
 		echo '
@@ -3010,7 +3083,6 @@ class Arlo_For_Wordpress {
 	}
 	
 	
-	
 	public static function arlo_get_task_info_callback() {
 		$task_id = intval($_POST['taskID']);
 		
@@ -3025,6 +3097,21 @@ class Arlo_For_Wordpress {
 		
 		wp_die();
 	}
+	
+	public static function dismiss_message_callback() {
+		$id = intval($_POST['id']);
+		
+		if ($id > 0) {
+			$plugin = Arlo_For_Wordpress::get_instance();
+			$message_handler = $plugin->get_message_handler();		
+			
+			$message_handler->dismiss_message($id);
+		}		
+		
+		echo $id;
+		wp_die();
+	}	
+	
 	
 	public static function dismissible_notice_callback() {		
 		$user = wp_get_current_user();

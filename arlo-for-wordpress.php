@@ -67,6 +67,7 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-venues.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-presenters.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-shortcodes.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-scheduler.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-message-handler.php');
 
 // start the public plugin class
 require_once( plugin_dir_path( __FILE__ ) . 'public/class-arlo-for-wordpress.php' );
