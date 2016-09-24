@@ -92,10 +92,13 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 		switch ($column_name) {
 			case 'id':
 			case 'message':
-			case 'import_id':
 			case 'created':
 				return $item->$column_name;
 			
+			case 'import_id':
+				if ($item->$column_name != '0') {
+					return $item->$column_name;
+				}
 			default:
 				return '';
 			}
