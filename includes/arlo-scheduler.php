@@ -2,7 +2,11 @@
 
 namespace Arlo;
 
-class Scheduler {
+require_once 'arlo-singleton.php';
+
+use Arlo\Singleton;
+
+class Scheduler extends Singleton {
 	
 	private $max_simultaneous_task = 1;
 	private $table = '';
