@@ -520,10 +520,16 @@ class Arlo_For_Wordpress {
 			if ($plugin_version != $plugin::VERSION) {
 				$plugin::update($plugin::VERSION, $plugin_version);
 				update_option('arlo_plugin_version', $plugin::VERSION);
+				
+				$now = self::get_now_utc();
+				update_option('arlo_updated', $now->format("Y-m-d H:i:s"));
 			}
 		} else {
 			arlo_add_datamodel();
 			update_option('arlo_plugin_version', $plugin::VERSION);
+			
+			$now = self::get_now_utc();
+			update_option('arlo_updated', $now->format("Y-m-d H:i:s"));			
 		}
 	}
 	
@@ -1126,25 +1132,34 @@ class Arlo_For_Wordpress {
 		$type = 'import_error';
 		$last_import = $this->get_last_import();
 		$last_import_ts = strtotime($last_import);
+		$no_import = false;
 		
-		if (!empty($settings['platform_name']) && !empty($last_import) && $last_import_ts !== false) {
-			$now = self::get_now_utc();
-			
-			//older than 6 hours
-			if (intval($now->format("U")) - $last_import_ts > 60 * 60 * 6) {
-				$message_handler = $this->get_message_handler();
-				
-				//create an error message, if there isn't 
-				if ($message_handler->get_message_by_type_count($type) == 0) {	
-					
-					$message = '<p>The plugin couldn\'t synchronize with the Arlo platform. The last sucesfull synchonization was ' . $last_import . ' UTC.</p>
-					<p>Please check the <a href="?page=arlo-for-wordpress-logs" target="blank">logs</a> for more information.</p>';
-					
-					if ($message_handler->set_message($type, 'Import error', $message, true) === false) {
-						$this->add_import_log("Couldn't create Arlo 6 hours import error message");
-					}
-				}				
+		if (!empty($settings['platform_name'])) {
+			if (!(!empty($last_import) && $last_import_ts !== false)) {
+				$last_import = get_option('arlo_updated');
+				$last_import_ts = strtotime($last_import);
+				$no_import = true;
 			}
+			
+			if (!empty($last_import) && $last_import_ts !== false) {
+				$now = self::get_now_utc();
+				
+				//older than 6 hours
+				if (intval($now->format("U")) - $last_import_ts > 60 * 60 * 6) {
+					$message_handler = $this->get_message_handler();
+					
+					//create an error message, if there isn't 
+					if ($message_handler->get_message_by_type_count($type) == 0) {	
+						
+						$message = '<p>The plugin couldn\'t synchronize with the Arlo platform. ' . (!$no_import ? ' The last sucesfull synchonization was ' . $last_import . ' UTC.' : '') . '</p>
+						<p>Please check the <a href="?page=arlo-for-wordpress-logs" target="blank">logs</a> for more information.</p>';
+						
+						if ($message_handler->set_message($type, 'Import error', $message, true) === false) {
+							$this->add_import_log("Couldn't create Arlo 6 hours import error message");
+						}
+					}				
+				}			
+			}	
 		}
 	}
 	

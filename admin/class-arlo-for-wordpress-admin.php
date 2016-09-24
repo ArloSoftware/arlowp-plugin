@@ -125,9 +125,16 @@ class Arlo_For_Wordpress_Admin {
 				$plugin::update($plugin::VERSION, $plugin_version);
 				$wp_rewrite->flush_rules();
 				update_option('arlo_plugin_version', $plugin::VERSION);
+				
+				$now = self::get_now_utc();
+				update_option('arlo_updated', $now->format("Y-m-d H:i:s"));				
 			}
 		} else {
+			arlo_add_datamodel();
 			update_option('arlo_plugin_version', $plugin::VERSION);
+			
+			$now = self::get_now_utc();
+			update_option('arlo_updated', $now->format("Y-m-d H:i:s"));
 		}
 	}	
 	
