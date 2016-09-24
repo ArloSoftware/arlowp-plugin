@@ -1118,7 +1118,7 @@ class Arlo_For_Wordpress {
 	
 	public function cron_set_import() {
 		$scheduler = $this->get_scheduler();
-		//$scheduler->set_task("import");
+		$scheduler->set_task("import");
 		$settings = get_option('arlo_settings');
 		
 		//check last import date
