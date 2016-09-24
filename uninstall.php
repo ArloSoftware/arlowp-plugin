@@ -59,6 +59,7 @@ function arlo_delete_tables()
 		$wpdb->prefix . "arlo_tags,  " . 
 		$wpdb->prefix . "arlo_timezones,  " . 
 		$wpdb->prefix . "arlo_timezones_olson, " . 
+		$wpdb->prefix . "arlo_messages, " .
 		$wpdb->prefix . "arlo_import_log," .
 		$wpdb->prefix . "arlo_import_lock";
 
@@ -90,10 +91,19 @@ function arlo_delete_custom_posts() {
  */
 function arlo_delete_options() {
 
-	delete_option('arlo_settings');
-
-	delete_option('arlo_last_import');
-
+	$options = [
+		'arlo_import_id',
+		'arlo_customcss',
+		'arlo_customcss_timestamp',
+		'arlo_settings',
+		'arlo_last_import',
+		'arlo_new_url_structure',
+		'arlo_plugin_version'
+	];
+	
+	foreach ($options as $option) {
+		delete_option($option);
+	}
 }
 
 arlo_uninstall();
