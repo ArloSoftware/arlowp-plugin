@@ -583,6 +583,7 @@ class Arlo_For_Wordpress {
 				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events_presenters DROP PRIMARY KEY, ADD PRIMARY KEY (e_arlo_id,p_arlo_id,active)");
 				
 				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_categories DROP PRIMARY KEY, ADD PRIMARY KEY (c_id, active)");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_categories DROP KEY c_arlo_id ");
 				
 				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates_categories DROP PRIMARY KEY, ADD PRIMARY KEY (et_arlo_id,c_arlo_id,active)");
 				
