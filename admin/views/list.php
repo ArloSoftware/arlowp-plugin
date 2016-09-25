@@ -13,7 +13,7 @@
 
 <div class="wrap arlo-wrap arlo-list">
 	<h2><?php echo esc_html( $list->get_title() ); ?></h2>
-	<?php if ($list::TABLENAME !== 'arlo_import_log') { ?>
+	<?php if ($list::TABLENAME !== 'arlo_log') { ?>
 	<a href="<?=$list->get_new_link()?>" target="_blank" class="button button-primary">New <?=strtolower($list->singular)?></a>
 	&nbsp;&nbsp;&nbsp;
 	<a href="<?=$list->get_list_link()?>" target="_blank" class="arlo-middle">Manage <?=strtolower($list->plural)?> in Arlo</a>

@@ -637,7 +637,8 @@ function arlo_add_datamodel() {
 	install_table_arlo_offers();
 	install_table_arlo_eventtemplates_presenters();
 	install_table_arlo_events_presenters();
-	install_table_arlo_import_log();
+	install_table_arlo_log();
+	install_table_arlo_import_lock();
 	install_table_arlo_categories();
 	install_table_arlo_eventtemplates_categories();
 	install_table_arlo_timezones();
@@ -1167,15 +1168,15 @@ function install_table_arlo_timezones() {
 }
 
 /**
- * install_table_arlo_import_log function.
+ * install_table_arlo_log function.
  * 
  * @access public
  * @return void
  */
-function install_table_arlo_import_log() {	
+function install_table_arlo_log() {	
 	global $wpdb, $current_user;
 	$charset_collate = core_set_charset();
-	$table_name = $wpdb->prefix . "arlo_import_log";
+	$table_name = $wpdb->prefix . "arlo_log";
 
 	$sql = "CREATE TABLE $table_name (
 		  id int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -1201,11 +1202,34 @@ function install_table_arlo_import_log() {
             ) CHARACTER SET utf8 COLLATE=utf8_general_ci;";
         
 		dbDelta($sql);
-        
 }
 
 /**
- * install_table_arlo_import_log function.
+ * install_table_arlo_import_lock function.
+ * 
+ * @access public
+ * @return void
+ */
+function install_table_arlo_import_lock() {	
+	global $wpdb, $current_user;
+	$charset_collate = core_set_charset();
+	$table_name = $wpdb->prefix . "arlo_log";
+
+   require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+
+   $table_name = $wpdb->prefix . "arlo_import_lock";
+        
+	$sql = "CREATE TABLE $table_name (
+		import_id int(10) unsigned NOT NULL,
+		lock_acquired DATETIME NOT NULL,
+		lock_expired DATETIME NOT NULL
+		) CHARACTER SET utf8 COLLATE=utf8_general_ci;";
+	
+	dbDelta($sql);        
+}
+
+/**
+ * install_table_arlo_messages function.
  * 
  * @access public
  * @return void

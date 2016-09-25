@@ -26,7 +26,7 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 	protected $plugin_slug;
 	
 	const PERPAGE = 30;
-	const TABLENAME = 'arlo_import_log';
+	const TABLENAME = 'arlo_log';
 
 	public function __construct() {
 		$this->init_variables();	
