@@ -476,6 +476,27 @@ class Arlo_For_Wordpress {
 		return $wpdb->get_col( $sql );
 	}
 	
+	
+	/**
+	 * Send log to Arlo
+	 *
+	 * @since     2.3.6
+	 *
+	 * @return    null
+	 */	
+	
+	public static function send_log_to_arlo($message = '') {
+		$plugin = self::get_instance();
+		
+		$client = $plugin->get_api_client();		
+		$last_import = $plugin->get_last_import();
+		
+		$log = self::create_log_csv(1000);
+				
+		$response = $client->WPLogError()->sendLog($message, $last_import, $log);
+	}		
+
+	
 	/**
 	 * Check the plugin version on bulk update
 	 *
@@ -1157,11 +1178,18 @@ class Arlo_For_Wordpress {
 					//create an error message, if there isn't 
 					if ($message_handler->get_message_by_type_count($type) == 0) {	
 						
-						$message = '<p>The plugin couldn\'t synchronize with the Arlo platform. ' . (!$no_import ? ' The last sucesfull synchonization was ' . $last_import . ' UTC.' : '') . '</p>
-						<p>Please check the <a href="?page=arlo-for-wordpress-logs" target="blank">logs</a> for more information.</p>';
+						$message = [
+						'<p>The plugin couldn\'t synchronize with the Arlo platform. ' . (!$no_import ? ' The last sucesfull synchonization was ' . $last_import . ' UTC.' : '') . '</p>',
+						'<p>Please check the <a href="?page=arlo-for-wordpress-logs" target="blank">logs</a> for more information.</p>'
+						];
 						
-						if ($message_handler->set_message($type, 'Import error', $message, true) === false) {
+						if ($message_handler->set_message($type, 'Import error', implode('', $message), true) === false) {
 							$this->add_import_log("Couldn't create Arlo 6 hours import error message");
+						}
+						
+						$send_data = get_option('arlo_send_data');
+						if ($send_data == "1") {
+							self::send_log_to_arlo($message[0]);
 						}
 					}				
 				}			
@@ -1232,10 +1260,17 @@ class Arlo_For_Wordpress {
 		$scheduler->run_task();		
 	}
 	
-	public function download_synclog() {
+	public function create_log_csv($limit = 1000) {
 		global $wpdb;
+		$limit = intval($limit);
 		
         $table_name = "{$wpdb->prefix}arlo_import_lock";
+        
+		$fp = fopen('php://temp/maxmemory:2097125', 'w');
+		if($fp === FALSE) {
+			$this->add_import_log('Couldn\'t create log CSV', $import_id);
+		    return false;
+		}
         
         $sql = '
             SELECT 
@@ -1247,26 +1282,36 @@ class Arlo_For_Wordpress {
                 ' . $wpdb->prefix . 'arlo_import_log
             ORDER BY
             	id DESC
-            ';
+            ' . 
+            ($limit !== 0 ? 'LIMIT ' . $limit : '');
+            
 	               
         $entries = $wpdb->get_results($sql, 'ARRAY_N');
-        
-        if (is_array($entries) && count($entries)) {
-        
-	        header('Content-Type: text/csv; charset=utf-8');
-			header('Content-Disposition: attachment; filename=arlo_sync_log.csv');
-        
-	        $output = fopen('php://output', 'w');
-	        fputcsv($output, array('ID', 'Log', 'CreatedDateTime', 'Successful'));
-	        
-	        foreach ($entries as $entry) {
-	        	 fputcsv($output, $entry);
+	
+		if (is_array($entries) && count($entries)) {
+			fputcsv($fp, array('ID', 'Log', 'CreatedDateTime', 'Successful'));
+			
+			foreach ($entries as $entry) {
+				fputcsv($fp, $entry);
 	        } 
-	        
-	        fclose($output);        
-        }
-        
+		}
 		
+		rewind($fp);
+		$csv = stream_get_contents($fp);
+		fclose($fp);		
+		
+		return $csv;
+	
+	}
+	
+	public function download_synclog() {        
+		$csv = self::create_log_csv(0);
+	
+        header('Content-Type: text/csv; charset=utf-8');
+		header('Content-Disposition: attachment; filename=arlo_sync_log.csv');
+		
+		echo $csv;
+		exit;
 	}
 	
 	public function load_demo() {

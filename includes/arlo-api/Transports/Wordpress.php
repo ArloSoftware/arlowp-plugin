@@ -33,6 +33,7 @@ class Wordpress extends Transport
 			$response = wp_remote_request( $url, array(
 				'headers' => array(
 					'X-Plugin-Version' => $plugin_version,
+					'Content-type' => 'application/json'
 				),
 				'compress'    => true,
                                 'decompress'  => true,
@@ -46,9 +47,7 @@ class Wordpress extends Transport
 				throw new \Exception($message);
 			}
 			
-			if(empty($response) || !isset($response['response']) || empty($response['body'])) {
-				throw new \Exception('Invalid Arlo Response.');
-			} else if($response['response']['code'] != 200) {
+			if(substr($response['response']['code'], 0, 1) !== "2") {
 				$body = json_decode($response['body'], true);			
 				throw new \Exception('Error code ' . $response['response']['code'] . ': ' . $response['response']['message'] . (!empty($body['Message']) ?  ' ' . $body['Message'] : ''));
 			}
