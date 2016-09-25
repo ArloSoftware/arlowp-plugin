@@ -23,6 +23,7 @@
 				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#pages" class="nav-tab" id="<?=$this->plugin_slug?>-tab-pages">Pages</a>
 				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#regions" class="nav-tab" id="<?=$this->plugin_slug?>-tab-regions">Regions</a>
 				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#customcss" class="nav-tab" id="<?=$this->plugin_slug?>-tab-customcss">Custom CSS</a>
+				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#misc" class="nav-tab" id="<?=$this->plugin_slug?>-tab-misc">Misc</a>
 			</h2>		
 			<?php settings_fields( 'arlo_settings' ); ?>
             <?php $this->do_settings_sections( $this->plugin_slug ); ?>

@@ -163,7 +163,7 @@ class Arlo_For_Wordpress_Settings {
                             'default_val' => __('Interested in attending? Have a suggestion about running this course near you?', $this->plugin_slug),
                             )
                 );
-                		 		
+                                		 		
 		/*
 		 *
 		 * Page Section Settings
@@ -196,6 +196,31 @@ class Arlo_For_Wordpress_Settings {
 		 
 		add_settings_section('arlo_customcss_section', null, null, $this->plugin_slug );				
 		add_settings_field( 'arlo_customcss', null, array($this, 'arlo_simple_textarea_callback'), $this->plugin_slug, 'arlo_customcss_section', array('id'=>'customcss') );
+		
+		/*
+		 *
+		 * Misc Section Settings
+		 *
+		 */ 
+		 
+		add_settings_section('arlo_misc_section',  __('Miscellaneous', $this->plugin_slug), null, $this->plugin_slug );
+		
+		add_settings_field(
+			'arlo_send_data_setting', 
+			'<label for="arlo_send_data">'.__('Allow to send data to Arlo', $this->plugin_slug).'</label>', 
+			array($this, 'arlo_checkbox_callback'), 
+			$this->plugin_slug, 
+			'arlo_misc_section', 
+			['option_name' => 'arlo_send_data']);
+			
+		add_settings_field(
+			'arlo_download_log_setting', 
+			'<label for="arlo_download_log">'.__('Download log', $this->plugin_slug).'</label>', 
+			array($this, 'arlo_simple_text_callback'), 
+			$this->plugin_slug, 
+			'arlo_misc_section',
+			['html' => '<a href="?page=arlo-for-wordpress&arlo-donwload-sync-log">Download</a>']);
+		
 		
 		/*
 		 *
@@ -266,6 +291,22 @@ class Arlo_For_Wordpress_Settings {
 		
 		echo $output;
 	}
+	
+	
+	function arlo_checkbox_callback($args) {
+		if (empty($args['option_name'])) return;
+		
+		$option_name = $args['option_name'];
+		$settings = get_option('arlo_settings');
+				
+		$output = '<div id="'.ARLO_PLUGIN_PREFIX.'-' . $option_name . '" class="cf">';
+		$output .= '<input type="checkbox" value="1" name="arlo_settings['.$option_name.']" id="' . $option_name . '" ' . ($settings[$option_name] == '1' ? 'checked="checked"' : '') . '>';
+		
+		$output .= '</div>';
+		
+		echo $output;
+	}
+	
         
 	function arlo_simple_input_callback($args) {
 	    $settings = get_option('arlo_settings');
@@ -430,7 +471,7 @@ class Arlo_For_Wordpress_Settings {
 			return file_get_contents($path);
 		}
 	}
-	
+		
 	function arlo_regions_callback($args) {
 		$regions = get_option('arlo_regions', array());
 		
@@ -534,7 +575,6 @@ class Arlo_For_Wordpress_Settings {
 	    	</ul>
 	    </p>
 	    <p>If you are experiencing problems with the URLs, please save changes to the Arlo settings page and resynchronize the data under the general tab.</p>
-	    <p><a href="?page=arlo-for-wordpress&arlo-donwload-sync-log">Download synchronization log</a>/p>
 	    ';
 	} 		
 }

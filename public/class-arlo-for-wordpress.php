@@ -1187,8 +1187,7 @@ class Arlo_For_Wordpress {
 							$this->add_import_log("Couldn't create Arlo 6 hours import error message");
 						}
 						
-						$send_data = get_option('arlo_send_data');
-						if ($send_data == "1") {
+						if ($settings['arlo_send_data'] == "1") {
 							self::send_log_to_arlo($message[0]);
 						}
 					}				
