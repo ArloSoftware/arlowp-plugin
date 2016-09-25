@@ -79,19 +79,22 @@ class MessageHandler extends Singleton {
 		UPDATE
 			' . $this->table . ' 
 		SET
-			dismissed = %s
+			dismissed = %s,
+			dismissed_by = %d
 		WHERE 
 			type = %s
 		AND
 			dismissed IS NULL
 		';
 		
-		$query = $this->wpdb->query($this->wpdb->prepare($sql, $utc_date, $type));		
+		$query = $this->wpdb->query($this->wpdb->prepare($sql, $utc_date, $user->ID, $type));		
 	}
 	
 	public function dismiss_message($id) {
 		$id = intval($id);
 		if ($id == 0) return false;
+		
+		$user = wp_get_current_user();		
 		
 		$utc_date = gmdate("Y-m-d H:i:s"); 
 	
@@ -99,14 +102,15 @@ class MessageHandler extends Singleton {
 		UPDATE
 			' . $this->table . ' 
 		SET
-			dismissed = %s
+			dismissed = %s,
+			dismissed_by = %d
 		WHERE
 			id = %d
 		AND
 			dismissed IS NULL
 		';
 		
-		$query = $this->wpdb->query($this->wpdb->prepare($sql, $utc_date, $id));
+		$query = $this->wpdb->query($this->wpdb->prepare($sql, $utc_date, $user->ID, $id));
 		
 		return $query !== false;
 	}	

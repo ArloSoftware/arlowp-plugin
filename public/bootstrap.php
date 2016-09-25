@@ -1222,6 +1222,7 @@ function install_table_arlo_messages() {
   		  message text NOT NULL,
   		  global tinyint(1) DEFAULT 0,
 		  dismissed timestamp NULL DEFAULT NULL,
+		  dismissed_by int(10) unsigned NULL DEFAULT NULL,
  		  created timestamp NULL DEFAULT NULL,
   		  PRIMARY KEY (id),
 		  KEY type (type))
