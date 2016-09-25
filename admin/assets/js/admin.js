@@ -283,6 +283,13 @@
 				$(this).removeClass('arlo-error');
 			}
 		});
+
+		//go to any section
+		$('.arlo-settings-link').click(function() {
+			var id = $(this).attr('id').split('_').pop();
+			showNavTab(id);	
+			scrollTo(0,10000);
+		});
 		
 		//go to the general section
 		$('#arlo-connet-platform').click(function () {
@@ -419,7 +426,20 @@
 				
 				jQuery.post(ajaxurl, data);
 			}
-		})		
+		})	
+
+		//turn off arlo_send_data
+		$('#arlo_turn_off_send_data').click(function() {
+			var el = $(this),
+				data = {
+					action: 'arlo_turn_off_send_data'
+				}
+			
+			$.post(ajaxurl, data, function() {
+				el.parentsUntil('.arlo-message').parent().find('.notice-dismiss').trigger('click');
+				$('#arlo_send_data').removeAttr("checked");
+			});
+		});
 		
 	});
 

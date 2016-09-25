@@ -31,9 +31,11 @@ class Arlo_For_Wordpress_Settings {
 		$settings = get_option('arlo_settings');
 		$message_handler = $plugin->get_message_handler();
 		
-		add_action( 'admin_notices', array($plugin, "global_notice") );
+		add_action( 'admin_notices', array($plugin, "global_notices") );
 		
-		if(isset($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress') {		
+		if(isset($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress') {
+			add_action( 'admin_notices', array($plugin, "arlo_notices") );
+
 			if ( defined('DISABLE_WP_CRON') && DISABLE_WP_CRON ) {
 				add_action( 'admin_notices', array($plugin, "wpcron_notice") );
 			}

@@ -1217,7 +1217,7 @@ function install_table_arlo_messages() {
 
 	$sql = "CREATE TABLE $table_name (
 		  id int(10) unsigned NOT NULL AUTO_INCREMENT,
-		  type enum('import_error') DEFAULT NULL,
+		  type enum('import_error', 'information') DEFAULT NULL,
 		  title varchar(255) DEFAULT NULL,
   		  message text NOT NULL,
   		  global tinyint(1) DEFAULT 0,

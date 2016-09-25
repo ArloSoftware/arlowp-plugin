@@ -134,7 +134,8 @@ class MessageHandler extends Singleton {
 			id,
 			type,
 			title,
-			message
+			message,
+			global
 		FROM
 			' . $this->table . '	
 		WHERE 

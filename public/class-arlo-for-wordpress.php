@@ -153,7 +153,19 @@ class Arlo_For_Wordpress {
 				'content' 			=> '[arlo_venue_list]',
 				'child_post_type'	=> 'venue'
 			),
-		);    
+		);  
+
+	/**
+	 * $message_notice_types: used to map arlo message types to WP notices 
+	 *
+	 * @since    2.3.6
+	 *
+	 * @var      array
+	 */
+    public static $message_notice_types = array(
+        'inport_error' => 'error',
+        'information' => 'notice-warning',
+    ); 		  
     
 	/**
 	 * $price_settings: used to set the price showing on the site
@@ -306,6 +318,8 @@ class Arlo_For_Wordpress {
 	
 	
 		add_action( 'wp_ajax_arlo_dismissible_notice', array($this, 'dismissible_notice_callback'));
+
+		add_action( 'wp_ajax_arlo_turn_off_send_data', array($this, 'turn_off_send_data_callback'));
 		
 		add_action( 'wp_ajax_arlo_dismiss_message', array($this, 'dismiss_message_callback'));
 		
@@ -722,6 +736,19 @@ class Arlo_For_Wordpress {
 				}
 				
 				arlo_set_option('templates', $saved_templates);
+
+				$plugin = self::get_instance();
+				$message_handler = $plugin->get_message_handler();
+
+				$plugin::change_setting('arlo_send_data', 1);
+
+				$message = [
+				'<p>The Arlo for Wordpress plugin will send data to Arlo when a synchronization failed. You can turn this of anytime in the <a href="?page=arlo-for-wordpress#misc" class="arlo-settings-link" id="settings_misc">settings</a>.</p>',
+				'<p><a target="_blank" class="button button-primary" id="arlo_turn_off_send_data">' . __('Turn off', self::get_instance()->plugin_slug) . '</a></p>'
+				];
+				
+				$message_handler->set_message('information', 'Send data to Arlo', implode('', $message), false);
+				
 			break;			
 		}	
 	}
@@ -3033,25 +3060,42 @@ class Arlo_For_Wordpress {
 		';
 	}	
 	
-	public static function global_notice() {
+	public static function global_notices() {
 		$plugin = self::get_instance();
 		$message_handler = $plugin->get_message_handler();
 		$messages = $message_handler->get_messages('import_error', true);
 		
 		foreach ($messages as $message) {
-			echo self::create_error_notice($message);
+			echo self::create_notice($message);
 		}
 	}
 
+	public static function arlo_notices() {
+		$plugin = self::get_instance();
+		$message_handler = $plugin->get_message_handler();
+		$messages = $message_handler->get_messages(null, false);
+		
+		foreach ($messages as $message) {
+			echo self::create_notice($message);
+		}
+	}	
+
 	
-	public static function create_error_notice($message) {
+	public static function create_notice($message) {
+		$notice_type = (isset(self::$message_notice_types[$message->type]) ? self::$message_notice_types[$message->type] : 'error');
+
+		$global_message = '';
+		if ($message->global) {
+			$global_message = '<td class="logo" valign="top" style="width: 60px; padding-top: 1em;">
+						<a href="http://www.arlo.co" target="_blank"><img src="' . plugins_url( '/assets/img/icon-128x128.png', __FILE__) . '" style="width: 48px"></a>
+					</td>';
+		}
+
 		return '
-		<div class="error notice arlo-message is-dismissible arlo-' . $message->type .  '" id="arlo-message-' . $message->id . '">
+		<div class="' . $notice_type . '  notice arlo-message is-dismissible arlo-' . $message->type .  '" id="arlo-message-' . $message->id . '">
 			<table>
 				<tr>
-					<td class="logo" valign="top" style="width: 60px; padding-top: 1em;">
-						<a href="http://www.arlo.co" target="_blank"><img src="' . plugins_url( '/assets/img/icon-128x128.png', __FILE__) . '" style="width: 48px"></a>
-					</td>
+					' . $global_message . '
 					<td>
 						<p><strong>' . __( $message->title, self::get_instance()->plugin_slug) . '</strong></p>
 						' . __( $message->message, self::get_instance()->plugin_slug) . '
@@ -3180,6 +3224,13 @@ class Arlo_For_Wordpress {
 		echo $id;
 		wp_die();
 	}	
+
+	public static function turn_off_send_data_callback() {		
+		self::change_setting('arlo_send_data', 0);
+
+		echo 0;
+		wp_die();
+	}		
 	
 	
 	public static function dismissible_notice_callback() {		
@@ -3192,6 +3243,14 @@ class Arlo_For_Wordpress {
 		echo $_POST['id'];
 		wp_die();
 	}	
+
+	public static function change_setting($setting_name, $value) {
+		$settings = get_option('arlo_settings');
+
+		$settings[$setting_name] = $value;
+
+		update_option('arlo_settings', $settings);
+	}
 	
 	public static function get_tag_by_id($tag_id) {
 		global $wpdb;		
