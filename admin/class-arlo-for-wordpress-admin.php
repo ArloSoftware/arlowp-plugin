@@ -214,6 +214,8 @@ class Arlo_For_Wordpress_Admin {
 		if ( ! isset( $this->plugin_screen_hook_suffix ) ) {
 			return;
 		}
+		
+		wp_enqueue_script( $this->plugin_slug . '-admin-global-script', plugins_url( 'assets/js/admin_public.js?20160904', __FILE__ ), array( 'jquery' ), Arlo_For_Wordpress::VERSION, true );
 
 		$screen = get_current_screen();
 		if ( $this->plugin_screen_hook_suffix == $screen->id ) {
