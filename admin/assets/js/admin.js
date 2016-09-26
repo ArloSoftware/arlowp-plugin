@@ -177,7 +177,7 @@
 												jQuery('.arlo-last-sync-date').fadeOut().html(response.last_import + ' UTC').fadeIn();
 												
 												//dismiss only, if the sync is not terminated by the user
-												if (response.message.indexOf('terminate') != -1) {
+												if (task.task_status_text.indexOf('terminate') == -1) {
 													jQuery('.toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message.arlo-import_error .notice-dismiss').trigger('click');
 												}
 											} else {
