@@ -30,7 +30,7 @@ class Wordpress extends Transport
 		$url = $this->getRemoteURL($platform_name, $public) . $path;
 				
 		try {
-			$response = wp_remote_request( $url, array(
+			$args = array(
 				'headers' => array(
 					'X-Plugin-Version' => $plugin_version,
 					'Content-type' => 'application/json'
@@ -40,7 +40,13 @@ class Wordpress extends Transport
                                 'stream'      => false,
 				'timeout'     => $this->getRequestTimeout(),
 				'method'	  => (is_null($post_data)) ? 'GET' : 'POST',
-			) );
+			);
+
+			if (!is_null($post_data)) {
+				$args['body'] = json_encode($post_data);
+			}
+
+			$response = wp_remote_request( $url, $args );
 			
 			if(is_wp_error($response)) {
 				$message = reset(reset($response->errors));

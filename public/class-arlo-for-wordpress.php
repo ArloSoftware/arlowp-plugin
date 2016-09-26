@@ -1289,9 +1289,9 @@ class Arlo_For_Wordpress {
 						}
 						
 						if ($settings['arlo_send_data'] == "1") {
-							self::send_log_to_arlo($message[0]);
+							self::send_log_to_arlo(strip_tags($message[0]));
 						}
-					}				
+					}
 				}			
 			}	
 		}
