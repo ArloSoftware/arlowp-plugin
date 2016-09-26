@@ -107,38 +107,9 @@ class Arlo_For_Wordpress_Admin {
 	public static function check_plugin_version($plugin) {
 		global $wp_rewrite;
  		$plugin = Arlo_For_Wordpress::get_instance();
- 		
-		$plugin_version = get_option('arlo_plugin_version');
-		
-		if (!empty($plugin_version)) {
-            $import_id  = get_option('arlo_import_id',"");
-            $last_import = $plugin->get_last_import();
-            
-            if (empty($import_id)) {
-                if (empty($last_import)) {
-                    $last_import = date("Y");
-                }
-                $plugin->set_import_id(date("Y", strtotime($last_import)));
-            }
-                        
-			if ($plugin_version != $plugin::VERSION) {
-				$plugin::update($plugin::VERSION, $plugin_version);
-				$wp_rewrite->flush_rules();
-				update_option('arlo_plugin_version', $plugin::VERSION);
-				
-				$now = self::get_now_utc();
-				update_option('arlo_updated', $now->format("Y-m-d H:i:s"));		
-				self::check_db_schema();		
-			}
-		} else {
-			arlo_add_datamodel();
-			update_option('arlo_plugin_version', $plugin::VERSION);
-			
-			$now = self::get_now_utc();
-			update_option('arlo_updated', $now->format("Y-m-d H:i:s"));
-		}
-	}	
-	
+		$plugin::check_plugin_version();
+		$wp_rewrite->flush_rules(); 		
+	}
 
 	/**
 	 * Return an instance of this class.
