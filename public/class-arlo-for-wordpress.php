@@ -596,7 +596,7 @@ class Arlo_For_Wordpress {
 			$message_handler = $plugin->get_message_handler();
 			$message = [
 				'<p>During the update, we noticed that there might be a problem with your database.</p>',
-				'<p>If you are experiencing problem with the synchronization, please deactivate and reactivate the plugin.</p>'
+				'<p>If you are experiencing a problem with the synchronization, please deactivate and reactivate the plugin.</p>'
 			 ];
 			 
 			$message_handler->set_message('error', 'Database schema error', implode('', $message), false);
@@ -838,7 +838,7 @@ class Arlo_For_Wordpress {
 				if ($message_handler->get_message_by_type_count('information') == 0) {
 					
 					$message = [
-					'<p>The Arlo for Wordpress plugin will send data to Arlo when a synchronization failed. You can turn this of anytime in the <a href="?page=arlo-for-wordpress#misc" class="arlo-settings-link" id="settings_misc">settings</a>.</p>',
+					'<p>The Arlo for Wordpress plugin will send data to Arlo when a synchronization failed. You can turn this off anytime in the <a href="?page=arlo-for-wordpress#misc" class="arlo-settings-link" id="settings_misc">settings</a>.</p>',
 					'<p><a target="_blank" class="button button-primary" id="arlo_turn_off_send_data">' . __('Turn off', self::get_instance()->plugin_slug) . '</a></p>'
 					];
 					
@@ -1302,7 +1302,7 @@ class Arlo_For_Wordpress {
 					if ($message_handler->get_message_by_type_count($type) == 0) {	
 						
 						$message = [
-						'<p>The plugin couldn\'t synchronize with the Arlo platform. ' . (!$no_import ? ' The last sucesfull synchonization was ' . $last_import . ' UTC.' : '') . '</p>',
+						'<p>The plugin couldn\'t synchronize with the Arlo platform. ' . (!$no_import ? ' The last successful synchronization was ' . $last_import . ' UTC.' : '') . '</p>',
 						'<p>Please check the <a href="?page=arlo-for-wordpress-logs" target="blank">logs</a> for more information.</p>'
 						];
 						
