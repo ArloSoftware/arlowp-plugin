@@ -2051,7 +2051,17 @@ $shortcodes->add('content_field_name', function($content='', $atts, $shortcode_n
 $shortcodes->add('content_field_text', function($content='', $atts, $shortcode_name){
 	if(!isset($GLOBALS['arlo_content_field_item']['cf_text'])) return '';
 
-	return wpautop($GLOBALS['arlo_content_field_item']['cf_text']);
+	extract(shortcode_atts(array(
+		'strip_html'	=> 'false',
+	), $atts, $shortcode_name));	
+
+	if ($strip_html == 'true') {
+		$return = strip_tags($GLOBALS['arlo_content_field_item']['cf_text']);
+	} else {
+		$return = wpautop($GLOBALS['arlo_content_field_item']['cf_text']);
+	}
+
+	return $return;
 });
 
 // event template filter shortcode
