@@ -806,9 +806,8 @@ class Arlo_For_Wordpress {
 					}
 				}
 				
-				if ( ! wp_next_scheduled('arlo_scheduler')) {
-					wp_schedule_event( time(), 'minutes_5', 'arlo_scheduler' );
-				}
+				wp_clear_scheduled_hook( 'arlo_scheduler' );
+				wp_schedule_event( time(), 'minutes_5', 'arlo_scheduler' );
 				
 				arlo_set_option('templates', $saved_templates);
 
@@ -816,7 +815,7 @@ class Arlo_For_Wordpress {
 				$message_handler = $plugin->get_message_handler();
 
 				$plugin::change_setting('arlo_send_data', 1);
-
+				
 				$message = [
 				'<p>The Arlo for Wordpress plugin will send data to Arlo when a synchronization failed. You can turn this of anytime in the <a href="?page=arlo-for-wordpress#misc" class="arlo-settings-link" id="settings_misc">settings</a>.</p>',
 				'<p><a target="_blank" class="button button-primary" id="arlo_turn_off_send_data">' . __('Turn off', self::get_instance()->plugin_slug) . '</a></p>'
