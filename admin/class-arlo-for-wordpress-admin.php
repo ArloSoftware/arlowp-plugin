@@ -127,7 +127,8 @@ class Arlo_For_Wordpress_Admin {
 				update_option('arlo_plugin_version', $plugin::VERSION);
 				
 				$now = self::get_now_utc();
-				update_option('arlo_updated', $now->format("Y-m-d H:i:s"));				
+				update_option('arlo_updated', $now->format("Y-m-d H:i:s"));		
+				self::check_db_schema();		
 			}
 		} else {
 			arlo_add_datamodel();

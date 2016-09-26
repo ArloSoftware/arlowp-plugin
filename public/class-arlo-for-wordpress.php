@@ -34,6 +34,17 @@ class Arlo_For_Wordpress {
 	const VERSION = '2.3.6';
 
 	/**
+	 * DB Schema hash for this version.
+	 * Need to generate with create_db_schema_hash if there is a schema change
+	 *
+	 * @since   2.3.6
+	 *
+	 * @var     string
+	 */
+
+	const DB_SCHEMA_HASH = 'b002abcae1c4031050360a1419b740c40131e77d';	
+
+	/**
 	 * Minimum required PHP version
 	 *
 	 * @since   2.0.6
@@ -528,6 +539,69 @@ class Arlo_For_Wordpress {
 			}
 		}
 	}
+
+	/**
+	 * Create a hash for the database Schema
+	 *
+	 * @since     2.3.6
+	 *
+	 * @return    string
+	 */	
+	
+	public static function create_db_schema_hash( ) {
+		global $wpdb;
+		
+		$scheme = [];
+
+		$tables = $wpdb->get_results("SHOW TABLES like '%arlo%'", ARRAY_N);
+		foreach ($tables as $table) {
+			$field_defs = $wpdb->get_results("SHOW COLUMNS FROM " . $table[0], ARRAY_A);
+			$fields = [];
+			foreach ($field_defs as $fd) {
+
+				if (strpos($fd['Type'], 'enum') !== false) {
+					preg_match_all("/'(.*)'/sU", $fd['Type'], $matches);
+					if (is_array($matches[1])) {
+						sort($matches[1]);
+
+						$fd['Type'] = "enum('" . implode("','", $matches[1]) . ")";
+					}
+				}
+
+				$fields[$fd['Field']] = [
+					'Type' => $fd['Type'], 
+					'Key' => $fd['Key'],
+				];
+			}
+			ksort($fields);
+			$scheme[$table[0]] = $fields;
+		}
+		ksort($scheme);
+
+		return hash('sha1', json_encode($scheme));
+	}	
+
+
+	/**
+	 * Check the version of the db schema
+	 *
+	 * @since     2.3.6
+	 *
+	 * @return    null
+	 */
+	public static function check_db_schema() {
+ 		if (self::create_db_schema_hash() !== self::DB_SCHEMA_HASH) {
+			$plugin = self::get_instance();
+			$plugin->add_log("The current database shema could be wrong");
+			$message_handler = $plugin->get_message_handler();
+			$message = [
+				'<p>During the update, we noticed that there might be a problem with your database.</p>',
+				'<p>If you are experiencing problem with the synchronization, please deactivate and reactivate the plugin.</p>'
+			 ];
+			 
+			$message_handler->set_message('error', 'Database schema error', implode('', $message), false);
+		 }
+	}
 	
 	/**
 	 * Check the version of the plugin
@@ -538,7 +612,6 @@ class Arlo_For_Wordpress {
 	 */
 	public static function check_plugin_version() {
  		$plugin = self::get_instance();
- 		
 		$plugin_version = get_option('arlo_plugin_version');
 		
 		if (!empty($plugin_version)) {
@@ -558,6 +631,7 @@ class Arlo_For_Wordpress {
 				
 				$now = self::get_now_utc();
 				update_option('arlo_updated', $now->format("Y-m-d H:i:s"));
+				self::check_db_schema();
 			}
 		} else {
 			arlo_add_datamodel();

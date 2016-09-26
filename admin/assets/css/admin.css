@@ -32,7 +32,7 @@
 	overflow: hidden;
 }
 
-.arlo-error {
+.arlo-error:not(.arlo-message) {
 	border: 1px solid red;
 }
 
