@@ -625,7 +625,11 @@ function arlo_set_option($key, $value = null) {
  * @return void
  */
 function arlo_add_datamodel() {
-	
+	global $wpdb;
+	$wpdb->suppress_errors(false);
+
+	$wpdb->query('START TRANSACTION');
+
 	install_table_arlo_async_tasks();
 	install_table_arlo_eventtemplate();
 	install_table_arlo_contentfields();
@@ -643,6 +647,8 @@ function arlo_add_datamodel() {
 	install_table_arlo_eventtemplates_categories();
 	install_table_arlo_timezones();
 	install_table_arlo_messages();
+
+	$wpdb->query('COMMIT');
 	
 	return;
 }
