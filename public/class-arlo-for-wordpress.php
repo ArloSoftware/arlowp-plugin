@@ -834,13 +834,16 @@ class Arlo_For_Wordpress {
 				$message_handler = $plugin->get_message_handler();
 
 				$plugin::change_setting('arlo_send_data', 1);
-				
-				$message = [
-				'<p>The Arlo for Wordpress plugin will send data to Arlo when a synchronization failed. You can turn this of anytime in the <a href="?page=arlo-for-wordpress#misc" class="arlo-settings-link" id="settings_misc">settings</a>.</p>',
-				'<p><a target="_blank" class="button button-primary" id="arlo_turn_off_send_data">' . __('Turn off', self::get_instance()->plugin_slug) . '</a></p>'
-				];
-				
-				$message_handler->set_message('information', 'Send data to Arlo', implode('', $message), false);
+
+				if ($message_handler->get_message_by_type_count('information') == 0) {
+					
+					$message = [
+					'<p>The Arlo for Wordpress plugin will send data to Arlo when a synchronization failed. You can turn this of anytime in the <a href="?page=arlo-for-wordpress#misc" class="arlo-settings-link" id="settings_misc">settings</a>.</p>',
+					'<p><a target="_blank" class="button button-primary" id="arlo_turn_off_send_data">' . __('Turn off', self::get_instance()->plugin_slug) . '</a></p>'
+					];
+					
+					$message_handler->set_message('information', 'Send data to Arlo', implode('', $message), false);
+				}
 				
 			break;			
 		}	
