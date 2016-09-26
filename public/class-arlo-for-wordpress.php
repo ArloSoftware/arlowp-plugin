@@ -684,8 +684,11 @@ class Arlo_For_Wordpress {
 					$wpdb->query("RENAME TABLE " . $wpdb->prefix . "arlo_import_log TO " . $wpdb->prefix . "arlo_log");
 				}
 				
-				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_async_tasks CHANGE task_modified task_modified TIMESTAMP NULL DEFAULT NULL COMMENT 'Dates are in UTC';");
-				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_async_tasks CHANGE task_created task_created TIMESTAMP NULL DEFAULT NULL COMMENT 'Dates are in UTC';");				
+				$exists = $wpdb->get_var("SHOW TABLES LIKE '" . $wpdb->prefix . "arlo_async_tasks'", 0, 0);
+				if (!is_null($exists)) {
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_async_tasks CHANGE task_modified task_modified TIMESTAMP NULL DEFAULT NULL COMMENT 'Dates are in UTC';");
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_async_tasks CHANGE task_created task_created TIMESTAMP NULL DEFAULT NULL COMMENT 'Dates are in UTC';");
+				}				
 				
 				$exists = $wpdb->get_var("SHOW COLUMNS FROM " . $wpdb->prefix . "arlo_eventtemplates_presenters LIKE 'et_arlo_id'", 0, 0);
 				if (!is_null($exists)) {
