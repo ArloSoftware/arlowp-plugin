@@ -88,7 +88,7 @@ add_action('parse_query', function($wp_query){
  */
 add_filter('page_template', function($template){
 	global $post;
-	
+
 	if(in_array($post->post_type, array('arlo_event', 'arlo_presenter', 'arlo_venue'))) {
 		$type = str_replace('arlo_', '', $post->post_type);
 				
@@ -101,7 +101,7 @@ add_filter('page_template', function($template){
             $classes[] = 'arlo';
             return $classes;
         });
-	
+
 	return $template;
 }, 100, 1);
 
@@ -445,6 +445,8 @@ function arlo_the_content_event($content) {
 	$item = $wpdb->get_row($sql, ARRAY_A);	
 
 	$GLOBALS['arlo_eventtemplate'] = $item;
+
+	$GLOBALS['no_event'] = $GLOBALS['no_onlineactivity'] = 1;
 
 	$output = do_shortcode($content);
 
@@ -2264,10 +2266,7 @@ $shortcodes->add('event_list_item', function($content='', $atts, $shortcode_name
 	
 			unset($GLOBALS['arlo_event_list_item']);
 		}	
-	} else {
-		$GLOBALS['no_event'] = 1;
-	}
-	
+	} 
 	
 	return $output;
 });
