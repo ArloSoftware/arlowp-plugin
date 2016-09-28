@@ -3020,7 +3020,7 @@ $shortcodes->add('upcoming_list_pagination', function($content='', $atts, $short
 		$join
 		$where
 		GROUP BY 
-			etc.et_id, e.e_id
+			etc.et_arlo_id, e.e_id
 		ORDER BY 
 			e.e_startdatetime", ARRAY_A);
 		
@@ -3184,7 +3184,7 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 	$join
 	$where
 	GROUP BY 
-		etc.et_id, e.e_id
+		etc.et_arlo_id, e.e_id
 	ORDER BY 
 		e.e_startdatetime
 	LIMIT 
