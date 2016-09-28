@@ -35,10 +35,6 @@ class Arlo_For_Wordpress_Settings {
 		
 		if(isset($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress') {
 			add_action( 'admin_notices', array($plugin, "arlo_notices") );
-
-			if ( defined('DISABLE_WP_CRON') && DISABLE_WP_CRON ) {
-				add_action( 'admin_notices', array($plugin, "wpcron_notice") );
-			}
 			
 			if (!empty($settings['platform_name'])) {
 				$show_notice = false;
@@ -302,7 +298,7 @@ class Arlo_For_Wordpress_Settings {
 		$settings = get_option('arlo_settings');
 				
 		$output = '<div id="'.ARLO_PLUGIN_PREFIX.'-' . $option_name . '" class="cf">';
-		$output .= '<input type="checkbox" value="1" name="arlo_settings['.$option_name.']" id="' . $option_name . '" ' . ($settings[$option_name] == '1' ? 'checked="checked"' : '') . '>';
+		$output .= '<input type="checkbox" value="1" name="arlo_settings['.$option_name.']" id="' . $option_name . '" ' . (isset($settings[$option_name]) && $settings[$option_name] == '1' ? 'checked="checked"' : '') . '>';
 		
 		$output .= '</div>';
 		

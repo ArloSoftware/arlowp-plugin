@@ -847,6 +847,15 @@ class Arlo_For_Wordpress {
 					
 					$message_handler->set_message('information', __('Send error data to Arlo', self::get_instance()->plugin_slug), implode('', $message), false);
 				}
+
+				if ( defined('DISABLE_WP_CRON') && DISABLE_WP_CRON ) {
+					$message = [
+						'<p>' . __('Arlo for WordPress requires that the Cron feature in WordPress is enabled, or replaced with an external trigger.', self::get_instance()->plugin_slug ) .' ' . sprintf(__('<a target="_blank" href="%s">View documentation</a> for more information.', self::get_instance()->plugin_slug), 'http://developer.arlo.co/doc/wordpress/import#import-wordpress-cron') . '</p>',
+						'<p>' . __('You may safely dismiss this warning if your system administrator has installed an external Cron solution.', self::get_instance()->plugin_slug) . '</p>'
+					];
+			
+					$message_handler->set_message('error', __('WordPress Cron is disabled', self::get_instance()->plugin_slug), implode('', $message), false);
+				}
 				
 			break;			
 		}	
@@ -3147,15 +3156,6 @@ class Arlo_For_Wordpress {
 	    </div>
 		';
 	}
-
-	public static function wpcron_notice() {
-		echo '
-		<div class="error notice">
-			<p><strong>' . __("WordPress Cron is disabled.", self::get_instance()->plugin_slug) . '</strong> ' . __('Arlo for WordPress requires that the Cron feature in WordPress is enabled, or replaced with an external trigger.', self::get_instance()->plugin_slug ) .' ' . sprintf(__('<a target="_blank" href="%s">View documentation</a> for more information.', self::get_instance()->plugin_slug), 'http://developer.arlo.co/doc/wordpress/import#import-wordpress-cron') . '</p>
-			<p>' . __('You may safely dismiss this warning if your system administrator has installed an external Cron solution.', self::get_instance()->plugin_slug) . '</p>
-	    </div>
-		';
-	}	
 	
 	public static function global_notices() {
 		$plugin = self::get_instance();
