@@ -595,11 +595,11 @@ class Arlo_For_Wordpress {
 			$plugin->add_log("The current database shema could be wrong");
 			$message_handler = $plugin->get_message_handler();
 			$message = [
-				'<p>During the update, we noticed that there might be a problem with your database.</p>',
-				'<p>If you are experiencing a problem with the synchronization, please deactivate and reactivate the plugin.</p>'
+				'<p>' . __('Arlo for WordPress has detected that there may be a problem with the structure of event information in your database, or that a recent upgrade may not have completed correctly.', self::get_instance()->plugin_slug) . '</p>',
+				'<p>' . __('Please deactivate and reactivate the Arlo for WordPress plugin to complete the upgrade.', self::get_instance()->plugin_slug) . '</p>'
 			 ];
 			 
-			$message_handler->set_message('error', 'Database schema error', implode('', $message), false);
+			$message_handler->set_message('error', __('Plugin upgrade warning', self::get_instance()->plugin_slug), implode('', $message), false);
 		 }
 	}
 	
@@ -841,11 +841,11 @@ class Arlo_For_Wordpress {
 				if ($message_handler->get_message_by_type_count('information') == 0) {
 					
 					$message = [
-					'<p>The Arlo for Wordpress plugin will send data to Arlo when a synchronization failed. You can turn this off anytime in the <a href="?page=arlo-for-wordpress#misc" class="arlo-settings-link" id="settings_misc">settings</a>.</p>',
+					'<p>' . __('Arlo for WordPress will automatically send technical data to Arlo if problems are encountered when synchronising your event information. The data is sent securely and will help our team when providing support for this plugin. You can turn this off anytime in the', self::get_instance()->plugin_slug) . ' <a href="?page=arlo-for-wordpress#misc" class="arlo-settings-link" id="settings_misc">' . __('setting', self::get_instance()->plugin_slug) . '</a>.</p>',
 					'<p><a target="_blank" class="button button-primary" id="arlo_turn_off_send_data">' . __('Turn off', self::get_instance()->plugin_slug) . '</a></p>'
 					];
 					
-					$message_handler->set_message('information', 'Send data to Arlo', implode('', $message), false);
+					$message_handler->set_message('information', __('Send error data to Arlo', self::get_instance()->plugin_slug), implode('', $message), false);
 				}
 				
 			break;			
@@ -1305,11 +1305,11 @@ class Arlo_For_Wordpress {
 					if ($message_handler->get_message_by_type_count($type) == 0) {	
 						
 						$message = [
-						'<p>The plugin couldn\'t synchronize with the Arlo platform. ' . (!$no_import ? ' The last successful synchronization was ' . $last_import . ' UTC.' : '') . '</p>',
-						'<p>Please check the <a href="?page=arlo-for-wordpress-logs" target="blank">logs</a> for more information.</p>'
+						'<p>'. __('Arlo for WordPress encountered problems when synchronising your event information. Information about your events may be out of date.', self::get_instance()->plugin_slug) . ' ' . (!$no_import ? sprintf(__('The last successful synchronisation was %s UTC', self::get_instance()->plugin_slug), $last_import)  : '') . '</p>',
+						'<p><a href="' . get_admin_url() . 'admin.php?page=arlo-for-wordpress-logs" target="blank">'. __('View diagnostic logs', self::get_instance()->plugin_slug) . '</a> '. __('for more information.', self::get_instance()->plugin_slug) . '</p>'
 						];
 						
-						if ($message_handler->set_message($type, 'Import error', implode('', $message), true) === false) {
+						if ($message_handler->set_message($type, __('Event synchronisation error', self::get_instance()->plugin_slug), implode('', $message), true) === false) {
 							$this->add_log("Couldn't create Arlo 6 hours import error message");
 						}
 						
@@ -3151,8 +3151,8 @@ class Arlo_For_Wordpress {
 	public static function wpcron_notice() {
 		echo '
 		<div class="error notice">
-			<p><strong>' . __("Your WordPress Cron is disabled.", self::get_instance()->plugin_slug) . '</strong> ' . __('Arlo for WordPress requires that the cron in WordPress is enabled.', self::get_instance()->plugin_slug ) .'</p>
-			<p>' . sprintf(__('<a target="_blank" href="%s">View documentation</a> for more information.', self::get_instance()->plugin_slug), 'http://developer.arlo.co/doc/wordpress/import#import-wordpress-cron') . '</p>
+			<p><strong>' . __("WordPress Cron is disabled.", self::get_instance()->plugin_slug) . '</strong> ' . __('Arlo for WordPress requires that the Cron feature in WordPress is enabled, or replaced with an external trigger.', self::get_instance()->plugin_slug ) .' ' . sprintf(__('<a target="_blank" href="%s">View documentation</a> for more information.', self::get_instance()->plugin_slug), 'http://developer.arlo.co/doc/wordpress/import#import-wordpress-cron') . '</p>
+			<p>' . __('You may safely dismiss this warning if your system administrator has installed an external Cron solution.', self::get_instance()->plugin_slug) . '</p>
 	    </div>
 		';
 	}	
