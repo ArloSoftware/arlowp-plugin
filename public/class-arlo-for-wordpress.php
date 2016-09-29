@@ -1344,7 +1344,7 @@ class Arlo_For_Wordpress {
 		
 		$log_message = "Kick off wp_cron.php for new subtask.";
 		if($errno = curl_errno($ch)) {
-			$error_message = curl_strerror($errno);
+			$error_message = curl_error($ch);
 			$this->add_log($log_message . " ERROR: " . $url . ' ' . $error_message);
 		} else {
 			$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE); 
