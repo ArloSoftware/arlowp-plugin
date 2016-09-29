@@ -42,7 +42,7 @@ class Arlo_For_Wordpress {
 	 * @var     string
 	 */
 
-	const DB_SCHEMA_HASH = 'b002abcae1c4031050360a1419b740c40131e77d';	
+	const DB_SCHEMA_HASH = '29dbebf0c27c672f52f355c59d1c1bef4ed1f486';	
 
 	/**
 	 * Minimum required PHP version
