@@ -1556,7 +1556,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 	$t7 = "{$wpdb->prefix}arlo_tags";
 		
 	$where = "WHERE post.post_type = 'arlo_event' AND et.active = {$active}";
-	$join = "";
+	$join = $output = "";
 	
 	$arlo_location = isset($_GET['arlo-location']) && !empty($_GET['arlo-location']) ? $_GET['arlo-location'] : get_query_var('arlo-location', '');
 	$arlo_category = isset($_GET['arlo-category']) && !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : get_query_var('arlo-category', '');
@@ -2207,6 +2207,8 @@ $shortcodes->add('event_list_item', function($content='', $atts, $shortcode_name
 	$regions = get_option('arlo_regions');
 	
 	$active = $arlo_plugin->get_import_id();
+
+	$where = '';
 	
 	$arlo_region = get_query_var('arlo-region', '');
 	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
@@ -2713,7 +2715,7 @@ $shortcodes->add('event_session_list_item', function($content='', $atts, $shortc
 	$arlo_region = get_query_var('arlo-region', '');
 	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');		
 	
-	$output = '';
+	$output = $where = '';
 	
 	extract(shortcode_atts(array(
 		'label'	=> __('Session information', $GLOBALS['arlo_plugin_slug']),
