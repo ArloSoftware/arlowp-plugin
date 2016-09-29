@@ -1716,11 +1716,11 @@ class Arlo_For_Wordpress {
 			if (!empty($subtask)) {
 			
 				$scheduler->update_task($task_id, 2, "Import is running: task " . ($current_subtask + 1) . "/" . count($import_tasks) . ": " . $import_tasks_desc[$subtask]);
-				self::add_log('Import subtask started: ' . $import_tasks_desc[$subtask], $import_id);
+				self::add_log('Import subtask started: ' . ($current_subtask + 1) . "/" . count($import_tasks) . ": " . $import_tasks_desc[$subtask], $import_id);
 
 				call_user_func(array('Arlo_For_Wordpress', $subtask), $import_id);
 
-				self::add_log('Import subtask ended: ' . $import_tasks_desc[$subtask], $import_id);
+				self::add_log('Import subtask ended: ' . ($current_subtask + 1) . "/" . count($import_tasks) . ": " . $import_tasks_desc[$subtask], $import_id);
 				
 				$scheduler-> update_task_data($task_id, ['finished_subtask' => $current_subtask]);
 				$scheduler->update_task($task_id, 1);
