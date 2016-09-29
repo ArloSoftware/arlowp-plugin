@@ -1156,7 +1156,7 @@ function install_table_arlo_timezones() {
 		id tinyint(3) unsigned NOT NULL,
 		name varchar(256) NOT NULL,
 		active int(10) unsigned DEFAULT NULL,
-		PRIMARY KEY  (id)) 
+		PRIMARY KEY  (id,active)) 
 		CHARACTER SET utf8 COLLATE=utf8_general_ci;	
   	";
   	

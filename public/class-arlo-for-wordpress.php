@@ -715,8 +715,9 @@ class Arlo_For_Wordpress {
 				$exists = $wpdb->get_var("SHOW KEYS FROM " . $wpdb->prefix . "arlo_categories WHERE key_name = 'c_arlo_id'", 0, 0);
 				if (!is_null($exists)) {
 					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_categories DROP KEY c_arlo_id ");	
-				}				
+				}
 
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_timezones DROP PRIMARY KEY, ADD PRIMARY KEY (id,active)");
 				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events_presenters DROP PRIMARY KEY, ADD PRIMARY KEY (e_id,p_arlo_id,active)");
 				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events_tags DROP PRIMARY KEY, ADD PRIMARY KEY (e_id,tag_id,active)");
 				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates_tags DROP PRIMARY KEY, ADD PRIMARY KEY (et_id,tag_id,active)");
@@ -2329,7 +2330,7 @@ class Arlo_For_Wordpress {
 			$this->add_log('Data process start: '.__FUNCTION__, $timestamp);
 			
 			foreach($items as $item) {
-				$query = $wpdb->replace(
+				$query = $wpdb->insert(
 					$table_name,
 					array(
 						'id' => $item->TimeZoneID,
@@ -2346,7 +2347,7 @@ class Arlo_For_Wordpress {
 				} else {
 					if (is_array($item->TzNames)) {
 						foreach ($item->TzNames as $TzName) {
-							$query = $wpdb->replace(
+							$query = $wpdb->insert(
 								$table_name . '_olson',
 								array(
 									'timezone_id' => $item->TimeZoneID,
