@@ -1816,7 +1816,7 @@ $shortcodes->add('event_template_register_interest', function($content='', $atts
 		$no_event_text = !empty($settings['noeventontemplate_text']) ? $settings['noeventontemplate_text'] : __('Interested in attending? Have a suggestion about running this course near you?', $GLOBALS['arlo_plugin_slug']);
 		
 		if (!empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) {
-			$no_event_text .= '<br /><a href="' . $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'] . '">Register your interest now</a>';
+			$no_event_text .= '<br /><a href="' . $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'] . '">' . __('Register your interest now', $GLOBALS['arlo_plugin_slug']) . '</a>';
 		}
 		
 		$output = '
