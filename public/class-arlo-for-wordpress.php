@@ -1128,7 +1128,10 @@ class Arlo_For_Wordpress {
     private static function get_now_utc() {
 		do {
 			//this returns, check php doc 
-			$now = DateTime::createFromFormat('U.u', microtime(true));
+			$now = DateTime::createFromFormat('U', time());
+			if (!is_object($now)) {
+				self::add_log("Errpr DateTime::createFromFormat: " . implode(", ", DateTime::getLastErrors()));
+			}
 		} while (!is_object($now));
 		
 		return $now;    
