@@ -1192,7 +1192,7 @@ class Arlo_For_Wordpress {
 		return false;
 	}
 	
-	public function add_log($message = '', $import_id = null, $timestamp = null, $successful = false, $utimestamp = null) {
+	public static function add_log($message = '', $import_id = null, $timestamp = null, $successful = false, $utimestamp = null) {
 		global $wpdb;
 		
 		$table_name = "{$wpdb->prefix}arlo_log";
@@ -1320,7 +1320,7 @@ class Arlo_For_Wordpress {
 						];
 						
 						if ($message_handler->set_message($type, __('Event synchronisation error', self::get_instance()->plugin_slug), implode('', $message), true) === false) {
-							$this->add_log("Couldn't create Arlo 6 hours import error message");
+							self::add_log("Couldn't create Arlo 6 hours import error message");
 						}
 						
 						if ($settings['arlo_send_data'] == "1") {
@@ -1345,10 +1345,10 @@ class Arlo_For_Wordpress {
 		$log_message = "Kick off wp_cron.php for new subtask.";
 		if($errno = curl_errno($ch)) {
 			$error_message = curl_error($ch);
-			$this->add_log($log_message . " ERROR: " . $url . ' ' . $error_message);
+			self::add_log($log_message . " ERROR: " . $url . ' ' . $error_message);
 		} else {
 			$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE); 
-			$this->add_log($log_message . " HTTP_CODE: " . $httpcode);
+			self::add_log($log_message . " HTTP_CODE: " . $httpcode);
 		}
 		 
 		curl_close($ch);
@@ -1403,7 +1403,7 @@ class Arlo_For_Wordpress {
         
 		$fp = fopen('php://temp/maxmemory:2097125', 'w');
 		if($fp === FALSE) {
-			$this->add_log('Couldn\'t create log CSV', $import_id);
+			self::add_log('Couldn\'t create log CSV', $import_id);
 		    return false;
 		}
         
@@ -1634,7 +1634,7 @@ class Arlo_For_Wordpress {
 				$last = $this->get_last_import();
 		        $import_id = $this->get_random_int();
 		                        
-		        $this->add_log('Synchronization Started', $import_id);
+		        self::add_log('Synchronization Started', $import_id);
 		        
 		        $scheduler->update_task_data($task_id, ['import_id' => $import_id]);
 								
@@ -1642,19 +1642,19 @@ class Arlo_For_Wordpress {
 				// If not forced
 				if(!$force) {
 					// LOG THIS AS AN AUTOMATIC IMPORT
-					$this->add_log('Synchronization identified as automatic synchronization.', $import_id);
+					self::add_log('Synchronization identified as automatic synchronization.', $import_id);
 					if(!empty($last)) {
 						// LOG THAT A PREVIOUS SUCCESSFUL IMPORT HAS BEEN FOUND
-						$this->add_log('Previous succesful synchronization found.', $import_id);
+						self::add_log('Previous succesful synchronization found.', $import_id);
 						if(strtotime('-1 hour') > strtotime($last)) {
 							// LOG THE FACT THAT PREVIOUS SUCCESSFUL IMPORT IS MORE THAN AN HOUR AGO
-							$this->add_log('Synchronization more than an hour old. Synchronization required.', $import_id);
+							self::add_log('Synchronization more than an hour old. Synchronization required.', $import_id);
 						}
 						else {
 							// LOG THE FACT THAT PREVIOUS SUCCESSFUL IMPORT IS MORE THAN AN HOUR AGO
-							$this->add_log('Synchronization less than an hour old. Synchronization stopped.', $import_id);
+							self::add_log('Synchronization less than an hour old. Synchronization stopped.', $import_id);
 							// LOG DATA USED TO DECIDE IMPORT NOT REQUIRED.
-							$this->add_log($last . '-'  . strtotime($last) . '-' . strtotime('-1 hour') . '-'  . !$force, $import_id);
+							self::add_log($last . '-'  . strtotime($last) . '-' . strtotime('-1 hour') . '-'  . !$force, $import_id);
 							return false;
 						}
 					}
@@ -1679,7 +1679,7 @@ class Arlo_For_Wordpress {
                 
         //if an import is already running, exit
         if (!$this->acquire_import_lock($import_id)) {
-            $this->add_log('Synchronization LOCK found, please wait 5 minutes and try again', $import_id);
+            self::add_log('Synchronization LOCK found, please wait 5 minutes and try again', $import_id);
             return false;
         }
                 
@@ -1713,11 +1713,11 @@ class Arlo_For_Wordpress {
 			if (!empty($subtask)) {
 			
 				$scheduler->update_task($task_id, 2, "Import is running: task " . ($current_subtask + 1) . "/" . count($import_tasks) . ": " . $import_tasks_desc[$subtask]);
-				$this->add_log('Import subtask started: ' . $import_tasks_desc[$subtask], $import_id);
+				self::add_log('Import subtask started: ' . $import_tasks_desc[$subtask], $import_id);
 
 				call_user_func(array('Arlo_For_Wordpress', $subtask), $import_id);
 
-				$this->add_log('Import subtask ended: ' . $import_tasks_desc[$subtask], $import_id);
+				self::add_log('Import subtask ended: ' . $import_tasks_desc[$subtask], $import_id);
 				
 				$scheduler-> update_task_data($task_id, ['finished_subtask' => $current_subtask]);
 				$scheduler->update_task($task_id, 1);
@@ -1756,7 +1756,7 @@ class Arlo_For_Wordpress {
 				$scheduler->update_task($task_id, 4, "Import finished");
 			}
 		} catch(\Exception $e) {
-			$this->add_log('Synchronization failed: ' . $e->getMessage(), $import_id);
+			self::add_log('Synchronization failed: ' . $e->getMessage(), $import_id);
 			
 			$this->clear_import_lock();
 			
@@ -1783,7 +1783,7 @@ class Arlo_For_Wordpress {
 			
 		$client = $this->get_api_client();
 
-		$this->add_log('API Call started: EventTemplateSearch', $timestamp);
+		self::add_log('API Call started: EventTemplateSearch', $timestamp);
 		
 		$regionalized_items = $client->EventTemplateSearch()->getAllEventTemplates(
 			array(
@@ -1802,13 +1802,13 @@ class Arlo_For_Wordpress {
 			array_keys($regions)
 		);
 
-		$this->add_log('API Call finished: EventTemplateSearch', $timestamp);		
+		self::add_log('API Call finished: EventTemplateSearch', $timestamp);		
 		
 		$table_name = "{$wpdb->prefix}arlo_eventtemplates";
 				
 		if(!empty($regionalized_items)) {
 
-			$this->add_log('Data process start: '.__FUNCTION__, $timestamp);	
+			self::add_log('Data process start: '.__FUNCTION__, $timestamp);	
 				
 			foreach($regionalized_items as $region => $items) {
 			
@@ -1834,7 +1834,7 @@ class Arlo_For_Wordpress {
 					);
 	                                
 	                if ($query === false) {
-	                	$this->add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
+	                	self::add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
 	                    throw new Exception('Database insert failed: ' . $table_name);
 	                }
 	                
@@ -1889,7 +1889,7 @@ class Arlo_For_Wordpress {
 								$timestamp
 							) );
 	                        if ($query === false) {
-	                        	$this->add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
+	                        	self::add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
 	                            throw new Exception('Database insert failed: ' . $table_name);
 	                        }
 						}
@@ -1910,7 +1910,7 @@ class Arlo_For_Wordpress {
 							) );
 	                                                        
 	                        if ($query === false) {
-	                        	$this->add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
+	                        	self::add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
 	                            throw new Exception('Database insert failed: ' . $table_name);
 	                        }
 						}
@@ -1930,7 +1930,7 @@ class Arlo_For_Wordpress {
 							) );
 	                                                        
 	                        if ($query === false) {
-	                        	$this->add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
+	                        	self::add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
 	                            throw new Exception('Database insert failed: ' . $table_name);
 	                        }
 						}
@@ -1938,7 +1938,7 @@ class Arlo_For_Wordpress {
 				}
 			}
 			
-			$this->add_log('Data process finished: '.__FUNCTION__, $timestamp);
+			self::add_log('Data process finished: '.__FUNCTION__, $timestamp);
 		}
 		
 		return $items;
@@ -1996,7 +1996,7 @@ class Arlo_For_Wordpress {
 					) );
 												
 					if ($query === false) {
-						$this->add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
+						self::add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
 						throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_tags ' . $type );
 					} else {
 						$exisiting_tags[$tag] = $wpdb->insert_id;
@@ -2015,7 +2015,7 @@ class Arlo_For_Wordpress {
 					) );
 					
 					if ($query === false) {
-						$this->add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
+						self::add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
 						throw new Exception('Database insert failed: ' . $table_name );
 					}
 				} else {
@@ -2063,7 +2063,7 @@ class Arlo_For_Wordpress {
 				) );
 				
 				if ($query === false) {
-					$this->add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
+					self::add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
 					throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_offers');
 				}
 			}
@@ -2115,7 +2115,7 @@ class Arlo_For_Wordpress {
 		);
                         
 		if ($query === false) {					
-			$this->add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
+			self::add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
 			throw new Exception('Database insert failed: ' . $table_name);
 		}	
 		
@@ -2140,7 +2140,7 @@ class Arlo_For_Wordpress {
 				) );
 				
 				if ($query === false) {
-					$this->add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
+					self::add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
 					throw new Exception('Database insert failed: ' . $wpdb->prefix . 'arlo_events_presenters');
 				}
 			}
@@ -2167,7 +2167,7 @@ class Arlo_For_Wordpress {
 	
 		$client = $this->get_api_client();
 
-		$this->add_log('API Call started: EventSearch', $timestamp);
+		self::add_log('API Call started: EventSearch', $timestamp);
 		
 		$regionalized_items = $client->EventSearch()->getAllEvents(
 			array(
@@ -2199,11 +2199,11 @@ class Arlo_For_Wordpress {
 			array_keys($regions)
 		);
 
-		$this->add_log('API Call finished: EventSearch', $timestamp);	
+		self::add_log('API Call finished: EventSearch', $timestamp);	
 						
 		if(!empty($regionalized_items)) {
 
-			$this->add_log('Data process start: '.__FUNCTION__, $timestamp);
+			self::add_log('Data process start: '.__FUNCTION__, $timestamp);
 			
 			foreach($regionalized_items as $region => $items) {
 			
@@ -2217,7 +2217,7 @@ class Arlo_For_Wordpress {
 				}				
 			}
 			
-			$this->add_log('Data process finished: '.__FUNCTION__, $timestamp);
+			self::add_log('Data process finished: '.__FUNCTION__, $timestamp);
 		}
 		
 		return $items;
@@ -2234,7 +2234,7 @@ class Arlo_For_Wordpress {
 	
 		$client = $this->get_api_client();
 
-		$this->add_log('API Call started: OnlineActivitySearch', $timestamp);
+		self::add_log('API Call started: OnlineActivitySearch', $timestamp);
 		
 		$regionalized_items = $client->OnlineActivitySearch()->getAllOnlineActivities(
 			array(
@@ -2253,11 +2253,11 @@ class Arlo_For_Wordpress {
 			array_keys($regions)
 		);
 
-		$this->add_log('API Call finished: OnlineActivitySearch', $timestamp);	
+		self::add_log('API Call finished: OnlineActivitySearch', $timestamp);	
 										
 		if(!empty($regionalized_items)) {
 
-			$this->add_log('Data process start: '.__FUNCTION__, $timestamp);
+			self::add_log('Data process start: '.__FUNCTION__, $timestamp);
 			
 			foreach($regionalized_items as $region => $items) {
 			
@@ -2288,7 +2288,7 @@ class Arlo_For_Wordpress {
 						);
 				                        
 						if ($query === false) {					
-							$this->add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
+							self::add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
 							throw new Exception('Database insert failed: ' . $table_name);
 						}	
 						
@@ -2305,7 +2305,7 @@ class Arlo_For_Wordpress {
 				}				
 			}
 			
-			$this->add_log('Data process finished: '.__FUNCTION__, $timestamp);
+			self::add_log('Data process finished: '.__FUNCTION__, $timestamp);
 		}
 		
 		return $items;
@@ -2317,17 +2317,17 @@ class Arlo_For_Wordpress {
 	
 		$client = $this->get_api_client();
 		
-		$this->add_log('API Call started: Timezones', $timestamp);
+		self::add_log('API Call started: Timezones', $timestamp);
 
 		$items = $client->Timezones()->getAllTimezones();
 
-		$this->add_log('API Call finished: Timezones', $timestamp);	
+		self::add_log('API Call finished: Timezones', $timestamp);	
 				
 		$table_name = "{$wpdb->prefix}arlo_timezones";
 		
 		if(!empty($items)) {
 		
-			$this->add_log('Data process start: '.__FUNCTION__, $timestamp);
+			self::add_log('Data process start: '.__FUNCTION__, $timestamp);
 			
 			foreach($items as $item) {
 				$query = $wpdb->insert(
@@ -2342,7 +2342,7 @@ class Arlo_For_Wordpress {
 					)
 				);				
 				if ($query === false) {
-					$this->add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
+					self::add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
 					throw new Exception('Database insert failed: ' . $table_name);
 				} else {
 					if (is_array($item->TzNames)) {
@@ -2364,7 +2364,7 @@ class Arlo_For_Wordpress {
 				}			
 			}
 			
-			$this->add_log('Data process finished: '.__FUNCTION__, $timestamp);
+			self::add_log('Data process finished: '.__FUNCTION__, $timestamp);
 		}
 		
 		return $items;
@@ -2375,7 +2375,7 @@ class Arlo_For_Wordpress {
 	
 		$client = $this->get_api_client();
 
-		$this->add_log('API Call started: Presenters', $timestamp);
+		self::add_log('API Call started: Presenters', $timestamp);
 		
 		$items = $client->Presenters()->getAllPresenters(
 			array(
@@ -2388,13 +2388,13 @@ class Arlo_For_Wordpress {
 			)
 		);
 
-		$this->add_log('API Call finished: Presenters', $timestamp);
+		self::add_log('API Call finished: Presenters', $timestamp);
 		
 		$table_name = "{$wpdb->prefix}arlo_presenters";
 				
 		if(!empty($items)) {
 
-			$this->add_log('Data process start: '.__FUNCTION__, $timestamp);
+			self::add_log('Data process start: '.__FUNCTION__, $timestamp);
 		
 			foreach($items as $item) {
 				$slug = sanitize_title($item->PresenterID . ' ' . $item->FirstName . ' ' . $item->LastName);
@@ -2418,7 +2418,7 @@ class Arlo_For_Wordpress {
 				) );
                                 
                 if ($query === false) {
-                	$this->add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
+                	self::add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
                     throw new Exception('Database insert failed: ' . $table_name);
                 }
 				
@@ -2437,7 +2437,7 @@ class Arlo_For_Wordpress {
 				}
 			}
 			
-			$this->add_log('Data process finished: '.__FUNCTION__, $timestamp);
+			self::add_log('Data process finished: '.__FUNCTION__, $timestamp);
 		}
 		
 		return $items;
@@ -2448,7 +2448,7 @@ class Arlo_For_Wordpress {
 	
 		$client = $this->get_api_client();
 		
-		$this->add_log('API Call started: Venues', $timestamp);
+		self::add_log('API Call started: Venues', $timestamp);
 
 		$items = $client->Venues()->getAllVenues(
 			array(
@@ -2461,13 +2461,13 @@ class Arlo_For_Wordpress {
 			)
 		);
 
-		$this->add_log('API Call finished: Venues', $timestamp);	
+		self::add_log('API Call finished: Venues', $timestamp);	
 		
 		$table_name = "{$wpdb->prefix}arlo_venues";
 		
 		if(!empty($items)) {
 
-			$this->add_log('Data process start: '.__FUNCTION__, $timestamp);
+			self::add_log('Data process start: '.__FUNCTION__, $timestamp);
 		
 			foreach($items as $item) {
 				$slug = sanitize_title($item->VenueID . ' ' . $item->Name);
@@ -2497,7 +2497,7 @@ class Arlo_For_Wordpress {
 				) );
                                 
                 if ($query === false) {
-                	$this->add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
+                	self::add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
                     throw new Exception('Database insert failed: ' . $table_name);
                 }
                                 
@@ -2515,7 +2515,7 @@ class Arlo_For_Wordpress {
 				}
 			}
 			
-			$this->add_log('Data process finished: '.__FUNCTION__, $timestamp);
+			self::add_log('Data process finished: '.__FUNCTION__, $timestamp);
 		}
 		
 		return $items;
@@ -2528,7 +2528,7 @@ class Arlo_For_Wordpress {
 
 		$table_name = "{$wpdb->prefix}arlo_categories";
 
-		$this->add_log('API Call started: Categories', $timestamp);
+		self::add_log('API Call started: Categories', $timestamp);
 		
 		$items = $client->Categories()->getAllCategories(
 			array(
@@ -2541,9 +2541,9 @@ class Arlo_For_Wordpress {
 			)
 		);
 
-		$this->add_log('API Call finished: Categories', $timestamp);
+		self::add_log('API Call finished: Categories', $timestamp);
 
-		$this->add_log('Data process start: '.__FUNCTION__, $timestamp);
+		self::add_log('Data process start: '.__FUNCTION__, $timestamp);
 		
 		if(!empty($items)) {
 			foreach($items as $item) {
@@ -2564,7 +2564,7 @@ class Arlo_For_Wordpress {
 				) );
                                 
                 if ($query === false) {
-                	$this->add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
+                	self::add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
                     throw new Exception('Database insert failed: ' . $table_name);
                 }               
 			}
@@ -2601,7 +2601,7 @@ class Arlo_For_Wordpress {
 				$query = $wpdb->query( $wpdb->prepare($sql, $counts['num'], $counts['c_arlo_id']) );
 				
 		        if ($query === false) {
-		        	$this->add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
+		        	self::add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
 		        	throw new Exception('Database insert failed: ' . $table_name);
 		        }
 			}		
@@ -2649,7 +2649,7 @@ class Arlo_For_Wordpress {
 			}
 		}
 		
-		$this->add_log('Data process finished: '.__FUNCTION__, $timestamp);
+		self::add_log('Data process finished: '.__FUNCTION__, $timestamp);
 		
 		return $items;
 	}
@@ -2695,7 +2695,7 @@ class Arlo_For_Wordpress {
 			
 			$query = $wpdb->query( $wpdb->prepare($sql, $order + $cat->c_order, $cat->c_arlo_id, $timestamp) );
 			if ($query === false) {
-				$this->add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
+				self::add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
 				throw new Exception('Database update failed in set_category_depth_order()');
 			} else if (is_array($cat->children)) {
 				$this->set_category_depth_order($cat->children, $max_depth, $order, $timestamp);
@@ -2721,7 +2721,7 @@ class Arlo_For_Wordpress {
 			return $item['c_arlo_id'];
 		}, $category_ids);
 		
-		$this->add_log('API Call started: EventTemplateCategoryItems: ' . implode(', ', $category_ids), $timestamp);
+		self::add_log('API Call started: EventTemplateCategoryItems: ' . implode(', ', $category_ids), $timestamp);
 
 		$items = $client->EventTemplateCategoryItems()->getAllTemplateCategoriesItems(
 			array(
@@ -2732,7 +2732,7 @@ class Arlo_For_Wordpress {
 			$category_ids
 		);
 
-		$this->add_log('API Call finished: EventTemplateCategoryItems', $timestamp);
+		self::add_log('API Call finished: EventTemplateCategoryItems', $timestamp);
 		
 		$table_name = "{$wpdb->prefix}arlo_eventtemplates_categories";
 		
@@ -2753,7 +2753,7 @@ class Arlo_For_Wordpress {
 				$query = $wpdb->query( $wpdb->prepare($sql, !empty($item->SequenceIndex) ? $item->SequenceIndex : 0, $item->EventTemplateID, $item->CategoryID) );
 				
 		        if ($query === false) {
-		        	$this->add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
+		        	self::add_log('SQL error: ' . $wpdb->last_error . ' ' .$wpdb->last_query, $timestamp);
 		        	throw new Exception('Database insert failed: ' . $table_name);
 		        }
 			}
@@ -2788,7 +2788,7 @@ class Arlo_For_Wordpress {
 			$wpdb->query($wpdb->prepare("DELETE FROM $table WHERE active <> %s", $import_id));
 		}   
 
-		$this->add_log('Database cleanup', $import_id);
+		self::add_log('Database cleanup', $import_id);
         
         // delete unneeded custom posts
         $this->delete_custom_posts('eventtemplates','et_post_name','event');
@@ -2797,7 +2797,7 @@ class Arlo_For_Wordpress {
 
         $this->delete_custom_posts('venues','v_post_name','venue');           
         
-		$this->add_log('Posts cleanup ', $import_id);        
+		self::add_log('Posts cleanup ', $import_id);        
 	}
 
 	private function delete_custom_posts($table, $column, $post_type) {
@@ -2836,7 +2836,7 @@ class Arlo_For_Wordpress {
 			$this->import_cleanup($import_id);        
         
             // update logs
-            $this->add_log('Synchronization successful', $import_id, null, true);            
+            self::add_log('Synchronization successful', $import_id, null, true);            
 			
 	        //set import id
 	        $this->set_import_id($import_id);
@@ -2846,7 +2846,7 @@ class Arlo_For_Wordpress {
 	        $message_handler = $this->get_message_handler();
 	        $message_handler->dismiss_by_type('import_error');	        
         } else {
-            $this->add_log('Synchronization died because of a database LOCK, please wait 5 minutes and try again.', $import_id);
+            self::add_log('Synchronization died because of a database LOCK, please wait 5 minutes and try again.', $import_id);
         }
 	}	
 	
