@@ -102,6 +102,7 @@ class Shortcodes extends Singleton {
 		extract(shortcode_atts(array(
 			'wrap' => '%s',
 			'label' => '',
+			'strip_html'	=> 'false',
 		), $atts, $shortcode_name));
 		
 		// need to decide ordering - currently makes sense to process the specific filter first
@@ -113,14 +114,15 @@ class Shortcodes extends Singleton {
 		
 		// if not empty, process labels and wrapping
 		if(trim($content) != '') {
-			// labels will be passed through an attribute, however do we want to be able to filter them? Not for now.
-			//$content = apply_filters('arlo_shortcode_label', $atts, $content, $shortcode_name);
-			//$content = apply_filters('arlo_shortcode_label_'.$shortcode_name, $atts, $content, $shortcode_name);
+			//strip html, if neccessary 
+			if ($strip_html == 'true') {
+				$content = strip_tags($content);
+			}
 			
 			// prepend label
-                        if (!empty($label)) {
-                            $content = '<label>' . $label . '</label> ' . $content;
-                        }
+            if (!empty($label)) {
+                $content = '<label>' . $label . '</label> ' . $content;
+            }
 			
 			
 			// wrap content			
