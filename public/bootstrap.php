@@ -4334,6 +4334,7 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 $shortcodes->add('category_title', function($content='', $atts, $shortcode_name) {
 	$arlo_category = isset($_GET['arlo-category']) && !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : get_query_var('arlo-category', '');
 	
+	
 	if (!empty($arlo_category)) {
 		$category = \Arlo\Categories::get(array('id' => current(explode('-', $arlo_category))), 1);
 	} else {

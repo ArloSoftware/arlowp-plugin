@@ -10,6 +10,15 @@ use Arlo\Singleton;
 class Categories extends Singleton {
 	static function get($conditions=array(), $limit=null) {
 		global $wpdb;
+
+		$args = func_get_args();
+				
+		$cache_key = md5(serialize($args));
+		$cache_category = 'ArloCategories';
+		
+		if($cached = wp_cache_get($cache_key, $cache_category)) {
+			return $cached;
+		}		
 	
 		$query = "SELECT c.* FROM {$wpdb->prefix}arlo_categories AS c";
 		
@@ -55,6 +64,8 @@ class Categories extends Singleton {
 		}
 		
 		$result = ($limit != 1) ? $wpdb->get_results($query) : $wpdb->get_row($query);
+		
+		wp_cache_add( $cache_key, $result, $cache_category, 30 );
 		
 		return $result;
 	}
