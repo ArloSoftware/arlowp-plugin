@@ -146,6 +146,8 @@ Automated sync doesn't run every hour https://github.com/ArloSoftware/arlowp-plu
 
 Fixed category count number for [arlo_categories] shortcode
 
+New [arlo_category_title] shortcode
+
 = 2.3.5.1 = 
 
 Fix start and end date times when the dates are returning a UTC value

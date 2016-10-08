@@ -4330,6 +4330,21 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 	return $return;
 });
 
+// category title
+$shortcodes->add('category_title', function($content='', $atts, $shortcode_name) {
+	$arlo_category = isset($_GET['arlo-category']) && !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : get_query_var('arlo-category', '');
+	
+	if (!empty($arlo_category)) {
+		$category = \Arlo\Categories::get(array('id' => current(explode('-', $arlo_category))), 1);
+	} else {
+		$category = \Arlo\Categories::get(array('parent_id' => 0), 1);
+	}
+	
+	if(!$category) return;
+	
+	return htmlentities($category->c_name, ENT_QUOTES, "UTF-8");
+});
+
 // category header
 $shortcodes->add('category_header', function($content='', $atts, $shortcode_name) {
 	$arlo_category = isset($_GET['arlo-category']) && !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : get_query_var('arlo-category', '');
