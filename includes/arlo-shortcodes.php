@@ -10,59 +10,10 @@ class Shortcodes extends Singleton {
 	private $shortcodes = array();
 	
     public function __construct() {
-		//add_filter('su/data/shortcodes', array($this, 'init_shortcodes_ultimate'));
-		//add_filter('plugins_loaded', array($this, 'init_shortcodes'));
+
     }
     
-    /*public function init_shortcodes() {
-	    foreach($this->shortcodes as $shortcode) {
-		    $name = $shortcode['name'];
-		    $function = $shortcode['function'];
-		    
-		    $shortcode_name = 'arlo_' . $name;
-    	
-		    // add the shortcode
-		    add_shortcode($shortcode_name, array($this, 'the_shortcode'));
-		    
-		    // assign the passed function to a filter
-		    // all shortcodes are run through filters to allow external manipulation if required, however we also need a means of running the passed function
-		    add_filter('arlo_shortcode_content_' . $shortcode_name, $function, 10, 3);
-	    }
-    }*/
-    
-    /*public function init_shortcodes_ultimate($shortcodes) {
-	    foreach($this->shortcodes as $shortcode) {
-		    $name = $shortcode['name'];
-		    
-		    $shortcode_name = 'arlo_' . $name;
-		    
-		    // Add new shortcode
-			$shortcodes[$name] = array(
-				// Shortcode name
-				'name' => isset($options['title']) ? $options['title'] : $name,
-				// Shortcode type. Can be 'wrap' or 'single'
-				// Example: [b]this is wrapped[/b], [this_is_single]
-				'type' => isset($options['type']) ? $options['type'] : 'single',
-				// Shortcode group.
-				// Can be 'content', 'box', 'media' or 'other'.
-				// Groups can be mixed, for example 'content box'
-				'group' => isset($options['group']) ? $options['group'] : 'arlo',
-				// List of shortcode params (attributes)
-				'atts' => isset($options['atts']) ? $options['atts'] : array(),
-				// Default content for generator (for wrap-type shortcodes)
-				'content' => isset($options['content']) ? $options['content'] : '',
-				// Shortcode description for cheatsheet and generator
-				'desc' => isset($options['desc']) ? $options['desc'] : '',
-				// Custom icon (font-awesome)
-				'icon' => isset($options['icon']) ? $options['icon'] : 'plus',
-				'prefix' => 'arlo_'
-			);
-		}
-		
-		// Return modified data
-		return $shortcodes;
-    }*/
-    
+        
     public function add() {
 	    $args = func_get_args();
 	    
@@ -75,11 +26,6 @@ class Shortcodes extends Singleton {
 		    $name = $args[0];
 		    $function = $args[1];
 	    }
-	    
-	    /*$this->shortcodes[] = array(
-		    'name' => $name,
-		    'function' => $function
-	    );*/
 	    
 	    $shortcode_name = 'arlo_' . $name;
 	
@@ -115,8 +61,12 @@ class Shortcodes extends Singleton {
 		// if not empty, process labels and wrapping
 		if(trim($content) != '') {
 			//strip html, if neccessary 
-			if ($strip_html == 'true') {
-				$content = strip_tags($content);
+			if ($strip_html !== 'false') {
+				if ($strip_html == 'true') {
+					$content = strip_tags($content);
+				} else {
+					$content = strip_tags($content, $strip_html);
+				}
 			}
 			
 			// prepend label
