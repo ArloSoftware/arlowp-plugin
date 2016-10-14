@@ -148,6 +148,8 @@ Fixed category count number for [arlo_categories] shortcode
 
 New [arlo_category_title] shortcode
 
+New setting for GoogleMaps API Key
+
 = 2.3.5.1 = 
 
 Fix start and end date times when the dates are returning a UTC value

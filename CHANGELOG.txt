@@ -10,6 +10,7 @@ New 'showfrom' attribute for [arlo_event_price] shortcode
 New 'strip_html' attribute for [content_field_text] shortcode
 Terminate background task
 New [arlo_category_title] shortcode
+New setting for GoogleMaps API Key
 
 
 Bugfixes

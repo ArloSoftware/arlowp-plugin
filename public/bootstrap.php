@@ -3492,6 +3492,10 @@ $shortcodes->add('venue_permalink', function($content='', $atts, $shortcode_name
 // venue map shortcode
 
 $shortcodes->add('venue_map', function($content='', $atts, $shortcode_name){
+	$settings = get_option('arlo_settings');
+	
+	if (empty($settings['googlemaps_api_key'])) return;
+	
 	// merge and extract attributes
 	extract(shortcode_atts(array(
 		'height'	=> 400,
@@ -3508,11 +3512,11 @@ $shortcodes->add('venue_map', function($content='', $atts, $shortcode_name){
 		if(intval($height) <= 0) $height = 400;
 		if(intval($width) <= 0) $width = 400;
 
-
 		$map = '<img src="https://maps.googleapis.com/maps/api/staticmap?markers=color:green%7C';
 		$map .= $lat . ',' . $long;
 		$map .= '&size=' . $width . 'x' . $height;
-		$map .= '&zoom=' . $zoom . '"';
+		$map .= '&zoom=' . $zoom;
+		$map .= '&key=' . $settings['googlemaps_api_key'] . '"';
 		$map .= ' height="' . $height . '"';
 		$map .= ' width="' . $width . '"';
 		$map .= ' alt="' . esc_attr(sprintf(__('Map of %s', $GLOBALS['arlo_plugin_slug']), $name)) . '"'; 
