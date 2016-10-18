@@ -4265,7 +4265,8 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 		'format' => 'd M y',
 		'layout' => '',
 		'limit' => 1,
-		'removeyear' => "true"
+		'removeyear' => "true",
+		'text' => '{%date%}'
 	), $atts, $shortcode_name));
 	
 	if (strpos($format, '%') === false) {
@@ -4309,12 +4310,18 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 			if (!empty($event->e_startdatetime)) {
 	            if(date('y', strtotime($event->e_startdatetime)) == date('y') && $removeyear) {
 	            	$format = trim(preg_replace('/\s+/', ' ', str_replace(["%Y", "%y", "Y", "y", "%g", "%G"], "", $format)));
-	            }	
+	            }
+	            
+	            $location = $event->e_locationname;
+	            
+	            $date = strftime($format, strtotime($event->e_startdatetime));
+	            
+	            $text = str_replace(['{%date%}', '{%location%}'], [$date, $location], $text);
 	            
 	            if ($event->e_registeruri && !$event->e_isfull) {
-	                $return_links[] = ($layout == 'list' ? "<li>" : "") . '<a href="' . $event->e_registeruri . '" class="' . esc_attr($dateclass) . ' arlo-register">' . strftime($format, strtotime($event->e_startdatetime)) . '</a>' . ($layout == 'list' ? "</li>" : "");
+	                $return_links[] = ($layout == 'list' ? "<li>" : "") . '<a href="' . $event->e_registeruri . '" class="' . esc_attr($dateclass) . ' arlo-register">' . $text  . '</a>' . ($layout == 'list' ? "</li>" : "");
 	            } else {
-	                $return_links[] = ($layout == 'list' ? "<li>" : "") . '<span class="' . esc_attr($dateclass) . '">' . strftime($format, strtotime($event->e_startdatetime)) . '</span>' . ($layout == 'list' ? "</li>" : "");
+	                $return_links[] = ($layout == 'list' ? "<li>" : "") . '<span class="' . esc_attr($dateclass) . '">' . $text . '</span>' . ($layout == 'list' ? "</li>" : "");
 	            }
 	        }	
 		}	

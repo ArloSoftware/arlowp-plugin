@@ -150,6 +150,8 @@ New [arlo_category_title] shortcode
 
 New setting for GoogleMaps API Key
 
+New 'text' attribute for [arlo_event_next_running] shortcode
+
 = 2.3.5.1 = 
 
 Fix start and end date times when the dates are returning a UTC value

@@ -11,6 +11,7 @@ New 'strip_html' attribute for [content_field_text] shortcode
 Terminate background task
 New [arlo_category_title] shortcode
 New setting for GoogleMaps API Key
+New 'text' attribute for [arlo_event_next_running] shortcode
 
 
 Bugfixes
