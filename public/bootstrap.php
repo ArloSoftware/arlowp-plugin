@@ -7,7 +7,9 @@ $arlo_plugin_slug = $arlo_plugin->get_plugin_slug();
  * Add event category to title when filtered by a category
  */
 add_filter( 'the_title', function($title, $id = null){
-	global $post;
+	global $post, $arlo_plugin;
+	
+	$active = $arlo_plugin->get_import_id();	
 	
 	$title = htmlentities($title, ENT_QUOTES, "UTF-8", false);
 	
@@ -36,7 +38,7 @@ add_filter( 'the_title', function($title, $id = null){
 	$cat = null;
 	
 	if (!empty($cat_slug))
-		$cat = \Arlo\Categories::get(array('slug' => $cat_slug));
+		$cat = \Arlo\Categories::get(array('slug' => $cat_slug), null, $active);
 		
 		
 	$location = !empty($_GET['arlo-location']) ? $_GET['arlo-location'] : get_query_var('arlo-location', '');
@@ -1478,7 +1480,7 @@ $shortcodes->add('event_template_list_pagination', function($content='', $atts, 
 		} 
 		
 		if (isset($GLOBALS['show_child_elements']) && $GLOBALS['show_child_elements']) {
-			$cats = \Arlo\Categories::getTree($cat_id, null);
+			$cats = \Arlo\Categories::getTree($cat_id, null, 0, $active);
 			
 			$categories_tree = arlo_child_categories($cats);
 			
@@ -1646,7 +1648,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 		if (isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true") {
 			$GLOBALS['show_child_elements'] = true;
 		
-			$cats = \Arlo\Categories::getTree($cat_id, null);
+			$cats = \Arlo\Categories::getTree($cat_id, null, 0, $active);
 						
 			$categories_tree = arlo_child_categories($cats);
 			
@@ -2088,9 +2090,9 @@ $shortcodes->add('event_template_filters', function($content='', $atts, $shortco
 			case 'category' :
 
 				//root category select
-				$cats = \Arlo\Categories::getTree(0, 1);	
+				$cats = \Arlo\Categories::getTree(0, 1, 0, $active);	
 				if (!empty($cats)) {
-					$cats = \Arlo\Categories::getTree($cats[0]->c_arlo_id, 100);
+					$cats = \Arlo\Categories::getTree($cats[0]->c_arlo_id, 100, 0, $active);
 				}
 				
 				if (is_array($cats)) {
@@ -3269,9 +3271,9 @@ $shortcodes->add('upcoming_event_filters', function($content='', $atts, $shortco
 				// category select
 
 				//root category select
-				$cats = \Arlo\Categories::getTree(0, 1);	
+				$cats = \Arlo\Categories::getTree(0, 1, 0, $active);	
 				if (!empty($cats)) {
-					$cats = \Arlo\Categories::getTree($cats[0]->c_arlo_id, 100);
+					$cats = \Arlo\Categories::getTree($cats[0]->c_arlo_id, 100, 0, $active);
 				}
 
 				if (is_array($cats)) {
@@ -4036,6 +4038,9 @@ function category_ul($items, $counts) {
 }
 	
 $shortcodes->add('categories', function($content='', $atts, $shortcode_name){
+	global $arlo_plugin;
+	$active = $arlo_plugin->get_import_id();
+
 	$return = '';
 	
 	$arlo_category = isset($_GET['arlo-category']) && !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : get_query_var('arlo-category', '');
@@ -4064,21 +4069,21 @@ $shortcodes->add('categories', function($content='', $atts, $shortcode_name){
 			$conditions = array('parent_id' => 0);
 		}
 		
-		$current = \Arlo\Categories::get($conditions, 1);
+		$current = \Arlo\Categories::get($conditions, 1, $active);
 		
 		$return .= sprintf($title, $current->c_name);
 	}
 	
 	if ($depth > 0) {
 		if ($start_at == 0) {
-			$root = \Arlo\Categories::getTree($start_at, 1);	
+			$root = \Arlo\Categories::getTree($start_at, 1, 0, $active);	
 					
 			if (!empty($root)) {
 				$start_at = $root[0]->c_arlo_id;
 			}
 		}
 		
-		$tree = \Arlo\Categories::getTree($start_at, $depth);	
+		$tree = \Arlo\Categories::getTree($start_at, $depth, 0, $active);	
 		
 		$GLOBALS['categories_count'] = count($tree);		
 				
@@ -4343,13 +4348,15 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 
 // category title
 $shortcodes->add('category_title', function($content='', $atts, $shortcode_name) {
+	global $arlo_plugin;
+	$active = $arlo_plugin->get_import_id();
+
 	$arlo_category = isset($_GET['arlo-category']) && !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : get_query_var('arlo-category', '');
 	
-	
 	if (!empty($arlo_category)) {
-		$category = \Arlo\Categories::get(array('id' => current(explode('-', $arlo_category))), 1);
+		$category = \Arlo\Categories::get(array('id' => current(explode('-', $arlo_category))), 1, $active);
 	} else {
-		$category = \Arlo\Categories::get(array('parent_id' => 0), 1);
+		$category = \Arlo\Categories::get(array('parent_id' => 0), 1, $active);
 	}
 	
 	if(!$category) return;
@@ -4359,12 +4366,15 @@ $shortcodes->add('category_title', function($content='', $atts, $shortcode_name)
 
 // category header
 $shortcodes->add('category_header', function($content='', $atts, $shortcode_name) {
+	global $arlo_plugin;
+	$active = $arlo_plugin->get_import_id();
+
 	$arlo_category = isset($_GET['arlo-category']) && !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : get_query_var('arlo-category', '');
 	
 	if (!empty($arlo_category)) {
-		$category = \Arlo\Categories::get(array('id' => current(explode('-', $arlo_category))), 1);
+		$category = \Arlo\Categories::get(array('id' => current(explode('-', $arlo_category))), 1, $active);
 	} else {
-		$category = \Arlo\Categories::get(array('parent_id' => 0), 1);
+		$category = \Arlo\Categories::get(array('parent_id' => 0), 1, $active);
 	}
 	
 	if(!$category) return;
@@ -4374,13 +4384,15 @@ $shortcodes->add('category_header', function($content='', $atts, $shortcode_name
 
 // category footer
 $shortcodes->add('category_footer', function($content='', $atts, $shortcode_name){
+	global $arlo_plugin;
+	$active = $arlo_plugin->get_import_id();
+
 	$arlo_category = isset($_GET['arlo-category']) && !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : get_query_var('arlo-category', '');
-
-
+	
 	if (!empty($arlo_category)) {
-		$category = \Arlo\Categories::get(array('id' => current(explode('-', $arlo_category))), 1);
+		$category = \Arlo\Categories::get(array('id' => current(explode('-', $arlo_category))), 1, $active);
 	} else {
-		$category = \Arlo\Categories::get(array('parent_id' => 0), 1);
+		$category = \Arlo\Categories::get(array('parent_id' => 0), 1, $active);
 	}
 	
 	if(!$category) return;
