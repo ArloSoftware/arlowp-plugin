@@ -7,12 +7,12 @@ require_once 'arlo-singleton.php';
 use Arlo\Singleton;
 
 class Presenters extends Singleton {
-	static function get($conditions=array(), $order=array(), $limit=null) {
+	static function get($conditions=array(), $order=array(), $limit=null, $active = null) {
 		global $wpdb;
 	
 		$query = "SELECT p.* FROM {$wpdb->prefix}arlo_presenters AS p";
 		
-		$where = array();
+		$where = array("active = " . $active);
 	
 		// conditions
 		foreach($conditions as $key => $value) {

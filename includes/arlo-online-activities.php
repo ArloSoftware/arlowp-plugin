@@ -7,12 +7,12 @@ require_once 'arlo-singleton.php';
 use Arlo\Singleton;
 
 class OnlineActivities extends Singleton {
-	static function get($conditions=array(), $order=array(), $limit=null) {
+	static function get($conditions = array(), $order = array(), $limit = null, $active = null) {
 		global $wpdb;
 	
 		$query = "SELECT oa.* FROM {$wpdb->prefix}arlo_onlineactivities AS oa";
 		
-		$where = array();
+		$where = array("active = " . $active);
 	
 		// conditions
 		foreach($conditions as $key => $value) {

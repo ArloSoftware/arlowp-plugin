@@ -4097,13 +4097,16 @@ $shortcodes->add('categories', function($content='', $atts, $shortcode_name){
 
 // event template duration
 $shortcodes->add('event_duration', function($content='', $atts, $shortcode_name){
+	global $arlo_plugin;
+	$active = $arlo_plugin->get_import_id();
+
 	if(!isset($GLOBALS['arlo_event_list_item']) || empty($GLOBALS['arlo_event_list_item']['et_arlo_id'])) return;
 	
 	$conditions = array(
 		'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id']
 	);
 	
-	$events = \Arlo\Events::get($conditions, array('e.e_startdatetime ASC'), 1);
+	$events = \Arlo\Events::get($conditions, array('e.e_startdatetime ASC'), 1, $active);
 	
 	if(empty($events)) return;
 	
@@ -4157,6 +4160,9 @@ $shortcodes->add('event_duration', function($content='', $atts, $shortcode_name)
 
 // event template price
 $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
+	global $arlo_plugin;
+	$active = $arlo_plugin->get_import_id();
+
 	if(!isset($GLOBALS['arlo_event_list_item']) || empty($GLOBALS['arlo_event_list_item']['et_arlo_id'])) return;
 	
 	// merge and extract attributes
@@ -4188,7 +4194,7 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 		$conditions['region'] = $arlo_region; 
 	}
 	
-	$offer = \Arlo\Offers::get($conditions, array("o.{$price_field} ASC"), 1);
+	$offer = \Arlo\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $active);
 	
 	// if none, try the associated events
 	if(!$offer) {
@@ -4196,7 +4202,7 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 			'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id']
 		);
 		
-		$event = \Arlo\Events::get($conditions, array('e.e_startdatetime ASC'), 1);
+		$event = \Arlo\Events::get($conditions, array('e.e_startdatetime ASC'), 1, $active);
 		
 		if(empty($event)) return;
 		
@@ -4209,7 +4215,7 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 			$conditions['region'] = $arlo_region; 
 		}		
 		
-		$offer = \Arlo\Offers::get($conditions, array("o.{$price_field} ASC"), 1);
+		$offer = \Arlo\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $active);
 	}
 	
 	
@@ -4219,7 +4225,7 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 			'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id']
 		);
 		
-		$oa = \Arlo\OnlineActivities::get($conditions, null, 1);
+		$oa = \Arlo\OnlineActivities::get($conditions, null, 1, $active);
 		
 		if(empty($oa)) return;
 		
@@ -4232,7 +4238,7 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 			$conditions['region'] = $arlo_region; 
 		}		
 		
-		$offer = \Arlo\Offers::get($conditions, array("o.{$price_field} ASC"), 1);
+		$offer = \Arlo\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $active);
 	}	
 	
 	if(empty($offer)) return;
@@ -4252,6 +4258,9 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 
 // event template next running
 $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_name){
+	global $arlo_plugin;
+	$active = $arlo_plugin->get_import_id();
+
 	if(!isset($GLOBALS['arlo_eventtemplate']) || empty($GLOBALS['arlo_eventtemplate']['et_arlo_id'])) return;
 	$return = "";
 	
@@ -4295,8 +4304,8 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 		$oaconditions['region'] = 'oa.oa_region = "' . $arlo_region . '"';
 	}	
 	
-	$events = \Arlo\Events::get($conditions, array('e.e_startdatetime ASC'), $limit);
-	$oa = \Arlo\OnlineActivities::get($oaconditions, null, 1);
+	$events = \Arlo\Events::get($conditions, array('e.e_startdatetime ASC'), $limit, $active);
+	$oa = \Arlo\OnlineActivities::get($oaconditions, null, 1, $active);
 			
 	if ($layout == "list") {
 		$return = '<ul class="arlo-event-next-running">';

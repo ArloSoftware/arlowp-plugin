@@ -2877,6 +2877,7 @@ class Arlo_For_Wordpress {
 	
 	public static function redirect_proxy() {
 		$settings = get_option('arlo_settings');
+		$active = self::get_instance()->get_import_id();
 		
 		if(!isset($_GET['object_post_type']) || !isset($_GET['arlo_id'])) return;
 		
@@ -2890,7 +2891,7 @@ class Arlo_For_Wordpress {
 					
 					$location = $url;
 				} else {
-					$event = \Arlo\EventTemplates::get(array('id' => $_GET['arlo_id']), array(), 1);
+					$event = \Arlo\EventTemplates::get(array('id' => $_GET['arlo_id']), array(), 1, $active);
 					
 					if(!$event) return;
 					
@@ -2903,7 +2904,7 @@ class Arlo_For_Wordpress {
 			break;
 			
 			case 'venue':
-				$venue = \Arlo\Venues::get(array('id' => $_GET['arlo_id']), array(), 1);
+				$venue = \Arlo\Venues::get(array('id' => $_GET['arlo_id']), array(), 1, $active);
 				
 				if(!$venue) return;
 				
@@ -2915,7 +2916,7 @@ class Arlo_For_Wordpress {
 			break;
 			
 			case 'presenter':
-				$presenter = \Arlo\Presenters::get(array('id' => $_GET['arlo_id']), array(), 1);
+				$presenter = \Arlo\Presenters::get(array('id' => $_GET['arlo_id']), array(), 1, $active);
 				
 				if(!$presenter) return;
 				
