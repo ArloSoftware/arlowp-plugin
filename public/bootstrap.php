@@ -4263,7 +4263,7 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 
 	if(!isset($GLOBALS['arlo_eventtemplate']) || empty($GLOBALS['arlo_eventtemplate']['et_arlo_id'])) return;
 	$return = "";
-	
+
 	if (!empty($GLOBALS['arlo_eventtemplate']['et_region'])) {
 		$arlo_region = $GLOBALS['arlo_eventtemplate']['et_region'];
 	} else {
@@ -4302,11 +4302,11 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 	if (!empty($arlo_region)) {
 		$conditions['region'] = 'e.e_region = "' . $arlo_region . '"';
 		$oaconditions['region'] = 'oa.oa_region = "' . $arlo_region . '"';
-	}	
-	
+	}
+
 	$events = \Arlo\Events::get($conditions, array('e.e_startdatetime ASC'), $limit, $active);
 	$oa = \Arlo\OnlineActivities::get($oaconditions, null, 1, $active);
-			
+	
 	if ($layout == "list") {
 		$return = '<ul class="arlo-event-next-running">';
 	}
@@ -4329,13 +4329,13 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 	            $location = $event->e_locationname;
 	            
 	            $date = strftime($format, strtotime($event->e_startdatetime));
-	            
-	            $text = str_replace(['{%date%}', '{%location%}'], [$date, $location], $text);
+
+	            $display_text = str_replace(['{%date%}', '{%location%}'], [$date, $location], $text);
 	            
 	            if ($event->e_registeruri && !$event->e_isfull) {
-	                $return_links[] = ($layout == 'list' ? "<li>" : "") . '<a href="' . $event->e_registeruri . '" class="' . esc_attr($dateclass) . ' arlo-register">' . $text  . '</a>' . ($layout == 'list' ? "</li>" : "");
+	                $return_links[] = ($layout == 'list' ? "<li>" : "") . '<a href="' . $event->e_registeruri . '" class="' . esc_attr($dateclass) . ' arlo-register">' . $display_text  . '</a>' . ($layout == 'list' ? "</li>" : "");
 	            } else {
-	                $return_links[] = ($layout == 'list' ? "<li>" : "") . '<span class="' . esc_attr($dateclass) . '">' . $text . '</span>' . ($layout == 'list' ? "</li>" : "");
+	                $return_links[] = ($layout == 'list' ? "<li>" : "") . '<span class="' . esc_attr($dateclass) . '">' . $display_text . '</span>' . ($layout == 'list' ? "</li>" : "");
 	            }
 	        }	
 		}	
