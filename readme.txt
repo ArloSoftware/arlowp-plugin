@@ -56,7 +56,7 @@ Arlo for WordPress providers you with the building blocks to create great lookin
 = Get started today! =
 Sign-up for a [free Arlo trial](https://www.arlo.co/register) and then install the "Arlo training and event management system" plugin now!
  
-[youtube http://www.youtube.com/watch?v=6MWDFKjYNPY]
+[youtube https://www.youtube.com/watch?v=-uUhu90cvoc]
 
 
 == Installation ==
