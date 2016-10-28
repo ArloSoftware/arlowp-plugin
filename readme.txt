@@ -11,6 +11,8 @@ Seamlessly integrate Arlo's market leading training and event management system 
 
 == Description ==
 = Arlo training and event management system =
+[youtube https://www.youtube.com/watch?v=-uUhu90cvoc]
+
 Arlo is a cloud-based training and event management system for managing, marketing and delivering physical and online training and event services. It provides streamlined event scheduling, online registrations, invoicing and receipting, runs marketing activities, and manages client records and relationships. The service can be rapidly deployed and seamlessly integrated within your website and connected with your other business applications.
 
 * [Online registration](https://www.arlo.co/features/online-registration) - Offer the entire registration experience online. Create simple registration forms for free events, complex forms for conferences, and everything between. Accept payments, issue invoices, and manage transfers, cancellations, and refunds. 
@@ -55,9 +57,6 @@ Arlo for WordPress providers you with the building blocks to create great lookin
 
 = Get started today! =
 Sign-up for a [free Arlo trial](https://www.arlo.co/register) and then install the "Arlo training and event management system" plugin now!
- 
-[youtube https://www.youtube.com/watch?v=-uUhu90cvoc]
-
 
 == Installation ==
 = From your WordPress dashboard =
