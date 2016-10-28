@@ -317,7 +317,7 @@ class Arlo_For_Wordpress {
 		
 		// GP: Check if the scheduled task is entered. If it does not exist set it. (This ensures it is in as long as the plugin is activated.  
 		if ( ! wp_next_scheduled('arlo_set_import')) {
-			wp_schedule_event( time(), 'minutes_75', 'arlo_set_import' );
+			wp_schedule_event( time(), 'minutes_30', 'arlo_set_import' );
 		}
 		
 		if ( ! wp_next_scheduled('arlo_scheduler')) {
@@ -2867,9 +2867,9 @@ class Arlo_For_Wordpress {
 				'interval' => 3600,
 				'display' => __('Once every hour')
 				],
-			'minutes_75' => [
-				'interval' => 4500,
-				'display' => __('Every 75 minutes')
+			'minutes_30' => [
+				'interval' => 1800,
+				'display' => __('Every 30 minutes')
 				]
 			];
 		return $schedules;
