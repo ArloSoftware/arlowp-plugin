@@ -4265,6 +4265,7 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 	$return = "";
 
 	$arlo_location = isset($_GET['arlo-location']) && !empty($_GET['arlo-location']) ? $_GET['arlo-location'] : get_query_var('arlo-location', '');
+	$arlo_delivery = isset($_GET['arlo-delivery']) && !empty($_GET['arlo-delivery']) ? $_GET['arlo-delivery'] : get_query_var('arlo-delivery', '');
 	
 	if (!empty($GLOBALS['arlo_eventtemplate']['et_region'])) {
 		$arlo_region = $GLOBALS['arlo_eventtemplate']['et_region'];
@@ -4308,6 +4309,10 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 
 	if (!empty($arlo_location)) {
 		$conditions['location'] = "e.e_locationname = '" . urldecode($arlo_location) . "'";
+	}
+
+	if(!empty($arlo_delivery) && is_numeric($arlo_delivery)) {
+		$conditions['delivery'] .= "e.e_isonline = " . intval($arlo_delivery);
 	}
 	
 	$events = \Arlo\Events::get($conditions, array('e.e_startdatetime ASC'), $limit, $active);
