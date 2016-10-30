@@ -127,7 +127,7 @@ The Arlo - Training and Event Management, and online registration plugin is only
 
 = 2.3.6 = 
 
-Online Acticities
+Online Activities
 
 [arlo_content_field_item] shortcode is available within the [arlo_upcoming_list_item] shortcode
 
@@ -137,19 +137,31 @@ New [arlo_event_template_advertised_duration] shortcode
 
 New 'showfrom' attribute for [arlo_event_price] shortcode
 
+New 'strip_html' attribute every shortcode
+
 Terminate background task
 
-Price can be missing on the event template page, if WP is using other db prefix than 'wp_' https://github.com/ArloSoftware/arlowp-plugin/issues/150
-
-Automated sync doesn't run every hour https://github.com/ArloSoftware/arlowp-plugin/issues/151
-
-Fixed category count number for [arlo_categories] shortcode
+Send error data to Arlo
 
 New [arlo_category_title] shortcode
 
 New setting for GoogleMaps API Key
 
 New 'text' attribute for [arlo_event_next_running] shortcode
+
+Detailed log / Ability to download log
+
+[arlo_event_next_running] shortcode respects delivery and location filters
+
+Fix, when the price can be missing on the event template page, if WP is using other db prefix than 'wp_' https://github.com/ArloSoftware/arlowp-plugin/issues/150
+
+Fix automated sync doesn't run every hour https://github.com/ArloSoftware/arlowp-plugin/issues/151
+
+Fixed category count number for [arlo_categories] shortcode
+
+Fix when multiple data showed during import
+
+Fix the multiregion import issue 
 
 = 2.3.5.1 = 
 

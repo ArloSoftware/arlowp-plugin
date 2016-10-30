@@ -548,7 +548,20 @@ class Arlo_For_Wordpress_Settings {
 	    <h4>Version ' . $this->version . '</h4>
 	    <p>
 	    	<ul class="arlo-whatsnew-list">
-	    		<li>Online Activities</li>
+	    		<li>The plugin supports <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivityrelated" target="_blank">Online Activities</a></li>
+				<li>
+					New 
+					<a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_credits" target="_blank">[arlo_event_credits]</a>,  
+					<a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_advertised_duration" target="_blank">[arlo_event_template_advertised_duration]</a>,  
+					<a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/categoryrelated#arlo_category_title" target="_blank">[arlo_category_title]</a> 
+					shortcodes
+				</li>
+				<li>New "showfrom" attribute for <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_price" target="_blank">[arlo_event_price]</a> shortcode</li>
+				<li>New "strip_html" attribute every <a href="http://developer.arlo.co/doc/wordpress/shortcodes/" target="_blank">shortcode</a></li>
+				<li>New "text" attribute for <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_next_running" target="_blank">[arlo_event_next_running] shortcode</a></li>
+				<li>Sending error data to Arlo</li>
+				<li>Detailed log</li>
+				<li>Many bug fixes and enhancements</li>
 	    	</ul>
 	    </p>
 	    
