@@ -31,13 +31,13 @@ class Arlo_For_Wordpress {
 	 * @var     string
 	 */
 
-	const VERSION = '2.3.6';
+	const VERSION = '2.4';
 
 	/**
 	 * DB Schema hash for this version.
 	 * Need to generate with create_db_schema_hash if there is a schema change
 	 *
-	 * @since   2.3.6
+	 * @since   2.4
 	 *
 	 * @var     string
 	 */
@@ -169,7 +169,7 @@ class Arlo_For_Wordpress {
 	/**
 	 * $message_notice_types: used to map arlo message types to WP notices 
 	 *
-	 * @since    2.3.6
+	 * @since    2.4
 	 *
 	 * @var      array
 	 */
@@ -506,7 +506,7 @@ class Arlo_For_Wordpress {
 	/**
 	 * Send log to Arlo
 	 *
-	 * @since     2.3.6
+	 * @since     2.4
 	 *
 	 * @return    null
 	 */	
@@ -526,7 +526,7 @@ class Arlo_For_Wordpress {
 	/**
 	 * Check the plugin version on bulk update
 	 *
-	 * @since     2.3.6
+	 * @since     2.4
 	 *
 	 * @return    null
 	 */	
@@ -544,7 +544,7 @@ class Arlo_For_Wordpress {
 	/**
 	 * Create a hash for the database Schema
 	 *
-	 * @since     2.3.6
+	 * @since     2.4
 	 *
 	 * @return    string
 	 */	
@@ -586,7 +586,7 @@ class Arlo_For_Wordpress {
 	/**
 	 * Check the version of the db schema
 	 *
-	 * @since     2.3.6
+	 * @since     2.4
 	 *
 	 * @return    null
 	 */
@@ -607,7 +607,7 @@ class Arlo_For_Wordpress {
 	/**
 	 * Check the version of the plugin
 	 *
-	 * @since     2.3.6
+	 * @since     2.4
 	 *
 	 * @return    null
 	 */
@@ -652,8 +652,8 @@ class Arlo_For_Wordpress {
 	 */
 	public static function update($new_version, $old_version) {
 		//pre datamodell update need to be done before
-		if (version_compare($old_version, '2.3.6') < 0) {
-			self::run_pre_data_update('2.3.6');
+		if (version_compare($old_version, '2.4') < 0) {
+			self::run_pre_data_update('2.4');
 		}
 		
 		arlo_add_datamodel();	
@@ -670,8 +670,8 @@ class Arlo_For_Wordpress {
 			self::run_update('2.3.5');
 		}
 		
-		if (version_compare($old_version, '2.3.6') < 0) {
-			self::run_update('2.3.6');
+		if (version_compare($old_version, '2.4') < 0) {
+			self::run_update('2.4');
 		}
 	}
 	
@@ -679,7 +679,7 @@ class Arlo_For_Wordpress {
 		global $wpdb;	
 		
 		switch($version) {
-			case '2.3.6':
+			case '2.4':
 				$exists = $wpdb->get_var("SHOW TABLES LIKE '" . $wpdb->prefix . "arlo_log'", 0, 0);
 				if (is_null($exists)) {
 					$wpdb->query("RENAME TABLE " . $wpdb->prefix . "arlo_import_log TO " . $wpdb->prefix . "arlo_log");
@@ -796,7 +796,7 @@ class Arlo_For_Wordpress {
 
 			break;
 			
-			case '2.3.6': 
+			case '2.4': 
 				
 				//Add [event_template_register_interest] shortcode to the event template
 				$update_templates = ['event'];
