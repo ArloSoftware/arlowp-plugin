@@ -202,6 +202,7 @@ class Arlo_For_Wordpress {
     	'developer' => 'arlo-developer-admin-notice',
     	'webinar' => 'arlo-webinar-admin-notice',
     	'newpages' => 'arlo-newpages-admin-notice',
+		'wp_video' => 'arlo-wp-video',
     );     
     
 	/**
@@ -3097,10 +3098,11 @@ class Arlo_For_Wordpress {
 		    </div>
 			';		
 		}
-		
+		self::wp_video_notice();
 		self::load_demo_notice(!empty($_SESSION['arlo-demo']) ? $_SESSION['arlo-demo'] : []);
 		self::webinar_notice();
 		self::developer_notice();
+		
 		
 		unset($_SESSION['arlo-import']);
 	}	
@@ -3124,6 +3126,24 @@ class Arlo_For_Wordpress {
 			';	
 		}
 	}
+
+	public static function wp_video_notice() {
+		$notice_id = self::$dismissible_notices['wp_video'];
+		$user = wp_get_current_user();
+		$meta = get_user_meta($user->ID, $notice_id, true);
+
+		if ($meta !== '0') {
+			echo '
+			<div class="notice is-dismissible" id="' . $notice_id . '">
+				<p class="developer">
+					<img src="' . plugins_url( '/assets/img/video-yellow.png', __FILE__) . '" style="width: 32px">
+					' . sprintf(__('<a target="_blank" href="%s">Watch overview video</a>', self::get_instance()->plugin_slug), 'https://www.arlo.co/videos#-uUhu90cvoc') . '
+					' . __('to see Arlo for WordPress in action.', self::get_instance()->plugin_slug) . '
+				</p>
+		    </div>
+			';	
+		}
+	}	
 	
 	public static function webinar_notice() {
 		$notice_id = self::$dismissible_notices['webinar'];
