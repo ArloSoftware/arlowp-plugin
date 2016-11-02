@@ -231,7 +231,14 @@ class Arlo_For_Wordpress_Settings {
 			$this->plugin_slug, 
 			'arlo_misc_section',
 			['html' => '<a href="?page=arlo-for-wordpress&arlo-donwload-sync-log">Download</a>']);
-		
+
+		add_settings_field(
+			'arlo_wp_newsletter', 
+			'<label for="arlo_wp_newsletter">'.__('Subscribe to our WP newsletter', $this->plugin_slug).'</label>', 
+			array($this, 'arlo_simple_text_callback'), 
+			$this->plugin_slug, 
+			'arlo_misc_section',
+			['html' => '<a href="https://confirmsubscription.com/h/r/41B80B5B566BCC0B" target="_blank">Subscribe</a>']);
 		
 		/*
 		 *
