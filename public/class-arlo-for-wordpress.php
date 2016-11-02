@@ -31,7 +31,7 @@ class Arlo_For_Wordpress {
 	 * @var     string
 	 */
 
-	const VERSION = '2.4';
+	const VERSION = '2.4.1';
 
 	/**
 	 * DB Schema hash for this version.
@@ -321,9 +321,6 @@ class Arlo_For_Wordpress {
 			wp_schedule_event( time(), 'minutes_30', 'arlo_set_import' );
 		}
 		
-		if ( ! wp_next_scheduled('arlo_scheduler')) {
-			wp_schedule_event( time(), 'minutes_5', 'arlo_scheduler' );
-		}
 
 		// content and excerpt filters to hijack arlo registered post types
 		add_filter('the_content', 'arlo_the_content');
@@ -342,6 +339,10 @@ class Arlo_For_Wordpress {
 		add_action( 'wp_ajax_arlo_terminate_task', array($this, 'arlo_terminate_task_callback'));
 		
 		add_action( 'wp_ajax_arlo_get_last_import_log', array($this, 'arlo_get_last_import_log_callback'));
+
+		//load scheduler tasks
+		add_action( 'wp_ajax_arlo_run_scheduler', array( $this, 'run_scheduler' ) );
+		add_action( 'wp_ajax_nopriv_arlo_run_scheduler', array( $this, 'run_scheduler' ) );
 		
 		
 		// the_post action - allows us to inject Arlo-specific data as required
@@ -352,6 +353,19 @@ class Arlo_For_Wordpress {
 		
 		add_action( 'wp', 'set_region_redirect');
 	}
+
+	/**
+	 * Run the scheduler action
+	 *
+	 * @since     2.4.1
+	 *
+	 * @return    null
+	 */
+	public static function run_scheduler() {
+		session_write_close();
+		do_action('arlo_scheduler');
+		wp_die();
+	}		
 
 	/**
 	 * Return the plugin slug.
@@ -1334,34 +1348,14 @@ class Arlo_For_Wordpress {
 				}			
 			}	
 		}
-	}
-	
-	public function call_wp_cron() {	      
-		$url = get_site_url() . '/wp-cron.php';        
-	
-		$ch = curl_init($url);
 
-		curl_setopt($ch, CURLOPT_TIMEOUT, 20);
-		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_exec($ch);
-		
-		$log_message = "Kick off wp_cron.php for new subtask.";
-		if($errno = curl_errno($ch)) {
-			$error_message = curl_error($ch);
-			self::add_log($log_message . " ERROR: " . $url . ' ' . $error_message);
-		} else {
-			$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE); 
-			self::add_log($log_message . " HTTP_CODE: " . $httpcode);
-		}
-		 
-		curl_close($ch);
+		//kick off Scheduler
+		$this->cron_scheduler();
 	}
 	
 	public function cron_scheduler() {
+		session_write_close();
 		try{
-			//necessary to avoid multiple scripts running on a forced import.
-			sleep(2);
 			$this->clean_up_tasks();
 			$this->run_task_scheduler();
 		}catch(\Exception $e){
@@ -1379,10 +1373,9 @@ class Arlo_For_Wordpress {
 			$now = time() - date('Z');
 			if ($now - $ts > 10*60) {
 				$scheduler->update_task($task->task_id, 3, "Import doesn't respond within 10 minutes, stopped by the scheduler");
+				$scheduler->clear_cron();
 			}
 		}
-
-		
 	}
 	
 	private function delete_running_tasks() {
@@ -1626,7 +1619,7 @@ class Arlo_For_Wordpress {
 		global $wpdb;
 		$task_id = intval($task_id);
 		$scheduler = $this->get_scheduler();
-				
+			
 		if ($task_id > 0) {
 			$task = $scheduler->get_task_data($task_id);
 			if (count($task)) {
@@ -1723,38 +1716,21 @@ class Arlo_For_Wordpress {
 
 				self::add_log('Import subtask ended: ' . ($current_subtask + 1) . "/" . count($import_tasks) . ": " . $import_tasks_desc[$subtask], $import_id);
 				
-				$scheduler-> update_task_data($task_id, ['finished_subtask' => $current_subtask]);
+				$scheduler->update_task_data($task_id, ['finished_subtask' => $current_subtask]);
 				$scheduler->update_task($task_id, 1);
+				$scheduler->unlock_process('import');
 								
 				if ($current_subtask + 1 == count($import_tasks)) {
 					//finish task
 					$scheduler->update_task($task_id, 4, "Import finished");
+					$scheduler->clear_cron();
 				} else {
-					//kick off next
-					$scheduler->update_task($task_id, 1);
-					$fake_data = mt_rand(1000,9999);
-					wp_schedule_single_event(time(), 'arlo_scheduler', ['fake_data' => $fake_data]);
+					//need to unlock the process here, before it kicks off the next one
+					$url  = add_query_arg( $this->get_query_args(), $this->get_query_url() );
+					$args = $this->get_post_args();
 					
-					sleep(1);
-					$i = 0;
-					do {
-						sleep(1);
-						$cron_fake_datas = [];
-						foreach (_get_cron_array() as $timestamp => $crons) {
-							foreach ($crons as $cron_name => $cron_args) {
-								if ($cron_name == 'arlo_scheduler') {
-									foreach ($cron_args as $cron) {
-										if (is_array($cron['args']) && !empty($cron['args']['fake_data'])) {
-											$cron_fake_datas[] = $cron['args']['fake_data'];
-										}
-									}
-								}
-							}
-						}
-					} while (!in_array($fake_data, $cron_fake_datas) && $i++ <= 10);
-					sleep(1);
-					
-					$this->call_wp_cron();
+					wp_remote_post( esc_url_raw( $url ), $args );
+
 				}
 			} else {
 				$scheduler->update_task($task_id, 4, "Import finished");
@@ -1775,6 +1751,53 @@ class Arlo_For_Wordpress {
 		
 		return true;
 	}
+
+		/**
+		 * Get query args
+		 *
+		 * @return array
+		 */
+		protected function get_query_args() {
+			if ( property_exists( $this, 'query_args' ) ) {
+				return $this->query_args;
+			}
+
+			return array(
+				'action' => 'arlo_run_scheduler',
+				//'nonce'  => wp_create_nonce( $this->identifier ),
+			);
+		}
+
+		/**
+		 * Get query URL
+		 *
+		 * @return string
+		 */
+		protected function get_query_url() {
+			if ( property_exists( $this, 'query_url' ) ) {
+				return $this->query_url;
+			}
+
+			return admin_url( 'admin-ajax.php' );
+		}
+
+		/**
+		 * Get post args
+		 *
+		 * @return array
+		 */
+		protected function get_post_args() {
+			if ( property_exists( $this, 'post_args' ) ) {
+				return $this->post_args;
+			}
+
+			return array(
+				'timeout'   => 0.01,
+				'blocking'  => false,
+				'cookies'   => $_COOKIE,
+				'sslverify' => apply_filters( 'https_local_ssl_verify', false ),
+			);
+		}	
 	
 	private function import_event_templates($timestamp) {
 		global $wpdb;
@@ -2658,7 +2681,7 @@ class Arlo_For_Wordpress {
 		return $items;
 	}
 		
-	private function set_category_depth_level($cats, $timestamp) {
+	private function set_category_depth_level($cats = [], $timestamp) {
 		global $wpdb;
 		
 		foreach ($cats as $cat) {
@@ -2679,7 +2702,7 @@ class Arlo_For_Wordpress {
 		}
 	}
 	
-	private function set_category_depth_order($cats, $max_depth, $parent_order = 0, $timestamp) {
+	private function set_category_depth_order($cats = [], $max_depth, $parent_order = 0, $timestamp) {
 		global $wpdb;
 		$num = 100;
 		
