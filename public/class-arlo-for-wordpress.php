@@ -2634,7 +2634,7 @@ class Arlo_For_Wordpress {
 			}		
 		}
 		
-		$cats = \Arlo\Categories::getTree(0, 1000);
+		$cats = \Arlo\Categories::getTree(0, 1000, 0, $timestamp);
 				
 		$this->set_category_depth_level($cats, $timestamp);
 		
