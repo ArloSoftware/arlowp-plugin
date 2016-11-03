@@ -1,3 +1,13 @@
+== V2.4.1.1 ==
+
+Enhancement
+------------------
+Improvement of the import stability
+
+Bugfixes
+------------------
+Fix category depth level set
+
 == V2.4 ==
 
 Enhancement
