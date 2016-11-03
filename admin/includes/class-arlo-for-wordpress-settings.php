@@ -554,6 +554,13 @@ class Arlo_For_Wordpress_Settings {
 		<p><strong>If you are experiencing problems after an update, please deactivate and re-activate the plugin and re-synchronize the data.</strong></p>
 	    <h4>Version ' . $this->version . '</h4>
 	    <p>
+	    	<ul class="arlo-whatsnew-list">	    
+	    		<li>Improvement the stability of the import</li>
+				<li><a href="https://confirmsubscription.com/h/r/41B80B5B566BCC0B" target="_blank">Subscribe</a> to our WP newsletter</li>
+	    	</ul>
+	    </p>
+		<h4>Version 2.4</h4>		
+	    <p>
 	    	<ul class="arlo-whatsnew-list">
 	    		<li>The plugin supports <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivityrelated" target="_blank">Online Activities</a></li>
 				<li>

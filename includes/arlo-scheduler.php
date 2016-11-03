@@ -252,18 +252,65 @@ class Scheduler extends Singleton {
 	}
 	
 	public function process_task($task = array()) {
-		if (!empty($task[0]->task_task)) {
+		$task_task = $task[0]->task_task;
 
-			switch ($task[0]->task_task) {
-				case 'import':
-					if (!$this->plugin->import($task[0]->task_priority == -1, $task[0]->task_id)) {
-						$this->update_task($task[0]->task_id, 3, "Import failed");
-					}
-					
-				break;
-			}
+		if (!empty($task_task)) {
+			
+			$this->schedule_cron();
+
+			if (!$this->is_process_running($task_task)) {
+				switch ($task_task) {
+					case 'import':
+						$this->lock_process($task_task );
+						
+						if (!$this->plugin->import($task[0]->task_priority == -1, $task[0]->task_id)) {
+							$this->update_task($task[0]->task_id, 3, "Import failed");
+							$this->clear_cron();
+						}
+						$this->unlock_process($task_task);
+					break;
+				}
+			}	
+		} else {
+			$this->clear_cron();
 		}
 	}
+
+	protected function schedule_cron() {
+		if ( ! wp_next_scheduled('arlo_scheduler')) {
+			wp_schedule_event( time(), 'minutes_5', 'arlo_scheduler' );
+		}
+	}
+
+	public function clear_cron() {
+		$timestamp = wp_next_scheduled('arlo_scheduler');
+
+		if ( $timestamp ) {
+			wp_unschedule_event( $timestamp, 'arlo_scheduler');
+		}
+
+		wp_clear_scheduled_hook( 'arlo_scheduler');
+	}	
+
+	protected function is_process_running($task) {
+		if ( get_site_transient( $task . '_process_lock' ) ) {
+			// Process already running.
+			return true;
+		}
+
+		return false;
+	}
+
+	protected function lock_process($task) {
+		$this->start_time = time(); // Set start time of current process.
+
+		set_site_transient( $task . '_process_lock', microtime(), 180 );
+	}
+
+	public function unlock_process($task) {
+		delete_site_transient( $task . '_process_lock' );
+		return $this;
+	}	
 }
 
 ?>
