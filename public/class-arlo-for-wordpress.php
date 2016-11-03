@@ -901,8 +901,16 @@ class Arlo_For_Wordpress {
 
 		// now add pages
 		self::add_pages();
-		
+
 		update_option('arlo_plugin_version', self::VERSION);
+
+		//load demo data
+		$settings = get_option('arlo_settings');
+		if (empty($settings['platform_name'])) {
+			$plugin = self::get_instance();
+			$plugin->load_demo();
+			do_action('arlo_scheduler');
+		}
 	}
 
 	/**
