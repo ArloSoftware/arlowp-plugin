@@ -363,6 +363,7 @@ class Arlo_For_Wordpress {
 	 */
 	public static function run_scheduler() {
 		session_write_close();
+		check_ajax_referer( 'arlo_import', 'nonce' );
 		do_action('arlo_scheduler');
 		wp_die();
 	}		
@@ -1772,7 +1773,7 @@ class Arlo_For_Wordpress {
 
 			return array(
 				'action' => 'arlo_run_scheduler',
-				//'nonce'  => wp_create_nonce( $this->identifier ),
+				'nonce'  => wp_create_nonce( 'arlo_import' ),
 			);
 		}
 
