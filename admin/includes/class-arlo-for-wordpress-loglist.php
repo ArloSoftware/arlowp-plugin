@@ -118,7 +118,7 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 	protected function get_sql_where_expression() {	
 		$search_where = $this->get_sql_search_where_array();
 		if (count($search_where)) {
-			$where .= " (" . implode(" OR ", $search_where) . ")";
+			$where = " (" . implode(" OR ", $search_where) . ")";
 		}
 		
 		return !empty($where) ? $where : '1';
