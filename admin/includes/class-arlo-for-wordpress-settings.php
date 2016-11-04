@@ -397,7 +397,7 @@ class Arlo_For_Wordpress_Settings {
 	    
 	    echo '<div class="arlo-label arlo-full-width">
 	    		<label>
-	    		' . sprintf(__('%s page', $this->plugin_slug), Arlo_For_Wordpress::$templates[$id]['name'], Arlo_For_Wordpress::$templates[$id]['shortcode']) . '
+	    		' . sprintf(__('%s page', $this->plugin_slug), Arlo_For_Wordpress::$templates[$id]['name']) . '
 	    		' . (!empty(Arlo_For_Wordpress::$templates[$id]['shortcode']) ? 'shortcode <span class="arlo-gray">' . Arlo_For_Wordpress::$templates[$id]['shortcode'] . '</span>' : '') . ' content
 	    		</label>
 	    	</div>';
