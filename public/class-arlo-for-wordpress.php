@@ -1900,6 +1900,7 @@ class Arlo_For_Wordpress {
 					if(!$post) {					
 						wp_insert_post($post_config_array, true);						
 					} else {
+						$post_config_array['ID'] = $post->ID;
 						wp_update_post($post_config_array);				
 	  				}
 	  									
