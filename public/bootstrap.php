@@ -4113,11 +4113,12 @@ $shortcodes->add('event_duration', function($content='', $atts, $shortcode_name)
 	$start = $events->e_startdatetime;
 	$end = $events->e_finishdatetime;
 	$difference = strtotime($end)-strtotime($start);// seconds
-        
+
+	$hours = floor($difference/60/60);
+
 	// if we're the same day, display hours
-	if(date('d-m', strtotime($start)) == date('d-m', strtotime($end))) {
-		$hours = floor($difference/60/60);
-                
+	if(date('d-m', strtotime($start)) == date('d-m', strtotime($end)) || $hours <= 6) {
+		
 		if ($hours > 6) {
 			return __('1 day', $GLOBALS['arlo_plugin_slug']);
 		}
