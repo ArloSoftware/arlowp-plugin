@@ -1925,14 +1925,15 @@ $shortcodes->add('event_template_permalink', function($content='', $atts, $short
 	
 	$region_link_suffix = '';
 
-	if (!empty($GLOBALS['arlo_eventtemplate']['et_region'])) {
+	$regions = get_option('arlo_regions');
+
+	if (!empty($GLOBALS['arlo_eventtemplate']['et_region']) && is_array($regions) && count($regions)) {
 		$arlo_region = $GLOBALS['arlo_eventtemplate']['et_region'];
 	} else {
-		$regions = get_option('arlo_regions');
 		$arlo_region = get_query_var('arlo-region', '');
 		$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
 	}
-	
+
 	if (!empty($arlo_region)) {
 		$region_link_suffix = 'region-' . $arlo_region . '/';
 	}

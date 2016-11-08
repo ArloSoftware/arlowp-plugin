@@ -31,7 +31,7 @@ class OnlineActivities extends Importer {
 							(!empty($item->Credits) ? json_encode($item->Credits) : ''),
 							@$item->RegistrationInfo->RegisterMessage,
 							@$item->RegistrationInfo->RegisterUri,
-							(!empty($region) ? $region : 'NULL'),
+							(!empty($item->Region) ? $item->Region : ''),
 							parent::$import_id
 						)
 					);
@@ -48,7 +48,7 @@ class OnlineActivities extends Importer {
 					}
 					
 					if(isset($item->AdvertisedOffers) && !empty($item->AdvertisedOffers)) {
-						$this->save_advertised_offer($item->AdvertisedOffers, '', null, null, $this->oa_id);
+						$this->save_advertised_offer($item->AdvertisedOffers, $item->Region, null, null, $this->oa_id);
 					}
 				}
 			}		

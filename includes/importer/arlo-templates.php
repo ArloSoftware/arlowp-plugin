@@ -52,7 +52,7 @@ class Templates extends Importer {
 						parent::$import_id,
 						!empty($item->RegisterInterestUri) ? $item->RegisterInterestUri : '',
 						!empty($item->ViewUri) ? $item->ViewUri : '',
-						(!empty($region) ? $region : '')
+						(!empty($item->Region) ? $item->Region : '')
 					)
 				);
 								
@@ -73,7 +73,7 @@ class Templates extends Importer {
 									
 				// advertised offers
 				if(!empty($item->BestAdvertisedOffers) && is_array($item->BestAdvertisedOffers)) {
-					$this->save_advertised_offer($item->BestAdvertisedOffers, '', $this->template_id);
+					$this->save_advertised_offer($item->BestAdvertisedOffers, $item->Region, $this->template_id);
 				}
 				
 				// content fields

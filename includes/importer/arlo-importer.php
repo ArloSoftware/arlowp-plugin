@@ -173,7 +173,7 @@ class Importer extends Singleton {
 					@$offer->Message,
 					$key+1,
 					(isset($offer->ReplacesOfferID)) ? $offer->ReplacesOfferID+1 : null,
-					(!empty($region) ? $region : 'NULL'),
+					(!empty($region) ? $region : ''),
 					self::$import_id
 				) );
 				

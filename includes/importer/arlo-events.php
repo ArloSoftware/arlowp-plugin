@@ -23,7 +23,7 @@ class Events extends Importer {
 		}
 	}
 
-	private function save_event_data($item = [], $parent_id = 0, $region = '') {
+	private function save_event_data($item = [], $parent_id = 0) {
 		$table_name = parent::$wpdb->prefix . "arlo_events";
 		
 		$query = parent::$wpdb->query(
@@ -58,7 +58,7 @@ class Events extends Importer {
 				@$item->Provider->WebsiteUri,
 				@$item->Location->IsOnline,
 				(!empty($item->Credits) ? json_encode($item->Credits) : ''),
-				(!empty($region) ? $region : ''),
+				(!empty($item->Region) ? $item->Region : ''),
 				parent::$import_id
 			)
 		);
@@ -72,7 +72,7 @@ class Events extends Importer {
 		
 		//advertised offers
 		if(!empty($item->AdvertisedOffers) && is_array($item->AdvertisedOffers)) {
-			$this->save_advertised_offer($item->AdvertisedOffers, '', null, $this->event_id);
+			$this->save_advertised_offer($item->AdvertisedOffers, $item->Region, null, $this->event_id);
 		}
 		
 		// prsenters
@@ -83,7 +83,7 @@ class Events extends Importer {
 		//Save session information
 		if ($parent_id == 0 && isset($item->Sessions) && is_array($item->Sessions) && !empty($item->Sessions[0]->EventID) && $item->Sessions[0]->EventID != $item->EventID ) {
 			foreach ($item->Sessions as $session) {
-				$this->save_event_data($session, $item->EventID, $region);
+				$this->save_event_data($session, $item->EventID, $item->Region);
 			}
 		}
 	}

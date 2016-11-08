@@ -7,6 +7,8 @@ class Finish extends Importer {
 	public function __construct() {	}
 
 	public function import() {
+		error_log(parent::$plugin->get_import_lock_entries_number());
+		error_log(parent::$plugin->check_import_lock(parent::$import_id));
 		if (parent::$plugin->get_import_lock_entries_number() == 1 && parent::$plugin->check_import_lock(parent::$import_id)) {
             //clean up the old entries
 			$this->cleanup_import(parent::$import_id);
