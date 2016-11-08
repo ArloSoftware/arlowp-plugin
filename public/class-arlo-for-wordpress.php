@@ -1377,7 +1377,7 @@ class Arlo_For_Wordpress {
 							self::add_log("Couldn't create Arlo 6 hours import error message");
 						}
 						
-						if ($settings['arlo_send_data'] == "1") {
+						if (isset($settings['arlo_send_data']) && $settings['arlo_send_data'] == "1") {
 							self::send_log_to_arlo(strip_tags($message[0]));
 						}
 					}
@@ -1414,7 +1414,7 @@ class Arlo_For_Wordpress {
 		}
 	}
 	
-	private function delete_running_tasks() {
+	private static function delete_running_tasks() {
 		$plugin = self::get_instance();
 		$scheduler = $plugin->get_scheduler();
 		
