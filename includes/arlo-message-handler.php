@@ -72,8 +72,6 @@ class MessageHandler extends Singleton {
 	public function dismiss_by_type($type = null) {
 		$type = (!empty($type) ? $type : null);
 		if (is_null($type)) return;
-
-		$user = wp_get_current_user();	
 		
 		$utc_date = gmdate("Y-m-d H:i:s"); 
 		
