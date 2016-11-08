@@ -16,7 +16,7 @@ class Timezones extends Importer {
 					array(
 						'id' => $item->TimeZoneID,
 						'name' => $item->Name,
-						'active' => parent::$import_id
+						'import_id' => parent::$import_id
 					),
 					array(
 						'%d', '%s', '%s'
@@ -33,7 +33,7 @@ class Timezones extends Importer {
 								array(
 									'timezone_id' => $item->TimeZoneID,
 									'olson_name' => $TzName,
-									'active' => parent::$import_id
+									'import_id' => parent::$import_id
 								),
 								array(
 									'%d', '%s', '%s'

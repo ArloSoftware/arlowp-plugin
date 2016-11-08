@@ -669,6 +669,10 @@ class Arlo_For_Wordpress {
 		if (version_compare($old_version, '2.4') < 0) {
 			self::run_pre_data_update('2.4');
 		}
+
+		if (version_compare($old_version, '2.4.1.1') < 0) {
+			self::run_pre_data_update('2.4.1.1');
+		}		
 		
 		arlo_add_datamodel();	
 	
@@ -741,6 +745,26 @@ class Arlo_For_Wordpress {
 				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_timezones_olson DROP PRIMARY KEY, ADD PRIMARY KEY (timezone_id,olson_name,active)");				
 				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates_presenters DROP PRIMARY KEY, ADD PRIMARY KEY (et_id,p_arlo_id,active)");
 															
+			break;
+
+			case '2.4.1.1':
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_categories CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_contentfields CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events_presenters CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events_tags CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates_categories CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates_presenters CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates_tags CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_offers CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_onlineactivities CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_onlineactivities_tags CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_presenters CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");				
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_tags CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_timezones CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_timezones_olson CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_venues CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
 			break;
 		}
 	}	
@@ -1831,7 +1855,7 @@ class Arlo_For_Wordpress {
 	
 	public static function redirect_proxy() {
 		$settings = get_option('arlo_settings');
-		$active = self::get_instance()->get_import_id();
+		$import_id = self::get_instance()->get_import_id();
 		
 		if(!isset($_GET['object_post_type']) || !isset($_GET['arlo_id'])) return;
 		
@@ -1845,7 +1869,7 @@ class Arlo_For_Wordpress {
 					
 					$location = $url;
 				} else {
-					$event = \Arlo\EventTemplates::get(array('id' => $_GET['arlo_id']), array(), 1, $active);
+					$event = \Arlo\EventTemplates::get(array('id' => $_GET['arlo_id']), array(), 1, $import_id);
 					
 					if(!$event) return;
 					
@@ -1858,7 +1882,7 @@ class Arlo_For_Wordpress {
 			break;
 			
 			case 'venue':
-				$venue = \Arlo\Venues::get(array('id' => $_GET['arlo_id']), array(), 1, $active);
+				$venue = \Arlo\Venues::get(array('id' => $_GET['arlo_id']), array(), 1, $import_id);
 				
 				if(!$venue) return;
 				
@@ -1870,7 +1894,7 @@ class Arlo_For_Wordpress {
 			break;
 			
 			case 'presenter':
-				$presenter = \Arlo\Presenters::get(array('id' => $_GET['arlo_id']), array(), 1, $active);
+				$presenter = \Arlo\Presenters::get(array('id' => $_GET['arlo_id']), array(), 1, $import_id);
 				
 				if(!$presenter) return;
 				
@@ -1893,7 +1917,7 @@ class Arlo_For_Wordpress {
 	public static function load_demo_notice($error = []) {
 		global $wpdb;
 		$settings = get_option('arlo_settings');
-		$timestamp = get_option('arlo_last_import');
+		$import_id = get_option('arlo_last_import');
 		
 		$events = arlo_get_post_by_name('events', 'page');
 		$upcoming = arlo_get_post_by_name('upcoming', 'page');
@@ -1924,7 +1948,7 @@ class Arlo_For_Wordpress {
 					ON
 						e.et_arlo_id = et.et_arlo_id
 					AND
-						e.active = '{$timestamp}'
+						e.import_id = " . $import_id ."
 					LEFT JOIN
 						{$wpdb->prefix}posts
 					ON
@@ -1932,7 +1956,7 @@ class Arlo_For_Wordpress {
 					AND
 						post_status = 'publish'
 					WHERE 
-						et.active = '{$timestamp}'
+						et.import_id = " . $import_id ."
 					LIMIT 
 						1
 					";
@@ -1958,7 +1982,7 @@ class Arlo_For_Wordpress {
 					AND
 						post_status = 'publish'
 					WHERE 
-						p.active = '{$timestamp}'
+						p.import_id = " . $import_id ."
 					LIMIT 
 						1
 					";
@@ -1983,7 +2007,7 @@ class Arlo_For_Wordpress {
 					AND
 						post_status = 'publish'
 					WHERE 
-						v.active = '{$timestamp}'
+						v.import_id = " . $import_id ."
 					LIMIT 
 						1
 					";

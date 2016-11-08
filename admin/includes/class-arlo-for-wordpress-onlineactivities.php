@@ -88,7 +88,7 @@ class Arlo_For_Wordpress_OnlineActivities extends Arlo_For_Wordpress_Lists  {
 		
 	protected function get_sql_where_array() {
 		return [
-			"oa.active = '" . $this->active . "'"
+			"oa.import_id = '" . $this->import_id . "'"
 		];
 	}
 	

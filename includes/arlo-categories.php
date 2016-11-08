@@ -8,7 +8,7 @@ require_once 'arlo-singleton.php';
 use Arlo\Singleton;
 
 class Categories extends Singleton {
-	static function get($conditions = array(), $limit = null, $active = null) {
+	static function get($conditions = array(), $limit = null, $import_id = null) {
 		global $wpdb;
 
 		$args = func_get_args();
@@ -22,7 +22,7 @@ class Categories extends Singleton {
 	
 		$query = "SELECT c.* FROM {$wpdb->prefix}arlo_categories AS c";
 		
-		$where = array("active = " . $active);
+		$where = array("import_id = " . $import_id);
 	
 		foreach($conditions as $key => $value) {
 			// what to do?
@@ -71,16 +71,16 @@ class Categories extends Singleton {
 	}
 	
 	//$categories = \Arlo\Categories::getTree();
-	static function getTree($start_id = 0, $depth = 1, $level = 0, $active = null) {
+	static function getTree($start_id = 0, $depth = 1, $level = 0, $import_id = null) {
 		$result = null;
 		$conditions = array('parent_id' => $start_id);
 		
-		$categories = self::get($conditions, null, $active);
+		$categories = self::get($conditions, null, $import_id);
 				
 		foreach($categories as $item) {		
 			$item->depth_level = $level;	
 			if($depth - 1 > $level) {
-				$item->children = self::getTree($item->c_arlo_id, $depth, $level+1, $active);
+				$item->children = self::getTree($item->c_arlo_id, $depth, $level+1, $import_id);
 			}
 			$result[] = $item;
 		}

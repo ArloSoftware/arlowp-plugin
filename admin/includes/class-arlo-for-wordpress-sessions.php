@@ -116,7 +116,7 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 	
 	protected function get_sql_where_array() {
 		return [
-			"es.active = '" . $this->active . "'",
+			"es.import_id = '" . $this->import_id . "'",
 			"es.e_parent_arlo_id != 0"
 		];
 	}
