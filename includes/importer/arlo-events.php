@@ -29,7 +29,7 @@ class Events extends Importer {
 		$query = parent::$wpdb->query(
 			parent::$wpdb->prepare( 
 				"INSERT INTO $table_name 
-				(e_arlo_id, et_arlo_id, e_parent_arlo_id, e_code, e_name, e_startdatetime, e_finishdatetime, e_datetimeoffset, e_timezone, e_timezone_id, v_id, e_locationname, e_locationroomname, e_locationvisible , e_isfull, e_placesremaining, e_summary, e_sessiondescription, e_notice, e_viewuri, e_registermessage, e_registeruri, e_providerorganisation, e_providerwebsite, e_isonline, e_credits, e_region, import_id) 
+				(e_arlo_id, et_arlo_id, e_parent_arlo_id, e_code, e_name, e_startdatetime, e_finishdatetime, e_datetimeoffset, e_timezone, e_timezone_id, v_id, e_locationname, e_locationroomname, e_locationvisible , e_isfull, e_placesremaining, e_summary, e_sessiondescription, e_notice, e_viewuri, e_registermessage, e_registeruri, e_providerorganisation, e_providerwebsite, e_isonline, e_credits, e_region, active) 
 				VALUES ( %d, %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) 
 				", 
 			    $item->EventID,
@@ -95,7 +95,7 @@ class Events extends Importer {
 			foreach($presenters as $index => $presenter) {
 				$query = parent::$wpdb->query( parent::$wpdb->prepare( 
 					"INSERT INTO " . parent::$wpdb->prefix . "arlo_events_presenters 
-					(e_id, p_arlo_id, p_order, import_id) 
+					(e_id, p_arlo_id, p_order, active) 
 					VALUES ( %d, %d, %d, %s ) 
 					", 
 				    $this->event_id,

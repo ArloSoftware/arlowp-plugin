@@ -7,12 +7,12 @@ require_once 'arlo-singleton.php';
 use Arlo\Singleton;
 
 class Offers extends Singleton {
-	static function get($conditions = array(), $order = array(), $limit = null, $import_id = null) {
+	static function get($conditions = array(), $order = array(), $limit = null, $active = null) {
 		global $wpdb;
 	
 		$query = "SELECT o.* FROM {$wpdb->prefix}arlo_offers AS o";
 		
-		$where = array("o.import_id = " . $import_id);
+		$where = array("o.active = " . $active);
 		$join = array();
 	
 		// conditions
@@ -49,7 +49,7 @@ class Offers extends Singleton {
 					$join[] = "
 					LEFT JOIN {$wpdb->prefix}arlo_eventtemplates AS et USING (et_id) 
 					";
-					$where = array("et.import_id = " . $import_id);
+					$where = array("et.active = " . $active);
 					if(is_array($value)) {
 						$where[] = "et.et_arlo_id IN (" . implode(',', $value) . ")";
 					} else {

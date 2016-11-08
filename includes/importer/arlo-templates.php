@@ -40,7 +40,7 @@ class Templates extends Importer {
 				$query = parent::$wpdb->query(
 					parent::$wpdb->prepare( 
 						"INSERT INTO $table_name 
-						(et_arlo_id, et_code, et_name, et_descriptionsummary, et_advertised_duration, et_post_name, import_id, et_registerinteresturi, et_viewuri, et_region) 
+						(et_arlo_id, et_code, et_name, et_descriptionsummary, et_advertised_duration, et_post_name, active, et_registerinteresturi, et_viewuri, et_region) 
 						VALUES ( %d, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
 						", 
 						$item->TemplateID,
@@ -101,7 +101,7 @@ class Templates extends Importer {
 			foreach($categories as $index => $category) {
 				$query = parent::$wpdb->query( parent::$wpdb->prepare( 
 					"REPLACE INTO " . parent::$wpdb->prefix . "arlo_eventtemplates_categories 
-					(et_arlo_id, c_arlo_id, import_id) 
+					(et_arlo_id, c_arlo_id, active) 
 					VALUES ( %d, %d, %s ) 
 					", 
 					$this->template_id,
@@ -124,7 +124,7 @@ class Templates extends Importer {
 			foreach($advertised_presenters as $index => $presenter) {
 				$query = parent::$wpdb->query( parent::$wpdb->prepare( 
 					"INSERT INTO " . parent::$wpdb->prefix . "arlo_eventtemplates_presenters 
-					(et_id, p_arlo_id, p_order, import_id) 
+					(et_id, p_arlo_id, p_order, active) 
 					VALUES ( %d, %d, %d, %s ) 
 					", 
 					$this->template_id,
@@ -148,7 +148,7 @@ class Templates extends Importer {
 			foreach($content_fields as $index => $content) {
 				$query = parent::$wpdb->query( parent::$wpdb->prepare( 
 					"INSERT INTO " . parent::$wpdb->prefix . "arlo_contentfields 
-					(et_id, cf_fieldname, cf_text, cf_order, e_contenttype, import_id) 
+					(et_id, cf_fieldname, cf_text, cf_order, e_contenttype, active) 
 					VALUES ( %d, %s, %s, %s, %s, %s ) 
 					", 
 					$this->template_id,

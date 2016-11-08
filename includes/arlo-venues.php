@@ -7,12 +7,12 @@ require_once 'arlo-singleton.php';
 use Arlo\Singleton;
 
 class Venues extends Singleton {
-	static function get($conditions = array(), $order = array(), $limit = null, $import_id = null) {
+	static function get($conditions = array(), $order = array(), $limit = null, $active = null) {
 		global $wpdb;
 	
 		$query = "SELECT v.* FROM {$wpdb->prefix}arlo_venues AS v";
 		
-		$where = array("import_id = " . $import_id);
+		$where = array("active = " . $active);
 	
 		// conditions
 		foreach($conditions as $key => $value) {

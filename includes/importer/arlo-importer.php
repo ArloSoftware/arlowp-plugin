@@ -10,7 +10,7 @@ use Arlo\Singleton;
 class Importer extends Singleton {
 	public static $filename;
 	public static $is_finished = false;
-
+	
 	protected static $dir;
 	protected static $import_id;
 	protected static $plugin;
@@ -153,7 +153,7 @@ class Importer extends Singleton {
 			foreach($offers as $key => $offer) {
 				$query = self::$wpdb->query( self::$wpdb->prepare( 
 					"INSERT INTO " . self::$wpdb->prefix . "arlo_offers 
-					(o_arlo_id, et_id, e_id, oa_id, o_label, o_isdiscountoffer, o_currencycode, o_offeramounttaxexclusive, o_offeramounttaxinclusive, o_formattedamounttaxexclusive, o_formattedamounttaxinclusive, o_taxrateshortcode, o_taxratename, o_taxratepercentage, o_message, o_order, o_replaces, o_region, import_id) 
+					(o_arlo_id, et_id, e_id, oa_id, o_label, o_isdiscountoffer, o_currencycode, o_offeramounttaxexclusive, o_offeramounttaxinclusive, o_formattedamounttaxexclusive, o_formattedamounttaxinclusive, o_taxrateshortcode, o_taxratename, o_taxratepercentage, o_message, o_order, o_replaces, o_region, active) 
 					VALUES ( %d, %d, %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, %s, %s, %s ) 
 					", 
 					$offer->OfferID + 1,
@@ -217,7 +217,7 @@ class Importer extends Singleton {
 			WHERE 
 				tag IN ('" . implode("', '", $tags) . "')
 			AND
-				import_id = " . self::$import_id . "
+				active = " . self::$import_id . "
 			";
 
 			$rows = self::$wpdb->get_results($sql, ARRAY_A);
@@ -230,7 +230,7 @@ class Importer extends Singleton {
 				if (empty($exisiting_tags[$tag])) {
 					$query = self::$wpdb->query( self::$wpdb->prepare( 
 						"INSERT INTO " . self::$wpdb->prefix . "arlo_tags
-						(tag, import_id) 
+						(tag, active) 
 						VALUES ( %s, %s ) 
 						", 
 						$tag,
@@ -248,7 +248,7 @@ class Importer extends Singleton {
 				if (!empty($exisiting_tags[$tag])) {
 					$query = self::$wpdb->query( self::$wpdb->prepare( 
 						"INSERT INTO {$table_name}
-						(" . $field . ", tag_id, import_id) 
+						(" . $field . ", tag_id, active) 
 						VALUES ( %d, %d, %s ) 
 						", 
 						$id,

@@ -51,7 +51,7 @@ class Finish extends Importer {
                 		
 		foreach($tables as $table) {
 			$table = parent::$wpdb->prefix . 'arlo_' . $table;
-			parent::$wpdb->query(parent::$wpdb->prepare("DELETE FROM $table WHERE import_id <> %s", parent::$import_id));
+			parent::$wpdb->query(parent::$wpdb->prepare("DELETE FROM $table WHERE active <> %s", parent::$import_id));
 		}   
 
 		parent::$plugin->add_log('Database cleanup', parent::$import_id);

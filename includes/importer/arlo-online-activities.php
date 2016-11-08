@@ -18,7 +18,7 @@ class OnlineActivities extends Importer {
 					$query = parent::$wpdb->query(
 						parent::$wpdb->prepare( 
 							"INSERT INTO $table_name 
-							(oa_arlo_id, oat_arlo_id, oa_code, oa_name, oa_delivery_description, oa_viewuri, oa_reference_terms, oa_credits, oa_registermessage, oa_registeruri, oa_region, import_id) 
+							(oa_arlo_id, oat_arlo_id, oa_code, oa_name, oa_delivery_description, oa_viewuri, oa_reference_terms, oa_credits, oa_registermessage, oa_registeruri, oa_region, active) 
 							VALUES ( %s, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
 							", 
 							$item->OnlineActivityID,

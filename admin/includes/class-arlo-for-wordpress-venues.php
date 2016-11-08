@@ -101,7 +101,7 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 	
 	protected function get_sql_where_array() {
 		return [
-			"v.import_id = '" . $this->import_id . "'",
+			"v.active = '" . $this->active . "'",
 		];
 	}
 	
