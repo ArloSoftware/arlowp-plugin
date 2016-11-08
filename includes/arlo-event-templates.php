@@ -7,12 +7,12 @@ require_once 'arlo-singleton.php';
 use Arlo\Singleton;
 
 class EventTemplates extends Singleton {
-	static function get($conditions=array(), $order=array(), $limit=null, $active = null) {
+	static function get($conditions=array(), $order=array(), $limit=null, $import_id = null) {
 		global $wpdb;
 	
 		$query = "SELECT et.* FROM {$wpdb->prefix}arlo_eventtemplates AS et";
 		
-		$where = array("active = " . $active);
+		$where = array("import_id = " . $import_id);
 	
 		// conditions
 		foreach($conditions as $key => $value) {

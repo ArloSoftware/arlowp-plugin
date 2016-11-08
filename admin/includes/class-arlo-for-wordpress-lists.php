@@ -23,7 +23,7 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	protected $order;
 	protected $orderby;
 	protected $paged;
-	protected $active;
+	protected $import_id;
 	protected $plugin_slug;
 	
 	protected static $filter_column_mapping = array(
@@ -58,7 +58,7 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 		$plugin = Arlo_For_Wordpress::get_instance();
 		$settings = get_option('arlo_settings');
 				
-		$this->active = $plugin->get_import_id();
+		$this->import_id = $plugin->get_import_id();
 		$this->plugin_slug = $plugin->plugin_slug;
 		$this->version = Arlo_For_Wordpress::VERSION;	
 		$this->wpdb = &$wpdb;
@@ -104,7 +104,7 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	}
 	
 	protected function get_sql_where_array() {
-		return ["active = " . $this->active];
+		return ["import_id = " . $this->import_id];
 	}
 	
 	private function get_sql_search_where_array() {

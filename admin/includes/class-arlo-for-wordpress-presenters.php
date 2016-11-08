@@ -60,7 +60,7 @@ class Arlo_For_Wordpress_Presenters extends Arlo_For_Wordpress_Lists  {
 	
 	protected function get_sql_where_array() {
 		return [
-			"p.active = '" . $this->active . "'",
+			"p.import_id = '" . $this->import_id . "'",
 		];
 	}	
 		

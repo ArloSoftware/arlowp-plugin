@@ -286,7 +286,7 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 		global $wpdb;
 		
 		$regions = get_option('arlo_regions');	
-		$active = $this->get_import_id();
+		$import_id = $this->get_import_id();
 		$arlo_region = get_query_var('arlo-region', '');
 		$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : (!empty($_COOKIE['arlo-region']) ? $_COOKIE['arlo-region'] : '' ));
 				
@@ -294,7 +294,7 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 			$where['region'] = ' e_region = "' . $arlo_region . '" AND et_region = "' . $arlo_region . '"';
 		}
 		
-		$where['active'] = "e.active = ".$active;
+		$where['import_id'] = "e.import_id = ".$import_id;
 		$where['date'] = " CURDATE() < DATE(e.e_startdatetime) ";
 		$where['event'] = "e_parent_arlo_id = 0";
 				
@@ -315,7 +315,7 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 		ON 
 			e.et_arlo_id = et.et_arlo_id
 		AND
-			e.active = et.active
+			e.import_id = et.import_id
 		WHERE
 			" . implode(" AND ", $where) . "
 		ORDER BY 

@@ -14,7 +14,7 @@ class Categories extends Importer {
 				$slug = sanitize_title($item->CategoryID . ' ' . $item->Name);
 				$query = parent::$wpdb->query( parent::$wpdb->prepare( 
 					"INSERT INTO $table_name 
-					(c_arlo_id, c_name, c_slug, c_header, c_footer, c_order, c_parent_id, active) 
+					(c_arlo_id, c_name, c_slug, c_header, c_footer, c_order, c_parent_id, import_id) 
 					VALUES ( %d, %s, %s, %s, %s, %d, %d, %s ) 
 					", 
 				    $item->CategoryID,
@@ -45,7 +45,7 @@ class Categories extends Importer {
 		FROM
 			" . parent::$wpdb->prefix . "arlo_eventtemplates_categories
 		WHERE
-			active = " . parent::$import_id . "
+			import_id = " . parent::$import_id . "
 		GROUP BY
 			c_arlo_id
 		";
@@ -61,7 +61,7 @@ class Categories extends Importer {
 				WHERE
 					c_arlo_id = %d
 				AND
-					active = " . parent::$import_id . "
+					import_id = " . parent::$import_id . "
 				";
 				$query = parent::$wpdb->query( parent::$wpdb->prepare($sql, $counts['num'], $counts['c_arlo_id']) );
 				
@@ -76,7 +76,7 @@ class Categories extends Importer {
 				
 		$this->set_category_depth_level($cats, parent::$import_id);
 		
-		$sql = "SELECT MAX(c_depth_level) FROM " . parent::$wpdb->prefix . "arlo_categories WHERE active = " . parent::$import_id . "";
+		$sql = "SELECT MAX(c_depth_level) FROM " . parent::$wpdb->prefix . "arlo_categories WHERE import_id = " . parent::$import_id . "";
 		$max_depth = parent::$wpdb->get_var($sql);
 		
 		$this->set_category_depth_order($cats, $max_depth, 0, parent::$import_id);
@@ -91,7 +91,7 @@ class Categories extends Importer {
 			WHERE
 				c_depth_level = {$i}
 			AND
-				active = " . parent::$import_id . "
+				import_id = " . parent::$import_id . "
 			GROUP BY
 				c_parent_id
 			";
@@ -107,7 +107,7 @@ class Categories extends Importer {
 					WHERE
 						c_arlo_id = %d
 					AND
-						active = " . parent::$import_id . "
+						import_id = " . parent::$import_id . "
 					";
 					$query = parent::$wpdb->query( parent::$wpdb->prepare($sql, $cat['num'], $cat['c_parent_id']) );
 				}
@@ -125,7 +125,7 @@ private function set_category_depth_level($cats = []) {
 			WHERE
 				c_arlo_id = %d
 			AND
-				active = %s
+				import_id = %s
 			";
 			$query = parent::$wpdb->query( parent::$wpdb->prepare($sql, $cat->depth_level, $cat->c_arlo_id, parent::$import_id) );
 			if (isset($cat->children) && is_array($cat->children)) {
@@ -148,7 +148,7 @@ private function set_category_depth_level($cats = []) {
 			WHERE
 				c_arlo_id = %d
 			AND
-				active = %s	
+				import_id = %s	
 			";
 			
 			$query = parent::$wpdb->query( parent::$wpdb->prepare($sql, $order + $cat->c_order, $cat->c_arlo_id, parent::$import_id) );
