@@ -259,17 +259,18 @@ class Scheduler extends Singleton {
 			$this->schedule_cron();
 
 			if (!$this->is_process_running($task_task)) {
+				//$this->lock_process($task_task);
 				switch ($task_task) {
 					case 'import':
-						$this->lock_process($task_task );
+						
 						
 						if (!$this->plugin->import($task[0]->task_priority == -1, $task[0]->task_id)) {
 							$this->update_task($task[0]->task_id, 3, "Import failed");
 							$this->clear_cron();
 						}
-						$this->unlock_process($task_task);
 					break;
 				}
+				$this->unlock_process($task_task);
 			}	
 		} else {
 			$this->clear_cron();
@@ -302,8 +303,6 @@ class Scheduler extends Singleton {
 	}
 
 	protected function lock_process($task) {
-		$this->start_time = time(); // Set start time of current process.
-
 		set_site_transient( $task . '_process_lock', microtime(), 180 );
 	}
 

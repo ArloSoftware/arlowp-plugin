@@ -68,16 +68,22 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-presenters.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-shortcodes.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-scheduler.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-crypto.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-environment.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-message-handler.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-importer.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-base-entity.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-timezones.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-presenters.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-venues.php');
-require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-events.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-templates.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-events.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-online-activities.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-categories.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-category-items.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-category-depth.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-finish.php');
-require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-message-handler.php');
+
+
 
 // start the public plugin class
 require_once( plugin_dir_path( __FILE__ ) . 'public/class-arlo-for-wordpress.php' );

@@ -1656,6 +1656,8 @@ class Arlo_For_Wordpress {
 		$task_id = intval($task_id);
 		$scheduler = $this->get_scheduler();
 		$importer = $this->get_importer();
+
+		var_dump($task_id);
 	
 		if ($task_id > 0) {
 			$task = $scheduler->get_task_data($task_id);
@@ -1694,7 +1696,6 @@ class Arlo_For_Wordpress {
 					}
 				} 				
 			} else {
-
 				$task->task_data_text = json_decode($task->task_data_text);
 				if (empty($task->task_data_text->import_id)) {
 					return false;
@@ -1717,17 +1718,18 @@ class Arlo_For_Wordpress {
 		try {			
 			$importer->set_import_id($import_id);
 
-			$current_subtask_step_num = ((!empty($task->task_data_text) && isset($task->task_data_text->finished_subtask)) ? intval($task->task_data_text->finished_subtask) + 1 : 0 );
+			$importer->set_state($task->task_data_text);
 
-			$importer->set_current_task($current_subtask_step_num);
+			if (!$importer::$is_finished) {
+				$scheduler->update_task($task_id, 2, "Import is running: task " . ($importer->current_task_num + 1) . "/" . count($importer->import_tasks) . ": " . $importer->current_task_desc);
 
-			$scheduler->update_task($task_id, 2, "Import is running: task " . ($current_subtask_step_num + 1) . "/" . count($importer->import_tasks) . ": " . $importer->current_task_desc);
+				$importer->run();
 
-			$importer->run();
-
-			$scheduler->update_task_data($task_id, ['finished_subtask' => $current_subtask_step_num]);
-			$scheduler->update_task($task_id, 1);
-			$scheduler->unlock_process('import');
+				$scheduler->update_task_data($task_id, $importer->get_state());
+				
+				$scheduler->update_task($task_id, 1);
+				$scheduler->unlock_process('import');
+			}
 								
 			if ($importer::$is_finished) {
 				//finish task
@@ -1756,52 +1758,37 @@ class Arlo_For_Wordpress {
 		return true;
 	}
 
-		/**
-		 * Get query args
-		 *
-		 * @return array
-		 */
-		protected function get_query_args() {
-			if ( property_exists( $this, 'query_args' ) ) {
-				return $this->query_args;
-			}
-
-			return array(
-				'action' => 'arlo_run_scheduler',
-				//'nonce'  => wp_create_nonce( $this->identifier ),
-			);
+	protected function get_query_args() {
+		if ( property_exists( $this, 'query_args' ) ) {
+			return $this->query_args;
 		}
 
-		/**
-		 * Get query URL
-		 *
-		 * @return string
-		 */
-		protected function get_query_url() {
-			if ( property_exists( $this, 'query_url' ) ) {
-				return $this->query_url;
-			}
+		return array(
+			'action' => 'arlo_run_scheduler',
+			//'nonce'  => wp_create_nonce( $this->identifier ),
+		);
+	}
 
-			return admin_url( 'admin-ajax.php' );
+	protected function get_query_url() {
+		if ( property_exists( $this, 'query_url' ) ) {
+			return $this->query_url;
 		}
 
-		/**
-		 * Get post args
-		 *
-		 * @return array
-		 */
-		protected function get_post_args() {
-			if ( property_exists( $this, 'post_args' ) ) {
-				return $this->post_args;
-			}
+		return admin_url( 'admin-ajax.php' );
+	}
 
-			return array(
-				'timeout'   => 0.01,
-				'blocking'  => false,
-				'cookies'   => $_COOKIE,
-				'sslverify' => apply_filters( 'https_local_ssl_verify', false ),
-			);
+	protected function get_post_args() {
+		if ( property_exists( $this, 'post_args' ) ) {
+			return $this->post_args;
 		}
+
+		return array(
+			'timeout'   => 0.01,
+			'blocking'  => false,
+			'cookies'   => $_COOKIE,
+			'sslverify' => apply_filters( 'https_local_ssl_verify', false ),
+		);
+	}
 
 	public function delete_custom_posts($table, $column, $post_type) {
 		global $wpdb;

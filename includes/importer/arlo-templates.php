@@ -2,12 +2,72 @@
 
 namespace Arlo\Importer;
 
-class Templates extends Importer {
+class Templates extends BaseEntity {
 
 	private $slug;
-	private $template_id;
 
-	public function __construct() {	}
+	public function __construct($plugin, $importer, $data, $iterator = 0) {
+		parent::__construct($plugin, $importer, $data, $iterator);
+
+		$this->table_name = $this->wpdb->prefix . 'arlo_eventtemplates';
+	}
+
+	protected function save_entity($item) {
+		$this->slug = sanitize_title($item->TemplateID . ' ' . $item->Name);
+		$query = $this->wpdb->query(
+			$this->wpdb->prepare( 
+				"INSERT INTO " . $this->table_name ." 
+				(et_arlo_id, et_code, et_name, et_descriptionsummary, et_advertised_duration, et_post_name, import_id, et_registerinteresturi, et_viewuri, et_region) 
+				VALUES ( %d, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
+				", 
+				$item->TemplateID,
+				@$item->Code,
+				$item->Name,
+				@$item->Description->Summary,
+				@$item->AdvertisedDuration,
+				$this->slug,
+				$this->import_id,
+				!empty($item->RegisterInterestUri) ? $item->RegisterInterestUri : '',
+				!empty($item->ViewUri) ? $item->ViewUri : '',
+				(!empty($item->Region) ? $item->Region : '')
+			)
+		);
+						
+		if ($query === false) {
+			$this->plugin->add_log('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
+			throw new Exception('Database insert failed: ' . $this->table_name);
+		}
+		
+		$this->id = $this->wpdb->insert_id;
+		
+		//TODO: Test without a summary/description
+		$this->save_update_wp_post($item->Name, @$item->Description->Summary);
+
+		//tags
+		if (isset($item->Tags) && !empty($item->Tags)) {
+			$this->save_tags($item->Tags, $this->id, 'template');
+		}
+							
+		// advertised offers
+		if(!empty($item->BestAdvertisedOffers) && is_array($item->BestAdvertisedOffers)) {
+			$this->save_advertised_offer($item->BestAdvertisedOffers, $item->Region, $this->id);
+		}
+		
+		// content fields
+		if(!empty($item->Description->ContentFields) && is_array($item->Description->ContentFields)) {
+			$this->save_content_fields($item->Description->ContentFields);
+		}
+	
+		// prsenters
+		if(!empty($item->AdvertisedPresenters) && is_array($item->AdvertisedPresenters)) {
+			$this->save_advertised_presenters($item->AdvertisedPresenters);
+		}
+		
+		// categories
+		if(!empty($item->Categories) && is_array($item->Categories)) {
+			$this->save_categories($item->Categories);
+		}
+	}
 
 	private function save_update_wp_post($title, $content = '') {
 		
@@ -29,88 +89,25 @@ class Templates extends Importer {
 			$post_config_array['ID'] = $post->ID;
 			wp_update_post($post_config_array);				
 		}
-	} 
-
-	public function import() {
-		$table_name = parent::$wpdb->prefix . 'arlo_eventtemplates'; 
-	
-		if (!empty(parent::$data_json->Templates) && is_array(parent::$data_json->Templates)) {
-			foreach(parent::$data_json->Templates as $item) {
-				$this->slug = sanitize_title($item->TemplateID . ' ' . $item->Name);
-				$query = parent::$wpdb->query(
-					parent::$wpdb->prepare( 
-						"INSERT INTO $table_name 
-						(et_arlo_id, et_code, et_name, et_descriptionsummary, et_advertised_duration, et_post_name, import_id, et_registerinteresturi, et_viewuri, et_region) 
-						VALUES ( %d, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
-						", 
-						$item->TemplateID,
-						@$item->Code,
-						$item->Name,
-						@$item->Description->Summary,
-						@$item->AdvertisedDuration,
-						$this->slug,
-						parent::$import_id,
-						!empty($item->RegisterInterestUri) ? $item->RegisterInterestUri : '',
-						!empty($item->ViewUri) ? $item->ViewUri : '',
-						(!empty($item->Region) ? $item->Region : '')
-					)
-				);
-								
-				if ($query === false) {
-					parent::$plugin->add_log('SQL error: ' . parent::$wpdb->last_error . ' ' .parent::$wpdb->last_query, parent::$import_id);
-					throw new Exception('Database insert failed: ' . $table_name);
-				}
-				
-				$this->template_id = parent::$wpdb->insert_id;
-				
-				//TODO: Test without a summary/description
-				$this->save_update_wp_post($item->Name, @$item->Description->Summary);
-
-				//tags
-				if (isset($item->Tags) && !empty($item->Tags)) {
-					$this->save_tags($item->Tags, $this->template_id, 'template');
-				}				
-									
-				// advertised offers
-				if(!empty($item->BestAdvertisedOffers) && is_array($item->BestAdvertisedOffers)) {
-					$this->save_advertised_offer($item->BestAdvertisedOffers, $item->Region, $this->template_id);
-				}
-				
-				// content fields
-				if(!empty($item->Description->ContentFields) && is_array($item->Description->ContentFields)) {
-					$this->save_content_fields($item->Description->ContentFields);
-				}
-			
-				// prsenters
-				if(!empty($item->AdvertisedPresenters) && is_array($item->AdvertisedPresenters)) {
-					$this->save_advertised_presenters($item->AdvertisedPresenters);
-				}
-				
-				// categories
-				if(!empty($item->Categories) && is_array($item->Categories)) {
-					$this->save_categories($item->Categories);
-				}
-			}
-		}
-	}
+	} 	
 
 	private function save_categories($categories) {
-		if (empty($this->template_id)) throw new Exception('No templateID given: ' . __CLASS__ . '::' . __FUNCTION__);
+		if (empty($this->id)) throw new Exception('No templateID given: ' . __CLASS__ . '::' . __FUNCTION__);
 
 		if(!empty($categories) && is_array($categories)) {
 			foreach($categories as $index => $category) {
-				$query = parent::$wpdb->query( parent::$wpdb->prepare( 
-					"REPLACE INTO " . parent::$wpdb->prefix . "arlo_eventtemplates_categories 
+				$query = $this->wpdb->query( $this->wpdb->prepare( 
+					"REPLACE INTO " . $this->wpdb->prefix . "arlo_eventtemplates_categories 
 					(et_arlo_id, c_arlo_id, import_id) 
 					VALUES ( %d, %d, %s ) 
 					", 
-					$this->template_id,
+					$this->id,
 					$category->CategoryID,
-					parent::$import_id
+					$this->import_id
 				) );
 												
 				if ($query === false) {
-					parent::$plugin->add_log('SQL error: ' . parent::$wpdb->last_error . ' ' . parent::$wpdb->last_query, parent::$import_id);
+					$this->plugin->add_log('SQL error: ' . $this->wpdb->last_error . ' ' . $this->wpdb->last_query, $this->import_id);
 					throw new Exception('Database insert failed: ' . $table_name);
 				}
 			}
@@ -118,23 +115,23 @@ class Templates extends Importer {
 	}
 
 	private function save_advertised_presenters($advertised_presenters = []) {
-		if (empty($this->template_id)) throw new Exception('No templateID given: ' . __CLASS__ . '::' . __FUNCTION__);
+		if (empty($this->id)) throw new Exception('No templateID given: ' . __CLASS__ . '::' . __FUNCTION__);
 
 		if(!empty($advertised_presenters) && is_array($advertised_presenters)) {
 			foreach($advertised_presenters as $index => $presenter) {
-				$query = parent::$wpdb->query( parent::$wpdb->prepare( 
-					"INSERT INTO " . parent::$wpdb->prefix . "arlo_eventtemplates_presenters 
+				$query = $this->wpdb->query( $this->wpdb->prepare( 
+					"INSERT INTO " . $this->wpdb->prefix . "arlo_eventtemplates_presenters 
 					(et_id, p_arlo_id, p_order, import_id) 
 					VALUES ( %d, %d, %d, %s ) 
 					", 
-					$this->template_id,
+					$this->id,
 					$presenter->PresenterID,
 					$index,
-					parent::$import_id
+					$this->import_id
 				) );
 												
 				if ($query === false) {
-					parent::$plugin->add_log('SQL error: ' . parent::$wpdb->last_error . ' ' . parent::$wpdb->last_query, parent::$import_id);
+					$this->plugin->add_log('SQL error: ' . $this->wpdb->last_error . ' ' . $this->wpdb->last_query, $this->import_id);
 					throw new Exception('Database insert failed: ' . $table_name);
 				}
 			}
@@ -142,25 +139,25 @@ class Templates extends Importer {
 	}
 
 	private function save_content_fields($content_fields = []) {
-		if (empty($this->template_id)) throw new Exception('No templateID given: ' . __CLASS__ . '::' . __FUNCTION__);
+		if (empty($this->id)) throw new Exception('No templateID given: ' . __CLASS__ . '::' . __FUNCTION__);
 
 		if (!empty($content_fields) && is_array($content_fields)) {
 			foreach($content_fields as $index => $content) {
-				$query = parent::$wpdb->query( parent::$wpdb->prepare( 
-					"INSERT INTO " . parent::$wpdb->prefix . "arlo_contentfields 
+				$query = $this->wpdb->query( $this->wpdb->prepare( 
+					"INSERT INTO " . $this->wpdb->prefix . "arlo_contentfields 
 					(et_id, cf_fieldname, cf_text, cf_order, e_contenttype, import_id) 
 					VALUES ( %d, %s, %s, %s, %s, %s ) 
 					", 
-					$this->template_id,
+					$this->id,
 					@$content->FieldName,
 					@$content->Content->Text,
 					$index,
 					@$content->Content->ContentType,
-					parent::$import_id
+					$this->import_id
 				));
 				
 				if ($query === false) {
-					parent::$plugin->add_log('SQL error: ' . parent::$wpdb->last_error . ' ' . parent::$wpdb->last_query, parent::$import_id);
+					$this->plugin->add_log('SQL error: ' . $this->wpdb->last_error . ' ' . $this->wpdb->last_query, $this->import_id);
 					throw new Exception('Database insert failed: ' . $table_name);
 				}
 			}		

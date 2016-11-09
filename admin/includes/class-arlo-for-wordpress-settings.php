@@ -59,7 +59,7 @@ class Arlo_For_Wordpress_Settings {
 			if (isset($_GET['arlo-import'])) {
 				$scheduler = $plugin->get_scheduler();
 				$scheduler->set_task("import", -1);
-				do_action('arlo_scheduler');
+				//do_action('arlo_scheduler');
 				//$plugin->import();
 				//die('import');
 				wp_redirect( admin_url( 'admin.php?page=arlo-for-wordpress'));

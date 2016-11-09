@@ -2,31 +2,29 @@
 
 namespace Arlo\Importer;
 
-class Finish extends Importer {
+class Finish extends BaseEntity {
 
-	public function __construct() {	}
+	protected function save_entity($item) {}
 
 	public function import() {
-		error_log(parent::$plugin->get_import_lock_entries_number());
-		error_log(parent::$plugin->check_import_lock(parent::$import_id));
-		if (parent::$plugin->get_import_lock_entries_number() == 1 && parent::$plugin->check_import_lock(parent::$import_id)) {
+		if ($this->plugin->get_import_lock_entries_number() == 1 && $this->plugin->check_import_lock($this->import_id)) {
             //clean up the old entries
-			$this->cleanup_import(parent::$import_id);
+			$this->cleanup_import($this->import_id);
         
             // update logs
-            parent::$plugin->add_log('Synchronization successful', parent::$import_id, null, true);            
+            $this->plugin->add_log('Synchronization successful', $this->import_id, null, true);            
 			
 	        //set import id
-	        parent::$plugin->set_import_id(parent::$import_id);
+	        $this->plugin->set_import_id($this->import_id);
 	        
-	        parent::$plugin->set_last_import();
+	        $this->plugin->set_last_import();
 	        
-	        $message_handler = parent::$plugin->get_message_handler();
+	        $message_handler = $this->plugin->get_message_handler();
 	        $message_handler->dismiss_by_type('import_error');
 
-			parent::$is_finished = true;	        
+			$this->is_finished = true;
         } else {
-            parent::$plugin->add_log('Synchronization died because of a database LOCK, please wait 5 minutes and try again.', parent::$import_id);
+            $this->plugin->add_log('Synchronization died because of a database LOCK, please wait 5 minutes and try again.', $this->import_id);
         }
 	}
 
@@ -52,19 +50,19 @@ class Finish extends Importer {
 		);
                 		
 		foreach($tables as $table) {
-			$table = parent::$wpdb->prefix . 'arlo_' . $table;
-			parent::$wpdb->query(parent::$wpdb->prepare("DELETE FROM $table WHERE import_id <> %s", parent::$import_id));
+			$table = $this->wpdb->prefix . 'arlo_' . $table;
+			$this->wpdb->query($this->wpdb->prepare("DELETE FROM $table WHERE import_id <> %s", $this->import_id));
 		}   
 
-		parent::$plugin->add_log('Database cleanup', parent::$import_id);
+		$this->plugin->add_log('Database cleanup', $this->import_id);
         
         // delete unneeded custom posts
-        parent::$plugin->delete_custom_posts('eventtemplates','et_post_name','event');
+        $this->plugin->delete_custom_posts('eventtemplates','et_post_name','event');
 
-        parent::$plugin->delete_custom_posts('presenters','p_post_name','presenter');
+        $this->plugin->delete_custom_posts('presenters','p_post_name','presenter');
 
-        parent::$plugin->delete_custom_posts('venues','v_post_name','venue');           
+        $this->plugin->delete_custom_posts('venues','v_post_name','venue');           
         
-		parent::$plugin->add_log('Posts cleanup ', parent::$import_id);
+		$this->plugin->add_log('Posts cleanup ', $this->import_id);
 	}
 }

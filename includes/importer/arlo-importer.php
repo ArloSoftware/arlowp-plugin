@@ -12,11 +12,12 @@ class Importer extends Singleton {
 	public static $is_finished = false;
 
 	protected static $dir;
-	protected static $import_id;
 	protected static $plugin;
 	protected static $data_json;
 	protected static $wpdb;
-	
+
+	protected $environment;
+	public $import_id;
 
 	private $import_timezones;
 	private $import_presenters;
@@ -26,21 +27,32 @@ class Importer extends Singleton {
 	private $import_onlineactivities;
 	private $import_categories;
 	private $import_finish;
-		
+	
+	//the keys in this array have to match with the keys in the JSON 
+	//except the last two
 	public $import_tasks = [
-				'import_timezones' => "Importing time zones",
-				'import_presenters' => "Importing presenters",
-				'import_event_templates' => "Importing event templates",
-				'import_events' => "Importing events",
-				'import_onlineactivities' => "Importing online activities",
-				'import_venues' => "Importing venues",
-				'import_categories' => "Importing categories",
-				'import_finish' => "Finalize the import",
+				'TimeZones' => "Importing time zones",
+				'Presenters' => "Importing presenters",
+				'Venues' => "Importing venues",
+				'Templates' => "Importing event templates",
+				'Events' => "Importing events",
+				'OnlineActivities' => "Importing online activities",
+				'Categories' => "Importing categories",
+				'CategoryItems' => 'Updating templates order in category',
+				'CategoryDepth' => 'Updating category depth',			
+				'Finish' => 'Finalize the import',
 			];	
 
 	public $current_task;
+	public $current_task_class;
 	public $current_task_num;
 	public $current_task_desc = '';
+
+	private $current_task_iterator = 0;
+	private $irregular_tasks = [
+				'CategoryDepth',
+				'Finish',
+			];
 
 	public function __construct($plugin) {
 		global $wpdb;
@@ -50,29 +62,59 @@ class Importer extends Singleton {
 		self::$filename = 'data'; //TODO: Change it
 		self::$plugin = $plugin;
 
-		$this->import_timezones = new Timezones();
-		$this->import_presenters = new Presenters();
-		$this->import_venues = new Venues();
-		$this->import_event_templates = new Templates();
-		$this->import_events = new Events();
-		$this->import_onlineactivities = new OnlineActivities();
-		$this->import_categories = new Categories();
-		$this->import_finish = new Finish();
+		$this->environment = new \Arlo\Environment();
 	}
 
 	public function set_import_id($import_id) {
-		self::$import_id = $import_id;
+		$this->import_id = $import_id;
 	}
 
-	public function set_current_task($task_step_num) {
+	public function set_state($state) {
 		$task_keys = array_keys($this->import_tasks);
-		if (array_key_exists($task_step_num, $task_keys)) {
-			$this->current_task_num = $task_step_num;
-			$this->current_task = $task_keys[$task_step_num];
-			$this->current_task_desc = $this->import_tasks[$this->current_task];
+
+		if (!empty($state)) {
+			if (!empty($state->current_subtask)) {
+				$this->set_current_task($state->current_subtask);
+				$this->current_task_iterator = (!empty($state->iterator) && is_numeric($state->iterator) ? $state->iterator + 1 : 0);
+			} else if (!empty($state->finished_subtask)) {
+				//figure out the next task;
+				$k = array_search($state->finished_subtask, $task_keys);
+				if ($k !== false && isset($task_keys[++$k])) {
+					$this->set_current_task($task_keys[$k]);			
+				} else {
+					self::$is_finished = true;
+				}
+			}
 		} else {
-			throw new \Exception('Invalid task step num: ' . $task_step_num);
+			$this->set_current_task($task_keys[0]);
 		}
+	}
+
+	public function get_state() {
+		$state = [
+			'finished_subtask' => null,
+			'current_subtask' => null ,
+			'iterator' => null
+		];
+	
+		if ($this->current_task_class->is_finished) {
+			$state['finished_subtask'] = $this->current_task;
+		} else {
+			$state['current_subtask'] = $this->current_task;
+			$state['iterator'] = $this->current_task_class->iterator;
+		}
+
+		return $state;
+	}
+
+    public function check_viable_execution_environment() { 
+        return $this->environment->check_viable_execution_environment();
+    }
+
+	public function set_current_task($task_step) {
+		$this->current_task = $task_step;
+		$this->current_task_num = array_search($this->current_task, array_keys($this->import_tasks));
+		$this->current_task_desc = $this->import_tasks[$this->current_task];
 	}
 
 	private function get_data_json() {
@@ -91,7 +133,7 @@ class Importer extends Singleton {
 
 			return $content;
 		} else {
-			self::$plugin->add_log('The file doesn\'t exist: ' . self::$filename, self::$import_id);
+			self::$plugin->add_log('The file doesn\'t exist: ' . self::$filename, $this->import_id);
 			throw new \Exception('The file doesn\'t exist:' . self::$filename);
 		}
 	}
@@ -116,7 +158,7 @@ class Importer extends Singleton {
 				
 				$this->write_file($filename . '.json', self::$data_json);
 			} catch (\Exception $e) {
-				self::$plugin->add_log('Couldn\'t decrypt the file: ' . $e->getMessage(), self::$import_id);				
+				self::$plugin->add_log('Couldn\'t decrypt the file: ' . $e->getMessage(), $this->import_id);				
 			}
 		}
 
@@ -126,144 +168,25 @@ class Importer extends Singleton {
 	}
 
 	public function run() {
-		if (isset($this->import_tasks[$this->current_task])) {
-			self::$plugin->add_log($this->current_task_num  . 'Import subtask started: ' . ($this->current_task_num + 1) . "/" . count($this->import_tasks) . ": " . $this->current_task_desc, self::$import_id);
-			
+		if (!self::$is_finished && isset($this->import_tasks[$this->current_task])) {
 			$this->run_import_task($this->current_task);
-
-			self::$plugin->add_log($this->current_task_num  . 'Import subtask ended: ' . ($this->current_task_num + 1) . "/" . count($this->import_tasks) . ": " . $this->current_task_desc, self::$import_id);
-		} 
+		}
 	}
 
 	private function run_import_task($import_task) {
 		$this->get_data_json(); 
 		
-		if (!empty(self::$data_json)) {
-			$this->$import_task->import();
-		}
-	}
-
-	protected function save_advertised_offer($advertised_offer, $region = '', $template_id = null, $event_id = null, $oa_id = null) {
-		if(!empty($advertised_offer) && is_array($advertised_offer)) {
-			$template_id = (intval($template_id) > 0 ? $template_id : null);
-			$event_id = (intval($event_id) > 0 ? $event_id : null);
-			$oa_id = (intval($oa_id) > 0 ? $oa_id : null);
-		
-			$offers = array_reverse($advertised_offer);
-			foreach($offers as $key => $offer) {
-				$query = self::$wpdb->query( self::$wpdb->prepare( 
-					"INSERT INTO " . self::$wpdb->prefix . "arlo_offers 
-					(o_arlo_id, et_id, e_id, oa_id, o_label, o_isdiscountoffer, o_currencycode, o_offeramounttaxexclusive, o_offeramounttaxinclusive, o_formattedamounttaxexclusive, o_formattedamounttaxinclusive, o_taxrateshortcode, o_taxratename, o_taxratepercentage, o_message, o_order, o_replaces, o_region, import_id) 
-					VALUES ( %d, %d, %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, %s, %s, %s ) 
-					", 
-					$offer->OfferID + 1,
-				    $template_id,
-					$event_id,
-					$oa_id,
-					@$offer->Label,
-					@$offer->IsDiscountOffer,
-					@$offer->OfferAmount->CurrencyCode,
-					@$offer->OfferAmount->AmountTaxExclusive,
-					@$offer->OfferAmount->AmountTaxInclusive,
-					@$offer->OfferAmount->FormattedAmountTaxExclusive,
-					@$offer->OfferAmount->FormattedAmountTaxInclusive,
-					@$offer->OfferAmount->TaxRate->ShortName,
-					@$offer->OfferAmount->TaxRate->Name,
-					@$offer->OfferAmount->TaxRate->RatePercent,
-					@$offer->Message,
-					$key+1,
-					(isset($offer->ReplacesOfferID)) ? $offer->ReplacesOfferID+1 : null,
-					(!empty($region) ? $region : ''),
-					self::$import_id
-				) );
-				
-				if ($query === false) {
-					self::$plugin->add_log('SQL error: ' . self::$wpdb->last_error . ' ' .self::$wpdb->last_query, self::$import_id);
-					throw new Exception('Database insert failed: ' . self::$wpdb->prefix . 'arlo_offers');
-				}
-			}
-		}	
-	}
-
-	protected function save_tags($tags = [], $id, $type = '') {
-		switch ($type) {
-			case "template":
-				$field = "et_id";
-				$table_name = self::$wpdb->prefix . "arlo_eventtemplates_tags";			
-			break;		
-			case "event":
-				$field = "e_id";
-				$table_name = self::$wpdb->prefix . "arlo_events_tags";			
-			break;
-			case "oa":
-				$field = "oa_id";
-				$table_name = self::$wpdb->prefix . "arlo_onlineactivities_tags";
-			break;			
-			default: 
-				throw new Exception('Tag type failed: ' . $type);
-			break;		
-		}
-
-		
-		
-		if (isset($tags) && is_array($tags)) {
-			$exisiting_tags = [];
-			$sql = "
-			SELECT 
-				id, 
-				tag
-			FROM
-				" . self::$wpdb->prefix . "arlo_tags 
-			WHERE 
-				tag IN ('" . implode("', '", $tags) . "')
-			AND
-				import_id = " . self::$import_id . "
-			";
-
-			$rows = self::$wpdb->get_results($sql, ARRAY_A);
-			foreach ($rows as $row) {
-				$exisiting_tags[$row['tag']] = $row['id'];
-			}
-			unset($rows);
+		if (!empty(self::$data_json->$import_task) || in_array($import_task, $this->irregular_tasks)) {
+			$this->environment->start_time = time(); // Set start time of current process.
 			
-			foreach ($tags as $tag) {
-				if (empty($exisiting_tags[$tag])) {
-					$query = self::$wpdb->query( self::$wpdb->prepare( 
-						"INSERT INTO " . self::$wpdb->prefix . "arlo_tags
-						(tag, import_id) 
-						VALUES ( %s, %s ) 
-						", 
-						$tag,
-						self::$import_id
-					) );
-												
-					if ($query === false) {
-						self::$plugin->add_log('SQL error: ' . self::$wpdb->last_error . ' ' .self::$wpdb->last_query, self::$import_id);
-						throw new Exception('Database insert failed: ' . self::$wpdb->prefix . 'arlo_tags ' . $type );
-					} else {
-						$exisiting_tags[$tag] = self::$wpdb->insert_id;
-					}
-				}
-										
-				if (!empty($exisiting_tags[$tag])) {
-					$query = self::$wpdb->query( self::$wpdb->prepare( 
-						"INSERT INTO {$table_name}
-						(" . $field . ", tag_id, import_id) 
-						VALUES ( %d, %d, %s ) 
-						", 
-						$id,
-						$exisiting_tags[$tag],
-						self::$import_id
-					) );
-					
-					if ($query === false) {
-						self::$plugin->add_log('SQL error: ' . self::$wpdb->last_error . ' ' .self::$wpdb->last_query, self::$import_id);
-						throw new Exception('Database insert failed: ' . $table_name );
-					}
-				} else {
-					throw new Exception('Couldn\'t find tag: ' . $tag );
-				}
-			}
+			self::$plugin->add_log('Import subtask started: ' . ($this->current_task_num + 1) . "/" . count($this->import_tasks) . ": " . $this->current_task_desc, $this->import_id);
+
+			$class_name = "Arlo\Importer\\" . $import_task;
+			
+			$this->current_task_class = new $class_name(self::$plugin, $this, (!empty(self::$data_json->$import_task) ? self::$data_json->$import_task : null), $this->current_task_iterator);
+			$this->current_task_class->import();
+			
+			self::$plugin->add_log('Import subtask ended: ' . ($this->current_task_num + 1) . "/" . count($this->import_tasks) . ": " . $this->current_task_desc, $this->import_id);			
 		}
 	}
 }

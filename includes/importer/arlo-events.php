@@ -2,33 +2,31 @@
 
 namespace Arlo\Importer;
 
-class Events extends Importer {
+class Events extends BaseEntity {
 
 	private $event_id;
 
-	public function __construct() {	}
+	public function __construct($plugin, $importer, $data, $iterator = 0) {
+		parent::__construct($plugin, $importer, $data, $iterator);
 
-	public function import() {
-		if (!empty(parent::$data_json->Events) && is_array(parent::$data_json->Events)) {
-			foreach(parent::$data_json->Events as $item) {
-				if (!empty($item->EventID) && is_numeric($item->EventID) && $item->EventID > 0) {
-					$this->save_event_data($item, 0);
+		$this->table_name = $this->wpdb->prefix . 'arlo_events';
+	}
 
-					//only save for events, not for sessions
-					if (isset($item->Tags) && !empty($item->Tags)) {
-						$this->save_tags($item->Tags, $this->event_id, 'event');
-					}
-				}
-			}			
+	protected function save_entity($item) {
+		if (!empty($item->EventID) && is_numeric($item->EventID) && $item->EventID > 0) {
+			$this->save_event_data($item, 0);
+
+			//only save for events, not for sessions
+			if (isset($item->Tags) && !empty($item->Tags)) {
+				$this->save_tags($item->Tags, $this->event_id, 'event');
+			}
 		}
 	}
 
-	private function save_event_data($item = [], $parent_id = 0) {
-		$table_name = parent::$wpdb->prefix . "arlo_events";
-		
-		$query = parent::$wpdb->query(
-			parent::$wpdb->prepare( 
-				"INSERT INTO $table_name 
+	private function save_event_data($item = [], $parent_id = 0) {		
+		$query = $this->wpdb->query(
+			$this->wpdb->prepare( 
+				"INSERT INTO " . $this->table_name ." 
 				(e_arlo_id, et_arlo_id, e_parent_arlo_id, e_code, e_name, e_startdatetime, e_finishdatetime, e_datetimeoffset, e_timezone, e_timezone_id, v_id, e_locationname, e_locationroomname, e_locationvisible , e_isfull, e_placesremaining, e_summary, e_sessiondescription, e_notice, e_viewuri, e_registermessage, e_registeruri, e_providerorganisation, e_providerwebsite, e_isonline, e_credits, e_region, import_id) 
 				VALUES ( %d, %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) 
 				", 
@@ -59,16 +57,16 @@ class Events extends Importer {
 				@$item->Location->IsOnline,
 				(!empty($item->Credits) ? json_encode($item->Credits) : ''),
 				(!empty($item->Region) ? $item->Region : ''),
-				parent::$import_id
+				$this->import_id
 			)
 		);
                         
 		if ($query === false) {					
-			parent::$plugin->add_log('SQL error: ' . parent::$wpdb->last_error . ' ' .parent::$wpdb->last_query, parent::$import_id);
-			throw new Exception('Database insert failed: ' . $table_name);
+			$this->plugin->add_log('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
+			throw new Exception('Database insert failed: ' . $this->table_name);
 		}	
 		
-		$this->event_id = parent::$wpdb->insert_id;
+		$this->event_id = $this->wpdb->insert_id;
 		
 		//advertised offers
 		if(!empty($item->AdvertisedOffers) && is_array($item->AdvertisedOffers)) {
@@ -93,20 +91,20 @@ class Events extends Importer {
 
 		if(!empty($presenters) && is_array($presenters)) {
 			foreach($presenters as $index => $presenter) {
-				$query = parent::$wpdb->query( parent::$wpdb->prepare( 
-					"INSERT INTO " . parent::$wpdb->prefix . "arlo_events_presenters 
+				$query = $this->wpdb->query( $this->wpdb->prepare( 
+					"INSERT INTO " . $this->wpdb->prefix . "arlo_events_presenters 
 					(e_id, p_arlo_id, p_order, import_id) 
 					VALUES ( %d, %d, %d, %s ) 
 					", 
 				    $this->event_id,
 				    $presenter->PresenterID,
 				    $index,
-				    parent::$import_id
+				    $this->import_id
 				) );
 				
 				if ($query === false) {
-					parent::$plugin->add_log('SQL error: ' . parent::$wpdb->last_error . ' ' .parent::$wpdb->last_query, parent::$import_id);
-					throw new Exception('Database insert failed: ' . parent::$wpdb->prefix . 'arlo_events_presenters');
+					$this->plugin->add_log('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
+					throw new Exception('Database insert failed: ' . $this->wpdb->prefix . 'arlo_events_presenters');
 				}
 			}
 		}		
