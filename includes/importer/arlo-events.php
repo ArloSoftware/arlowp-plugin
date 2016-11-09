@@ -62,8 +62,7 @@ class Events extends BaseEntity {
 		);
                         
 		if ($query === false) {					
-			$this->plugin->add_log('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
-			throw new Exception('Database insert failed: ' . $this->table_name);
+			Logger::log('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id, null, false , true);
 		}	
 		
 		$this->event_id = $this->wpdb->insert_id;
@@ -103,8 +102,7 @@ class Events extends BaseEntity {
 				) );
 				
 				if ($query === false) {
-					$this->plugin->add_log('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
-					throw new Exception('Database insert failed: ' . $this->wpdb->prefix . 'arlo_events_presenters');
+					Logger::log('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id, null, false , true);
 				}
 			}
 		}		

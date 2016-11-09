@@ -50,12 +50,19 @@ if ( ! defined( 'WPINC' ) ) {
  *
  */
  
-//load extra functions
-require_once( plugin_dir_path( __FILE__ ) . 'includes/functions.php' ); 
- 
 // load API files
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-api/Client.php' );
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-api/Transports/Wordpress.php' );
+
+//include extra classes
+require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-utilities.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-date-formatter.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-shortcodes.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-scheduler.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-crypto.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-environment.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-message-handler.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-logger.php');
 
 // Include Arlo classes
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-event-templates.php');
@@ -65,11 +72,8 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-categories.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-offers.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-venues.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-presenters.php');
-require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-shortcodes.php');
-require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-scheduler.php');
-require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-crypto.php');
-require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-environment.php');
-require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-message-handler.php');
+
+//include importer
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-importer.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-base-entity.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-timezones.php');
@@ -82,7 +86,6 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-categories.p
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-category-items.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-category-depth.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-finish.php');
-
 
 
 // start the public plugin class

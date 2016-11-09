@@ -419,7 +419,7 @@ function arlo_the_content_event($content) {
 	$regions = get_option('arlo_regions');	
 	
 	$arlo_region = get_query_var('arlo-region', '');
-	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
+	$arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
 	
 	$t1 = "{$wpdb->prefix}arlo_eventtemplates";
 	$t2 = "{$wpdb->prefix}posts";	
@@ -1567,7 +1567,7 @@ $shortcodes->add('event_template_list_item', function($content='', $atts, $short
 	$arlo_search = isset($_GET['arlo-search']) && !empty($_GET['arlo-search']) ? $_GET['arlo-search'] : get_query_var('arlo-search', '');
 	$arlo_search = esc_sql(stripslashes(urldecode($arlo_search)));
 	$arlo_region = get_query_var('arlo-region', '');
-	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+	$arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
 	
 	if(!empty($arlo_location) || (isset($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) ) :
 
@@ -1931,7 +1931,7 @@ $shortcodes->add('event_template_permalink', function($content='', $atts, $short
 		$arlo_region = $GLOBALS['arlo_eventtemplate']['et_region'];
 	} else {
 		$arlo_region = get_query_var('arlo-region', '');
-		$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+		$arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
 	}
 
 	if (!empty($arlo_region)) {
@@ -1981,7 +1981,7 @@ $shortcodes->add('content_field_item', function($content='', $atts, $shortcode_n
 	$regions = get_option('arlo_regions');
 	
 	$arlo_region = get_query_var('arlo-region', '');
-	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');		
+	$arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');		
 	
 	extract(shortcode_atts(array(
 		'fields'	=> 'all',
@@ -2204,7 +2204,7 @@ $shortcodes->add('event_list_item', function($content='', $atts, $shortcode_name
 	$where = '';
 	
 	$arlo_region = get_query_var('arlo-region', '');
-	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
+	$arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
 	
 	$t1 = "{$wpdb->prefix}arlo_eventtemplates";
 	$t2 = "{$wpdb->prefix}arlo_events";
@@ -2352,7 +2352,7 @@ $shortcodes->add('event_start_date', function($content='', $atts, $shortcode_nam
 	}
 	
 	if (strpos($format, '%') === false) {
-		$format = date_format_to_strftime_format($format);
+		$format = DateFormatter::date_format_to_strftime_format($format);
 	}	
 
 	return strftime($format, $start_date->getTimestamp() + $start_date->getOffset());
@@ -2401,7 +2401,7 @@ $shortcodes->add('event_end_date', function($content='', $atts, $shortcode_name)
 	}	
 	
 	if (strpos($format, '%') === false) {
-		$format = date_format_to_strftime_format($format);
+		$format = DateFormatter::date_format_to_strftime_format($format);
 	}
 
 	return strftime($format, $end_date->getTimestamp() + $end_date->getOffset());
@@ -2483,7 +2483,7 @@ $shortcodes->add('event_offers', function($content='', $atts, $shortcode_name){
 	$regions = get_option('arlo_regions');	
 	
 	$arlo_region = get_query_var('arlo-region', '');
-	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
+	$arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
 
 	$t1 = "{$wpdb->prefix}arlo_offers";
 	
@@ -2706,7 +2706,7 @@ $shortcodes->add('event_session_list_item', function($content='', $atts, $shortc
 	$regions = get_option('arlo_regions');
 	
 	$arlo_region = get_query_var('arlo-region', '');
-	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');		
+	$arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');		
 	
 	$output = $where = '';
 	
@@ -2770,7 +2770,7 @@ $shortcodes->add('suggest_templates', function($content='', $atts, $shortcode_na
 	$regions = get_option('arlo_regions');
 	
 	$arlo_region = get_query_var('arlo-region', '');
-	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');		
+	$arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');		
 	
 	extract(shortcode_atts(array(
 		'limit'	=> 5,
@@ -3057,7 +3057,7 @@ $shortcodes->add('upcoming_list_item', function($content='', $atts, $shortcode_n
 	$arlo_delivery = isset($_GET['arlo-delivery']) && !empty($_GET['arlo-delivery']) ? $_GET['arlo-delivery'] : get_query_var('arlo-delivery', '');
 	$arlo_eventtag = isset($_GET['arlo-eventtag']) && !empty($_GET['arlo-eventtag']) ? $_GET['arlo-eventtag'] : get_query_var('arlo-eventtag', '');
 	$arlo_region = get_query_var('arlo-region', '');
-	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+	$arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
 	
 
 	if(!empty($arlo_month)) :
@@ -4011,7 +4011,7 @@ function category_ul($items, $counts) {
 	
 	$regions = get_option('arlo_regions');	
 	$arlo_region = get_query_var('arlo-region', '');
-	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
+	$arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
 	
 	$html = '<ul class="arlo-category-list">';
 	
@@ -4183,7 +4183,7 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 	$regions = get_option('arlo_regions');	
 	
 	$arlo_region = get_query_var('arlo-region', '');
-	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+	$arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
         
 	// attempt to find event template offer
 	$conditions = array(
@@ -4273,7 +4273,7 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 	} else {
 		$regions = get_option('arlo_regions');
 		$arlo_region = get_query_var('arlo-region', '');
-		$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+		$arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
 	}
 	
 	// merge and extract attributes
@@ -4288,7 +4288,7 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 	), $atts, $shortcode_name));
 	
 	if (strpos($format, '%') === false) {
-		$format = date_format_to_strftime_format($format);
+		$format = DateFormatter::date_format_to_strftime_format($format);
 	}
         
 	$removeyear = ($removeyear == "false" || $removeyear == "0" ? false : true);
@@ -4431,7 +4431,7 @@ $shortcodes->add('oa_list_item', function($content='', $atts, $shortcode_name){
 	$import_id = $arlo_plugin->get_import_id();
 	
 	$arlo_region = get_query_var('arlo-region', '');
-	$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
+	$arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
 	
 	$t1 = "{$wpdb->prefix}arlo_eventtemplates";
 	$t2 = "{$wpdb->prefix}arlo_onlineactivities";

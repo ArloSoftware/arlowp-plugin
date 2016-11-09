@@ -83,8 +83,7 @@ abstract class BaseEntity {
 				) );
 				
 				if ($query === false) {
-					$this->plugin->add_log('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
-					throw new Exception('Database insert failed: ' . $this->wpdb->prefix . 'arlo_offers');
+					Logger::log('SQL error: ' . $this->wpdb->last_error . ' ' . $this->wpdb->last_query, $this->import_id, null, false , true);
 				}
 			}
 		}	
@@ -143,8 +142,7 @@ abstract class BaseEntity {
 					) );
 												
 					if ($query === false) {
-						$this->plugin->add_log('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
-						throw new Exception('Database insert failed: ' . $this->wpdb->prefix . 'arlo_tags ' . $type );
+						Logger::log('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id, null, false , true);
 					} else {
 						$exisiting_tags[$tag] = $this->wpdb->insert_id;
 					}
@@ -162,8 +160,7 @@ abstract class BaseEntity {
 					) );
 					
 					if ($query === false) {
-						$this->plugin->add_log('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
-						throw new Exception('Database insert failed: ' . $table_name );
+						Logger::log('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id, null, false , true);
 					}
 				} else {
 					throw new Exception('Couldn\'t find tag: ' . $tag );

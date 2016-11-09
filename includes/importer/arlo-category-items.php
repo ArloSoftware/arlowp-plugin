@@ -25,8 +25,7 @@ class CategoryItems extends BaseEntity {
 		$query = $this->wpdb->query( $this->wpdb->prepare($sql, !empty($item->SequenceIndex) ? $item->SequenceIndex : 0, $item->EventTemplateID, $item->CategoryID) );
 		
 		if ($query === false) {
-			$this->plugin->add_log('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
-			throw new Exception('Database insert failed: ' . $table_name);
+			Logger::log('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id, null, false , true);
 		}
 	}
 }
