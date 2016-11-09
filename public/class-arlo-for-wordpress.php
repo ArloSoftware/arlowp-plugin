@@ -616,7 +616,7 @@ class Arlo_For_Wordpress {
 			 
 			$message_handler->set_message('error', __('Plugin upgrade warning', self::get_instance()->plugin_slug), implode('', $message), false);
 
-			Logger::log("The current database shema could be wrong");
+			\Arlo\Logger::log("The current database shema could be wrong");
 		 }
 	}
 	
@@ -646,7 +646,7 @@ class Arlo_For_Wordpress {
 				$plugin::update($plugin::VERSION, $plugin_version);
 				update_option('arlo_plugin_version', $plugin::VERSION);
 				
-				$now = Utilities::get_now_utc();
+				$now = \Arlo\Utilities::get_now_utc();
 				update_option('arlo_updated', $now->format("Y-m-d H:i:s"));
 				self::check_db_schema();
 			}
@@ -654,7 +654,7 @@ class Arlo_For_Wordpress {
 			arlo_add_datamodel();
 			update_option('arlo_plugin_version', $plugin::VERSION);
 			
-			$now = Utilities::get_now_utc();
+			$now = \Arlo\Utilities::get_now_utc();
 			update_option('arlo_updated', $now->format("Y-m-d H:i:s"));			
 		}
 	}
@@ -923,7 +923,7 @@ class Arlo_For_Wordpress {
 		self::set_default_options();
 		
 		// run import every 15 minutes
-		Logger::log("Plugin activated");
+		\Arlo\Logger::log("Plugin activated");
 
 		// now add pages
 		self::add_pages();
@@ -1226,7 +1226,7 @@ class Arlo_For_Wordpress {
 	
 	// should only be used when successful
 	public function set_last_import() {
-		$now = Utilities::get_now_utc();
+		$now = \Arlo\Utilities::get_now_utc();
        	$timestamp = $now->format("Y-m-d H:i:s");	
 	
 		update_option('arlo_last_import', $timestamp);
@@ -1322,7 +1322,7 @@ class Arlo_For_Wordpress {
 			}
 			
 			if (!empty($last_import) && $last_import_ts !== false) {
-				$now = Utilities::get_now_utc();
+				$now = \Arlo\Utilities::get_now_utc();
 				
 				//older than 6 hours
 				if (intval($now->format("U")) - $last_import_ts > 60 * 60 * 6) {
@@ -1337,7 +1337,7 @@ class Arlo_For_Wordpress {
 						];
 						
 						if ($message_handler->set_message($type, __('Event synchronisation error', self::get_instance()->plugin_slug), implode('', $message), true) === false) {
-							Logger::log("Couldn't create Arlo 6 hours import error message");
+							\Arlo\Logger::log("Couldn't create Arlo 6 hours import error message");
 						}
 						
 						if (isset($settings['arlo_send_data']) && $settings['arlo_send_data'] == "1") {
@@ -1399,7 +1399,7 @@ class Arlo_For_Wordpress {
         
 		$fp = fopen('php://temp/maxmemory:2097125', 'w');
 		if($fp === FALSE) {
-			Logger::log('Couldn\'t create log CSV', $import_id);
+			\Arlo\Logger::log('Couldn\'t create log CSV', $import_id);
 		    return false;
 		}
         
@@ -1631,7 +1631,7 @@ class Arlo_For_Wordpress {
 				$last = $this->get_last_import();
 		        $import_id = $this->get_random_int();
 		                        
-		        Logger::log('Synchronization Started', $import_id);
+		        \Arlo\Logger::log('Synchronization Started', $import_id);
 		        
 		        $scheduler->update_task_data($task_id, ['import_id' => $import_id]);
 								
@@ -1639,19 +1639,19 @@ class Arlo_For_Wordpress {
 				// If not forced
 				if(!$force) {
 					// LOG THIS AS AN AUTOMATIC IMPORT
-					Logger::log('Synchronization identified as automatic synchronization.', $import_id);
+					\Arlo\Logger::log('Synchronization identified as automatic synchronization.', $import_id);
 					if(!empty($last)) {
 						// LOG THAT A PREVIOUS SUCCESSFUL IMPORT HAS BEEN FOUND
-						Logger::log('Previous succesful synchronization found.', $import_id);
+						\Arlo\Logger::log('Previous succesful synchronization found.', $import_id);
 						if(strtotime('-1 hour') > strtotime($last)) {
 							// LOG THE FACT THAT PREVIOUS SUCCESSFUL IMPORT IS MORE THAN AN HOUR AGO
-							Logger::log('Synchronization more than an hour old. Synchronization required.', $import_id);
+							\Arlo\Logger::log('Synchronization more than an hour old. Synchronization required.', $import_id);
 						}
 						else {
 							// LOG THE FACT THAT PREVIOUS SUCCESSFUL IMPORT IS MORE THAN AN HOUR AGO
-							Logger::log('Synchronization less than an hour old. Synchronization stopped.', $import_id);
+							\Arlo\Logger::log('Synchronization less than an hour old. Synchronization stopped.', $import_id);
 							// LOG DATA USED TO DECIDE IMPORT NOT REQUIRED.
-							Logger::log($last . '-'  . strtotime($last) . '-' . strtotime('-1 hour') . '-'  . !$force, $import_id);
+							\Arlo\Logger::log($last . '-'  . strtotime($last) . '-' . strtotime('-1 hour') . '-'  . !$force, $import_id);
 							return false;
 						}
 					}
@@ -1672,7 +1672,7 @@ class Arlo_For_Wordpress {
 				
         //if an import is already running, exit
         if (!$this->acquire_import_lock($import_id)) {
-            Logger::log('Synchronization LOCK found, please wait 5 minutes and try again', $import_id);
+            \Arlo\Logger::log('Synchronization LOCK found, please wait 5 minutes and try again', $import_id);
             return false;
         }
                 
@@ -1683,7 +1683,6 @@ class Arlo_For_Wordpress {
 
 			if (!$importer::$is_finished) {
 				$scheduler->update_task($task_id, 2, "Import is running: task " . ($importer->current_task_num + 1) . "/" . count($importer->import_tasks) . ": " . $importer->current_task_desc);
-
 				$importer->run();
 
 				$scheduler->update_task_data($task_id, $importer->get_state());
@@ -1703,7 +1702,9 @@ class Arlo_For_Wordpress {
 				wp_remote_post( esc_url_raw( $url ), $args );
 			}
 		} catch(\Exception $e) {
-			Logger::log('Synchronization failed: ' . $e->getMessage(), $import_id);
+			\Arlo\Logger::log('Synchronization failed: ' . $e->getMessage(), $import_id);
+
+			$scheduler->update_task($task_id, 3);
 			
 			$this->clear_import_lock();
 			

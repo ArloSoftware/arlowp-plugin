@@ -83,7 +83,7 @@ abstract class BaseEntity {
 				) );
 				
 				if ($query === false) {
-					Logger::log('SQL error: ' . $this->wpdb->last_error . ' ' . $this->wpdb->last_query, $this->import_id, null, false , true);
+					\Arlo\Logger::log('SQL error: ' . $this->wpdb->last_error . ' ' . $this->wpdb->last_query, $this->import_id, null, false , true);
 				}
 			}
 		}	
@@ -142,7 +142,7 @@ abstract class BaseEntity {
 					) );
 												
 					if ($query === false) {
-						Logger::log('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id, null, false , true);
+						\Arlo\Logger::log('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id, null, false , true);
 					} else {
 						$exisiting_tags[$tag] = $this->wpdb->insert_id;
 					}
@@ -160,7 +160,7 @@ abstract class BaseEntity {
 					) );
 					
 					if ($query === false) {
-						Logger::log('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id, null, false , true);
+						\Arlo\Logger::log('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id, null, false , true);
 					}
 				} else {
 					throw new Exception('Couldn\'t find tag: ' . $tag );

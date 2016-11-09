@@ -62,7 +62,7 @@ class Events extends BaseEntity {
 		);
                         
 		if ($query === false) {					
-			Logger::log('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id, null, false , true);
+			\Arlo\Logger::log('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id, null, false , true);
 		}	
 		
 		$this->event_id = $this->wpdb->insert_id;
@@ -102,7 +102,7 @@ class Events extends BaseEntity {
 				) );
 				
 				if ($query === false) {
-					Logger::log('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id, null, false , true);
+					\Arlo\Logger::log('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id, null, false , true);
 				}
 			}
 		}		

@@ -36,7 +36,7 @@ class CategoryDepth extends BaseEntity {
 				$query = $this->wpdb->query( $this->wpdb->prepare($sql, $counts['num'], $counts['c_arlo_id']) );
 				
 				if ($query === false) {
-					Logger::log('SQL error: ' . $this->wpdb->last_error . ' ' . $this->wpdb->last_query, $this->import_id, null, false , true);
+					\Arlo\Logger::log('SQL error: ' . $this->wpdb->last_error . ' ' . $this->wpdb->last_query, $this->import_id, null, false , true);
 				}
 			}		
 		}
@@ -124,7 +124,7 @@ class CategoryDepth extends BaseEntity {
 			
 			$query = $this->wpdb->query( $this->wpdb->prepare($sql, $order + $cat->c_order, $cat->c_arlo_id, $this->import_id) );
 			if ($query === false) {
-				Logger::log('SQL error: ' . $this->wpdb->last_error . ' ' . $this->wpdb->last_query, $this->import_id, null, false , true);
+				\Arlo\Logger::log('SQL error: ' . $this->wpdb->last_error . ' ' . $this->wpdb->last_query, $this->import_id, null, false , true);
 			} else if (is_array($cat->children)) {
 				$this->set_category_depth_order($cat->children, $max_depth, $order, $this->import_id);
 			}

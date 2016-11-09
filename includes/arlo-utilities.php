@@ -11,12 +11,12 @@ class Utilities {
 			return false; 
 	} 
 
-	private static function get_now_utc() {
+	public static function get_now_utc() {
 		$logger = new Logger();
 
 		do {
 			//this returns, check php doc 
-			$now = DateTime::createFromFormat('U', time());
+			$now = \DateTime::createFromFormat('U', time());
 			if (!is_object($now)) {
 				$logger->log("Error DateTime::createFromFormat: " . implode(", ", DateTime::getLastErrors()));
 			}

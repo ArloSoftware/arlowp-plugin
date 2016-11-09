@@ -133,8 +133,7 @@ class Importer extends Singleton {
 
 			return $content;
 		} else {
-			Logger::log('The file doesn\'t exist: ' . self::$filename, $this->import_id);
-			throw new \Exception('The file doesn\'t exist:' . self::$filename);
+			\Arlo\Logger::log('The file doesn\'t exist: ' . self::$filename, $this->import_id, null, false, true);
 		}
 	}
 
@@ -158,7 +157,7 @@ class Importer extends Singleton {
 				
 				$this->write_file($filename . '.json', self::$data_json);
 			} catch (\Exception $e) {
-				Logger::log('Couldn\'t decrypt the file: ' . $e->getMessage(), $this->import_id);				
+				\Arlo\Logger::log('Couldn\'t decrypt the file: ' . $e->getMessage(), $this->import_id);				
 			}
 		}
 
@@ -179,14 +178,14 @@ class Importer extends Singleton {
 		if (!empty(self::$data_json->$import_task) || in_array($import_task, $this->irregular_tasks)) {
 			$this->environment->start_time = time(); // Set start time of current process.
 			
-			Logger::log('Import subtask started: ' . ($this->current_task_num + 1) . "/" . count($this->import_tasks) . ": " . $this->current_task_desc, $this->import_id);
+			\Arlo\Logger::log('Import subtask started: ' . ($this->current_task_num + 1) . "/" . count($this->import_tasks) . ": " . $this->current_task_desc, $this->import_id);
 
 			$class_name = "Arlo\Importer\\" . $import_task;
 			
 			$this->current_task_class = new $class_name(self::$plugin, $this, (!empty(self::$data_json->$import_task) ? self::$data_json->$import_task : null), $this->current_task_iterator);
 			$this->current_task_class->import();
 			
-			Logger::log('Import subtask ended: ' . ($this->current_task_num + 1) . "/" . count($this->import_tasks) . ": " . $this->current_task_desc, $this->import_id);			
+			\Arlo\Logger::log('Import subtask ended: ' . ($this->current_task_num + 1) . "/" . count($this->import_tasks) . ": " . $this->current_task_desc, $this->import_id);			
 		}
 	}
 }
