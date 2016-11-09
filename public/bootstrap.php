@@ -2352,7 +2352,7 @@ $shortcodes->add('event_start_date', function($content='', $atts, $shortcode_nam
 	}
 	
 	if (strpos($format, '%') === false) {
-		$format = DateFormatter::date_format_to_strftime_format($format);
+		$format = \Arlo\DateFormatter::date_format_to_strftime_format($format);
 	}	
 
 	return strftime($format, $start_date->getTimestamp() + $start_date->getOffset());
@@ -2401,7 +2401,7 @@ $shortcodes->add('event_end_date', function($content='', $atts, $shortcode_name)
 	}	
 	
 	if (strpos($format, '%') === false) {
-		$format = DateFormatter::date_format_to_strftime_format($format);
+		$format = \Arlo\DateFormatter::date_format_to_strftime_format($format);
 	}
 
 	return strftime($format, $end_date->getTimestamp() + $end_date->getOffset());
@@ -4288,7 +4288,7 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 	), $atts, $shortcode_name));
 	
 	if (strpos($format, '%') === false) {
-		$format = DateFormatter::date_format_to_strftime_format($format);
+		$format = \Arlo\DateFormatter::date_format_to_strftime_format($format);
 	}
         
 	$removeyear = ($removeyear == "false" || $removeyear == "0" ? false : true);
@@ -4427,6 +4427,8 @@ $shortcodes->add('oa_list_item', function($content='', $atts, $shortcode_name){
 	global $post, $wpdb, $arlo_plugin;
 	$settings = get_option('arlo_settings');
 	$regions = get_option('arlo_regions');
+
+	$where = '';
 	
 	$import_id = $arlo_plugin->get_import_id();
 	
