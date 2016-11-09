@@ -1702,7 +1702,7 @@ class Arlo_For_Wordpress {
 				wp_remote_post( esc_url_raw( $url ), $args );
 			}
 		} catch(\Exception $e) {
-			\Arlo\Logger::log('Synchronization failed: ' . $e->getMessage(), $import_id);
+			\Arlo\Logger::log('Synchronization failed, please check the <a href="?page=arlo-for-wordpress-logs&s='.$import_id.'">Log</a> ', $import_id);
 
 			$scheduler->update_task($task_id, 3);
 			

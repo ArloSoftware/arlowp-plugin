@@ -181,7 +181,7 @@
 													jQuery('.toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message.arlo-import_error .notice-dismiss').trigger('click');
 												}
 											} else {
-												taskPlaceholder.find(".desc").after(": <span>" + response.message.replace(/\d{4,}/, '') + "</span>");
+												taskPlaceholder.find(".desc").after(": <span>" + response.message + "</span>");
 											}
 										}, task.task_status == 4);
 									}
