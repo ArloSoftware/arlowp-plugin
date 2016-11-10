@@ -57,12 +57,21 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-api/Transports/Wordpr
 //include extra classes
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-utilities.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-date-formatter.php');
-require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-shortcodes.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-scheduler.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-crypto.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-environment.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-message-handler.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-logger.php');
+
+//include shortcodes
+require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-shortcodes.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-categories.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-online-activities.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-templates.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-events.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-presenters.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-venues.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-upcoming-events.php');
 
 // Include Arlo classes
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-event-templates.php');

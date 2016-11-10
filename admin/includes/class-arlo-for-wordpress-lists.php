@@ -159,8 +159,6 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 		$limit = ($this->paged-1) * self::PERPAGE;
 		$sql .= ' LIMIT ' . $limit . ',' . self::PERPAGE;
 		
-		//var_dump($sql);
-		
 		$num = $this->get_num_rows();
 				
 		$this->set_pagination_args( array(
