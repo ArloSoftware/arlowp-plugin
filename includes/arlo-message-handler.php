@@ -12,7 +12,7 @@ class MessageHandler extends Singleton {
 	private $table = '';
 	private $plugin_slug;
 	
-	public function __construct() {
+	public function __construct($plugin) {
 		global $wpdb;
 		
 		$this->wpdb = &$wpdb; 		
