@@ -54,6 +54,13 @@ if ( ! defined( 'WPINC' ) ) {
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-api/Client.php' );
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-api/Transports/Wordpress.php' );
 
+//include database classes
+require_once( plugin_dir_path( __FILE__ ) . 'includes/database/arlo-database-layer.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/database/arlo-wp-database-layer.php');
+
+//include provisioning classes
+require_once( plugin_dir_path( __FILE__ ) . 'includes/provisioning/arlo-schema-manager.php');
+
 //include extra classes
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-utilities.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-date-formatter.php');

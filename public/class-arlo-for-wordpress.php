@@ -1,4 +1,8 @@
 <?php
+
+use \Arlo\Database;
+use \Arlo\Provisioning;
+
 /**
  * Plugin Name.
  *
@@ -32,17 +36,6 @@ class Arlo_For_Wordpress {
 	 */
 
 	const VERSION = '2.4.1.1';
-
-	/**
-	 * DB Schema hash for this version.
-	 * Need to generate with create_db_schema_hash if there is a schema change
-	 *
-	 * @since   2.4
-	 *
-	 * @var     string
-	 */
-
-	const DB_SCHEMA_HASH = '29dbebf0c27c672f52f355c59d1c1bef4ed1f486';	
 
 	/**
 	 * Minimum required PHP version
@@ -555,47 +548,6 @@ class Arlo_For_Wordpress {
 		}
 	}
 
-	/**
-	 * Create a hash for the database Schema
-	 *
-	 * @since     2.4
-	 *
-	 * @return    string
-	 */	
-	
-	public static function create_db_schema_hash( ) {
-		global $wpdb;
-		
-		$scheme = [];
-
-		$tables = $wpdb->get_results("SHOW TABLES like '%arlo%'", ARRAY_N);
-		foreach ($tables as $table) {
-			$field_defs = $wpdb->get_results("SHOW COLUMNS FROM " . $table[0], ARRAY_A);
-			$fields = [];
-			foreach ($field_defs as $fd) {
-
-				if (strpos($fd['Type'], 'enum') !== false) {
-					preg_match_all("/'(.*)'/sU", $fd['Type'], $matches);
-					if (is_array($matches[1])) {
-						sort($matches[1]);
-
-						$fd['Type'] = "enum('" . implode("','", $matches[1]) . ")";
-					}
-				}
-
-				$fields[$fd['Field']] = [
-					'Type' => $fd['Type'], 
-					'Key' => $fd['Key'],
-				];
-			}
-			ksort($fields);
-			$scheme[$table[0]] = $fields;
-		}
-		ksort($scheme);
-
-		return hash('sha1', json_encode($scheme));
-	}	
-
 
 	/**
 	 * Check the version of the db schema
@@ -604,21 +556,14 @@ class Arlo_For_Wordpress {
 	 *
 	 * @return    null
 	 */
-	public static function check_db_schema() {
- 		if (self::create_db_schema_hash() !== self::DB_SCHEMA_HASH) {
-			$plugin = self::get_instance();
+	public static function check_db_schema() { 		
+		$plugin = self::get_instance();
+		$message_handler = $plugin->get_message_handler();
 
-			$message_handler = $plugin->get_message_handler();
-			$message = [
-				'<p>' . __('Arlo for WordPress has detected that there may be a problem with the structure of event information in your database, or that a recent upgrade may not have completed correctly.', self::get_instance()->plugin_slug) . '</p>',
-				'<p>' . __('Please deactivate and reactivate the Arlo for WordPress plugin to complete the upgrade.', self::get_instance()->plugin_slug) . '</p>'
-			 ];
-			 
-			$message_handler->set_message('error', __('Plugin upgrade warning', self::get_instance()->plugin_slug), implode('', $message), false);
-
-			\Arlo\Logger::log("The current database shema could be wrong");
-		 }
-	}
+		$dbl = new WPDatabaseLayer();
+		$schema_manager = new SchemaManager($dbl, $message_handler);
+		$schema_manager->check_db_schema();
+	}	
 	
 	/**
 	 * Check the version of the plugin
