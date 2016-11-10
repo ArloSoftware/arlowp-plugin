@@ -2,8 +2,7 @@
 
 namespace Arlo;
 
-// load main Transport class for extending
-require_once 'arlo-singleton.php';
+require_once( plugin_dir_path( __FILE__ ) . '../arlo-singleton.php');
 
 use Arlo\Singleton;
 

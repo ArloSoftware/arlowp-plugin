@@ -2,15 +2,15 @@
 
 namespace Arlo;
 
-require_once 'arlo-singleton.php';
+require_once( plugin_dir_path( __FILE__ ) . '../arlo-singleton.php');
 
 use Arlo\Singleton;
 
-class Presenters extends Singleton {
+class EventTemplates extends Singleton {
 	static function get($conditions=array(), $order=array(), $limit=null, $import_id = null) {
 		global $wpdb;
 	
-		$query = "SELECT p.* FROM {$wpdb->prefix}arlo_presenters AS p";
+		$query = "SELECT et.* FROM {$wpdb->prefix}arlo_eventtemplates AS et";
 		
 		$where = array("import_id = " . $import_id);
 	
@@ -20,9 +20,9 @@ class Presenters extends Singleton {
 			switch($key) {
 				case 'id':
 					if(is_array($value)) {
-						$where[] = "p.p_arlo_id IN (" . implode(',', $value) . ")";
+						$where[] = "et.et_arlo_id IN (" . implode(',', $value) . ")";
 					} else {
-						$where[] = "p.p_arlo_id = $value";
+						$where[] = "et.et_arlo_id = $value";
 						$limit = 1;
 					}
 				break;

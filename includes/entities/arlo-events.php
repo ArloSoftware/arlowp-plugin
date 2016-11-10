@@ -2,15 +2,15 @@
 
 namespace Arlo;
 
-require_once 'arlo-singleton.php';
+require_once( plugin_dir_path( __FILE__ ) . '../arlo-singleton.php');
 
 use Arlo\Singleton;
 
-class OnlineActivities extends Singleton {
-	static function get($conditions = array(), $order = array(), $limit = null, $import_id = null) {
+class Events extends Singleton {
+	static function get($conditions=array(), $order=array(), $limit=null, $import_id = null) {
 		global $wpdb;
 	
-		$query = "SELECT oa.* FROM {$wpdb->prefix}arlo_onlineactivities AS oa";
+		$query = "SELECT e.* FROM {$wpdb->prefix}arlo_events AS e";
 		
 		$where = array("import_id = " . $import_id);
 	
@@ -20,18 +20,18 @@ class OnlineActivities extends Singleton {
 			switch($key) {
 				case 'id':
 					if(is_array($value)) {
-						$where[] = "oa.oa_arlo_id IN (" . implode(',', $value) . ")";
+						$where[] = "e.e_arlo_id IN (" . implode(',', $value) . ")";
 					} else {
-						$where[] = "oa.oa_arlo_id = $value";
+						$where[] = "e.e_arlo_id = $value";
 						$limit = 1;
 					}
 				break;
 				
 				case 'template_id':
 					if(is_array($value)) {
-						$where[] = "oa.oat_arlo_id IN (" . implode(',', $value) . ")";
+						$where[] = "e.et_arlo_id IN (" . implode(',', $value) . ")";
 					} else {
-						$where[] = "oa.oat_arlo_id = $value";
+						$where[] = "e.et_arlo_id = $value";
 					}
 				break;
 				

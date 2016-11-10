@@ -2,15 +2,15 @@
 
 namespace Arlo;
 
-require_once 'arlo-singleton.php';
+require_once( plugin_dir_path( __FILE__ ) . '../arlo-singleton.php');
 
 use Arlo\Singleton;
 
-class Venues extends Singleton {
-	static function get($conditions = array(), $order = array(), $limit = null, $import_id = null) {
+class Presenters extends Singleton {
+	static function get($conditions=array(), $order=array(), $limit=null, $import_id = null) {
 		global $wpdb;
 	
-		$query = "SELECT v.* FROM {$wpdb->prefix}arlo_venues AS v";
+		$query = "SELECT p.* FROM {$wpdb->prefix}arlo_presenters AS p";
 		
 		$where = array("import_id = " . $import_id);
 	
@@ -20,9 +20,9 @@ class Venues extends Singleton {
 			switch($key) {
 				case 'id':
 					if(is_array($value)) {
-						$where[] = "v.v_arlo_id IN (" . implode(',', $value) . ")";
+						$where[] = "p.p_arlo_id IN (" . implode(',', $value) . ")";
 					} else {
-						$where[] = "v.v_arlo_id = $value";
+						$where[] = "p.p_arlo_id = $value";
 						$limit = 1;
 					}
 				break;
