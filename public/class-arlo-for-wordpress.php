@@ -1818,7 +1818,7 @@ class Arlo_For_Wordpress {
 					
 					$location = $url;
 				} else {
-					$event = \Arlo\EventTemplates::get(array('id' => $_GET['arlo_id']), array(), 1, $import_id);
+					$event = \Arlo\Templates::get(array('id' => $_GET['arlo_id']), array(), 1, $import_id);
 					
 					if(!$event) return;
 					

@@ -6,7 +6,7 @@ require_once( plugin_dir_path( __FILE__ ) . '../arlo-singleton.php');
 
 use Arlo\Singleton;
 
-class EventTemplates extends Singleton {
+class Templates extends Singleton {
 	static function get($conditions=array(), $order=array(), $limit=null, $import_id = null) {
 		global $wpdb;
 	
