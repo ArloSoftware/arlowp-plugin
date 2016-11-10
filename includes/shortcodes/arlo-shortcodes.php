@@ -18,11 +18,15 @@ class Shortcodes {
 			if(isset($GLOBALS['arlo_event_list_item']['show_divider'])) return $GLOBALS['arlo_event_list_item']['show_divider'];
 		});
 
-		// group devider
+		// timezones
 		self::add('timezones', function($content = '', $atts, $shortcode_name, $import_id){
 			return self::shortcode_timezones($content, $atts, $shortcode_name, $import_id);	
 		});
-		
+
+		// timezones
+		self::add('label', function($content = '', $atts, $shortcode_name, $import_id){
+			return $content;
+		});
 	}
 
 	/*
