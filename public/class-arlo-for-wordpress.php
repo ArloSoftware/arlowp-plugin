@@ -4,13 +4,15 @@ use \Arlo\Database;
 use \Arlo\Provisioning;
 
 /**
- * Plugin Name.
+ * Arlo for WordPress.
+ * Text Domain: arlo-for-wordpress
  *
  * @package   Arlo_For_Wordpress
  * @author    Arlo <info@arlo.co>
  * @license   GPL-2.0+
  * @link      http://arlo.co
  * @copyright 2015 Arlo
+ * 
  */
 
 /**
@@ -20,10 +22,9 @@ use \Arlo\Provisioning;
  * If you're interested in introducing administrative or dashboard
  * functionality, then refer to 'class-arlo-for-wordpress-admin.php'
  *
- * @TODO: Rename this class to a proper name for your plugin.
  *
  * @package Arlo_For_Wordpress
- * @author  Your Name <email@example.com>
+ * @author  Adam Fentosi <adam.fentosi@arlo.co>
  */
 class Arlo_For_Wordpress {
 
@@ -47,10 +48,6 @@ class Arlo_For_Wordpress {
 	const MIN_PHP_VERSION = '5.4.0';
 
 	/**
-	 * @TODO - Rename "arlo-for-wordpress" to the name your your plugin
-	 *
-	 * Unique identifier for your plugin.
-	 *
 	 *
 	 * The variable name is used as the text domain when internationalizing strings
 	 * of text. Its value should match the Text Domain file header in the main
@@ -281,18 +278,10 @@ class Arlo_For_Wordpress {
 		// Register custom post types
 		add_action( 'init', 'arlo_register_custom_post_types');
 
-		// Activate plugin when new blog is added
-		//add_action( 'wpmu_new_blog', array( $this, 'activate_new_site' ) );
-
 		// Load public-facing style sheet and JavaScript.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
-		/* Define custom functionality.
-		 * Refer To http://codex.wordpress.org/Plugin_API#Hooks.2C_Actions_and_Filters
-		 */
-		//add_action( '@TODO', array( $this, 'action_method_name' ) );
-		//add_filter( '@TODO', array( $this, 'filter_method_name' ) );
 		
 		// cron actions
 		add_filter( 'cron_schedules', array( $this, 'add_cron_schedules' ) ); 
@@ -994,8 +983,6 @@ class Arlo_For_Wordpress {
 	 * @since    1.0.0
 	 */
 	private static function single_activate() {
-		// @TODO: Define activation functionality here
-		
 		//check plugin version and forca data modell update
 		self::check_plugin_version();
 		arlo_add_datamodel();
@@ -1059,8 +1046,6 @@ class Arlo_For_Wordpress {
 	 * @since    1.0.0
 	 */
 	private static function single_deactivate() {
-		// @TODO: Define deactivation functionality here
-
 		// flush permalinks upon plugin deactivation
 		flush_rewrite_rules();
 		
