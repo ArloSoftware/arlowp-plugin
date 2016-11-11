@@ -1955,7 +1955,7 @@ class Arlo_For_Wordpress {
 	public static function load_demo_notice($error = []) {
 		global $wpdb;
 		$settings = get_option('arlo_settings');
-		$import_id = get_option('arlo_last_import');
+		$import_id = self::get_instance()->get_import_id();
 		
 		$events = arlo_get_post_by_name('events', 'page');
 		$upcoming = arlo_get_post_by_name('upcoming', 'page');
