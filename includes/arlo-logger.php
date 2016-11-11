@@ -5,11 +5,11 @@ namespace Arlo;
 class Logger {
     const clean_up_days = 14;
 
-    public function log_error($message, $import_id = null, $timestamp = null, $successful = false) {
+    public static function log_error($message, $import_id = null, $timestamp = null, $successful = false) {
         self::save_log($message, $import_id, $timestamp, $successful, true);
     }
 
-    public function log($message, $import_id = null, $timestamp = null, $successful = false) {
+    public static function log($message, $import_id = null, $timestamp = null, $successful = false) {
         self::save_log($message, $import_id, $timestamp, $successful, false);
     }
 
