@@ -133,7 +133,7 @@ class Importer extends Singleton {
 
 			return $content;
 		} else {
-			\Arlo\Logger::log('The file doesn\'t exist: ' . self::$filename, $this->import_id, null, false, true);
+			\Arlo\Logger::log_error('The file doesn\'t exist: ' . self::$filename, $this->import_id);
 		}
 	}
 
@@ -157,7 +157,7 @@ class Importer extends Singleton {
 				
 				$this->write_file($filename . '.json', self::$data_json);
 			} catch (\Exception $e) {
-				\Arlo\Logger::log('Couldn\'t decrypt the file: ' . $e->getMessage(), $this->import_id);				
+				\Arlo\Logger::log_error('Couldn\'t decrypt the file: ' . $e->getMessage(), $this->import_id);				
 			}
 		}
 

@@ -22,7 +22,7 @@ class Timezones extends BaseEntity {
 			)
 		);				
 		if ($query === false) {
-			\Arlo\Logger::log('SQL error: ' . $this->wpdb->last_error . ' ' . $this->wpdb->last_query, $this->import_id, null, false , true);
+			\Arlo\Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' . $this->wpdb->last_query, $this->import_id);
 		} else {
 			if (is_array($item->TzNames)) {
 				foreach ($item->TzNames as $TzName) {

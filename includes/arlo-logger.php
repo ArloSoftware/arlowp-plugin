@@ -5,7 +5,15 @@ namespace Arlo;
 class Logger {
     const clean_up_days = 14;
 
-    public static function log($message, $import_id = null, $timestamp = null, $successful = false, $raise_exception = false) {
+    public function log_error($message, $import_id = null, $timestamp = null, $successful = false) {
+        self::save_log($message, $import_id, $timestamp, $successful, true);
+    }
+
+    public function log($message, $import_id = null, $timestamp = null, $successful = false) {
+        self::save_log($message, $import_id, $timestamp, $successful, false);
+    }
+
+    private static function save_log($message, $import_id = null, $timestamp = null, $successful = false, $raise_exception = false) {
 		global $wpdb;
 
         $table_name = $wpdb->prefix . "arlo_log";
