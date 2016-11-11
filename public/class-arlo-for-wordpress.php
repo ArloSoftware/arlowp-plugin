@@ -560,8 +560,8 @@ class Arlo_For_Wordpress {
 		$plugin = self::get_instance();
 		$message_handler = $plugin->get_message_handler();
 
-		$dbl = new WPDatabaseLayer();
-		$schema_manager = new SchemaManager($dbl, $message_handler);
+		$dbl = new \Arlo\Database\WPDatabaseLayer();
+		$schema_manager = new \Arlo\Provisioning\SchemaManager($dbl, $message_handler);
 		$schema_manager->check_db_schema();
 	}	
 	
@@ -619,7 +619,11 @@ class Arlo_For_Wordpress {
 
 		if (version_compare($old_version, '2.4.1.1') < 0) {
 			self::run_pre_data_update('2.4.1.1');
-		}		
+		}	
+
+		if (version_compare($old_version, '2.5') < 0) {
+			self::run_pre_data_update('2.5');
+		}			
 		
 		arlo_add_datamodel();	
 	
@@ -638,6 +642,10 @@ class Arlo_For_Wordpress {
 		if (version_compare($old_version, '2.4') < 0) {
 			self::run_update('2.4');
 		}
+
+		if (version_compare($old_version, '2.5') < 0) {
+			self::run_update('2.5');
+		}		
 	}
 	
 	private static function run_pre_data_update($version) {
@@ -713,6 +721,137 @@ class Arlo_For_Wordpress {
 				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_timezones_olson CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
 				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_venues CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
 			break;
+
+			case '2.5':
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_async_tasks 
+				CHANGE task_task task_task VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE task_status_text task_status_text VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;");
+
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_async_task_data 
+				CHANGE data_text data_text TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+				DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;");
+
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates 
+				CHANGE et_code et_code VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE et_post_name et_post_name VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE et_advertised_duration et_advertised_duration VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE et_region et_region VARCHAR(5) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE et_descriptionsummary et_descriptionsummary TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;");
+				
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_contentfields 
+				CHANGE cf_fieldname cf_fieldname VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE e_contenttype e_contenttype VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE cf_text cf_text TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;");
+
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events 
+				CHANGE e_code e_code VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE e_name e_name VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE e_datetimeoffset e_datetimeoffset VARCHAR(6) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE e_timezone e_timezone VARCHAR(10) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE e_locationname e_locationname VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE e_locationroomname e_locationroomname VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE e_summary e_summary VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE e_sessiondescription e_sessiondescription VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE e_credits e_credits VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE e_viewuri e_viewuri VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE e_registermessage e_registermessage VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE e_registeruri e_registeruri VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE e_providerorganisation e_providerorganisation VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE e_providerwebsite e_providerwebsite VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE e_region e_region VARCHAR(5) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE e_notice e_notice TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;");
+
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_onlineactivities 
+				CHANGE oa_arlo_id oa_arlo_id VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE oa_code oa_code VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE oa_name oa_name VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE oa_delivery_description oa_delivery_description VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE oa_viewuri oa_viewuri VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE oa_reference_terms oa_reference_terms VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE oa_credits oa_credits VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE oa_registermessage oa_registermessage VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE oa_registeruri oa_registeruri VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE oa_region oa_region VARCHAR(5) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;");
+
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_venues 
+				CHANGE v_name v_name VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE v_physicaladdressline1 v_physicaladdressline1 VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE v_physicaladdressline2 v_physicaladdressline2 VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE v_physicaladdressline3 v_physicaladdressline3 VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE v_physicaladdressline4 v_physicaladdressline4 VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE v_physicaladdresssuburb v_physicaladdresssuburb VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE v_physicaladdresscity v_physicaladdresscity VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE v_physicaladdressstate v_physicaladdressstate VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE v_physicaladdresspostcode v_physicaladdresspostcode VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE v_physicaladdresscountry v_physicaladdresscountry VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE v_viewuri v_viewuri VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE v_post_name v_post_name VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE v_facilityinfodirections v_facilityinfodirections TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci,
+				CHANGE v_facilityinfoparking v_facilityinfoparking TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci,
+				DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;");
+
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_presenters 
+				CHANGE p_firstname p_firstname VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE p_lastname p_lastname VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE p_viewuri p_viewuri VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE p_twitterid p_twitterid VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE p_facebookid p_facebookid VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE p_linkedinid p_linkedinid VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE p_post_name p_post_name VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE p_profile p_profile TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci,
+				CHANGE p_qualifications p_qualifications TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci,
+				CHANGE p_interests p_interests TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci,
+				DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;");			
+
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_categories 
+				CHANGE c_name c_name VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+				CHANGE c_slug c_slug VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+				CHANGE c_header c_header TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci,
+				CHANGE c_footer c_footer TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci,
+				DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;");
+
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_offers
+				CHANGE o_label o_label VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE o_currencycode o_currencycode VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE o_formattedamounttaxexclusive o_formattedamounttaxexclusive VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE o_formattedamounttaxinclusive o_formattedamounttaxinclusive VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE o_taxrateshortcode o_taxrateshortcode VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE o_taxratename o_taxratename VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE o_region o_region VARCHAR(5) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE o_message o_message TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL,
+				DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;");
+
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_tags 
+				CHANGE tag tag VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+				DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;");	
+
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_categories 
+				CHANGE c_name c_name VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+				CHANGE c_slug c_slug VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+				DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;");		
+
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_timezones 
+				CHANGE name name VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+				DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;");
+
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_timezones_olson 
+				CHANGE olson_name olson_name VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+				DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;");
+
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_log 
+				CHANGE message message TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci,
+				DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;");
+
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_messages 
+				CHANGE title title VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+				CHANGE message message TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+				DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;");	
+			break;					
 		}
 	}	
 	
@@ -844,7 +983,7 @@ class Arlo_For_Wordpress {
 					$message_handler->set_message('error', __('WordPress Cron is disabled', self::get_instance()->plugin_slug), implode('', $message), false);
 				}
 				
-			break;			
+			break;	
 		}	
 	}
 	
