@@ -39,15 +39,6 @@ class Arlo_For_Wordpress {
 	const VERSION = '2.4.1.1';
 
 	/**
-	 * Minimum required PHP version
-	 *
-	 * @since   2.0.6
-	 *
-	 * @var     string
-	 */
-	const MIN_PHP_VERSION = '5.4.0';
-
-	/**
 	 *
 	 * The variable name is used as the text domain when internationalizing strings
 	 * of text. Its value should match the Text Domain file header in the main
@@ -389,11 +380,6 @@ class Arlo_For_Wordpress {
 	 */
 	public static function activate( $network_wide ) {
 		
-		//check the PHP version
-		if (version_compare(phpversion(), self::MIN_PHP_VERSION) === -1) {
-    		wp_die(sprintf(__('The minimum required PHP version for the Arlo plugin is %s'), self::MIN_PHP_VERSION));
-		}
-
 		if ( function_exists( 'is_multisite' ) && is_multisite() ) {
 
 			if ( $network_wide  ) {
