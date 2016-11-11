@@ -956,20 +956,20 @@ class Arlo_For_Wordpress {
 				if ($message_handler->get_message_by_type_count('information') == 0) {
 					
 					$message = [
-					'<p>' . __('Arlo for WordPress will automatically send technical data to Arlo if problems are encountered when synchronising your event information. The data is sent securely and will help our team when providing support for this plugin. You can turn this off anytime in the', self::get_instance()->plugin_slug) . ' <a href="?page=arlo-for-wordpress#misc" class="arlo-settings-link" id="settings_misc">' . __('setting', self::get_instance()->plugin_slug) . '</a>.</p>',
-					'<p><a target="_blank" class="button button-primary" id="arlo_turn_off_send_data">' . __('Turn off', self::get_instance()->plugin_slug) . '</a></p>'
+					'<p>' . __('Arlo for WordPress will automatically send technical data to Arlo if problems are encountered when synchronising your event information. The data is sent securely and will help our team when providing support for this plugin. You can turn this off anytime in the', 'arlo-for-wordpress' ) . ' <a href="?page=arlo-for-wordpress#misc" class="arlo-settings-link" id="settings_misc">' . __('setting', 'arlo-for-wordpress' ) . '</a>.</p>',
+					'<p><a target="_blank" class="button button-primary" id="arlo_turn_off_send_data">' . __('Turn off', 'arlo-for-wordpress' ) . '</a></p>'
 					];
 					
-					$message_handler->set_message('information', __('Send error data to Arlo', self::get_instance()->plugin_slug), implode('', $message), false);
+					$message_handler->set_message('information', __('Send error data to Arlo', 'arlo-for-wordpress' ), implode('', $message), false);
 				}
 
 				if ( defined('DISABLE_WP_CRON') && DISABLE_WP_CRON ) {
 					$message = [
-						'<p>' . __('Arlo for WordPress requires that the Cron feature in WordPress is enabled, or replaced with an external trigger.', self::get_instance()->plugin_slug ) .' ' . sprintf(__('<a target="_blank" href="%s">View documentation</a> for more information.', self::get_instance()->plugin_slug), 'http://developer.arlo.co/doc/wordpress/import#import-wordpress-cron') . '</p>',
-						'<p>' . __('You may safely dismiss this warning if your system administrator has installed an external Cron solution.', self::get_instance()->plugin_slug) . '</p>'
+						'<p>' . __('Arlo for WordPress requires that the Cron feature in WordPress is enabled, or replaced with an external trigger.', 'arlo-for-wordpress' ) .' ' . sprintf(__('<a target="_blank" href="%s">View documentation</a> for more information.', 'arlo-for-wordpress' ), 'http://developer.arlo.co/doc/wordpress/import#import-wordpress-cron') . '</p>',
+						'<p>' . __('You may safely dismiss this warning if your system administrator has installed an external Cron solution.', 'arlo-for-wordpress' ) . '</p>'
 					];
 			
-					$message_handler->set_message('error', __('WordPress Cron is disabled', self::get_instance()->plugin_slug), implode('', $message), false);
+					$message_handler->set_message('error', __('WordPress Cron is disabled', 'arlo-for-wordpress' ), implode('', $message), false);
 				}
 				
 			break;	
@@ -1211,7 +1211,7 @@ class Arlo_For_Wordpress {
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script-darktooltip', plugins_url( 'assets/js/libs/jquery.darktooltip.min.js', __FILE__ ), array( 'jquery' ), self::VERSION );
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script-cookie', plugins_url( 'assets/js/libs/jquery.cookie.js', __FILE__ ), array( 'jquery' ), self::VERSION );
 		wp_localize_script( $this->plugin_slug . '-plugin-script', 'objectL10n', array(
-			'showmoredates' => __( 'Show me more dates', $this->plugin_slug ),
+			'showmoredates' => __( 'Show me more dates', 'arlo-for-wordpress' ),
 		) );
 		wp_localize_script( $this->plugin_slug . '-plugin-script', 'WPUrls', array(
 			'home_url' => get_home_url(),
@@ -1401,11 +1401,11 @@ class Arlo_For_Wordpress {
 					if ($message_handler->get_message_by_type_count($type) == 0) {	
 						
 						$message = [
-						'<p>'. __('Arlo for WordPress encountered problems when synchronising your event information. Information about your events may be out of date.', self::get_instance()->plugin_slug) . ' ' . (!$no_import ? sprintf(__('The last successful synchronisation was %s UTC', self::get_instance()->plugin_slug), $last_import)  : '') . '</p>',
-						'<p><a href="' . get_admin_url() . 'admin.php?page=arlo-for-wordpress-logs" target="blank">'. __('View diagnostic logs', self::get_instance()->plugin_slug) . '</a> '. __('for more information.', self::get_instance()->plugin_slug) . '</p>'
+						'<p>'. __('Arlo for WordPress encountered problems when synchronising your event information. Information about your events may be out of date.', 'arlo-for-wordpress' ) . ' ' . (!$no_import ? sprintf(__('The last successful synchronisation was %s UTC', 'arlo-for-wordpress' ), $last_import)  : '') . '</p>',
+						'<p><a href="' . get_admin_url() . 'admin.php?page=arlo-for-wordpress-logs" target="blank">'. __('View diagnostic logs', 'arlo-for-wordpress' ) . '</a> '. __('for more information.', 'arlo-for-wordpress' ) . '</p>'
 						];
 						
-						if ($message_handler->set_message($type, __('Event synchronisation error', self::get_instance()->plugin_slug), implode('', $message), true) === false) {
+						if ($message_handler->set_message($type, __('Event synchronisation error', 'arlo-for-wordpress' ), implode('', $message), true) === false) {
 							\Arlo\Logger::log("Couldn't create Arlo 6 hours import error message");
 						}
 						
@@ -1949,7 +1949,7 @@ class Arlo_For_Wordpress {
 		if (count($error)) {
 			echo '
 				<div class="' . (count($error) ? "error" : "") . ' notice is-dismissible" id="' . $notice_id . '">
-		        	<p>' . sprintf(__('Couldn\'t set the following post types: %s', self::get_instance()->plugin_slug), implode(', ', $error)) . '</p>
+		        	<p>' . sprintf(__('Couldn\'t set the following post types: %s', 'arlo-for-wordpress' ), implode(', ', $error)) . '</p>
 		        	<button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button>
 			 	</div>';
 		} else {
@@ -1984,7 +1984,7 @@ class Arlo_For_Wordpress {
 					if (count($event)) {
 						$event_link = sprintf('<a href="%s" target="_blank">%s</a>,',
 						get_post_permalink($event[0]['ID']),
-						__('Event', self::get_instance()->plugin_slug));
+						__('Event', 'arlo-for-wordpress' ));
 					}					
 					
 					//Get the first presenter
@@ -2009,7 +2009,7 @@ class Arlo_For_Wordpress {
 					if (count($event)) {
 						$presenter_link = sprintf('<a href="%s" target="_blank">%s</a>,',
 						get_post_permalink($presenter[0]['ID']),
-						__('Presenter profile', self::get_instance()->plugin_slug));
+						__('Presenter profile', 'arlo-for-wordpress' ));
 					}					
 					
 					//Get the first venue
@@ -2034,24 +2034,24 @@ class Arlo_For_Wordpress {
 					if (count($event)) {
 						$venue_link = sprintf('<a href="%s" target="_blank">%s</a>,',
 						get_post_permalink($venue[0]['ID']),
-						__('Venue information', self::get_instance()->plugin_slug));
+						__('Venue information', 'arlo-for-wordpress' ));
 					}					
 					
 					
-					$message = '<h3>' . __('Start editing your new pages', self::get_instance()->plugin_slug) . '</h3><p>'.
+					$message = '<h3>' . __('Start editing your new pages', 'arlo-for-wordpress' ) . '</h3><p>'.
 											
-					sprintf(__('View %s <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, %s <a href="%s" target="_blank">%s</a> %s or <a href="%s" target="_blank">%s</a> pages', self::get_instance()->plugin_slug), 
+					sprintf(__('View %s <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, %s <a href="%s" target="_blank">%s</a> %s or <a href="%s" target="_blank">%s</a> pages', 'arlo-for-wordpress' ), 
 						$event_link,
 						$events->guid, 
-						__('Catalogue', self::get_instance()->plugin_slug), 
+						__('Catalogue', 'arlo-for-wordpress' ), 
 						$upcoming->guid,  
 						$upcoming->post_title,
 						$presenter_link,
 						$presenters->guid, 
-						__('Presenters list', self::get_instance()->plugin_slug), 						
+						__('Presenters list', 'arlo-for-wordpress' ), 						
 						$venue_link,
 						$venues->guid,  
-						__('Venues list', self::get_instance()->plugin_slug)
+						__('Venues list', 'arlo-for-wordpress' )
 					) . '</p><p>' . __('Edit the page <a href="#pages" class="arlo-pages-setup">templates</a> for each of these websites pages below.') . '</p>';
 					
 					echo '
@@ -2076,16 +2076,16 @@ class Arlo_For_Wordpress {
 		if ($meta !== '0') {
 			echo '
 			<div class="notice is-dismissible" id="' . $notice_id . '">
-				<h3>' . __('Welcome to Arlo for WordPress', self::get_instance()->plugin_slug) . '</h3>
+				<h3>' . __('Welcome to Arlo for WordPress', 'arlo-for-wordpress' ) . '</h3>
 				<table class="arlo-welcome">
 					<tr>
 						<td class="logo" valign="top">
 							<a href="http://www.arlo.co" target="_blank"><img src="' . plugins_url( '/assets/img/icon-128x128.png', __FILE__) . '" style="width: 65px"></a>
 						</td>
 						<td>
-							<p>' . __( 'Create beautiful and interactive training and event websites using the Arlo for WordPress plugin. Access an extensive library of WordPress Shortcodes, Templates, and Widgets, all designed specifically for web developers to make integration easy.', self::get_instance()->plugin_slug) . '</p>
-							<p>' . __('<a href="https://developer.arlo.co/doc/wordpress/index" target="_blank">Learn how to use</a> Arlo for WordPress or visit <a href="http://www.arlo.co" target="_blank">www.arlo.co</a> to find out more about Arlo.', self::get_instance()->plugin_slug) . '</p>
-							<p>' . (empty($settings['platform_name']) ? '<a href="?page=arlo-for-wordpress&load-demo" class="button button-primary">' . __('Try with demo data', self::get_instance()->plugin_slug) . '</a> &nbsp; &nbsp; ' : '') .'<a href="http://www.arlo.co/register" target="_blank"  class="button button-primary">' . __('Get started with free trial', self::get_instance()->plugin_slug) . '</a></p>
+							<p>' . __( 'Create beautiful and interactive training and event websites using the Arlo for WordPress plugin. Access an extensive library of WordPress Shortcodes, Templates, and Widgets, all designed specifically for web developers to make integration easy.', 'arlo-for-wordpress' ) . '</p>
+							<p>' . __('<a href="https://developer.arlo.co/doc/wordpress/index" target="_blank">Learn how to use</a> Arlo for WordPress or visit <a href="http://www.arlo.co" target="_blank">www.arlo.co</a> to find out more about Arlo.', 'arlo-for-wordpress' ) . '</p>
+							<p>' . (empty($settings['platform_name']) ? '<a href="?page=arlo-for-wordpress&load-demo" class="button button-primary">' . __('Try with demo data', 'arlo-for-wordpress' ) . '</a> &nbsp; &nbsp; ' : '') .'<a href="http://www.arlo.co/register" target="_blank"  class="button button-primary">' . __('Get started with free trial', 'arlo-for-wordpress' ) . '</a></p>
 						</td>
 					</tr>
 				</table>
@@ -2113,8 +2113,8 @@ class Arlo_For_Wordpress {
 				<p class="developer">
 					
 					<img src="' . plugins_url( '/assets/img/tips-yellow.png', __FILE__) . '" style="width: 32px">
-					' . __('Are you a web developer building a site for a client?', self::get_instance()->plugin_slug) . '
-					' . sprintf(__('<a target="_blank" href="%s">Contact us to become an Arlo partner</a>', self::get_instance()->plugin_slug), 'https://www.arlo.co/contact') . '
+					' . __('Are you a web developer building a site for a client?', 'arlo-for-wordpress' ) . '
+					' . sprintf(__('<a target="_blank" href="%s">Contact us to become an Arlo partner</a>', 'arlo-for-wordpress' ), 'https://www.arlo.co/contact') . '
 				</p>
 				<button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button>
 		    </div>
@@ -2132,8 +2132,8 @@ class Arlo_For_Wordpress {
 			<div class="notice is-dismissible" id="' . $notice_id . '">
 				<p class="developer">
 					<img src="' . plugins_url( '/assets/img/video-yellow.png', __FILE__) . '" style="width: 32px">
-					' . sprintf(__('<a target="_blank" href="%s">Watch overview video</a>', self::get_instance()->plugin_slug), 'https://www.arlo.co/videos#-uUhu90cvoc') . '
-					' . __('to see Arlo for WordPress in action.', self::get_instance()->plugin_slug) . '
+					' . sprintf(__('<a target="_blank" href="%s">Watch overview video</a>', 'arlo-for-wordpress' ), 'https://www.arlo.co/videos#-uUhu90cvoc') . '
+					' . __('to see Arlo for WordPress in action.', 'arlo-for-wordpress' ) . '
 				</p>
 		    </div>
 			';	
@@ -2149,10 +2149,10 @@ class Arlo_For_Wordpress {
 			echo '
 			<div class="notice is-dismissible" id="' . $notice_id . '" style="display: none">
 				<p class="webinar">
-					<a target="_blank" href="https://www.arlo.co/video/wordpress-overview" target="_blank"><img src="' . plugins_url( '/assets/img/video-yellow.png', __FILE__) . '" style="width: 32px">' . __('Watch overview video', self::get_instance()->plugin_slug) .'</a>
+					<a target="_blank" href="https://www.arlo.co/video/wordpress-overview" target="_blank"><img src="' . plugins_url( '/assets/img/video-yellow.png', __FILE__) . '" style="width: 32px">' . __('Watch overview video', 'arlo-for-wordpress' ) .'</a>
 					<img src="' . plugins_url( '/assets/img/training-yellow.png', __FILE__) . '" style="width: 32px">
-					' . __('Join <a target="_blank" href="" class="webinar_url">Arlo for WordPress Getting started</a> webinar on <span id="webinar_date"></span>', self::get_instance()->plugin_slug) . '
-					' . __('<a target="_blank" href="" class="webinar_url">Register now!</a> or <a target="_blank" href="" id="webinar_template_url">view more times</a>', self::get_instance()->plugin_slug) . '
+					' . __('Join <a target="_blank" href="" class="webinar_url">Arlo for WordPress Getting started</a> webinar on <span id="webinar_date"></span>', 'arlo-for-wordpress' ) . '
+					' . __('<a target="_blank" href="" class="webinar_url">Register now!</a> or <a target="_blank" href="" id="webinar_template_url">view more times</a>', 'arlo-for-wordpress' ) . '
 				</p>
 				<button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button>
 		    </div>
@@ -2163,7 +2163,7 @@ class Arlo_For_Wordpress {
 	public static function permalink_notice() {
 		echo '
 		<div class="error notice">
-			<p><strong>' . __("Permalink setting change required.", self::get_instance()->plugin_slug) . '</strong> ' . sprintf(__('Arlo for WordPress requires <a target="_blank" href="%s">Permalinks</a> to be set to "Post name".', self::get_instance()->plugin_slug), admin_url('options-permalink.php')) . '</p>
+			<p><strong>' . __("Permalink setting change required.", 'arlo-for-wordpress' ) . '</strong> ' . sprintf(__('Arlo for WordPress requires <a target="_blank" href="%s">Permalinks</a> to be set to "Post name".', 'arlo-for-wordpress' ), admin_url('options-permalink.php')) . '</p>
 	    </div>
 		';		
 	}		
@@ -2171,8 +2171,8 @@ class Arlo_For_Wordpress {
 	public static function posttype_notice() {
 		echo '
 		<div class="error notice">
-			<p><strong>' . __("Page setup required.", self::get_instance()->plugin_slug) . '</strong> ' . __('Arlo for WordPress requires you to setup the pages which will host event information.', self::get_instance()->plugin_slug ) .' '. sprintf(__('<a href="%s" class="arlo-pages-setup">Setup pages</a>', self::get_instance()->plugin_slug), admin_url('admin.php?page=arlo-for-wordpress#pages/events')) . '</p>
-			<p>' . sprintf(__('<a target="_blank" href="%s">View documentation</a> for more information.', self::get_instance()->plugin_slug), 'http://developer.arlo.co/doc/wordpress/index#pages-and-post-types') . '</p>
+			<p><strong>' . __("Page setup required.", 'arlo-for-wordpress' ) . '</strong> ' . __('Arlo for WordPress requires you to setup the pages which will host event information.', 'arlo-for-wordpress' ) .' '. sprintf(__('<a href="%s" class="arlo-pages-setup">Setup pages</a>', 'arlo-for-wordpress' ), admin_url('admin.php?page=arlo-for-wordpress#pages/events')) . '</p>
+			<p>' . sprintf(__('<a target="_blank" href="%s">View documentation</a> for more information.', 'arlo-for-wordpress' ), 'http://developer.arlo.co/doc/wordpress/index#pages-and-post-types') . '</p>
 	    </div>
 		';
 	}
@@ -2214,8 +2214,8 @@ class Arlo_For_Wordpress {
 				<tr>
 					' . $global_message . '
 					<td>
-						<p><strong>' . __( $message->title, self::get_instance()->plugin_slug) . '</strong></p>
-						' . __( $message->message, self::get_instance()->plugin_slug) . '
+						<p><strong>' . __( $message->title, 'arlo-for-wordpress' ) . '</strong></p>
+						' . __( $message->message, 'arlo-for-wordpress' ) . '
 					</td>
 				</tr>
 			</table>
@@ -2283,7 +2283,7 @@ class Arlo_For_Wordpress {
 		
 		if (count($log)) {
 			if (strpos($log[0]['message'], "Error code 404") !== false ) {
-				$log[0]['message'] = __('The provided platform name does not exist.', self::get_instance()->plugin_slug);
+				$log[0]['message'] = __('The provided platform name does not exist.', 'arlo-for-wordpress' );
 			}
 				
 			$log[0]['last_import'] = $plugin->get_last_import();

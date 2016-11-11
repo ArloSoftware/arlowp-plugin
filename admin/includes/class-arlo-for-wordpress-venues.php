@@ -16,8 +16,8 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 	const TABLENAME = 'arlo_venues';
 
 	public function __construct() {		
-		$this->singular = __( 'Venue', $this->plugin_slug );		
-		$this->plural = __( 'Venues', $this->plugin_slug );
+		$this->singular = __( 'Venue', 'arlo-for-wordpress' );		
+		$this->plural = __( 'Venues', 'arlo-for-wordpress' );
 
 		parent::__construct();		
 	}
@@ -38,13 +38,13 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 	
 	public function get_columns() {
 		return $columns = [
-			'v_name'    => __( 'Venue name', $this->plugin_slug ),
-			'address' => __( 'Address', $this->plugin_slug ),
-			'v_physicaladdresscity'    => __( 'City', $this->plugin_slug ),
-			'v_physicaladdresspostcode'    => __( 'Postcode', $this->plugin_slug ),
-			'v_physicaladdresscountry'    => __( 'Country', $this->plugin_slug ),
-			'v_facilityinfodirections'    => __( 'Directions', $this->plugin_slug ),
-			'v_facilityinfoparking'    => __( 'Parking', $this->plugin_slug ),
+			'v_name'    => __( 'Venue name', 'arlo-for-wordpress' ),
+			'address' => __( 'Address', 'arlo-for-wordpress' ),
+			'v_physicaladdresscity'    => __( 'City', 'arlo-for-wordpress' ),
+			'v_physicaladdresspostcode'    => __( 'Postcode', 'arlo-for-wordpress' ),
+			'v_physicaladdresscountry'    => __( 'Country', 'arlo-for-wordpress' ),
+			'v_facilityinfodirections'    => __( 'Directions', 'arlo-for-wordpress' ),
+			'v_facilityinfoparking'    => __( 'Parking', 'arlo-for-wordpress' ),
 		];
 	}	
 	

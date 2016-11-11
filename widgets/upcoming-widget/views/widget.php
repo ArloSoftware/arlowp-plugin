@@ -1,11 +1,8 @@
 
 <?php
 
-	$plugin = Arlo_For_Wordpress::get_instance();
-	$plugin_slug = $plugin->get_plugin_slug();
-
 	// output the widget title
-	$title = apply_filters( 'widget_title', empty( $instance['title'] ) ? __( 'Upcoming event', $plugin_slug ) : $instance['title'], $instance, $this->id_base );
+	$title = apply_filters( 'widget_title', empty( $instance['title'] ) ? __( 'Upcoming event', 'arlo-for-wordpress-upcoming-widget' ) : $instance['title'], $instance, $this->id_base );
 	echo $before_title . $title . $after_title; 
 
 
@@ -46,7 +43,7 @@
 		$output .= '</ul>';
 
 	} else {
-		$output = '<p>'. __('No upcoming events found', $plugin_slug) .'</p>';
+		$output = '<p>'. __('No upcoming events found', 'arlo-for-wordpress-upcoming-widget') .'</p>';
 	}
 
 	// output the events list

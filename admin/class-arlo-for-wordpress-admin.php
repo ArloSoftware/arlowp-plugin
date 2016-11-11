@@ -222,7 +222,7 @@ class Arlo_For_Wordpress_Admin {
 		 * $pointerAlign: How the pointer is aligned to the target element. Optional, defaults to 'center'
 		 */
 
-		$pointer = new Feature_Pointer('arlo-1st-pointer', '#toplevel_page_arlo-for-wordpress', __('Arlo for WordPress',$this->plugin_slug), __('Arlo is almost ready. Just enter your details and you&apos;re good to go.',$this->plugin_slug), 'left', 'center');
+		$pointer = new Feature_Pointer('arlo-1st-pointer', '#toplevel_page_arlo-for-wordpress', __('Arlo for WordPress', 'arlo-for-wordpress' ), __('Arlo is almost ready. Just enter your details and you&apos;re good to go.', 'arlo-for-wordpress' ), 'left', 'center');
 
 	}
 
@@ -250,7 +250,7 @@ class Arlo_For_Wordpress_Admin {
 		 
 		 /*
 		$this->plugin_screen_hook_suffix = add_options_page(
-			ARLO_PLUGIN_NAME . ' ' . __( 'Settings', $this->plugin_slug ),
+			ARLO_PLUGIN_NAME . ' ' . __( 'Settings', 'arlo-for-wordpress' ),
 			ARLO_PLUGIN_NAME,
 			'manage_options',
 			$this->plugin_slug,
@@ -259,13 +259,13 @@ class Arlo_For_Wordpress_Admin {
 		*/
 		
 		$this->plugin_screen_hook_suffix = add_menu_page( 'Arlo settings page', 'Arlo settings', 'manage_options', $this->plugin_slug, array( $this, 'display_plugin_admin_page' ), 'none', '10.4837219128727371208127' );
-		$this->plugin_events_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Events', $this->plugin_slug ), __( 'Events', $this->plugin_slug ) , 'manage_options' , $this->plugin_slug . '-events' , array( $this, 'display_events_admin_page'));		
-		$this->plugin_oa_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Online Activities', $this->plugin_slug ), __( 'Online Activities', $this->plugin_slug ) , 'manage_options' , $this->plugin_slug . '-onlineactivities' , array( $this, 'display_oa_admin_page'));
-		$this->plugin_templates_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Templates', $this->plugin_slug ), __( 'Templates', $this->plugin_slug ) , 'manage_options' , $this->plugin_slug . '-templates' , array( $this, 'display_templates_admin_page'));		
-		$this->plugin_sessions_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Sessions', $this->plugin_slug ), __( 'Sessions', $this->plugin_slug ) , 'manage_options' , $this->plugin_slug . '-sessions' , array( $this, 'display_sessions_admin_page'));		
-		$this->plugin_presenters_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Presenters', $this->plugin_slug ), __( 'Presenters', $this->plugin_slug ) , 'manage_options' , $this->plugin_slug . '-presenters' , array( $this, 'display_presenters_admin_page'));
-		$this->plugin_venues_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Venues', $this->plugin_slug ), __( 'Venues', $this->plugin_slug ) , 'manage_options' , $this->plugin_slug . '-venues' , array( $this, 'display_venues_admin_page'));
-		$this->plugin_loglist_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Logs', $this->plugin_slug ), __( 'Logs', $this->plugin_slug ) , 'manage_options' , $this->plugin_slug . '-logs' , array( $this, 'display_loglist_admin_page'));
+		$this->plugin_events_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Events', 'arlo-for-wordpress' ), __( 'Events', 'arlo-for-wordpress' ) , 'manage_options' , $this->plugin_slug . '-events' , array( $this, 'display_events_admin_page'));		
+		$this->plugin_oa_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Online Activities', 'arlo-for-wordpress' ), __( 'Online Activities', 'arlo-for-wordpress' ) , 'manage_options' , $this->plugin_slug . '-onlineactivities' , array( $this, 'display_oa_admin_page'));
+		$this->plugin_templates_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Templates', 'arlo-for-wordpress' ), __( 'Templates', 'arlo-for-wordpress' ) , 'manage_options' , $this->plugin_slug . '-templates' , array( $this, 'display_templates_admin_page'));		
+		$this->plugin_sessions_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Sessions', 'arlo-for-wordpress' ), __( 'Sessions', 'arlo-for-wordpress' ) , 'manage_options' , $this->plugin_slug . '-sessions' , array( $this, 'display_sessions_admin_page'));		
+		$this->plugin_presenters_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Presenters', 'arlo-for-wordpress' ), __( 'Presenters', 'arlo-for-wordpress' ) , 'manage_options' , $this->plugin_slug . '-presenters' , array( $this, 'display_presenters_admin_page'));
+		$this->plugin_venues_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Venues', 'arlo-for-wordpress' ), __( 'Venues', 'arlo-for-wordpress' ) , 'manage_options' , $this->plugin_slug . '-venues' , array( $this, 'display_venues_admin_page'));
+		$this->plugin_loglist_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Logs', 'arlo-for-wordpress' ), __( 'Logs', 'arlo-for-wordpress' ) , 'manage_options' , $this->plugin_slug . '-logs' , array( $this, 'display_loglist_admin_page'));
 
 	}
 
@@ -350,7 +350,7 @@ class Arlo_For_Wordpress_Admin {
 
 		return array_merge(
 			array(
-				'settings' => '<a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug ) . '">' . __( 'Settings', $this->plugin_slug ) . '</a>'
+				'settings' => '<a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug ) . '">' . __( 'Settings', 'arlo-for-wordpress' ) . '</a>'
 			),
 			$links
 		);
@@ -468,7 +468,7 @@ class Arlo_For_Wordpress_Admin {
 							<td>
 								<h2 class="nav-tab-wrapper vertical-nav-tab-wrapper">';
 								    foreach(Arlo_For_Wordpress::$templates as $id => $template) {
-								    	$name = __($template['name'], $this->plugin_slug);
+								    	$name = __($template['name'], 'arlo-for-wordpress' );
 										echo '<a href="#pages/'.$id.'" class="nav-tab vertical-nav-tab ' . $this->plugin_slug . '-pages-' . $id . '" id="' . $this->plugin_slug . '-pages-' . $id . '">'.$name.'</a>';
 								    }				
 								echo '</h2>							
@@ -481,8 +481,8 @@ class Arlo_For_Wordpress_Admin {
 									$path = ARLO_PLUGIN_DIR . 'admin/includes/codes/' . $field['id'] . '.php';
 									if(file_exists($path)) {
 										echo '<div class="' . ARLO_PLUGIN_PREFIX . '-shortcodes">
-											<h3>' . __( 'Recommended shortcodes', $this->plugin_slug ) . '</h3>
-											<a href="http://developer.arlo.co/doc/wordpress/shortcodes/" target="_blank">' . __( 'More about shortcodes', $this->plugin_slug ) . '</a>';
+											<h3>' . __( 'Recommended shortcodes', 'arlo-for-wordpress' ) . '</h3>
+											<a href="http://developer.arlo.co/doc/wordpress/shortcodes/" target="_blank">' . __( 'More about shortcodes', 'arlo-for-wordpress' ) . '</a>';
 										
 										include($path);
 										echo '</div>';

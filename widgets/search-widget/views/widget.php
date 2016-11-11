@@ -1,11 +1,8 @@
 
 <?php
 
-	$plugin = Arlo_For_Wordpress::get_instance();
-	$plugin_slug = $plugin->get_plugin_slug();
-
 	// output the widget title
-	$title = apply_filters( 'widget_title', empty( $instance['title'] ) ? __( 'Event search', $plugin_slug ) : $instance['title'], $instance, $this->id_base );
+	$title = apply_filters( 'widget_title', empty( $instance['title'] ) ? __( 'Event search', 'arlo-for-wordpress-search-widget') : $instance['title'], $instance, $this->id_base );
 	
 	$settings = get_option('arlo_settings');
 	if (!empty($settings['post_types']['eventsearch']['posts_page'])) {

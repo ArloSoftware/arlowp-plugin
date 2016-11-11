@@ -16,8 +16,8 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 	const TABLENAME = 'arlo_events';
 
 	public function __construct() {		
-		$this->singular = __( 'Session', $this->plugin_slug );		
-		$this->plural = __( 'Sessions', $this->plugin_slug );
+		$this->singular = __( 'Session', 'arlo-for-wordpress' );		
+		$this->plural = __( 'Sessions', 'arlo-for-wordpress' );
 
 		parent::__construct();		
 	}
@@ -38,14 +38,14 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 	
 	public function get_columns() {
 		return $columns = [
-			'e_code'    => __( 'Event code', $this->plugin_slug ),
-			'event_name'    => __( 'Name', $this->plugin_slug ),
-			'e_startdatetime'    => __( 'Start date', $this->plugin_slug ),
-			'e_finishdatetime'    => __( 'Finish date', $this->plugin_slug ),
-			'v_name' => __( 'Venue name', $this->plugin_slug ),
-			'e_summary' => __( 'Summary', $this->plugin_slug ),
-			'e_sessiondescription' => __( 'Description', $this->plugin_slug ),
-			'e_region' => __( 'Regions', $this->plugin_slug ),
+			'e_code'    => __( 'Event code', 'arlo-for-wordpress' ),
+			'event_name'    => __( 'Name', 'arlo-for-wordpress' ),
+			'e_startdatetime'    => __( 'Start date', 'arlo-for-wordpress' ),
+			'e_finishdatetime'    => __( 'Finish date', 'arlo-for-wordpress' ),
+			'v_name' => __( 'Venue name', 'arlo-for-wordpress' ),
+			'e_summary' => __( 'Summary', 'arlo-for-wordpress' ),
+			'e_sessiondescription' => __( 'Description', 'arlo-for-wordpress' ),
+			'e_region' => __( 'Regions', 'arlo-for-wordpress' ),
 		];
 	}	
 	

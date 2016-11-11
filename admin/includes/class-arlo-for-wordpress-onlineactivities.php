@@ -16,8 +16,8 @@ class Arlo_For_Wordpress_OnlineActivities extends Arlo_For_Wordpress_Lists  {
 	const TABLENAME = 'arlo_onlineactivities';
 
 	public function __construct() {		
-		$this->singular = __( 'Online activity', $this->plugin_slug );		
-		$this->plural = __( 'Online activities', $this->plugin_slug );
+		$this->singular = __( 'Online activity', 'arlo-for-wordpress' );		
+		$this->plural = __( 'Online activities', 'arlo-for-wordpress' );
 
 		parent::__construct();		
 	}
@@ -38,10 +38,10 @@ class Arlo_For_Wordpress_OnlineActivities extends Arlo_For_Wordpress_Lists  {
 	
 	public function get_columns() {
 		return $columns = [
-			'oa_code'    => __( 'Code', $this->plugin_slug ),
-			'oa_name'    => __( 'Name', $this->plugin_slug ),
-			'oa_delivery_description'    => __( 'Delivery desc.', $this->plugin_slug ),
-			'oa_region' => __( 'Regions', $this->plugin_slug ),
+			'oa_code'    => __( 'Code', 'arlo-for-wordpress' ),
+			'oa_name'    => __( 'Name', 'arlo-for-wordpress' ),
+			'oa_delivery_description'    => __( 'Delivery desc.', 'arlo-for-wordpress' ),
+			'oa_region' => __( 'Regions', 'arlo-for-wordpress' ),
 		];
 	}	
 	

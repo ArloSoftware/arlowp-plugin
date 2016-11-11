@@ -26,7 +26,7 @@ class MessageHandler extends Singleton {
 	//TODO: need to create a separate translation class
 	public function get_translated_message($text = '') {
 		if (!empty($text)) {
-			$text = __($text, $this->plugin_slug);
+			$text = __($text, 'arlo-for-wordpress' );
 		}
 
 		return $text;

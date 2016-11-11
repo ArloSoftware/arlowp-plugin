@@ -16,8 +16,8 @@ class Arlo_For_Wordpress_Presenters extends Arlo_For_Wordpress_Lists  {
 	const TABLENAME = 'arlo_presenters';
 
 	public function __construct() {		
-		$this->singular = __( 'Presenter', $this->plugin_slug );		
-		$this->plural = __( 'Presenters', $this->plugin_slug );
+		$this->singular = __( 'Presenter', 'arlo-for-wordpress' );		
+		$this->plural = __( 'Presenters', 'arlo-for-wordpress' );
 
 		parent::__construct();		
 	}	
@@ -38,13 +38,13 @@ class Arlo_For_Wordpress_Presenters extends Arlo_For_Wordpress_Lists  {
 
 	public function get_columns() {
 		return $columns = [
-			'name'    => __( 'Name', $this->plugin_slug ),
-			'p_profile'    => __( 'Profile', $this->plugin_slug ),
-			'p_qualifications'    => __( 'Qualifications', $this->plugin_slug ),
-			'p_interests'    => __( 'Interests', $this->plugin_slug ),
-			'p_twitterid'    => __( 'Twitter', $this->plugin_slug ),
-			'p_facebookid'    => __( 'Facebook', $this->plugin_slug ),
-			'p_linkedinid'    => __( 'LinkedIn', $this->plugin_slug ),
+			'name'    => __( 'Name', 'arlo-for-wordpress' ),
+			'p_profile'    => __( 'Profile', 'arlo-for-wordpress' ),
+			'p_qualifications'    => __( 'Qualifications', 'arlo-for-wordpress' ),
+			'p_interests'    => __( 'Interests', 'arlo-for-wordpress' ),
+			'p_twitterid'    => __( 'Twitter', 'arlo-for-wordpress' ),
+			'p_facebookid'    => __( 'Facebook', 'arlo-for-wordpress' ),
+			'p_linkedinid'    => __( 'LinkedIn', 'arlo-for-wordpress' ),
 		];
 	}	
 	

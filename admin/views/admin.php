@@ -31,9 +31,9 @@
 		</form>
 	</div>
 	<script type="text/javascript">
-		var apiHelpText = "<?php _e('API help text', $this->plugin_slug); ?>";
-		var slugHelpText = "<?php _e('Slug help text', $this->plugin_slug); ?>";
-		var cronHelpText = "<?php _e('Cron help text', $this->plugin_slug); ?>";
-		var templateHelpText = "<?php _e('Template help text', $this->plugin_slug); ?>";
+		var apiHelpText = "<?php _e('API help text', 'arlo-for-wordpress' ); ?>";
+		var slugHelpText = "<?php _e('Slug help text', 'arlo-for-wordpress' ); ?>";
+		var cronHelpText = "<?php _e('Cron help text', 'arlo-for-wordpress' ); ?>";
+		var templateHelpText = "<?php _e('Template help text', 'arlo-for-wordpress' ); ?>";
 	</script>
 </div>

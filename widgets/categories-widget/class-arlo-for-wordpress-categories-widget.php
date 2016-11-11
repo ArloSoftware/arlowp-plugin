@@ -54,10 +54,10 @@ class Arlo_For_Wordpress_Categories_Widget extends WP_Widget {
 		// TODO: update description
 		parent::__construct(
 			$this->get_widget_slug(),
-			__( 'Arlo Categories', $this->get_widget_slug() ),
+			__( 'Arlo Categories', 'arlo-for-wordpress-categories-widget' ),
 			array(
 				'classname'  => $this->get_widget_slug().'-class',
-				'description' => __( 'Display Categories.', $this->get_widget_slug() )
+				'description' => __( 'Display Categories.', 'arlo-for-wordpress-categories-widget' )
 			)
 		);
 

@@ -91,12 +91,12 @@ class Arlo_For_Wordpress_Settings {
 		 */
 
 		// create a section for the API Endpoint
-		add_settings_section( 'arlo_general_section', __('General Settings', $this->plugin_slug), null, $this->plugin_slug );
+		add_settings_section( 'arlo_general_section', __('General Settings', 'arlo-for-wordpress' ), null, 'arlo-for-wordpress' );
 
 		// create API Endpoint field                
 		add_settings_field(
                         'arlo_platform_name', 
-                        '<label for="arlo_platform_name">'.__('Platform Name', $this->plugin_slug).'</label>', 
+                        '<label for="arlo_platform_name">'.__('Platform Name', 'arlo-for-wordpress' ).'</label>', 
                         array($this, 'arlo_simple_input_callback'), 
                         $this->plugin_slug, 'arlo_general_section', 
                         array(
@@ -110,63 +110,63 @@ class Arlo_For_Wordpress_Settings {
 			// create last import text
 			add_settings_field(
                         'arlo_last_import', 
-                        '<label for="arlo_last_import">'.__('Last import', $this->plugin_slug).'</label>', 
+                        '<label for="arlo_last_import">'.__('Last import', 'arlo-for-wordpress' ).'</label>', 
                         array($this, 'arlo_simple_text_callback'), 
                         $this->plugin_slug, 'arlo_general_section', 
                         array(
-                            'html' => '<span class="arlo-last-sync-date">' . $plugin->get_last_import() . ' UTC</span>&nbsp;&nbsp;<a href="?page=arlo-for-wordpress&arlo-import" class="arlo-sync-button">'.__('Synchronize now', $this->plugin_slug).'</a>'
+                            'html' => '<span class="arlo-last-sync-date">' . $plugin->get_last_import() . ' UTC</span>&nbsp;&nbsp;<a href="?page=arlo-for-wordpress&arlo-import" class="arlo-sync-button">'.__('Synchronize now', 'arlo-for-wordpress' ).'</a>'
                             )
                 );        
         }
                 
               
 		// create price settings dropdown
-		add_settings_field('arlo_price_setting', '<label for="arlo_price_setting">'.__('Price shown', $this->plugin_slug).'</label>', array($this, 'arlo_price_setting_callback'), $this->plugin_slug, 'arlo_general_section');                
+		add_settings_field('arlo_price_setting', '<label for="arlo_price_setting">'.__('Price shown', 'arlo-for-wordpress' ).'</label>', array($this, 'arlo_price_setting_callback'), $this->plugin_slug, 'arlo_general_section');                
         
                 
 		// create Free text field
 		add_settings_field(
                         'arlo_free_text', 
-                        '<label for="arlo_free_text">'.__('"Free" text', $this->plugin_slug).'</label>', 
+                        '<label for="arlo_free_text">'.__('"Free" text', 'arlo-for-wordpress' ).'</label>', 
                         array($this, 'arlo_simple_input_callback'), 
                         $this->plugin_slug, 'arlo_general_section', 
                         array(
                             'id' => 'free_text',
                             'label_for' => 'arlo_free_text',
-                            'default_val' => __('Free', $this->plugin_slug),
+                            'default_val' => __('Free', 'arlo-for-wordpress' ),
                             )
                 );
 
 		// create No events to show text field
 		add_settings_field(
                         'arlo_noevent_text', 
-                        '<label for="arlo_noevent_text">'.__('"No events to show" text', $this->plugin_slug).'</label>', 
+                        '<label for="arlo_noevent_text">'.__('"No events to show" text', 'arlo-for-wordpress' ).'</label>', 
                         array($this, 'arlo_simple_input_callback'), 
                         $this->plugin_slug, 'arlo_general_section', 
                         array(
                             'id' => 'noevent_text',
                             'label_for' => 'arlo_noevent_text',
-                            'default_val' => __('No events to show', $this->plugin_slug),
+                            'default_val' => __('No events to show', 'arlo-for-wordpress' ),
                             )
                 );
 
 		// create No events to show text field
 		add_settings_field(
                         'arlo_noeventontemplate_text', 
-                        '<label for="arlo_noeventontemplate_text">'.__('No event on a template text', $this->plugin_slug).'</label>', 
+                        '<label for="arlo_noeventontemplate_text">'.__('No event on a template text', 'arlo-for-wordpress' ).'</label>', 
                         array($this, 'arlo_simple_input_callback'), 
                         $this->plugin_slug, 'arlo_general_section', 
                         array(
                             'id' => 'noeventontemplate_text',
                             'label_for' => 'arlo_noeventontemplate_text',
-                            'default_val' => __('Interested in attending? Have a suggestion about running this course near you?', $this->plugin_slug),
+                            'default_val' => __('Interested in attending? Have a suggestion about running this course near you?', 'arlo-for-wordpress' ),
                             )
                 );
                 
 		// create No events to show text field
 		add_settings_field(
                         'arlo_googlemaps_api_key', 
-                        '<label for="arlo_googlemaps_api_key">'.__('GoogleMaps API Key', $this->plugin_slug).'</label>', 
+                        '<label for="arlo_googlemaps_api_key">'.__('GoogleMaps API Key', 'arlo-for-wordpress' ).'</label>', 
                         array($this, 'arlo_simple_input_callback'), 
                         $this->plugin_slug, 'arlo_general_section', 
                         array(
@@ -186,7 +186,7 @@ class Arlo_For_Wordpress_Settings {
 
 		// loop though slug array and create each required slug field
 	    foreach(Arlo_For_Wordpress::$templates as $id => $template) {
-	    	$name = __($template['name'], $this->plugin_slug);
+	    	$name = __($template['name'], 'arlo-for-wordpress' );
 			add_settings_field( $id, '<label for="'.$id.'">'.$name.'</label>', array($this, 'arlo_template_callback'), $this->plugin_slug, 'arlo_pages_section', array('id'=>$id,'label_for'=>$id) );
 		}
 		
@@ -215,11 +215,11 @@ class Arlo_For_Wordpress_Settings {
 		 *
 		 */ 
 		 
-		add_settings_section('arlo_misc_section',  __('Miscellaneous', $this->plugin_slug), null, $this->plugin_slug );
+		add_settings_section('arlo_misc_section',  __('Miscellaneous', 'arlo-for-wordpress' ), null, 'arlo-for-wordpress' );
 		
 		add_settings_field(
 			'arlo_send_data_setting', 
-			'<label for="arlo_send_data">'.__('Allow to send data to Arlo', $this->plugin_slug).'</label>', 
+			'<label for="arlo_send_data">'.__('Allow to send data to Arlo', 'arlo-for-wordpress' ).'</label>', 
 			array($this, 'arlo_checkbox_callback'), 
 			$this->plugin_slug, 
 			'arlo_misc_section', 
@@ -227,7 +227,7 @@ class Arlo_For_Wordpress_Settings {
 			
 		add_settings_field(
 			'arlo_download_log_setting', 
-			'<label for="arlo_download_log">'.__('Download log', $this->plugin_slug).'</label>', 
+			'<label for="arlo_download_log">'.__('Download log', 'arlo-for-wordpress' ).'</label>', 
 			array($this, 'arlo_simple_text_callback'), 
 			$this->plugin_slug, 
 			'arlo_misc_section',
@@ -235,7 +235,7 @@ class Arlo_For_Wordpress_Settings {
 
 		add_settings_field(
 			'arlo_wp_newsletter', 
-			'<label for="arlo_wp_newsletter">'.__('Subscribe to our WP newsletter', $this->plugin_slug).'</label>', 
+			'<label for="arlo_wp_newsletter">'.__('Subscribe to our WP newsletter', 'arlo-for-wordpress' ).'</label>', 
 			array($this, 'arlo_simple_text_callback'), 
 			$this->plugin_slug, 
 			'arlo_misc_section',
@@ -360,7 +360,7 @@ class Arlo_For_Wordpress_Settings {
 		$id = $args['id'];
 		$settings = get_option('arlo_settings');
 		
-		echo '<h3>' . sprintf(__('%s page', $this->plugin_slug), Arlo_For_Wordpress::$templates[$id]['name']) . '</h3>';
+		echo '<h3>' . sprintf(__('%s page', 'arlo-for-wordpress' ), Arlo_For_Wordpress::$templates[$id]['name']) . '</h3>';
 		
 		/*
 		HACK because the keys in the $post_types arrays are bad, couldn't change because backward comp.
@@ -384,10 +384,10 @@ class Arlo_For_Wordpress_Settings {
 			));
 	
 			echo '
-			<div class="arlo-label"><label>' .  __("Host page", $this->plugin_slug) . '</label></div>
+			<div class="arlo-label"><label>' .  __("Host page", 'arlo-for-wordpress' ) . '</label></div>
 			<div class="arlo-field">
 				<span class="arlo-page-select">' . $select . '</span>
-				<span class="arlo-gray arlo-inlineblock">' . sprintf(__('Page must contain the %s shortcode', $this->plugin_slug), Arlo_For_Wordpress::$templates[$id]['shortcode']) . '</span>
+				<span class="arlo-gray arlo-inlineblock">' . sprintf(__('Page must contain the %s shortcode', 'arlo-for-wordpress' ), Arlo_For_Wordpress::$templates[$id]['shortcode']) . '</span>
 			</div>';
     	}
 	    
@@ -398,7 +398,7 @@ class Arlo_For_Wordpress_Settings {
 	    
 	    echo '<div class="arlo-label arlo-full-width">
 	    		<label>
-	    		' . sprintf(__('%s page', $this->plugin_slug), Arlo_For_Wordpress::$templates[$id]['name']) . '
+	    		' . sprintf(__('%s page', 'arlo-for-wordpress' ), Arlo_For_Wordpress::$templates[$id]['name']) . '
 	    		' . (!empty(Arlo_For_Wordpress::$templates[$id]['shortcode']) ? 'shortcode <span class="arlo-gray">' . Arlo_For_Wordpress::$templates[$id]['shortcode'] . '</span>' : '') . ' content
 	    		</label>
 	    	</div>';
@@ -410,7 +410,7 @@ class Arlo_For_Wordpress_Settings {
 	
 	    echo '
 	    	<div class="arlo-label">
-	    		<label>'. __('Style and layout', $this->plugin_slug) . '</label>
+	    		<label>'. __('Style and layout', 'arlo-for-wordpress' ) . '</label>
 	    	</div>
 	    	<div class="arlo-field">';
 				    if (!empty(Arlo_For_Wordpress::$templates[$template])) {
@@ -428,7 +428,7 @@ class Arlo_For_Wordpress_Settings {
 						}	    
 				    }	    	
 				echo '
-	    		<div class="' . ARLO_PLUGIN_PREFIX . '-reload-template"><a>' . __('Reload original template', $this->plugin_slug) . '</a></div>
+	    		<div class="' . ARLO_PLUGIN_PREFIX . '-reload-template"><a>' . __('Reload original template', 'arlo-for-wordpress' ) . '</a></div>
 	    	</div>
 	    	<div class="cf"></div>';
 	}

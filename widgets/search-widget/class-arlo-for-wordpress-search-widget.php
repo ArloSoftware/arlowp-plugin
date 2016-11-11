@@ -54,10 +54,10 @@ class Arlo_For_Wordpress_Search_Widget extends WP_Widget {
 		// TODO: update description
 		parent::__construct(
 			$this->get_widget_slug(),
-			__( 'Arlo event search', $this->get_widget_slug() ),
+			__( 'Arlo event search', 'arlo-for-wordpress-search-widget' ),
 			array(
 				'classname'  => $this->get_widget_slug().'-class',
-				'description' => __( 'Arlo event search', $this->get_widget_slug() )
+				'description' => __( 'Arlo event search', 'arlo-for-wordpress-search-widget' )
 			)
 		);
 

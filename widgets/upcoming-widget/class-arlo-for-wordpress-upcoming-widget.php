@@ -54,10 +54,10 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 		// TODO: update description
 		parent::__construct(
 			$this->get_widget_slug(),
-			__( 'Arlo Upcoming Events', $this->get_widget_slug() ),
+			__( 'Arlo Upcoming Events', 'arlo-for-wordpress-upcoming-widget' ),
 			array(
 				'classname'  => $this->get_widget_slug().'-class',
-				'description' => __( 'Display Upcoming Events.', $this->get_widget_slug() )
+				'description' => __( 'Display Upcoming Events.', 'arlo-for-wordpress-upcoming-widget' )
 			)
 		);
 
