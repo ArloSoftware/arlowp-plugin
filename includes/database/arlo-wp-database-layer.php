@@ -15,15 +15,15 @@ class WPDatabaseLayer extends DatabaseLayer {
 	}
 
 	public function suppress_errors($suppress = true) {
-		$this->wpdb->suppress_errors($suppress);
+		return $this->wpdb->suppress_errors($suppress);
 	}
 
 	public function query($sql) {
-		$this->wpdb->query($sql);
+		return $this->wpdb->query($sql);
 	}
 
 	public function get_results($sql, $output) {
-		$this->wpdb->get_results($sql, $output);
+		return $this->wpdb->get_results($sql, $output);
 	}
 
 	public function sync_schema($sql, $execute = true) {
