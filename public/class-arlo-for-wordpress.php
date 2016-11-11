@@ -547,11 +547,7 @@ class Arlo_For_Wordpress {
 	 */
 	public static function check_db_schema() { 		
 		$plugin = self::get_instance();
-		$message_handler = $plugin->get_message_handler();
-
-		$dbl = new \Arlo\Database\WPDatabaseLayer();
-		$schema_manager = new \Arlo\Provisioning\SchemaManager($dbl, $message_handler);
-		$schema_manager->check_db_schema();
+		$plugin->get_schema_manager()->check_db_schema();
 	}	
 	
 	/**
@@ -1347,6 +1343,30 @@ class Arlo_For_Wordpress {
 		
 		return $message_handler;
 	}	
+
+	public function get_dbl() {
+		if($dbl = $this->__get('dbl')) {
+			return $dbl;
+		}
+		
+		$dbl = new WPDatabaseLayer();
+		
+		$this->__set('dbl', $dbl);
+		
+		return $dbl;
+	}	
+
+	public function get_schema_manager() {
+		if($schema_manager = $this->__get('schema_manager')) {
+			return $schema_manager;
+		}
+		
+		$schema_manager = SchemaManager($this->get_dbl(), $this->get_message_handler());
+		
+		$this->__set('schema_manager', $schema_manager);
+		
+		return $schema_manager;
+	}		
 	
 	public function get_api_client() {
 		if(get_option('arlo_test_api')) {

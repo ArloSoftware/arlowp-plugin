@@ -538,12 +538,7 @@ function arlo_get_post_by_name($name, $post_type='post') {
 function arlo_add_datamodel() {
 	$plugin = Arlo_For_Wordpress::get_instance();
 
-	$message_handler = $plugin->get_message_handler();
-
-	$dbl = new \Arlo\Database\WPDatabaseLayer();
-	$schema_manager = new \Arlo\Provisioning\SchemaManager($dbl, $message_handler);
-
-	$schema_manager->install_schema();
+	$plugin->get_schema_manager()->install_schema();
 }
 
 
