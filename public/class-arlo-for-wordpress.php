@@ -1341,7 +1341,7 @@ class Arlo_For_Wordpress {
 			return $message_handler;
 		}
 		
-		$message_handler = new \Arlo\MessageHandler($this);
+		$message_handler = new \Arlo\MessageHandler();
 		
 		$this->__set('message_handler', $message_handler);
 		

@@ -53,11 +53,11 @@ class SchemaManager {
 	public function check_db_schema() {
  		if ($this->create_db_schema_hash() !== self::DB_SCHEMA_HASH) {
 			$message = [
-				'<p>' . $this->message_handler->get_translated_message('Arlo for WordPress has detected that there may be a problem with the structure of event information in your database, or that a recent upgrade may not have completed correctly.') . '</p>',
-				'<p>' . $this->message_handler->get_translated_message('Please deactivate and reactivate the Arlo for WordPress plugin to complete the upgrade.') . '</p>'
+				'<p>' . __('Arlo for WordPress has detected that there may be a problem with the structure of event information in your database, or that a recent upgrade may not have completed correctly.', 'arlo-for-wordpress' ) . '</p>',
+				'<p>' . __('Please deactivate and reactivate the Arlo for WordPress plugin to complete the upgrade.', 'arlo-for-wordpress' ) . '</p>'
 			 ];
 			 
-			$this->message_handler->set_message('error', $this->message_handler->get_translated_message('Plugin upgrade warning'), implode('', $message), false);
+			$this->message_handler->set_message('error', __('Plugin upgrade warning', 'arlo-for-wordpress' ), implode('', $message), false);
 
 			\Arlo\Logger::log("The current database shema could be wrong");
 		 }

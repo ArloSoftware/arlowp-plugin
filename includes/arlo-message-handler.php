@@ -10,26 +10,12 @@ class MessageHandler extends Singleton {
 	
 	private $wpdb;
 	private $table = '';
-	private $plugin_slug;
 	
-	public function __construct($plugin) {
+	public function __construct() {
 		global $wpdb;
 		
 		$this->wpdb = &$wpdb; 		
 		$this->table = $this->wpdb->prefix . 'arlo_messages';
-		
-		//TODOD: Remove the plugin, we just need the slug
-		$this->plugin = $plugin;
-		$this->plugin_slug = $this->plugin->plugin_slug;
-	}
-
-	//TODO: need to create a separate translation class
-	public function get_translated_message($text = '') {
-		if (!empty($text)) {
-			$text = __($text, 'arlo-for-wordpress' );
-		}
-
-		return $text;
 	}
 
 	public function get_message_by_type_count($type = null, $count_dismissed = false) {		
