@@ -104,10 +104,11 @@ class Arlo_For_Wordpress_Admin {
 	 *
 	 * @return    null
 	 */
-	public static function check_plugin_version($plugin) {
+	 
+	public function check_plugin_version($plugin) {
 		global $wp_rewrite;
  		$plugin = Arlo_For_Wordpress::get_instance();
-		$plugin::check_plugin_version();
+		$plugin->check_plugin_version();
 		$wp_rewrite->flush_rules(); 		
 	}
 

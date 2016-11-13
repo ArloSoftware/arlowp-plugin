@@ -1,7 +1,7 @@
 <?php
 
-use \Arlo\Database;
-use \Arlo\Provisioning;
+use Arlo\Database\WPDatabaseLayer;
+use Arlo\Provisioning\SchemaManager;
 
 /**
  * Arlo for WordPress.
@@ -334,11 +334,11 @@ class Arlo_For_Wordpress {
 	 *
 	 * @return    null
 	 */
-	public static function run_scheduler() {
+	public function run_scheduler() {
 		session_write_close();
 		do_action('arlo_scheduler');
 		wp_die();
-	}		
+	}
 
 	/**
 	 * Return the plugin slug.
@@ -379,28 +379,29 @@ class Arlo_For_Wordpress {
 	 *                                       activated on an individual blog.
 	 */
 	public static function activate( $network_wide ) {
-		
+		$plugin = Arlo_For_Wordpress::get_instance();
+
 		if ( function_exists( 'is_multisite' ) && is_multisite() ) {
 
 			if ( $network_wide  ) {
 
 				// Get all blog ids
-				$blog_ids = self::get_blog_ids();
+				$blog_ids = $plugin->get_blog_ids();
 
 				foreach ( $blog_ids as $blog_id ) {
 
 					switch_to_blog( $blog_id );
-					self::single_activate();
+					$plugin->single_activate();
 				}
 
 				restore_current_blog();
 
 			} else {
-				self::single_activate();
+				$plugin->single_activate();
 			}
 
 		} else {
-			self::single_activate();
+			$plugin->single_activate();
 		}
 
 	}
@@ -416,29 +417,30 @@ class Arlo_For_Wordpress {
 	 *                                       deactivated on an individual blog.
 	 */
 	public static function deactivate( $network_wide ) {
+		$plugin = Arlo_For_Wordpress::get_instance();
 
 		if ( function_exists( 'is_multisite' ) && is_multisite() ) {
 
 			if ( $network_wide ) {
 
 				// Get all blog ids
-				$blog_ids = self::get_blog_ids();
+				$blog_ids = $plugin->get_blog_ids();
 
 				foreach ( $blog_ids as $blog_id ) {
 
 					switch_to_blog( $blog_id );
-					self::single_deactivate();
+					$plugin->single_deactivate();
 
 				}
 
 				restore_current_blog();
 
 			} else {
-				self::single_deactivate();
+				$plugin->single_deactivate();
 			}
 
 		} else {
-			self::single_deactivate();
+			$plugin->single_deactivate();
 		}
 
 	}
@@ -457,7 +459,7 @@ class Arlo_For_Wordpress {
 		}
 
 		switch_to_blog( $blog_id );
-		self::single_activate();
+		$this->single_activate();
 		restore_current_blog();
 
 	}
@@ -472,7 +474,7 @@ class Arlo_For_Wordpress {
 	 *
 	 * @return   array|false    The blog ids, false if no matches.
 	 */
-	private static function get_blog_ids() {
+	private function get_blog_ids() {
 
 		global $wpdb;
 
@@ -493,13 +495,11 @@ class Arlo_For_Wordpress {
 	 * @return    null
 	 */	
 	
-	public static function send_log_to_arlo($message = '') {
-		$plugin = self::get_instance();
+	public function send_log_to_arlo($message = '') {	
+		$client = $this->get_api_client();		
+		$last_import = $this->get_last_import();
 		
-		$client = $plugin->get_api_client();		
-		$last_import = $plugin->get_last_import();
-		
-		$log = self::create_log_csv(1000);
+		$log = $this->create_log_csv(1000);
 				
 		$response = $client->WPLogError()->sendLog($message, $last_import, $log);
 	}		
@@ -517,7 +517,7 @@ class Arlo_For_Wordpress {
 		if ($data['action'] == 'update' && $data['type'] == 'plugin' ) {
 			foreach($data['plugins'] as $each_plugin){
 				if (basename($each_plugin) == 'arlo-for-wordpress.php'){
-					self::check_plugin_version();
+					Arlo_For_Wordpress::check_plugin_version();
 				}
 			}
 		}
@@ -531,9 +531,8 @@ class Arlo_For_Wordpress {
 	 *
 	 * @return    null
 	 */
-	public static function check_db_schema() { 		
-		$plugin = self::get_instance();
-		$plugin->get_schema_manager()->check_db_schema();
+	public function check_db_schema() { 		
+		$this->get_schema_manager()->check_db_schema();
 	}	
 	
 	/**
@@ -544,7 +543,8 @@ class Arlo_For_Wordpress {
 	 * @return    null
 	 */
 	public static function check_plugin_version() {
- 		$plugin = self::get_instance();
+		$plugin = Arlo_For_Wordpress::get_instance();
+
 		$plugin_version = get_option('arlo_plugin_version');
 		
 		if (!empty($plugin_version)) {
@@ -558,17 +558,17 @@ class Arlo_For_Wordpress {
                 $plugin->set_import_id(date("Y", strtotime($last_import)));
             }
                         
-			if ($plugin_version != $plugin::VERSION) {
-				$plugin::update($plugin::VERSION, $plugin_version);
-				update_option('arlo_plugin_version', $plugin::VERSION);
+			if ($plugin_version != self::VERSION) {
+				$plugin->update(self::VERSION, $plugin_version);
+				update_option('arlo_plugin_version', self::VERSION);
 				
 				$now = \Arlo\Utilities::get_now_utc();
 				update_option('arlo_updated', $now->format("Y-m-d H:i:s"));
-				self::check_db_schema();
+				$plugin->check_db_schema();
 			}
 		} else {
 			arlo_add_datamodel();
-			update_option('arlo_plugin_version', $plugin::VERSION);
+			update_option('arlo_plugin_version', self::VERSION);
 			
 			$now = \Arlo\Utilities::get_now_utc();
 			update_option('arlo_updated', $now->format("Y-m-d H:i:s"));			
@@ -582,44 +582,44 @@ class Arlo_For_Wordpress {
 	 *
 	 * @return   null
 	 */
-	public static function update($new_version, $old_version) {
+	public function update($new_version, $old_version) {
 		//pre datamodell update need to be done before
 		if (version_compare($old_version, '2.4') < 0) {
-			self::run_pre_data_update('2.4');
+			$this->run_pre_data_update('2.4');
 		}
 
 		if (version_compare($old_version, '2.4.1.1') < 0) {
-			self::run_pre_data_update('2.4.1.1');
+			$this->run_pre_data_update('2.4.1.1');
 		}	
 
 		if (version_compare($old_version, '2.5') < 0) {
-			self::run_pre_data_update('2.5');
+			$this->run_pre_data_update('2.5');
 		}			
 		
 		arlo_add_datamodel();	
 	
 		if (version_compare($old_version, '2.2.1') < 0) {
-			self::run_update('2.2.1');
+			$this->run_update('2.2.1');
 		}	
 		
 		if (version_compare($old_version, '2.3') < 0) {
-			self::run_update('2.3');
+			$this->run_update('2.3');
 		}
 
 		if (version_compare($old_version, '2.3.5') < 0) {
-			self::run_update('2.3.5');
+			$this->run_update('2.3.5');
 		}
 		
 		if (version_compare($old_version, '2.4') < 0) {
-			self::run_update('2.4');
+			$this->run_update('2.4');
 		}
 
 		if (version_compare($old_version, '2.5') < 0) {
-			self::run_update('2.5');
+			$this->run_update('2.5');
 		}		
 	}
 	
-	private static function run_pre_data_update($version) {
+	private function run_pre_data_update($version) {
 		global $wpdb;	
 		
 		switch($version) {
@@ -826,7 +826,7 @@ class Arlo_For_Wordpress {
 		}
 	}	
 	
-	private static function run_update($version) {
+	private function run_update($version) {
 		switch($version) {
 			case '2.2.1': 
 				//Add [arlo_no_event_text] shortcode to the templates
@@ -930,10 +930,9 @@ class Arlo_For_Wordpress {
 				
 				arlo_set_option('templates', $saved_templates);
 
-				$plugin = self::get_instance();
-				$message_handler = $plugin->get_message_handler();
+				$message_handler = $this->get_message_handler();
 
-				$plugin::change_setting('arlo_send_data', 1);
+				$this->change_setting('arlo_send_data', 1);
 
 				if ($message_handler->get_message_by_type_count('information') == 0) {
 					
@@ -964,22 +963,22 @@ class Arlo_For_Wordpress {
 	 *
 	 * @since    1.0.0
 	 */
-	private static function single_activate() {
+	private function single_activate() {
 		//check plugin version and forca data modell update
-		self::check_plugin_version();
+		$this->check_plugin_version();
 		arlo_add_datamodel();
 
 		// flush permalinks upon plugin deactivation
 		flush_rewrite_rules();
 
 		// must happen before adding pages
-		self::set_default_options();
+		$this->set_default_options();
 		
 		// run import every 15 minutes
 		\Arlo\Logger::log("Plugin activated");
 
 		// now add pages
-		self::add_pages();
+		$this->add_pages();
 		
 		update_option('arlo_plugin_version', self::VERSION);
 	}
@@ -990,12 +989,12 @@ class Arlo_For_Wordpress {
 	 * @since    1.0.0
 	 *
 	 */
-	private static function set_default_options() {
+	private function set_default_options() {
 		$settings = get_option('arlo_settings');
 		
 		if (is_array($settings) && count($settings)) {
 			//add new templates			
-			foreach(self::$templates as $id => $template) {
+			foreach($this::$templates as $id => $template) {
 				if (empty($settings['templates'][$id]['html'])) {
 					$settings['templates'][$id] = array(
 						'html' => arlo_get_blueprint($id)
@@ -1012,7 +1011,7 @@ class Arlo_For_Wordpress {
 				'templates' => array()
 			);
 			
-			foreach(self::$templates as $id => $template) {
+			foreach($this::$templates as $id => $template) {
 				$default_settings['templates'][$id] = array(
 					'html' => arlo_get_blueprint($id)
 				);
@@ -1027,7 +1026,7 @@ class Arlo_For_Wordpress {
 	 *
 	 * @since    1.0.0
 	 */
-	private static function single_deactivate() {
+	private function single_deactivate() {
 		// flush permalinks upon plugin deactivation
 		flush_rewrite_rules();
 		
@@ -1035,7 +1034,7 @@ class Arlo_For_Wordpress {
 		wp_clear_scheduled_hook( 'arlo_set_import' );
 		wp_clear_scheduled_hook( 'arlo_import' );
 		
-		self::delete_running_tasks();
+		$this->delete_running_tasks();
 	}
 
 	/**
@@ -1347,7 +1346,7 @@ class Arlo_For_Wordpress {
 			return $schema_manager;
 		}
 		
-		$schema_manager = SchemaManager($this->get_dbl(), $this->get_message_handler());
+		$schema_manager = new SchemaManager($this->get_dbl(), $this->get_message_handler());
 		
 		$this->__set('schema_manager', $schema_manager);
 		
@@ -1416,7 +1415,7 @@ class Arlo_For_Wordpress {
 						}
 						
 						if (isset($settings['arlo_send_data']) && $settings['arlo_send_data'] == "1") {
-							self::send_log_to_arlo(strip_tags($message[0]));
+							$this->send_log_to_arlo(strip_tags($message[0]));
 						}
 					}
 				}			
@@ -1452,18 +1451,13 @@ class Arlo_For_Wordpress {
 		}
 	}
 	
-	private static function delete_running_tasks() {
-		$plugin = self::get_instance();
-		$scheduler = $plugin->get_scheduler();
-		
-		$scheduler->delete_running_tasks();
-		$scheduler->delete_paused_tasks();
+	private function delete_running_tasks() {		
+		$this->get_scheduler()->delete_running_tasks();
+		$this->get_scheduler()->delete_paused_tasks();
 	}
 
-	public function run_task_scheduler() {
-		$scheduler = $this->get_scheduler();
-		
-		$scheduler->run_task();		
+	public function run_task_scheduler() {	
+		$this->get_scheduler()->run_task();		
 	}
 	
 	public function create_log_csv($limit = 1000) {
@@ -1511,7 +1505,7 @@ class Arlo_For_Wordpress {
 	}
 	
 	public function download_synclog() {        
-		$csv = self::create_log_csv(0);
+		$csv = $this->create_log_csv(0);
 	
         header('Content-Type: text/csv; charset=utf-8');
 		header('Content-Disposition: attachment; filename=arlo_sync_log.csv');
@@ -1877,9 +1871,9 @@ class Arlo_For_Wordpress {
 		return $schedules;
 	}
 	
-	public static function redirect_proxy() {
+	public function redirect_proxy() {
 		$settings = get_option('arlo_settings');
-		$import_id = self::get_instance()->get_import_id();
+		$import_id = $this->get_import_id();
 		
 		if(!isset($_GET['object_post_type']) || !isset($_GET['arlo_id'])) return;
 		
@@ -1938,17 +1932,17 @@ class Arlo_For_Wordpress {
 		exit;
 	}
 		
-	public static function load_demo_notice($error = []) {
+	public function load_demo_notice($error = []) {
 		global $wpdb;
 		$settings = get_option('arlo_settings');
-		$import_id = self::get_instance()->get_import_id();
+		$import_id = $this->get_import_id();
 		
 		$events = arlo_get_post_by_name('events', 'page');
 		$upcoming = arlo_get_post_by_name('upcoming', 'page');
 		$presenters = arlo_get_post_by_name('presenters', 'page');
 		$venues = arlo_get_post_by_name('venues', 'page');
 		
-		$notice_id = self::$dismissible_notices['newpages'];
+		$notice_id = $this->dismissible_notices['newpages'];
 		$user = wp_get_current_user();
 		$meta = get_user_meta($user->ID, $notice_id, true);
 				
@@ -2073,9 +2067,9 @@ class Arlo_For_Wordpress {
 		}
 	}	
 	
-	public static function welcome_notice() {
+	public function welcome_notice() {
 		$settings = get_option('arlo_settings');
-		$notice_id = self::$dismissible_notices['welcome'];
+		$notice_id = $this->dismissible_notices['welcome'];
 		$user = wp_get_current_user();
 		$meta = get_user_meta($user->ID, $notice_id, true);
 		
@@ -2099,17 +2093,17 @@ class Arlo_For_Wordpress {
 		    </div>
 			';		
 		}
-		self::wp_video_notice();
-		self::load_demo_notice(!empty($_SESSION['arlo-demo']) ? $_SESSION['arlo-demo'] : []);
-		self::webinar_notice();
-		self::developer_notice();
+		$this->wp_video_notice();
+		$this->load_demo_notice(!empty($_SESSION['arlo-demo']) ? $_SESSION['arlo-demo'] : []);
+		$this->webinar_notice();
+		$this->developer_notice();
 		
 		
 		unset($_SESSION['arlo-import']);
 	}	
 	
-	public static function developer_notice() {
-		$notice_id = self::$dismissible_notices['developer'];
+	public function developer_notice() {
+		$notice_id = $this->dismissible_notices['developer'];
 		$user = wp_get_current_user();
 		$meta = get_user_meta($user->ID, $notice_id, true);
 
@@ -2128,8 +2122,8 @@ class Arlo_For_Wordpress {
 		}
 	}
 
-	public static function wp_video_notice() {
-		$notice_id = self::$dismissible_notices['wp_video'];
+	public function wp_video_notice() {
+		$notice_id = $this->dismissible_notices['wp_video'];
 		$user = wp_get_current_user();
 		$meta = get_user_meta($user->ID, $notice_id, true);
 
@@ -2146,8 +2140,8 @@ class Arlo_For_Wordpress {
 		}
 	}	
 	
-	public static function webinar_notice() {
-		$notice_id = self::$dismissible_notices['webinar'];
+	public function webinar_notice() {
+		$notice_id = $this->dismissible_notices['webinar'];
 		$user = wp_get_current_user();
 		$meta = get_user_meta($user->ID, $notice_id, true);
 
@@ -2166,7 +2160,7 @@ class Arlo_For_Wordpress {
 		}
 	}	
 	
-	public static function permalink_notice() {
+	public function permalink_notice() {
 		echo '
 		<div class="error notice">
 			<p><strong>' . __("Permalink setting change required.", 'arlo-for-wordpress' ) . '</strong> ' . sprintf(__('Arlo for WordPress requires <a target="_blank" href="%s">Permalinks</a> to be set to "Post name".', 'arlo-for-wordpress' ), admin_url('options-permalink.php')) . '</p>
@@ -2174,7 +2168,7 @@ class Arlo_For_Wordpress {
 		';		
 	}		
 	
-	public static function posttype_notice() {
+	public function posttype_notice() {
 		echo '
 		<div class="error notice">
 			<p><strong>' . __("Page setup required.", 'arlo-for-wordpress' ) . '</strong> ' . __('Arlo for WordPress requires you to setup the pages which will host event information.', 'arlo-for-wordpress' ) .' '. sprintf(__('<a href="%s" class="arlo-pages-setup">Setup pages</a>', 'arlo-for-wordpress' ), admin_url('admin.php?page=arlo-for-wordpress#pages/events')) . '</p>
@@ -2183,29 +2177,25 @@ class Arlo_For_Wordpress {
 		';
 	}
 	
-	public static function global_notices() {
-		$plugin = self::get_instance();
-		$message_handler = $plugin->get_message_handler();
-		$messages = $message_handler->get_messages('import_error', true);
+	public function global_notices() {
+		$messages = $this->get_message_handler()->get_messages('import_error', true);
 		
 		foreach ($messages as $message) {
-			echo self::create_notice($message);
+			echo $this->create_notice($message);
 		}
 	}
 
-	public static function arlo_notices() {
-		$plugin = self::get_instance();
-		$message_handler = $plugin->get_message_handler();
-		$messages = $message_handler->get_messages(null, false);
+	public function arlo_notices() {
+		$messages = $this->get_message_handler()->get_messages(null, false);
 		
 		foreach ($messages as $message) {
-			echo self::create_notice($message);
+			echo $this->create_notice($message);
 		}
 	}	
 
 	
-	public static function create_notice($message) {
-		$notice_type = (isset(self::$message_notice_types[$message->type]) ? self::$message_notice_types[$message->type] : 'error');
+	public function create_notice($message) {
+		$notice_type = (isset($this->message_notice_types[$message->type]) ? $this->message_notice_types[$message->type] : 'error');
 
 		$global_message = '';
 		if ($message->global) {
@@ -2230,12 +2220,12 @@ class Arlo_For_Wordpress {
 	}	
 	
 	
-	public static function connected_platform_notice() {
+	public function connected_platform_notice() {
 		$settings = get_option('arlo_settings');
 		echo '
 			<div class="notice arlo-connected-message"> 
 				<p>
-					Arlo is connected to <strong>' . $settings['platform_name'] . '</strong> <span class="arlo-block">Last synchronized: <span class="arlo-last-sync-date">' . self::get_instance()->get_last_import() . ' UTC</span></span> 
+					Arlo is connected to <strong>' . $settings['platform_name'] . '</strong> <span class="arlo-block">Last synchronized: <span class="arlo-last-sync-date">' . $this->get_last_import() . ' UTC</span></span> 
 					<a class="arlo-block arlo-sync-button" href="?page=arlo-for-wordpress&arlo-import">Synchronize now</a>
 				</p>
 			</div>
@@ -2258,18 +2248,15 @@ class Arlo_For_Wordpress {
 	}		
 	
 	
-	public static function start_scheduler_callback() {		
+	public function start_scheduler_callback() {		
 		do_action("arlo_scheduler");
 		
 		wp_die();
 	}
 	
-	public static function arlo_get_last_import_log_callback() {
+	public function arlo_get_last_import_log_callback() {
 		global $wpdb;
-		$sucessful = isset($_POST['sucessful']) ? true : false;
-		
-		$plugin = Arlo_For_Wordpress::get_instance();
-		
+		$sucessful = isset($_POST['sucessful']) ? true : false;	
 		
 		$sql = "
 		SELECT
@@ -2292,7 +2279,7 @@ class Arlo_For_Wordpress {
 				$log[0]['message'] = __('The provided platform name does not exist.', 'arlo-for-wordpress' );
 			}
 				
-			$log[0]['last_import'] = $plugin->get_last_import();
+			$log[0]['last_import'] = $this->get_last_import();
 			
 			echo wp_json_encode($log[0]);
 		}
@@ -2301,16 +2288,14 @@ class Arlo_For_Wordpress {
 	}
 	
 	
-	public static function arlo_terminate_task_callback() {
+	public function arlo_terminate_task_callback() {
 		$task_id = intval($_POST['taskID']);
 		if ($task_id > 0) {
-			$plugin = Arlo_For_Wordpress::get_instance();
-			$scheduler = $plugin->get_scheduler();
 			
 			//need to terminate all the upcoming immediate tasks
-			$scheduler->terminate_all_immediate_task($task_id);
+			$this->get_scheduler()->terminate_all_immediate_task($task_id);
 			
-			$plugin->clear_import_lock();
+			$this->clear_import_lock();
 			
 			echo $task_id;
 		}
@@ -2319,14 +2304,11 @@ class Arlo_For_Wordpress {
 	}
 	
 	
-	public static function arlo_get_task_info_callback() {
+	public function arlo_get_task_info_callback() {
 		$task_id = intval($_POST['taskID']);
 		
 		if ($task_id > 0) {
-			$plugin = Arlo_For_Wordpress::get_instance();
-			$scheduler = $plugin->get_scheduler();
-			
-			$task = $scheduler->get_tasks(null, null, $task_id);
+			$task = $this->get_scheduler()->get_tasks(null, null, $task_id);
 			
 			echo wp_json_encode($task);
 		}
@@ -2334,32 +2316,29 @@ class Arlo_For_Wordpress {
 		wp_die();
 	}
 	
-	public static function dismiss_message_callback() {
+	public function dismiss_message_callback() {
 		$id = intval($_POST['id']);
 		
-		if ($id > 0) {
-			$plugin = Arlo_For_Wordpress::get_instance();
-			$message_handler = $plugin->get_message_handler();		
-			
-			$message_handler->dismiss_message($id);
+		if ($id > 0) {			
+			$this->get_message_handler()->dismiss_message($id);
 		}		
 		
 		echo $id;
 		wp_die();
 	}	
 
-	public static function turn_off_send_data_callback() {		
-		self::change_setting('arlo_send_data', 0);
+	public function turn_off_send_data_callback() {		
+		$this->change_setting('arlo_send_data', 0);
 
 		echo 0;
 		wp_die();
 	}		
 	
 	
-	public static function dismissible_notice_callback() {		
+	public function dismissible_notice_callback() {		
 		$user = wp_get_current_user();
 		
-		if (in_array($_POST['id'], self::$dismissible_notices)) {
+		if (in_array($_POST['id'], $this->dismissible_notices)) {
 			update_user_meta($user->ID, $_POST['id'], 0);
 		}
 		
@@ -2367,7 +2346,7 @@ class Arlo_For_Wordpress {
 		wp_die();
 	}	
 
-	public static function change_setting($setting_name, $value) {
+	public function change_setting($setting_name, $value) {
 		$settings = get_option('arlo_settings');
 
 		$settings[$setting_name] = $value;
@@ -2375,7 +2354,7 @@ class Arlo_For_Wordpress {
 		update_option('arlo_settings', $settings);
 	}
 	
-	public static function get_tag_by_id($tag_id) {
+	public function get_tag_by_id($tag_id) {
 		global $wpdb;		
 		
 		$tag = $wpdb->get_row(
@@ -2399,9 +2378,8 @@ class Arlo_For_Wordpress {
 	 * @access public
 	 * @return void
 	 */
-	public static function determine_url_structure($platform_name = '') {
-		$plugin = self::get_instance();
-		$client = $plugin->get_api_client();
+	public function determine_url_structure($platform_name = '') {
+		$client = $this->get_api_client();
 		
 		$new_url = $client->transport->getRemoteURL($platform_name, true, true);
 		
@@ -2425,11 +2403,11 @@ class Arlo_For_Wordpress {
 	 * @access public
 	 * @return void
 	 */
-	private static function add_pages() {
+	private function add_pages() {
 		
 		$settings = get_option('arlo_settings');
 	
-		foreach(self::$pages as $page) {
+		foreach($this::$pages as $page) {
 			$current_page = get_page_by_title($page['title']);
 		
 			if(is_null($current_page)) {
