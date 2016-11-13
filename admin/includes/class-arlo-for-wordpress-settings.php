@@ -9,6 +9,8 @@
  * @copyright 2015 Arlo
  */
 
+ use Arlo\Logger;
+
 class Arlo_For_Wordpress_Settings {
 
 	public function __construct() {
@@ -53,7 +55,7 @@ class Arlo_For_Wordpress_Settings {
 			}
 			
 			if (isset($_GET['arlo-donwload-sync-log'])) {
-				$plugin->download_synclog();
+				Logger::download_log();
 			}
 		
 			if (isset($_GET['arlo-import'])) {

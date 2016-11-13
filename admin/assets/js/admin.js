@@ -203,13 +203,13 @@
 			});
 		}
 		
-		function getLastImportLog(callback, sucessful) {
+		function getLastImportLog(callback, successful) {
 			var data = {
 				action: 'arlo_get_last_import_log'
 			};
 			
-			if (sucessful) {
-				data.sucessful = 1;
+			if (successful) {
+				data.successful = 1;
 			} 
 			
 			jQuery.post(ajaxurl, data, function(response) {

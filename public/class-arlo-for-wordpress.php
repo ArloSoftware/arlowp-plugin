@@ -2,6 +2,7 @@
 
 use Arlo\Database\WPDatabaseLayer;
 use Arlo\Provisioning\SchemaManager;
+use Arlo\Logger;
 
 /**
  * Arlo for WordPress.
@@ -499,7 +500,7 @@ class Arlo_For_Wordpress {
 		$client = $this->get_api_client();		
 		$last_import = $this->get_last_import();
 		
-		$log = $this->create_log_csv(1000);
+		$log = Logger::create_log_csv(1000);
 				
 		$response = $client->WPLogError()->sendLog($message, $last_import, $log);
 	}		
@@ -1241,39 +1242,6 @@ class Arlo_For_Wordpress {
 		return $this->import_id;
 	}            
 	
-	public function get_log($limit=1) {
-		global $wpdb;
-		
-		$table_name = "{$wpdb->prefix}arlo_log";
-		
-		$items = $wpdb->get_results(
-			"SELECT log.* 
-			FROM $table_name log 
-			ORDER BY log.id DESC
-			LIMIT $limit"
-		);
-		
-		return $items;
-	}
-	
-	public function get_last_successful_import_log() {
-		global $wpdb;
-		
-		$table_name = "{$wpdb->prefix}arlo_log";
-		
-		$item = $wpdb->get_row(
-			"SELECT log.* 
-			FROM $table_name log 
-			WHERE log.successful = 1 
-			ORDER BY log.created DESC
-			LIMIT 1"
-		);
-		
-		if($item) return $item;
-		
-		return false;
-	}
-	
 	// should only be used when successful
 	public function set_last_import() {
 		$now = \Arlo\Utilities::get_now_utc();
@@ -1460,60 +1428,6 @@ class Arlo_For_Wordpress {
 		$this->get_scheduler()->run_task();		
 	}
 	
-	public function create_log_csv($limit = 1000) {
-		global $wpdb;
-		$limit = intval($limit);
-		
-        $table_name = "{$wpdb->prefix}arlo_import_lock";
-        
-		$fp = fopen('php://temp/maxmemory:2097125', 'w');
-		if($fp === FALSE) {
-			\Arlo\Logger::log('Couldn\'t create log CSV', $import_id);
-		    return false;
-		}
-        
-        $sql = '
-            SELECT 
-                id,
-                message,
-                created, 
-                successful
-            FROM
-                ' . $wpdb->prefix . 'arlo_log
-            ORDER BY
-            	id DESC
-            ' . 
-            ($limit !== 0 ? 'LIMIT ' . $limit : '');
-            
-	               
-        $entries = $wpdb->get_results($sql, 'ARRAY_N');
-	
-		if (is_array($entries) && count($entries)) {
-			fputcsv($fp, array('ID', 'Log', 'CreatedDateTime', 'Successful'));
-			
-			foreach ($entries as $entry) {
-				fputcsv($fp, $entry);
-	        } 
-		}
-		
-		rewind($fp);
-		$csv = stream_get_contents($fp);
-		fclose($fp);		
-		
-		return $csv;
-	
-	}
-	
-	public function download_synclog() {        
-		$csv = $this->create_log_csv(0);
-	
-        header('Content-Type: text/csv; charset=utf-8');
-		header('Content-Disposition: attachment; filename=arlo_sync_log.csv');
-		
-		echo $csv;
-		exit;
-	}
-	
 	public function load_demo() {
 		$settings = get_option('arlo_settings');
 		$notice_id = self::$dismissible_notices['newpages'];
@@ -1696,7 +1610,7 @@ class Arlo_For_Wordpress {
 			}
 						
 			if (empty($task->task_data_text)) {
-				// check for last sucessful import. Continue if imported mor than an hour ago or forced. Otherwise, return.
+				// check for last successful import. Continue if imported mor than an hour ago or forced. Otherwise, return.
 				$last = $this->get_last_import();
 		        $import_id = $this->get_random_int();
 		                        
@@ -2256,23 +2170,9 @@ class Arlo_For_Wordpress {
 	
 	public function arlo_get_last_import_log_callback() {
 		global $wpdb;
-		$sucessful = isset($_POST['sucessful']) ? true : false;	
+		$successful = isset($_POST['successful']) ? true : false;	
 		
-		$sql = "
-		SELECT
-			message,
-			created,
-			successful
-		FROM
-			{$wpdb->prefix}arlo_log
-			". ($sucessful ? "WHERE successful = 1" : "") ."
-		ORDER BY
-			id DESC
-		LIMIT 
-			1
-		";
-		
-		$log = $wpdb->get_results($sql, ARRAY_A);
+		$log = Logger::get_log($successful, 1);
 		
 		if (count($log)) {
 			if (strpos($log[0]['message'], "Error code 404") !== false ) {
