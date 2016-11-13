@@ -10,6 +10,7 @@
  */
 
  use Arlo\Logger;
+ use Arlo\VersionHandler;
 
 class Arlo_For_Wordpress_Settings {
 
@@ -24,7 +25,6 @@ class Arlo_For_Wordpress_Settings {
 
 		$plugin = Arlo_For_Wordpress::get_instance();
 		$this->plugin_slug = $plugin->get_plugin_slug();
-		$this->version = Arlo_For_Wordpress::VERSION;
 		
 		if (isset($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress' && get_option('permalink_structure') != "/%postname%/") {
 			add_action( 'admin_notices', array($plugin, "permalink_notice") );
@@ -555,7 +555,7 @@ class Arlo_For_Wordpress_Settings {
 	    echo '
 	    <h3>What\'s new in this release</h3>
 		<p><strong>If you are experiencing problems after an update, please deactivate and re-activate the plugin and re-synchronize the data.</strong></p>
-	    <h4>Version ' . $this->version . '</h4>
+	    <h4>Version ' .  VersionHandler::VERSION . '</h4>
 	    <p>
 	    	<ul class="arlo-whatsnew-list">	    
 	    		<li>Improvement the stability of the import</li>

@@ -21,6 +21,9 @@
  * @package Arlo_For_Wordpress_Admin
  * @author  Your Name <email@example.com>
  */
+
+use Arlo\VersionHandler;
+
 class Arlo_For_Wordpress_Admin {
 
 	/**
@@ -155,17 +158,17 @@ class Arlo_For_Wordpress_Admin {
 			return;
 		}
 		
-		wp_enqueue_style( $this->plugin_slug .'-admin-public-styles', plugins_url( 'assets/css/admin_public.css?20161031', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );		
+		wp_enqueue_style( $this->plugin_slug .'-admin-public-styles', plugins_url( 'assets/css/admin_public.css?20161031', __FILE__ ), array(), VersionHandler::VERSION );		
 		
 		$screen = get_current_screen();	
 		
 		if ( in_array($screen->id, [$this->plugin_screen_hook_suffix, $this->plugin_venues_screen_hook_suffix, $this->plugin_oa_screen_hook_suffix, $this->plugin_loglist_screen_hook_suffix, $this->plugin_presenters_screen_hook_suffix, $this->plugin_templates_screen_hook_suffix, $this->plugin_events_screen_hook_suffix, $this->plugin_sessions_screen_hook_suffix])) {
-			wp_enqueue_style( $this->plugin_slug .'-admin-styles', plugins_url( 'assets/css/admin.css?20161031', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );
+			wp_enqueue_style( $this->plugin_slug .'-admin-styles', plugins_url( 'assets/css/admin.css?20161031', __FILE__ ), array(), VersionHandler::VERSION );
 			
 			if ($screen->id == $this->plugin_screen_hook_suffix) {
-				wp_enqueue_style( $this->plugin_slug .'-codemirror', plugins_url( 'assets/css/libs/codemirror.css', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );
-				wp_enqueue_style( $this->plugin_slug .'-jquery-ui', plugins_url( 'assets/css/libs/jquery-ui.min.css', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );
-				wp_enqueue_style( $this->plugin_slug .'-icons8', plugins_url( 'assets/fonts/icons8/Arlo-WP.css', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );
+				wp_enqueue_style( $this->plugin_slug .'-codemirror', plugins_url( 'assets/css/libs/codemirror.css', __FILE__ ), array(), VersionHandler::VERSION );
+				wp_enqueue_style( $this->plugin_slug .'-jquery-ui', plugins_url( 'assets/css/libs/jquery-ui.min.css', __FILE__ ), array(), VersionHandler::VERSION );
+				wp_enqueue_style( $this->plugin_slug .'-icons8', plugins_url( 'assets/fonts/icons8/Arlo-WP.css', __FILE__ ), array(), VersionHandler::VERSION );
 			}
 		}
 
@@ -188,15 +191,15 @@ class Arlo_For_Wordpress_Admin {
 			return;
 		}
 		
-		wp_enqueue_script( $this->plugin_slug . '-admin-global-script', plugins_url( 'assets/js/admin_public.js?20161031', __FILE__ ), array( 'jquery' ), Arlo_For_Wordpress::VERSION, true );
+		wp_enqueue_script( $this->plugin_slug . '-admin-global-script', plugins_url( 'assets/js/admin_public.js?20161031', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, true );
 
 		$screen = get_current_screen();
 		if ( $this->plugin_screen_hook_suffix == $screen->id ) {
-			wp_enqueue_script( $this->plugin_slug . '-lsapiclient', plugins_url( 'assets/js/lib/ls-apiclient-1.2.0.min.js', __FILE__ ), array( 'jquery' ), Arlo_For_Wordpress::VERSION, true );
-			wp_enqueue_script( $this->plugin_slug . '-jquery-ui', plugins_url( 'assets/js/lib/jquery-ui.min.js', __FILE__ ), array( 'jquery' ), Arlo_For_Wordpress::VERSION, true );
-			wp_enqueue_script( $this->plugin_slug . '-codemirror', plugins_url( 'assets/js/lib/codemirror.js', __FILE__ ), array(), Arlo_For_Wordpress::VERSION, true );
-			wp_enqueue_script( $this->plugin_slug . '-codemirror-css', plugins_url( 'assets/js/lib/codemirror-css.js', __FILE__ ), array(), Arlo_For_Wordpress::VERSION, true );
-			wp_enqueue_script( $this->plugin_slug . '-admin-script', plugins_url( 'assets/js/admin.js?20161031', __FILE__ ), array( 'jquery' ), Arlo_For_Wordpress::VERSION, true );		
+			wp_enqueue_script( $this->plugin_slug . '-lsapiclient', plugins_url( 'assets/js/lib/ls-apiclient-1.2.0.min.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, true );
+			wp_enqueue_script( $this->plugin_slug . '-jquery-ui', plugins_url( 'assets/js/lib/jquery-ui.min.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, true );
+			wp_enqueue_script( $this->plugin_slug . '-codemirror', plugins_url( 'assets/js/lib/codemirror.js', __FILE__ ), array(), VersionHandler::VERSION, true );
+			wp_enqueue_script( $this->plugin_slug . '-codemirror-css', plugins_url( 'assets/js/lib/codemirror-css.js', __FILE__ ), array(), VersionHandler::VERSION, true );
+			wp_enqueue_script( $this->plugin_slug . '-admin-script', plugins_url( 'assets/js/admin.js?20161031', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, true );		
 		}
 
 	}

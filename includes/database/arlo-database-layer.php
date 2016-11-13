@@ -65,4 +65,21 @@ abstract class DatabaseLayer {
 	* @return array Strings containing the results of the various update queries.
 	*/
 	abstract public function sync_schema($sql, $execute = true );
+
+
+	/**
+	 * Retrieve one variable from the database.
+	 *
+	 * Executes a SQL query and returns the value from the SQL result.
+	 * If the SQL result contains more than one column and/or more than one row, this function returns the value in the column and row specified.
+	 * If $query is null, this function returns the value in the specified column and row from the previous SQL result.
+	 *
+	 * @since 0.71
+	 *
+	 * @param string|null $query Optional. SQL query. Defaults to null, use the result from the previous query.
+	 * @param int         $x     Optional. Column of value to return. Indexed from 0.
+	 * @param int         $y     Optional. Row of value to return. Indexed from 0.
+	 * @return string|null Database query result (as string), or null on failure
+	 */
+	abstract public function get_var( $query = null, $x = 0, $y = 0 );
 }

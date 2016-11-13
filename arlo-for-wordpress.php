@@ -68,6 +68,7 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-scheduler.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-crypto.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-environment.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-message-handler.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-version-handler.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-logger.php');
 
 //include shortcodes

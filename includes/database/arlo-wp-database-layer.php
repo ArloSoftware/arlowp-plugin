@@ -26,6 +26,10 @@ class WPDatabaseLayer extends DatabaseLayer {
 		return $this->wpdb->get_results($sql, $output);
 	}
 
+	public function get_var( $query = null, $x = 0, $y = 0 ) {
+		return $this->wpdb->get_var($query, $x, $y);
+	}
+
 	public function sync_schema($sql, $execute = true) {
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
