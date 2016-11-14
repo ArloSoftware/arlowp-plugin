@@ -335,6 +335,7 @@ class Arlo_For_Wordpress {
 	 */
 	public function run_scheduler() {
 		session_write_close();
+		check_ajax_referer( 'arlo_import', 'nonce' );
 		do_action('arlo_scheduler');
 		wp_die();
 	}
@@ -1105,8 +1106,6 @@ class Arlo_For_Wordpress {
         }
                 
 		try {			
-			
-
 			$importer->set_state($task->task_data_text);
 
 			if (!$importer::$is_finished) {
@@ -1124,10 +1123,7 @@ class Arlo_For_Wordpress {
 				$scheduler->update_task($task_id, 4, "Import finished");
 				$scheduler->clear_cron();
 			} else {
-				$url  = add_query_arg( $this->get_query_args(), $this->get_query_url() );
-				$args = $this->get_post_args();
-				
-				wp_remote_post( esc_url_raw( $url ), $args );
+				$scheduler->kick_off_scheduler();
 			}
 		} catch(\Exception $e) {
 			Logger::log('Synchronization failed, please check the <a href="?page=arlo-for-wordpress-logs&s='.$importer->import_id.'">Log</a> ', $importer->import_id);
@@ -1148,37 +1144,7 @@ class Arlo_For_Wordpress {
 		return true;
 	}
 
-	protected function get_query_args() {
-		if ( property_exists( $this, 'query_args' ) ) {
-			return $this->query_args;
-		}
-
-		return array(
-			'action' => 'arlo_run_scheduler',
-			//'nonce'  => wp_create_nonce( $this->identifier ),
-		);
-	}
-
-	protected function get_query_url() {
-		if ( property_exists( $this, 'query_url' ) ) {
-			return $this->query_url;
-		}
-
-		return admin_url( 'admin-ajax.php' );
-	}
-
-	protected function get_post_args() {
-		if ( property_exists( $this, 'post_args' ) ) {
-			return $this->post_args;
-		}
-
-		return array(
-			'timeout'   => 0.01,
-			'blocking'  => false,
-			'cookies'   => $_COOKIE,
-			'sslverify' => apply_filters( 'https_local_ssl_verify', false ),
-		);
-	}
+	
 
 	public static function delete_custom_posts($table, $column, $post_type) {
 		global $wpdb;

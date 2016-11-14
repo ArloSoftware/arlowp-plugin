@@ -293,7 +293,7 @@ class Scheduler extends Singleton {
 		wp_clear_scheduled_hook( 'arlo_scheduler');
 	}	
 
-	protected function is_process_running($task) {
+	private function is_process_running($task) {
 		if ( get_site_transient( $task . '_process_lock' ) ) {
 			// Process already running.
 			return true;
@@ -302,13 +302,52 @@ class Scheduler extends Singleton {
 		return false;
 	}
 
-	protected function lock_process($task) {
+	private function lock_process($task) {
 		set_site_transient( $task . '_process_lock', microtime(), 180 );
 	}
 
 	public function unlock_process($task) {
 		delete_site_transient( $task . '_process_lock' );
 		return $this;
+	}	
+
+	public function kick_off_scheduler() {
+		$url = add_query_arg( $this->get_query_args(), $this->get_query_url() );
+		$args = $this->get_post_args();
+				
+		wp_remote_post( esc_url_raw( $url ), $args );
+	}
+
+	private function get_query_args() {
+		if ( property_exists( $this, 'query_args' ) ) {
+			return $this->query_args;
+		}
+
+		return array(
+			'action' => 'arlo_run_scheduler',
+			'nonce'  => wp_create_nonce( 'arlo_import' ),
+		);
+	}
+
+	private function get_query_url() {
+		if ( property_exists( $this, 'query_url' ) ) {
+			return $this->query_url;
+		}
+
+		return admin_url( 'admin-ajax.php' );
+	}
+
+	private function get_post_args() {
+		if ( property_exists( $this, 'post_args' ) ) {
+			return $this->post_args;
+		}
+
+		return array(
+			'timeout'   => 0.01,
+			'blocking'  => false,
+			'cookies'   => $_COOKIE,
+			'sslverify' => apply_filters( 'https_local_ssl_verify', false ),
+		);
 	}	
 }
 
