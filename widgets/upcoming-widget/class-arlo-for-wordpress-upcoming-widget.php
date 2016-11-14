@@ -7,6 +7,8 @@
  * @copyright 2015 Arlo
  */
 
+use Arlo\Utilities;
+
 class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 
 	/**
@@ -288,7 +290,7 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 		$regions = get_option('arlo_regions');	
 		$import_id = $this->get_import_id();
 		$arlo_region = get_query_var('arlo-region', '');
-		$arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : (!empty($_COOKIE['arlo-region']) ? $_COOKIE['arlo-region'] : '' ));
+		$arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : (!empty($_COOKIE['arlo-region']) ? $_COOKIE['arlo-region'] : '' ));
 				
 		if (!empty($arlo_region)) {
 			$where['region'] = ' e_region = "' . $arlo_region . '" AND et_region = "' . $arlo_region . '"';

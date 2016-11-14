@@ -1,6 +1,8 @@
 <?php
 namespace Arlo\Shortcodes;
 
+use Arlo\DateFormatter;
+
 class Events {
     public static function init() {
         $class = new \ReflectionClass(__CLASS__);
@@ -440,7 +442,7 @@ class Events {
             'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id']
         );
         
-        $events = \Arlo\Events::get($conditions, array('e.e_startdatetime ASC'), 1, $import_id);
+        $events = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), 1, $import_id);
         
         if(empty($events)) return;
         
@@ -524,7 +526,7 @@ class Events {
             $conditions['region'] = $arlo_region; 
         }
         
-        $offer = \Arlo\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $import_id);
+        $offer = \Arlo\Entities\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $import_id);
         
         // if none, try the associated events
         if(!$offer) {
@@ -532,7 +534,7 @@ class Events {
                 'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id']
             );
             
-            $event = \Arlo\Events::get($conditions, array('e.e_startdatetime ASC'), 1, $import_id);
+            $event = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), 1, $import_id);
             
             if(empty($event)) return;
             
@@ -545,7 +547,7 @@ class Events {
                 $conditions['region'] = $arlo_region; 
             }		
             
-            $offer = \Arlo\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $import_id);
+            $offer = \Arlo\Entities\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $import_id);
         }
         
         
@@ -555,7 +557,7 @@ class Events {
                 'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id']
             );
             
-            $oa = \Arlo\OnlineActivities::get($conditions, null, 1, $import_id);
+            $oa = \Arlo\Entities\OnlineActivities::get($conditions, null, 1, $import_id);
             
             if(empty($oa)) return;
             
@@ -568,7 +570,7 @@ class Events {
                 $conditions['region'] = $arlo_region; 
             }		
             
-            $offer = \Arlo\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $import_id);
+            $offer = \Arlo\Entities\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $import_id);
         }	
         
         if(empty($offer)) return;
@@ -619,7 +621,7 @@ class Events {
         ), $atts, $shortcode_name, $import_id));
         
         if (strpos($format, '%') === false) {
-            $format = \Arlo\DateFormatter::date_format_to_strftime_format($format);
+            $format = DateFormatter::date_format_to_strftime_format($format);
         }
             
         $removeyear = ($removeyear == "false" || $removeyear == "0" ? false : true);
@@ -647,8 +649,8 @@ class Events {
             $conditions['delivery'] .= "e.e_isonline = " . intval($arlo_delivery);
         }
         
-        $events = \Arlo\Events::get($conditions, array('e.e_startdatetime ASC'), $limit, $import_id);
-        $oa = \Arlo\OnlineActivities::get($oaconditions, null, 1, $import_id);
+        $events = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), $limit, $import_id);
+        $oa = \Arlo\Entities\OnlineActivities::get($oaconditions, null, 1, $import_id);
         
         if ($layout == "list") {
             $return = '<ul class="arlo-event-next-running">';
@@ -734,7 +736,7 @@ class Events {
         }
         
         if (strpos($format, '%') === false) {
-            $format = \Arlo\DateFormatter::date_format_to_strftime_format($format);
+            $format = DateFormatter::date_format_to_strftime_format($format);
         }	
 
         return strftime($format, $date->getTimestamp() + $date->getOffset());

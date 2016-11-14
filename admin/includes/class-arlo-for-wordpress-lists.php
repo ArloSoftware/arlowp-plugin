@@ -13,6 +13,8 @@ if(!class_exists('WP_List_Table')){
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
+use Arlo\VersionHandler;
+
 class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	public $singular;
 	public $plural;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Arlo;
+namespace Arlo\Entities;
 
 require_once( plugin_dir_path( __FILE__ ) . '../arlo-singleton.php');
 
@@ -69,7 +69,6 @@ class Categories extends Singleton {
 		return $result;
 	}
 	
-	//$categories = \Arlo\Categories::getTree();
 	static function getTree($start_id = 0, $depth = 1, $level = 0, $import_id = null) {
 		$result = null;
 		$conditions = array('parent_id' => $start_id);

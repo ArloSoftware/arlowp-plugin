@@ -2,6 +2,8 @@
 
 namespace Arlo\Importer;
 
+use Arlo\Logger;
+
 class OnlineActivities extends BaseEntity {
 
 	public function __construct($plugin, $importer, $data, $iterator = 0) {
@@ -34,7 +36,7 @@ class OnlineActivities extends BaseEntity {
 			);
 							
 			if ($query === false) {					
-				\Arlo\Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
+				Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
 			}	
 			
 			$this->id = $this->wpdb->insert_id;	

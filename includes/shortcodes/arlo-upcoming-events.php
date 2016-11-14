@@ -1,6 +1,8 @@
 <?php
 namespace Arlo\Shortcodes;
 
+use Arlo\Entities\Categories as CategoriesEntity;
+
 class UpcomingEvents {
     public static function init() {
         $class = new \ReflectionClass(__CLASS__);
@@ -126,9 +128,9 @@ class UpcomingEvents {
 
                 case 'category' :
                     //root category select
-                    $cats = \Arlo\Categories::getTree(0, 1, 0, $import_id);	
+                    $cats = CategoriesEntity::getTree(0, 1, 0, $import_id);	
                     if (!empty($cats)) {
-                        $cats = \Arlo\Categories::getTree($cats[0]->c_arlo_id, 100, 0, $import_id);
+                        $cats = CategoriesEntity::getTree($cats[0]->c_arlo_id, 100, 0, $import_id);
                     }
 
                     if (is_array($cats)) {

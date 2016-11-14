@@ -2,6 +2,8 @@
 
 namespace Arlo\Importer;
 
+use Arlo\Logger;
+
 class Timezones extends BaseEntity {
 	public function __construct($plugin, $importer, $data, $iterator = 0) {
 		parent::__construct($plugin, $importer, $data, $iterator);
@@ -22,7 +24,7 @@ class Timezones extends BaseEntity {
 			)
 		);				
 		if ($query === false) {
-			\Arlo\Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' . $this->wpdb->last_query, $this->import_id);
+			Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' . $this->wpdb->last_query, $this->import_id);
 		} else {
 			if (is_array($item->TzNames)) {
 				foreach ($item->TzNames as $TzName) {

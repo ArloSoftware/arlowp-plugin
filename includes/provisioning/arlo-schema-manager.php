@@ -2,6 +2,8 @@
 
 namespace Arlo\Provisioning;
 
+use Arlo\Logger;
+
 class SchemaManager {
 
 	const DB_SCHEMA_HASH = '29dbebf0c27c672f52f355c59d1c1bef4ed1f486';
@@ -59,7 +61,7 @@ class SchemaManager {
 			 
 			$this->message_handler->set_message('error', __('Plugin upgrade warning', 'arlo-for-wordpress' ), implode('', $message), false);
 
-			\Arlo\Logger::log("The current database shema could be wrong");
+			Logger::log("The current database shema could be wrong");
 		 }
 	}	
 

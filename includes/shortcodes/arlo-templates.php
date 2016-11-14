@@ -1,6 +1,8 @@
 <?php
 namespace Arlo\Shortcodes;
 
+use Arlo\Entities\Categories as CategoriesEntity;
+
 class Templates {
     public static function init() {
         $class = new \ReflectionClass(__CLASS__);
@@ -473,9 +475,9 @@ class Templates {
                 case 'category' :
 
                     //root category select
-                    $cats = \Arlo\Categories::getTree(0, 1, 0, $import_id);	
+                    $cats = CategoriesEntity::getTree(0, 1, 0, $import_id);	
                     if (!empty($cats)) {
-                        $cats = \Arlo\Categories::getTree($cats[0]->c_arlo_id, 100, 0, $import_id);
+                        $cats = CategoriesEntity::getTree($cats[0]->c_arlo_id, 100, 0, $import_id);
                     }
                     
                     if (is_array($cats)) {
@@ -750,9 +752,9 @@ class Templates {
             if (isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true") {
                 $GLOBALS['show_child_elements'] = true;
             
-                $cats = \Arlo\Categories::getTree($cat_id, null, 0, $import_id);
+                $cats = CategoriesEntity::getTree($cat_id, null, 0, $import_id);
 
-                $categories_tree = Categories::child_categories($cats);
+                $categories_tree = CategoriesEntity::child_categories($cats);
                 
                 $ids = array_map(function($item) {
                     return $item['id'];

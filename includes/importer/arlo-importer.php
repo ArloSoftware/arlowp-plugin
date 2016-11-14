@@ -2,10 +2,9 @@
 
 namespace Arlo\Importer;
 
-error_reporting(E_ALL);
-ini_set('display_error', 1);
-
 use Arlo\Singleton;
+use Arlo\Logger;
+use Arlo\Environment;
 
 class Importer extends Singleton {
 	public static $filename;
@@ -62,7 +61,7 @@ class Importer extends Singleton {
 		self::$filename = 'data'; //TODO: Change it
 		self::$plugin = $plugin;
 
-		$this->environment = new \Arlo\Environment();
+		$this->environment = new Environment();
 	}
 
 	public function set_import_id($import_id) {
@@ -133,7 +132,7 @@ class Importer extends Singleton {
 
 			return $content;
 		} else {
-			\Arlo\Logger::log_error('The file doesn\'t exist: ' . self::$filename, $this->import_id);
+			Logger::log_error('The file doesn\'t exist: ' . self::$filename, $this->import_id);
 		}
 	}
 
@@ -157,7 +156,7 @@ class Importer extends Singleton {
 				
 				$this->write_file($filename . '.json', self::$data_json);
 			} catch (\Exception $e) {
-				\Arlo\Logger::log_error('Couldn\'t decrypt the file: ' . $e->getMessage(), $this->import_id);				
+				Logger::log_error('Couldn\'t decrypt the file: ' . $e->getMessage(), $this->import_id);				
 			}
 		}
 
@@ -178,14 +177,14 @@ class Importer extends Singleton {
 		if (!empty(self::$data_json->$import_task) || in_array($import_task, $this->irregular_tasks)) {
 			$this->environment->start_time = time(); // Set start time of current process.
 			
-			\Arlo\Logger::log('Import subtask started: ' . ($this->current_task_num + 1) . "/" . count($this->import_tasks) . ": " . $this->current_task_desc, $this->import_id);
+			Logger::log('Import subtask started: ' . ($this->current_task_num + 1) . "/" . count($this->import_tasks) . ": " . $this->current_task_desc, $this->import_id);
 
 			$class_name = "Arlo\Importer\\" . $import_task;
 			
 			$this->current_task_class = new $class_name(self::$plugin, $this, (!empty(self::$data_json->$import_task) ? self::$data_json->$import_task : null), $this->current_task_iterator);
 			$this->current_task_class->import();
 			
-			\Arlo\Logger::log('Import subtask ended: ' . ($this->current_task_num + 1) . "/" . count($this->import_tasks) . ": " . $this->current_task_desc, $this->import_id);			
+			Logger::log('Import subtask ended: ' . ($this->current_task_num + 1) . "/" . count($this->import_tasks) . ": " . $this->current_task_desc, $this->import_id);			
 		}
 	}
 }

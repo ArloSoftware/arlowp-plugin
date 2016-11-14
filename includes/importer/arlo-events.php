@@ -2,6 +2,8 @@
 
 namespace Arlo\Importer;
 
+use Arlo\Logger;
+
 class Events extends BaseEntity {
 
 	private $event_id;
@@ -62,7 +64,7 @@ class Events extends BaseEntity {
 		);
                         
 		if ($query === false) {					
-			\Arlo\Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
+			Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
 		}	
 		
 		$this->event_id = $this->wpdb->insert_id;
@@ -102,7 +104,7 @@ class Events extends BaseEntity {
 				) );
 				
 				if ($query === false) {
-					\Arlo\Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
+					Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
 				}
 			}
 		}		

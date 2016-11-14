@@ -4,6 +4,12 @@ use Arlo\Database\WPDatabaseLayer;
 use Arlo\Provisioning\SchemaManager;
 use Arlo\Logger;
 use Arlo\VersionHandler;
+use Arlo\Scheduler;
+use Arlo\Importer\Importer;
+use Arlo\MessageHandler;
+use ArloAPI\Transports\Wordpress;
+use ArloAPI\Client;
+use Arlo\Utilities;
 
 /**
  * Arlo for WordPress.
@@ -557,7 +563,7 @@ class Arlo_For_Wordpress {
 			}
 		} else {
 			arlo_add_datamodel();
-			
+
 			$plugin->get_version_handler()->set_installed_version();
 		}
 	}
@@ -579,7 +585,7 @@ class Arlo_For_Wordpress {
 		$this->set_default_options();
 		
 		// run import every 15 minutes
-		\Arlo\Logger::log("Plugin activated");
+		Logger::log("Plugin activated");
 
 		// now add pages
 		$this->add_pages();
@@ -847,7 +853,7 @@ class Arlo_For_Wordpress {
 	
 	// should only be used when successful
 	public function set_last_import() {
-		$now = \Arlo\Utilities::get_now_utc();
+		$now = Utilities::get_now_utc();
        	$timestamp = $now->format("Y-m-d H:i:s");	
 	
 		update_option('arlo_last_import', $timestamp);
@@ -869,7 +875,7 @@ class Arlo_For_Wordpress {
 			return $scheduler;
 		}
 		
-		$scheduler = new \Arlo\Scheduler($this);
+		$scheduler = new Scheduler($this);
 		
 		$this->__set('scheduler', $scheduler);
 		
@@ -881,7 +887,7 @@ class Arlo_For_Wordpress {
 			return $importer;
 		}
 		
-		$importer = new \Arlo\Importer\Importer($this);
+		$importer = new Importer($this);
 		
 		$this->__set('importer', $importer);
 		
@@ -893,7 +899,7 @@ class Arlo_For_Wordpress {
 			return $message_handler;
 		}
 		
-		$message_handler = new \Arlo\MessageHandler();
+		$message_handler = new MessageHandler();
 		
 		$this->__set('message_handler', $message_handler);
 		
@@ -949,11 +955,11 @@ class Arlo_For_Wordpress {
 			return $client;
 		}
 	
-		$transport = new \ArloAPI\Transports\Wordpress();
+		$transport = new Wordpress();
 		$transport->setRequestTimeout(30);
 		$transport->setUseNewUrlStructure(get_option('arlo_new_url_structure') == 1);
 		
-		$client = new \ArloAPI\Client($platform_name, $transport, VersionHandler::VERSION);
+		$client = new Client($platform_name, $transport, VersionHandler::VERSION);
 		
 		$this->__set('api_client', $client);
 		
@@ -979,7 +985,7 @@ class Arlo_For_Wordpress {
 			}
 			
 			if (!empty($last_import) && $last_import_ts !== false) {
-				$now = \Arlo\Utilities::get_now_utc();
+				$now = Utilities::get_now_utc();
 				
 				//older than 6 hours
 				if (intval($now->format("U")) - $last_import_ts > 60 * 60 * 6) {
@@ -994,7 +1000,7 @@ class Arlo_For_Wordpress {
 						];
 						
 						if ($message_handler->set_message($type, __('Event synchronisation error', 'arlo-for-wordpress' ), implode('', $message), true) === false) {
-							\Arlo\Logger::log("Couldn't create Arlo 6 hours import error message");
+							Logger::log("Couldn't create Arlo 6 hours import error message");
 						}
 						
 						if (isset($settings['arlo_send_data']) && $settings['arlo_send_data'] == "1") {
@@ -1229,7 +1235,7 @@ class Arlo_For_Wordpress {
 				$last = $this->get_last_import();
 		        $import_id = $this->get_random_int();
 		                        
-		        \Arlo\Logger::log('Synchronization Started', $import_id);
+		        Logger::log('Synchronization Started', $import_id);
 		        
 		        $scheduler->update_task_data($task_id, ['import_id' => $import_id]);
 								
@@ -1237,19 +1243,19 @@ class Arlo_For_Wordpress {
 				// If not forced
 				if(!$force) {
 					// LOG THIS AS AN AUTOMATIC IMPORT
-					\Arlo\Logger::log('Synchronization identified as automatic synchronization.', $import_id);
+					Logger::log('Synchronization identified as automatic synchronization.', $import_id);
 					if(!empty($last)) {
 						// LOG THAT A PREVIOUS SUCCESSFUL IMPORT HAS BEEN FOUND
-						\Arlo\Logger::log('Previous succesful synchronization found.', $import_id);
+						Logger::log('Previous succesful synchronization found.', $import_id);
 						if(strtotime('-1 hour') > strtotime($last)) {
 							// LOG THE FACT THAT PREVIOUS SUCCESSFUL IMPORT IS MORE THAN AN HOUR AGO
-							\Arlo\Logger::log('Synchronization more than an hour old. Synchronization required.', $import_id);
+							Logger::log('Synchronization more than an hour old. Synchronization required.', $import_id);
 						}
 						else {
 							// LOG THE FACT THAT PREVIOUS SUCCESSFUL IMPORT IS MORE THAN AN HOUR AGO
-							\Arlo\Logger::log('Synchronization less than an hour old. Synchronization stopped.', $import_id);
+							Logger::log('Synchronization less than an hour old. Synchronization stopped.', $import_id);
 							// LOG DATA USED TO DECIDE IMPORT NOT REQUIRED.
-							\Arlo\Logger::log($last . '-'  . strtotime($last) . '-' . strtotime('-1 hour') . '-'  . !$force, $import_id);
+							Logger::log($last . '-'  . strtotime($last) . '-' . strtotime('-1 hour') . '-'  . !$force, $import_id);
 							return false;
 						}
 					}
@@ -1270,7 +1276,7 @@ class Arlo_For_Wordpress {
 				
         //if an import is already running, exit
         if (!$this->acquire_import_lock($import_id)) {
-            \Arlo\Logger::log('Synchronization LOCK found, please wait 5 minutes and try again', $import_id);
+            Logger::log('Synchronization LOCK found, please wait 5 minutes and try again', $import_id);
             return false;
         }
                 
@@ -1300,7 +1306,7 @@ class Arlo_For_Wordpress {
 				wp_remote_post( esc_url_raw( $url ), $args );
 			}
 		} catch(\Exception $e) {
-			\Arlo\Logger::log('Synchronization failed, please check the <a href="?page=arlo-for-wordpress-logs&s='.$import_id.'">Log</a> ', $import_id);
+			Logger::log('Synchronization failed, please check the <a href="?page=arlo-for-wordpress-logs&s='.$import_id.'">Log</a> ', $import_id);
 
 			$scheduler->update_task($task_id, 3);
 			
@@ -1416,7 +1422,7 @@ class Arlo_For_Wordpress {
 					
 					$location = $url;
 				} else {
-					$event = \Arlo\Templates::get(array('id' => $_GET['arlo_id']), array(), 1, $import_id);
+					$event = \Arlo\Entities\Templates::get(array('id' => $_GET['arlo_id']), array(), 1, $import_id);
 					
 					if(!$event) return;
 					
@@ -1429,7 +1435,7 @@ class Arlo_For_Wordpress {
 			break;
 			
 			case 'venue':
-				$venue = \Arlo\Venues::get(array('id' => $_GET['arlo_id']), array(), 1, $import_id);
+				$venue = \Arlo\Entities\Venues::get(array('id' => $_GET['arlo_id']), array(), 1, $import_id);
 				
 				if(!$venue) return;
 				
@@ -1441,7 +1447,7 @@ class Arlo_For_Wordpress {
 			break;
 			
 			case 'presenter':
-				$presenter = \Arlo\Presenters::get(array('id' => $_GET['arlo_id']), array(), 1, $import_id);
+				$presenter = \Arlo\Entities\Presenters::get(array('id' => $_GET['arlo_id']), array(), 1, $import_id);
 				
 				if(!$presenter) return;
 				

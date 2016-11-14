@@ -2,6 +2,8 @@
 
 namespace Arlo\Importer;
 
+use Arlo\Logger;
+
 class Finish extends BaseEntity {
 
 	protected function save_entity($item) {}
@@ -12,7 +14,7 @@ class Finish extends BaseEntity {
 			$this->cleanup_import($this->import_id);
         
             // update logs
-            \Arlo\Logger::log('Synchronization successful', $this->import_id, null, true);            
+            Logger::log('Synchronization successful', $this->import_id, null, true);            
 			
 	        //set import id
 	        $this->plugin->set_import_id($this->import_id);
@@ -24,7 +26,7 @@ class Finish extends BaseEntity {
 
 			$this->is_finished = true;
         } else {
-            \Arlo\Logger::log('Synchronization died because of a database LOCK, please wait 5 minutes and try again.', $this->import_id);
+            Logger::log('Synchronization died because of a database LOCK, please wait 5 minutes and try again.', $this->import_id);
         }
 	}
 
@@ -54,7 +56,7 @@ class Finish extends BaseEntity {
 			$this->wpdb->query($this->wpdb->prepare("DELETE FROM $table WHERE import_id <> %s", $this->import_id));
 		}   
 
-		\Arlo\Logger::log('Database cleanup', $this->import_id);
+		Logger::log('Database cleanup', $this->import_id);
         
         // delete unneeded custom posts
         $this->plugin->delete_custom_posts('eventtemplates','et_post_name','event');
@@ -63,6 +65,6 @@ class Finish extends BaseEntity {
 
         $this->plugin->delete_custom_posts('venues','v_post_name','venue');           
         
-		\Arlo\Logger::log('Posts cleanup ', $this->import_id);
+		Logger::log('Posts cleanup ', $this->import_id);
 	}
 }

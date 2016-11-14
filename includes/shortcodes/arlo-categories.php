@@ -1,6 +1,8 @@
 <?php
 namespace Arlo\Shortcodes;
 
+use Arlo\Entities\Categories as CategoriesEntity;
+
 class Categories {
     public static function init() {
         $class = new \ReflectionClass(__CLASS__);
@@ -47,21 +49,21 @@ class Categories {
                 $conditions = array('parent_id' => 0);
             }
             
-            $current = \Arlo\Categories::get($conditions, 1, $import_id);
+            $current = CategoriesEntity::get($conditions, 1, $import_id);
             
             $return .= sprintf($title, $current->c_name);
         }
         
         if ($depth > 0) {
             if ($start_at == 0) {
-                $root = \Arlo\Categories::getTree($start_at, 1, 0, $import_id);	
+                $root = CategoriesEntity::getTree($start_at, 1, 0, $import_id);
                         
                 if (!empty($root)) {
                     $start_at = $root[0]->c_arlo_id;
                 }
             }
             
-            $tree = \Arlo\Categories::getTree($start_at, $depth, 0, $import_id);	
+            $tree = CategoriesEntity::getTree($start_at, $depth, 0, $import_id);	
             
             $GLOBALS['categories_count'] = count($tree);		
                     
@@ -77,9 +79,9 @@ class Categories {
         $arlo_category = isset($_GET['arlo-category']) && !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : get_query_var('arlo-category', '');
         
         if (!empty($arlo_category)) {
-            $category = \Arlo\Categories::get(array('id' => current(explode('-', $arlo_category))), 1, $import_id);
+            $category = CategoriesEntity::get(array('id' => current(explode('-', $arlo_category))), 1, $import_id);
         } else {
-            $category = \Arlo\Categories::get(array('parent_id' => 0), 1, $import_id);
+            $category = CategoriesEntity::get(array('parent_id' => 0), 1, $import_id);
         }
         
         if(!$category) return;
@@ -91,9 +93,9 @@ class Categories {
         $arlo_category = isset($_GET['arlo-category']) && !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : get_query_var('arlo-category', '');
         
         if (!empty($arlo_category)) {
-            $category = \Arlo\Categories::get(array('id' => current(explode('-', $arlo_category))), 1, $import_id);
+            $category = CategoriesEntity::get(array('id' => current(explode('-', $arlo_category))), 1, $import_id);
         } else {
-            $category = \Arlo\Categories::get(array('parent_id' => 0), 1, $import_id);
+            $category = CategoriesEntity::get(array('parent_id' => 0), 1, $import_id);
         }
         
         if(!$category) return;
@@ -105,9 +107,9 @@ class Categories {
         $arlo_category = isset($_GET['arlo-category']) && !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : get_query_var('arlo-category', '');
         
         if (!empty($arlo_category)) {
-            $category = \Arlo\Categories::get(array('id' => current(explode('-', $arlo_category))), 1, $import_id);
+            $category = CategoriesEntity::get(array('id' => current(explode('-', $arlo_category))), 1, $import_id);
         } else {
-            $category = \Arlo\Categories::get(array('parent_id' => 0), 1, $import_id);
+            $category = CategoriesEntity::get(array('parent_id' => 0), 1, $import_id);
         }
         
         if(!$category) return;

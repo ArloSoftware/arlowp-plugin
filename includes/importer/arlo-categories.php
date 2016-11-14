@@ -2,6 +2,8 @@
 
 namespace Arlo\Importer;
 
+use Arlo\Logger;
+
 class Categories extends BaseEntity {
 
 	public function __construct($plugin, $importer, $data, $iterator = 0) {
@@ -28,7 +30,7 @@ class Categories extends BaseEntity {
 		) );
 
 		if ($query === false) {
-			\Arlo\Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
+			Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
 		}
 	}
 }

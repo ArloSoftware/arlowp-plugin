@@ -38,7 +38,7 @@ add_filter( 'the_title', function($title, $id = null){
 	$cat = null;
 	
 	if (!empty($cat_slug))
-		$cat = \Arlo\Categories::get(array('slug' => $cat_slug), null, $import_id);
+		$cat = \Arlo\Entities\Categories::get(array('slug' => $cat_slug), null, $import_id);
 		
 		
 	$location = !empty($_GET['arlo-location']) ? $_GET['arlo-location'] : get_query_var('arlo-location', '');

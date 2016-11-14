@@ -2,6 +2,8 @@
 
 namespace Arlo\Importer;
 
+use Arlo\Logger;
+
 abstract class BaseEntity {
     public $is_finished = false;
     public $iterator = 0;
@@ -83,7 +85,7 @@ abstract class BaseEntity {
 				) );
 				
 				if ($query === false) {
-					\Arlo\Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' . $this->wpdb->last_query, $this->import_id);
+					Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' . $this->wpdb->last_query, $this->import_id);
 				}
 			}
 		}	
@@ -142,7 +144,7 @@ abstract class BaseEntity {
 					) );
 												
 					if ($query === false) {
-						\Arlo\Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
+						Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
 					} else {
 						$exisiting_tags[$tag] = $this->wpdb->insert_id;
 					}
@@ -160,7 +162,7 @@ abstract class BaseEntity {
 					) );
 					
 					if ($query === false) {
-						\Arlo\Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
+						Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
 					}
 				} else {
 					throw new Exception('Couldn\'t find tag: ' . $tag );

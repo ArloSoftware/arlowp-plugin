@@ -1,6 +1,6 @@
 <?php
 
-namespace Arlo;
+namespace Arlo\Entities;
 
 require_once( plugin_dir_path( __FILE__ ) . '../arlo-singleton.php');
 

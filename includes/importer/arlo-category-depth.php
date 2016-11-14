@@ -2,6 +2,9 @@
 
 namespace Arlo\Importer;
 
+use Arlo\Logger;
+use Arlo\Entities\Categories as CategoriesEntity;
+
 class CategoryDepth extends BaseEntity {
 
 	protected function save_entity($item) {}
@@ -36,12 +39,12 @@ class CategoryDepth extends BaseEntity {
 				$query = $this->wpdb->query( $this->wpdb->prepare($sql, $counts['num'], $counts['c_arlo_id']) );
 				
 				if ($query === false) {
-					\Arlo\Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' . $this->wpdb->last_query, $this->import_id);
+					Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' . $this->wpdb->last_query, $this->import_id);
 				}
 			}		
 		}
 		
-		$cats = \Arlo\Categories::getTree(0, 1000, 0, $this->import_id);
+		$cats = CategoriesEntity::getTree(0, 1000, 0, $this->import_id);
 				
 		$this->set_category_depth_level($cats, $this->import_id);
 		
@@ -124,7 +127,7 @@ class CategoryDepth extends BaseEntity {
 			
 			$query = $this->wpdb->query( $this->wpdb->prepare($sql, $order + $cat->c_order, $cat->c_arlo_id, $this->import_id) );
 			if ($query === false) {
-				\Arlo\Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' . $this->wpdb->last_query, $this->import_id);
+				Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' . $this->wpdb->last_query, $this->import_id);
 			} else if (is_array($cat->children)) {
 				$this->set_category_depth_order($cat->children, $max_depth, $order, $this->import_id);
 			}
