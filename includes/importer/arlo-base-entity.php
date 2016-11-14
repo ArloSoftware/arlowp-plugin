@@ -9,9 +9,9 @@ abstract class BaseEntity {
     public $iterator = 0;
 
     protected $id;
-    protected $wpdb;
-    protected $plugin;
     protected $importer;
+	protected $dbl;
+	protected $message_handler;
     protected $import_id;
 
     protected $data;
@@ -19,12 +19,13 @@ abstract class BaseEntity {
    
     abstract protected function save_entity($item);
 
-    public function __construct($plugin, $importer, $data, $iterator = 0) {
+    public function __construct($importer, $dbl, $message_handler, $data, $iterator = 0) {
         global $wpdb;
 
-        $this->plugin = $plugin;
         $this->importer = $importer;
-        $this->wpdb = &$wpdb;
+		$this->dbl = $dbl;
+		$this->message_handler = $message_handler;
+
         $this->import_id = $importer->import_id;
         $this->data = $data;
         $this->iterator = $iterator;
@@ -58,8 +59,8 @@ abstract class BaseEntity {
 		
 			$offers = array_reverse($advertised_offer);
 			foreach($offers as $key => $offer) {
-				$query = $this->wpdb->query( $this->wpdb->prepare( 
-					"INSERT INTO " . $this->wpdb->prefix . "arlo_offers 
+				$query = $this->dbl->query( $this->dbl->prepare( 
+					"INSERT INTO " . $this->dbl->prefix . "arlo_offers 
 					(o_arlo_id, et_id, e_id, oa_id, o_label, o_isdiscountoffer, o_currencycode, o_offeramounttaxexclusive, o_offeramounttaxinclusive, o_formattedamounttaxexclusive, o_formattedamounttaxinclusive, o_taxrateshortcode, o_taxratename, o_taxratepercentage, o_message, o_order, o_replaces, o_region, import_id) 
 					VALUES ( %d, %d, %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, %s, %s, %s ) 
 					", 
@@ -85,7 +86,7 @@ abstract class BaseEntity {
 				) );
 				
 				if ($query === false) {
-					Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' . $this->wpdb->last_query, $this->import_id);
+					Logger::log_error('SQL error: ' . $this->dbl->last_error . ' ' . $this->dbl->last_query, $this->import_id);
 				}
 			}
 		}	
@@ -95,18 +96,18 @@ abstract class BaseEntity {
 		switch ($type) {
 			case "template":
 				$field = "et_id";
-				$table_name = $this->wpdb->prefix . "arlo_eventtemplates_tags";			
+				$table_name = $this->dbl->prefix . "arlo_eventtemplates_tags";			
 			break;		
 			case "event":
 				$field = "e_id";
-				$table_name = $this->wpdb->prefix . "arlo_events_tags";			
+				$table_name = $this->dbl->prefix . "arlo_events_tags";			
 			break;
 			case "oa":
 				$field = "oa_id";
-				$table_name = $this->wpdb->prefix . "arlo_onlineactivities_tags";
+				$table_name = $this->dbl->prefix . "arlo_onlineactivities_tags";
 			break;			
 			default: 
-				throw new Exception('Tag type failed: ' . $type);
+			 	Logger::log_error('Tag type failed: ' . $type, $this->import_id);
 			break;		
 		}
 
@@ -119,14 +120,14 @@ abstract class BaseEntity {
 				id, 
 				tag
 			FROM
-				" . $this->wpdb->prefix . "arlo_tags 
+				" . $this->dbl->prefix . "arlo_tags 
 			WHERE 
 				tag IN ('" . implode("', '", $tags) . "')
 			AND
 				import_id = " . $this->import_id . "
 			";
 
-			$rows = $this->wpdb->get_results($sql, ARRAY_A);
+			$rows = $this->dbl->get_results($sql, ARRAY_A);
 			foreach ($rows as $row) {
 				$exisiting_tags[$row['tag']] = $row['id'];
 			}
@@ -134,8 +135,8 @@ abstract class BaseEntity {
 			
 			foreach ($tags as $tag) {
 				if (empty($exisiting_tags[$tag])) {
-					$query = $this->wpdb->query( $this->wpdb->prepare( 
-						"INSERT INTO " . $this->wpdb->prefix . "arlo_tags
+					$query = $this->dbl->query( $this->dbl->prepare( 
+						"INSERT INTO " . $this->dbl->prefix . "arlo_tags
 						(tag, import_id) 
 						VALUES ( %s, %s ) 
 						", 
@@ -144,14 +145,14 @@ abstract class BaseEntity {
 					) );
 												
 					if ($query === false) {
-						Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
+						Logger::log_error('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query, $this->import_id);
 					} else {
-						$exisiting_tags[$tag] = $this->wpdb->insert_id;
+						$exisiting_tags[$tag] = $this->dbl->insert_id;
 					}
 				}
 										
 				if (!empty($exisiting_tags[$tag])) {
-					$query = $this->wpdb->query( $this->wpdb->prepare( 
+					$query = $this->dbl->query( $this->dbl->prepare( 
 						"INSERT INTO {$table_name}
 						(" . $field . ", tag_id, import_id) 
 						VALUES ( %d, %d, %s ) 
@@ -162,10 +163,10 @@ abstract class BaseEntity {
 					) );
 					
 					if ($query === false) {
-						Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
+						Logger::log_error('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query, $this->import_id);
 					}
 				} else {
-					throw new Exception('Couldn\'t find tag: ' . $tag );
+					throw new \Exception('Couldn\'t find tag: ' . $tag );
 				}
 			}
 		}

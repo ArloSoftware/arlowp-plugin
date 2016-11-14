@@ -9,12 +9,12 @@ class Presenters extends BaseEntity {
 	public function __construct($plugin, $importer, $data, $iterator = 0) {
 		parent::__construct($plugin, $importer, $data, $iterator);
 
-		$this->table_name = $this->wpdb->prefix . 'arlo_presenters';
+		$this->table_name = $this->dbl->prefix . 'arlo_presenters';
 	}
 
 	protected function save_entity($item) { 
 		$slug = sanitize_title($item->PresenterID . ' ' . $item->FirstName . ' ' . $item->LastName);
-		$query = $this->wpdb->query( $this->wpdb->prepare( 
+		$query = $this->dbl->query( $this->dbl->prepare( 
 			"INSERT INTO 
 				" . $this->table_name ." 
 				(p_arlo_id, p_firstname, p_lastname, p_viewuri, p_profile, p_qualifications, p_interests, p_twitterid, p_facebookid, p_linkedinid, p_post_name, import_id) 
@@ -36,7 +36,7 @@ class Presenters extends BaseEntity {
 		) );
 						
 		if ($query === false) {
-			Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' . $this->wpdb->last_query, $this->import_id);
+			Logger::log_error('SQL error: ' . $this->dbl->last_error . ' ' . $this->dbl->last_query, $this->import_id);
 		}
 		
 		$name = $item->FirstName . ' ' . $item->LastName;

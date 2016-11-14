@@ -9,7 +9,7 @@ class Finish extends BaseEntity {
 	protected function save_entity($item) {}
 
 	public function import() {
-		if ($this->plugin->get_import_lock_entries_number() == 1 && $this->plugin->check_import_lock($this->import_id)) {
+		if ($this->importer->get_import_lock_entries_number() == 1 && $this->importer->check_import_lock($this->import_id)) {
             //clean up the old entries
 			$this->cleanup_import($this->import_id);
         
@@ -17,12 +17,11 @@ class Finish extends BaseEntity {
             Logger::log('Synchronization successful', $this->import_id, null, true);            
 			
 	        //set import id
-	        $this->plugin->set_import_id($this->import_id);
+	        $this->importer->set_current_import_id($this->import_id);
 	        
-	        $this->plugin->set_last_import();
+	        $this->importer->set_last_import_date();
 	        
-	        $message_handler = $this->plugin->get_message_handler();
-	        $message_handler->dismiss_by_type('import_error');
+	        $this->message_handler->dismiss_by_type('import_error');
 
 			$this->is_finished = true;
         } else {
@@ -52,18 +51,18 @@ class Finish extends BaseEntity {
 		);
                 		
 		foreach($tables as $table) {
-			$table = $this->wpdb->prefix . 'arlo_' . $table;
-			$this->wpdb->query($this->wpdb->prepare("DELETE FROM $table WHERE import_id <> %s", $this->import_id));
+			$table = $this->dbl->prefix . 'arlo_' . $table;
+			$this->dbl->query($this->dbl->prepare("DELETE FROM $table WHERE import_id <> %s", $this->import_id));
 		}   
 
 		Logger::log('Database cleanup', $this->import_id);
         
         // delete unneeded custom posts
-        $this->plugin->delete_custom_posts('eventtemplates','et_post_name','event');
+        \Arlo_For_Wordpress::delete_custom_posts('eventtemplates','et_post_name','event');
 
-        $this->plugin->delete_custom_posts('presenters','p_post_name','presenter');
+        \Arlo_For_Wordpress::delete_custom_posts('presenters','p_post_name','presenter');
 
-        $this->plugin->delete_custom_posts('venues','v_post_name','venue');           
+        \Arlo_For_Wordpress::delete_custom_posts('venues','v_post_name','venue');           
         
 		Logger::log('Posts cleanup ', $this->import_id);
 	}

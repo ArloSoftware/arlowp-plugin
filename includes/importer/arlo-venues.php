@@ -9,12 +9,12 @@ class Venues extends BaseEntity {
 	public function __construct($plugin, $importer, $data, $iterator = 0) {
 		parent::__construct($plugin, $importer, $data, $iterator);
 
-		$this->table_name = $this->wpdb->prefix . 'arlo_venues';
+		$this->table_name = $this->dbl->prefix . 'arlo_venues';
 	}
 
 	protected function save_entity($item) {
 		$slug = sanitize_title($item->VenueID . ' ' . $item->Name);
-		$query = $this->wpdb->query( $this->wpdb->prepare( 
+		$query = $this->dbl->query( $this->dbl->prepare( 
 			"INSERT INTO " . $this->table_name . " 
 			(v_arlo_id, v_name, v_geodatapointlatitude, v_geodatapointlongitude, v_physicaladdressline1, v_physicaladdressline2, v_physicaladdressline3, v_physicaladdressline4, v_physicaladdresssuburb, v_physicaladdresscity, v_physicaladdressstate, v_physicaladdresspostcode, v_physicaladdresscountry, v_viewuri, v_facilityinfodirections, v_facilityinfoparking, v_post_name, import_id) 
 			VALUES ( %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )
@@ -40,7 +40,7 @@ class Venues extends BaseEntity {
 		) );
 						
 		if ($query === false) {
-			Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
+			Logger::log_error('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query, $this->import_id);
 		}
 						
 		// create associated custom post, if it dosen't exist

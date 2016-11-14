@@ -11,7 +11,7 @@ class Events extends BaseEntity {
 	public function __construct($plugin, $importer, $data, $iterator = 0) {
 		parent::__construct($plugin, $importer, $data, $iterator);
 
-		$this->table_name = $this->wpdb->prefix . 'arlo_events';
+		$this->table_name = $this->dbl->prefix . 'arlo_events';
 	}
 
 	protected function save_entity($item) {
@@ -26,8 +26,8 @@ class Events extends BaseEntity {
 	}
 
 	private function save_event_data($item = [], $parent_id = 0) {		
-		$query = $this->wpdb->query(
-			$this->wpdb->prepare( 
+		$query = $this->dbl->query(
+			$this->dbl->prepare( 
 				"INSERT INTO " . $this->table_name ." 
 				(e_arlo_id, et_arlo_id, e_parent_arlo_id, e_code, e_name, e_startdatetime, e_finishdatetime, e_datetimeoffset, e_timezone, e_timezone_id, v_id, e_locationname, e_locationroomname, e_locationvisible , e_isfull, e_placesremaining, e_summary, e_sessiondescription, e_notice, e_viewuri, e_registermessage, e_registeruri, e_providerorganisation, e_providerwebsite, e_isonline, e_credits, e_region, import_id) 
 				VALUES ( %d, %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) 
@@ -64,10 +64,10 @@ class Events extends BaseEntity {
 		);
                         
 		if ($query === false) {					
-			Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
+			Logger::log_error('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query, $this->import_id);
 		}	
 		
-		$this->event_id = $this->wpdb->insert_id;
+		$this->event_id = $this->dbl->insert_id;
 		
 		//advertised offers
 		if(!empty($item->AdvertisedOffers) && is_array($item->AdvertisedOffers)) {
@@ -88,12 +88,12 @@ class Events extends BaseEntity {
 	}
 
 	private function save_presenters($presenters = []) {
-		if (empty($this->event_id)) throw new Exception('No eventID given: ' . __CLASS__ . '::' . __FUNCTION__);
+		if (empty($this->event_id)) Logger::log_error('No eventID given: ' . __CLASS__ . '::' . __FUNCTION__, $this->event_id);
 
 		if(!empty($presenters) && is_array($presenters)) {
 			foreach($presenters as $index => $presenter) {
-				$query = $this->wpdb->query( $this->wpdb->prepare( 
-					"INSERT INTO " . $this->wpdb->prefix . "arlo_events_presenters 
+				$query = $this->dbl->query( $this->dbl->prepare( 
+					"INSERT INTO " . $this->dbl->prefix . "arlo_events_presenters 
 					(e_id, p_arlo_id, p_order, import_id) 
 					VALUES ( %d, %d, %d, %s ) 
 					", 
@@ -104,7 +104,7 @@ class Events extends BaseEntity {
 				) );
 				
 				if ($query === false) {
-					Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
+					Logger::log_error('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query, $this->import_id);
 				}
 			}
 		}		

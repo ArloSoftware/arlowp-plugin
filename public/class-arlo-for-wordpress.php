@@ -10,6 +10,7 @@ use Arlo\MessageHandler;
 use ArloAPI\Transports\Wordpress;
 use ArloAPI\Client;
 use Arlo\Utilities;
+use Arlo\Environment;
 
 /**
  * Arlo for WordPress.
@@ -495,7 +496,7 @@ class Arlo_For_Wordpress {
 	
 	public function send_log_to_arlo($message = '') {	
 		$client = $this->get_api_client();		
-		$last_import = $this->get_last_import();
+		$last_import = $this->get_importer()->get_last_import_date();
 		
 		$log = Logger::create_log_csv(1000);
 				
@@ -547,13 +548,13 @@ class Arlo_For_Wordpress {
 		
 		if (!empty($plugin_version)) {
             $import_id  = get_option('arlo_import_id',"");
-            $last_import = $plugin->get_last_import();
+            $last_import = $plugin->get_importer()->get_last_import_date();
             
             if (empty($import_id)) {
                 if (empty($last_import)) {
                     $last_import = date("Y");
                 }
-                $plugin->set_import_id(date("Y", strtotime($last_import)));
+                $plugin->get_importer()->set_import_id(date("Y", strtotime($last_import)));
             }
                         
 			if ($plugin_version != VersionHandler::VERSION) {
@@ -824,51 +825,7 @@ class Arlo_For_Wordpress {
         }
 
         return null;
-    }
-
-	/* API & import functionality */
-    
-	public function set_import_id($import_id) {
-		update_option('arlo_import_id', $import_id);
-                               
-		$this->import_id = $import_id;
-	}    
-        
-	public function get_import_id() {	
-        global $wpdb;
-        
-        //need to access the db directly, get_option('arlo_import_id'); can return a cached (old) value
-        $table_name = "{$wpdb->prefix}options";
-        
-        $sql = "SELECT option_value
-			FROM $table_name 
-            WHERE option_name = 'arlo_import_id'";
-	    
-	    $import_id = $wpdb->get_var($sql);
-            
-		$this->import_id = $import_id;
-                
-		return $this->import_id;
-	}            
-	
-	// should only be used when successful
-	public function set_last_import() {
-		$now = Utilities::get_now_utc();
-       	$timestamp = $now->format("Y-m-d H:i:s");	
-	
-		update_option('arlo_last_import', $timestamp);
-		$this->last_imported = $timestamp;
-	}
-	
-	public function get_last_import() {
-		if(!is_null($this->last_imported)) {
-			return $this->last_imported;
-		}
-		
-		$this->last_imported = get_option('arlo_last_import');
-		
-		return $this->last_imported;
-	}
+    }         
 	
 	public function get_scheduler() {
 		if($scheduler = $this->__get('scheduler')) {
@@ -887,12 +844,24 @@ class Arlo_For_Wordpress {
 			return $importer;
 		}
 		
-		$importer = new Importer($this);
+		$importer = new Importer($this->get_environment(), $this->get_dbl(), $this->get_message_handler());
 		
 		$this->__set('importer', $importer);
 		
 		return $importer;
 	}
+
+	public function get_environment() {
+		if($get_environment = $this->__get('get_environment')) {
+			return $get_environment;
+		}
+		
+		$get_environment = new Environment();
+		
+		$this->__set('get_environment', $get_environment);
+		
+		return $get_environment;
+	}		
 	
 	public function get_message_handler() {
 		if($message_handler = $this->__get('message_handler')) {
@@ -973,7 +942,7 @@ class Arlo_For_Wordpress {
 		
 		//check last import date
 		$type = 'import_error';
-		$last_import = $this->get_last_import();
+		$last_import = $this->get_importer()->get_last_import_date();
 		$last_import_ts = strtotime($last_import);
 		$no_import = false;
 		
@@ -1100,123 +1069,7 @@ class Arlo_For_Wordpress {
 		
 		$scheduler = $this->get_scheduler();
 		$scheduler->set_task("import", -1);
-	}
-        
-    public function GUIDv4 ($trim = true) {
-        // Windows
-        if (function_exists('com_create_guid') === true) {
-            if ($trim === true)
-                return trim(com_create_guid(), '{}');
-            else
-                return com_create_guid();
-        }
-
-        // OSX/Linux
-        if (function_exists('openssl_random_pseudo_bytes') === true) {
-            $data = openssl_random_pseudo_bytes(16);
-            $data[6] = chr(ord($data[6]) & 0x0f | 0x40);    // set version to 0100
-            $data[8] = chr(ord($data[8]) & 0x3f | 0x80);    // set bits 6-7 to 10
-            return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
-        }
-    }
-    
-    public function get_random_int() {
-        $guid = explode("-", $this->GUIDv4());
-        
-        return hexdec($guid[0]);
-    }
-    
-    public function clear_import_lock() {
-        global $wpdb;
-        $table_name = "{$wpdb->prefix}arlo_import_lock";
-      
-        $query = $wpdb->query(
-            'DELETE FROM  
-                ' . $table_name
-        );
-    }     
-    
-    public function get_import_lock_entries_number() {
-        global $wpdb;
-        $table_name = "{$wpdb->prefix}arlo_import_lock";
-        
-        $sql = '
-            SELECT 
-                lock_acquired
-            FROM
-                ' . $table_name . '
-            WHERE
-                lock_expired > NOW()
-            ';
-	               
-        $wpdb->get_results($sql);
-        
-        return $wpdb->num_rows;
-    }
-    
-    public function cleanup_import_lock() {
-        global $wpdb;
-        $table_name = "{$wpdb->prefix}arlo_import_lock";
-      
-        $wpdb->query(
-            'DELETE FROM  
-                ' . $table_name . '
-            WHERE 
-                lock_expired < NOW()
-            '
-        );
-    }
-    
-    public function add_import_lock($import_id) {
-        global $wpdb;
-        
-        $table_lock = "{$wpdb->prefix}arlo_import_lock";
-        $table_log = "{$wpdb->prefix}arlo_log";
-        
-        $query = $wpdb->query(
-                'INSERT INTO ' . $table_lock . ' (import_id, lock_acquired, lock_expired)
-                SELECT ' . $import_id . ', NOW(), ADDTIME(NOW(), "00:05:00.00") FROM ' . $table_log . ' WHERE (SELECT count(1) FROM ' . $table_lock . ') = 0 LIMIT 1');
-                    
-        return $query !== false && $query == 1;
-    }
-    
-    public function acquire_import_lock($import_id) {
-    	$lock_entries_num = $this->get_import_lock_entries_number();
-        if ($lock_entries_num == 0) {
-            $this->cleanup_import_lock();
-            if ($this->add_import_lock($import_id)) {
-                return true;
-            }
-        } else if ($lock_entries_num == 1) {
-        	return $this->check_import_lock($import_id);
-        }
-        
-        return false;
-    }
-    
-    public function check_import_lock($import_id) {
-        global $wpdb;
-    	$table_name = "{$wpdb->prefix}arlo_import_lock";
-        
-        $sql = '
-            SELECT 
-                lock_acquired
-            FROM
-                ' . $table_name . '
-            WHERE
-                import_id = ' . $import_id . '
-            AND    
-                lock_expired > NOW()';
-               
-        $wpdb->get_results($sql);
-        
-        if ($wpdb->num_rows == 1) {
-            return true;
-        }
-    
-        return false;
-    }
-        
+	}       
         	
 	public function import($force = false, $task_id = 0) {
 		global $wpdb;
@@ -1224,64 +1077,35 @@ class Arlo_For_Wordpress {
 		$scheduler = $this->get_scheduler();
 		$importer = $this->get_importer();
 
+		$importer->set_import_id(Utilities::get_random_int());
+
 		if ($task_id > 0) {
 			$task = $scheduler->get_task_data($task_id);
 			if (count($task)) {
 				$task = $task[0];
-			}
-						
-			if (empty($task->task_data_text)) {
-				// check for last successful import. Continue if imported mor than an hour ago or forced. Otherwise, return.
-				$last = $this->get_last_import();
-		        $import_id = $this->get_random_int();
-		                        
-		        Logger::log('Synchronization Started', $import_id);
-		        
-		        $scheduler->update_task_data($task_id, ['import_id' => $import_id]);
-								
-				// MV: Untangled the if statements. 
-				// If not forced
-				if(!$force) {
-					// LOG THIS AS AN AUTOMATIC IMPORT
-					Logger::log('Synchronization identified as automatic synchronization.', $import_id);
-					if(!empty($last)) {
-						// LOG THAT A PREVIOUS SUCCESSFUL IMPORT HAS BEEN FOUND
-						Logger::log('Previous succesful synchronization found.', $import_id);
-						if(strtotime('-1 hour') > strtotime($last)) {
-							// LOG THE FACT THAT PREVIOUS SUCCESSFUL IMPORT IS MORE THAN AN HOUR AGO
-							Logger::log('Synchronization more than an hour old. Synchronization required.', $import_id);
-						}
-						else {
-							// LOG THE FACT THAT PREVIOUS SUCCESSFUL IMPORT IS MORE THAN AN HOUR AGO
-							Logger::log('Synchronization less than an hour old. Synchronization stopped.', $import_id);
-							// LOG DATA USED TO DECIDE IMPORT NOT REQUIRED.
-							Logger::log($last . '-'  . strtotime($last) . '-' . strtotime('-1 hour') . '-'  . !$force, $import_id);
-							return false;
-						}
-					}
-				} 				
+			};
+
+			if (empty($task->task_data_text) && $importer->should_importer_run($force)) {
+		        $scheduler->update_task_data($task_id, ['import_id' => $importer->import_id]);
 			} else {
 				$task->task_data_text = json_decode($task->task_data_text);
 				if (empty($task->task_data_text->import_id)) {
 					return false;
 				} else {
-					$import_id = $task->task_data_text->import_id;
+					$importer->set_import_id($task->task_data_text->import_id);
+					Logger::log('Synchronization Started', $importer->import_id);
 				}				
 			}
 		}
 
-		// excessive, but some servers are slow...
-		ini_set('max_execution_time', 3000);
-		set_time_limit(3000);		
-				
         //if an import is already running, exit
-        if (!$this->acquire_import_lock($import_id)) {
-            Logger::log('Synchronization LOCK found, please wait 5 minutes and try again', $import_id);
+        if (!$importer->acquire_import_lock()) {
+            Logger::log('Synchronization LOCK found, please wait 5 minutes and try again', $importer->import_id);
             return false;
         }
                 
 		try {			
-			$importer->set_import_id($import_id);
+			
 
 			$importer->set_state($task->task_data_text);
 
@@ -1306,11 +1130,11 @@ class Arlo_For_Wordpress {
 				wp_remote_post( esc_url_raw( $url ), $args );
 			}
 		} catch(\Exception $e) {
-			Logger::log('Synchronization failed, please check the <a href="?page=arlo-for-wordpress-logs&s='.$import_id.'">Log</a> ', $import_id);
+			Logger::log('Synchronization failed, please check the <a href="?page=arlo-for-wordpress-logs&s='.$importer->import_id.'">Log</a> ', $importer->import_id);
 
 			$scheduler->update_task($task_id, 3);
 			
-			$this->clear_import_lock();
+			$importer->clear_import_lock();
 			
 			return false;
 		}
@@ -1319,7 +1143,7 @@ class Arlo_For_Wordpress {
 		flush_rewrite_rules(true);	
       	wp_cache_flush();
         
-        $this->clear_import_lock();    
+        $importer->clear_import_lock();    
 		
 		return true;
 	}
@@ -1356,7 +1180,7 @@ class Arlo_For_Wordpress {
 		);
 	}
 
-	public function delete_custom_posts($table, $column, $post_type) {
+	public static function delete_custom_posts($table, $column, $post_type) {
 		global $wpdb;
 
 		$table = $wpdb->prefix . 'arlo_' . $table;
@@ -1381,7 +1205,6 @@ class Arlo_For_Wordpress {
 				}
 			}
 		}
-
 	}
 	
 	public function add_cron_schedules($schedules) {
@@ -1408,7 +1231,7 @@ class Arlo_For_Wordpress {
 	
 	public function redirect_proxy() {
 		$settings = get_option('arlo_settings');
-		$import_id = $this->get_import_id();
+		$import_id = $this->get_importer()->get_current_import_id();
 		
 		if(!isset($_GET['object_post_type']) || !isset($_GET['arlo_id'])) return;
 		
@@ -1470,7 +1293,7 @@ class Arlo_For_Wordpress {
 	public function load_demo_notice($error = []) {
 		global $wpdb;
 		$settings = get_option('arlo_settings');
-		$import_id = $this->get_import_id();
+		$import_id = $this->get_importer()->get_current_import_id();
 		
 		$events = arlo_get_post_by_name('events', 'page');
 		$upcoming = arlo_get_post_by_name('upcoming', 'page');
@@ -1760,7 +1583,7 @@ class Arlo_For_Wordpress {
 		echo '
 			<div class="notice arlo-connected-message"> 
 				<p>
-					Arlo is connected to <strong>' . $settings['platform_name'] . '</strong> <span class="arlo-block">Last synchronized: <span class="arlo-last-sync-date">' . $this->get_last_import() . ' UTC</span></span> 
+					Arlo is connected to <strong>' . $settings['platform_name'] . '</strong> <span class="arlo-block">Last synchronized: <span class="arlo-last-sync-date">' . $this->get_importer()->get_last_import_date() . ' UTC</span></span> 
 					<a class="arlo-block arlo-sync-button" href="?page=arlo-for-wordpress&arlo-import">Synchronize now</a>
 				</p>
 			</div>
@@ -1800,7 +1623,7 @@ class Arlo_For_Wordpress {
 				$log[0]['message'] = __('The provided platform name does not exist.', 'arlo-for-wordpress' );
 			}
 				
-			$log[0]['last_import'] = $this->get_last_import();
+			$log[0]['last_import'] = $this->get_importer()->get_last_import_date();
 			
 			echo wp_json_encode($log[0]);
 		}
@@ -1816,7 +1639,7 @@ class Arlo_For_Wordpress {
 			//need to terminate all the upcoming immediate tasks
 			$this->get_scheduler()->terminate_all_immediate_task($task_id);
 			
-			$this->clear_import_lock();
+			$this->get_importer()->clear_import_lock();
 			
 			echo $task_id;
 		}

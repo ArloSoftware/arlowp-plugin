@@ -9,6 +9,9 @@ class Environment {
     public $start_time;
 
     public function __construct() {
+		ini_set('max_execution_time', 3000);
+		set_time_limit(3000);	
+
         $this->memory_limit = $this->get_memory_limit();
     }
 

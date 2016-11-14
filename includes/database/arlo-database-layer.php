@@ -9,6 +9,9 @@ abstract class DatabaseLayer {
 	
 	public $charset;
 	public $prefix;
+	public $insert_id;
+	public $last_error;
+	public $last_query;
 
 	public function __construct() {}
 
@@ -82,4 +85,63 @@ abstract class DatabaseLayer {
 	 * @return string|null Database query result (as string), or null on failure
 	 */
 	abstract public function get_var( $query = null, $x = 0, $y = 0 );
+
+		/**
+	 * Insert a row into a table.
+	 *
+	 *     wpdb::insert( 'table', array( 'column' => 'foo', 'field' => 'bar' ) )
+	 *     wpdb::insert( 'table', array( 'column' => 'foo', 'field' => 1337 ), array( '%s', '%d' ) )
+	 *
+	 * @since 2.5.0
+	 * @see wpdb::prepare()
+	 * @see wpdb::$field_types
+	 * @see wp_set_wpdb_vars()
+	 *
+	 * @param string       $table  Table name
+	 * @param array        $data   Data to insert (in column => value pairs).
+	 *                             Both $data columns and $data values should be "raw" (neither should be SQL escaped).
+	 *                             Sending a null value will cause the column to be set to NULL - the corresponding format is ignored in this case.
+	 * @param array|string $format Optional. An array of formats to be mapped to each of the value in $data.
+	 *                             If string, that format will be used for all of the values in $data.
+	 *                             A format is one of '%d', '%f', '%s' (integer, float, string).
+	 *                             If omitted, all values in $data will be treated as strings unless otherwise specified in wpdb::$field_types.
+	 * @return int|false The number of rows inserted, or false on error.
+	 */
+	abstract function insert( $table, $data, $format = null );
+
+		/**
+	 * Prepares a SQL query for safe execution. Uses sprintf()-like syntax.
+	 *
+	 * The following directives can be used in the query format string:
+	 *   %d (integer)
+	 *   %f (float)
+	 *   %s (string)
+	 *   %% (literal percentage sign - no argument needed)
+	 *
+	 * All of %d, %f, and %s are to be left unquoted in the query string and they need an argument passed for them.
+	 * Literals (%) as parts of the query must be properly written as %%.
+	 *
+	 * This function only supports a small subset of the sprintf syntax; it only supports %d (integer), %f (float), and %s (string).
+	 * Does not support sign, padding, alignment, width or precision specifiers.
+	 * Does not support argument numbering/swapping.
+	 *
+	 * May be called like {@link https://secure.php.net/sprintf sprintf()} or like {@link https://secure.php.net/vsprintf vsprintf()}.
+	 *
+	 * Both %d and %s should be left unquoted in the query string.
+	 *
+	 *     wpdb::prepare( "SELECT * FROM `table` WHERE `column` = %s AND `field` = %d", 'foo', 1337 )
+	 *     wpdb::prepare( "SELECT DATE_FORMAT(`field`, '%%c') FROM `table` WHERE `column` = %s", 'foo' );
+	 *
+	 * @link https://secure.php.net/sprintf Description of syntax.
+	 * @since 2.3.0
+	 *
+	 * @param string      $query    Query statement with sprintf()-like placeholders
+	 * @param array|mixed $args     The array of variables to substitute into the query's placeholders if being called like
+	 *                              {@link https://secure.php.net/vsprintf vsprintf()}, or the first variable to substitute into the query's placeholders if
+	 *                              being called like {@link https://secure.php.net/sprintf sprintf()}.
+	 * @param mixed       $args,... further variables to substitute into the query's placeholders if being called like
+	 *                              {@link https://secure.php.net/sprintf sprintf()}.
+	 * @return string|void Sanitized query string, if there is a query to prepare.
+	 */
+	abstract function prepare( $query, $args );
 }

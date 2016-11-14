@@ -72,7 +72,7 @@ class Shortcodes {
 	    add_filter('arlo_shortcode_content_' . $shortcode_name, function($content='', $atts, $shortcode_name, $import_id = '') use($closure) {
 			global $arlo_plugin;
 
-		    return $closure->invokeArgs(array($content, $atts, $shortcode_name, $arlo_plugin->get_import_id(), 'asd'));
+		    return $closure->invokeArgs(array($content, $atts, $shortcode_name, $arlo_plugin->get_importer()->get_current_import_id(), ''));
 	    }, 10, 3);
 		
     }
@@ -164,7 +164,7 @@ class Shortcodes {
 		global $wpdb, $arlo_plugin;
 		
 		$table = $wpdb->prefix . "arlo_timezones";
-		$import_id = $arlo_plugin->get_import_id();
+		$import_id = $arlo_plugin->get_importer()->get_current_import_id();
 		
 		$sql = "
 		SELECT
@@ -185,7 +185,7 @@ class Shortcodes {
 		$timezone_id = intval($timezone_id);
 		
 		$table = $wpdb->prefix . "arlo_timezones_olson";
-		$import_id = $arlo_plugin->get_import_id();
+		$import_id = $arlo_plugin->get_importer()->get_current_import_id();
 		$where = '';
 		
 		if ($timezone_id > 0) {

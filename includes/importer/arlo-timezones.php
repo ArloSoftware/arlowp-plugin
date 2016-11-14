@@ -8,11 +8,11 @@ class Timezones extends BaseEntity {
 	public function __construct($plugin, $importer, $data, $iterator = 0) {
 		parent::__construct($plugin, $importer, $data, $iterator);
 
-		$this->table_name = $this->wpdb->prefix . 'arlo_timezones';
+		$this->table_name = $this->dbl->prefix . 'arlo_timezones';
 	}
 
 	protected function save_entity($item) {
-		$query = $this->wpdb->insert(
+		$query = $this->dbl->insert(
 			$this->table_name,
 			array(
 				'id' => $item->TimeZoneID,
@@ -24,11 +24,11 @@ class Timezones extends BaseEntity {
 			)
 		);				
 		if ($query === false) {
-			Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' . $this->wpdb->last_query, $this->import_id);
+			Logger::log_error('SQL error: ' . $this->dbl->last_error . ' ' . $this->dbl->last_query, $this->import_id);
 		} else {
 			if (is_array($item->TzNames)) {
 				foreach ($item->TzNames as $TzName) {
-					$query = $this->wpdb->insert(
+					$query = $this->dbl->insert(
 						$this->table_name . '_olson',
 						array(
 							'timezone_id' => $item->TimeZoneID,

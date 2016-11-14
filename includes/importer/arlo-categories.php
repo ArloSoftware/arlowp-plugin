@@ -9,12 +9,12 @@ class Categories extends BaseEntity {
 	public function __construct($plugin, $importer, $data, $iterator = 0) {
 		parent::__construct($plugin, $importer, $data, $iterator);
 
-		$this->table_name = $this->wpdb->prefix . 'arlo_categories';
+		$this->table_name = $this->dbl->prefix . 'arlo_categories';
 	}
 
 	protected function save_entity($item) {
 		$slug = sanitize_title($item->CategoryID . ' ' . $item->Name);
-		$query = $this->wpdb->query( $this->wpdb->prepare( 
+		$query = $this->dbl->query( $this->dbl->prepare( 
 			"INSERT INTO ". $this->table_name . " 
 			(c_arlo_id, c_name, c_slug, c_header, c_footer, c_order, c_parent_id, import_id) 
 			VALUES ( %d, %s, %s, %s, %s, %d, %d, %s ) 
@@ -30,7 +30,7 @@ class Categories extends BaseEntity {
 		) );
 
 		if ($query === false) {
-			Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
+			Logger::log_error('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query, $this->import_id);
 		}
 	}
 }

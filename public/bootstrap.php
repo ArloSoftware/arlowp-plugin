@@ -9,7 +9,7 @@ $arlo_plugin_slug = $arlo_plugin->get_plugin_slug();
 add_filter( 'the_title', function($title, $id = null){
 	global $post, $arlo_plugin;
 	
-	$import_id = $arlo_plugin->get_import_id();	
+	$import_id = $arlo_plugin->get_importer()->get_current_import_id();	
 	
 	$title = htmlentities($title, ENT_QUOTES, "UTF-8", false);
 	

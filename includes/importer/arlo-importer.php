@@ -4,7 +4,7 @@ namespace Arlo\Importer;
 
 use Arlo\Singleton;
 use Arlo\Logger;
-use Arlo\Environment;
+use Arlo\Utilities;
 
 class Importer extends Singleton {
 	public static $filename;
@@ -13,19 +13,16 @@ class Importer extends Singleton {
 	protected static $dir;
 	protected static $plugin;
 	protected static $data_json;
-	protected static $wpdb;
 
-	protected $environment;
 	public $import_id;
+	
+	private $current_import_id;
+	private $last_import_date;
 
-	private $import_timezones;
-	private $import_presenters;
-	private $import_venues;
-	private $import_event_templates;
-	private $import_events;
-	private $import_onlineactivities;
-	private $import_categories;
-	private $import_finish;
+	private $environment;
+	private $message_handler;
+	private $dbl;
+
 	
 	//the keys in this array have to match with the keys in the JSON 
 	//except the last two
@@ -53,20 +50,59 @@ class Importer extends Singleton {
 				'Finish',
 			];
 
-	public function __construct($plugin) {
+	public function __construct($environment, $dbl, $message_handler) {
 		global $wpdb;
 		
-		self::$wpdb = &$wpdb; 
 		self::$dir = trailingslashit(plugin_dir_path( __FILE__ )).'../../import/';
 		self::$filename = 'data'; //TODO: Change it
-		self::$plugin = $plugin;
 
-		$this->environment = new Environment();
+		$this->environment = $environment;
+		$this->dbl = $dbl;
+		$this->message_handler = $message_handler;
 	}
 
 	public function set_import_id($import_id) {
 		$this->import_id = $import_id;
 	}
+
+	public function set_current_import_id($import_id) {
+		update_option('arlo_import_id', $import_id);
+                               
+		$this->current_import_id = $import_id;		
+	}
+
+	public function get_current_import_id() {
+        global $wpdb;
+        
+        //need to access the db directly, get_option('arlo_import_id'); can return a cached (old) value
+        $table_name = $wpdb->prefix . "options";
+        
+        $sql = "SELECT option_value
+			FROM $table_name 
+            WHERE option_name = 'arlo_import_id'";
+	               
+		$this->current_import_id = $wpdb->get_var($sql);
+                
+		return $this->current_import_id;		
+	}
+
+	public function set_last_import_date() {
+		$now = Utilities::get_now_utc();
+       	$timestamp = $now->format("Y-m-d H:i:s");	
+	
+		update_option('arlo_last_import', $timestamp);
+		$this->last_import_date = $timestamp;
+	}	
+
+	public function get_last_import_date() {
+		if(!is_null($this->last_import_date)) {
+			return $this->last_import_date;
+		}
+		
+		$this->last_import_date = get_option('arlo_last_import');
+		
+		return $this->last_import_date;
+	}	
 
 	public function set_state($state) {
 		$task_keys = array_keys($this->import_tasks);
@@ -104,6 +140,25 @@ class Importer extends Singleton {
 		}
 
 		return $state;
+	}
+
+	public function should_importer_run($force = false) {
+		if(!$force) {
+			Logger::log('Synchronization Started', $this->import_id);
+			Logger::log('Synchronization identified as automatic synchronization.', $this->import_id);
+			if(!empty($last)) {
+				Logger::log('Previous successful synchronization found.', $this->import_id);
+				if(strtotime('-1 hour') > strtotime($this->get_last_import_date())) {
+					Logger::log('Synchronization more than an hour old. Synchronization required.', $this->import_id);
+				}
+				else {
+					Logger::log('Synchronization less than an hour old (' . date("Y-m-d H:i:s", strtotime($this->get_last_import_date())) . '). Synchronization stopped.', $this->import_id);
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 
     public function check_viable_execution_environment() { 
@@ -171,6 +226,94 @@ class Importer extends Singleton {
 		}
 	}
 
+   public function clear_import_lock() {
+        global $wpdb;
+        $table_name = $wpdb->prefix . "arlo_import_lock";
+      
+        $query = $wpdb->query('DELETE FROM ' . $table_name);
+    }     
+    
+    public function get_import_lock_entries_number() {
+        global $wpdb;
+        $table_name = $wpdb->prefix ."arlo_import_lock";
+        
+        $sql = '
+            SELECT 
+                lock_acquired
+            FROM
+                ' . $table_name . '
+            WHERE
+                lock_expired > NOW()
+            ';
+	               
+        $wpdb->get_results($sql);
+        
+        return $wpdb->num_rows;
+    }
+    
+    private function cleanup_import_lock() {
+        global $wpdb;
+        $table_name = $wpdb->prefix ."arlo_import_lock";
+      
+        $wpdb->query(
+            'DELETE FROM  
+                ' . $table_name . '
+            WHERE 
+                lock_expired < NOW()
+            '
+        );
+    }
+    
+    private function add_import_lock() {
+        global $wpdb;
+        
+        $table_lock = $wpdb->prefix . "arlo_import_lock";
+        $table_log = $wpdb->prefix . "arlo_log";
+        
+        $query = $wpdb->query(
+                'INSERT INTO ' . $table_lock . ' (import_id, lock_acquired, lock_expired)
+                SELECT ' . $this->import_id . ', NOW(), ADDTIME(NOW(), "00:05:00.00") FROM ' . $table_log . ' WHERE (SELECT count(1) FROM ' . $table_lock . ') = 0 LIMIT 1');
+                    
+        return $query !== false && $query == 1;
+    }
+    
+    public function acquire_import_lock() {
+    	$lock_entries_num = $this->get_import_lock_entries_number();
+        if ($lock_entries_num == 0) {
+            $this->cleanup_import_lock();
+            if ($this->add_import_lock($this->import_id)) {
+                return true;
+            }
+        } else if ($lock_entries_num == 1) {
+        	return $this->check_import_lock($this->import_id);
+        }
+        
+        return false;
+    }
+    
+    public function check_import_lock() {
+        global $wpdb;
+    	$table_name = "{$wpdb->prefix}arlo_import_lock";
+        
+        $sql = '
+            SELECT 
+                lock_acquired
+            FROM
+                ' . $table_name . '
+            WHERE
+                import_id = ' . $this->import_id . '
+            AND    
+                lock_expired > NOW()';
+               
+        $wpdb->get_results($sql);
+        
+        if ($wpdb->num_rows == 1) {
+            return true;
+        }
+    
+        return false;
+    }	
+
 	private function run_import_task($import_task) {
 		$this->get_data_json(); 
 		
@@ -181,7 +324,7 @@ class Importer extends Singleton {
 
 			$class_name = "Arlo\Importer\\" . $import_task;
 			
-			$this->current_task_class = new $class_name(self::$plugin, $this, (!empty(self::$data_json->$import_task) ? self::$data_json->$import_task : null), $this->current_task_iterator);
+			$this->current_task_class = new $class_name($this, $this->dbl, $this->message_handler, (!empty(self::$data_json->$import_task) ? self::$data_json->$import_task : null), $this->current_task_iterator);
 			$this->current_task_class->import();
 			
 			Logger::log('Import subtask ended: ' . ($this->current_task_num + 1) . "/" . count($this->import_tasks) . ": " . $this->current_task_desc, $this->import_id);			

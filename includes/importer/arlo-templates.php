@@ -11,13 +11,13 @@ class Templates extends BaseEntity {
 	public function __construct($plugin, $importer, $data, $iterator = 0) {
 		parent::__construct($plugin, $importer, $data, $iterator);
 
-		$this->table_name = $this->wpdb->prefix . 'arlo_eventtemplates';
+		$this->table_name = $this->dbl->prefix . 'arlo_eventtemplates';
 	}
 
 	protected function save_entity($item) {
 		$this->slug = sanitize_title($item->TemplateID . ' ' . $item->Name);
-		$query = $this->wpdb->query(
-			$this->wpdb->prepare( 
+		$query = $this->dbl->query(
+			$this->dbl->prepare( 
 				"INSERT INTO " . $this->table_name ." 
 				(et_arlo_id, et_code, et_name, et_descriptionsummary, et_advertised_duration, et_post_name, import_id, et_registerinteresturi, et_viewuri, et_region) 
 				VALUES ( %d, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
@@ -36,10 +36,10 @@ class Templates extends BaseEntity {
 		);
 						
 		if ($query === false) {
-			Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' .$this->wpdb->last_query, $this->import_id);
+			Logger::log_error('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query, $this->import_id);
 		}
 		
-		$this->id = $this->wpdb->insert_id;
+		$this->id = $this->dbl->insert_id;
 		
 		//TODO: Test without a summary/description
 		$this->save_update_wp_post($item->Name, @$item->Description->Summary);
@@ -93,12 +93,12 @@ class Templates extends BaseEntity {
 	} 	
 
 	private function save_categories($categories) {
-		if (empty($this->id)) throw new Exception('No templateID given: ' . __CLASS__ . '::' . __FUNCTION__);
+		if (empty($this->id)) Logger::log_error('No templateID given: ' . __CLASS__ . '::' . __FUNCTION__, $this->import_id);
 
 		if(!empty($categories) && is_array($categories)) {
 			foreach($categories as $index => $category) {
-				$query = $this->wpdb->query( $this->wpdb->prepare( 
-					"REPLACE INTO " . $this->wpdb->prefix . "arlo_eventtemplates_categories 
+				$query = $this->dbl->query( $this->dbl->prepare( 
+					"REPLACE INTO " . $this->dbl->prefix . "arlo_eventtemplates_categories 
 					(et_arlo_id, c_arlo_id, import_id) 
 					VALUES ( %d, %d, %s ) 
 					", 
@@ -108,19 +108,19 @@ class Templates extends BaseEntity {
 				) );
 												
 				if ($query === false) {
-					Logger::log('SQL error: ' . $this->wpdb->last_error . ' ' . $this->wpdb->last_query, $this->import_id);
+					Logger::log('SQL error: ' . $this->dbl->last_error . ' ' . $this->dbl->last_query, $this->import_id);
 				}
 			}
 		}
 	}
 
 	private function save_advertised_presenters($advertised_presenters = []) {
-		if (empty($this->id)) throw new Exception('No templateID given: ' . __CLASS__ . '::' . __FUNCTION__);
+		if (empty($this->id)) Logger::log_error('No templateID given: ' . __CLASS__ . '::' . __FUNCTION__, $this->import_id);
 
 		if(!empty($advertised_presenters) && is_array($advertised_presenters)) {
 			foreach($advertised_presenters as $index => $presenter) {
-				$query = $this->wpdb->query( $this->wpdb->prepare( 
-					"INSERT INTO " . $this->wpdb->prefix . "arlo_eventtemplates_presenters 
+				$query = $this->dbl->query( $this->dbl->prepare( 
+					"INSERT INTO " . $this->dbl->prefix . "arlo_eventtemplates_presenters 
 					(et_id, p_arlo_id, p_order, import_id) 
 					VALUES ( %d, %d, %d, %s ) 
 					", 
@@ -131,19 +131,19 @@ class Templates extends BaseEntity {
 				) );
 												
 				if ($query === false) {
-					Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' . $this->wpdb->last_query, $this->import_id);
+					Logger::log_error('SQL error: ' . $this->dbl->last_error . ' ' . $this->dbl->last_query, $this->import_id);
 				}
 			}
 		}		
 	}
 
 	private function save_content_fields($content_fields = []) {
-		if (empty($this->id)) throw new Exception('No templateID given: ' . __CLASS__ . '::' . __FUNCTION__);
+		if (empty($this->id)) Logger::log_error('No templateID given: ' . __CLASS__ . '::' . __FUNCTION__, $this->import_id);
 
 		if (!empty($content_fields) && is_array($content_fields)) {
 			foreach($content_fields as $index => $content) {
-				$query = $this->wpdb->query( $this->wpdb->prepare( 
-					"INSERT INTO " . $this->wpdb->prefix . "arlo_contentfields 
+				$query = $this->dbl->query( $this->dbl->prepare( 
+					"INSERT INTO " . $this->dbl->prefix . "arlo_contentfields 
 					(et_id, cf_fieldname, cf_text, cf_order, e_contenttype, import_id) 
 					VALUES ( %d, %s, %s, %s, %s, %s ) 
 					", 
@@ -156,7 +156,7 @@ class Templates extends BaseEntity {
 				));
 				
 				if ($query === false) {
-					Logger::log_error('SQL error: ' . $this->wpdb->last_error . ' ' . $this->wpdb->last_query, $this->import_id);
+					Logger::log_error('SQL error: ' . $this->dbl->last_error . ' ' . $this->dbl->last_query, $this->import_id);
 				}
 			}		
 		}
