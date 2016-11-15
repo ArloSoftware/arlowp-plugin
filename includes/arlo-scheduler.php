@@ -11,17 +11,15 @@ class Scheduler extends Singleton {
 	private $max_simultaneous_task = 1;
 	private $table = '';
 	private $table_data = '';
-	private $wpdb;
+	private $plugin;
+	private $dbl;
 	
-	public function __construct($plugin) {
-		global $wpdb;
-		
-		$this->wpdb = &$wpdb; 		
-		$this->table = $this->wpdb->prefix . 'arlo_async_tasks';
-		$this->tabledata = $this->wpdb->prefix . 'arlo_async_task_data';
+	public function __construct($plugin, $dbl) {
+		$this->dbl = &$dbl; 		
+		$this->table = $this->dbl->prefix . 'arlo_async_tasks';
+		$this->tabledata = $this->dbl->prefix . 'arlo_async_task_data';
 		$this->plugin = $plugin;
 	}
-
 	
 	private function get_running_tasks_count() {		
 		$sql = "
@@ -33,7 +31,7 @@ class Scheduler extends Singleton {
 			task_status = 2
 		";
 		
-		$result = $this->wpdb->get_results($sql); 
+		$result = $this->dbl->get_results($sql); 
 				
 		return $result[0]->num;
 	}
@@ -48,7 +46,7 @@ class Scheduler extends Singleton {
 			task_status IN (1,2)
 		";
 		
-		$result = $this->wpdb->get_results($sql); 
+		$result = $this->dbl->get_results($sql); 
 				
 		return $result[0]->num;
 	}
@@ -65,10 +63,10 @@ class Scheduler extends Singleton {
 			(%d, %s, %s)
 		";
 		
-		$query = $this->wpdb->query($this->wpdb->prepare($sql, $priority, $task, $utc_date));
+		$query = $this->dbl->query($this->dbl->prepare($sql, $priority, $task, $utc_date));
 		
 		if ($query) {
-			return $this->wpdb->insert_id;
+			return $this->dbl->insert_id;
 		} else {
 			return false;
 		}
@@ -76,7 +74,7 @@ class Scheduler extends Singleton {
 	
 	public function update_task($task_id = 0, $task_status = null, $task_status_text = '') {
 		$task_status = (is_null($task_status) ? 'task_status' : intval($task_status));
-		$task_status_text = (empty($task_status_text) ? 'task_status_text' : "'" . $this->wpdb->_real_escape($task_status_text) . "'");
+		$task_status_text = (empty($task_status_text) ? 'task_status_text' : "'" . $this->dbl->_real_escape($task_status_text) . "'");
 		$utc_date = gmdate("Y-m-d H:i:s"); 
 	
 		$sql = "
@@ -90,7 +88,7 @@ class Scheduler extends Singleton {
 			task_id = " . (intval($task_id)) . "
 		";
 		
-		$query = $this->wpdb->query($sql);		
+		$query = $this->dbl->query($sql);		
 	}	
 	
 	public function update_task_data($task_id, $data = array(), $overwrite_data = false) {	
@@ -111,7 +109,7 @@ class Scheduler extends Singleton {
 		ON DUPLICATE KEY UPDATE 
 			data_text = '%s'
 		";
-		$query = $this->wpdb->query($this->wpdb->prepare($sql, $task_id, $data, $data));		
+		$query = $this->dbl->query($this->dbl->prepare($sql, $task_id, $data, $data));		
 	}
 	
 	public function check_empty_slot_for_task() {
@@ -186,7 +184,7 @@ class Scheduler extends Singleton {
 			task_created
 		" . (!is_null($limit) ? "LIMIT " . $limit : "");
 				
-		return $this->wpdb->get_results($sql);
+		return $this->dbl->get_results($sql);
 	}
 		
 	public function delete_running_tasks() {
@@ -217,7 +215,7 @@ class Scheduler extends Singleton {
 			".(!is_null($task_id) ? "AND task_id = " . $task_id : "") . "
 		" . (!is_null($limit) ? "LIMIT " . $limit : "");
 				
-		return $this->wpdb->get_results($sql);
+		return $this->dbl->get_results($sql);
 	}
 	
 	public function run_task($task_id = null) {
@@ -244,7 +242,7 @@ class Scheduler extends Singleton {
 				task_id >= {$task_id}
 			";
 			
-			return $this->wpdb->query($sql);
+			return $this->dbl->query($sql);
 		}
 		
 		return false;

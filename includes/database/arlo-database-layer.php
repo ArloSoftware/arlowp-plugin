@@ -12,6 +12,7 @@ abstract class DatabaseLayer {
 	public $insert_id;
 	public $last_error;
 	public $last_query;
+	public $num_rows;
 
 	public function __construct() {}
 
@@ -144,4 +145,17 @@ abstract class DatabaseLayer {
 	 * @return string|void Sanitized query string, if there is a query to prepare.
 	 */
 	abstract function prepare( $query, $args );
+
+	/**
+	 * Real escape, using mysqli_real_escape_string() or mysql_real_escape_string()
+	 *
+	 * @see mysqli_real_escape_string()
+	 * @see mysql_real_escape_string()
+	 * @since 2.8.0
+	 * @access private
+	 *
+	 * @param  string $string to escape
+	 * @return string escaped
+	 */
+	abstract function _real_escape( $string );
 }

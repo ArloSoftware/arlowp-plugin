@@ -823,7 +823,7 @@ class Arlo_For_Wordpress {
 			return $scheduler;
 		}
 		
-		$scheduler = new Scheduler($this);
+		$scheduler = new Scheduler($this, $this->get_dbl());
 		
 		$this->__set('scheduler', $scheduler);
 		
@@ -871,7 +871,7 @@ class Arlo_For_Wordpress {
 			return $message_handler;
 		}
 		
-		$message_handler = new MessageHandler();
+		$message_handler = new MessageHandler($this->get_dbl());
 		
 		$this->__set('message_handler', $message_handler);
 		

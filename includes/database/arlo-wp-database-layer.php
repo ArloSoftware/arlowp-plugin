@@ -18,6 +18,7 @@ class WPDatabaseLayer extends DatabaseLayer {
 		$this->insert_id = $this->wpdb->insert_id;
 		$this->last_error = $this->wpdb->last_error;
 		$this->last_query = $this->wpdb->last_query;
+		$this->num_rows = $this->wpdb->num_rows;
 	}
 
 	public function suppress_errors($suppress = true) {
@@ -31,7 +32,7 @@ class WPDatabaseLayer extends DatabaseLayer {
 		return $return;
 	}
 
-	public function get_results($sql, $output) {
+	public function get_results($sql, $output = 'OBJECT') {
 		$return = $this->wpdb->get_results($sql, $output);
 		$this->set_variables();
 
@@ -66,5 +67,9 @@ class WPDatabaseLayer extends DatabaseLayer {
 			$args = $args[0];
 
 		return $this->wpdb->prepare($query, $args);
+	}
+
+	public function _real_escape($query) {
+		return $this->wpdb->_real_escape($query);
 	}
 }

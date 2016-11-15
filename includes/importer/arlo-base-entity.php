@@ -20,8 +20,6 @@ abstract class BaseEntity {
     abstract protected function save_entity($item);
 
     public function __construct($importer, $dbl, $message_handler, $data, $iterator = 0) {
-        global $wpdb;
-
         $this->importer = $importer;
 		$this->dbl = $dbl;
 		$this->message_handler = $message_handler;

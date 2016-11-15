@@ -10,8 +10,6 @@ use Arlo\Utilities;
 class VersionHandler extends Singleton {
 	const VERSION = '2.4.1.1';
 
-	private $wpdb;
-	
 	public function __construct($dbl, $message_handler) {
 		$this->dbl = &$dbl; 	
 

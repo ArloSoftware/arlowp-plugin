@@ -51,8 +51,6 @@ class Importer extends Singleton {
 			];
 
 	public function __construct($environment, $dbl, $message_handler) {
-		global $wpdb;
-		
 		self::$dir = trailingslashit(plugin_dir_path( __FILE__ )).'../../import/';
 		self::$filename = 'data'; //TODO: Change it
 
@@ -72,16 +70,14 @@ class Importer extends Singleton {
 	}
 
 	public function get_current_import_id() {
-        global $wpdb;
-        
         //need to access the db directly, get_option('arlo_import_id'); can return a cached (old) value
-        $table_name = $wpdb->prefix . "options";
+        $table_name = $this->dbl->prefix . "options";
         
         $sql = "SELECT option_value
 			FROM $table_name 
             WHERE option_name = 'arlo_import_id'";
 	               
-		$this->current_import_id = $wpdb->get_var($sql);
+		$this->current_import_id = $this->dbl->get_var($sql);
                 
 		return $this->current_import_id;		
 	}
@@ -227,15 +223,13 @@ class Importer extends Singleton {
 	}
 
    public function clear_import_lock() {
-        global $wpdb;
-        $table_name = $wpdb->prefix . "arlo_import_lock";
+        $table_name = $this->dbl->prefix . "arlo_import_lock";
       
-        $query = $wpdb->query('DELETE FROM ' . $table_name);
+        $query = $this->dbl->query('DELETE FROM ' . $table_name);
     }     
     
     public function get_import_lock_entries_number() {
-        global $wpdb;
-        $table_name = $wpdb->prefix ."arlo_import_lock";
+        $table_name = $this->dbl->prefix ."arlo_import_lock";
         
         $sql = '
             SELECT 
@@ -246,16 +240,15 @@ class Importer extends Singleton {
                 lock_expired > NOW()
             ';
 	               
-        $wpdb->get_results($sql);
+        $this->dbl->get_results($sql);
         
-        return $wpdb->num_rows;
+        return $this->dbl->num_rows;
     }
     
     private function cleanup_import_lock() {
-        global $wpdb;
-        $table_name = $wpdb->prefix ."arlo_import_lock";
+        $table_name = $this->dbl->prefix ."arlo_import_lock";
       
-        $wpdb->query(
+        $this->dbl->query(
             'DELETE FROM  
                 ' . $table_name . '
             WHERE 
@@ -265,12 +258,11 @@ class Importer extends Singleton {
     }
     
     private function add_import_lock() {
-        global $wpdb;
         
-        $table_lock = $wpdb->prefix . "arlo_import_lock";
-        $table_log = $wpdb->prefix . "arlo_log";
+        $table_lock = $this->dbl->prefix . "arlo_import_lock";
+        $table_log = $this->dbl->prefix . "arlo_log";
         
-        $query = $wpdb->query(
+        $query = $this->dbl->query(
                 'INSERT INTO ' . $table_lock . ' (import_id, lock_acquired, lock_expired)
                 SELECT ' . $this->import_id . ', NOW(), ADDTIME(NOW(), "00:05:00.00") FROM ' . $table_log . ' WHERE (SELECT count(1) FROM ' . $table_lock . ') = 0 LIMIT 1');
                     
@@ -292,8 +284,7 @@ class Importer extends Singleton {
     }
     
     public function check_import_lock() {
-        global $wpdb;
-    	$table_name = "{$wpdb->prefix}arlo_import_lock";
+    	$table_name = "{$this->dbl->prefix}arlo_import_lock";
         
         $sql = '
             SELECT 
@@ -305,9 +296,9 @@ class Importer extends Singleton {
             AND    
                 lock_expired > NOW()';
                
-        $wpdb->get_results($sql);
+        $this->dbl->get_results($sql);
         
-        if ($wpdb->num_rows == 1) {
+        if ($this->dbl->num_rows == 1) {
             return true;
         }
     
