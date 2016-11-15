@@ -11,6 +11,7 @@
 
  use Arlo\Logger;
  use Arlo\VersionHandler;
+ use Arlo\NoticeHandler;
 
 class Arlo_For_Wordpress_Settings {
 
@@ -24,19 +25,20 @@ class Arlo_For_Wordpress_Settings {
 		register_setting( 'arlo_settings', 'arlo_settings' );		
 
 		$plugin = Arlo_For_Wordpress::get_instance();
+		$settings = get_option('arlo_settings');
+
+		$message_handler = $plugin->get_message_handler();
+		$notice_handler = $plugin->get_notice_handler();		
 		$this->plugin_slug = $plugin->get_plugin_slug();
 		
 		if (isset($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress' && get_option('permalink_structure') != "/%postname%/") {
-			add_action( 'admin_notices', array($plugin, "permalink_notice") );
+			add_action( 'admin_notices', array($notice_handler, "permalink_notice") );
 		}					
 		
-		$settings = get_option('arlo_settings');
-		$message_handler = $plugin->get_message_handler();
-		
-		add_action( 'admin_notices', array($plugin, "global_notices") );
+		add_action( 'admin_notices', array($notice_handler, "global_notices") );
 		
 		if(isset($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress') {
-			add_action( 'admin_notices', array($plugin, "arlo_notices") );
+			add_action( 'admin_notices', array($notice_handler, "arlo_notices") );
 			
 			if (!empty($settings['platform_name'])) {
 				$show_notice = false;
@@ -48,10 +50,10 @@ class Arlo_For_Wordpress_Settings {
 				}
 				
 				if ($show_notice) {
-					add_action( 'admin_notices', array($plugin, "posttype_notice") );
+					add_action( 'admin_notices', array($notice_handler, "posttype_notice") );
 				}
 				
-				add_action( 'admin_notices', array($plugin, "connected_platform_notice") );
+				add_action( 'admin_notices', array($notice_handler, "connected_platform_notice") );
 			}
 			
 			if (isset($_GET['arlo-donwload-sync-log'])) {
@@ -81,7 +83,7 @@ class Arlo_For_Wordpress_Settings {
 				exit;
 			}
 						
-			add_action( 'admin_notices', array($plugin, "welcome_notice") );
+			add_action( 'admin_notices', array($notice_handler, "welcome_notice") );
 			
 			add_action( 'admin_print_scripts', array($this, "arlo_check_current_tasks") );			
 		}

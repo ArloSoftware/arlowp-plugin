@@ -7,6 +7,7 @@ use Arlo\VersionHandler;
 use Arlo\Scheduler;
 use Arlo\Importer\Importer;
 use Arlo\MessageHandler;
+use Arlo\NoticeHandler;
 use ArloAPI\Transports\Wordpress;
 use ArloAPI\Client;
 use Arlo\Utilities;
@@ -146,17 +147,6 @@ class Arlo_For_Wordpress {
 			),
 		);  
 
-	/**
-	 * $message_notice_types: used to map arlo message types to WP notices 
-	 *
-	 * @since    2.4
-	 *
-	 * @var      array
-	 */
-    public static $message_notice_types = array(
-        'inport_error' => 'error',
-        'information' => 'notice-warning',
-    ); 		  
     
 	/**
 	 * $price_settings: used to set the price showing on the site
@@ -862,6 +852,18 @@ class Arlo_For_Wordpress {
 		$this->__set('get_environment', $get_environment);
 		
 		return $get_environment;
+	}	
+
+	public function get_notice_handler() {
+		if($notice_handler = $this->__get('notice_handler')) {
+			return $notice_handler;
+		}
+		
+		$notice_handler = new NoticeHandler($this->get_message_handler(), $this->get_importer(), $this->get_dbl());
+		
+		$this->__set('notice_handler', $notice_handler);
+		
+		return $notice_handler;
 	}		
 	
 	public function get_message_handler() {
@@ -1254,323 +1256,7 @@ class Arlo_For_Wordpress {
 		
 		wp_redirect( $location, 301 );
 		exit;
-	}
-		
-	public function load_demo_notice($error = []) {
-		global $wpdb;
-		$settings = get_option('arlo_settings');
-		$import_id = $this->get_importer()->get_current_import_id();
-		
-		$events = arlo_get_post_by_name('events', 'page');
-		$upcoming = arlo_get_post_by_name('upcoming', 'page');
-		$presenters = arlo_get_post_by_name('presenters', 'page');
-		$venues = arlo_get_post_by_name('venues', 'page');
-		
-		$notice_id = $this->dismissible_notices['newpages'];
-		$user = wp_get_current_user();
-		$meta = get_user_meta($user->ID, $notice_id, true);
-				
-		if (count($error)) {
-			echo '
-				<div class="' . (count($error) ? "error" : "") . ' notice is-dismissible" id="' . $notice_id . '">
-		        	<p>' . sprintf(__('Couldn\'t set the following post types: %s', 'arlo-for-wordpress' ), implode(', ', $error)) . '</p>
-		        	<button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button>
-			 	</div>';
-		} else {
-			if ($meta !== '0') {			
-				if (!empty($settings['platform_name']) && $events !== false && $upcoming !== false && $presenters !== false && $venues !== false) {		
-					//Get the first event template wich has event
-					$sql = "
-					SELECT 
-						ID
-					FROM
-						{$wpdb->prefix}arlo_events AS e
-					LEFT JOIN 		
-						{$wpdb->prefix}arlo_eventtemplates AS et		
-					ON
-						e.et_arlo_id = et.et_arlo_id
-					AND
-						e.import_id = " . $import_id ."
-					LEFT JOIN
-						{$wpdb->prefix}posts
-					ON
-						et_post_name = post_name		
-					AND
-						post_status = 'publish'
-					WHERE 
-						et.import_id = " . $import_id ."
-					LIMIT 
-						1
-					";
-
-					$event = $wpdb->get_results($sql, ARRAY_A);
-					$event_link = '';
-					if (count($event)) {
-						$event_link = sprintf('<a href="%s" target="_blank">%s</a>,',
-						get_post_permalink($event[0]['ID']),
-						__('Event', 'arlo-for-wordpress' ));
-					}					
-					
-					//Get the first presenter
-					$sql = "
-					SELECT 
-						ID
-					FROM
-						{$wpdb->prefix}arlo_presenters AS p
-					LEFT JOIN
-						{$wpdb->prefix}posts
-					ON
-						p_post_name = post_name		
-					AND
-						post_status = 'publish'
-					WHERE 
-						p.import_id = " . $import_id ."
-					LIMIT 
-						1
-					";
-					$presenter = $wpdb->get_results($sql, ARRAY_A);		
-					$presenter_link = '';
-					if (count($event)) {
-						$presenter_link = sprintf('<a href="%s" target="_blank">%s</a>,',
-						get_post_permalink($presenter[0]['ID']),
-						__('Presenter profile', 'arlo-for-wordpress' ));
-					}					
-					
-					//Get the first venue
-					$sql = "
-					SELECT 
-						ID
-					FROM
-						{$wpdb->prefix}arlo_venues AS v
-					LEFT JOIN
-						{$wpdb->prefix}posts
-					ON
-						v_post_name = post_name		
-					AND
-						post_status = 'publish'
-					WHERE 
-						v.import_id = " . $import_id ."
-					LIMIT 
-						1
-					";
-					$venue = $wpdb->get_results($sql, ARRAY_A);							
-					$venue_link = '';
-					if (count($event)) {
-						$venue_link = sprintf('<a href="%s" target="_blank">%s</a>,',
-						get_post_permalink($venue[0]['ID']),
-						__('Venue information', 'arlo-for-wordpress' ));
-					}					
-					
-					
-					$message = '<h3>' . __('Start editing your new pages', 'arlo-for-wordpress' ) . '</h3><p>'.
-											
-					sprintf(__('View %s <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, %s <a href="%s" target="_blank">%s</a> %s or <a href="%s" target="_blank">%s</a> pages', 'arlo-for-wordpress' ), 
-						$event_link,
-						$events->guid, 
-						__('Catalogue', 'arlo-for-wordpress' ), 
-						$upcoming->guid,  
-						$upcoming->post_title,
-						$presenter_link,
-						$presenters->guid, 
-						__('Presenters list', 'arlo-for-wordpress' ), 						
-						$venue_link,
-						$venues->guid,  
-						__('Venues list', 'arlo-for-wordpress' )
-					) . '</p><p>' . __('Edit the page <a href="#pages" class="arlo-pages-setup">templates</a> for each of these websites pages below.') . '</p>';
-					
-					echo '
-					<div class="' . (count($error) ? "error" : "") . ' notice is-dismissible" id="' . $notice_id . '">
-			        	' . $message . '
-			        	<button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button>
-				 	</div>
-				 	';
-					
-					unset($_SESSION['arlo-demo']);		
-				}				
-			}		
-		}
-	}	
-	
-	public function welcome_notice() {
-		$settings = get_option('arlo_settings');
-		$notice_id = $this->dismissible_notices['welcome'];
-		$user = wp_get_current_user();
-		$meta = get_user_meta($user->ID, $notice_id, true);
-		
-		if ($meta !== '0') {
-			echo '
-			<div class="notice is-dismissible" id="' . $notice_id . '">
-				<h3>' . __('Welcome to Arlo for WordPress', 'arlo-for-wordpress' ) . '</h3>
-				<table class="arlo-welcome">
-					<tr>
-						<td class="logo" valign="top">
-							<a href="http://www.arlo.co" target="_blank"><img src="' . plugins_url( '/assets/img/icon-128x128.png', __FILE__) . '" style="width: 65px"></a>
-						</td>
-						<td>
-							<p>' . __( 'Create beautiful and interactive training and event websites using the Arlo for WordPress plugin. Access an extensive library of WordPress Shortcodes, Templates, and Widgets, all designed specifically for web developers to make integration easy.', 'arlo-for-wordpress' ) . '</p>
-							<p>' . __('<a href="https://developer.arlo.co/doc/wordpress/index" target="_blank">Learn how to use</a> Arlo for WordPress or visit <a href="http://www.arlo.co" target="_blank">www.arlo.co</a> to find out more about Arlo.', 'arlo-for-wordpress' ) . '</p>
-							<p>' . (empty($settings['platform_name']) ? '<a href="?page=arlo-for-wordpress&load-demo" class="button button-primary">' . __('Try with demo data', 'arlo-for-wordpress' ) . '</a> &nbsp; &nbsp; ' : '') .'<a href="http://www.arlo.co/register" target="_blank"  class="button button-primary">' . __('Get started with free trial', 'arlo-for-wordpress' ) . '</a></p>
-						</td>
-					</tr>
-				</table>
-				<button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button>
-		    </div>
-			';		
-		}
-		$this->wp_video_notice();
-		$this->load_demo_notice(!empty($_SESSION['arlo-demo']) ? $_SESSION['arlo-demo'] : []);
-		$this->webinar_notice();
-		$this->developer_notice();
-		
-		
-		unset($_SESSION['arlo-import']);
-	}	
-	
-	public function developer_notice() {
-		$notice_id = $this->dismissible_notices['developer'];
-		$user = wp_get_current_user();
-		$meta = get_user_meta($user->ID, $notice_id, true);
-
-		if ($meta !== '0') {
-			echo '
-			<div class="notice is-dismissible" id="' . $notice_id . '">
-				<p class="developer">
-					
-					<img src="' . plugins_url( '/assets/img/tips-yellow.png', __FILE__) . '" style="width: 32px">
-					' . __('Are you a web developer building a site for a client?', 'arlo-for-wordpress' ) . '
-					' . sprintf(__('<a target="_blank" href="%s">Contact us to become an Arlo partner</a>', 'arlo-for-wordpress' ), 'https://www.arlo.co/contact') . '
-				</p>
-				<button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button>
-		    </div>
-			';	
-		}
-	}
-
-	public function wp_video_notice() {
-		$notice_id = $this->dismissible_notices['wp_video'];
-		$user = wp_get_current_user();
-		$meta = get_user_meta($user->ID, $notice_id, true);
-
-		if ($meta !== '0') {
-			echo '
-			<div class="notice is-dismissible" id="' . $notice_id . '">
-				<p class="developer">
-					<img src="' . plugins_url( '/assets/img/video-yellow.png', __FILE__) . '" style="width: 32px">
-					' . sprintf(__('<a target="_blank" href="%s">Watch overview video</a>', 'arlo-for-wordpress' ), 'https://www.arlo.co/videos#-uUhu90cvoc') . '
-					' . __('to see Arlo for WordPress in action.', 'arlo-for-wordpress' ) . '
-				</p>
-		    </div>
-			';	
-		}
-	}	
-	
-	public function webinar_notice() {
-		$notice_id = $this->dismissible_notices['webinar'];
-		$user = wp_get_current_user();
-		$meta = get_user_meta($user->ID, $notice_id, true);
-
-		if ($meta !== '0') {	
-			echo '
-			<div class="notice is-dismissible" id="' . $notice_id . '" style="display: none">
-				<p class="webinar">
-					<a target="_blank" href="https://www.arlo.co/video/wordpress-overview" target="_blank"><img src="' . plugins_url( '/assets/img/video-yellow.png', __FILE__) . '" style="width: 32px">' . __('Watch overview video', 'arlo-for-wordpress' ) .'</a>
-					<img src="' . plugins_url( '/assets/img/training-yellow.png', __FILE__) . '" style="width: 32px">
-					' . __('Join <a target="_blank" href="" class="webinar_url">Arlo for WordPress Getting started</a> webinar on <span id="webinar_date"></span>', 'arlo-for-wordpress' ) . '
-					' . __('<a target="_blank" href="" class="webinar_url">Register now!</a> or <a target="_blank" href="" id="webinar_template_url">view more times</a>', 'arlo-for-wordpress' ) . '
-				</p>
-				<button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button>
-		    </div>
-			';	
-		}
-	}	
-	
-	public function permalink_notice() {
-		echo '
-		<div class="error notice">
-			<p><strong>' . __("Permalink setting change required.", 'arlo-for-wordpress' ) . '</strong> ' . sprintf(__('Arlo for WordPress requires <a target="_blank" href="%s">Permalinks</a> to be set to "Post name".', 'arlo-for-wordpress' ), admin_url('options-permalink.php')) . '</p>
-	    </div>
-		';		
 	}		
-	
-	public function posttype_notice() {
-		echo '
-		<div class="error notice">
-			<p><strong>' . __("Page setup required.", 'arlo-for-wordpress' ) . '</strong> ' . __('Arlo for WordPress requires you to setup the pages which will host event information.', 'arlo-for-wordpress' ) .' '. sprintf(__('<a href="%s" class="arlo-pages-setup">Setup pages</a>', 'arlo-for-wordpress' ), admin_url('admin.php?page=arlo-for-wordpress#pages/events')) . '</p>
-			<p>' . sprintf(__('<a target="_blank" href="%s">View documentation</a> for more information.', 'arlo-for-wordpress' ), 'http://developer.arlo.co/doc/wordpress/index#pages-and-post-types') . '</p>
-	    </div>
-		';
-	}
-	
-	public function global_notices() {
-		$messages = $this->get_message_handler()->get_messages('import_error', true);
-		
-		foreach ($messages as $message) {
-			echo $this->create_notice($message);
-		}
-	}
-
-	public function arlo_notices() {
-		$messages = $this->get_message_handler()->get_messages(null, false);
-		
-		foreach ($messages as $message) {
-			echo $this->create_notice($message);
-		}
-	}	
-
-	
-	public function create_notice($message) {
-		$notice_type = (isset($this->message_notice_types[$message->type]) ? $this->message_notice_types[$message->type] : 'error');
-
-		$global_message = '';
-		if ($message->global) {
-			$global_message = '<td class="logo" valign="top" style="width: 60px; padding-top: 1em;">
-						<a href="http://www.arlo.co" target="_blank"><img src="' . plugins_url( '/assets/img/icon-128x128.png', __FILE__) . '" style="width: 48px"></a>
-					</td>';
-		}
-
-		return '
-		<div class="' . $notice_type . '  notice arlo-message is-dismissible arlo-' . $message->type .  '" id="arlo-message-' . $message->id . '">
-			<table>
-				<tr>
-					' . $global_message . '
-					<td>
-						<p><strong>' . __( $message->title, 'arlo-for-wordpress' ) . '</strong></p>
-						' . __( $message->message, 'arlo-for-wordpress' ) . '
-					</td>
-				</tr>
-			</table>
-	    </div>
-		';
-	}	
-	
-	
-	public function connected_platform_notice() {
-		$settings = get_option('arlo_settings');
-		echo '
-			<div class="notice arlo-connected-message"> 
-				<p>
-					Arlo is connected to <strong>' . $settings['platform_name'] . '</strong> <span class="arlo-block">Last synchronized: <span class="arlo-last-sync-date">' . $this->get_importer()->get_last_import_date() . ' UTC</span></span> 
-					<a class="arlo-block arlo-sync-button" href="?page=arlo-for-wordpress&arlo-import">Synchronize now</a>
-				</p>
-			</div>
-		';
-		
-		if (strtolower($settings['platform_name']) === "websitetestdata") {
-			echo '
-				<div class="notice updated"> 
-					<p>
-						<strong>Connected to demo data</strong>  Your site is currently using demo event, presenter, and venue data. Start an Arlo trial to load your own events!
-					</p>
-					<p>
-						<a class="button button-primary" href="https://www.arlo.co/register">Get started with free Arlo trial</a>&nbsp;&nbsp;&nbsp;&nbsp;
-						<a class="button button-primary arlo-block" href="#general" id="arlo-connet-platform">Connect existing Arlo platform</a>
-					</p>
-				</div>
-			';
-			
-		}
-	}		
-	
 	
 	public function start_scheduler_callback() {		
 		do_action("arlo_scheduler");
@@ -1646,11 +1332,9 @@ class Arlo_For_Wordpress {
 	
 	
 	public function dismissible_notice_callback() {		
-		$user = wp_get_current_user();
-		
-		if (in_array($_POST['id'], $this->dismissible_notices)) {
-			update_user_meta($user->ID, $_POST['id'], 0);
-		}
+		if (!empty($_POST['id'])) {
+			$this->get_notice_handler()->dismiss_user_notice($_POST['id']);
+		}		
 		
 		echo $_POST['id'];
 		wp_die();

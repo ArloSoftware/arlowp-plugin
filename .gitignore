@@ -1,2 +1,4 @@
 /nbproject/private/
 /public/assets/css/custom.css
+/vendor
+/composer*

@@ -141,8 +141,13 @@ class MessageHandler extends Singleton {
 		WHERE 
 			' . (implode(' AND ', $where)) . '
 		';
+
+		$items = $this->wpdb->get_results($sql);
+		array_map(function($item) {
+			$item['is_dismissable'] = true;
+		}, $items); 
 		
-		return $this->wpdb->get_results($sql);
+		return $items;
 	}
 	
 	

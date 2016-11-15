@@ -402,7 +402,7 @@
 		}
 		
 		//dismissible message
-		jQuery('.toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message .notice-dismiss').click(function() {
+		jQuery('.toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-dismiss').click(function() {
 			var id = jQuery(this).parent().attr('id').split('-').pop();
 			if (id != null) {
 				var data = {
@@ -416,7 +416,7 @@
 		
 		
 		//dismissible admin notices
-		jQuery('.toplevel_page_arlo-for-wordpress .notice.is-dismissible:not(.arlo-message) .notice-dismiss').click(function() {
+		jQuery('.toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-user-dismissable-message .notice-dismiss').click(function() {
 			var id = jQuery(this).parent().attr('id');
 			if (id != null) {
 				var data = {
