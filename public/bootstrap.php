@@ -4103,7 +4103,8 @@ $shortcodes->add('event_duration', function($content='', $atts, $shortcode_name)
 	if(!isset($GLOBALS['arlo_event_list_item']) || empty($GLOBALS['arlo_event_list_item']['et_arlo_id'])) return;
 	
 	$conditions = array(
-		'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id']
+		'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id'],
+		'parent_id' => 0
 	);
 	
 	$events = \Arlo\Events::get($conditions, array('e.e_startdatetime ASC'), 1, $active);
@@ -4296,7 +4297,7 @@ $shortcodes->add('event_next_running', function($content='', $atts, $shortcode_n
 	$conditions = array(
 		'template_id' => $GLOBALS['arlo_eventtemplate']['et_arlo_id'],
 		'date' => 'e.e_startdatetime > NOW()',
-		'parent_id' => 'e.e_parent_arlo_id = 0',
+		'parent_id' => 0,
 	);
 	
 	$oaconditions = array(

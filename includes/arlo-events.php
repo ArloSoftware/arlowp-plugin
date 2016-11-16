@@ -27,6 +27,7 @@ class Events extends Singleton {
 					}
 				break;
 				
+				case 'event_template_id':
 				case 'template_id':
 					if(is_array($value)) {
 						$where[] = "e.et_arlo_id IN (" . implode(',', $value) . ")";
@@ -34,6 +35,14 @@ class Events extends Singleton {
 						$where[] = "e.et_arlo_id = $value";
 					}
 				break;
+
+				case 'parent_id':
+					if(is_array($value)) {
+						$where[] = "e.e_parent_arlo_id IN (" . implode(',', $value) . ")";
+					} else {
+						$where[] = "e.e_parent_arlo_id = $value";
+					}
+				break;				
 				
 				default:
 					$where[] = $value;
