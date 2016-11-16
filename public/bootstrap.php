@@ -4188,8 +4188,7 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
         
 	// attempt to find event template offer
 	$conditions = array(
-		'event_template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id'],
-		'discounts' => false
+		'event_template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id']
 	);
 	
 	if (!empty($arlo_region)) {
@@ -4197,7 +4196,7 @@ $shortcodes->add('event_price', function($content='', $atts, $shortcode_name){
 	}
 	
 	$offer = \Arlo\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $active);
-	
+
 	// if none, try the associated events
 	if(!$offer) {
 		$conditions = array(
