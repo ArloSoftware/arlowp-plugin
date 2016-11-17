@@ -518,7 +518,8 @@ class Events {
             
         // attempt to find event template offer
         $conditions = array(
-            'event_template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id']
+            'event_template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id'],
+            'parent_id' => 0
         );
         
         if (!empty($arlo_region)) {
@@ -628,7 +629,7 @@ class Events {
         $conditions = array(
             'template_id' => $GLOBALS['arlo_eventtemplate']['et_arlo_id'],
             'date' => 'e.e_startdatetime > NOW()',
-            'parent_id' => 'e.e_parent_arlo_id = 0',
+            'parent_id' => 0
         );
         
         $oaconditions = array(
