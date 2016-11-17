@@ -19,7 +19,7 @@ class Wordpress extends Transport
 	 *
 	 * @return void
 	 */
-	public function request($platform_name, $path, $post_data=null, $public=true, $plugin_version = '') {
+	public function request($platform_name, $path, $post_data=null, $public=true, $plugin_version = '', $force_ssl = true) {
 		$args = func_get_args();
 		$cache_key = md5(serialize($args));
 		
@@ -27,13 +27,14 @@ class Wordpress extends Transport
 			return $cached;
 		}
 		
-		$url = $this->getRemoteURL($platform_name, $public) . $path;
-				
+		$url = $this->getRemoteURL($platform_name, $public, false, $force_ssl) . $path;
+
 		try {
 			$args = array(
 				'headers' => array(
 					'X-Plugin-Version' => $plugin_version,
-					'Content-type' => 'application/json'
+					'Content-type' => 'application/json',
+					'Accept' => 'application/json'
 				),
 				'compress'    => true,
                                 'decompress'  => true,
@@ -57,17 +58,7 @@ class Wordpress extends Transport
 				$body = json_decode($response['body'], true);			
 				throw new \Exception('Error code ' . $response['response']['code'] . ': ' . $response['response']['message'] . (!empty($body['Message']) ?  ' ' . $body['Message'] : ''));
 			}
-		} catch(\Exception $e) {
-			// trigger an error
-			// not a good idea - not the place to log errors - will just end up filling an error_log
-	        /*$trace = debug_backtrace();
-	        trigger_error(
-	            'Arlo API response error ' .
-	            ' in ' . $trace[0]['file'] .
-	            ' on line ' . $trace[0]['line'] . 
-	            ' with message ' . $e->getMessage(),
-            E_USER_NOTICE);*/
-            
+		} catch(\Exception $e) {           
             //pass on the exception to catch framework-side
             throw $e;
 		}
