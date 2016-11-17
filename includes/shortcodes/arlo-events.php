@@ -518,8 +518,7 @@ class Events {
             
         // attempt to find event template offer
         $conditions = array(
-            'event_template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id'],
-            'discounts' => false
+            'event_template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id']
         );
         
         if (!empty($arlo_region)) {
