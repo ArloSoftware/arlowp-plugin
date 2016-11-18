@@ -142,7 +142,7 @@ class MessageHandler extends Singleton {
 
 		$items = $this->dbl->get_results($sql);
 		array_map(function($item) {
-			$item['is_dismissable'] = true;
+			$item->is_dismissable = true;
 		}, $items); 
 		
 		return $items;

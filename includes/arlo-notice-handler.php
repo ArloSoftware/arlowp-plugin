@@ -59,7 +59,7 @@ class NoticeHandler {
 		}
 
 		return '
-		<div class="' . $notice_type . ' ' . (!empty($message->class) ? $message->class : '' ) . ' arlo-message ' . (isset($message->is_dismissable) && $message->is_dismissable ? 'is-dismissible' : '' ) . ' arlo-' . $message->type .  '" ' . 
+		<div class="notice ' . $notice_type . ' ' . (!empty($message->class) ? $message->class : '' ) . ' arlo-message ' . (isset($message->is_dismissable) && $message->is_dismissable ? 'is-dismissible' : '' ) . ' arlo-' . $message->type .  '" ' . 
 		(!empty($message->id) ? 'id="' . $message->id . '"' : '' ) . '>
 			<table>
 				<tr>
