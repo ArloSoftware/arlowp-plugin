@@ -4,7 +4,7 @@ namespace Arlo\Importer;
 
 use Arlo\Logger;
 
-class Presenters extends BaseEntity {
+class Presenters extends BaseImporter {
 	
 	public function __construct($plugin, $importer, $data, $iterator = 0) {
 		parent::__construct($plugin, $importer, $data, $iterator);

@@ -93,7 +93,7 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/entities/arlo-presenters.p
 
 //include importer
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-importer.php');
-require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-base-entity.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-base-importer.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-timezones.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-presenters.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-venues.php');

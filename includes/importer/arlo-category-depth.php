@@ -5,7 +5,7 @@ namespace Arlo\Importer;
 use Arlo\Logger;
 use Arlo\Entities\Categories as CategoriesEntity;
 
-class CategoryDepth extends BaseEntity {
+class CategoryDepth extends BaseImporter {
 
 	protected function save_entity($item) {}
 

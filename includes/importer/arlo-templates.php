@@ -4,7 +4,7 @@ namespace Arlo\Importer;
 
 use Arlo\Logger;
 
-class Templates extends BaseEntity {
+class Templates extends BaseImporter {
 
 	private $slug;
 

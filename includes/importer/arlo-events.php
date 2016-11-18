@@ -4,7 +4,7 @@ namespace Arlo\Importer;
 
 use Arlo\Logger;
 
-class Events extends BaseEntity {
+class Events extends BaseImporter {
 
 	private $event_id;
 

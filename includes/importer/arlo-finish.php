@@ -4,7 +4,7 @@ namespace Arlo\Importer;
 
 use Arlo\Logger;
 
-class Finish extends BaseEntity {
+class Finish extends BaseImporter {
 
 	protected function save_entity($item) {}
 
