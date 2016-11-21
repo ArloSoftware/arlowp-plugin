@@ -34,7 +34,7 @@ abstract class BaseImporter {
         $this->iterator = $iterator;
     }
 
-	public function import() {
+	public function run() {
 		if (!empty($this->data) && is_array($this->data)) {
             
             $count = count($this->data);

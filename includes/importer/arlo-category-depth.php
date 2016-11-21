@@ -9,7 +9,7 @@ class CategoryDepth extends BaseImporter {
 
 	protected function save_entity($item) {}
 
-	public function import() {
+	public function run() {
 		//count the templates in the categories
 		$sql = "
 		SELECT

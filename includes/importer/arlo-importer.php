@@ -359,7 +359,7 @@ class Importer extends Singleton {
 			$class_name = "Arlo\Importer\\" . $import_task;
 			
 			$this->current_task_class = new $class_name($this, $this->dbl, $this->message_handler, (!empty(self::$data_json->$import_task) ? self::$data_json->$import_task : null), $this->current_task_iterator, $this->api_client, $this->file_handler);
-			$this->current_task_class->import();
+			$this->current_task_class->run();
 			
 			Logger::log('Import subtask ended: ' . ($this->current_task_num + 1) . "/" . count($this->import_tasks) . ": " . $this->current_task_desc, $this->import_id);			
 		} else {

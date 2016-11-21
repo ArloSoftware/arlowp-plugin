@@ -8,7 +8,7 @@ class Finish extends BaseImporter {
 
 	protected function save_entity($item) {}
 
-	public function import() {
+	public function run() {
 		if ($this->importer->get_import_lock_entries_number() == 1 && $this->importer->check_import_lock($this->import_id)) {
             //clean up the old entries
 			$this->cleanup_import($this->import_id);

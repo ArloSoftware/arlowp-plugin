@@ -20,7 +20,7 @@ class Download extends BaseImporter  {
 
 	protected function save_entity($item) {}
 
-	public function import() {
+	public function run() {
 
 		$import = $this->importer->get_import_entry($this->import_id, null, 1);
 		
