@@ -129,7 +129,7 @@
 /* regions */
 
 #arlo-regions, #arlo-regions-header {
-	width: 480px;
+	width: 500px;
 }
 
 #arlo-regions-header {
@@ -178,7 +178,7 @@
 }
 
 .arlo-region-controls {
-	width: 50px;
+	width: 60px;
 }
 
 .arlo-region-controls i {
