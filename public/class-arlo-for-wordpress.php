@@ -305,7 +305,9 @@ class Arlo_For_Wordpress {
 		//load scheduler tasks
 		add_action( 'wp_ajax_arlo_run_scheduler', array( $this, 'run_scheduler' ) );
 		add_action( 'wp_ajax_nopriv_arlo_run_scheduler', array( $this, 'run_scheduler' ) );
-		
+
+		add_action( 'wp_ajax_arlo_import_callback', array( $this, 'import_callback' ) );
+		add_action( 'wp_ajax_nopriv_arlo_import_callback', array( $this, 'import_callback' ) );
 		
 		// the_post action - allows us to inject Arlo-specific data as required
 		// consider this later
@@ -315,6 +317,18 @@ class Arlo_For_Wordpress {
 		
 		add_action( 'wp', 'set_region_redirect');
 	}
+
+	/**
+	 * Import callback
+	 *
+	 * @since     2.5
+	 *
+	 * @return    null
+	 */	
+
+	public function import_callback() {
+		$this->get_importer()->callback();
+	}	
 
 	/**
 	 * Run the scheduler action
@@ -835,7 +849,7 @@ class Arlo_For_Wordpress {
 			return $importer;
 		}
 		
-		$importer = new Importer($this->get_environment(), $this->get_dbl(), $this->get_message_handler());
+		$importer = new Importer($this->get_environment(), $this->get_dbl(), $this->get_message_handler(), $this->get_api_client(), $this->get_scheduler());
 		
 		$this->__set('importer', $importer);
 		
@@ -1075,78 +1089,20 @@ class Arlo_For_Wordpress {
 	}       
         	
 	public function import($force = false, $task_id = 0) {
-		global $wpdb;
-		$task_id = intval($task_id);
-		$scheduler = $this->get_scheduler();
 		$importer = $this->get_importer();
 
-		$importer->set_import_id(Utilities::get_random_int());
-
-		if ($task_id > 0) {
-			$task = $scheduler->get_task_data($task_id);
-			if (count($task)) {
-				$task = $task[0];
-			};
-
-			if (empty($task->task_data_text) && $importer->should_importer_run($force)) {
-		        $scheduler->update_task_data($task_id, ['import_id' => $importer->import_id]);
-			} else {
-				$task->task_data_text = json_decode($task->task_data_text);
-				if (empty($task->task_data_text->import_id)) {
-					return false;
-				} else {
-					$importer->set_import_id($task->task_data_text->import_id);
-					Logger::log('Synchronization Started', $importer->import_id);
-				}				
-			}
-		}
-
-        //if an import is already running, exit
-        if (!$importer->acquire_import_lock()) {
-            Logger::log('Synchronization LOCK found, please wait 5 minutes and try again', $importer->import_id);
-            return false;
-        }
-                
-		try {			
-			$importer->set_state($task->task_data_text);
-
-			if (!$importer::$is_finished) {
-				$scheduler->update_task($task_id, 2, "Import is running: task " . ($importer->current_task_num + 1) . "/" . count($importer->import_tasks) . ": " . $importer->current_task_desc);
-				$importer->run();
-
-				$scheduler->update_task_data($task_id, $importer->get_state());
-				
-				$scheduler->update_task($task_id, 1);
-				$scheduler->unlock_process('import');
-			}
-								
+		if ($importer->run($force, $task_id) !== false) {
 			if ($importer::$is_finished) {
-				//finish task
-				$scheduler->update_task($task_id, 4, "Import finished");
-				$scheduler->clear_cron();
-			} else {
-				$scheduler->kick_off_scheduler();
+				// flush the rewrite rules
+				flush_rewrite_rules(true);	
+      			wp_cache_flush();
 			}
-		} catch(\Exception $e) {
-			Logger::log('Synchronization failed, please check the <a href="?page=arlo-for-wordpress-logs&s='.$importer->import_id.'">Log</a> ', $importer->import_id);
 
-			$scheduler->update_task($task_id, 3);
-			
-			$importer->clear_import_lock();
-			
-			return false;
+			return true;
 		}
-					
-		// flush the rewrite rules
-		flush_rewrite_rules(true);	
-      	wp_cache_flush();
-        
-        $importer->clear_import_lock();    
-		
-		return true;
-	}
 
-	
+		return false;
+	}
 
 	public static function delete_custom_posts($table, $column, $post_type) {
 		global $wpdb;

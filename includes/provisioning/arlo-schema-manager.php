@@ -82,6 +82,7 @@ class SchemaManager {
 		$this->install_table_arlo_eventtemplates_presenters();
 		$this->install_table_arlo_events_presenters();
 		$this->install_table_arlo_log();
+		$this->install_table_arlo_import();
 		$this->install_table_arlo_import_lock();
 		$this->install_table_arlo_categories();
 		$this->install_table_arlo_eventtemplates_categories();
@@ -478,16 +479,6 @@ class SchemaManager {
 			CHARACTER SET utf8 COLLATE=utf8_unicode_ci;";
 
 		$this->dbl->sync_schema($sql);
-		
-		$table_name = $this->dbl->prefix . "arlo_import_lock";
-		
-		$sql = "CREATE TABLE $table_name (
-			import_id int(10) unsigned NOT NULL,
-			lock_acquired DATETIME NOT NULL,
-			lock_expired DATETIME NOT NULL
-			) CHARACTER SET utf8 COLLATE=utf8_unicode_ci;";
-		
-		$this->dbl->sync_schema($sql);
 	}
 
 	private function install_table_arlo_import_lock() {	
@@ -499,9 +490,28 @@ class SchemaManager {
 			lock_expired DATETIME NOT NULL
 			) CHARACTER SET utf8 COLLATE=utf8_unicode_ci;";
 		
-		$this->dbl->sync_schema($sql);        
+		$this->dbl->sync_schema($sql);
 	}
 
+	private function install_table_arlo_import() {	
+		$table_name = $this->dbl->prefix . "arlo_import";
+			
+		$sql = "CREATE TABLE $table_name (
+			  	id mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+				request_id varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,  
+				import_id int(10) unsigned NOT NULL,
+				response_json text NULL DEFAULT NULL,
+				callback_json text NULL DEFAULT NULL,
+				nonce varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+				type enum('full') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'full',
+				created datetime NOT NULL COMMENT 'in UTC',
+				modified datetime DEFAULT NULL COMMENT 'in UTC',
+				expired datetime NOT NULL COMMENT 'in UTC',
+				PRIMARY KEY  (id)
+			) CHARACTER SET utf8 COLLATE=utf8mb4_unicode_ci;";
+		
+		$this->dbl->sync_schema($sql);        
+	}
 
 	private function install_table_arlo_messages() {	
 		$table_name = $this->dbl->prefix . "arlo_messages";

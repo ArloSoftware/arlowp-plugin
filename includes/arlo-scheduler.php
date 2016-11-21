@@ -257,11 +257,9 @@ class Scheduler extends Singleton {
 			$this->schedule_cron();
 
 			if (!$this->is_process_running($task_task)) {
-				//$this->lock_process($task_task);
+				$this->lock_process($task_task);
 				switch ($task_task) {
 					case 'import':
-						
-						
 						if (!$this->plugin->import($task[0]->task_priority == -1, $task[0]->task_id)) {
 							$this->update_task($task[0]->task_id, 3, "Import failed");
 							$this->clear_cron();
@@ -277,7 +275,7 @@ class Scheduler extends Singleton {
 
 	protected function schedule_cron() {
 		if ( ! wp_next_scheduled('arlo_scheduler')) {
-			wp_schedule_event( time(), 'minutes_5', 'arlo_scheduler' );
+			wp_schedule_event( time() + (60*5), 'minutes_5', 'arlo_scheduler' );
 		}
 	}
 

@@ -13,7 +13,7 @@ abstract class BaseImporter {
 	protected $dbl;
 	protected $message_handler;
 	protected $api_client;
-
+	protected $file_handler;
 
     protected $import_id;
 
@@ -22,11 +22,12 @@ abstract class BaseImporter {
    
     abstract protected function save_entity($item);
 
-    public function __construct($importer, $dbl, $message_handler, $data, $iterator = 0, $api_client) {
+    public function __construct($importer, $dbl, $message_handler, $data, $iterator = 0, $api_client = null, $file_handler = null) {
         $this->importer = $importer;
 		$this->dbl = $dbl;
 		$this->message_handler = $message_handler;
 		$this->api_client = $api_client;
+		$this->file_handler = $file_handler;
 
         $this->import_id = $importer->import_id;
         $this->data = $data;

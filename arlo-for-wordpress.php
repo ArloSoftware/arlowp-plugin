@@ -70,6 +70,7 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-environment.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-notice-handler.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-message-handler.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-version-handler.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-file-handler.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-logger.php');
 
 //include shortcodes
@@ -94,6 +95,8 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/entities/arlo-presenters.p
 //include importer
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-importer.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-base-importer.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-import-request.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-download.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-timezones.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-presenters.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-venues.php');
