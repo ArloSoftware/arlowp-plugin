@@ -714,13 +714,14 @@ class Arlo_For_Wordpress_Settings {
 
 		foreach ($system_requirements as $req) {
 			$current_value = $req['current_value']();
+			$check = $req['check']($current_value, $req['expected_value']);
 
 			echo '
 			<tr>
-				<td class="arlo-required-setting-icon">' . ($req['check']($current_value, $req['expected_value']) ? $good : $bad) . '</td>
+				<td class="arlo-required-setting-icon">' . ($check ? $good : $bad) . '</td>
 				<td class="arlo-required-setting">' . $req['name'] . '</td>
 				<td class="arlo-required-setting-value">' . $req['expected_value'] . '</td>
-				<td class="arlo-required-setting-value">' . $current_value . '</td>
+				<td class="arlo-required-setting-value ' . ($check ? 'green' : 'red') . '">' . $current_value . '</td>
 			</tr>			
 			';
 		}
