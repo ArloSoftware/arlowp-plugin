@@ -1091,6 +1091,8 @@ class Arlo_For_Wordpress {
 	public function import($force = false, $task_id = 0) {
 		$importer = $this->get_importer();
 
+		//track warnings during the import
+		$old_track_settings = ini_set('track_errors', '1');
 		if ($importer->run($force, $task_id) !== false) {
 			if ($importer::$is_finished) {
 				// flush the rewrite rules
@@ -1098,8 +1100,12 @@ class Arlo_For_Wordpress {
       			wp_cache_flush();
 			}
 
+			ini_set('track_errors', $old_track_settings);
+
 			return true;
 		}
+
+		ini_set('track_errors', $old_track_settings);
 
 		return false;
 	}

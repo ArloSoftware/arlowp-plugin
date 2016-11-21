@@ -49,6 +49,10 @@ class Download extends BaseImporter  {
 	}
 
 	private function get_remote_data($url) {
+		if (!extension_loaded('curl') ) {
+			Logger::log_error('cUrl is not available', $this->importer->import_id);
+		}
+
     	$c = curl_init();
     	curl_setopt($c, CURLOPT_URL, $url);
     	curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
