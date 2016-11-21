@@ -384,6 +384,29 @@ table.arlo-welcome td.logo {
 	text-align: right;
 }
 
+.arlo-system-requirements-table .arlo-required-setting-icon {
+	width: 24px;
+	height: 24px;
+}
+
+.arlo-system-requirements-table .arlo-required-setting {
+	width: 300px;
+	text-align: left;
+}
+
+.arlo-system-requirements-table .arlo-required-setting-value {
+	text-align: center;
+	width: 80px;
+}
+
+.green {
+	color: green;
+}
+
+.red {
+	color: darkred;
+}
+
 /* media queries, these match the wordpress admin breakpoints as of WP 3.9 */
 
 @media only screen and (min-width: 601px) {

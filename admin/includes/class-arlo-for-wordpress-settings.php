@@ -252,6 +252,11 @@ class Arlo_For_Wordpress_Settings {
 		 
 		add_settings_section('arlo_welcome_section', null, null, $this->plugin_slug );				
 		add_settings_field( 'arlo_welcome', null, array($this, 'arlo_welcome_callback'), $this->plugin_slug, 'arlo_welcome_section', array('id'=>'welcome') );
+
+		/* System requirements */
+
+		add_settings_section('arlo_systemrequirements_section',  __('System requirements', 'arlo-for-wordpress' ), null, 'arlo-for-wordpress' );
+		add_settings_field( 'arlo_systemrequirements', null, array($this, 'arlo_systemrequirements_callback'), $this->plugin_slug, 'arlo_systemrequirements_section', array('id'=>'systemrequirements') );
 	}
 
 	/*
@@ -618,7 +623,112 @@ class Arlo_For_Wordpress_Settings {
 	    </p>
 	    <p>If you are experiencing problems with the URLs, please save changes to the Arlo settings page and resynchronize the data under the general tab.</p>
 	    ';
-	} 		
+	}
+	
+	function arlo_systemrequirements_callback () {
+		$system_requirements = [
+			[
+				'name' => 'Memory limit',
+				'expected_value' => '64M',
+				'current_value' => function () {
+					return ini_get('memory_limit');
+				},
+				'check' => function($current_value, $expected_value) {
+					return intval($current_value) >= intval($expected_value);
+				}
+			],
+			[
+				'name' => 'Max execution time',
+				'expected_value' => '30',
+				'current_value' => function () {
+					return ini_get('max_execution_time');
+				},
+				'check' => function($current_value, $expected_value) {
+					return intval($current_value) >= intval($expected_value);
+				}
+			],
+			[
+				'name' => 'cUrl enabled',
+				'expected_value' => 'Yes',
+				'current_value' => function () {
+					return extension_loaded('curl') ? 'Yes': 'No';
+				},
+				'check' => function($current_value, $expected_value) {
+					return $current_value == 'Yes';
+				}
+			],
+			[
+				'name' => 'mCrypt enabled',
+				'expected_value' => 'Yes',
+				'current_value' => function () {
+					return extension_loaded('mcrypt') ? 'Yes': 'No';
+				},
+				'check' => function($current_value, $expected_value) {
+					return $current_value == 'Yes';
+				}
+			],
+			[
+				'name' => 'RIJNDAEL 128 available',
+				'expected_value' => 'Yes',
+				'current_value' => function () {
+					return extension_loaded('mcrypt') && in_array('rijndael-128', mcrypt_list_algorithms()) ? 'Yes' : 'No';
+				},
+				'check' => function($current_value, $expected_value) {
+					return $current_value == 'Yes';
+				}
+			],
+			[
+				'name' => 'CBC mode available',
+				'expected_value' => 'Yes',
+				'current_value' => function () {
+					return extension_loaded('mcrypt') && in_array('cbc', mcrypt_list_modes()) ? 'Yes' : 'No';
+				},
+				'check' => function($current_value, $expected_value) {
+					return $current_value == 'Yes';
+				}
+			],
+			[
+				'name' => 'SHA512 available',
+				'expected_value' => 'Yes',
+				'current_value' => function () {
+					return in_array('sha512', hash_algos()) ? 'Yes' : 'No';
+				},
+				'check' => function($current_value, $expected_value) {
+					return $current_value == 'Yes';
+				}
+			]									
+		];
+
+		$good = '<i class="icons8-checkmark icons8 size-21 green"></i>';
+		$bad = '<i class="icons8-cancel icons8 size-21 red"></i>';
+
+		echo '
+		<table class="arlo-system-requirements-table">
+			<tr>
+				<th class="arlo-required-setting-icon"></th>
+				<th class="arlo-required-setting">Setting</th>
+				<th class="arlo-required-setting-value">Expected</th>
+				<th class="arlo-required-setting-value">Current</th>
+			</tr>
+		';
+
+		foreach ($system_requirements as $req) {
+			$current_value = $req['current_value']();
+
+			echo '
+			<tr>
+				<td class="arlo-required-setting-icon">' . ($req['check']($current_value, $req['expected_value']) ? $good : $bad) . '</td>
+				<td class="arlo-required-setting">' . $req['name'] . '</td>
+				<td class="arlo-required-setting-value">' . $req['expected_value'] . '</td>
+				<td class="arlo-required-setting-value">' . $current_value . '</td>
+			</tr>			
+			';
+		}
+
+		echo '</table>';
+	} 
+	 		
 }
+
 
 ?>
