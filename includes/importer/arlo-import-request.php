@@ -7,6 +7,8 @@ use Arlo\Utilities;
 
 class ImportRequest extends BaseImporter  {
 	const schema_level = 100;
+	const FRAGMENT_MAX_BYTE_SIZE = 10485760;
+	const FRAGMENT_DEFAULT_BYTE_SIZE = 524288;	
 
 	private $nonce;
 
@@ -43,7 +45,9 @@ class ImportRequest extends BaseImporter  {
 		],
 	];
 	private $encription_type = 'A256CBC-HS512';
-	private $fragment_max_size_bytes = 524288;
+
+	private $fragmentation = true;
+	public $fragment_size;
 
 	protected function save_entity($item) {}
 
@@ -52,7 +56,9 @@ class ImportRequest extends BaseImporter  {
 
 		$this->importer->set_import_entry($this->nonce);
 
-		$retval = $this->api_client->Snapshots()->request_import($this->generate_post_data());
+		$this->check_fragment_byte_size();
+
+		$retval = $this->api_client->Snapshots()->request_import($this->generate_post_data($this->fragmentation));
 
 		if (!empty($retval->RequestID)) {
 			$data = [
@@ -66,13 +72,21 @@ class ImportRequest extends BaseImporter  {
 		$this->is_finished = true;
 	}
 
-	private function generate_post_data($fragment = false) {
+	private function check_fragment_byte_size() {
+		if (empty($this->fragment_size) || !is_numeric($this->fragment_size) ) {
+			$this->fragment_size = self::FRAGMENT_DEFAULT_BYTE_SIZE;
+		} else if ($this->fragment_size > self::FRAGMENT_MAX_BYTE_SIZE) {
+			$this->fragment_size = self::FRAGMENT_MAX_BYTE_SIZE;
+		}
+	}
+
+	private function generate_post_data($fragmentation = false) {
 		$data_obj = new \stdClass();
 
 		$data_obj->SchemaLevel = self::schema_level;
 		$data_obj->SnapshotType = $this->snapshot_type;
 		$data_obj->Query = $this->generate_query_object();
-		$data_obj->Result = $this->generate_result_object();
+		$data_obj->Result = $this->generate_result_object($fragmentation);
 		$data_obj->Callback = $this->generate_callback_object();
 
 		return $data_obj;
@@ -89,19 +103,20 @@ class ImportRequest extends BaseImporter  {
 		return $data_obj;
 	}
 
-	private function generate_result_object($fragment = false) {
+	private function generate_result_object($fragmentation = false) {
 		$data_obj = new \stdClass();
 		$data_obj->EncryptedResponse = $this->generate_encryptedresponse_object();
 
-		if ($fragment) {
+		if ($fragmentation) {
 			$data_obj->Disposition = "Fragmented";
-			$data_obj->Fragmentation->FragmentMaxSizeBytes = $this->fragment_max_size_bytes;
+			$data_obj->Fragmentation = new \stdClass(); 
+			$data_obj->Fragmentation->FragmentMaxSizeBytes = $this->fragment_size;
 		}
 
 		return $data_obj;
 	}
 
-	private function generate_callback_object($fragment = false) {
+	private function generate_callback_object() {
 		$data_obj = new \stdClass();
 
 		$data_obj->Uri = admin_url('admin-ajax.php') . '?action=' . $this->callback_action;

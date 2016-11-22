@@ -10,33 +10,34 @@ class Download extends BaseImporter  {
 	const CONNECTION_TIMEOUT = 10;
 	const TIMEOUT = 20;
 
-	protected static $dir;		
+	protected static $dir;
+	public $filename;
+	public $uri;
 
-	public function __construct($importer, $dbl, $message_handler, $data, $iterator = 0, $api_client, $file_handler) {
+	public $response_json;
+
+	public function __construct($importer, $dbl, $message_handler, $data, $iteration = 0, $api_client = null, $file_handler = null) {
+		parent::__construct($importer, $dbl, $message_handler, $data, $iteration, $api_client, $file_handler);
+
 		self::$dir = trailingslashit(plugin_dir_path( __FILE__ )).'../../import/';
 
-		parent::__construct($importer, $dbl, $message_handler, $data, $iterator, $api_client, $file_handler);
+		parent::__construct($importer, $dbl, $message_handler, $data, $iteration, $api_client, $file_handler);
 	}
 
 	protected function save_entity($item) {}
 
 	public function run() {
-
-		$import = $this->importer->get_import_entry($this->import_id, null, 1);
 		
-		$callback_json = json_decode($import->callback_json);
-		$response_json = json_decode($import->response_json);
-
-		if (!empty($callback_json->SnapshotUri)) {
-			$content = $this->get_remote_data($callback_json->SnapshotUri);
+		if (!empty($this->uri)) {
+			$content = $this->get_remote_data($this->uri);
 			if (!empty($content) && $content !== false) {
 
 				//need to decode with the given key
-				$methods = explode('-', $response_json->Result->EncryptedResponse->enc);
+				$methods = explode('-', $this->response_json->Result->EncryptedResponse->enc);
 				try {
-					$content = Crypto::decrypt($content, $response_json->Result->EncryptedResponse->key->k, $methods[0], $methods[1]);
+					$content = Crypto::decrypt($content, $this->response_json->Result->EncryptedResponse->key->k, $methods[0], $methods[1]);
 
-					$filename = self::$dir . $this->import_id . '.dec.json';
+					$filename = self::$dir . $this->filename . '.dec.json';
 					if ($this->file_handler->write_file($filename, $content)) {
 						$this->is_finished = true;
 					}
@@ -45,6 +46,8 @@ class Download extends BaseImporter  {
 					Logger::log_error($e->getMessage(), $this->importer->import_id);
 				}
 			}
+		} else {
+			Logger::log_error('The URI couldn\'t be empty', $this->importer->import_id);
 		}
 	}
 

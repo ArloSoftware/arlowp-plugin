@@ -6,6 +6,7 @@ use Arlo\Logger;
 use Arlo\VersionHandler;
 use Arlo\Scheduler;
 use Arlo\Importer\Importer;
+use Arlo\Importer\ImportRequest;
 use Arlo\MessageHandler;
 use Arlo\NoticeHandler;
 use ArloAPI\Transports\Wordpress;
@@ -848,8 +849,14 @@ class Arlo_For_Wordpress {
 		if($importer = $this->__get('importer')) {
 			return $importer;
 		}
+
+		$settings = get_option('arlo_settings');
 		
 		$importer = new Importer($this->get_environment(), $this->get_dbl(), $this->get_message_handler(), $this->get_api_client(), $this->get_scheduler());
+
+		if (!empty($settings['import_fragment_size'])) {
+			$importer->fragment_size = $settings['import_fragment_size'];
+		}
 		
 		$this->__set('importer', $importer);
 		
@@ -1094,7 +1101,7 @@ class Arlo_For_Wordpress {
 		//track warnings during the import
 		$old_track_settings = ini_set('track_errors', '1');
 		if ($importer->run($force, $task_id) !== false) {
-			if ($importer::$is_finished) {
+			if ($importer->is_finished) {
 				// flush the rewrite rules
 				flush_rewrite_rules(true);	
       			wp_cache_flush();

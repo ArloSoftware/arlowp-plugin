@@ -500,6 +500,7 @@ class SchemaManager {
 			  	id mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
 				request_id varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,  
 				import_id int(10) unsigned NOT NULL,
+				fragmented bit(1) NOT NULL DEFAULT b'1', 
 				response_json text NULL DEFAULT NULL,
 				callback_json text NULL DEFAULT NULL,
 				nonce varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,

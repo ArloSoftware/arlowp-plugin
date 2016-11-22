@@ -5,8 +5,9 @@ namespace Arlo\Importer;
 use Arlo\Logger;
 
 abstract class BaseImporter {
+	public $iteration_finished = false;
     public $is_finished = false;
-    public $iterator = 0;
+    public $iteration = 0;
 
     protected $id;
     protected $importer;
@@ -22,7 +23,7 @@ abstract class BaseImporter {
    
     abstract protected function save_entity($item);
 
-    public function __construct($importer, $dbl, $message_handler, $data, $iterator = 0, $api_client = null, $file_handler = null) {
+    public function __construct($importer, $dbl, $message_handler, $data, $iteration = 0, $api_client = null, $file_handler = null) {
         $this->importer = $importer;
 		$this->dbl = $dbl;
 		$this->message_handler = $message_handler;
@@ -31,20 +32,25 @@ abstract class BaseImporter {
 
         $this->import_id = $importer->import_id;
         $this->data = $data;
-        $this->iterator = $iterator;
+        $this->iteration = $iteration;
     }
+
+	public function get_state() {
+		return null;
+	}
 
 	public function run() {
 		if (!empty($this->data) && is_array($this->data)) {
-            
             $count = count($this->data);
-            
-            for($i = $this->iterator; $i < $count; $i++) {
-				$this->save_entity($this->data[$i]);
-				
-				if (!$this->importer->check_viable_execution_environment()) {
-					$this->iterator = $i;
-					break;
+
+            for($i = $this->iteration; $i < $count; $i++) {
+				if (!isset($this->data[$i])) {
+					$this->save_entity($this->data[$i]);
+					
+					if (!$this->importer->check_viable_execution_environment() || $i%10 == 9) {
+						$this->iteration = $i;
+						break;
+					}
 				}
 			}
 

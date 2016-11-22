@@ -6,8 +6,8 @@ use Arlo\Logger;
 
 class Presenters extends BaseImporter {
 	
-	public function __construct($plugin, $importer, $data, $iterator = 0) {
-		parent::__construct($plugin, $importer, $data, $iterator);
+	public function __construct($importer, $dbl, $message_handler, $data, $iteration = 0, $api_client = null, $file_handler = null) {
+		parent::__construct($importer, $dbl, $message_handler, $data, $iteration, $api_client, $file_handler);
 
 		$this->table_name = $this->dbl->prefix . 'arlo_presenters';
 	}

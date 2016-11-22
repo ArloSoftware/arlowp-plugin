@@ -23,6 +23,7 @@
  */
 
 use Arlo\VersionHandler;
+use Arlo\Importer\ImportRequest;
 
 class Arlo_For_Wordpress_Admin {
 
@@ -94,8 +95,11 @@ class Arlo_For_Wordpress_Admin {
 		add_filter( 'plugin_action_links_' . $plugin_basename, array( $this, 'add_action_links' ) );
 
 		add_filter ( 'user_can_richedit' , array( $this, 'disable_visual_editor') , 50 );
+
+		add_filter( 'pre_update_option_arlo_settings', array($this, 'settings_pre_saved'), 10, 2 );
 		
 		add_action( 'update_option_arlo_settings', array($this, 'settings_saved') );
+		
 		
 		add_action( 'admin_init', array($this, 'check_plugin_version') );
 	}
@@ -528,6 +532,16 @@ class Arlo_For_Wordpress_Admin {
 
 		return $default;
 	}
+
+	public function settings_pre_saved($new, $old) {
+		if (empty($new['import_fragment_size']) || !is_numeric($new['import_fragment_size'])) {
+			$new['import_fragment_size'] = ImportRequest::FRAGMENT_DEFAULT_BYTE_SIZE;
+		} else if ($new['import_fragment_size'] > ImportRequest::FRAGMENT_MAX_BYTE_SIZE) {
+			$new['import_fragment_size'] = ImportRequest::FRAGMENT_MAX_BYTE_SIZE;
+		}
+
+		return $new;
+	}
 		
 	public function settings_saved($old) {
 		$new = get_option('arlo_settings', array());
@@ -595,8 +609,6 @@ class Arlo_For_Wordpress_Admin {
 						'post_parent'	=> $new['post_types'][$id]['posts_page']
 					));
 				}
-				
-				
 			}
 		}
 	}

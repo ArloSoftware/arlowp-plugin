@@ -8,21 +8,9 @@ use Arlo\Utilities;
 use Arlo\FileHandler;
 
 class Importer extends Singleton {
+
+	protected $data_json;			
 	
-	public static $is_finished = false;
-
-	protected static $plugin;
-	protected static $data_json;
-
-	public static $filename;
-	protected static $dir;			
-
-	public $import_id;
-	public $nonce;
-	
-	private $current_import_id;
-	private $last_import_date;
-
 	private $environment;
 	private $message_handler;
 	private $dbl;
@@ -30,21 +18,19 @@ class Importer extends Singleton {
 	private $scheduler;
 	private $file_handler;
 
-	
+	private $current_import_id;
+	private $last_import_date;
+
+	private $current_task_iteration = 0;
+	private $state;		
+	private $task_id;
+
 	//the keys in this array have to match with the keys in the JSON 
 	//except irregular_tasks
 	public $import_tasks = [
 				'ImportRequest' => "Request a database snapshot",
-				'Download' => "Download file",
-				'TimeZones' => "Importing time zones",
-				'Presenters' => "Importing presenters",
-				'Venues' => "Importing venues",
-				'Templates' => "Importing event templates",
-				'Events' => "Importing events",
-				'OnlineActivities' => "Importing online activities",
-				'Categories' => "Importing categories",
-				'CategoryItems' => 'Updating templates order in category',
-				'CategoryDepth' => 'Updating category depth',			
+				'Download' => "Download snapshot file",
+				'ProcessFragment' => "Process fragments",
 				'Finish' => 'Finalize the import',
 			];	
 
@@ -53,16 +39,15 @@ class Importer extends Singleton {
 	public $current_task_num;
 	public $current_task_desc = '';
 
-	private $current_task_iterator = 0;
-	private $irregular_tasks = [
-				'ImportRequest',
-				'Download',
-				'CategoryDepth',
-				'Finish',
-			];
+	public $fragment_size;
+
+	public $import_id;
+	public $nonce;
+	public $is_finished = false;
+	public $dir;
 
 	public function __construct($environment, $dbl, $message_handler, $api_client, $scheduler) {
-		self::$dir = trailingslashit(plugin_dir_path( __FILE__ )).'../../import/';
+		$this->dir = trailingslashit(plugin_dir_path( __FILE__ )).'../../import/';
 
 		$this->environment = $environment;
 		$this->dbl = $dbl;
@@ -79,7 +64,7 @@ class Importer extends Singleton {
 		$this->import_id = $import_id;
 
 		//pretty weird place for it, but the file name depends on the import_id
-		$this->file_handler = new FileHandler(self::$dir, $import_id, $import_id);
+		$this->file_handler = new FileHandler($this->dir, $import_id, $import_id);
 	}
 
 	public function set_current_import_id($import_id) {
@@ -120,19 +105,20 @@ class Importer extends Singleton {
 	}	
 
 	public function set_state($state) {
+		$this->state = $state;		
 		$task_keys = array_keys($this->import_tasks);
 
 		if (!empty($state)) {
 			if (!empty($state->current_subtask)) {
 				$this->set_current_task($state->current_subtask);
-				$this->current_task_iterator = (!empty($state->iterator) && is_numeric($state->iterator) ? $state->iterator + 1 : 0);
+				$this->current_task_iteration = (isset($state->iteration) && is_numeric($state->iteration) ? ((isset($state->subtask_state) && $state->subtask_state->iteration_finished == 1) || !isset($state->subtask_state) ? $state->iteration + 1 : $state->iteration )  : 0);
 			} else if (!empty($state->finished_subtask)) {
 				//figure out the next task;
 				$k = array_search($state->finished_subtask, $task_keys);
 				if ($k !== false && isset($task_keys[++$k])) {
 					$this->set_current_task($task_keys[$k]);			
 				} else {
-					self::$is_finished = true;
+					$this->is_finished = true;
 				}
 			}
 		} else {
@@ -144,14 +130,17 @@ class Importer extends Singleton {
 		$state = [
 			'finished_subtask' => null,
 			'current_subtask' => null ,
-			'iterator' => null
+			'iteration' => null,
+			'subtask_state' => null,
 		];
 	
 		if ($this->current_task_class->is_finished) {
 			$state['finished_subtask'] = $this->current_task;
+			$state['subtask_state'] = $this->current_task_class->get_state();
 		} else {
 			$state['current_subtask'] = $this->current_task;
-			$state['iterator'] = $this->current_task_class->iterator;
+			$state['iteration'] = $this->current_task_class->iteration;
+			$state['subtask_state'] = $this->current_task_class->get_state();
 		}
 
 		return $state;
@@ -187,28 +176,28 @@ class Importer extends Singleton {
 	}
 
 	private function get_data_json() {
-		$filename = self::$dir . $this->import_id . '.dec.json';
+		$filename = $this->dir . $this->import_id . '.dec.json';
 	
-		if (is_null(self::$data_json)) {
-			self::$data_json = $this->file_handler->read_file_as_json($filename)->FullImage;
+		if (is_null($this->data_json)) {
+			$this->data_json = $this->file_handler->read_file_as_json($filename);
 		}
 	}
 
 	public function run($force = false, $task_id = 0) {
-		$task_id = intval($task_id);
+		$this->task_id = intval($task_id);
 		$retval = true;
 
 		$this->set_import_id(Utilities::get_random_int());
 
-		if ($task_id > 0) {
-			$task = $this->scheduler->get_task_data($task_id);
+		if ($this->task_id > 0) {
+			$task = $this->scheduler->get_task_data($this->task_id);
 			if (count($task)) {
 				$task = $task[0];
 			};
 
 			if (empty($task->task_data_text) && $this->should_importer_run($force)) {
 				Logger::log('Synchronization Started', $this->import_id);
-		        $this->scheduler->update_task_data($task_id, ['import_id' => $this->import_id]);
+		        $this->scheduler->update_task_data($this->task_id, ['import_id' => $this->import_id]);
 			} else {
 				$task->task_data_text = json_decode($task->task_data_text);
 				if (empty($task->task_data_text->import_id)) {
@@ -224,32 +213,31 @@ class Importer extends Singleton {
 			try {
 				$this->set_state($task->task_data_text);
 
-				if (!self::$is_finished) {
-					$this->scheduler->update_task($task_id, 2, "Import is running: task " . ($this->current_task_num + 1) . "/" . count($this->import_tasks) . ": " . $this->current_task_desc);
+				if (!$this->is_finished) {
 
-					if (!self::$is_finished && isset($this->import_tasks[$this->current_task])) {
+					if (!$this->is_finished && isset($this->import_tasks[$this->current_task])) {
 						$this->run_import_task($this->current_task);
 					}
 
-					$this->scheduler->update_task_data($task_id, $this->get_state());
+					$this->scheduler->update_task_data($this->task_id, $this->get_state());
 					
-					$this->scheduler->update_task($task_id, 1);
+					$this->scheduler->update_task($this->task_id, 1);
 					$this->scheduler->unlock_process('import');
 				}
 
-				if (self::$is_finished) {
+				if ($this->is_finished) {
 					//finish task
-					$this->scheduler->update_task($task_id, 4, "Import finished");
+					$this->scheduler->update_task($this->task_id, 4, "Import finished");
 					$this->scheduler->clear_cron();
 
-					$this->file_handler->delete_file(self::$dir . $this->import_id . '.dec.json');
+					//$this->file_handler->delete_file($this->dir . $this->import_id . '.dec.json');
 
 				} else if ($this->current_task_num > 0) {
 					$this->scheduler->kick_off_scheduler();
 				}
 			} catch(\Exception $e) {
 				Logger::log('Synchronization failed, please check the <a href="?page=arlo-for-wordpress-logs&s='.$this->import_id.'">Log</a> ', $this->import_id);
-				$this->scheduler->update_task($task_id, 3);
+				$this->scheduler->update_task($this->task_id, 3);
 				
 				$retval = false;
 			}
@@ -351,19 +339,48 @@ class Importer extends Singleton {
 			$this->get_data_json();
 		}
 		
-		if (!empty(self::$data_json->$import_task) || in_array($import_task, $this->irregular_tasks)) {
-			$this->environment->start_time = time(); // Set start time of current process.
-			
-			Logger::log('Import subtask started: ' . ($this->current_task_num + 1) . "/" . count($this->import_tasks) . ": " . $this->current_task_desc, $this->import_id);
+		$this->environment->start_time = time(); // Set start time of current process.
+		
+		$class_name = "Arlo\Importer\\" . $import_task;
 
-			$class_name = "Arlo\Importer\\" . $import_task;
-			
-			$this->current_task_class = new $class_name($this, $this->dbl, $this->message_handler, (!empty(self::$data_json->$import_task) ? self::$data_json->$import_task : null), $this->current_task_iterator, $this->api_client, $this->file_handler);
+		$this->current_task_class = new $class_name($this, $this->dbl, $this->message_handler, (!empty($this->data_json->$import_task) ? $this->data_json->$import_task : null), $this->current_task_iteration, $this->api_client, $this->file_handler);
+
+		//we need to do some special setup for different tasks
+		switch($this->current_task) {
+			case 'ImportRequest':
+				$this->current_task_class->fragment_size = $this->fragment_size;
+				break;
+			case 'Download':
+				$import = $this->get_import_entry($this->import_id, null, 1);
+				
+				$this->current_task_class->uri = json_decode($import->callback_json)->SnapshotUri;
+				$this->current_task_class->filename = $this->import_id;
+				$this->current_task_class->response_json = json_decode($import->response_json);			 
+			break;
+			case 'ProcessFragment':
+				$this->current_task_class->set_state($this->state->subtask_state);
+
+				if (!empty($this->data_json->FullImageFragments->Elements[$this->current_task_iteration])) {
+					$this->current_task_class->filename = $this->import_id . '_f' . $this->current_task_iteration;
+					$this->current_task_desc .= ' ' . ($this->current_task_iteration+1) . '/' . count($this->data_json->FullImageFragments->Elements);
+					$this->current_task_class->uri = $this->data_json->FullImageFragments->Elements[$this->current_task_iteration]->Uri;
+				} else {
+					$this->current_task_class->is_finished = true;
+				}
+			break;			
+		}
+
+		if (!$this->current_task_class->is_finished && !$this->current_task_class->iteration_finished) {
+			$subtask_state = $this->current_task_class->get_state();
+			$subtask_desc = '';
+			if (!is_null($subtask_state)) {
+				$subtask_desc = ': ' . $subtask_state['current_subtask_num'] . '/' . count($this->current_task_class->import_tasks) . ' ' . $subtask_state['current_subtask_desc'];
+			}
+			$this->scheduler->update_task($this->task_id, 2, "Import is running: task " . ($this->current_task_num + 1) . "/" . count($this->import_tasks) . ": " . $this->current_task_desc . $subtask_desc);
+
+			Logger::log('Import subtask started: ' . ($this->current_task_num + 1) . "/" . count($this->import_tasks) . ": " . $this->current_task_desc . $subtask_desc, $this->import_id);		
 			$this->current_task_class->run();
-			
-			Logger::log('Import subtask ended: ' . ($this->current_task_num + 1) . "/" . count($this->import_tasks) . ": " . $this->current_task_desc, $this->import_id);			
-		} else {
-			Logger::log_error('Error with the subtask', $this->import_id);
+			Logger::log('Import subtask ended: ' . ($this->current_task_num + 1) . "/" . count($this->import_tasks) . ": " . $this->current_task_desc . $subtask_desc, $this->import_id);
 		}
 	}
 
@@ -473,7 +490,7 @@ class Importer extends Singleton {
 		VALUES
 			(%s, %s, %s, %s)
 		';
-		
+
 		$query = $this->dbl->query($this->dbl->prepare($sql, $this->import_id, $nonce, $utc_date, $utc_plusonehour));
 		
 		if ($query) {

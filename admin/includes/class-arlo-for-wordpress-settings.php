@@ -12,6 +12,7 @@
  use Arlo\Logger;
  use Arlo\VersionHandler;
  use Arlo\NoticeHandler;
+ use Arlo\Importer\ImportRequest;
 
 class Arlo_For_Wordpress_Settings {
 
@@ -227,6 +228,18 @@ class Arlo_For_Wordpress_Settings {
 			$this->plugin_slug, 
 			'arlo_misc_section', 
 			['option_name' => 'arlo_send_data']);
+
+		add_settings_field(
+			'arlo_fragmented_import_setting', 
+			'<label for="arlo_import_fragment_size">'.__('Import fragment size (in bytes, max 10 MB)', 'arlo-for-wordpress' ).'</label>', 
+			array($this, 'arlo_simple_input_callback'), 
+			$this->plugin_slug, 
+			'arlo_misc_section', 
+			array(
+				'id' => 'import_fragment_size',
+				'label_for' => 'arlo_import_fragment_size',
+				'default_val' => ImportRequest::FRAGMENT_DEFAULT_BYTE_SIZE,
+				));			
 			
 		add_settings_field(
 			'arlo_download_log_setting', 
