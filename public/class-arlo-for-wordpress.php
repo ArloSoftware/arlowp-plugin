@@ -341,7 +341,7 @@ class Arlo_For_Wordpress {
 	public function run_scheduler() {
 		session_write_close();
 		check_ajax_referer( 'arlo_import', 'nonce' );
-		do_action('arlo_scheduler');
+		$this->cron_scheduler();
 		wp_die();
 	}
 

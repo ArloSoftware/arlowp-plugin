@@ -39,52 +39,53 @@ class CategoryDepth extends BaseImporter {
 				$query = $this->dbl->query( $this->dbl->prepare($sql, $counts['num'], $counts['c_arlo_id']) );
 				
 				if ($query === false) {
-					Logger::log_error('SQL error: ' . $this->dbl->last_error . ' ' . $this->dbl->last_query, $this->import_id);
+					throw new \Exception('SQL error: ' . $this->dbl->last_error . ' ' . $this->dbl->last_query);
 				}
 			}		
 		}
 		
-		$cats = CategoriesEntity::getTree(0, 1000, 0, $this->import_id);
-				
-		$this->set_category_depth_level($cats, $this->import_id);
-		
-		$sql = "SELECT MAX(c_depth_level) FROM " . $this->dbl->prefix . "arlo_categories WHERE import_id = " . $this->import_id . "";
-		$max_depth = $this->dbl->get_var($sql);
-		
-		$this->set_category_depth_order($cats, $max_depth, 0, $this->import_id);
-				
-		for ($i = $max_depth+1; $i--; $i < 0) {
-			$sql = "
-			SELECT 
-				SUM(c_template_num) as num,
-				c_parent_id
-			FROM
-				" . $this->dbl->prefix . "arlo_categories
-			WHERE
-				c_depth_level = {$i}
-			AND
-				import_id = " . $this->import_id . "
-			GROUP BY
-				c_parent_id
-			";
+		if (is_array($cats = CategoriesEntity::getTree(0, 1000, 0, $this->import_id))) {
+			$this->set_category_depth_level($cats, $this->import_id);
+			
+			$sql = "SELECT MAX(c_depth_level) FROM " . $this->dbl->prefix . "arlo_categories WHERE import_id = " . $this->import_id . "";
+			$max_depth = $this->dbl->get_var($sql);
+			
+			$this->set_category_depth_order($cats, $max_depth, 0, $this->import_id);
+					
+			for ($i = $max_depth+1; $i--; $i < 0) {
+				$sql = "
+				SELECT 
+					SUM(c_template_num) as num,
+					c_parent_id
+				FROM
+					" . $this->dbl->prefix . "arlo_categories
+				WHERE
+					c_depth_level = {$i}
+				AND
+					import_id = " . $this->import_id . "
+				GROUP BY
+					c_parent_id
+				";
 
-			$cats = $this->dbl->get_results($sql, ARRAY_A);
-			if (!is_null($cats)) {
-				foreach ($cats as $cat) {
-					$sql = "
-					UPDATE
-						" . $this->dbl->prefix . "arlo_categories
-					SET
-						c_template_num = c_template_num + %d
-					WHERE
-						c_arlo_id = %d
-					AND
-						import_id = " . $this->import_id . "
-					";
-					$query = $this->dbl->query( $this->dbl->prepare($sql, $cat['num'], $cat['c_parent_id']) );
+				$cats = $this->dbl->get_results($sql, ARRAY_A);
+				if (!is_null($cats)) {
+					foreach ($cats as $cat) {
+						$sql = "
+						UPDATE
+							" . $this->dbl->prefix . "arlo_categories
+						SET
+							c_template_num = c_template_num + %d
+						WHERE
+							c_arlo_id = %d
+						AND
+							import_id = " . $this->import_id . "
+						";
+						$query = $this->dbl->query( $this->dbl->prepare($sql, $cat['num'], $cat['c_parent_id']) );
+					}
 				}
 			}
 		}
+				
 
 		$this->is_finished = true;
 	}
@@ -127,7 +128,7 @@ class CategoryDepth extends BaseImporter {
 			
 			$query = $this->dbl->query( $this->dbl->prepare($sql, $order + $cat->c_order, $cat->c_arlo_id, $this->import_id) );
 			if ($query === false) {
-				Logger::log_error('SQL error: ' . $this->dbl->last_error . ' ' . $this->dbl->last_query, $this->import_id);
+				throw new \Exception('SQL error: ' . $this->dbl->last_error . ' ' . $this->dbl->last_query);
 			} else if (is_array($cat->children)) {
 				$this->set_category_depth_order($cat->children, $max_depth, $order, $this->import_id);
 			}

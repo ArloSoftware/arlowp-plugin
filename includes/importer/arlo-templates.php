@@ -8,8 +8,8 @@ class Templates extends BaseImporter {
 
 	private $slug;
 
-	public function __construct($importer, $dbl, $message_handler, $data, $iteration = 0, $api_client = null, $file_handler = null) {
-		parent::__construct($importer, $dbl, $message_handler, $data, $iteration, $api_client, $file_handler);
+	public function __construct($importer, $dbl, $message_handler, $data, $iteration = 0, $api_client = null, $file_handler = null, $scheduler = null) {
+		parent::__construct($importer, $dbl, $message_handler, $data, $iteration, $api_client, $file_handler, $scheduler);
 
 		$this->table_name = $this->dbl->prefix . 'arlo_eventtemplates';
 	}
@@ -36,7 +36,7 @@ class Templates extends BaseImporter {
 		);
 						
 		if ($query === false) {
-			Logger::log_error('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query, $this->import_id);
+			throw new \Exception('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query);
 		}
 		
 		$this->id = $this->dbl->insert_id;
@@ -93,7 +93,7 @@ class Templates extends BaseImporter {
 	} 	
 
 	private function save_categories($categories) {
-		if (empty($this->id)) Logger::log_error('No templateID given: ' . __CLASS__ . '::' . __FUNCTION__, $this->import_id);
+		if (empty($this->id)) throw new \Exception('No templateID given: ' . __CLASS__ . '::' . __FUNCTION__);
 
 		if(!empty($categories) && is_array($categories)) {
 			foreach($categories as $index => $category) {
@@ -115,7 +115,7 @@ class Templates extends BaseImporter {
 	}
 
 	private function save_advertised_presenters($advertised_presenters = []) {
-		if (empty($this->id)) Logger::log_error('No templateID given: ' . __CLASS__ . '::' . __FUNCTION__, $this->import_id);
+		if (empty($this->id)) throw new \Exception('No templateID given: ' . __CLASS__ . '::' . __FUNCTION__);
 
 		if(!empty($advertised_presenters) && is_array($advertised_presenters)) {
 			foreach($advertised_presenters as $index => $presenter) {
@@ -131,14 +131,14 @@ class Templates extends BaseImporter {
 				) );
 												
 				if ($query === false) {
-					Logger::log_error('SQL error: ' . $this->dbl->last_error . ' ' . $this->dbl->last_query, $this->import_id);
+					throw new \Exception('SQL error: ' . $this->dbl->last_error . ' ' . $this->dbl->last_query);
 				}
 			}
 		}		
 	}
 
 	private function save_content_fields($content_fields = []) {
-		if (empty($this->id)) Logger::log_error('No templateID given: ' . __CLASS__ . '::' . __FUNCTION__, $this->import_id);
+		if (empty($this->id)) throw new \Exception('No templateID given: ' . __CLASS__ . '::' . __FUNCTION__);
 
 		if (!empty($content_fields) && is_array($content_fields)) {
 			foreach($content_fields as $index => $content) {
@@ -156,7 +156,7 @@ class Templates extends BaseImporter {
 				));
 				
 				if ($query === false) {
-					Logger::log_error('SQL error: ' . $this->dbl->last_error . ' ' . $this->dbl->last_query, $this->import_id);
+					throw new \Exception('SQL error: ' . $this->dbl->last_error . ' ' . $this->dbl->last_query);
 				}
 			}		
 		}

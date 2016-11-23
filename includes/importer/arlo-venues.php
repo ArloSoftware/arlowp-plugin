@@ -6,8 +6,8 @@ use Arlo\Logger;
 
 class Venues extends BaseImporter {
 
-	public function __construct($importer, $dbl, $message_handler, $data, $iteration = 0, $api_client = null, $file_handler = null) {
-		parent::__construct($importer, $dbl, $message_handler, $data, $iteration, $api_client, $file_handler);
+	public function __construct($importer, $dbl, $message_handler, $data, $iteration = 0, $api_client = null, $file_handler = null, $scheduler = null) {
+		parent::__construct($importer, $dbl, $message_handler, $data, $iteration, $api_client, $file_handler, $scheduler);
 
 		$this->table_name = $this->dbl->prefix . 'arlo_venues';
 	}
@@ -40,7 +40,7 @@ class Venues extends BaseImporter {
 		) );
 						
 		if ($query === false) {
-			Logger::log_error('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query, $this->import_id);
+			throw new \Exception('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query);
 		}
 						
 		// create associated custom post, if it dosen't exist

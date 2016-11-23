@@ -11,13 +11,11 @@ class FileHandler {
 
 	private $import_id;
 	
-	public function __construct($dir, $filename, $import_id = null) {
+	public function __construct($dir, $filename) {
 		$this->dir = $dir;
 		$this->filename = $filename;
 
 		$this->file = $this->dir . $this->filename;
-
-		$this->import_id = $import_id;
 	}
 
 	public function read_file($file = null) {
@@ -31,7 +29,7 @@ class FileHandler {
 
 			return $content;
 		} else {
-			Logger::log_error('The file doesn\'t exist: ' . $file, $this->import_id);
+			throw new \Exception('The file doesn\'t exist: ' . $file);
 		}
 	}
 
@@ -52,7 +50,13 @@ class FileHandler {
 		if (is_null($file)) 
 			$file = $this->$file;
 
-		return json_decode(mb_strcut(utf8_encode($this->read_file($file)), 6));
+		$json = json_decode(mb_strcut(utf8_encode($this->read_file($file)), 6));
+
+		if (is_null($json)) {
+			throw new \Exception(json_last_error_msg());
+		}
+
+		return $json;
 	}
 
 	public function delete_file($file = null) {

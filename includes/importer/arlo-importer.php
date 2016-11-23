@@ -8,6 +8,7 @@ use Arlo\Utilities;
 use Arlo\FileHandler;
 
 class Importer extends Singleton {
+	const MAX_RETRY_ATTEMPT = 5;
 
 	protected $data_json;			
 	
@@ -38,6 +39,7 @@ class Importer extends Singleton {
 	public $current_task_class;
 	public $current_task_num;
 	public $current_task_desc = '';
+	public $current_task_retry = 0;
 
 	public $fragment_size;
 
@@ -64,7 +66,7 @@ class Importer extends Singleton {
 		$this->import_id = $import_id;
 
 		//pretty weird place for it, but the file name depends on the import_id
-		$this->file_handler = new FileHandler($this->dir, $import_id, $import_id);
+		$this->file_handler = new FileHandler($this->dir, $import_id);
 	}
 
 	public function set_current_import_id($import_id) {
@@ -116,33 +118,44 @@ class Importer extends Singleton {
 				//figure out the next task;
 				$k = array_search($state->finished_subtask, $task_keys);
 				if ($k !== false && isset($task_keys[++$k])) {
-					$this->set_current_task($task_keys[$k]);			
+					$this->set_current_task($task_keys[$k]);	
+					$state->current_subtask_retry = 0;		
 				} else {
 					$this->is_finished = true;
 				}
+			} else {
+				$this->set_current_task($task_keys[0]);	
 			}
 		} else {
 			$this->set_current_task($task_keys[0]);
 		}
+
+		$this->current_task_retry = (isset($state->current_subtask_retry) ? $state->current_subtask_retry + 1 : $this->current_task_retry + 1);
+		$this->scheduler->update_task_data($this->task_id, $this->get_state());
 	}
 
 	public function get_state() {
 		$state = [
 			'finished_subtask' => null,
-			'current_subtask' => null ,
+			'current_subtask' => null,
+			'current_subtask_retry' => $this->current_task_retry,
 			'iteration' => null,
-			'subtask_state' => null,
+			'subtask_state' =>  null,
 		];
-	
-		if ($this->current_task_class->is_finished) {
-			$state['finished_subtask'] = $this->current_task;
+
+		if (!is_null($this->current_task_class)) {
 			$state['subtask_state'] = $this->current_task_class->get_state();
+
+			if ($this->current_task_class->is_finished) {
+				$state['finished_subtask'] = $this->current_task;
+			} else {
+				$state['current_subtask'] = $this->current_task;
+				$state['iteration'] = $this->current_task_class->iteration;
+			}
 		} else {
 			$state['current_subtask'] = $this->current_task;
-			$state['iteration'] = $this->current_task_class->iteration;
-			$state['subtask_state'] = $this->current_task_class->get_state();
 		}
-
+	
 		return $state;
 	}
 
@@ -210,6 +223,12 @@ class Importer extends Singleton {
 
 		//if an import is already running, exit
         if ($this->acquire_import_lock()) {
+			
+			set_error_handler ( function($num, $str, $file, $line, $context = null) {
+				error_log($str . ' in ' . $file . ' on line ' . $line);
+				throw new \Exception($str);
+			}, E_ALL & ~E_USER_NOTICE & ~E_NOTICE  & ~E_DEPRECATED);
+			
 			try {
 				$this->set_state($task->task_data_text);
 
@@ -219,10 +238,10 @@ class Importer extends Singleton {
 						$this->run_import_task($this->current_task);
 					}
 
+					//means that wasn't any error/warning during the task
+					$this->current_task_retry--;
 					$this->scheduler->update_task_data($this->task_id, $this->get_state());
-					
 					$this->scheduler->update_task($this->task_id, 1);
-					$this->scheduler->unlock_process('import');
 				}
 
 				if ($this->is_finished) {
@@ -230,28 +249,57 @@ class Importer extends Singleton {
 					$this->scheduler->update_task($this->task_id, 4, "Import finished");
 					$this->scheduler->clear_cron();
 
-					//$this->file_handler->delete_file($this->dir . $this->import_id . '.dec.json');
+					$this->file_handler->delete_file($this->dir . $this->import_id . '.dec.json');
 
 				} else if ($this->current_task_num > 0) {
-					$this->scheduler->kick_off_scheduler();
+					$this->kick_off_scheduler();
 				}
 			} catch(\Exception $e) {
-				Logger::log('Synchronization failed, please check the <a href="?page=arlo-for-wordpress-logs&s='.$this->import_id.'">Log</a> ', $this->import_id);
-				$this->scheduler->update_task($this->task_id, 3);
-				
-				$retval = false;
+				if ($this->should_retry($this->get_state())) {
+					//pause the task 
+					$this->scheduler->update_task($this->task_id, 1);
+					$this->kick_off_scheduler();
+				} else {
+					Logger::log($e->getMessagE(), $this->import_id);
+					Logger::log('Synchronization failed, please check the <a href="?page=arlo-for-wordpress-logs&s='.$this->import_id.'">Log</a> ', $this->import_id);
+					//cancel the task
+					$this->scheduler->update_task($this->task_id, 3);
+					$retval = false;
+				}
 			}
+
+			restore_error_handler();
 		} else {
             Logger::log('Synchronization LOCK found, please wait 5 minutes and try again', $this->import_id);
             $retval = false;
         }
 
 		$this->clear_import_lock();
+		$this->scheduler->unlock_process('import');
 
 		return $retval;
 	}
 
-   public function clear_import_lock() {
+	private function update_task_data_for_retry($state) {
+		$data = ['current_subtask_retry' => $state['current_subtask_retry']];
+		if (!is_null($state['subtask_state'])) {
+			$data['subtask_state']['current_subtask_retry'] = $state['subtask_state']['current_subtask_retry'];
+		}
+
+		$this->scheduler->update_task_data($this->task_id, $data);
+	}
+
+	private function should_retry($state) {
+		if ((is_null($state['subtask_state']) && $state['current_subtask_retry'] >= self::MAX_RETRY_ATTEMPT) || (!is_null($state['subtask_state']) && $state['subtask_state']['current_subtask_retry'] >= self::MAX_RETRY_ATTEMPT)) {
+			$subtask_desc = $this->get_subtask_state_desc();
+			Logger::log("Maximum retry attempt reached for '" . $this->current_task_desc . $subtask_desc . "'", $this->import_id);
+			return false;
+		}
+
+		return true; 
+	}
+
+   	public function clear_import_lock() {
         $table_name = $this->dbl->prefix . "arlo_import_lock";
       
         $query = $this->dbl->query('DELETE FROM ' . $table_name);
@@ -343,7 +391,8 @@ class Importer extends Singleton {
 		
 		$class_name = "Arlo\Importer\\" . $import_task;
 
-		$this->current_task_class = new $class_name($this, $this->dbl, $this->message_handler, (!empty($this->data_json->$import_task) ? $this->data_json->$import_task : null), $this->current_task_iteration, $this->api_client, $this->file_handler);
+		$this->current_task_class = new $class_name($this, $this->dbl, $this->message_handler, (!empty($this->data_json->$import_task) ? $this->data_json->$import_task : null), $this->current_task_iteration, $this->api_client, $this->file_handler, $this->scheduler);
+		$this->current_task_class->task_id = $this->task_id;
 
 		//we need to do some special setup for different tasks
 		switch($this->current_task) {
@@ -371,17 +420,23 @@ class Importer extends Singleton {
 		}
 
 		if (!$this->current_task_class->is_finished && !$this->current_task_class->iteration_finished) {
-			$subtask_state = $this->current_task_class->get_state();
-			$subtask_desc = '';
-			if (!is_null($subtask_state)) {
-				$subtask_desc = ': ' . $subtask_state['current_subtask_num'] . '/' . count($this->current_task_class->import_tasks) . ' ' . $subtask_state['current_subtask_desc'];
-			}
+			$subtask_desc = $this->get_subtask_state_desc();
 			$this->scheduler->update_task($this->task_id, 2, "Import is running: task " . ($this->current_task_num + 1) . "/" . count($this->import_tasks) . ": " . $this->current_task_desc . $subtask_desc);
 
 			Logger::log('Import subtask started: ' . ($this->current_task_num + 1) . "/" . count($this->import_tasks) . ": " . $this->current_task_desc . $subtask_desc, $this->import_id);		
 			$this->current_task_class->run();
 			Logger::log('Import subtask ended: ' . ($this->current_task_num + 1) . "/" . count($this->import_tasks) . ": " . $this->current_task_desc . $subtask_desc, $this->import_id);
 		}
+	}
+
+	private function get_subtask_state_desc() {
+		$subtask_state = $this->current_task_class->get_state();
+		$subtask_desc = '';
+		if (!is_null($subtask_state)) {
+			$subtask_desc = ': ' . $subtask_state['current_subtask_num'] . '/' . count($this->current_task_class->import_tasks) . ' ' . $subtask_state['current_subtask_desc'];
+		}
+
+		return $subtask_desc;		
 	}
 
 	private function validate_import_entry($nonce = null, $request_id = null) {
@@ -396,13 +451,18 @@ class Importer extends Singleton {
 		return false;
 	}
 
+	private function kick_off_scheduler() {
+		$this->scheduler->unlock_process('import');
+		$this->scheduler->kick_off_scheduler();		
+	}
+
 	public function callback() {
 		$callback_json = json_decode(file_get_contents("php://input"));
 
-		if (!empty($callback_json->Nonce) && ($import = $this->validate_import_entry($callback_json->Nonce, $callback_json->RequestID)) !== false) {
+		if (!is_null($callback_json) && !empty($callback_json->Nonce) && ($import = $this->validate_import_entry($callback_json->Nonce, $callback_json->RequestID)) !== false) {
 			$this->set_import_id($import->import_id);
 			$this->update_import_entry(['callback_json' => json_encode($callback_json) ]);
-			$this->scheduler->kick_off_scheduler();
+			$this->kick_off_scheduler();
 		} 
 	}
 
@@ -474,7 +534,7 @@ class Importer extends Singleton {
 		';
 
 		if ($this->dbl->query($sql) === false) {
-			Logger::log_error('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query, $this->import_id);
+			throw new \Exception('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query);
 		}
 	}
 

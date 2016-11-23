@@ -89,17 +89,17 @@ class Scheduler extends Singleton {
 		";
 		
 		$query = $this->dbl->query($sql);		
-	}	
+	}
 	
 	public function update_task_data($task_id, $data = array(), $overwrite_data = false) {	
 		if (!$overwrite_data) {
 			$task = $this->get_task_data($task_id);
 			
 			$task_data = (!empty($task[0]->task_data_text) ? json_decode($task[0]->task_data_text, true) : [] ) ;
-			$data = array_merge($task_data, $data);
+			$data = array_replace_recursive($task_data, $data);
 		}		
 		$data = json_encode($data);
-	
+
 		$sql = "
 		INSERT INTO
 			{$this->tabledata}
@@ -220,10 +220,9 @@ class Scheduler extends Singleton {
 	
 	public function run_task($task_id = null) {
 		$task_id = (!empty($task_id) && is_numeric($task_id) ? $task_id : null);
-		
 		if ($this->check_empty_slot_for_task()) {
+			
 			$task = !is_null($task_id) ? $this->get_task_data($task_id) : $this->get_next_task();
-						
 			$this->process_task($task);
 		}
 	}
@@ -241,6 +240,9 @@ class Scheduler extends Singleton {
 			WHERE 
 				task_id >= {$task_id}
 			";
+
+			//TODO: we should query this from the database, but now we have only import as an async task
+			$this->unlock_process("import");
 			
 			return $this->dbl->query($sql);
 		}
@@ -255,7 +257,6 @@ class Scheduler extends Singleton {
 		if (!empty($task_task)) {
 			
 			$this->schedule_cron();
-
 			if (!$this->is_process_running($task_task)) {
 				$this->lock_process($task_task);
 				switch ($task_task) {

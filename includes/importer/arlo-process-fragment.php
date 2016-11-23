@@ -31,6 +31,7 @@ class ProcessFragment extends BaseImporter {
 	public $current_task_num;
 	public $current_task_desc = '';
 	public $current_task_iteration = 0;
+	public $current_task_retry = 0;
 
 	private $irregular_tasks = [
 				'Download',
@@ -51,12 +52,11 @@ class ProcessFragment extends BaseImporter {
 				$this->current_task_iteration = (isset($state->iteration) && is_numeric($state->iteration) ? $state->iteration + 1 : 0);
 			} else if (!empty($state->finished_subtask)) {
 				//figure out the next task;
-				
 				$k = array_search($state->finished_subtask, $task_keys);
 				if ($k !== false && isset($task_keys[++$k])) {
-					$this->set_current_task($task_keys[$k]);			
+					$this->set_current_task($task_keys[$k]);	
+					$state->current_subtask_retry = 0;		
 				} else {
-					//$this->is_finished = true;
 					$this->iteration_finished = true;
 				}
 			} else {
@@ -65,6 +65,9 @@ class ProcessFragment extends BaseImporter {
 		} else {
 			$this->set_current_task($task_keys[0]);
 		}
+
+		$this->current_task_retry = (isset($state->current_subtask_retry) ? $state->current_subtask_retry + 1 : $this->current_task_retry + 1);
+		$this->update_task_data_for_retry($this->get_state());
 	}
 
 	public function get_state() {
@@ -75,7 +78,7 @@ class ProcessFragment extends BaseImporter {
 			'current_subtask_num' => array_search($this->current_task, array_keys($this->import_tasks)),
 			'iteration' => null,
 			'iteration_finished' => ($this->iteration_finished ? 1 : 0),
-			
+			'current_subtask_retry' => $this->current_task_retry,
 		];
 	
 		if ($this->current_task_class->is_finished) {
@@ -86,6 +89,12 @@ class ProcessFragment extends BaseImporter {
 		}
 
 		return $state;
+	}
+
+	private function update_task_data_for_retry($state) {
+		$data['subtask_state'] = $state;
+
+		$this->scheduler->update_task_data($this->task_id, $data);
 	}
 
 	public function set_current_task($task_step) {
@@ -124,8 +133,13 @@ class ProcessFragment extends BaseImporter {
 					$this->current_task_class->response_json = json_decode($import->response_json);			 
 				break;
 			}
-
-			$this->current_task_class->run();
+			try {
+				$this->current_task_class->run();
+				$this->current_task_retry--;
+			} catch (\Exception $e) {
+				throw new \Exception($e->getMessage());
+			}
+			
 		} else {
 			$this->current_task_class->is_finished = true;
 		}

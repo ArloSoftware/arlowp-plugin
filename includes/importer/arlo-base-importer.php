@@ -8,6 +8,7 @@ abstract class BaseImporter {
 	public $iteration_finished = false;
     public $is_finished = false;
     public $iteration = 0;
+	public $task_id;
 
     protected $id;
     protected $importer;
@@ -15,20 +16,23 @@ abstract class BaseImporter {
 	protected $message_handler;
 	protected $api_client;
 	protected $file_handler;
+	protected $scheduler;
 
     protected $import_id;
 
     protected $data;
     protected $table_name;
+	
    
     abstract protected function save_entity($item);
 
-    public function __construct($importer, $dbl, $message_handler, $data, $iteration = 0, $api_client = null, $file_handler = null) {
+    public function __construct($importer, $dbl, $message_handler, $data, $iteration = 0, $api_client = null, $file_handler = null, $scheduler) {
         $this->importer = $importer;
 		$this->dbl = $dbl;
 		$this->message_handler = $message_handler;
 		$this->api_client = $api_client;
 		$this->file_handler = $file_handler;
+		$this->scheduler = $scheduler;
 
         $this->import_id = $importer->import_id;
         $this->data = $data;
@@ -44,10 +48,9 @@ abstract class BaseImporter {
             $count = count($this->data);
 
             for($i = $this->iteration; $i < $count; $i++) {
-				if (!isset($this->data[$i])) {
+				if (isset($this->data[$i])) {
 					$this->save_entity($this->data[$i]);
-					
-					if (!$this->importer->check_viable_execution_environment() || $i%10 == 9) {
+					if (!$this->importer->check_viable_execution_environment()) {
 						$this->iteration = $i;
 						break;
 					}
@@ -95,7 +98,7 @@ abstract class BaseImporter {
 				) );
 				
 				if ($query === false) {
-					Logger::log_error('SQL error: ' . $this->dbl->last_error . ' ' . $this->dbl->last_query, $this->import_id);
+					throw new \Exception('SQL error: ' . $this->dbl->last_error . ' ' . $this->dbl->last_query);
 				}
 			}
 		}	
@@ -116,7 +119,7 @@ abstract class BaseImporter {
 				$table_name = $this->dbl->prefix . "arlo_onlineactivities_tags";
 			break;			
 			default: 
-			 	Logger::log_error('Tag type failed: ' . $type, $this->import_id);
+			 	throw new \Exception('Tag type failed: ' . $type);
 			break;		
 		}
 
@@ -154,7 +157,7 @@ abstract class BaseImporter {
 					) );
 												
 					if ($query === false) {
-						Logger::log_error('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query, $this->import_id);
+						throw new \Exception('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query);
 					} else {
 						$exisiting_tags[$tag] = $this->dbl->insert_id;
 					}
@@ -172,7 +175,7 @@ abstract class BaseImporter {
 					) );
 					
 					if ($query === false) {
-						Logger::log_error('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query, $this->import_id);
+						throw new \Exception('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query);
 					}
 				} else {
 					throw new \Exception('Couldn\'t find tag: ' . $tag );

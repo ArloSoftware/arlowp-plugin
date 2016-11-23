@@ -8,8 +8,8 @@ class Events extends BaseImporter {
 
 	private $event_id;
 
-	public function __construct($importer, $dbl, $message_handler, $data, $iteration = 0, $api_client = null, $file_handler = null) {
-		parent::__construct($importer, $dbl, $message_handler, $data, $iteration, $api_client, $file_handler);
+	public function __construct($importer, $dbl, $message_handler, $data, $iteration = 0, $api_client = null, $file_handler = null, $scheduler = null) {
+		parent::__construct($importer, $dbl, $message_handler, $data, $iteration, $api_client, $file_handler, $scheduler);
 
 		$this->table_name = $this->dbl->prefix . 'arlo_events';
 	}
@@ -64,7 +64,7 @@ class Events extends BaseImporter {
 		);
                         
 		if ($query === false) {					
-			Logger::log_error('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query, $this->import_id);
+			throw new \Exception('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query);
 		}	
 		
 		$this->event_id = $this->dbl->insert_id;
@@ -88,7 +88,7 @@ class Events extends BaseImporter {
 	}
 
 	private function save_presenters($presenters = []) {
-		if (empty($this->event_id)) Logger::log_error('No eventID given: ' . __CLASS__ . '::' . __FUNCTION__, $this->event_id);
+		if (empty($this->event_id)) throw new \Exception('No eventID given: ' . __CLASS__ . '::' . __FUNCTION__);
 
 		if(!empty($presenters) && is_array($presenters)) {
 			foreach($presenters as $index => $presenter) {
@@ -104,7 +104,7 @@ class Events extends BaseImporter {
 				) );
 				
 				if ($query === false) {
-					Logger::log_error('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query, $this->import_id);
+					throw new \Exception('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query);
 				}
 			}
 		}		
