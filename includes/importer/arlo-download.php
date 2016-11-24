@@ -68,14 +68,14 @@ class Download extends BaseImporter  {
     	curl_setopt($c, CURLOPT_ENCODING, 'gzip,deflate');
 
     	$data = curl_exec($c);
-		$error_no = curl_errno($c);
     	$status = curl_getinfo($c);
-    	curl_close($c);
 
-		if ($error_no) {
-			throw new \Exception("File download error: " . curl_error($ch));
+		if (curl_errno($c)) {
+			throw new \Exception("File download error: " . curl_error($c));
 			return false;
 		}
+
+		curl_close($c);
 
 		switch ($status['http_code']) {
 			case 200:

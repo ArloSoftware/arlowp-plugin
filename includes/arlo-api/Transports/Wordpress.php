@@ -48,9 +48,16 @@ class Wordpress extends Transport
 			}
 
 			$response = wp_remote_request( $url, $args );
-			
+
 			if(is_wp_error($response)) {
-				$message = reset(reset($response->errors));
+				$message = '';
+				if (is_array($response->errors)) {
+					foreach ($response->errors as $key => $error) {
+						$message .= $key . ' ' . implode(', ', $error) . "; \n";
+					}
+				} else {
+					$message = $response->errors;
+				}
 				throw new \Exception($message);
 			}
 			

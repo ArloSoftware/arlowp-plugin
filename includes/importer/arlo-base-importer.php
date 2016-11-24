@@ -26,7 +26,7 @@ abstract class BaseImporter {
    
     abstract protected function save_entity($item);
 
-    public function __construct($importer, $dbl, $message_handler, $data, $iteration = 0, $api_client = null, $file_handler = null, $scheduler) {
+    public function __construct($importer, $dbl, $message_handler, $data, $iteration = 0, $api_client = null, $file_handler = null, $scheduler = null) {
         $this->importer = $importer;
 		$this->dbl = $dbl;
 		$this->message_handler = $message_handler;
