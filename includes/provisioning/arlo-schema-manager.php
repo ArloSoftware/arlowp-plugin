@@ -96,7 +96,7 @@ class SchemaManager {
 
 	public function core_set_charset() {	
 		if ( !empty($this->dbl->charset) )
-			return "DEFAULT CHARACTER SET " . $this->dbl->charset;
+			return $this->dbl->query("DEFAULT CHARACTER SET " . $this->dbl->charset);
 		return;
 	}
 
