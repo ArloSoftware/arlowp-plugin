@@ -404,5 +404,3 @@ class VersionHandler extends Singleton {
 		}	
 	}	
 }
-
-?>

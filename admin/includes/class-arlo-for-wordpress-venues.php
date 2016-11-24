@@ -169,5 +169,3 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 	}
 		
 }
-
-?>

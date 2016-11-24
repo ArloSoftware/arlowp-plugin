@@ -150,5 +150,3 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 		return sprintf('https://my.arlo.co/%s/Courses/Courses2.aspx', $this->platform_name );
 	}				
 }
-
-?>

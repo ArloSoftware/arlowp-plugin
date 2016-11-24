@@ -678,5 +678,3 @@ class Arlo_For_Wordpress_Settings {
 		echo '</table>';
 	} 
 }
-
-?>

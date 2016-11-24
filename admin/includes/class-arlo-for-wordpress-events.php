@@ -228,5 +228,3 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 		return sprintf('https://my.arlo.co/%s/Courses/Courses2.aspx', $this->platform_name );
 	}			
 }
-
-?>

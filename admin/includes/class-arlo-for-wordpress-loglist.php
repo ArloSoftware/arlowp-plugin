@@ -200,5 +200,3 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 		);
 	}		
 }
-
-?>

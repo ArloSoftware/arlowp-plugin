@@ -94,5 +94,3 @@ class SystemRequirements {
 		return $good;
 	}
 }
-
-?>

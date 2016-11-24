@@ -140,5 +140,3 @@ class Arlo_For_Wordpress_OnlineActivities extends Arlo_For_Wordpress_Lists  {
 		return sprintf('https://my.arlo.co/%s/Console/#/onlineactivities/', $this->platform_name );
 	}			
 }
-
-?>

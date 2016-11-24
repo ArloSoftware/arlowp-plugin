@@ -150,5 +150,3 @@ class MessageHandler extends Singleton {
 	
 	
 }
-
-?>

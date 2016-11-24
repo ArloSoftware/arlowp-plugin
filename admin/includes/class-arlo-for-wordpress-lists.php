@@ -203,5 +203,3 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	}	
 	
 }
-
-?>

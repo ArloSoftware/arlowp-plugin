@@ -178,5 +178,3 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 	}			
 		
 }
-
-?>

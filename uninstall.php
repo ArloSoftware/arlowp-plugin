@@ -109,4 +109,3 @@ function arlo_delete_options() {
 
 arlo_uninstall();
 
-?>
