@@ -273,7 +273,14 @@
 			showNavTab(tabIDs[0]);
 			markPageSetupError();
 			scrollTo(0,10000);
-		});	
+		});
+
+		//go to the pages section
+		$('.arlo-pages-systemrequirements').click(function() {
+			tabIDs = ['systemrequirements'];
+			showNavTab(tabIDs[0]);
+			scrollTo(0,10000);
+		});				
 		
 		//remove error from the select
 		$('.arlo-page-select > select').change(function() {

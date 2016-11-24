@@ -123,7 +123,7 @@ class NoticeHandler {
 		$message->class = 'arlo-connected-message';
 		$message->message = '<p>
 					Arlo is connected to <strong>' . $this->settings['platform_name'] . '</strong> <span class="arlo-block">Last synchronized: <span class="arlo-last-sync-date">' . $this->importer->get_last_import_date() . ' UTC</span></span> 
-					<a class="arlo-block arlo-sync-button" href="?page=arlo-for-wordpress&arlo-import">Synchronize now</a>
+					' . (get_option('arlo_import_disabled', '0') != '1' ? '<a class="arlo-block arlo-sync-button" href="?page=arlo-for-wordpress&arlo-import">Synchronize now</a>' : '') . '
 				</p>';
 
 		echo $this->create_notice($message);
@@ -151,7 +151,35 @@ class NoticeHandler {
 				'error notice');
 
 		echo $this->create_notice($message_obj);	
-	}	
+	}
+
+	
+	public function plugin_disabled() {
+		$message = '<p>' . sprintf(__('The Arlo for WordPress plugin has been disabled, please check the <a href="%s" class="%s">System Requirements</a> page'), '?page=arlo-for-wordpress#systemrequirements', 'arlo-pages-systemrequirements') . '</p>';
+
+		$message_obj = $this->create_message_object(
+				__('Plugin disabled', 'arlo-for-wordpress'),
+				$message,
+				'error',
+				true,
+				false);
+
+		echo $this->create_notice($message_obj);
+	}
+
+	public function import_disabled() {
+		$message = '<p>' . sprintf(__('The import for the Arlo for WordPress plugin has been disabled, but the current existing data is still available. Please check the <a href="%s" class="%s">System Requirements</a> page'), '?page=arlo-for-wordpress#systemrequirements', 'arlo-pages-systemrequirements') . '</p>';
+
+		$message_obj = $this->create_message_object(
+				__('Import disabled', 'arlo-for-wordpress'),
+				$message,
+				'error',
+				true,
+				false);
+
+		echo $this->create_notice($message_obj);
+	}
+	
 
 	public function posttype_notice() {
 

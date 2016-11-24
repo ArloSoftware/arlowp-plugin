@@ -72,6 +72,7 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-message-handler.php')
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-version-handler.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-file-handler.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-logger.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-system-requirements.php');
 
 //include shortcodes
 require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-shortcodes.php');

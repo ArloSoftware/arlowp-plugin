@@ -13,6 +13,7 @@ use ArloAPI\Transports\Wordpress;
 use ArloAPI\Client;
 use Arlo\Utilities;
 use Arlo\Environment;
+use Arlo\SystemRequirements;
 
 /**
  * Arlo for WordPress.
@@ -328,6 +329,7 @@ class Arlo_For_Wordpress {
 	 */	
 
 	public function import_callback() {
+		if (get_option('arlo_import_disabled', '0') == '1') return;
 		$this->get_importer()->callback();
 	}	
 
@@ -568,10 +570,24 @@ class Arlo_For_Wordpress {
 				
 				$plugin->get_schema_manager()->check_db_schema();
 			}
+
+			//check system requirements and disable the import
+			if (!SystemRequirements::overall_check()) {
+				update_option( 'arlo_import_disabled', 1 );
+			} else {
+				update_option( 'arlo_import_disabled', 0 );
+				update_option( 'arlo_plugin_disabled', 0 );
+			}
 		} else {
 			arlo_add_datamodel();
 
 			$plugin->get_version_handler()->set_installed_version();
+
+			//check system requirements and disable the plugin/import
+			if (!SystemRequirements::overall_check()) {
+				update_option( 'arlo_plugin_disabled', 1 );
+				update_option( 'arlo_import_disabled', 1 );
+			} 
 		}
 	}
 
@@ -1096,6 +1112,7 @@ class Arlo_For_Wordpress {
 	}       
         	
 	public function import($force = false, $task_id = 0) {
+		if (get_option('arlo_import_disabled', '0') == '1') return;
 		$importer = $this->get_importer();
 
 		//track warnings during the import

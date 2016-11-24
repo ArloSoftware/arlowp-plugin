@@ -301,6 +301,8 @@ function arlo_the_content($content) {
  */
 function arlo_the_content_event($content) {
 	global $post, $wpdb;
+
+	if (get_option('arlo_plugin_disabled', '0') == '1') return;
 	
 	$templates = arlo_get_option('templates');
 	$content = $templates['event']['html'];
@@ -355,6 +357,8 @@ function arlo_the_content_event($content) {
  * @return   string The content replaced by the filtered presenter template
  */
 function arlo_the_content_presenter($content) {
+	if (get_option('arlo_plugin_disabled', '0') == '1') return;
+        
 	$templates = arlo_get_option('templates');
 	$content = $templates['presenter']['html'];
 
@@ -390,6 +394,8 @@ function arlo_the_content_presenter($content) {
  * @return   string The content replaced by the filtered venue template
  */
 function arlo_the_content_venue($content) {
+	if (get_option('arlo_plugin_disabled', '0') == '1') return;
+    
 	$templates = arlo_get_option('templates');
 	$content = $templates['venue']['html'];
 

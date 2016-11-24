@@ -23,6 +23,8 @@ class UpcomingEvents {
     }
 
     private static function shortcode_upcoming_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if (get_option('arlo_plugin_disabled', '0') == '1') return;
+        
         $templates = arlo_get_option('templates');
         $content = $templates['upcoming']['html'];
         return do_shortcode($content);        

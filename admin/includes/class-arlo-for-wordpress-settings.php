@@ -12,6 +12,7 @@
  use Arlo\Logger;
  use Arlo\VersionHandler;
  use Arlo\NoticeHandler;
+ use Arlo\SystemRequirements;
  use Arlo\Importer\ImportRequest;
 
 class Arlo_For_Wordpress_Settings {
@@ -34,9 +35,15 @@ class Arlo_For_Wordpress_Settings {
 		
 		if (isset($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress' && get_option('permalink_structure') != "/%postname%/") {
 			add_action( 'admin_notices', array($notice_handler, "permalink_notice") );
-		}					
+		}
 		
 		add_action( 'admin_notices', array($notice_handler, "global_notices") );
+
+		if (get_option('arlo_plugin_disabled', '0') == '1') {
+			add_action( 'admin_notices', array($notice_handler, "plugin_disabled") );
+		} else if (get_option('arlo_import_disabled', '0') == '1') {
+			add_action( 'admin_notices', array($notice_handler, "import_disabled") );
+		}		
 		
 		if(isset($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress') {
 			add_action( 'admin_notices', array($notice_handler, "arlo_notices") );
@@ -62,7 +69,9 @@ class Arlo_For_Wordpress_Settings {
 			}
 		
 			if (isset($_GET['arlo-import'])) {
-				$plugin->get_scheduler()->set_task("import", -1);
+				if (get_option('arlo_import_disabled', '0') != '1')
+					$plugin->get_scheduler()->set_task("import", -1);
+
 				//do_action('arlo_scheduler');
 				//$plugin->import();
 				//die('import');
@@ -118,7 +127,7 @@ class Arlo_For_Wordpress_Settings {
                         array($this, 'arlo_simple_text_callback'), 
                         $this->plugin_slug, 'arlo_general_section', 
                         array(
-                            'html' => '<span class="arlo-last-sync-date">' . $plugin->get_importer()->get_last_import_date() . ' UTC</span>&nbsp;&nbsp;<a href="?page=arlo-for-wordpress&arlo-import" class="arlo-sync-button">'.__('Synchronize now', 'arlo-for-wordpress' ).'</a>'
+                            'html' => '<span class="arlo-last-sync-date">' . $plugin->get_importer()->get_last_import_date() . ' UTC</span>&nbsp;&nbsp;' . (get_option('arlo_import_disabled', '0') != '1' ? '<a href="?page=arlo-for-wordpress&arlo-import" class="arlo-sync-button">' . __('Synchronize now', 'arlo-for-wordpress' ) . '</a>' : '' )
                             )
                 );        
         }
@@ -639,79 +648,6 @@ class Arlo_For_Wordpress_Settings {
 	}
 	
 	function arlo_systemrequirements_callback () {
-		$system_requirements = [
-			[
-				'name' => 'Memory limit',
-				'expected_value' => '64M',
-				'current_value' => function () {
-					return ini_get('memory_limit');
-				},
-				'check' => function($current_value, $expected_value) {
-					return intval($current_value) >= intval($expected_value);
-				}
-			],
-			[
-				'name' => 'Max execution time',
-				'expected_value' => '30',
-				'current_value' => function () {
-					return ini_get('max_execution_time');
-				},
-				'check' => function($current_value, $expected_value) {
-					return intval($current_value) >= intval($expected_value);
-				}
-			],
-			[
-				'name' => 'cUrl enabled',
-				'expected_value' => 'Yes',
-				'current_value' => function () {
-					return extension_loaded('curl') ? 'Yes': 'No';
-				},
-				'check' => function($current_value, $expected_value) {
-					return $current_value == 'Yes';
-				}
-			],
-			[
-				'name' => 'mCrypt enabled',
-				'expected_value' => 'Yes',
-				'current_value' => function () {
-					return extension_loaded('mcrypt') ? 'Yes': 'No';
-				},
-				'check' => function($current_value, $expected_value) {
-					return $current_value == 'Yes';
-				}
-			],
-			[
-				'name' => 'RIJNDAEL 128 available',
-				'expected_value' => 'Yes',
-				'current_value' => function () {
-					return extension_loaded('mcrypt') && in_array('rijndael-128', mcrypt_list_algorithms()) ? 'Yes' : 'No';
-				},
-				'check' => function($current_value, $expected_value) {
-					return $current_value == 'Yes';
-				}
-			],
-			[
-				'name' => 'CBC mode available',
-				'expected_value' => 'Yes',
-				'current_value' => function () {
-					return extension_loaded('mcrypt') && in_array('cbc', mcrypt_list_modes()) ? 'Yes' : 'No';
-				},
-				'check' => function($current_value, $expected_value) {
-					return $current_value == 'Yes';
-				}
-			],
-			[
-				'name' => 'SHA512 available',
-				'expected_value' => 'Yes',
-				'current_value' => function () {
-					return in_array('sha512', hash_algos()) ? 'Yes' : 'No';
-				},
-				'check' => function($current_value, $expected_value) {
-					return $current_value == 'Yes';
-				}
-			]									
-		];
-
 		$good = '<i class="icons8-checkmark icons8 size-21 green"></i>';
 		$bad = '<i class="icons8-cancel icons8 size-21 red"></i>';
 
@@ -725,7 +661,7 @@ class Arlo_For_Wordpress_Settings {
 			</tr>
 		';
 
-		foreach ($system_requirements as $req) {
+		foreach (SystemRequirements::get_system_requirements() as $req) {
 			$current_value = $req['current_value']();
 			$check = $req['check']($current_value, $req['expected_value']);
 
@@ -741,8 +677,6 @@ class Arlo_For_Wordpress_Settings {
 
 		echo '</table>';
 	} 
-	 		
 }
-
 
 ?>
