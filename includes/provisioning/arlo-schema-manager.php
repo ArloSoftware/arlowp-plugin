@@ -114,7 +114,7 @@ class SchemaManager {
 		PRIMARY KEY  (task_id),
 		KEY task_status (task_status),
 		KEY task_priority (task_priority)
-		) CHARACTER SET utf8mb4 COLLATE=utf8mb4_unicode_ci";
+		) CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . "";
 
 		$this->dbl->sync_schema($sql);
 		
@@ -123,7 +123,7 @@ class SchemaManager {
 		data_task_id int(11) NOT NULL,
 		data_text text NOT NULL,
 		PRIMARY KEY  (data_task_id)
-		) CHARACTER SET utf8mb4 COLLATE=utf8mb4_unicode_ci;  
+		) CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";  
 		";
 		
 		$this->dbl->sync_schema($sql);
@@ -147,7 +147,7 @@ class SchemaManager {
 			PRIMARY KEY  (et_id),
 			KEY et_arlo_id (et_arlo_id),
 			KEY et_region (et_region))
-			CHARACTER SET utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";";
 
 		$this->dbl->sync_schema($sql);
 	}
@@ -166,7 +166,7 @@ class SchemaManager {
 			PRIMARY KEY  (cf_id),
 			KEY cf_order (cf_order),
 			KEY et_id (et_id))
-			CHARACTER SET utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";";
 
 		$this->dbl->sync_schema($sql);
 	}
@@ -209,7 +209,7 @@ class SchemaManager {
 			KEY e_arlo_id (e_arlo_id),
 			KEY e_region (e_region),
 			KEY v_id (v_id))
-			CHARACTER SET utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";";
 
 		$this->dbl->sync_schema($sql);
 	}
@@ -234,7 +234,7 @@ class SchemaManager {
 			PRIMARY KEY  (oa_id),
 			KEY oat_arlo_id (oat_arlo_id),
 			KEY oa_region (oa_region))
-			CHARACTER SET utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";";
 
 		$this->dbl->sync_schema($sql);
 	}
@@ -264,7 +264,7 @@ class SchemaManager {
 			import_id int(10) unsigned DEFAULT NULL,
 			PRIMARY KEY  (v_id),
 			KEY v_arlo_id (v_arlo_id))
-			CHARACTER SET utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";";
 
 		$this->dbl->sync_schema($sql);
 	}
@@ -288,7 +288,7 @@ class SchemaManager {
 			import_id int(10) unsigned DEFAULT NULL,
 			PRIMARY KEY  (p_id),
 			KEY p_arlo_id (p_arlo_id))
-			CHARACTER SET utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";";
 
 		$this->dbl->sync_schema($sql);
 	}
@@ -324,7 +324,7 @@ class SchemaManager {
 			KEY oa_id (oa_id),
 			KEY o_region (o_region),
 			KEY o_order (o_order))
-			CHARACTER SET utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";";
 		
 		$this->dbl->sync_schema($sql);
 	}
@@ -341,7 +341,7 @@ class SchemaManager {
 			KEY cf_order (p_order),
 			KEY fk_et_id_idx (et_id ASC),
 			KEY fk_p_id_idx (p_arlo_id ASC))
-			CHARACTER SET utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";";
 
 		$this->dbl->sync_schema($sql);
 	}
@@ -352,7 +352,7 @@ class SchemaManager {
 			tag varchar(255) NOT NULL,
 			import_id int(10) unsigned DEFAULT NULL,
 			PRIMARY KEY  (id))
-			CHARACTER SET utf8mb4 COLLATE=utf8mb4_unicode_ci";
+			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . "";
 			
 		$this->dbl->sync_schema($sql);
 		
@@ -361,7 +361,7 @@ class SchemaManager {
 			tag_id mediumint(8) unsigned NOT NULL,
 			import_id int(10) unsigned DEFAULT NULL,
 			PRIMARY KEY  (e_id,tag_id,import_id))
-			CHARACTER SET utf8mb4 COLLATE=utf8mb4_unicode_ci";
+			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . "";
 			
 		$this->dbl->sync_schema($sql);  	
 		
@@ -370,7 +370,7 @@ class SchemaManager {
 			tag_id mediumint(8) unsigned NOT NULL,
 			import_id int(10) unsigned DEFAULT NULL,
 			PRIMARY KEY  (oa_id,tag_id,import_id))
-			CHARACTER SET utf8mb4 COLLATE=utf8mb4_unicode_ci";
+			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . "";
 			
 		$this->dbl->sync_schema($sql);	
 		
@@ -379,7 +379,7 @@ class SchemaManager {
 			tag_id mediumint(8) unsigned NOT NULL,
 			import_id int(10) unsigned DEFAULT NULL,
 			PRIMARY KEY  (et_id,tag_id,import_id))
-			CHARACTER SET utf8mb4 COLLATE=utf8mb4_unicode_ci";
+			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . "";
 
 		$this->dbl->sync_schema($sql);
 	}
@@ -395,7 +395,7 @@ class SchemaManager {
 			PRIMARY KEY  (e_id,p_arlo_id,import_id),		
 			KEY fk_e_id_idx (e_id ASC),
 			KEY fk_p_id_idx (p_arlo_id ASC))
-			CHARACTER SET utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";";
 
 		$this->dbl->sync_schema($sql);
 	}
@@ -418,7 +418,7 @@ class SchemaManager {
 			PRIMARY KEY  (c_id,import_id),
 			UNIQUE KEY c_arlo_id_key (c_arlo_id,import_id),
 			KEY c_parent_id (c_parent_id))
-			CHARACTER SET utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";";
 
 		$this->dbl->sync_schema($sql);
 	}
@@ -434,7 +434,7 @@ class SchemaManager {
 			PRIMARY KEY  (et_arlo_id,c_arlo_id,import_id),
 			KEY fk_et_id_idx (et_arlo_id ASC),
 			KEY fk_c_id_idx (c_arlo_id ASC))
-			CHARACTER SET utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";";
 
 		$this->dbl->sync_schema($sql);
 	}
@@ -448,7 +448,7 @@ class SchemaManager {
 			name varchar(256) NOT NULL,
 			import_id int(10) unsigned DEFAULT NULL,
 			PRIMARY KEY  (id,import_id)) 
-			CHARACTER SET utf8mb4 COLLATE=utf8mb4_unicode_ci;	
+			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";	
 		";
 
 		$this->dbl->sync_schema($sql);
@@ -459,7 +459,7 @@ class SchemaManager {
 			olson_name varchar(255) NOT NULL,
 			import_id int(10) unsigned DEFAULT NULL,
 			PRIMARY KEY  (timezone_id,olson_name(50),import_id)
-			) CHARACTER SET utf8mb4 COLLATE=utf8mb4_unicode_ci;
+			) CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";
 		";
 		
 		$this->dbl->sync_schema($sql2);	
@@ -476,7 +476,7 @@ class SchemaManager {
 			successful tinyint(1) DEFAULT NULL,
 			PRIMARY KEY  (id),
 			KEY import_id (import_id)) 
-			CHARACTER SET utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";";
 
 		$this->dbl->sync_schema($sql);
 	}
@@ -488,7 +488,7 @@ class SchemaManager {
 			import_id int(10) unsigned NOT NULL,
 			lock_acquired DATETIME NOT NULL,
 			lock_expired DATETIME NOT NULL
-			) CHARACTER SET utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+			) CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";";
 		
 		$this->dbl->sync_schema($sql);
 	}
@@ -498,18 +498,18 @@ class SchemaManager {
 			
 		$sql = "CREATE TABLE $table_name (
 			  	id mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
-				request_id varchar(63) CHARACTER SET utf8mb4 NOT NULL,  
+				request_id varchar(63) CHARACTER SET " . $this->dbl->charset . " NOT NULL,  
 				import_id int(10) unsigned NOT NULL,
 				fragmented bit(1) NOT NULL DEFAULT b'1', 
 				response_json text NULL DEFAULT NULL,
 				callback_json text NULL DEFAULT NULL,
-				nonce varchar(63) CHARACTER SET utf8mb4 NOT NULL,
-				type enum('full') CHARACTER SET utf8mb4 NOT NULL DEFAULT 'full',
+				nonce varchar(63) CHARACTER SET " . $this->dbl->charset . " NOT NULL,
+				type enum('full') CHARACTER SET " . $this->dbl->charset . " NOT NULL DEFAULT 'full',
 				created datetime NOT NULL COMMENT 'in UTC',
 				modified datetime DEFAULT NULL COMMENT 'in UTC',
 				expired datetime NOT NULL COMMENT 'in UTC',
 				PRIMARY KEY  (id)
-			) CHARACTER SET utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+			) CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";";
 		
 		$this->dbl->sync_schema($sql);        
 	}
@@ -528,7 +528,7 @@ class SchemaManager {
 			created timestamp NULL DEFAULT NULL,
 			PRIMARY KEY (id),
 			KEY type (type))
-			CHARACTER SET utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";";
 
 		$this->dbl->sync_schema($sql);
 	}

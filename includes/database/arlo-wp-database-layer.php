@@ -11,6 +11,7 @@ class WPDatabaseLayer extends DatabaseLayer {
 
 		$this->wpdb = &$wpdb;
 		$this->charset = $this->wpdb->charset;
+		$this->collate = $this->wpdb->collate;
 		$this->prefix = $this->wpdb->prefix;
 	}
 
@@ -71,5 +72,13 @@ class WPDatabaseLayer extends DatabaseLayer {
 
 	public function _real_escape($query) {
 		return $this->wpdb->_real_escape($query);
+	}
+
+	public function determine_charset( $charset, $collate ) {
+		return $this->wpdb->determine_charset($charset, $collate);
+	}
+
+	public function init_charset() {
+		$this->wpdb->init_charset();
 	}
 }

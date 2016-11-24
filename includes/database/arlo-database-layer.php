@@ -8,6 +8,8 @@ abstract class DatabaseLayer {
 	private $wpdb;
 	
 	public $charset;
+	public $collate;
+
 	public $prefix;
 	public $insert_id;
 	public $last_error;
@@ -158,4 +160,27 @@ abstract class DatabaseLayer {
 	 * @return string escaped
 	 */
 	abstract function _real_escape( $string );
+
+	/**
+	 * Set $this->charset and $this->collate
+	 *
+	 * @since 3.1.0
+	 */
+	abstract function init_charset();	
+
+		/**
+	 * Determines the best charset and collation to use given a charset and collation.
+	 *
+	 * For example, when able, utf8mb4 should be used instead of utf8.
+	 *
+	 * @since 4.6.0
+	 * @access public
+	 *
+	 * @param string $charset The character set to check.
+	 * @param string $collate The collation to check.
+	 * @return array The most appropriate character set and collation to use.
+	 */
+	abstract function determine_charset( $charset, $collate );
+
+
 }
