@@ -56,7 +56,7 @@ class UpcomingEvents {
 
         if(empty($items)) :
         
-            $no_event_text = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', $GLOBALS['arlo_plugin_slug']);
+            $no_event_text = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', 'arlo-for-wordpress');
             $output = '<p class="arlo-no-results">' . $no_event_text . '</p>';
             
         else :
@@ -90,14 +90,14 @@ class UpcomingEvents {
     private static function shortcode_upcoming_offer($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         $settings = get_option('arlo_settings');  
         $price_setting = (isset($settings['price_setting'])) ? $settings['price_setting'] : ARLO_PLUGIN_PREFIX . '-exclgst';
-        $free_text = (isset($settings['free_text'])) ? $settings['free_text'] : __('Free', $GLOBALS['arlo_plugin_slug']);
+        $free_text = (isset($settings['free_text'])) ? $settings['free_text'] : __('Free', 'arlo-for-wordpress');
                 
         $amount = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $GLOBALS['arlo_event_list_item']['o_offeramounttaxexclusive'] : $GLOBALS['arlo_event_list_item']['o_offeramounttaxinclusive'];
         $famount = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $GLOBALS['arlo_event_list_item']['o_formattedamounttaxexclusive'] : $GLOBALS['arlo_event_list_item']['o_formattedamounttaxinclusive'];
         $tax = $GLOBALS['arlo_event_list_item']['o_taxrateshortcode'];
 
         $offer = ($amount > 0) ? '<span class="arlo-amount">' . $famount .'</span> <span class="arlo-price-tax">'. 
-                ($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__(' excl. %s', $GLOBALS['arlo_plugin_slug']), $tax) : sprintf(__(' incl. %s', $GLOBALS['arlo_plugin_slug']), $tax)). '</span>' 
+                ($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__(' excl. %s', 'arlo-for-wordpress'), $tax) : sprintf(__(' incl. %s', 'arlo-for-wordpress'), $tax)). '</span>' 
                 : '<span class="arlo-amount">' . htmlentities($free_text, ENT_QUOTES, "UTF-8") . '</span>';
 
         return $offer;        
@@ -108,7 +108,7 @@ class UpcomingEvents {
 
         extract(shortcode_atts(array(
             'filters'	=> 'category,month,location,delivery',
-            'resettext'	=> __('Reset', $GLOBALS['arlo_plugin_slug']),
+            'resettext'	=> __('Reset', 'arlo-for-wordpress'),
             'buttonclass'   => 'button'
         ), $atts, $shortcode_name, $import_id));
 
@@ -136,12 +136,12 @@ class UpcomingEvents {
                     }
 
                     if (is_array($cats)) {
-                        $filter_html .= Shortcodes::create_filter($filter, Categories::child_categories($cats), __('All categories', $GLOBALS['arlo_plugin_slug']));					
+                        $filter_html .= Shortcodes::create_filter($filter, Categories::child_categories($cats), __('All categories', 'arlo-for-wordpress'));					
                     }
 
                     break;                    
                 case 'delivery' :
-                    $filter_html .= Shortcodes::create_filter($filter, \Arlo_For_Wordpress::$delivery_labels, __('All delivery options', $GLOBALS['arlo_plugin_slug']));
+                    $filter_html .= Shortcodes::create_filter($filter, \Arlo_For_Wordpress::$delivery_labels, __('All delivery options', 'arlo-for-wordpress'));
 
                     break;                                    
                 case 'month' :
@@ -156,7 +156,7 @@ class UpcomingEvents {
 
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter, $months, __('All months', $GLOBALS['arlo_plugin_slug']));
+                    $filter_html .= Shortcodes::create_filter($filter, $months, __('All months', 'arlo-for-wordpress'));
 
                     break;
                 case 'location' :
@@ -185,7 +185,7 @@ class UpcomingEvents {
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter, $locations, __('All locations', $GLOBALS['arlo_plugin_slug']));
+                    $filter_html .= Shortcodes::create_filter($filter, $locations, __('All locations', 'arlo-for-wordpress'));
 
                     break;          
                 case 'eventtag' :
@@ -214,7 +214,7 @@ class UpcomingEvents {
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter, $tags, __('Select tag', $GLOBALS['arlo_plugin_slug']));				
+                    $filter_html .= Shortcodes::create_filter($filter, $tags, __('Select tag', 'arlo-for-wordpress'));				
                     
                     break;				
             endswitch;

@@ -270,7 +270,7 @@ class Templates {
         $items = $wpdb->get_results($sql, ARRAY_A);
             
         if(empty($items)) :
-            $GLOBALS['no_event_text'] = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', $GLOBALS['arlo_plugin_slug']);
+            $GLOBALS['no_event_text'] = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', 'arlo-for-wordpress');
         else :
                 
             $output = $GLOBALS['no_event_text'] = '';			
@@ -381,10 +381,10 @@ class Templates {
         $output = '';
         
         if (!empty($GLOBALS['no_event']) && !empty($GLOBALS['no_onlineactivity'])) {
-            $no_event_text = !empty($settings['noeventontemplate_text']) ? $settings['noeventontemplate_text'] : __('Interested in attending? Have a suggestion about running this course near you?', $GLOBALS['arlo_plugin_slug']);
+            $no_event_text = !empty($settings['noeventontemplate_text']) ? $settings['noeventontemplate_text'] : __('Interested in attending? Have a suggestion about running this course near you?', 'arlo-for-wordpress');
             
             if (!empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) {
-                $no_event_text .= '<br /><a href="' . $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'] . '">' . __('Register your interest now', $GLOBALS['arlo_plugin_slug']) . '</a>';
+                $no_event_text .= '<br /><a href="' . $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'] . '">' . __('Register your interest now', 'arlo-for-wordpress') . '</a>';
             }
             
             $output = '
@@ -454,7 +454,7 @@ class Templates {
 
         extract(shortcode_atts(array(
             'filters'	=> 'category,location,delivery',
-            'resettext'	=> __('Reset', $GLOBALS['arlo_plugin_slug']),
+            'resettext'	=> __('Reset', 'arlo-for-wordpress'),
             'buttonclass'   => 'button'
         ), $atts, $shortcode_name, $import_id));
         
@@ -483,7 +483,7 @@ class Templates {
                     }
                     
                     if (is_array($cats)) {
-                        $filter_html .= Shortcodes::create_filter('category', Categories::child_categories($cats), __('All categories', $GLOBALS['arlo_plugin_slug']));
+                        $filter_html .= Shortcodes::create_filter('category', Categories::child_categories($cats), __('All categories', 'arlo-for-wordpress'));
                     }
                     
                     break;
@@ -492,7 +492,7 @@ class Templates {
 
                     // delivery select
 
-                    $filter_html .= Shortcodes::create_filter($filter, \Arlo_For_Wordpress::$delivery_labels, __('All delivery options', $GLOBALS['arlo_plugin_slug']));
+                    $filter_html .= Shortcodes::create_filter($filter, \Arlo_For_Wordpress::$delivery_labels, __('All delivery options', 'arlo-for-wordpress'));
 
                     break;				
 
@@ -525,7 +525,7 @@ class Templates {
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter, $locations, __('All locations', $GLOBALS['arlo_plugin_slug']));
+                    $filter_html .= Shortcodes::create_filter($filter, $locations, __('All locations', 'arlo-for-wordpress'));
 
                     break;
                     
@@ -557,7 +557,7 @@ class Templates {
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter, $tags, __('Select tag', $GLOBALS['arlo_plugin_slug']));				
+                    $filter_html .= Shortcodes::create_filter($filter, $tags, __('Select tag', 'arlo-for-wordpress'));				
                     
                     break;
 
@@ -582,7 +582,7 @@ class Templates {
         
         // merge and extract attributes
         extract(shortcode_atts(array(
-            'text'	=> __('Suggest another date/location', $GLOBALS['arlo_plugin_slug']),
+            'text'	=> __('Suggest another date/location', 'arlo-for-wordpress'),
         ), $atts, $shortcode_name, $import_id));
         
         if(!isset($GLOBALS['arlo_eventtemplate']['et_registerinteresturi']) || empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) return '';

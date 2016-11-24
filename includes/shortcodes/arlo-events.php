@@ -249,17 +249,17 @@ class Events {
         $class = (!empty($atts['class']) ? $atts['class'] : 'button' );
 
         $registration = '<div class="arlo-event-registration">';
-        $registration .= (($isfull) ? '<span class="arlo-event-full">' . __('Event is full', $GLOBALS['arlo_plugin_slug']) . '</span>' : '');
+        $registration .= (($isfull) ? '<span class="arlo-event-full">' . __('Event is full', 'arlo-for-wordpress') . '</span>' : '');
         // test if there is a register uri string, if so display the button
         if(!is_null($registeruri) && $registeruri != '') {
             $registration .= '<a class="' . $class . ' ' . (($isfull) ? 'arlo-waiting-list' : 'arlo-register') . '" href="'. esc_attr($registeruri) . '" target="_blank">';
-            $registration .= (($isfull) ? __('Join waiting list', $GLOBALS['arlo_plugin_slug']) : __($registermessage, $GLOBALS['arlo_plugin_slug'])) . '</a>';
+            $registration .= (($isfull) ? __('Join waiting list', 'arlo-for-wordpress') : __($registermessage, 'arlo-for-wordpress')) . '</a>';
         } else {
             $registration .= $registermessage;
         }
 
         if ($placesremaining > 0) {
-            $registration .= '<span class="arlo-places-remaining">' . sprintf( _n( '%d place remaining', '%d places remaining', $placesremaining, $GLOBALS['arlo_plugin_slug'] ), $placesremaining ) .'</span>';	
+            $registration .= '<span class="arlo-places-remaining">' . sprintf( _n( '%d place remaining', '%d places remaining', $placesremaining, 'arlo-for-wordpress' ), $placesremaining ) .'</span>';	
         }
         
         $registration .= '</div>';
@@ -314,7 +314,7 @@ class Events {
         if($layout == 'list') {
 
             $output .= '<figure>';
-            $output .= '<figcaption class="arlo-event-presenters-title">'._n('Presenter', 'Presenters', $np, $GLOBALS['arlo_plugin_slug']).'</figcaption>';
+            $output .= '<figcaption class="arlo-event-presenters-title">'._n('Presenter', 'Presenters', $np, 'arlo-for-wordpress').'</figcaption>';
             $output .= '<ul class="arlo-list event-presenters">';
 
             foreach($items as $item) {
@@ -387,8 +387,8 @@ class Events {
         $output = $where = '';
         
         extract(shortcode_atts(array(
-            'label'	=> __('Session information', $GLOBALS['arlo_plugin_slug']),
-            'header' => __('Sessions', $GLOBALS['arlo_plugin_slug']),
+            'label'	=> __('Session information', 'arlo-for-wordpress'),
+            'header' => __('Sessions', 'arlo-for-wordpress'),
         ), $atts, $shortcode_name, $import_id));
         
         if (!empty($arlo_region)) {
@@ -455,7 +455,7 @@ class Events {
             $hours = floor($difference/60/60);
                     
             if ($hours > 6) {
-                return __('1 day', $GLOBALS['arlo_plugin_slug']);
+                return __('1 day', 'arlo-for-wordpress');
             }
 
             $minutes = ceil(($difference % 3600)/60);
@@ -463,7 +463,7 @@ class Events {
             $duration = '';
             
             if($hours > 0) {
-                $duration .= sprintf(_n('%d hour', '%d hours', $hours, $GLOBALS['arlo_plugin_slug']), $hours);
+                $duration .= sprintf(_n('%d hour', '%d hours', $hours, 'arlo-for-wordpress'), $hours);
             }
 
             if($hours > 0 && $minutes > 0) {
@@ -471,7 +471,7 @@ class Events {
             }
 
             if($minutes > 0) {
-                $duration .= sprintf(_n('%d minute', '%d minutes', $minutes, $GLOBALS['arlo_plugin_slug']), $minutes);
+                $duration .= sprintf(_n('%d minute', '%d minutes', $minutes, 'arlo-for-wordpress'), $minutes);
             }
             
             return $duration;
@@ -481,14 +481,14 @@ class Events {
         if(ceil($difference/60/60/24) <= 7) {
             $days = ceil($difference/60/60/24);
             
-            return sprintf(_n('%d day','%d days', $days, $GLOBALS['arlo_plugin_slug']), $days);
+            return sprintf(_n('%d day','%d days', $days, 'arlo-for-wordpress'), $days);
         }
         
         // if not the same day, and more than 7 days, then show number of weeks
         if(ceil($difference/60/60/24) > 7) {
             $weeks = ceil($difference/60/60/24/7);
             
-            return sprintf(_n('%d week','%d weeks', $weeks, $GLOBALS['arlo_plugin_slug']), $weeks);		
+            return sprintf(_n('%d week','%d weeks', $weeks, 'arlo-for-wordpress'), $weeks);		
         }
         
         return;        
@@ -507,7 +507,7 @@ class Events {
         $price_setting = (isset($settings['price_setting'])) ? $settings['price_setting'] : ARLO_PLUGIN_PREFIX . '-exclgst';
         $price_field = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? 'o_offeramounttaxexclusive' : 'o_offeramounttaxinclusive';
         $price_field_show = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? 'o_formattedamounttaxexclusive' : 'o_formattedamounttaxinclusive';
-        $free_text = (isset($settings['free_text'])) ? $settings['free_text'] : __('Free', $GLOBALS['arlo_plugin_slug']);
+        $free_text = (isset($settings['free_text'])) ? $settings['free_text'] : __('Free', 'arlo-for-wordpress');
         
         $offer;
         
@@ -582,7 +582,7 @@ class Events {
         
         $fromtext = '';
         if (strtolower($showfrom) === "true") {
-            $fromtext = '<span class="arlo-from-text">' . __('From', $GLOBALS['arlo_plugin_slug']) . '</span> ';
+            $fromtext = '<span class="arlo-from-text">' . __('From', 'arlo-for-wordpress') . '</span> ';
         }
         
         return $fromtext . $offer->$price_field_show;        
@@ -657,7 +657,7 @@ class Events {
         }
         
         if(count($events) == 0 && count($oa) == 0 && !empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) {
-            $return = '<a href="' . $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'] . '" title="' . __('Register interest', $GLOBALS['arlo_plugin_slug']) . '" class="' . esc_attr($buttonclass) . '">' . __('Register interest', $GLOBALS['arlo_plugin_slug']) . '</a>';
+            $return = '<a href="' . $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'] . '" title="' . __('Register interest', 'arlo-for-wordpress') . '" class="' . esc_attr($buttonclass) . '">' . __('Register interest', 'arlo-for-wordpress') . '</a>';
         } else if (count($events)) {
             $return_links = [];
             

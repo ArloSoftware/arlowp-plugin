@@ -131,8 +131,8 @@ function arlo_register_custom_post_types() {
                 
 		$args = array(
 			'labels' => array(
-                'name' => __( $type['name'], $GLOBALS['arlo_plugin_slug']),
-                'singular_name' => __( $type['singular_name'], $GLOBALS['arlo_plugin_slug'])
+                'name' => __( $type['name'], 'arlo-for-wordpress'),
+                'singular_name' => __( $type['singular_name'], 'arlo-for-wordpress')
             ),
 			'public'             => true,
 			'publicly_queryable' => true,

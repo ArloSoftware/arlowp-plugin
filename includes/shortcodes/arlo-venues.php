@@ -139,7 +139,7 @@ class Venues {
             $map .= '&key=' . $settings['googlemaps_api_key'] . '"';
             $map .= ' height="' . $height . '"';
             $map .= ' width="' . $width . '"';
-            $map .= ' alt="' . esc_attr(sprintf(__('Map of %s', $GLOBALS['arlo_plugin_slug']), $name)) . '"'; 
+            $map .= ' alt="' . esc_attr(sprintf(__('Map of %s', 'arlo-for-wordpress'), $name)) . '"'; 
             $map .= ' />';
 
             return $map;

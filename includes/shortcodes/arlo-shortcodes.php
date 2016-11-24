@@ -318,7 +318,7 @@ class Shortcodes {
             
         $settings = get_option('arlo_settings');  
         $price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : ARLO_PLUGIN_PREFIX . '-exclgst';      
-        $free_text = (isset($settings['free_text'])) ? esc_attr($settings['free_text']) : __('Free', $GLOBALS['arlo_plugin_slug']);
+        $free_text = (isset($settings['free_text'])) ? esc_attr($settings['free_text']) : __('Free', 'arlo-for-wordpress');
 
 
         foreach($offers_array as $offer) {
@@ -345,7 +345,7 @@ class Shortcodes {
             if($amount > 0) {
                 $offers .= '<span class="amount">'.$famount.'</span> ';
                 // only include the excl. tax if the offer is not replaced			
-                $offers .= $replaced ? '' : '<span class="arlo-price-tax">' . ($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode) : sprintf(__('incl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode) . '</span>');
+                $offers .= $replaced ? '' : '<span class="arlo-price-tax">' . ($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode) : sprintf(__('incl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode) . '</span>');
             } else {
                 $offers .= '<span class="amount free">'.$free_text.'</span> ';
             }
@@ -357,7 +357,7 @@ class Shortcodes {
                 
                 // display replacement offer label if there is one
                 $offers .= (!is_null($replacement_label) || $replacement_label != '') ? $replacement_label.' ':'';
-                $offers .= '<span class="amount">'.$replacement_amount.'</span> <span class="arlo-price-tax">'.($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode) : sprintf(__('incl. %s', $GLOBALS['arlo_plugin_slug']), $o_taxrateshortcode)) . '</span>';
+                $offers .= '<span class="amount">'.$replacement_amount.'</span> <span class="arlo-price-tax">'.($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode) : sprintf(__('incl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode)) . '</span>';
                 // display replacement offer message if there is one
                 $offers .= (!is_null($replacement_message) || $replacement_message != '') ? ' '.$replacement_message:'';
 
