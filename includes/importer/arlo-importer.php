@@ -249,8 +249,9 @@ class Importer extends Singleton {
 					$this->scheduler->update_task($this->task_id, 4, "Import finished");
 					$this->scheduler->clear_cron();
 
-					$this->file_handler->delete_file($this->dir . $this->import_id . '.dec.json');
-
+					foreach(glob($this->dir . $this->import_id . "*") as $file) {
+						$this->file_handler->delete_file($file);
+					}
 				} else if ($this->current_task_num > 0) {
 					$this->kick_off_scheduler();
 				}
