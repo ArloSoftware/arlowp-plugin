@@ -509,7 +509,7 @@ class SchemaManager {
 				modified datetime DEFAULT NULL COMMENT 'in UTC',
 				expired datetime NOT NULL COMMENT 'in UTC',
 				PRIMARY KEY  (id)
-			) CHARACTER SET utf8 COLLATE=utf8mb4_unicode_ci;";
+			) CHARACTER SET utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 		
 		$this->dbl->sync_schema($sql);        
 	}

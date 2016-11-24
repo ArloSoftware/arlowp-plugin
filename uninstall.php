@@ -61,6 +61,7 @@ function arlo_delete_tables()
 		$wpdb->prefix . "arlo_timezones_olson, " . 
 		$wpdb->prefix . "arlo_messages, " .
 		$wpdb->prefix . "arlo_log," .
+		$wpdb->prefix . "arlo_import," .
 		$wpdb->prefix . "arlo_import_lock";
 
 	$wpdb->query($sql);
