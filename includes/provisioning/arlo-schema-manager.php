@@ -16,8 +16,6 @@ class SchemaManager {
 	public function __construct($dbl, $message_handler) {
 		$this->dbl = &$dbl;
 		$this->message_handler = $message_handler;
-
-		$this->core_set_charset();
 	}
 
 	public function create_db_schema_hash( ) {
@@ -91,12 +89,6 @@ class SchemaManager {
 
 		$this->dbl->query('COMMIT');
 		
-		return;
-	}
-
-	public function core_set_charset() {	
-		if ( !empty($this->dbl->charset) )
-			return $this->dbl->query("DEFAULT CHARACTER SET " . $this->dbl->charset);
 		return;
 	}
 
