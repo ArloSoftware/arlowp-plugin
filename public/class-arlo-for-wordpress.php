@@ -1042,8 +1042,8 @@ class Arlo_For_Wordpress {
 		foreach ($paused_running_tasks as $task) {
 			$ts = strtotime($task->task_modified);
 			$now = time() - date('Z');
-			if ($now - $ts > 10*60) {
-				$scheduler->update_task($task->task_id, 3, "Import doesn't respond within 10 minutes, stopped by the scheduler");
+			if ($now - $ts > 4*60) {
+				$scheduler->update_task($task->task_id, 3, "Import doesn't respond within 4 minutes, stopped by the scheduler");
 				$scheduler->clear_cron();
 			}
 		}

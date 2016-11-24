@@ -41,7 +41,6 @@ class Templates extends BaseImporter {
 		
 		$this->id = $this->dbl->insert_id;
 		
-		//TODO: Test without a summary/description
 		$this->save_update_wp_post($item->Name, @$item->Description->Summary);
 
 		//tags
