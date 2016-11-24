@@ -9,6 +9,8 @@
  * @copyright 2015 Arlo
  */
 
+ use Arlo\SystemRequirements;
+
 /**
  * Plugin class. This class should ideally be used to work with the
  * public-facing side of the WordPress site.
@@ -526,13 +528,15 @@ class Arlo_For_Wordpress {
 	 * @return    null
 	 */	
 	
-	public static function send_log_to_arlo($message = '') {
+	public static function send_log_to_arlo($message = '', $attach_log = true) {
 		$plugin = self::get_instance();
-		
+		$log = null;
 		$client = $plugin->get_api_client();		
 		$last_import = $plugin->get_last_import();
 		
-		$log = self::create_log_csv(1000);
+		if ($attach_log) {
+			$log = self::create_log_csv(1000);
+		}
 				
 		$response = $client->WPLogError()->sendLog($message, $last_import, $log);
 	}		
@@ -688,6 +692,10 @@ class Arlo_For_Wordpress {
 		if (version_compare($old_version, '2.4') < 0) {
 			self::run_update('2.4');
 		}
+
+		if (version_compare($old_version, '2.4.1.1') < 0) {
+			self::run_update('2.4.1.1');
+		}		
 	}
 	
 	private static function run_pre_data_update($version) {
@@ -874,11 +882,29 @@ class Arlo_For_Wordpress {
 					$message_handler->set_message('error', __('WordPress Cron is disabled', self::get_instance()->plugin_slug), implode('', $message), false);
 				}
 				
-			break;			
+			break;	
+
+			case '2.4.1.1':
+				$settings = get_option('arlo_settings');
+
+				if (!empty($settings['platform_name']) && !SystemRequirements::overall_check()) {
+					$plugin = self::get_instance();
+					$message = "System requirements errors \n";
+
+					foreach (SystemRequirements::get_system_requirements() as $req) {
+						$current_value = $req['current_value']();
+						$check = $req['check']($current_value, $req['expected_value']);
+						if (!$check) {
+							$message .= $req['name'] . "\t Expected: " . $req['expected_value'] . "\t Current: " . $current_value . "\n" ;
+						}
+					}
+
+					$plugin->send_log_to_arlo($message, false);
+				}
+			break;					
 		}	
 	}
 	
-
 	/**
 	 * Fired for each blog when the plugin is activated.
 	 *
@@ -3434,17 +3460,20 @@ class Arlo_For_Wordpress {
 	public static function determine_url_structure($platform_name = '') {
 		$plugin = self::get_instance();
 		$client = $plugin->get_api_client();
+		$httpcode = 0;
 		
 		$new_url = $client->transport->getRemoteURL($platform_name, true, true);
-		
-		$ch = curl_init($new_url);
 
-		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_exec($ch);
-		
-		$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE); 
+		if (extension_loaded('curl')) {
+			$ch = curl_init($new_url);
+
+			curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_exec($ch);
+			
+			$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE); 
+		}
 
 		// update settings
 		update_option('arlo_new_url_structure', $httpcode == 500 ? 1 : 0);
