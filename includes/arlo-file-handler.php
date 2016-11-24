@@ -26,7 +26,7 @@ class FileHandler {
 			$fp = fopen($file, 'r');
 			$content = fread($fp, filesize($file));
 			fclose($fp);
-
+			
 			return $content;
 		} else {
 			throw new \Exception('The file doesn\'t exist: ' . $file);
@@ -38,9 +38,7 @@ class FileHandler {
 			$file = $this->$file;
 
 		$fp = fopen($file, 'w+');
-
 		$success = fwrite($fp, $data);
-
 		fclose($fp);
 
 		return $success;
@@ -53,7 +51,7 @@ class FileHandler {
 		$json = json_decode(mb_strcut(utf8_encode($this->read_file($file)), 6));
 
 		if (is_null($json)) {
-			throw new \Exception(json_last_error_msg());
+			throw new \Exception("JSON ERROR: " . json_last_error_msg());
 		}
 
 		return $json;

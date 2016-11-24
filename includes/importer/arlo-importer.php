@@ -431,10 +431,13 @@ class Importer extends Singleton {
 	}
 
 	private function get_subtask_state_desc() {
-		$subtask_state = $this->current_task_class->get_state();
 		$subtask_desc = '';
-		if (!is_null($subtask_state)) {
-			$subtask_desc = ': ' . $subtask_state['current_subtask_num'] . '/' . count($this->current_task_class->import_tasks) . ' ' . $subtask_state['current_subtask_desc'];
+		if (!is_null($this->current_task_class)) {
+			$subtask_state = $this->current_task_class->get_state();
+			
+			if (!is_null($subtask_state)) {
+				$subtask_desc = ': ' . $subtask_state['current_subtask_num'] . '/' . count($this->current_task_class->import_tasks) . ' ' . $subtask_state['current_subtask_desc'];
+			}
 		}
 
 		return $subtask_desc;		
