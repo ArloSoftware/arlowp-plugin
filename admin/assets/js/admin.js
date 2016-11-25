@@ -366,7 +366,7 @@
 			
 			var eventSearchOptions = {
 	            fields: ['ViewUri', 'RegistrationInfo', 'StartDateTime'],
-	            filter: { templateCode: 'ARLO9'},
+	            filter: { templateCode: 'LEAR1'},
 	            top: 1
 	        };
 	        
