@@ -203,7 +203,8 @@ class Arlo_For_Wordpress_Admin {
 			wp_enqueue_script( $this->plugin_slug . '-jquery-ui', plugins_url( 'assets/js/lib/jquery-ui.min.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, true );
 			wp_enqueue_script( $this->plugin_slug . '-codemirror', plugins_url( 'assets/js/lib/codemirror.js', __FILE__ ), array(), VersionHandler::VERSION, true );
 			wp_enqueue_script( $this->plugin_slug . '-codemirror-css', plugins_url( 'assets/js/lib/codemirror-css.js', __FILE__ ), array(), VersionHandler::VERSION, true );
-			wp_enqueue_script( $this->plugin_slug . '-admin-script', plugins_url( 'assets/js/admin.js?20161031', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, true );		
+			wp_enqueue_script( $this->plugin_slug . '-arlo-for-wordpress-script', plugins_url( 'assets/js/arlo_for_wordpress.js?20161031', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, true );
+			wp_enqueue_script( $this->plugin_slug . '-admin-script', plugins_url( 'assets/js/admin.js?20161031', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, true );					
 		}
 
 	}
