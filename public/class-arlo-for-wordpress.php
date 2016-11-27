@@ -44,7 +44,7 @@ class Arlo_For_Wordpress {
 	 * @var     string
 	 */
 
-	const DB_SCHEMA_HASH = '29dbebf0c27c672f52f355c59d1c1bef4ed1f486';	
+	const DB_SCHEMA_HASH = '4fc5c673788aebc7f6bb96e09e0af3cba27d8038';	
 
 	/**
 	 * Minimum required PHP version
@@ -631,6 +631,7 @@ class Arlo_For_Wordpress {
 	 * @return    null
 	 */
 	public static function check_plugin_version() {
+		error_log(self::create_db_schema_hash());
  		$plugin = self::get_instance();
 		$plugin_version = get_option('arlo_plugin_version');
 		
