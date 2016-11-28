@@ -286,8 +286,8 @@ class Templates {
                             }
                         break;
                         case 'alpha':
-                            if(is_null($previous) || $item['et_name'][0] != $previous['et_name'][0]) {
-                                $item['show_divider'] = $item['et_name'][0];
+                            if(is_null($previous) || strtolower(mb_substr($item['et_name'], 0, 1)) != strtolower(mb_substr($previous['et_name'], 0, 1))) {
+                                $item['show_divider'] = mb_substr($item['et_name'], 0, 1);
                             }
                         break;
                     }
