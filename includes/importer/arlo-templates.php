@@ -65,7 +65,7 @@ class Templates extends BaseImporter {
 		
 		// categories
 		if(!empty($item->Categories) && is_array($item->Categories)) {
-			$this->save_categories($item->Categories);
+			$this->save_categories($item->Categories, $item->TemplateID);
 		}
 	}
 
@@ -91,8 +91,8 @@ class Templates extends BaseImporter {
 		}
 	} 	
 
-	private function save_categories($categories) {
-		if (empty($this->id)) throw new \Exception('No templateID given: ' . __CLASS__ . '::' . __FUNCTION__);
+	private function save_categories($categories, $template_id) {
+		if (empty($template_id) || !is_numeric($template_id)) throw new \Exception('No templateID given: ' . __CLASS__ . '::' . __FUNCTION__);
 
 		if(!empty($categories) && is_array($categories)) {
 			foreach($categories as $index => $category) {
@@ -101,7 +101,7 @@ class Templates extends BaseImporter {
 					(et_arlo_id, c_arlo_id, import_id) 
 					VALUES ( %d, %d, %s ) 
 					", 
-					$this->id,
+					$template_id,
 					$category->CategoryID,
 					$this->import_id
 				) );
