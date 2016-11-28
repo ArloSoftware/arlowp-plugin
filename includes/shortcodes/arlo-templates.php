@@ -485,7 +485,7 @@ class Templates {
                     }
                     
                     if (is_array($cats)) {
-                        $filter_html .= Shortcodes::create_filter('category', Categories::child_categories($cats), __('All categories', 'arlo-for-wordpress'));
+                        $filter_html .= Shortcodes::create_filter('category', CategoriesEntity::child_categories($cats), __('All categories', 'arlo-for-wordpress'));
                     }
                     
                     break;
@@ -761,14 +761,16 @@ class Templates {
                 $cats = CategoriesEntity::getTree($cat_id, null, 0, $import_id);
 
                 $categories_tree = CategoriesEntity::child_categories($cats);
-                
-                $ids = array_map(function($item) {
-                    return $item['id'];
-                }, $categories_tree);
-                
-                
-                if (is_array($ids) && count($ids)) {
-                    $where .= " OR c.c_arlo_id IN (" . implode(',', $ids) . ")";
+
+                if (is_array($categories_tree)) {
+                    $ids = array_map(function($item) {
+                        return $item['id'];
+                    }, $categories_tree);
+                    
+                    
+                    if (is_array($ids) && count($ids)) {
+                        $where .= " OR c.c_arlo_id IN (" . implode(',', $ids) . ")";
+                    }
                 }
             } 
             

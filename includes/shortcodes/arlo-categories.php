@@ -151,26 +151,5 @@ class Categories {
         $html .= '</ul>';
         
         return $html;
-    }    
-
-	public static function child_categories($cats, $depth=0) {
-		if(!is_array($cats)) return array();
-
-		$space = ($depth > 0) ? ' ' : '';
-
-		$output = array();
-		
-
-		foreach($cats as $cat) {
-
-			$output[] = array(
-				'string' => str_repeat('&ndash;', $depth) . $space . $cat->c_name,
-				'value' => $cat->c_slug,
-				'id' => $cat->c_arlo_id
-				);
-			$output = array_merge($output, self::child_categories($cat->children, $depth+1));
-		}
-
-		return $output;
-	}    
+    }   
 }

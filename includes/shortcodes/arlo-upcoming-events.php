@@ -136,7 +136,7 @@ class UpcomingEvents {
                     }
 
                     if (is_array($cats)) {
-                        $filter_html .= Shortcodes::create_filter($filter, Categories::child_categories($cats), __('All categories', 'arlo-for-wordpress'));					
+                        $filter_html .= Shortcodes::create_filter($filter, CategoriesEntity::child_categories($cats), __('All categories', 'arlo-for-wordpress'));					
                     }
 
                     break;                    
