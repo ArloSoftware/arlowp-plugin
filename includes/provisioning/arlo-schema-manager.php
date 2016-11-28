@@ -6,7 +6,7 @@ use Arlo\Logger;
 
 class SchemaManager {
 
-	const DB_SCHEMA_HASH = '29dbebf0c27c672f52f355c59d1c1bef4ed1f486';
+	const DB_SCHEMA_HASH = '4fc5c673788aebc7f6bb96e09e0af3cba27d8038';
 
 	/* database layer */
 	private $dbl;
