@@ -98,7 +98,7 @@ class Templates {
         if ($onlyscheduled === "true") {
             $join .= "
             INNER JOIN 
-                {$wpdb->prefix}arlo_events	
+                {$wpdb->prefix}arlo_events AS e
             ON
                 e.et_arlo_id = et.et_arlo_id
             AND
@@ -135,6 +135,7 @@ class Templates {
                 RAND()
             LIMIT 
                 $limit";
+
 
         $items = $wpdb->get_results($sql, ARRAY_A);
             
