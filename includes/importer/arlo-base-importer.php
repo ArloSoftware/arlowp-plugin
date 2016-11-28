@@ -69,8 +69,8 @@ abstract class BaseImporter {
 			$event_id = (intval($event_id) > 0 ? $event_id : null);
 			$oa_id = (intval($oa_id) > 0 ? $oa_id : null);
 		
-			$offers = array_reverse($advertised_offer);
-			foreach($offers as $key => $offer) {
+			//$offers = array_reverse($advertised_offer);
+			foreach($advertised_offer as $key => $offer) {
 				$query = $this->dbl->query( $this->dbl->prepare( 
 					"INSERT INTO " . $this->dbl->prefix . "arlo_offers 
 					(o_arlo_id, et_id, e_id, oa_id, o_label, o_isdiscountoffer, o_currencycode, o_offeramounttaxexclusive, o_offeramounttaxinclusive, o_formattedamounttaxexclusive, o_formattedamounttaxinclusive, o_taxrateshortcode, o_taxratename, o_taxratepercentage, o_message, o_order, o_replaces, o_region, import_id) 
