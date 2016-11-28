@@ -270,7 +270,9 @@ class Templates {
         $items = $wpdb->get_results($sql, ARRAY_A);
             
         if(empty($items)) :
-            $GLOBALS['no_event_text'] = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', 'arlo-for-wordpress');
+            if (!(isset($atts['show_only_at_bottom']) && $atts['show_only_at_bottom'] == "true" && isset($GLOBALS['categories_count']) && $GLOBALS['categories_count'])) :
+                $GLOBALS['no_event_text'] = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', 'arlo-for-wordpress');
+            endif;
         else :
                 
             $output = $GLOBALS['no_event_text'] = '';			
