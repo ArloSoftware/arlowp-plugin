@@ -731,10 +731,10 @@ class Templates {
 
             $cat_id = 0;
 
-            if(!empty($atts['category'])) {
-                $cat_slug = $atts['category'];
-            } else {
+            if(!empty($arlo_category)) {
                 $cat_slug = $arlo_category;
+            } else {
+                $cat_slug = $atts['category'];
             }
             $where .= " AND ( c.c_slug = '$cat_slug'";
             
