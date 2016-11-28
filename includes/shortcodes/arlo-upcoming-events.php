@@ -255,12 +255,11 @@ class UpcomingEvents {
         $arlo_month = isset($_GET['arlo-month']) && !empty($_GET['arlo-month']) ? $_GET['arlo-month'] : get_query_var('arlo-month', '');
         $arlo_location = isset($_GET['arlo-location']) && !empty($_GET['arlo-location']) ? $_GET['arlo-location'] : get_query_var('arlo-location', '');
         $arlo_category = isset($_GET['arlo-category']) && !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : get_query_var('arlo-category', '');
-        $arlo_delivery = isset($_GET['arlo-delivery']) && !empty($_GET['arlo-delivery']) ? $_GET['arlo-delivery'] : get_query_var('arlo-delivery', '');
+        $arlo_delivery = isset($_GET['arlo-delivery']) ? $_GET['arlo-delivery'] : get_query_var('arlo-delivery', '');
         $arlo_eventtag = isset($_GET['arlo-eventtag']) && !empty($_GET['arlo-eventtag']) ? $_GET['arlo-eventtag'] : get_query_var('arlo-eventtag', '');
         $arlo_region = get_query_var('arlo-region', '');
         $arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
         
-
         if(!empty($arlo_month)) :
             $dates = explode(':',urldecode($arlo_month));
             $where .= " AND (DATE(e.e_startdatetime) BETWEEN DATE('$dates[0]')";
@@ -274,8 +273,8 @@ class UpcomingEvents {
         if(!empty($arlo_category)) :
             $where .= " AND c.c_arlo_id = " . intval(current(explode('-', $arlo_category)));
         endif;
-        
-        if(!empty($arlo_delivery) && is_numeric($arlo_delivery)) :
+
+        if(isset($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) :
             $where .= " AND e.e_isonline = " . intval($arlo_delivery);
         endif;	
             
