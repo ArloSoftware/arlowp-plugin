@@ -1,3 +1,16 @@
+== V2.4.1.2 ==
+
+Enhancement
+------------------
+Remove PHP notices
+Add system requirement check for future release
+
+Bugfixes
+------------------
+Fixed wrong [arlo_event_duration] return value
+Fix when [arlo_event_price] doesn't return the "cheapest" price
+Fix when [arlo_event_next_running] returns a session date
+
 == V2.4.1.1 ==
 
 Enhancement

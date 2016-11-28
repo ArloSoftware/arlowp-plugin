@@ -555,6 +555,14 @@ class Arlo_For_Wordpress_Settings {
 	    <h4>Version ' . $this->version . '</h4>
 	    <p>
 	    	<ul class="arlo-whatsnew-list">	    
+	    		<li>Fixed wrong [arlo_event_duration] return value</li>
+				<li>Fix when [arlo_event_price] shortcode doesn\'t return the "cheapest" price</li>
+				<li>Fix when [arlo_event_next_running] shortcode returns a session date</li>
+	    	</ul>
+	    </p>		
+		<h4>Version 2.4.1.1</h4>
+	    <p>
+	    	<ul class="arlo-whatsnew-list">	    
 	    		<li>Improvement the stability of the import</li>
 				<li><a href="https://confirmsubscription.com/h/r/41B80B5B566BCC0B" target="_blank">Subscribe</a> to our WP newsletter</li>
 	    	</ul>
