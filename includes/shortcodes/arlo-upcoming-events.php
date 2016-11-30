@@ -318,7 +318,6 @@ class UpcomingEvents {
             e.e_locationvisible,
             e.e_isfull,
             e.e_placesremaining,
-            e.e_summary,
             e.e_sessiondescription,
             e.e_notice,
             e.e_viewuri,

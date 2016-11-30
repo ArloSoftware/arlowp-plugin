@@ -43,7 +43,7 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 			'e_startdatetime'    => __( 'Start date', 'arlo-for-wordpress' ),
 			'e_finishdatetime'    => __( 'Finish date', 'arlo-for-wordpress' ),
 			'v_name' => __( 'Venue name', 'arlo-for-wordpress' ),
-			'e_summary' => __( 'Summary', 'arlo-for-wordpress' ),
+			'et_descriptionsummary,' => __( 'Summary', 'arlo-for-wordpress' ),
 			'e_sessiondescription' => __( 'Description', 'arlo-for-wordpress' ),
 			'e_region' => __( 'Regions', 'arlo-for-wordpress' ),
 		];
@@ -61,7 +61,7 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 			'v_name' => array( 'v_name', true ),
 			'e_locationname' => array( 'e_locationname', true ),
 			'e_placesremaining' => array( 'e_placesremaining', true ),
-			'e_summary' => array( 'e_summary', true ),
+			'et_descriptionsummary' => array( 'et_descriptionsummary', true ),
 			'e_sessiondescription' => array( 'e_sessiondescription', true ),
 		);
 	}
@@ -73,7 +73,7 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 			case 'e_placesremaining':
 			case 'e_region':
 				return $item->$column_name;
-			case 'e_summary':
+			case 'et_descriptionsummary':
 			case 'e_sessiondescription':
 				if (!empty($item->$column_name))
 					return '<div class="arlo-list-ellipsis">' . strip_tags($item->$column_name) . '</div>';
@@ -149,7 +149,7 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 			es.e_locationroomname,
 			es.e_isfull,
 			es.e_placesremaining,
-			es.e_summary,
+			et.et_descriptionsummary,
 			es.e_sessiondescription,
 			GROUP_CONCAT(DISTINCT es.e_region) as e_region
 		FROM
@@ -158,6 +158,10 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 			" . $this->wpdb->prefix . "arlo_events AS e
 		ON
 			es.e_parent_arlo_id = e.e_arlo_id
+		LEFT JOIN 
+			" . $this->wpdb->prefix . "arlo_eventtemplates AS et
+		ON	
+			e.et_arlo_id = et.et_arlo_id		
 		LEFT JOIN 
 			" . $this->wpdb->prefix . "arlo_venues AS v
 		ON

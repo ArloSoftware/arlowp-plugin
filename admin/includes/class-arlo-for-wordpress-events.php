@@ -43,7 +43,7 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			'e_startdatetime'    => __( 'Start date', 'arlo-for-wordpress' ),
 			'e_finishdatetime'    => __( 'Finish date', 'arlo-for-wordpress' ),
 			'v_name' => __( 'Venue name', 'arlo-for-wordpress' ),
-			'e_summary' => __( 'Summary', 'arlo-for-wordpress' ),
+			'et_descriptionsummary' => __( 'Summary', 'arlo-for-wordpress' ),
 			'e_sessiondescription' => __( 'Description', 'arlo-for-wordpress' ),
 			'e_notice' => __( 'Notice', 'arlo-for-wordpress' ),
 			'e_session_num' => __( 'Num. of sessions', 'arlo-for-wordpress' ),
@@ -64,7 +64,7 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			'e_finishdatetime' => array( 'e_finishdatetime', true ),
 			'v_name' => array( 'v_name', true ),
 			'e_placesremaining' => array( 'e_placesremaining', true ),
-			'e_summary' => array( 'e_summary', true ),
+			'et_descriptionsummary' => array( 'et_descriptionsummary', true ),
 			'e_sessiondescription' => array( 'e_sessiondescription', true ),			
 		);
 	}
@@ -99,7 +99,7 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 					$field .= '<div class="arlo-event_registeruri"><a href="'.$item->e_registeruri.'" target="_blank">' . $item->e_registermessage . '</a></div>';
 
 				return $field;
-			case 'e_summary':
+			case 'et_descriptionsummary':
 			case 'e_sessiondescription':
 				if (!empty($item->$column_name))
 					return '<div class="arlo-list-ellipsis">' . strip_tags($item->$column_name) . '</div>';
@@ -153,7 +153,7 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			'v_name',
 			'e_locationname',
 			'e_locationroomname',
-			'e_summary',
+			'et_descriptionsummary',
 			'e_sessiondescription',
 			'e_notice',
 			'e_registermessage',
@@ -178,7 +178,6 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			e.e_locationroomname,
 			e.e_isfull,
 			e.e_placesremaining,
-			e.e_summary,
 			e.e_sessiondescription,
 			e.e_notice,
 			e.e_registermessage,
@@ -188,6 +187,7 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			e.e_isonline,
 			(SELECT GROUP_CONCAT(e_region) FROM " . $this->wpdb->prefix . "arlo_events WHERE e_arlo_id = e.e_arlo_id AND import_id = '" . $this->import_id . "' AND e.import_id = '" . $this->import_id . "' GROUP BY e_arlo_id) AS e_region,
 			et.et_name,
+			et.et_descriptionsummary,
 			(SELECT COUNT(1) FROM " . $this->wpdb->prefix . "arlo_events WHERE e_parent_arlo_id = e.e_arlo_id AND e_region = e.e_region) as e_session_num,
 			GROUP_CONCAT(DISTINCT CONCAT_WS(' ', p.p_firstname, p.p_lastname) ORDER BY ep.p_order, p.p_firstname SEPARATOR ', ') AS presenters,
 			posts.guid

@@ -173,7 +173,6 @@ class VersionHandler extends Singleton {
 				CHANGE e_timezone e_timezone VARCHAR(10) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
 				CHANGE e_locationname e_locationname VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
 				CHANGE e_locationroomname e_locationroomname VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE e_summary e_summary VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
 				CHANGE e_sessiondescription e_sessiondescription VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
 				CHANGE e_credits e_credits VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
 				CHANGE e_viewuri e_viewuri VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
@@ -184,6 +183,8 @@ class VersionHandler extends Singleton {
 				CHANGE e_region e_region VARCHAR(5) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
 				CHANGE e_notice e_notice TEXT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
 				DEFAULT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ";");
+
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events DROP e_summary;");
 
 				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_onlineactivities 
 				CHANGE oa_arlo_id oa_arlo_id VARCHAR(64) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,

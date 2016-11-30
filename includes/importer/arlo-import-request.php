@@ -23,7 +23,7 @@ class ImportRequest extends BaseImporter  {
 			'TimeZoneID', 'Name', 'TzNames'
 		],
 		'Events' => [
-			'EventID', 'EventTemplateID', 'Name', 'Code', 'Summary', 'Description', 'StartDateTime', 'EndDateTime', 'TimeZoneID', 'TimeZone', 'Location', 'IsFull', 'PlacesRemaining', 'AdvertisedOffers', 'SessionsDescription', 'Presenters', 'Notice', 'ViewUri', 'RegistrationInfo', 'Provider', 'TemplateCode', 'Tags', 'Credits',
+			'EventID', 'EventTemplateID', 'Name', 'Code', 'Description', 'StartDateTime', 'EndDateTime', 'TimeZoneID', 'TimeZone', 'Location', 'IsFull', 'PlacesRemaining', 'AdvertisedOffers', 'SessionsDescription', 'Presenters', 'Notice', 'ViewUri', 'RegistrationInfo', 'Provider', 'TemplateCode', 'Tags', 'Credits',
 		],
 		'Templates' => [
 			'TemplateID', 'Code', 'Name', 'Description', 'AdvertisedPresenters', 'AdvertisedDuration', 'BestAdvertisedOffers', 'ViewUri', 'RegisterInterestUri', 'Categories', 'Tags',

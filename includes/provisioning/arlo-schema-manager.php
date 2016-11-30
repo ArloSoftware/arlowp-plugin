@@ -183,7 +183,6 @@ class SchemaManager {
 			e_locationvisible tinyint(1) NOT NULL DEFAULT '0',
 			e_isfull tinyint(1) NOT NULL DEFAULT FALSE,
 			e_placesremaining int(11) NULL,
-			e_summary varchar(255) NULL,
 			e_sessiondescription varchar(255) NULL,
 			e_notice text NULL,
 			e_credits varchar(255) NULL,
