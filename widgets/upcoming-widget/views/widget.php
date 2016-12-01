@@ -33,8 +33,8 @@
 			$output .= '<span class="arlo-cal-month">'.$date->format('M').'</span>';
 			$output .= '<span class="arlo-cal-day">'.$date->format('d').'</span>';
 			$output .= '</div>';
-			$output .= '<p><a href="'.$link.'">'.$events[$i]->et_name.'</a></p>';
-			$output .= '<p>'.$events[$i]->e_locationname.'</p>';
+			$output .= '<p><a href="'.$link.'">' . htmlentities($events[$i]->et_name, ENT_QUOTES, "UTF-8") . '</a></p>';
+			$output .= '<p>' . htmlentities($events[$i]->e_locationname, ENT_QUOTES, "UTF-8") . '</p>';
 			$output .= '</li>';
 
 		}
