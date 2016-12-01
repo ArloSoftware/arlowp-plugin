@@ -72,7 +72,7 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 			case 'e_locationname':
 			case 'e_placesremaining':
 			case 'e_region':
-				return $item->$column_name;
+				return htmlentities($item->$column_name, ENT_QUOTES, "UTF-8");
 			case 'et_descriptionsummary':
 			case 'e_sessiondescription':
 				if (!empty($item->$column_name))
@@ -85,21 +85,21 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 			case 'v_name':
 				$field = '';				
 				if (!empty($item->$column_name)) {
-					$field = '<div class="arlo-venue-name"><a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug . '-venues&v_e_id=' . $item->e_arlo_id)  .'" >' . $item->$column_name . '</a></div>';			
+					$field = '<div class="arlo-venue-name"><a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug . '-venues&v_e_id=' . $item->e_arlo_id)  .'" >' . htmlentities($item->$column_name, ENT_QUOTES, "UTF-8") . '</a></div>';			
 				}
 
 				if (!empty($item->e_locationname)) {
-					$field .= '<div class="arlo-location">' . $item->e_locationname . (!empty($item->e_locationroomname) ? ' (' . $item->e_locationroomname . ')' : '') . '</div>';
+					$field .= '<div class="arlo-location">' . htmlentities($item->e_locationname, ENT_QUOTES, "UTF-8") . (!empty($item->e_locationroomname) ? ' (' . htmlentities($item->e_locationroomname, ENT_QUOTES, "UTF-8") . ')' : '') . '</div>';
 				} elseif (!empty($item->e_locationroomname)) {
-					$field .= '<div class="arlo-locationroom">' . $item->e_locationroomname . '</div>';
+					$field .= '<div class="arlo-locationroom">' . htmlentities($item->e_locationroomname, ENT_QUOTES, "UTF-8") . '</div>';
 				}
 				
 				return $field;
 			case 'event_name':
-				return '<div class="arlo-session-name">' . $item->e_name . '</div><div class="arlo-session-event-name">' . $item->event_name . '</div>';
+				return '<div class="arlo-session-name">' . htmlentities($item->e_name, ENT_QUOTES, "UTF-8") . '</div><div class="arlo-session-event-name">' . htmlentities($item->event_name, ENT_QUOTES, "UTF-8") . '</div>';
 			case 'e_register':
 				if (!empty($item->e_registeruri)) 		
-					return '<a href="'.$item->e_registeruri.'" target="_blank">' . $item->e_registermessage . '</a>';
+					return '<a href="'.$item->e_registeruri.'" target="_blank">' . strip_tags($item->e_registermessage) . '</a>';
 				break;
 			default:
 				return '';

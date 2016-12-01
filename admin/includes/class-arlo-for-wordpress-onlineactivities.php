@@ -61,12 +61,12 @@ class Arlo_For_Wordpress_OnlineActivities extends Arlo_For_Wordpress_Lists  {
 			case 'oa_code':
 			case 'oa_region':
 			case 'oa_delivery_description':
-				return $item->$column_name;
+				return htmlentities($item->$column_name, ENT_QUOTES, "UTF-8");
 			case 'oa_name':
-				$field = '<div class="arlo-event-name">' . $item->oa_name . '</div>';
+				$field = '<div class="arlo-event-name">' . htmlentities($item->oa_name, ENT_QUOTES, "UTF-8") . '</div>';
 												
 				if (!empty($item->oa_registeruri)) 		
-					$field .= '<div class="arlo-event_registeruri"><a href="'.$item->oa_registeruri.'" target="_blank">' . $item->oa_registermessage . '</a></div>';
+					$field .= '<div class="arlo-event_registeruri"><a href="'.$item->oa_registeruri.'" target="_blank">' . strip_tags($item->oa_registermessage) . '</a></div>';
 
 				return $field;
 			default:

@@ -109,7 +109,7 @@ class Arlo_For_Wordpress_Presenters extends Arlo_For_Wordpress_Lists  {
             'view' => sprintf('<a href="%s" target="_blank">View</a>', $item->guid),
         );
         
-		return sprintf('%1$s %2$s', $item->p_firstname . ' ' . $item->p_lastname, $this->row_actions($actions) );
+		return sprintf('%1$s %2$s', htmlentities($item->p_firstname . ' ' . $item->p_lastname, ENT_QUOTES, "UTF-8"), $this->row_actions($actions) );
 	}
 	
 	public function get_sql_query() {

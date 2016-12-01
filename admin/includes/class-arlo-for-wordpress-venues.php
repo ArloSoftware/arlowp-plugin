@@ -69,13 +69,13 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 			case 'v_physicaladdresspostcode':
 			case 'v_physicaladdresscountry':
 			case 'v_physicaladdresscity':
-				return $item->$column_name;
+				return htmlentities($item->$column_name, ENT_QUOTES, "UTF-8");
 			case 'address':
 				$address = [];
 				for($i = 1; $i<5; $i++) {
 					$key = 'v_physicaladdressline' . $i;
 					if (!empty($item->$key)) {
-						$address[] = $item->$key;
+						$address[] = htmlentities($item->$key, ENT_QUOTES, "UTF-8");
 					}
 				}
 				return implode(', ', $address);
@@ -96,7 +96,7 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
             'view' => sprintf('<a href="%s" target="_blank">View</a>', $item->guid),
         );
 
-		return sprintf('%1$s %2$s', $item->v_name, $this->row_actions($actions) );
+		return sprintf('%1$s %2$s', htmlentities($item->v_name, ENT_QUOTES, "UTF-8"), $this->row_actions($actions) );
 	}
 	
 	protected function get_sql_where_array() {
