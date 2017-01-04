@@ -1,0 +1,888 @@
+.arlo * {
+    box-sizing: border-box;
+}
+
+.arlo-filters {
+    text-align: center;
+    margin-top: 2em;
+}
+
+.arlo-filters-buttons,
+.arlo-filters select {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.arlo-filters select {
+    background-color: #F1F7FB;
+    box-shadow: none;
+    border: 0;
+    border-radius: 30px;
+    padding: 10px 20px;
+    font-size: 16px;
+    -webkit-appearance: menulist;
+}
+
+.arlo-filters select:focus {
+    background-color: #F1F7FB !important;
+    color: #626262;
+}
+
+.arlo-filters-buttons {
+    margin-top: 0;
+}
+
+.arlo-filters-buttons a.button {
+    margin: 0;
+    display: block;
+    background-color: #ED017B;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+}
+
+.arlo-boxed .arlo-list.upcoming .arlo-cf.arlo-group-divider {
+    padding: 0;
+    color: #09142f;
+    text-align: center;
+    width: 100%;
+    clear: both;
+    font-size: 3em;
+    text-transform: uppercase;
+    margin-top: 1.5em;
+    line-height: 1.5;
+}
+
+.arlo-boxed .arlo-list.upcoming {
+    margin-top: 3em;
+}
+
+.the_content_wrapper .arlo ul,
+.the_content_wrapper .arlo li {
+    list-style: none;
+}
+
+.arlo-boxed .arlo-list.events .arlo-cf, 
+.arlo-boxed .arlo-list.upcoming .arlo-cf {
+    overflow: visible;
+    float: none;
+    width: 100%;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+}
+
+.arlo-boxed .arlo-cal {
+    text-align: center;
+    margin-left: .2em;
+    margin-top: .3em;
+    width: 60px;
+    float: left; 
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.arlo-event-subheading > span {
+    display: inline-block;
+    margin-right: .6em;
+    font-style: italic;
+}
+
+.arlo-event-subheading > span .fa {
+    margin-right: .3em;
+    opacity: .5;
+}
+
+.arlo-boxed .arlo-template-summary {
+    margin: .8em 0;
+    height: auto;
+}
+
+.arlo-offer {
+    font-size: 1.3em;
+}
+
+.arlo-event-details >  h4 {
+    font-weight: 400;
+    letter-spacing: 1px;
+    font-size: 1.7em;
+    line-height: 1;
+    margin: 0 0 .3em 0;
+}
+
+.arlo-boxed .arlo-event-details {
+    margin-left: 100px;
+    width: auto;
+}
+
+
+
+.arlo-month {
+    text-transform: uppercase;
+    font-size: 20px;
+    padding: .2em 0;
+    color: white;
+    background-color: #1DC6BC;
+}
+
+.arlo-day {
+    font-size: 32px;
+    vertical-align: top;
+    line-height: 1;
+    padding: .3em .5em;
+    color: #bcbcbc;
+}
+
+.arlo-buttons {
+    float: right;
+}
+
+.arlo-buttons a.button,
+.arlo-buttons .arlo-event-registration {
+    display: inline-block;
+    margin: 0 .5em 0 0;
+}
+
+.arlo-buttons .arlo-register {
+    background-color: #ED017B;
+    color: white;
+}
+
+.arlo-buttons .arlo-more-information {
+    background-color: #1DC6BC;
+    color: white;
+}
+
+.arlo-buttons .arlo-waiting-list {
+    background-color: #FFD101;
+    color: white;
+}
+
+.arlo-boxed .arlo-event-registration .arlo-event-full {
+    font-weight: normal;
+    font-style: italic;
+    color: #ffd101;
+    font-size: 1em;
+    width: auto;
+    float: none;
+    text-align: right;
+}
+
+.arlo-boxed .arlo-event-registration .arlo-places-remaining {
+    color: #ed017b;
+    display: block;
+    width: 100%;
+}
+
+.upcoming .arlo-event-registration > p {
+    float: right;
+}
+
+.arlo-event-registration > p,
+.arlo-next-running span {
+    padding: 12px 20px;
+    border-radius: 30px;
+    background: #EAEAEA;
+    color: #636363;
+    margin: 0;
+}
+
+.arlo-next-running span {
+    display: inline-block;
+}
+
+a.next.page-numbers,
+a.prev.page-numbers {
+    cursor: pointer;
+    font-size: 15px;
+    padding: 12px 30px;
+    border-radius: 30px;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.03);
+    background-image: url(http://theme1.demo.arlo.co/wp-content/themes/betheme/images/box_shadow_button.png);
+    background-repeat: repeat-x;
+    font-style: normal;
+    display: inline-block;
+    text-decoration: none;
+    color: white;
+    margin: 5px;
+    background-color: #1DC6BC;
+}
+
+.arlo-pagination {
+  text-align: center;
+  margin: 0 0 3em 0;
+  clear: both;
+}
+
+.page-numbers {
+    font-size: 1.5em;
+    margin: 0 .2em;
+}
+
+.arlo-pagination,
+.arlo-pagination > * {
+    vertical-align: middle;
+}
+
+a.next.page-numbers,
+a.prev.page-numbers {
+    position: relative;
+    overflow: hidden;
+}
+
+a.next.page-numbers:after, 
+a.prev.page-numbers:after,
+a.arlo-show-more-link:after,
+.catalogue .arlo-next-running > a.arlo-register:after,
+.arlo-category-list li a:after {    
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 0;
+    z-index: 1;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    transition: all 0.3s;
+    background: rgba(0,0,0,.05);
+}
+
+a.next.page-numbers:hover:after, 
+a.prev.page-numbers:hover:after,
+a.arlo-show-more-link:hover:after,
+.catalogue .arlo-next-running > a.arlo-register:hover:after,
+.arlo-category-list li a:hover:after {
+    width: 100%;
+}
+
+
+.arlo-full-width {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+}
+
+.arlo-banner-outer {
+    text-align: center;
+    margin-bottom: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    background-image: url(http://be.software.wpdemo.arlo.co/wp-content/uploads/2015/07/home_software_pattern.png);
+    background-color: #1DC6BC;
+    color: white;
+    padding: 5em 0;
+}
+
+.arlo-banner-inner {
+    font-size: 4.5em;
+    line-height: 1;
+}
+
+.arlo-banner-inner p {
+    font-size: .35em;
+    text-transform: none;
+    font-weight: normal;
+    margin-top: 1em;
+}
+
+.arlo-category-footer,
+.arlo-category-header-inner,
+.arlo-banner-inner {
+    width: 1220px;
+    margin: 0 auto;
+    word-wrap: break-word;
+}
+
+.arlo-category-header-wrapper {
+    background-color: #FFD101;
+}
+
+body:not(.template-slider).arlo_event-template-default #Content {
+  padding-top: 0;
+}
+
+p.arlo-summary {
+    text-align: center;
+    font-size: 1.2em;
+    margin: 1em 0 2em;
+}
+
+.the_content_wrapper ul.arlo-list.events li.arlo-cf {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 23%;
+  float: left;
+  margin-right: 1.3em;
+  padding: 1.2em;
+  box-shadow: 0 0 10px 5px #e6e6e6;
+  border: none;
+  border-radius: 5px;
+  margin-bottom: 1.3em;
+}
+
+.the_content_wrapper ul.arlo-list.events {
+  margin: 0;
+  overflow: auto;
+  padding: 1em 1em 0 1em;
+}
+
+.arlo-item-header {
+    font-size: 1.3em;
+    letter-spacing: 1px;
+}
+
+.the_content_wrapper ul.arlo-list.events li.arlo-cf > * {
+    margin: .5em 0;
+}
+
+.the_content_wrapper ul.arlo-event-offers,
+.the_content_wrapper ul.arlo-event-offers li {
+    list-style: none;
+}
+
+.the_content_wrapper .arlo-event-offers {
+    color: #1DC6BC;
+    font-size: 1.3em;
+    font-style: italic;
+}
+
+.arlo-event-registration {
+  text-align: left;
+}
+
+a.button.arlo-register {
+    background-color: #ED017B;
+    color: white;
+}
+
+.arlo-show-more-link-container {
+    text-align: center;
+    margin-top: 2em;
+}
+
+a.arlo-show-more-link,
+.catalogue .arlo-next-running > a {
+  background-color: #D6D6D6;
+  padding: .7em 4em;
+  text-decoration: none;
+  border-radius: 30px;
+  color: #fff;
+  -webkit-box-shadow: inset 0 0 0 1px rgba(0,0,0,.03);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.03);
+  background-image: url(/wp-content/themes/betheme/images/box_shadow_button.png);
+  background-repeat: repeat-x;
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+}
+
+.catalogue .arlo-next-running > a {
+  background-color: #08cec2;
+  padding: .7em 2em;
+}
+
+.catalogue .arlo-next-running > a:not(.arlo-register) {
+    background-color: transparent;
+    border: 1px solid #08cec2;
+    color: #08cec2;
+    box-shadow: none;
+    background-image: none;
+}
+
+.catalogue .arlo-next-running > a:not(.arlo-register):hover {
+    background-color: #08cec2;
+    color: white;
+}
+
+a.arlo-show-more-link:hover {
+  color: white;
+  text-decoration: none;
+}
+
+.arlo-suggest {
+    background-color: #F1F7FB;
+    text-align: center;
+    padding: .8em;
+    margin: 3em 0;
+}
+
+.arlo-suggest a {
+    color: #ED017B;
+    font-size: 1.2em;
+}
+
+.arlo-content-field {
+    margin-bottom: 3em;
+}
+
+.arlo-event-offers .discount {
+    color: #FFBD1F;
+}
+
+.arlo-event-offers .replaced {
+    margin-right: .2em;
+}
+
+a.button.arlo-waiting-list {
+    background-color: #FFBD1F;
+    color: white;
+}
+
+.arlo-event-registration > span {
+    font-size: 1em;
+    font-weight: normal;
+}
+
+.arlo-event-full {
+    color: #FFBD1F;
+}
+
+.arlo-places-remaining {
+    color: #ed017b;
+}
+
+.arlo-tooltip-button {
+    text-align: left;
+    font-weight: normal;
+}
+
+.arlo_session {
+    margin-bottom: .5em;
+}
+
+.arlo_session h6 {
+    margin-bottom: 0;
+}
+
+.catalogue li.arlo-cf.arlo-group-divider {
+    font-size: 2.5em;
+    color: #09142f;
+    clear: both;
+    padding: 1em 0 1em;
+}
+
+.catalogue li.arlo-cf.arlo-catalogue-event {
+    float: left;
+    width: 23%;
+    padding: 1em;
+    border-radius: 5px;
+    box-shadow: 0 0 10px 5px #e6e6e6;
+    margin: 0 1.3em 1.3em 0;
+}
+
+a.arlo-template-name:hover {
+  text-decoration: none;
+}
+
+.arlo-template-details > * {
+    margin: .5em 0;
+}
+
+.catalogue .arlo-offers {
+    color: #ed007b;
+    font-size: 1.2em;
+    font-style: italic;
+}
+
+.arlo-next-running {
+    margin-top: 1em;
+}
+
+.arlo-template-name h3 {
+    word-wrap: break-word;
+}
+
+.arlo-category-footer-wrapper {
+    background-color: #F1F7FB;
+    padding: 1em;
+}
+
+.arlo-category-footer {
+  font-size: 1.2em;
+  text-align: center;
+}
+
+.arlo-category-header-wrapper {
+    margin-bottom: 1em;
+}
+
+.arlo-category-list li {
+    display: inline-block;
+}
+
+.arlo-category-list li a {
+    background-color: #F1F7FB;
+    border-radius: 30px;
+    margin-right: .5em;
+    padding: .7em 1.5em;
+    color: #636363;
+    display: block;
+    position: relative;
+    overflow: hidden;
+}
+
+.arlo-category-list li a:hover {
+    text-decoration: none;
+}
+
+.arlo-catalogue-filters .arlo-filters-buttons {
+    display: none;
+}
+
+.arlo-catalogue-filters .arlo-categories {
+    float: left;
+}
+
+.arlo-catalogue-filters .arlo-filters {
+    float: right;
+    margin: 0;
+}
+
+.catalogue .arlo-offers,
+.catalogue .arlo-next-running {
+    margin-top: 1em;
+}
+
+.arlo-catalogue-filters {
+    overflow: auto;
+}
+
+.arlo-duration {
+    color: #09142f;
+}
+
+.arlo-delivery-icons {
+    font-family: "Arlo-WP";
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-decoration: inherit;
+    text-rendering: optimizeLegibility;
+    text-transform: none;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    font-smoothing: antialiased;
+}
+
+.arlo-delivery {
+    color: #FFD101;
+    margin: 1em 0;
+}
+
+.arlo-delivery-icons {
+  font-size: 1.9em;
+  margin-top: .2em;
+  line-height: 1;
+  letter-spacing: 5px;
+}
+
+.the_content_wrapper .arlo ul.arlo-category-list {
+    margin-bottom: 2em;
+}
+
+.the_content_wrapper .arlo ul.arlo-list.catalogue,
+.the_content_wrapper .arlo ul.arlo-category-list {
+    margin-left: 0;
+}
+
+p.arlo-no-results {
+    font-size: 1em;
+}
+
+
+/* Responsive - Catalogue */
+
+@media only screen and (max-width: 1239px) {
+  .arlo-category-footer, 
+  .arlo-category-header-inner, .arlo-banner-inner {
+    width: 100%;
+    padding: 0 .5em;
+  }
+}
+
+@media only screen and (max-width: 1239px) and (min-width: 960px) {
+    .catalogue li.arlo-cf.arlo-catalogue-event {
+        width: 31%;
+    }
+
+    .arlo-category-footer, 
+    .arlo-category-header-inner, .arlo-banner-inner {
+        width: 100%;
+    }
+}
+
+
+
+@media only screen and (max-width: 959px) and (min-width: 768px) {
+    .catalogue li.arlo-cf.arlo-catalogue-event {
+        width: 47%;
+    }
+
+    .arlo-catalogue-filters .arlo-filters {
+        clear: both;
+        float: none;
+        text-align: left;
+        margin-bottom: 3em;
+    }
+
+    .the_content_wrapper .arlo ul.arlo-category-list {
+        margin-bottom: .5em;
+        margin-left: 0;
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    .catalogue li.arlo-cf.arlo-catalogue-event {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .the_content_wrapper .arlo ul.arlo-category-list {
+        margin-left: 0;
+    }
+
+    .arlo-category-list li a,
+    .arlo-category-list li,
+    .arlo-catalogue-filters .arlo-filters,
+    .arlo-catalogue-filters .arlo-filters select {
+        width: 100%;
+    }
+
+    .arlo-category-list li a {
+        text-align: center;
+    }
+
+    .arlo-catalogue-filters .arlo-filters select {
+        margin-bottom: 2em;
+    }
+
+    .page-numbers {
+        display: none;
+    }
+
+    a.next.page-numbers, a.prev.page-numbers {
+        width: 100%;
+    }
+
+    .the_content_wrapper .arlo ul.arlo-list.catalogue {
+      margin: 0;
+    }
+  
+    .arlo-catalogue-filters {
+      overflow-x: hidden;
+    }
+
+    .arlo-banner-inner {
+        font-size: 2.5em;
+        line-height: 1.2;
+    }
+}
+
+
+/* Responsive - Event template */
+
+@media only screen and (max-width: 1239px) and (min-width: 960px) {
+    .the_content_wrapper ul.arlo-list.events li.arlo-cf {
+        width: 31%;
+    }
+}
+
+@media only screen and (max-width: 959px) and (min-width: 768px) {
+    .the_content_wrapper ul.arlo-list.events li.arlo-cf {
+        width: 47%;
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    .the_content_wrapper ul.arlo-list.events li.arlo-cf {
+        width: 100%;
+    }
+    
+    .arlo-next-running span {
+        display: block;  
+    }
+  
+    a.button.arlo-register,
+    a.arlo-show-more-link, 
+    .catalogue .arlo-next-running > a,
+    .arlo-next-running span {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+
+
+/* Responsive - Event list */
+
+@media only screen and (max-width: 767px) {
+    .arlo-filters select {
+        width: 100%;
+        margin-bottom: .5em;
+    }
+
+    .arlo-filters-buttons {
+        display: block;
+    }
+  
+    .arlo-boxed .arlo-event-details {
+        margin-left: 0;
+    }
+
+    .arlo-buttons {
+        width: 100%;
+        float: none;
+        margin-top: 1.5em;
+    }
+
+    .upcoming .arlo-event-registration > p {
+        width: 100%;
+        float: none;
+    }
+
+    .arlo-boxed .arlo-event-registration .arlo-event-full {
+        text-align: center;
+    }
+
+    .arlo-buttons a.button,
+    .arlo-boxed .arlo-event-registration {
+        display: block;
+        width:100%;
+        margin-bottom: .5em;
+        text-align: center;
+    }
+
+    .arlo-event-details > h4,
+    .arlo-event-subheading,
+    .arlo-boxed .arlo-template-summary,
+    .arlo-offer {
+        margin-left: 70px;
+    }
+
+    .arlo-boxed .arlo-cal {
+        width: 50px;
+    }
+
+    .arlo-boxed .arlo-list.upcoming .arlo-cf {
+        margin-bottom: 2em;
+        overflow: auto;
+    }
+
+    .arlo-day {
+        padding: .3em .1em;
+    }
+  
+    .arlo-event-details >  h4 {
+        line-height: 1.5;
+    }
+  
+    .arlo-boxed .arlo-event-registration span {
+        padding-top: 0;
+    }
+}
+
+ul.arlo-list.presenters > li,
+ul.arlo-list.presenters {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+ul.arlo-list.presenters > li {
+    margin-bottom: 4em;
+}
+
+ul.arlo-list.presenters > li label,
+ul.arlo-list.venues > li label {
+    font-size: 1.5em;
+    font-weight: normal;
+    margin-bottom: .5em;
+    margin-top: 1.5em;
+    color: #333333;
+}
+
+.arlo-presenter-info-link,
+.arlo-venue-info-link {
+  color: #ED017B;
+  font-size: 1.2em;
+  margin-bottom: 1em;
+  display: block;
+  margin-top: .5em;
+}
+
+.arlo-presenter-info-link:hover {
+  color: #ED017B;
+}
+
+.arlo-presenter-header-wrapper,
+.arlo-venue-header-wrapper {
+    margin-top: -30px;
+}
+
+.arlo-presenter-details > label,
+.arlo-venue-details > label {
+    margin: 2em 0 1em;
+}
+
+
+.the_content_wrapper ul.presenter-events,
+.the_content_wrapper ul.presenter-events li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.the_content_wrapper ul.presenter-events li {
+    float: left;
+    width: 270px;
+    height: 100px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px 5px #e6e6e6;
+    padding: 1em;
+    margin: 0 1.5em 1.5em 0;
+    max-width: 100%;
+    font-size: 1.2em;
+}
+
+.the_content_wrapper ul.presenter-events li a {
+    color: #ed087f;
+}
+
+.the_content_wrapper ul.presenter-events li a:hover {
+    color: #08cec2;
+    text-decoration: none;
+}
+
+.arlo-social-links a {
+    display: inline-block;
+    margin-right: .5em;
+}
+
+.arlo-social-links a:hover {
+    opacity: .7;
+}
+
+.arlo-presenter-details {
+    margin-top: 1.5em;
+}
+
+.arlo-list.venues > li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.arlo-list.venues > li {
+    margin-bottom: 2em;
+}
+
+.arlo-venue-details {
+    margin: 1em 0 3em;
+}
+
+.the_content_wrapper ul.arlo-address-list,
+.the_content_wrapper ul.arlo-address-list li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
