@@ -272,8 +272,8 @@ class Arlo_For_Wordpress_Settings {
 		 *
 		 */ 
 		 
-		add_settings_section('arlo_welcome_section', null, null, $this->plugin_slug );				
-		add_settings_field( 'arlo_welcome', null, array($this, 'arlo_welcome_callback'), $this->plugin_slug, 'arlo_welcome_section', array('id'=>'welcome') );
+		add_settings_section('arlo_changelog_section', null, null, $this->plugin_slug );				
+		add_settings_field( 'arlo_changelog', null, array($this, 'arlo_changelog_callback'), $this->plugin_slug, 'arlo_changelog_section', array('id'=>'welcome') );
 
 		/* System requirements */
 
@@ -578,7 +578,7 @@ class Arlo_For_Wordpress_Settings {
 	    ';
 	} 	
 	
-	function arlo_welcome_callback($args) {
+	function arlo_changelog_callback($args) {
 		
 	    echo '
 	    <h3>What\'s new in this release</h3>
