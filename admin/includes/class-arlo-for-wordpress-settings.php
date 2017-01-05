@@ -13,6 +13,7 @@
  use Arlo\VersionHandler;
  use Arlo\NoticeHandler;
  use Arlo\SystemRequirements;
+ use Arlo\Utilities;
  use Arlo\Importer\ImportRequest;
 
 class Arlo_For_Wordpress_Settings {
@@ -27,7 +28,7 @@ class Arlo_For_Wordpress_Settings {
 		register_setting( 'arlo_settings', 'arlo_settings' );		
 
 		$plugin = Arlo_For_Wordpress::get_instance();
-		$settings = get_option('arlo_settings');
+		$settings_object = get_option('arlo_settings');
 
 		$message_handler = $plugin->get_message_handler();
 		$notice_handler = $plugin->get_notice_handler();		
@@ -43,15 +44,15 @@ class Arlo_For_Wordpress_Settings {
 			add_action( 'admin_notices', array($notice_handler, "plugin_disabled") );
 		} else if (get_option('arlo_import_disabled', '0') == '1') {
 			add_action( 'admin_notices', array($notice_handler, "import_disabled") );
-		}		
+		}
 		
 		if(isset($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress') {
 			add_action( 'admin_notices', array($notice_handler, "arlo_notices") );
 			
-			if (!empty($settings['platform_name'])) {
+			if (!empty($settings_object['platform_name'])) {
 				$show_notice = false;
 				foreach (Arlo_For_Wordpress::$post_types as $id => $post_type) {
-					if (empty($settings['post_types'][$id]['posts_page'])) {
+					if (empty($settings_object['post_types'][$id]['posts_page'])) {
 						$show_notice = true;
 						break;
 					}
@@ -91,6 +92,33 @@ class Arlo_For_Wordpress_Settings {
 				wp_redirect( admin_url( 'admin.php?page=arlo-for-wordpress'));
 				exit;
 			}
+
+			if (isset($_GET['apply-theme']) && isset($_GET['_wpnonce']) && wp_verify_nonce($_GET['_wpnonce'], 'arlo-apply-theme-nonce')) {
+				$theme_id = $_GET['apply-theme'];
+				$theme_manager = $plugin->get_theme_manager();
+				
+				if ($theme_manager->is_theme_valid($theme_id)) {
+					$stored_themes_settings = get_option( 'arlo_themes_settings', [] );
+
+					//check if there is already a stored settings for the theme, or need to be reset
+					if ($_GET['reset'] == 1 || empty($stored_themes_settings[$theme_id])) {
+						$stored_themes_settings[$theme_id]['templates'] = $theme_manager->load_default_templates($theme_id);
+					}
+
+					if ($stored_themes_settings[$theme_id]['templates'] !== false) {
+						//update the main setting with the stored theme
+						foreach ($settings_object['templates'] as $page => $template) {
+							$settings_object['templates'][$page]['html'] = $stored_themes_settings[$theme_id]['templates'][$page]['html'];
+						}
+
+						update_option('arlo_themes_settings', $stored_themes_settings, 1);
+						update_option('arlo_settings', $settings_object, 1);
+						update_option('arlo_theme', $theme_id, 1);
+
+						wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages') );
+					}
+				}
+			}
 						
 			add_action( 'admin_notices', array($notice_handler, "welcome_notice") );
 			
@@ -119,7 +147,7 @@ class Arlo_For_Wordpress_Settings {
                             )
                 );                
                 
-        if (!empty($settings['platform_name'])) {
+        if (!empty($settings_object['platform_name'])) {
 			// create last import text
 			add_settings_field(
                         'arlo_last_import', 
@@ -268,12 +296,19 @@ class Arlo_For_Wordpress_Settings {
 		
 		/*
 		 *
-		 * Welcome Section Settings
+		 * Changelog Section Settings
 		 *
 		 */ 
 		 
 		add_settings_section('arlo_changelog_section', null, null, $this->plugin_slug );				
 		add_settings_field( 'arlo_changelog', null, array($this, 'arlo_changelog_callback'), $this->plugin_slug, 'arlo_changelog_section', array('id'=>'welcome') );
+
+
+		/* Theme Section Settings */ 
+		 
+		add_settings_section('arlo_theme_section', null, null, $this->plugin_slug );				
+		add_settings_field( 'arlo_theme', null, array($this, 'arlo_theme_callback'), $this->plugin_slug, 'arlo_theme_section', array('id'=>'theme') );
+		
 
 		/* System requirements */
 
@@ -303,8 +338,8 @@ class Arlo_For_Wordpress_Settings {
 	 */
 	 
 	function arlo_simple_textarea_callback($args) {
-	    $settings = get_option('arlo_settings');
-	    $val = (isset($settings[$args['id']])) ? esc_attr($settings[$args['id']]) : (!empty($args['default_val']) ? $args['default_val'] : '' );
+	    $settings_object = get_option('arlo_settings');
+	    $val = (isset($settings_object[$args['id']])) ? esc_attr($settings_object[$args['id']]) : (!empty($args['default_val']) ? $args['default_val'] : '' );
 	    
 	    $html = '';
 	        
@@ -322,13 +357,13 @@ class Arlo_For_Wordpress_Settings {
 	}	 
         
 	function arlo_price_setting_callback() {
-		$settings = get_option('arlo_settings');
+		$settings_object = get_option('arlo_settings');
 		$setting_id = 'price_setting';
 		
 		$output = '<div id="'.ARLO_PLUGIN_PREFIX.'-price-setting" class="cf">';
 		$output .= '<select name="arlo_settings['.$setting_id.']">';            
 		
-		$val = (isset($settings[$setting_id])) ? esc_attr($settings[$setting_id]) : ARLO_PLUGIN_PREFIX . '-exclgst';
+		$val = (isset($settings_object[$setting_id])) ? esc_attr($settings_object[$setting_id]) : ARLO_PLUGIN_PREFIX . '-exclgst';
 		
 		foreach(Arlo_For_Wordpress::$price_settings as $key => $value) {
 		    $key = ARLO_PLUGIN_PREFIX . '-' . $key;
@@ -346,10 +381,10 @@ class Arlo_For_Wordpress_Settings {
 		if (empty($args['option_name'])) return;
 		
 		$option_name = $args['option_name'];
-		$settings = get_option('arlo_settings');
+		$settings_object = get_option('arlo_settings');
 				
 		$output = '<div id="'.ARLO_PLUGIN_PREFIX.'-' . $option_name . '" class="cf">';
-		$output .= '<input type="checkbox" value="1" name="arlo_settings['.$option_name.']" id="' . $option_name . '" ' . (isset($settings[$option_name]) && $settings[$option_name] == '1' ? 'checked="checked"' : '') . '>';
+		$output .= '<input type="checkbox" value="1" name="arlo_settings['.$option_name.']" id="' . $option_name . '" ' . (isset($settings_object[$option_name]) && $settings_object[$option_name] == '1' ? 'checked="checked"' : '') . '>';
 		
 		$output .= '</div>';
 		
@@ -358,8 +393,8 @@ class Arlo_For_Wordpress_Settings {
 	
         
 	function arlo_simple_input_callback($args) {
-	    $settings = get_option('arlo_settings');
-	    $val = (isset($settings[$args['id']])) ? esc_attr($settings[$args['id']]) : (!empty($args['default_val']) ? $args['default_val'] : '' );
+	    $settings_object = get_option('arlo_settings');
+	    $val = (isset($settings_object[$args['id']])) ? esc_attr($settings_object[$args['id']]) : (!empty($args['default_val']) ? $args['default_val'] : '' );
 	    
 	    $html = '';
 	        
@@ -388,7 +423,7 @@ class Arlo_For_Wordpress_Settings {
 
 	function arlo_template_callback($args) {
 		$id = $args['id'];
-		$settings = get_option('arlo_settings');
+		$settings_object = get_option('arlo_settings');
 		
 		echo '<h3>' . sprintf(__('%s page', 'arlo-for-wordpress' ), Arlo_For_Wordpress::$templates[$id]['name']) . '</h3>';
 		
@@ -402,7 +437,7 @@ class Arlo_For_Wordpress_Settings {
 	
     	if (!empty($post_type_id) && !empty(Arlo_For_Wordpress::$post_types[$post_type_id])) {
     		$post_type = Arlo_For_Wordpress::$post_types[$post_type_id];
-		    $val = isset($settings['post_types'][$post_type_id]['posts_page']) ? esc_attr($settings['post_types'][$post_type_id]['posts_page']) : 0;
+		    $val = isset($settings_object['post_types'][$post_type_id]['posts_page']) ? esc_attr($settings_object['post_types'][$post_type_id]['posts_page']) : 0;
 	
 			$select = wp_dropdown_pages(array(
 				'id'				=> 'arlo_'.$post_type_id.'_posts_page',
@@ -421,10 +456,10 @@ class Arlo_For_Wordpress_Settings {
 			</div>';
     	}
 	    
-	    $val = isset($settings['templates'][$id]['html']) ? $settings['templates'][$id]['html'] : '';
+	    $val = isset($settings_object['templates'][$id]['html']) ? $settings_object['templates'][$id]['html'] : '';
 	    
 	    
-	    $this->arlo_reload_template($id, $settings);
+	    $this->arlo_reload_template($id, $settings_object);
 	    
 	    echo '<div class="arlo-label arlo-full-width">
 	    		<label>
@@ -436,7 +471,7 @@ class Arlo_For_Wordpress_Settings {
 	    wp_editor($val, $id, array('textarea_name'=>'arlo_settings[templates]['.$id.'][html]','textarea_rows'=>'20'));
 	}
 	
-	function arlo_reload_template($template, $settings) {
+	function arlo_reload_template($template, $settings_object) {
 	
 	    echo '
 	    	<div class="arlo-label">
@@ -449,7 +484,7 @@ class Arlo_For_Wordpress_Settings {
 							echo '<div class="' . ARLO_PLUGIN_PREFIX . '-sub-template-select">
 								<select name="arlo_settings[subtemplate]['.$template.']">';
 						    foreach ($template_definition['sub'] as $k => $v) {
-						    	$selected = (!empty($settings['subtemplate'][$template]) && $settings['subtemplate'][$template] == $k ? 'selected' : '');
+						    	$selected = (!empty($settings_object['subtemplate'][$template]) && $settings_object['subtemplate'][$template] == $k ? 'selected' : '');
 						    	echo '<option value="' . $k . '" '.$selected.'>' . $v . '</option>';
 						    }
 					    				
@@ -576,7 +611,7 @@ class Arlo_For_Wordpress_Settings {
 		
 		<p>For more information, please visit our <a href="http://developer.arlo.co/doc/wordpress/settings#regions" target="_blank">documentation</a></p>
 	    ';
-	} 	
+	} 		
 	
 	function arlo_changelog_callback($args) {
 		
@@ -677,4 +712,48 @@ class Arlo_For_Wordpress_Settings {
 
 		echo '</table>';
 	} 
+
+	function arlo_theme_callback($args) {
+		$plugin = Arlo_For_Wordpress::get_instance();
+		$theme_manager = $plugin->get_theme_manager();
+
+		$themes = $theme_manager->get_themes_settings();
+
+		$selected_theme_id = get_option('arlo_theme', 'basic.list');
+
+	    echo '
+	    <h4>Select a pre-built theme</h4>
+		<ul class="arlo-themes">';
+		foreach ($themes as $theme_id => $theme_data) {
+			$images = [];
+			foreach ($theme_data->images as $image) {
+				$images[] = '<img src="' . $image . '">';
+			}
+
+			echo '
+			<li class="arlo-theme">
+				<div class="arlo-theme-image">
+					' . (!empty($theme_data->demoUrl) ? '<a href="' . $theme_data->demoUrl . '" target="_blank">' : '' ) .'
+					' . $images[0] . '
+					<span class="arlo-theme-name">' . htmlentities($theme_data->name) . '</span>
+					' . (!empty($theme_data->demoUrl) ? '</a>' : '' ) .'
+				</div>
+				<div class="arlo-theme-buttons">
+					<ul>
+					' . (!empty($theme_data->demoUrl) ? '<li><a href="' . $theme_data->demoUrl . '" target="_blank">' . __('Live demo', 'arlo-for-wordpress' ) . '</a></li>' : '' ) . '
+					' . ($selected_theme_id == $theme_id ? '
+						<li class="arlo-theme-current">Current</li>
+						<li><a href="' . wp_nonce_url(admin_url('admin.php?page=arlo-for-wordpress&apply-theme=' . urlencode($theme_id) . '&reset=1'), 'arlo-apply-theme-nonce') . '">Reset</a></li>
+					':'
+						<li><a href="' . wp_nonce_url(admin_url('admin.php?page=arlo-for-wordpress&apply-theme=' . urlencode($theme_id)), 'arlo-apply-theme-nonce') . '">Apply</a></li>
+						<li><a href="' . wp_nonce_url(admin_url('admin.php?page=arlo-for-wordpress&apply-theme=' . urlencode($theme_id) . '&reset=1'), 'arlo-apply-theme-nonce') . '">Apply & Reset</a></li>
+					') . ' 
+					</ul>
+				</div>
+			</li>';
+		}
+		echo '	
+		</ul>
+	    ';
+	}	
 }

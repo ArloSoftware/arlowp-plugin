@@ -13,6 +13,7 @@ use ArloAPI\Transports\Wordpress;
 use ArloAPI\Client;
 use Arlo\Utilities;
 use Arlo\Environment;
+use Arlo\ThemeManager;
 use Arlo\SystemRequirements;
 
 /**
@@ -860,6 +861,18 @@ class Arlo_For_Wordpress {
 		
 		return $scheduler;
 	}
+
+	public function get_theme_manager() {
+		if($theme_manager = $this->__get('theme_manager')) {
+			return $theme_manager;
+		}
+		
+		$theme_manager = new ThemeManager($this, $this->get_dbl());
+		
+		$this->__set('theme_manager', $theme_manager);
+		
+		return $theme_manager;
+	}	
 
 	public function get_importer() {
 		if($importer = $this->__get('importer')) {

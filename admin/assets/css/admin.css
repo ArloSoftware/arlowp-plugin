@@ -407,6 +407,85 @@ table.arlo-welcome td.logo {
 	color: darkred;
 }
 
+
+.arlo-themes .arlo-theme {
+	width: 250px;
+	height: 220px;
+	float: left;
+	margin-right: 0.5em;
+}
+
+.arlo-themes .arlo-theme .arlo-theme-image {
+	border: 1px solid #ccc;
+	height: 183px;
+	position: relative;
+	cursor: pointer;
+}
+
+.arlo-themes .arlo-theme .arlo-theme-image img {
+	width: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 10;
+}
+
+.arlo-themes .arlo-theme .arlo-theme-image .arlo-theme-name {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 15;
+    text-align: center;
+    line-height: 183px;
+    color: white;
+    background-color: black;
+    font-size: 2em;
+	opacity: 0;
+	cursor: pointer;
+	-webkit-transition: opacity .25s ease-in-out;
+	-moz-transition: opacity .25s ease-in-out;
+	transition: opacity .25s ease-in-out;
+}
+
+.arlo-themes .arlo-theme .arlo-theme-image:hover .arlo-theme-name {
+	opacity: 0.4;
+}
+
+.arlo-themes .arlo-theme .arlo-theme-buttons {
+	float: left;
+}
+
+.arlo-themes .arlo-theme .arlo-theme-buttons {
+	display: block;
+	margin-top: 0.4em;
+}
+
+.arlo-themes .arlo-theme .arlo-theme-buttons li {
+	float: left;
+	text-transform: uppercase;
+	color: white;
+	margin-right: 0.5em;
+}
+
+.arlo-themes .arlo-theme .arlo-theme-buttons li a {
+	text-decoration: none;
+	color: white;
+	padding: 0.3em 0.5em;
+	background-color: lightgray;
+	display: inline-block;
+}
+
+.arlo-themes .arlo-theme .arlo-theme-buttons li a:hover {
+	background-color: darkgray;
+}
+
+.arlo-themes .arlo-theme .arlo-theme-buttons li.arlo-theme-current {
+	background-color: #ffd100;
+	padding: 0.3em 0.5em;
+}
+
 /* media queries, these match the wordpress admin breakpoints as of WP 3.9 */
 
 @media only screen and (min-width: 601px) {
