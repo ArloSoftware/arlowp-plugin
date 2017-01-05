@@ -597,6 +597,9 @@ class Arlo_For_Wordpress {
 		// flush permalinks upon plugin deactivation
 		flush_rewrite_rules();
 
+		//set default themes
+		$this->set_default_theme();
+
 		// must happen before adding pages
 		$this->set_default_options();
 		
@@ -607,6 +610,31 @@ class Arlo_For_Wordpress {
 		$this->add_pages();
 		
 		update_option('arlo_plugin_version', VersionHandler::VERSION);
+	}
+
+	/**
+	 * Set the default theme
+	 *
+	 * @since    3.0.0
+	 *
+	 */	
+	public function set_default_theme() {
+		$theme_id = get_option('arlo_theme', '');
+
+		//set default theme
+		if (empty($theme_id)) {
+			$plugin = Arlo_For_Wordpress::get_instance();
+			$theme_manager = $this->get_theme_manager();	
+			$theme_settings = $theme_manager->get_themes_settings();
+
+			$theme_id = 'basic.list';
+
+			$stored_themes_settings[$theme_id] = $theme_settings[$theme_id];
+			$stored_themes_settings[$theme_id]->templates = $theme_manager->load_default_templates($theme_id);
+
+			update_option('arlo_themes_settings', $stored_themes_settings, 1);
+			update_option('arlo_theme', $theme_id, 1);
+		}
 	}
 
 	/**
@@ -624,7 +652,7 @@ class Arlo_For_Wordpress {
 				if (empty($settings['templates'][$id]['html'])) {
 					$settings['templates'][$id] = array(
 						'html' => arlo_get_template($id)
-					);				
+					);
 				}
 			}
 			
