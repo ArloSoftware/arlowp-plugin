@@ -699,6 +699,26 @@ class Arlo_For_Wordpress {
 			$customcss_timestamp = get_option('arlo_customcss_timestamp');
 			wp_enqueue_style( $this->plugin_slug .'-custom-styles', plugins_url( 'assets/css/custom.css', __FILE__ ), array(), $customcss_timestamp );		
 		}	
+
+		//enqueue theme related styles
+		$stored_themes_settings = get_option( 'arlo_themes_settings', [] );
+		$theme_id = get_option( 'arlo_theme');
+		
+		if (isset($stored_themes_settings[$theme_id])) {
+			//internal resources
+			if (isset($stored_themes_settings[$theme_id]->internalResources->stylesheets) && is_array($stored_themes_settings[$theme_id]->internalResources->stylesheets)) {
+				foreach ($stored_themes_settings[$theme_id]->internalResources->stylesheets as $key => $stylesheet) {
+					wp_enqueue_style( $this->plugin_slug . '-theme-internal-stylesheet-' . $key, $stylesheet, [], $stored_themes_settings[$theme_id]->version );
+				}
+			} 
+
+			//external resources
+			if (isset($stored_themes_settings[$theme_id]->externalResources->stylesheets) && is_array($stored_themes_settings[$theme_id]->externalResources->stylesheets)) {
+				foreach ($stored_themes_settings[$theme_id]->externalResources->stylesheets as $key => $stylesheet) {
+					wp_enqueue_style( $this->plugin_slug . '-theme-external-stylesheet-' . $key, $stylesheet, [], VersionHandler::VERSION );
+				}
+			} 			
+		}		
 	}
 	
 	/**
@@ -831,7 +851,26 @@ class Arlo_For_Wordpress {
 		wp_localize_script( $this->plugin_slug . '-plugin-script', 'WPUrls', array(
 			'home_url' => get_home_url(),
 		) );
-		
+
+		//enqueue theme related scripts
+		$stored_themes_settings = get_option( 'arlo_themes_settings', [] );
+		$theme_id = get_option( 'arlo_theme');
+
+		if (isset($stored_themes_settings[$theme_id])) {
+			//internal resources
+			if (isset($stored_themes_settings[$theme_id]->internalResources->javascripts) && is_array($stored_themes_settings[$theme_id]->internalResources->javascripts)) {
+				foreach ($stored_themes_settings[$theme_id]->internalResources->javascripts as $key => $script) {
+					wp_enqueue_script( $this->plugin_slug . '-theme-internal-script-' . $key, $script, array( 'jquery' ), $stored_themes_settings[$theme_id]->version );
+				}
+			} 
+
+			//external resources
+			if (isset($stored_themes_settings[$theme_id]->externalResources->javascripts) && is_array($stored_themes_settings[$theme_id]->externalResources->javascripts)) {
+				foreach ($stored_themes_settings[$theme_id]->externalResources->javascripts as $key => $script) {
+					wp_enqueue_script( $this->plugin_slug . '-theme-external-script-' . $key, $script, [], VersionHandler::VERSION );
+				}
+			} 			
+		}
 	}
 	
 	/**  Local Setter  */

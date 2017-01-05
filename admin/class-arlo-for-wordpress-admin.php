@@ -551,7 +551,9 @@ class Arlo_For_Wordpress_Admin {
 
 		//save theme changes
 		$theme_id = get_option('arlo_theme', 'basic.list');
-		update_option('arlo_themes_settings', [$theme_id => ['templates' => $new['templates']]], 1);
+		$stored_themes_settings = get_option( 'arlo_themes_settings', [] );
+		$stored_themes_settings[$theme_id]->templates = $new['templates'];
+		update_option('arlo_themes_settings', $stored_themes_settings, 1);
 			
 		if($old['platform_name'] != $new['platform_name'] && !empty($new['platform_name'])) {
 		

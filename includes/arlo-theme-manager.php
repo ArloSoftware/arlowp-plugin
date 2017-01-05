@@ -14,8 +14,8 @@ class ThemeManager {
 
 	public $themes_path;
 	public $themes_url;
-	public $themes_settings;
-
+	
+	private $themes_settings;
 	private $plugin;
 	private $dbl;	
 
@@ -39,9 +39,21 @@ class ThemeManager {
 			$theme_id = str_replace($this->themes_path, '', $theme_dir);
 			$settings_object = json_decode(file_get_contents($theme_setting_file));
 			$settings_object->dir = $theme_dir;
+			$settings_object->url = str_replace($this->themes_path, $this->themes_url, $theme_dir);
+
 			$settings_object->images = array_map(function($image_path) use($plugin_dir, $plugin_url) {
 				return str_replace($this->themes_path, $this->themes_url, $image_path);
 			}, glob($theme_dir . "/images/*.{jpg,JPG,jpeg,JPEG,png,PNG,gif,GIF}", GLOB_BRACE));
+
+			//internal resources
+			$settings_object->internalResources = new \stdClass();
+			$settings_object->internalResources->stylesheets = array_map(function($stylesheet_path) use($plugin_dir, $plugin_url) {
+				return str_replace($this->themes_path, $this->themes_url, $stylesheet_path);
+			}, glob($theme_dir . "/css/*.{css,CSS}", GLOB_BRACE));
+
+			$settings_object->internalResources->javascripts = array_map(function($script_path) use($plugin_dir, $plugin_url) {
+				return str_replace($this->themes_path, $this->themes_url, $script_path);
+			}, glob($theme_dir . "/js/*.{js,JS}", GLOB_BRACE));			
 
 			$themes[$theme_id] = $settings_object;
 		}

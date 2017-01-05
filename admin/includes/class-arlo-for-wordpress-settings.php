@@ -98,17 +98,19 @@ class Arlo_For_Wordpress_Settings {
 				$theme_manager = $plugin->get_theme_manager();
 				
 				if ($theme_manager->is_theme_valid($theme_id)) {
+					$theme_settings = $theme_manager->get_themes_settings();
 					$stored_themes_settings = get_option( 'arlo_themes_settings', [] );
 
 					//check if there is already a stored settings for the theme, or need to be reset
 					if ($_GET['reset'] == 1 || empty($stored_themes_settings[$theme_id])) {
-						$stored_themes_settings[$theme_id]['templates'] = $theme_manager->load_default_templates($theme_id);
+						$stored_themes_settings[$theme_id] = $theme_settings[$theme_id];
+						$stored_themes_settings[$theme_id]->templates = $theme_manager->load_default_templates($theme_id);
 					}
 
-					if ($stored_themes_settings[$theme_id]['templates'] !== false) {
+					if ($stored_themes_settings[$theme_id]->templates !== false) {
 						//update the main setting with the stored theme
 						foreach ($settings_object['templates'] as $page => $template) {
-							$settings_object['templates'][$page]['html'] = $stored_themes_settings[$theme_id]['templates'][$page]['html'];
+							$settings_object['templates'][$page]['html'] = $stored_themes_settings[$theme_id]->templates[$page]['html'];
 						}
 
 						update_option('arlo_themes_settings', $stored_themes_settings, 1);
@@ -718,6 +720,7 @@ class Arlo_For_Wordpress_Settings {
 		$theme_manager = $plugin->get_theme_manager();
 
 		$themes = $theme_manager->get_themes_settings();
+		$themes = array_merge($themes, $themes, $themes, $themes);
 
 		$selected_theme_id = get_option('arlo_theme', 'basic.list');
 
