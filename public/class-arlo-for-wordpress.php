@@ -623,7 +623,6 @@ class Arlo_For_Wordpress {
 
 		//set default theme
 		if (empty($theme_id)) {
-			$plugin = Arlo_For_Wordpress::get_instance();
 			$theme_manager = $this->get_theme_manager();	
 			$theme_settings = $theme_manager->get_themes_settings();
 
@@ -1016,7 +1015,7 @@ class Arlo_For_Wordpress {
 			return $version_handler;
 		}
 		
-		$version_handler = new VersionHandler($this->get_dbl(), $this->get_message_handler());
+		$version_handler = new VersionHandler($this->get_dbl(), $this->get_message_handler(), $this->get_theme_manager());
 		
 		$this->__set('version_handler', $version_handler);
 		

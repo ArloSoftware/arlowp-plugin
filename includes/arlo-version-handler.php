@@ -10,10 +10,11 @@ use Arlo\Utilities;
 class VersionHandler extends Singleton {
 	const VERSION = '2.4.1.1';
 
-	public function __construct($dbl, $message_handler) {
+	public function __construct($dbl, $message_handler, $theme_manager) {
 		$this->dbl = &$dbl; 	
 
-		$this->message_handler = $message_handler;	
+		$this->message_handler = $message_handler;
+		$this->theme_manager = $theme_manager;
 	}	
 
 	public function get_current_installed_version () {
@@ -67,6 +68,10 @@ class VersionHandler extends Singleton {
 		if (version_compare($old_version, '2.5') < 0) {
 			$this->do_update('2.5');
 		}		
+
+		if (version_compare($old_version, '3.0') < 0) {
+			$this->do_update('3.0');
+		}
 	}
 	
 	private function run_pre_data_update($version) {
@@ -402,6 +407,25 @@ class VersionHandler extends Singleton {
 				}
 				
 			break;	
+
+			case '3.0':
+				$theme_id = 'basic.list';
+				update_option('arlo_theme', $theme_id, 1);
+
+				$settings = get_option('arlo_settings');
+
+				$theme_settings = $this->theme_manager->get_themes_settings();
+
+				$stored_themes_settings[$theme_id] = $theme_settings[$theme_id];
+				$stored_themes_settings[$theme_id]->templates = $this->theme_manager->load_default_templates($theme_id);
+
+				foreach ($settings['templates'] as $page => $template) {
+					$stored_themes_settings[$theme_id]->templates[$page]['html'] = $settings['templates'][$page]['html'];
+				}
+
+				update_option('arlo_themes_settings', $stored_themes_settings, 1);
+
+			break;
 		}	
 	}	
 }
