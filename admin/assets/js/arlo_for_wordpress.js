@@ -433,7 +433,22 @@ if (typeof (Arlo) === "undefined") {
 					el.parentsUntil('.arlo-message').parent().find('.notice-dismiss').trigger('click');
 					$('#arlo_send_data').removeAttr("checked");
 				});
-			});					
+			});	
+
+			$(".theme-apply").click(function(e) {
+				var message = "Do you really want to replace ALL the existing templates with the selected theme?",
+					target = $(e.currentTarget);
+
+				e.preventDefault();
+
+				if (target.hasClass('theme-reset')) {
+					message = "Do you really want to reset ALL the existing templates with the originals?"
+				}
+
+				if (confirm(message)) {
+					document.location = target.attr('href');
+				} 				
+			})
 		},
 		getEventsForWebinar: function() {
 			var me = this,

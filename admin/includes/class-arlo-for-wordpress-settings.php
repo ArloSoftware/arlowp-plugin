@@ -730,10 +730,10 @@ class Arlo_For_Wordpress_Settings {
 					' . (!empty($theme_data->demoUrl) ? '<li><a href="' . $theme_data->demoUrl . '" target="_blank">' . __('Live demo', 'arlo-for-wordpress' ) . '</a></li>' : '' ) . '
 					' . ($selected_theme_id == $theme_id ? '
 						<li class="arlo-theme-current">Current</li>
-						<li><a href="' . wp_nonce_url(admin_url('admin.php?page=arlo-for-wordpress&apply-theme=' . urlencode($theme_id) . '&reset=1'), 'arlo-apply-theme-nonce') . '">Reset</a></li>
+						<li><a class="theme-apply theme-reset" href="' . wp_nonce_url(admin_url('admin.php?page=arlo-for-wordpress&apply-theme=' . urlencode($theme_id) . '&reset=1'), 'arlo-apply-theme-nonce') . '">Reset</a></li>
 					':'
-						<li><a href="' . wp_nonce_url(admin_url('admin.php?page=arlo-for-wordpress&apply-theme=' . urlencode($theme_id)), 'arlo-apply-theme-nonce') . '">Apply</a></li>
-						<li><a href="' . wp_nonce_url(admin_url('admin.php?page=arlo-for-wordpress&apply-theme=' . urlencode($theme_id) . '&reset=1'), 'arlo-apply-theme-nonce') . '">Apply & Reset</a></li>
+						<li><a class="theme-apply" href="' . wp_nonce_url(admin_url('admin.php?page=arlo-for-wordpress&apply-theme=' . urlencode($theme_id)), 'arlo-apply-theme-nonce') . '">Apply</a></li>
+						<li><a class="theme-apply theme-reset" href="' . wp_nonce_url(admin_url('admin.php?page=arlo-for-wordpress&apply-theme=' . urlencode($theme_id) . '&reset=1'), 'arlo-apply-theme-nonce') . '">Apply & Reset</a></li>
 					') . ' 
 					</ul>
 				</div>
