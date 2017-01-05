@@ -2,7 +2,7 @@
 [arlo_upcoming_event_filters filtertext='Filter' resettext="Reset" filters='category,month,location,delivery']
 
 <ul class="arlo-list upcoming">
-    [arlo_upcoming_list_item limit="1000"]
+    [arlo_upcoming_list_item limit="100"]
         [arlo_group_divider wrap='<li class="arlo-cf arlo-group-divider">%s</li>']
 	
         <li class="arlo-cf">
@@ -31,4 +31,4 @@
 </ul>
 
 [arlo_no_event_text]
-[arlo_upcoming_list_pagination limit="1000"]
+[arlo_upcoming_list_pagination limit="100"]
