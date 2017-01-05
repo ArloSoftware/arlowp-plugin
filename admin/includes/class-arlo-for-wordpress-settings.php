@@ -728,17 +728,29 @@ class Arlo_For_Wordpress_Settings {
 	    <h4>Select a pre-built theme</h4>
 		<ul class="arlo-themes">';
 		foreach ($themes as $theme_id => $theme_data) {
-			$images = [];
+			$desc = [];
+			$overlay = htmlentities(strip_tags($theme_data->name));
+
 			foreach ($theme_data->images as $image) {
-				$images[] = '<img src="' . $image . '">';
+				$desc[] = '<img src="' . $image . '">';
+			}
+
+			if (!count($desc)) { 
+				$desc[] = '
+					<div class="arlo-theme-desc-text">
+						<div class="arlo-theme-name">' . htmlentities(strip_tags($theme_data->name)) . '</div>
+						<div class="arlo-theme-description">' . htmlentities(strip_tags($theme_data->description)) . '</div>
+					</div>
+				';
+				$overlay = $desc[0];
 			}
 
 			echo '
 			<li class="arlo-theme">
-				<div class="arlo-theme-image">
+				<div class="arlo-theme-desc">
 					' . (!empty($theme_data->demoUrl) ? '<a href="' . $theme_data->demoUrl . '" target="_blank">' : '' ) .'
-					' . $images[0] . '
-					<span class="arlo-theme-name">' . htmlentities($theme_data->name) . '</span>
+					' . $desc[0] . '
+					<div class="arlo-theme-overlay">' . $overlay  . '</div>
 					' . (!empty($theme_data->demoUrl) ? '</a>' : '' ) .'
 				</div>
 				<div class="arlo-theme-buttons">
