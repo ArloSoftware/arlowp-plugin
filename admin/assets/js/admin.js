@@ -6,7 +6,7 @@
 			var config = {
 				apiClient: LSApi,
 				ajaxUrl: window.ajaxurl,
-				bluePrints: window.arlo_blueprints,
+				templates: window.arlo_templates,
 				immediateTaskIDs: window.ArloImmediateTaskIDs,
 				runningTaskIDs: window.ArloRunningTaskIDs
 			}, 

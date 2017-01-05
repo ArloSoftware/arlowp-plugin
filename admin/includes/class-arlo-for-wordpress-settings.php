@@ -327,7 +327,7 @@ class Arlo_For_Wordpress_Settings {
 	function arlo_pages_section_callback() {
 		echo '
 	    		<script type="text/javascript"> 
-	    			var arlo_blueprints = ' . json_encode($this->arlo_template_source()) . ';
+	    			var arlo_templates = ' . json_encode($this->arlo_template_source()) . ';
 	    		</script>		
 		';
 	}
@@ -476,43 +476,25 @@ class Arlo_For_Wordpress_Settings {
 	
 	    echo '
 	    	<div class="arlo-label">
-	    		<label>'. __('Style and layout', 'arlo-for-wordpress' ) . '</label>
+	    		<label>'. __('Template', 'arlo-for-wordpress' ) . '</label>
 	    	</div>
-	    	<div class="arlo-field">';
-				    if (!empty(Arlo_For_Wordpress::$templates[$template])) {
-						$template_definition = Arlo_For_Wordpress::$templates[$template];
-						if (isset($template_definition['sub']) && is_array($template_definition['sub'])) {
-							echo '<div class="' . ARLO_PLUGIN_PREFIX . '-sub-template-select">
-								<select name="arlo_settings[subtemplate]['.$template.']">';
-						    foreach ($template_definition['sub'] as $k => $v) {
-						    	$selected = (!empty($settings_object['subtemplate'][$template]) && $settings_object['subtemplate'][$template] == $k ? 'selected' : '');
-						    	echo '<option value="' . $k . '" '.$selected.'>' . $v . '</option>';
-						    }
-					    				
-					    	echo '</select>
-					    	</div>';
-						}	    
-				    }	    	
-				echo '
+	    	<div class="arlo-field">
 	    		<div class="' . ARLO_PLUGIN_PREFIX . '-reload-template"><a>' . __('Reload original template', 'arlo-for-wordpress' ) . '</a></div>
 	    	</div>
 	    	<div class="cf"></div>';
 	}
 	
 	function arlo_template_source() {
+		$plugin = Arlo_For_Wordpress::get_instance();
+		$theme_manager = $plugin->get_theme_manager();
+
+		$selected_theme_id = get_option('arlo_theme', 'basic.list');
+		$theme_templates = $theme_manager->load_default_templates($selected_theme_id);
 		
 		$templates = [];
 		
 		foreach (Arlo_For_Wordpress::$templates as $key => $val) {
-			$templates[ARLO_PLUGIN_PREFIX . '-' . $key] = $this->arlo_get_blueprint($key);
-			
-			if (isset($val['sub']) && is_array($val['sub'])) {
-				foreach ($val['sub'] as $sufix => $sufixname) {
-					if (!empty($sufix)) {
-						$templates[ARLO_PLUGIN_PREFIX . '-' . $key . '-' . $sufix] = $this->arlo_get_blueprint($key . '_' . $sufix);			
-					}
-				}
-			}
+			$templates[ARLO_PLUGIN_PREFIX . '-' . $key] = $theme_templates[$key]['html'];
 		}
 		
 		return $templates;
@@ -548,15 +530,7 @@ class Arlo_For_Wordpress_Settings {
 		";
 		
 	}
-	                                                                                                                                                      
-	function arlo_get_blueprint($name) {
-		$path = ARLO_PLUGIN_DIR.'/includes/blueprints/'.$name.'.tmpl';
-
-		if(file_exists($path)) {
-			return file_get_contents($path);
-		}
-	}
-		
+	                                                                                                                                                      	
 	function arlo_regions_callback($args) {
 		$regions = get_option('arlo_regions', array());
 		

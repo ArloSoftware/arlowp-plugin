@@ -201,10 +201,6 @@ class Arlo_For_Wordpress {
 		'event' => array(
 			'id' => 'event',
 			'name' => 'Event',
-			'sub' => array(
-				'' => 'List',
-				'grid' => 'Grid'
-			)
 		),
 		'events' => array(
 			'id' => 'events',
@@ -220,10 +216,6 @@ class Arlo_For_Wordpress {
 			'id' => 'upcoming',
 			'shortcode' => '[arlo_upcoming_list]',
 			'name' => 'Upcoming event list',
-			'sub' => array(
-				'' => 'List',
-				'grid' => 'Grid'
-			)
 		),
 		'presenter' => array(
 			'id' => 'presenter',
@@ -631,7 +623,7 @@ class Arlo_For_Wordpress {
 			foreach($this::$templates as $id => $template) {
 				if (empty($settings['templates'][$id]['html'])) {
 					$settings['templates'][$id] = array(
-						'html' => arlo_get_blueprint($id)
+						'html' => arlo_get_template($id)
 					);				
 				}
 			}
@@ -647,7 +639,7 @@ class Arlo_For_Wordpress {
 			
 			foreach($this::$templates as $id => $template) {
 				$default_settings['templates'][$id] = array(
-					'html' => arlo_get_blueprint($id)
+					'html' => arlo_get_template($id)
 				);
 			}		
 			
