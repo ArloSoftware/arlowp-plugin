@@ -728,20 +728,19 @@ class Arlo_For_Wordpress_Settings {
 		<ul class="arlo-themes">';
 		foreach ($themes as $theme_id => $theme_data) {
 			$desc = [];
-			$overlay = htmlentities(strip_tags($theme_data->name));
+			$overlay = '
+					<div class="arlo-theme-desc-text">
+						<div class="arlo-theme-name">' . htmlentities(strip_tags($theme_data->name)) . '</div>
+						<div class="arlo-theme-description">' . htmlentities(strip_tags($theme_data->description)) . '</div>
+					</div>
+				';
 
 			foreach ($theme_data->images as $image) {
 				$desc[] = '<img src="' . $image . '">';
 			}
 
 			if (!count($desc)) { 
-				$desc[] = '
-					<div class="arlo-theme-desc-text">
-						<div class="arlo-theme-name">' . htmlentities(strip_tags($theme_data->name)) . '</div>
-						<div class="arlo-theme-description">' . htmlentities(strip_tags($theme_data->description)) . '</div>
-					</div>
-				';
-				$overlay = $desc[0];
+				$desc[] = $overlay;
 			}
 
 			echo '
