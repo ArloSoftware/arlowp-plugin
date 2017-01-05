@@ -112,9 +112,8 @@ class Arlo_For_Wordpress_Settings {
 						foreach ($settings_object['templates'] as $page => $template) {
 							$settings_object['templates'][$page]['html'] = $stored_themes_settings[$theme_id]->templates[$page]['html'];
 						}
-
-						update_option('arlo_themes_settings', $stored_themes_settings, 1);
 						update_option('arlo_settings', $settings_object, 1);
+						update_option('arlo_themes_settings', $stored_themes_settings, 1);
 						update_option('arlo_theme', $theme_id, 1);
 
 						wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages') );
