@@ -27,8 +27,6 @@ use Arlo\SystemRequirements;
  * 
  */
 
- use Arlo\SystemRequirements;
-
 /**
  * Plugin class. This class should ideally be used to work with the
  * public-facing side of the WordPress site.
@@ -43,8 +41,6 @@ use Arlo\SystemRequirements;
 class Arlo_For_Wordpress {
 
 	/**
-<<<<<<< HEAD
-=======
 	 * Plugin version, used for cache-busting of style and script file references.
 	 *
 	 * @since   1.0.0
@@ -79,7 +75,6 @@ class Arlo_For_Wordpress {
 	 *
 	 * Unique identifier for your plugin.
 	 *
->>>>>>> master
 	 *
 	 * The variable name is used as the text domain when internationalizing strings
 	 * of text. Its value should match the Text Domain file header in the main
