@@ -404,6 +404,12 @@ class Importer {
 				$import = $this->get_import_entry($this->import_id, null, 1);
 
 				$this->current_task_class->uri = json_decode($import->callback_json)->SnapshotUri;
+
+				if (json_last_error() != JSON_ERROR_NONE) {
+					error_log("JSON Decode error: " . json_last_error_msg());
+					Logger::log_error("JSON Decode error: " . json_last_error_msg(), $this->import_id);
+				}
+
 				$this->current_task_class->filename = $this->import_id;
 				$this->current_task_class->response_json = json_decode($import->response_json);
 			break;
@@ -462,7 +468,7 @@ class Importer {
 
 	public function callback() {
 		try {
-			$callback_json = json_decode(file_get_contents("php://input"));
+			$callback_json = json_decode(utf8_encode(file_get_contents("php://input")));
 
 			if (!is_null($callback_json) && !empty($callback_json->Nonce) && 
 				($import = $this->validate_import_entry($callback_json->Nonce, $callback_json->RequestID)) !== false && !empty($callback_json->__jwe__)) {
@@ -473,7 +479,7 @@ class Importer {
 
 				//JWE decode
 				$decoded = utf8_decode(Crypto::jwe_decrypt($callback_json->__jwe__, $response_json->Callback->EncryptedResponse->key->k));
-				$this->update_import_entry(['callback_json' => $decoded]);
+				$this->update_import_entry(['callback_json' => preg_replace('/[\x00-\x1F\x7F]/', '', $decoded)]);
 				$this->kick_off_scheduler();
 			} 
 		} catch(\Exception $e) {
