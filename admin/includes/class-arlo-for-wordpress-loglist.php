@@ -32,8 +32,8 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 		$this->init_variables();	
 		$this->table_name =  $this->wpdb->prefix . self::TABLENAME;
 		
-		$this->singular = __( 'Log entry', $this->plugin_slug );		
-		$this->plural = __( 'Log entries', $this->plugin_slug ); 
+		$this->singular = __( 'Log entry', 'arlo-for-wordpress' );		
+		$this->plural = __( 'Log entries', 'arlo-for-wordpress' ); 
 		
 		$this->_column_headers = array($this->get_columns(), $this->get_hidden_columns(), $this->get_sortable_columns());
 		
@@ -158,9 +158,7 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 		
 		$limit = ($this->paged-1) * self::PERPAGE;
 		$sql .= ' LIMIT ' . $limit . ',' . self::PERPAGE;
-		
-		//var_dump($sql);
-		
+			
 		$num = $this->get_num_rows();
 				
 		$this->set_pagination_args( array(
@@ -183,10 +181,10 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 	
 	public function get_columns() {
 		return $columns = [
-			'id'    => __( 'ID', $this->plugin_slug ),
-			'import_id'    => __( 'Import ID', $this->plugin_slug ),
-			'message'    => __( 'Message', $this->plugin_slug ),
-			'created'    => __( 'Created date', $this->plugin_slug ),
+			'id'    => __( 'ID', 'arlo-for-wordpress' ),
+			'import_id'    => __( 'Import ID', 'arlo-for-wordpress' ),
+			'message'    => __( 'Message', 'arlo-for-wordpress' ),
+			'created'    => __( 'Created date', 'arlo-for-wordpress' ),
 		];
 	}	
 
@@ -202,5 +200,3 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 		);
 	}		
 }
-
-?>

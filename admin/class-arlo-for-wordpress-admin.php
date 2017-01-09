@@ -21,6 +21,10 @@
  * @package Arlo_For_Wordpress_Admin
  * @author  Your Name <email@example.com>
  */
+
+use Arlo\VersionHandler;
+use Arlo\Importer\ImportRequest;
+
 class Arlo_For_Wordpress_Admin {
 
 	/**
@@ -91,8 +95,11 @@ class Arlo_For_Wordpress_Admin {
 		add_filter( 'plugin_action_links_' . $plugin_basename, array( $this, 'add_action_links' ) );
 
 		add_filter ( 'user_can_richedit' , array( $this, 'disable_visual_editor') , 50 );
+
+		add_filter( 'pre_update_option_arlo_settings', array($this, 'settings_pre_saved'), 10, 2 );
 		
 		add_action( 'update_option_arlo_settings', array($this, 'settings_saved') );
+		
 		
 		add_action( 'admin_init', array($this, 'check_plugin_version') );
 	}
@@ -104,10 +111,11 @@ class Arlo_For_Wordpress_Admin {
 	 *
 	 * @return    null
 	 */
-	public static function check_plugin_version($plugin) {
+	 
+	public function check_plugin_version($plugin) {
 		global $wp_rewrite;
  		$plugin = Arlo_For_Wordpress::get_instance();
-		$plugin::check_plugin_version();
+		$plugin->check_plugin_version();
 		$wp_rewrite->flush_rules(); 		
 	}
 
@@ -154,17 +162,17 @@ class Arlo_For_Wordpress_Admin {
 			return;
 		}
 		
-		wp_enqueue_style( $this->plugin_slug .'-admin-public-styles', plugins_url( 'assets/css/admin_public.css?20161031', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );		
+		wp_enqueue_style( $this->plugin_slug .'-admin-public-styles', plugins_url( 'assets/css/admin_public.css?20161031', __FILE__ ), array(), VersionHandler::VERSION );		
 		
 		$screen = get_current_screen();	
 		
 		if ( in_array($screen->id, [$this->plugin_screen_hook_suffix, $this->plugin_venues_screen_hook_suffix, $this->plugin_oa_screen_hook_suffix, $this->plugin_loglist_screen_hook_suffix, $this->plugin_presenters_screen_hook_suffix, $this->plugin_templates_screen_hook_suffix, $this->plugin_events_screen_hook_suffix, $this->plugin_sessions_screen_hook_suffix])) {
-			wp_enqueue_style( $this->plugin_slug .'-admin-styles', plugins_url( 'assets/css/admin.css?20161031', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );
+			wp_enqueue_style( $this->plugin_slug .'-admin-styles', plugins_url( 'assets/css/admin.css?20161031', __FILE__ ), array(), VersionHandler::VERSION );
 			
 			if ($screen->id == $this->plugin_screen_hook_suffix) {
-				wp_enqueue_style( $this->plugin_slug .'-codemirror', plugins_url( 'assets/css/libs/codemirror.css', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );
-				wp_enqueue_style( $this->plugin_slug .'-jquery-ui', plugins_url( 'assets/css/libs/jquery-ui.min.css', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );
-				wp_enqueue_style( $this->plugin_slug .'-icons8', plugins_url( 'assets/fonts/icons8/Arlo-WP.css', __FILE__ ), array(), Arlo_For_Wordpress::VERSION );
+				wp_enqueue_style( $this->plugin_slug .'-codemirror', plugins_url( 'assets/css/libs/codemirror.css', __FILE__ ), array(), VersionHandler::VERSION );
+				wp_enqueue_style( $this->plugin_slug .'-jquery-ui', plugins_url( 'assets/css/libs/jquery-ui.min.css', __FILE__ ), array(), VersionHandler::VERSION );
+				wp_enqueue_style( $this->plugin_slug .'-icons8', plugins_url( 'assets/fonts/icons8/Arlo-WP.css', __FILE__ ), array(), VersionHandler::VERSION );
 			}
 		}
 
@@ -187,15 +195,16 @@ class Arlo_For_Wordpress_Admin {
 			return;
 		}
 		
-		wp_enqueue_script( $this->plugin_slug . '-admin-global-script', plugins_url( 'assets/js/admin_public.js?20161031', __FILE__ ), array( 'jquery' ), Arlo_For_Wordpress::VERSION, true );
+		wp_enqueue_script( $this->plugin_slug . '-admin-global-script', plugins_url( 'assets/js/admin_public.js?20161031', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, true );
 
 		$screen = get_current_screen();
 		if ( $this->plugin_screen_hook_suffix == $screen->id ) {
-			wp_enqueue_script( $this->plugin_slug . '-lsapiclient', plugins_url( 'assets/js/lib/ls-apiclient-1.2.0.min.js', __FILE__ ), array( 'jquery' ), Arlo_For_Wordpress::VERSION, true );
-			wp_enqueue_script( $this->plugin_slug . '-jquery-ui', plugins_url( 'assets/js/lib/jquery-ui.min.js', __FILE__ ), array( 'jquery' ), Arlo_For_Wordpress::VERSION, true );
-			wp_enqueue_script( $this->plugin_slug . '-codemirror', plugins_url( 'assets/js/lib/codemirror.js', __FILE__ ), array(), Arlo_For_Wordpress::VERSION, true );
-			wp_enqueue_script( $this->plugin_slug . '-codemirror-css', plugins_url( 'assets/js/lib/codemirror-css.js', __FILE__ ), array(), Arlo_For_Wordpress::VERSION, true );
-			wp_enqueue_script( $this->plugin_slug . '-admin-script', plugins_url( 'assets/js/admin.js?20161031', __FILE__ ), array( 'jquery' ), Arlo_For_Wordpress::VERSION, true );		
+			wp_enqueue_script( $this->plugin_slug . '-lsapiclient', plugins_url( 'assets/js/lib/ls-apiclient-1.2.0.min.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, true );
+			wp_enqueue_script( $this->plugin_slug . '-jquery-ui', plugins_url( 'assets/js/lib/jquery-ui.min.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, true );
+			wp_enqueue_script( $this->plugin_slug . '-codemirror', plugins_url( 'assets/js/lib/codemirror.js', __FILE__ ), array(), VersionHandler::VERSION, true );
+			wp_enqueue_script( $this->plugin_slug . '-codemirror-css', plugins_url( 'assets/js/lib/codemirror-css.js', __FILE__ ), array(), VersionHandler::VERSION, true );
+			wp_enqueue_script( $this->plugin_slug . '-arlo-for-wordpress-script', plugins_url( 'assets/js/arlo_for_wordpress.js?20161031', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, true );
+			wp_enqueue_script( $this->plugin_slug . '-admin-script', plugins_url( 'assets/js/admin.js?20161031', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, true );					
 		}
 
 	}
@@ -222,7 +231,7 @@ class Arlo_For_Wordpress_Admin {
 		 * $pointerAlign: How the pointer is aligned to the target element. Optional, defaults to 'center'
 		 */
 
-		$pointer = new Feature_Pointer('arlo-1st-pointer', '#toplevel_page_arlo-for-wordpress', __('Arlo for WordPress',$this->plugin_slug), __('Arlo is almost ready. Just enter your details and you&apos;re good to go.',$this->plugin_slug), 'left', 'center');
+		$pointer = new Feature_Pointer('arlo-1st-pointer', '#toplevel_page_arlo-for-wordpress', __('Arlo for WordPress', 'arlo-for-wordpress' ), __('Arlo is almost ready. Just enter your details and you&apos;re good to go.', 'arlo-for-wordpress' ), 'left', 'center');
 
 	}
 
@@ -250,7 +259,7 @@ class Arlo_For_Wordpress_Admin {
 		 
 		 /*
 		$this->plugin_screen_hook_suffix = add_options_page(
-			ARLO_PLUGIN_NAME . ' ' . __( 'Settings', $this->plugin_slug ),
+			ARLO_PLUGIN_NAME . ' ' . __( 'Settings', 'arlo-for-wordpress' ),
 			ARLO_PLUGIN_NAME,
 			'manage_options',
 			$this->plugin_slug,
@@ -259,13 +268,13 @@ class Arlo_For_Wordpress_Admin {
 		*/
 		
 		$this->plugin_screen_hook_suffix = add_menu_page( 'Arlo settings page', 'Arlo settings', 'manage_options', $this->plugin_slug, array( $this, 'display_plugin_admin_page' ), 'none', '10.4837219128727371208127' );
-		$this->plugin_events_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Events', $this->plugin_slug ), __( 'Events', $this->plugin_slug ) , 'manage_options' , $this->plugin_slug . '-events' , array( $this, 'display_events_admin_page'));		
-		$this->plugin_oa_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Online Activities', $this->plugin_slug ), __( 'Online Activities', $this->plugin_slug ) , 'manage_options' , $this->plugin_slug . '-onlineactivities' , array( $this, 'display_oa_admin_page'));
-		$this->plugin_templates_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Templates', $this->plugin_slug ), __( 'Templates', $this->plugin_slug ) , 'manage_options' , $this->plugin_slug . '-templates' , array( $this, 'display_templates_admin_page'));		
-		$this->plugin_sessions_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Sessions', $this->plugin_slug ), __( 'Sessions', $this->plugin_slug ) , 'manage_options' , $this->plugin_slug . '-sessions' , array( $this, 'display_sessions_admin_page'));		
-		$this->plugin_presenters_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Presenters', $this->plugin_slug ), __( 'Presenters', $this->plugin_slug ) , 'manage_options' , $this->plugin_slug . '-presenters' , array( $this, 'display_presenters_admin_page'));
-		$this->plugin_venues_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Venues', $this->plugin_slug ), __( 'Venues', $this->plugin_slug ) , 'manage_options' , $this->plugin_slug . '-venues' , array( $this, 'display_venues_admin_page'));
-		$this->plugin_loglist_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Logs', $this->plugin_slug ), __( 'Logs', $this->plugin_slug ) , 'manage_options' , $this->plugin_slug . '-logs' , array( $this, 'display_loglist_admin_page'));
+		$this->plugin_events_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Events', 'arlo-for-wordpress' ), __( 'Events', 'arlo-for-wordpress' ) , 'manage_options' , $this->plugin_slug . '-events' , array( $this, 'display_events_admin_page'));		
+		$this->plugin_oa_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Online Activities', 'arlo-for-wordpress' ), __( 'Online Activities', 'arlo-for-wordpress' ) , 'manage_options' , $this->plugin_slug . '-onlineactivities' , array( $this, 'display_oa_admin_page'));
+		$this->plugin_templates_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Templates', 'arlo-for-wordpress' ), __( 'Templates', 'arlo-for-wordpress' ) , 'manage_options' , $this->plugin_slug . '-templates' , array( $this, 'display_templates_admin_page'));		
+		$this->plugin_sessions_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Sessions', 'arlo-for-wordpress' ), __( 'Sessions', 'arlo-for-wordpress' ) , 'manage_options' , $this->plugin_slug . '-sessions' , array( $this, 'display_sessions_admin_page'));		
+		$this->plugin_presenters_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Presenters', 'arlo-for-wordpress' ), __( 'Presenters', 'arlo-for-wordpress' ) , 'manage_options' , $this->plugin_slug . '-presenters' , array( $this, 'display_presenters_admin_page'));
+		$this->plugin_venues_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Venues', 'arlo-for-wordpress' ), __( 'Venues', 'arlo-for-wordpress' ) , 'manage_options' , $this->plugin_slug . '-venues' , array( $this, 'display_venues_admin_page'));
+		$this->plugin_loglist_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Logs', 'arlo-for-wordpress' ), __( 'Logs', 'arlo-for-wordpress' ) , 'manage_options' , $this->plugin_slug . '-logs' , array( $this, 'display_loglist_admin_page'));
 
 	}
 
@@ -350,7 +359,7 @@ class Arlo_For_Wordpress_Admin {
 
 		return array_merge(
 			array(
-				'settings' => '<a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug ) . '">' . __( 'Settings', $this->plugin_slug ) . '</a>'
+				'settings' => '<a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug ) . '">' . __( 'Settings', 'arlo-for-wordpress' ) . '</a>'
 			),
 			$links
 		);
@@ -468,7 +477,7 @@ class Arlo_For_Wordpress_Admin {
 							<td>
 								<h2 class="nav-tab-wrapper vertical-nav-tab-wrapper">';
 								    foreach(Arlo_For_Wordpress::$templates as $id => $template) {
-								    	$name = __($template['name'], $this->plugin_slug);
+								    	$name = __($template['name'], 'arlo-for-wordpress' );
 										echo '<a href="#pages/'.$id.'" class="nav-tab vertical-nav-tab ' . $this->plugin_slug . '-pages-' . $id . '" id="' . $this->plugin_slug . '-pages-' . $id . '">'.$name.'</a>';
 								    }				
 								echo '</h2>							
@@ -481,8 +490,8 @@ class Arlo_For_Wordpress_Admin {
 									$path = ARLO_PLUGIN_DIR . 'admin/includes/codes/' . $field['id'] . '.php';
 									if(file_exists($path)) {
 										echo '<div class="' . ARLO_PLUGIN_PREFIX . '-shortcodes">
-											<h3>' . __( 'Recommended shortcodes', $this->plugin_slug ) . '</h3>
-											<a href="http://developer.arlo.co/doc/wordpress/shortcodes/" target="_blank">' . __( 'More about shortcodes', $this->plugin_slug ) . '</a>';
+											<h3>' . __( 'Recommended shortcodes', 'arlo-for-wordpress' ) . '</h3>
+											<a href="http://developer.arlo.co/doc/wordpress/shortcodes/" target="_blank">' . __( 'More about shortcodes', 'arlo-for-wordpress' ) . '</a>';
 										
 										include($path);
 										echo '</div>';
@@ -523,6 +532,16 @@ class Arlo_For_Wordpress_Admin {
 		}
 
 		return $default;
+	}
+
+	public function settings_pre_saved($new, $old) {
+		if (empty($new['import_fragment_size']) || !is_numeric($new['import_fragment_size'])) {
+			$new['import_fragment_size'] = ImportRequest::FRAGMENT_DEFAULT_BYTE_SIZE;
+		} else if ($new['import_fragment_size'] > ImportRequest::FRAGMENT_MAX_BYTE_SIZE) {
+			$new['import_fragment_size'] = ImportRequest::FRAGMENT_MAX_BYTE_SIZE;
+		}
+
+		return $new;
 	}
 		
 	public function settings_saved($old) {
@@ -591,8 +610,6 @@ class Arlo_For_Wordpress_Admin {
 						'post_parent'	=> $new['post_types'][$id]['posts_page']
 					));
 				}
-				
-				
 			}
 		}
 	}

@@ -16,8 +16,8 @@ class Arlo_For_Wordpress_OnlineActivities extends Arlo_For_Wordpress_Lists  {
 	const TABLENAME = 'arlo_onlineactivities';
 
 	public function __construct() {		
-		$this->singular = __( 'Online activity', $this->plugin_slug );		
-		$this->plural = __( 'Online activities', $this->plugin_slug );
+		$this->singular = __( 'Online activity', 'arlo-for-wordpress' );		
+		$this->plural = __( 'Online activities', 'arlo-for-wordpress' );
 
 		parent::__construct();		
 	}
@@ -38,10 +38,10 @@ class Arlo_For_Wordpress_OnlineActivities extends Arlo_For_Wordpress_Lists  {
 	
 	public function get_columns() {
 		return $columns = [
-			'oa_code'    => __( 'Code', $this->plugin_slug ),
-			'oa_name'    => __( 'Name', $this->plugin_slug ),
-			'oa_delivery_description'    => __( 'Delivery desc.', $this->plugin_slug ),
-			'oa_region' => __( 'Regions', $this->plugin_slug ),
+			'oa_code'    => __( 'Code', 'arlo-for-wordpress' ),
+			'oa_name'    => __( 'Name', 'arlo-for-wordpress' ),
+			'oa_delivery_description'    => __( 'Delivery desc.', 'arlo-for-wordpress' ),
+			'oa_region' => __( 'Regions', 'arlo-for-wordpress' ),
 		];
 	}	
 	
@@ -61,12 +61,12 @@ class Arlo_For_Wordpress_OnlineActivities extends Arlo_For_Wordpress_Lists  {
 			case 'oa_code':
 			case 'oa_region':
 			case 'oa_delivery_description':
-				return $item->$column_name;
+				return htmlentities($item->$column_name, ENT_QUOTES, "UTF-8");
 			case 'oa_name':
-				$field = '<div class="arlo-event-name">' . $item->oa_name . '</div>';
+				$field = '<div class="arlo-event-name">' . htmlentities($item->oa_name, ENT_QUOTES, "UTF-8") . '</div>';
 												
 				if (!empty($item->oa_registeruri)) 		
-					$field .= '<div class="arlo-event_registeruri"><a href="'.$item->oa_registeruri.'" target="_blank">' . $item->oa_registermessage . '</a></div>';
+					$field .= '<div class="arlo-event_registeruri"><a href="'.$item->oa_registeruri.'" target="_blank">' . strip_tags($item->oa_registermessage) . '</a></div>';
 
 				return $field;
 			default:
@@ -88,7 +88,7 @@ class Arlo_For_Wordpress_OnlineActivities extends Arlo_For_Wordpress_Lists  {
 		
 	protected function get_sql_where_array() {
 		return [
-			"oa.active = '" . $this->active . "'"
+			"oa.import_id = '" . $this->import_id . "'"
 		];
 	}
 	
@@ -140,5 +140,3 @@ class Arlo_For_Wordpress_OnlineActivities extends Arlo_For_Wordpress_Lists  {
 		return sprintf('https://my.arlo.co/%s/Console/#/onlineactivities/', $this->platform_name );
 	}			
 }
-
-?>

@@ -2,26 +2,20 @@
 
 namespace Arlo;
 
-require_once 'arlo-singleton.php';
-
-use Arlo\Singleton;
-
-class Scheduler extends Singleton {
+class Scheduler {
 	
 	private $max_simultaneous_task = 1;
 	private $table = '';
 	private $table_data = '';
-	private $wpdb;
+	private $plugin;
+	private $dbl;
 	
-	public function __construct($plugin) {
-		global $wpdb;
-		
-		$this->wpdb = &$wpdb; 		
-		$this->table = $this->wpdb->prefix . 'arlo_async_tasks';
-		$this->tabledata = $this->wpdb->prefix . 'arlo_async_task_data';
+	public function __construct($plugin, $dbl) {
+		$this->dbl = &$dbl; 		
+		$this->table = $this->dbl->prefix . 'arlo_async_tasks';
+		$this->tabledata = $this->dbl->prefix . 'arlo_async_task_data';
 		$this->plugin = $plugin;
 	}
-
 	
 	private function get_running_tasks_count() {		
 		$sql = "
@@ -33,7 +27,7 @@ class Scheduler extends Singleton {
 			task_status = 2
 		";
 		
-		$result = $this->wpdb->get_results($sql); 
+		$result = $this->dbl->get_results($sql); 
 				
 		return $result[0]->num;
 	}
@@ -48,7 +42,7 @@ class Scheduler extends Singleton {
 			task_status IN (1,2)
 		";
 		
-		$result = $this->wpdb->get_results($sql); 
+		$result = $this->dbl->get_results($sql); 
 				
 		return $result[0]->num;
 	}
@@ -65,10 +59,10 @@ class Scheduler extends Singleton {
 			(%d, %s, %s)
 		";
 		
-		$query = $this->wpdb->query($this->wpdb->prepare($sql, $priority, $task, $utc_date));
+		$query = $this->dbl->query($this->dbl->prepare($sql, $priority, $task, $utc_date));
 		
 		if ($query) {
-			return $this->wpdb->insert_id;
+			return $this->dbl->insert_id;
 		} else {
 			return false;
 		}
@@ -76,7 +70,7 @@ class Scheduler extends Singleton {
 	
 	public function update_task($task_id = 0, $task_status = null, $task_status_text = '') {
 		$task_status = (is_null($task_status) ? 'task_status' : intval($task_status));
-		$task_status_text = (empty($task_status_text) ? 'task_status_text' : "'" . $this->wpdb->_real_escape($task_status_text) . "'");
+		$task_status_text = (empty($task_status_text) ? 'task_status_text' : "'" . $this->dbl->_real_escape($task_status_text) . "'");
 		$utc_date = gmdate("Y-m-d H:i:s"); 
 	
 		$sql = "
@@ -90,18 +84,18 @@ class Scheduler extends Singleton {
 			task_id = " . (intval($task_id)) . "
 		";
 		
-		$query = $this->wpdb->query($sql);		
-	}	
+		$query = $this->dbl->query($sql);		
+	}
 	
 	public function update_task_data($task_id, $data = array(), $overwrite_data = false) {	
 		if (!$overwrite_data) {
 			$task = $this->get_task_data($task_id);
 			
 			$task_data = (!empty($task[0]->task_data_text) ? json_decode($task[0]->task_data_text, true) : [] ) ;
-			$data = array_merge($task_data, $data);
+			$data = array_replace_recursive($task_data, $data);
 		}		
 		$data = json_encode($data);
-	
+
 		$sql = "
 		INSERT INTO
 			{$this->tabledata}
@@ -111,7 +105,7 @@ class Scheduler extends Singleton {
 		ON DUPLICATE KEY UPDATE 
 			data_text = '%s'
 		";
-		$query = $this->wpdb->query($this->wpdb->prepare($sql, $task_id, $data, $data));		
+		$query = $this->dbl->query($this->dbl->prepare($sql, $task_id, $data, $data));		
 	}
 	
 	public function check_empty_slot_for_task() {
@@ -155,11 +149,12 @@ class Scheduler extends Singleton {
 		return $this->get_tasks(1, null, null, 1);
 	}
 	
-	public function get_tasks($status = null, $priority = null, $task_id = null, $limit = null) {
+	public function get_tasks($status = null, $priority = null, $task_id = null, $limit = null, $task_data_text = '') {
 		$task_id = (isset($task_id) && is_numeric($task_id) ? $task_id : null);
-		$status = (isset($status) && is_numeric($status) ? [$status] : (is_array($status) ? $status : null));
+		$status = (isset($status) && is_numeric($status) ? [$status] : (is_array($status) ? array_filter($status, function($numeric) { return is_numeric($numeric);} ) : null));
 		$priority = (isset($priority) && is_numeric($priority) ? $priority : null);
 		$limit = (isset($limit) && is_numeric($limit) ? $limit : null);
+		$task_data_text = (!empty($task_data_text) ? $this->dbl->_real_escape($task_data_text) : null);
 		
 		$sql = "
 		SELECT
@@ -181,12 +176,13 @@ class Scheduler extends Singleton {
 			".(!is_null($status) ? "AND task_status IN (" . implode(",", $status) . ")" : "") . "
 			".(!is_null($priority) ? "AND task_priority = " . $priority : "") . "
 			".(!is_null($task_id) ? "AND task_id = " . $task_id : "") . "
+			".(!is_null($task_data_text) ? "AND data_text like '%" . $task_data_text . "%'" : "") . "
 		ORDER BY
 			task_priority,
 			task_created
 		" . (!is_null($limit) ? "LIMIT " . $limit : "");
-				
-		return $this->wpdb->get_results($sql);
+
+		return $this->dbl->get_results($sql);
 	}
 		
 	public function delete_running_tasks() {
@@ -217,15 +213,14 @@ class Scheduler extends Singleton {
 			".(!is_null($task_id) ? "AND task_id = " . $task_id : "") . "
 		" . (!is_null($limit) ? "LIMIT " . $limit : "");
 				
-		return $this->wpdb->get_results($sql);
+		return $this->dbl->get_results($sql);
 	}
 	
 	public function run_task($task_id = null) {
 		$task_id = (!empty($task_id) && is_numeric($task_id) ? $task_id : null);
-		
 		if ($this->check_empty_slot_for_task()) {
+			
 			$task = !is_null($task_id) ? $this->get_task_data($task_id) : $this->get_next_task();
-						
 			$this->process_task($task);
 		}
 	}
@@ -243,8 +238,11 @@ class Scheduler extends Singleton {
 			WHERE 
 				task_id >= {$task_id}
 			";
+
+			//TODO: we should query this from the database, but now we have only import as an async task
+			$this->unlock_process("import");
 			
-			return $this->wpdb->query($sql);
+			return $this->dbl->query($sql);
 		}
 		
 		return false;
@@ -257,19 +255,17 @@ class Scheduler extends Singleton {
 		if (!empty($task_task)) {
 			
 			$this->schedule_cron();
-
 			if (!$this->is_process_running($task_task)) {
+				$this->lock_process($task_task);
 				switch ($task_task) {
 					case 'import':
-						$this->lock_process($task_task );
-						
 						if (!$this->plugin->import($task[0]->task_priority == -1, $task[0]->task_id)) {
 							$this->update_task($task[0]->task_id, 3, "Import failed");
 							$this->clear_cron();
 						}
-						$this->unlock_process($task_task);
 					break;
 				}
+				$this->unlock_process($task_task);
 			}	
 		} else {
 			$this->clear_cron();
@@ -278,7 +274,7 @@ class Scheduler extends Singleton {
 
 	protected function schedule_cron() {
 		if ( ! wp_next_scheduled('arlo_scheduler')) {
-			wp_schedule_event( time(), 'minutes_5', 'arlo_scheduler' );
+			wp_schedule_event( time() + (60*5), 'minutes_5', 'arlo_scheduler' );
 		}
 	}
 
@@ -292,7 +288,7 @@ class Scheduler extends Singleton {
 		wp_clear_scheduled_hook( 'arlo_scheduler');
 	}	
 
-	protected function is_process_running($task) {
+	private function is_process_running($task) {
 		if ( get_site_transient( $task . '_process_lock' ) ) {
 			// Process already running.
 			return true;
@@ -301,9 +297,7 @@ class Scheduler extends Singleton {
 		return false;
 	}
 
-	protected function lock_process($task) {
-		$this->start_time = time(); // Set start time of current process.
-
+	private function lock_process($task) {
 		set_site_transient( $task . '_process_lock', microtime(), 180 );
 	}
 
@@ -311,6 +305,43 @@ class Scheduler extends Singleton {
 		delete_site_transient( $task . '_process_lock' );
 		return $this;
 	}	
-}
 
-?>
+	public function kick_off_scheduler() {
+		$url = add_query_arg( $this->get_query_args(), $this->get_query_url() );
+		$args = $this->get_post_args();
+				
+		wp_remote_post( esc_url_raw( $url ), $args );
+	}
+
+	private function get_query_args() {
+		if ( property_exists( $this, 'query_args' ) ) {
+			return $this->query_args;
+		}
+
+		return array(
+			'action' => 'arlo_run_scheduler',
+			'nonce'  => wp_create_nonce( 'arlo_import' ),
+		);
+	}
+
+	private function get_query_url() {
+		if ( property_exists( $this, 'query_url' ) ) {
+			return $this->query_url;
+		}
+
+		return admin_url( 'admin-ajax.php' );
+	}
+
+	private function get_post_args() {
+		if ( property_exists( $this, 'post_args' ) ) {
+			return $this->post_args;
+		}
+
+		return array(
+			'timeout'   => 0.01,
+			'blocking'  => false,
+			'cookies'   => $_COOKIE,
+			'sslverify' => apply_filters( 'https_local_ssl_verify', false ),
+		);
+	}	
+}

@@ -16,8 +16,8 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 	const TABLENAME = 'arlo_events';
 
 	public function __construct() {		
-		$this->singular = __( 'Event', $this->plugin_slug );		
-		$this->plural = __( 'Events', $this->plugin_slug );
+		$this->singular = __( 'Event', 'arlo-for-wordpress' );		
+		$this->plural = __( 'Events', 'arlo-for-wordpress' );
 
 		parent::__construct();		
 	}
@@ -38,17 +38,17 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 	
 	public function get_columns() {
 		return $columns = [
-			'e_code'    => __( 'Code', $this->plugin_slug ),
-			'e_name'    => __( 'Name', $this->plugin_slug ),
-			'e_startdatetime'    => __( 'Start date', $this->plugin_slug ),
-			'e_finishdatetime'    => __( 'Finish date', $this->plugin_slug ),
-			'v_name' => __( 'Venue name', $this->plugin_slug ),
-			'e_summary' => __( 'Summary', $this->plugin_slug ),
-			'e_sessiondescription' => __( 'Description', $this->plugin_slug ),
-			'e_notice' => __( 'Notice', $this->plugin_slug ),
-			'e_session_num' => __( 'Num. of sessions', $this->plugin_slug ),
-			'e_region' => __( 'Regions', $this->plugin_slug ),
-			//'e_isonline' => __( 'Online', $this->plugin_slug ),
+			'e_code'    => __( 'Code', 'arlo-for-wordpress' ),
+			'e_name'    => __( 'Name', 'arlo-for-wordpress' ),
+			'e_startdatetime'    => __( 'Start date', 'arlo-for-wordpress' ),
+			'e_finishdatetime'    => __( 'Finish date', 'arlo-for-wordpress' ),
+			'v_name' => __( 'Venue name', 'arlo-for-wordpress' ),
+			'et_descriptionsummary' => __( 'Summary', 'arlo-for-wordpress' ),
+			'e_sessiondescription' => __( 'Description', 'arlo-for-wordpress' ),
+			'e_notice' => __( 'Notice', 'arlo-for-wordpress' ),
+			'e_session_num' => __( 'Num. of sessions', 'arlo-for-wordpress' ),
+			'e_region' => __( 'Regions', 'arlo-for-wordpress' ),
+			//'e_isonline' => __( 'Online', 'arlo-for-wordpress' ),
 		];
 	}	
 	
@@ -64,7 +64,7 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			'e_finishdatetime' => array( 'e_finishdatetime', true ),
 			'v_name' => array( 'v_name', true ),
 			'e_placesremaining' => array( 'e_placesremaining', true ),
-			'e_summary' => array( 'e_summary', true ),
+			'et_descriptionsummary' => array( 'et_descriptionsummary', true ),
 			'e_sessiondescription' => array( 'e_sessiondescription', true ),			
 		);
 	}
@@ -76,19 +76,19 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			case 'e_region':
 				return $item->$column_name;
 			case 'e_name':
-				$field = '<div class="arlo-event-name">' . $item->e_name . (is_numeric($item->e_placesremaining) && $item->e_placesremaining > 0 ? ' (' . $item->e_placesremaining . ')' : '') . '</div>';
+				$field = '<div class="arlo-event-name">' . htmlentities($item->e_name, ENT_QUOTES, "UTF-8") . (is_numeric($item->e_placesremaining) && $item->e_placesremaining > 0 ? ' (' . $item->e_placesremaining . ')' : '') . '</div>';
 				
 				if ($item->e_isonline) {
 					$field .= '<div class="arlo-event-online">Live online</div>';
 				}
 				
 				if (!empty($item->presenters))
-					$field .= '<div class="arlo-event-presenter"><a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug . '-presenters&ep_e_id=' . $item->e_arlo_id)  .'" >' . $item->presenters . '</a>';
+					$field .= '<div class="arlo-event-presenter"><a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug . '-presenters&ep_e_id=' . $item->e_arlo_id)  .'" >' . htmlentities($item->presenters, ENT_QUOTES, "UTF-8") . '</a>';
 
 				if (!empty($item->e_providerorganisation)) {
 					$field .= '<div class="arlo-event-provider">';
 					if (!empty($item->e_providerwebsite)) {
-						$field .= '<a href="' . $item->e_providerwebsite  .'" target="_blank">' . $item->$column_name . '</a>';					
+						$field .= '<a href="' . $item->e_providerwebsite  .'" target="_blank">' . htmlentities($item->$column_name, ENT_QUOTES, "UTF-8") . '</a>';					
 					} else {
 						$field .= $item->e_providerorganisation;
 					}
@@ -96,10 +96,10 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 				}
 				
 				if (!empty($item->e_registeruri)) 		
-					$field .= '<div class="arlo-event_registeruri"><a href="'.$item->e_registeruri.'" target="_blank">' . $item->e_registermessage . '</a></div>';
+					$field .= '<div class="arlo-event_registeruri"><a href="'.$item->e_registeruri.'" target="_blank">' . strip_tags($item->e_registermessage) . '</a></div>';
 
 				return $field;
-			case 'e_summary':
+			case 'et_descriptionsummary':
 			case 'e_sessiondescription':
 				if (!empty($item->$column_name))
 					return '<div class="arlo-list-ellipsis">' . strip_tags($item->$column_name) . '</div>';
@@ -111,13 +111,13 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			case 'v_name':
 				$field = '';				
 				if (!empty($item->$column_name)) {
-					$field = '<div class="arlo-venue-name"><a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug . '-venues&v_e_id=' . $item->e_arlo_id)  .'" >' . $item->$column_name . '</a></div>';			
+					$field = '<div class="arlo-venue-name"><a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug . '-venues&v_e_id=' . $item->e_arlo_id)  .'" >' . htmlentities($item->$column_name , ENT_QUOTES, "UTF-8"). '</a></div>';			
 				}
 
 				if (!empty($item->e_locationname)) {
-					$field .= '<div class="arlo-location">' . $item->e_locationname . (!empty($item->e_locationroomname) ? ' (' . $item->e_locationroomname . ')' : '') . '</div>';
+					$field .= '<div class="arlo-location">' . htmlentities($item->e_locationname, ENT_QUOTES, "UTF-8") . (!empty($item->e_locationroomname) ? ' (' . htmlentities($item->e_locationroomname, ENT_QUOTES, "UTF-8") . ')' : '') . '</div>';
 				} elseif (!empty($item->e_locationroomname)) {
-					$field .= '<div class="arlo-locationroom">' . $item->e_locationroomname . '</div>';
+					$field .= '<div class="arlo-locationroom">' . htmlentities($item->e_locationroomname, ENT_QUOTES, "UTF-8") . '</div>';
 				}
 				
 				return $field;
@@ -141,7 +141,7 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 		
 	protected function get_sql_where_array() {
 		return [
-			"e.active = '" . $this->active . "'",
+			"e.import_id = '" . $this->import_id . "'",
 			"e.e_parent_arlo_id = 0"
 		];
 	}
@@ -153,7 +153,7 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			'v_name',
 			'e_locationname',
 			'e_locationroomname',
-			'e_summary',
+			'et_descriptionsummary',
 			'e_sessiondescription',
 			'e_notice',
 			'e_registermessage',
@@ -178,7 +178,6 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			e.e_locationroomname,
 			e.e_isfull,
 			e.e_placesremaining,
-			e.e_summary,
 			e.e_sessiondescription,
 			e.e_notice,
 			e.e_registermessage,
@@ -186,8 +185,9 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			e.e_providerorganisation,
 			e.e_providerwebsite,
 			e.e_isonline,
-			(SELECT GROUP_CONCAT(e_region) FROM " . $this->wpdb->prefix . "arlo_events WHERE e_arlo_id = e.e_arlo_id AND active = '" . $this->active . "' AND e.active = '" . $this->active . "' GROUP BY e_arlo_id) AS e_region,
+			(SELECT GROUP_CONCAT(e_region) FROM " . $this->wpdb->prefix . "arlo_events WHERE e_arlo_id = e.e_arlo_id AND import_id = '" . $this->import_id . "' AND e.import_id = '" . $this->import_id . "' GROUP BY e_arlo_id) AS e_region,
 			et.et_name,
+			et.et_descriptionsummary,
 			(SELECT COUNT(1) FROM " . $this->wpdb->prefix . "arlo_events WHERE e_parent_arlo_id = e.e_arlo_id AND e_region = e.e_region) as e_session_num,
 			GROUP_CONCAT(DISTINCT CONCAT_WS(' ', p.p_firstname, p.p_lastname) ORDER BY ep.p_order, p.p_firstname SEPARATOR ', ') AS presenters,
 			posts.guid
@@ -228,5 +228,3 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 		return sprintf('https://my.arlo.co/%s/Courses/Courses2.aspx', $this->platform_name );
 	}			
 }
-
-?>

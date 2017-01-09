@@ -1,11 +1,8 @@
 
 <?php
 
-	$plugin = Arlo_For_Wordpress::get_instance();
-	$plugin_slug = $plugin->get_plugin_slug();
-
 	// output the widget title
-	$title = apply_filters( 'widget_title', empty( $instance['title'] ) ? __( 'Upcoming event', $plugin_slug ) : $instance['title'], $instance, $this->id_base );
+	$title = apply_filters( 'widget_title', empty( $instance['title'] ) ? __( 'Upcoming event', 'arlo-for-wordpress-upcoming-widget' ) : $instance['title'], $instance, $this->id_base );
 	echo $before_title . $title . $after_title; 
 
 
@@ -36,8 +33,8 @@
 			$output .= '<span class="arlo-cal-month">'.$date->format('M').'</span>';
 			$output .= '<span class="arlo-cal-day">'.$date->format('d').'</span>';
 			$output .= '</div>';
-			$output .= '<p><a href="'.$link.'">'.$events[$i]->et_name.'</a></p>';
-			$output .= '<p>'.$events[$i]->e_locationname.'</p>';
+			$output .= '<p><a href="'.$link.'">' . htmlentities($events[$i]->et_name, ENT_QUOTES, "UTF-8") . '</a></p>';
+			$output .= '<p>' . htmlentities($events[$i]->e_locationname, ENT_QUOTES, "UTF-8") . '</p>';
 			$output .= '</li>';
 
 		}
@@ -46,7 +43,7 @@
 		$output .= '</ul>';
 
 	} else {
-		$output = '<p>'. __('No upcoming events found', $plugin_slug) .'</p>';
+		$output = '<p>'. __('No upcoming events found', 'arlo-for-wordpress-upcoming-widget') .'</p>';
 	}
 
 	// output the events list

@@ -16,8 +16,8 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 	const TABLENAME = 'arlo_eventtemplates';
 
 	public function __construct() {		
-		$this->singular = __( 'Template', $this->plugin_slug );		
-		$this->plural = __( 'Templates', $this->plugin_slug );
+		$this->singular = __( 'Template', 'arlo-for-wordpress' );		
+		$this->plural = __( 'Templates', 'arlo-for-wordpress' );
 
 		parent::__construct();		
 	}
@@ -28,12 +28,12 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 	
 	public function get_columns() {
 		return $columns = [
-			'et_code'    => __( 'Code', $this->plugin_slug ),
-			'et_name'    => __( 'Name', $this->plugin_slug ),
-			'et_descriptionsummary'    => __( 'Description', $this->plugin_slug ),
-			'et_registerinteresturi'    => __( 'Register interest', $this->plugin_slug ),
-			'et_event_num' => __( 'Num. of events', $this->plugin_slug ),
-			'et_region' => __( 'Regions', $this->plugin_slug ),
+			'et_code'    => __( 'Code', 'arlo-for-wordpress' ),
+			'et_name'    => __( 'Name', 'arlo-for-wordpress' ),
+			'et_descriptionsummary'    => __( 'Description', 'arlo-for-wordpress' ),
+			'et_registerinteresturi'    => __( 'Register interest', 'arlo-for-wordpress' ),
+			'et_event_num' => __( 'Num. of events', 'arlo-for-wordpress' ),
+			'et_region' => __( 'Regions', 'arlo-for-wordpress' ),
 		];
 	}	
 	
@@ -63,7 +63,7 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 				break;
 			case 'et_registerinteresturi':
 				if (!empty($item->$column_name)) 		
-					return '<a href="' . $item->$column_name . '" target="_blank">' . __( 'Register interest', $this->plugin_slug ) . '</a>';
+					return '<a href="' . $item->$column_name . '" target="_blank">' . __( 'Register interest', 'arlo-for-wordpress' ) . '</a>';
 				break;
 			case 'et_event_num':
 				$retval = '0';
@@ -71,7 +71,7 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 					$retval = '<a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug . '-events&et_id=' . $item->et_arlo_id)  .'" >' . $item->$column_name . '</a>';
 				
 				if (intval($item->oa_id) > 0) {
-					$retval .= ' / <a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug . '-onlineactivities&et_id=' . $item->et_arlo_id)  .'" >' . __( 'OA', $this->plugin_slug ) . '</a>';
+					$retval .= ' / <a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug . '-onlineactivities&et_id=' . $item->et_arlo_id)  .'" >' . __( 'OA', 'arlo-for-wordpress' ) . '</a>';
 				}
 				
 				return $retval;
@@ -91,7 +91,7 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 	}
 	
 	protected function get_sql_where_array() {
-		return ["et.active = '" . $this->active . "'"];
+		return ["et.import_id = '" . $this->import_id . "'"];
 	}
 	
 	protected function get_searchable_fields() {
@@ -150,5 +150,3 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 		return sprintf('https://my.arlo.co/%s/Courses/Courses2.aspx', $this->platform_name );
 	}				
 }
-
-?>

@@ -39,7 +39,7 @@ class Resource
         return null;
     }
     
-    protected function request($get_data=null, $post_data=null, $public=true) {
+    protected function request($get_data = null, $post_data = null, $public = true, $force_ssl = true) {
     	$platform_name = $this->__get('platform_name');
     	$transport = $this->__get('transport');
     	$path = $this->__get('api_path');
@@ -47,7 +47,7 @@ class Resource
     	
     	if($get_data) $path .= '?' . $get_data;
     	
-    	$response = $transport->request($platform_name, $path, $post_data, $public, $plugin_version);
+    	$response = $transport->request($platform_name, $path, $post_data, $public, $plugin_version, $force_ssl);
     
 		// reset api_path if it has been overidden
 		$this->__set('api_path', $this->apiPath);

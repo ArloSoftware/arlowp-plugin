@@ -1,18 +1,14 @@
 <?php
 
-namespace Arlo;
+namespace Arlo\Entities;
 
-require_once 'arlo-singleton.php';
-
-use Arlo\Singleton;
-
-class EventTemplates extends Singleton {
-	static function get($conditions=array(), $order=array(), $limit=null, $active = null) {
+class Venues {
+	static function get($conditions = array(), $order = array(), $limit = null, $import_id = null) {
 		global $wpdb;
 	
-		$query = "SELECT et.* FROM {$wpdb->prefix}arlo_eventtemplates AS et";
+		$query = "SELECT v.* FROM {$wpdb->prefix}arlo_venues AS v";
 		
-		$where = array("active = " . $active);
+		$where = array("import_id = " . $import_id);
 	
 		// conditions
 		foreach($conditions as $key => $value) {
@@ -20,9 +16,9 @@ class EventTemplates extends Singleton {
 			switch($key) {
 				case 'id':
 					if(is_array($value)) {
-						$where[] = "et.et_arlo_id IN (" . implode(',', $value) . ")";
+						$where[] = "v.v_arlo_id IN (" . implode(',', $value) . ")";
 					} else {
-						$where[] = "et.et_arlo_id = $value";
+						$where[] = "v.v_arlo_id = $value";
 						$limit = 1;
 					}
 				break;

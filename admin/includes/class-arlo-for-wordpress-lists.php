@@ -13,6 +13,8 @@ if(!class_exists('WP_List_Table')){
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
+use Arlo\VersionHandler;
+
 class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	public $singular;
 	public $plural;
@@ -23,7 +25,7 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	protected $order;
 	protected $orderby;
 	protected $paged;
-	protected $active;
+	protected $import_id;
 	protected $plugin_slug;
 	
 	protected static $filter_column_mapping = array(
@@ -58,9 +60,9 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 		$plugin = Arlo_For_Wordpress::get_instance();
 		$settings = get_option('arlo_settings');
 				
-		$this->active = $plugin->get_import_id();
+		$this->import_id = $plugin->get_importer()->get_current_import_id();
 		$this->plugin_slug = $plugin->plugin_slug;
-		$this->version = Arlo_For_Wordpress::VERSION;	
+		$this->version = VersionHandler::VERSION;	
 		$this->wpdb = &$wpdb;
 		$this->platform_name = $settings['platform_name'];	
 	}
@@ -104,7 +106,7 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	}
 	
 	protected function get_sql_where_array() {
-		return ["active = " . $this->active];
+		return ["import_id = " . $this->import_id];
 	}
 	
 	private function get_sql_search_where_array() {
@@ -159,8 +161,6 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 		$limit = ($this->paged-1) * self::PERPAGE;
 		$sql .= ' LIMIT ' . $limit . ',' . self::PERPAGE;
 		
-		//var_dump($sql);
-		
 		$num = $this->get_num_rows();
 				
 		$this->set_pagination_args( array(
@@ -203,5 +203,3 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	}	
 	
 }
-
-?>

@@ -9,7 +9,7 @@ class SystemRequirements {
 		return [
 			[
 				'name' => 'Memory limit',
-				'expected_value' => '640M',
+				'expected_value' => '64M',
 				'current_value' => function () {
 					return ini_get('memory_limit');
 				},
@@ -94,5 +94,3 @@ class SystemRequirements {
 		return $good;
 	}
 }
-
-?>

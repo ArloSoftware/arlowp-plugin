@@ -54,10 +54,10 @@ class Arlo_For_Wordpress_Categories_Widget extends WP_Widget {
 		// TODO: update description
 		parent::__construct(
 			$this->get_widget_slug(),
-			__( 'Arlo Categories', $this->get_widget_slug() ),
+			__( 'Arlo Categories', 'arlo-for-wordpress-categories-widget' ),
 			array(
 				'classname'  => $this->get_widget_slug().'-class',
-				'description' => __( 'Display Categories.', $this->get_widget_slug() )
+				'description' => __( 'Display Categories.', 'arlo-for-wordpress-categories-widget' )
 			)
 		);
 
@@ -121,7 +121,7 @@ class Arlo_For_Wordpress_Categories_Widget extends WP_Widget {
 	 * @param array instance The current instance of the widget
 	 */
 	public function widget( $args, $instance ) {
-
+		if (get_option('arlo_plugin_disabled', '0') == '1') return;
 		
 		// Check if there is a cached output
 		$cache = wp_cache_get( $this->get_widget_slug(), 'widget' );

@@ -7,6 +7,8 @@
  * @copyright 2015 Arlo
  */
 
+use Arlo\Utilities;
+
 class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 
 	/**
@@ -43,7 +45,7 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 	 * loads localization files, and includes necessary stylesheets and JavaScript.
 	 */
 	public function __construct() {
-
+		
 		// load plugin text domain
 		add_action( 'init', array( $this, 'widget_textdomain' ) );
 
@@ -54,10 +56,10 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 		// TODO: update description
 		parent::__construct(
 			$this->get_widget_slug(),
-			__( 'Arlo Upcoming Events', $this->get_widget_slug() ),
+			__( 'Arlo Upcoming Events', 'arlo-for-wordpress-upcoming-widget' ),
 			array(
 				'classname'  => $this->get_widget_slug().'-class',
-				'description' => __( 'Display Upcoming Events.', $this->get_widget_slug() )
+				'description' => __( 'Display Upcoming Events.', 'arlo-for-wordpress-upcoming-widget' )
 			)
 		);
 
@@ -121,7 +123,7 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 	 * @param array instance The current instance of the widget
 	 */
 	public function widget( $args, $instance ) {
-
+		if (get_option('arlo_plugin_disabled', '0') == '1') return;
 		
 		// Check if there is a cached output
 		$cache = wp_cache_get( $this->get_widget_slug(), 'widget' );
@@ -286,15 +288,15 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 		global $wpdb;
 		
 		$regions = get_option('arlo_regions');	
-		$active = $this->get_import_id();
+		$import_id = $this->get_import_id();
 		$arlo_region = get_query_var('arlo-region', '');
-		$arlo_region = (!empty($arlo_region) && array_ikey_exists($arlo_region, $regions) ? $arlo_region : (!empty($_COOKIE['arlo-region']) ? $_COOKIE['arlo-region'] : '' ));
+		$arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : (!empty($_COOKIE['arlo-region']) ? $_COOKIE['arlo-region'] : '' ));
 				
 		if (!empty($arlo_region)) {
 			$where['region'] = ' e_region = "' . $arlo_region . '" AND et_region = "' . $arlo_region . '"';
 		}
 		
-		$where['active'] = "e.active = ".$active;
+		$where['import_id'] = "e.import_id = ".$import_id;
 		$where['date'] = " CURDATE() < DATE(e.e_startdatetime) ";
 		$where['event'] = "e_parent_arlo_id = 0";
 				
@@ -315,7 +317,7 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 		ON 
 			e.et_arlo_id = et.et_arlo_id
 		AND
-			e.active = et.active
+			e.import_id = et.import_id
 		WHERE
 			" . implode(" AND ", $where) . "
 		ORDER BY 

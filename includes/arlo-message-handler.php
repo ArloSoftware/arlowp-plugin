@@ -2,24 +2,16 @@
 
 namespace Arlo;
 
-require_once 'arlo-singleton.php';
-
-use Arlo\Singleton;
-
-class MessageHandler extends Singleton {
+class MessageHandler {
 	
-	private $wpdb;
+	private $dbl;
 	private $table = '';
 	
-	public function __construct($plugin) {
-		global $wpdb;
-		
-		$this->wpdb = &$wpdb; 		
-		$this->table = $this->wpdb->prefix . 'arlo_messages';
-		$this->plugin = $plugin;
+	public function __construct($dbl) {		
+		$this->dbl = &$dbl;
+		$this->table = $this->dbl->prefix . 'arlo_messages';
 	}
 
-	
 	public function get_message_by_type_count($type = null, $count_dismissed = false) {		
 		$count_dismissed = (isset($count_dismissed) && $count_dismissed ? true : false );
 		$type = (!empty($type) ? $type : null);
@@ -43,7 +35,7 @@ class MessageHandler extends Singleton {
 			' . (implode(' AND ', $where)) . '
 		';
 		
-		$result = $this->wpdb->get_results($sql); 
+		$result = $this->dbl->get_results($sql); 
 				
 		return $result[0]->num;
 	}
@@ -60,10 +52,10 @@ class MessageHandler extends Singleton {
 			(%s, %s, %s, %d, %s)
 		';
 		
-		$query = $this->wpdb->query($this->wpdb->prepare($sql, $type, $title, $message, $global, $utc_date));
+		$query = $this->dbl->query($this->dbl->prepare($sql, $type, $title, $message, $global, $utc_date));
 		
 		if ($query) {
-			return $this->wpdb->insert_id;
+			return $this->dbl->insert_id;
 		} else {
 			return false;
 		}
@@ -72,6 +64,8 @@ class MessageHandler extends Singleton {
 	public function dismiss_by_type($type = null) {
 		$type = (!empty($type) ? $type : null);
 		if (is_null($type)) return;
+
+		$user = wp_get_current_user();	
 		
 		$utc_date = gmdate("Y-m-d H:i:s"); 
 		
@@ -87,7 +81,7 @@ class MessageHandler extends Singleton {
 			dismissed IS NULL
 		';
 		
-		$query = $this->wpdb->query($this->wpdb->prepare($sql, $utc_date, $user->ID, $type));		
+		$query = $this->dbl->query($this->dbl->prepare($sql, $utc_date, $user->ID, $type));		
 	}
 	
 	public function dismiss_message($id) {
@@ -110,7 +104,7 @@ class MessageHandler extends Singleton {
 			dismissed IS NULL
 		';
 		
-		$query = $this->wpdb->query($this->wpdb->prepare($sql, $utc_date, $user->ID, $id));
+		$query = $this->dbl->query($this->dbl->prepare($sql, $utc_date, $user->ID, $id));
 		
 		return $query !== false;
 	}	
@@ -141,11 +135,14 @@ class MessageHandler extends Singleton {
 		WHERE 
 			' . (implode(' AND ', $where)) . '
 		';
+
+		$items = $this->dbl->get_results($sql);
+		array_map(function($item) {
+			$item->is_dismissable = true;
+		}, $items); 
 		
-		return $this->wpdb->get_results($sql);
+		return $items;
 	}
 	
 	
 }
-
-?>

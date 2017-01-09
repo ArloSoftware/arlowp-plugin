@@ -43,7 +43,7 @@ class Arlo_For_Wordpress_Search_Widget extends WP_Widget {
 	 * loads localization files, and includes necessary stylesheets and JavaScript.
 	 */
 	public function __construct() {
-
+		 
 		// load plugin text domain
 		add_action( 'init', array( $this, 'widget_textdomain' ) );
 
@@ -54,10 +54,10 @@ class Arlo_For_Wordpress_Search_Widget extends WP_Widget {
 		// TODO: update description
 		parent::__construct(
 			$this->get_widget_slug(),
-			__( 'Arlo event search', $this->get_widget_slug() ),
+			__( 'Arlo event search', 'arlo-for-wordpress-search-widget' ),
 			array(
 				'classname'  => $this->get_widget_slug().'-class',
-				'description' => __( 'Arlo event search', $this->get_widget_slug() )
+				'description' => __( 'Arlo event search', 'arlo-for-wordpress-search-widget' )
 			)
 		);
 
@@ -121,7 +121,7 @@ class Arlo_For_Wordpress_Search_Widget extends WP_Widget {
 	 * @param array instance The current instance of the widget
 	 */
 	public function widget( $args, $instance ) {
-
+		 if (get_option('arlo_plugin_disabled', '0') == '1') return;
 		
 		// Check if there is a cached output
 		$cache = wp_cache_get( $this->get_widget_slug(), 'widget' );
