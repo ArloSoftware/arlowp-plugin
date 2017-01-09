@@ -22,7 +22,6 @@ class Events {
 						$limit = 1;
 					}
 				break;
-
 				case 'event_template_id':
 				case 'template_id':
 					if(is_array($value)) {

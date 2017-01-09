@@ -14,7 +14,7 @@
  * @wordpress-plugin
  * Plugin Name:       Arlo
  * Description:       Connect your WordPress to Arlo
- * Version:           2.4.1.1
+ * Version:           2.4.1.2
  * Author:            Arlo
  * Author URI:       http://arlo.co
  * Text Domain:       arlo-for-wordpress
@@ -109,7 +109,6 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-categories.p
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-category-items.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-category-depth.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-finish.php');
-
 
 // start the public plugin class
 require_once( plugin_dir_path( __FILE__ ) . 'public/class-arlo-for-wordpress.php' );

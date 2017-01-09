@@ -27,6 +27,8 @@ use Arlo\SystemRequirements;
  * 
  */
 
+ use Arlo\SystemRequirements;
+
 /**
  * Plugin class. This class should ideally be used to work with the
  * public-facing side of the WordPress site.
@@ -41,6 +43,43 @@ use Arlo\SystemRequirements;
 class Arlo_For_Wordpress {
 
 	/**
+<<<<<<< HEAD
+=======
+	 * Plugin version, used for cache-busting of style and script file references.
+	 *
+	 * @since   1.0.0
+	 *
+	 * @var     string
+	 */
+
+	const VERSION = '2.4.1.2';
+
+	/**
+	 * DB Schema hash for this version.
+	 * Need to generate with create_db_schema_hash if there is a schema change
+	 *
+	 * @since   2.4
+	 *
+	 * @var     string
+	 */
+
+	const DB_SCHEMA_HASH = '29dbebf0c27c672f52f355c59d1c1bef4ed1f486';	
+
+	/**
+	 * Minimum required PHP version
+	 *
+	 * @since   2.0.6
+	 *
+	 * @var     string
+	 */
+	const MIN_PHP_VERSION = '5.4.0';
+
+	/**
+	 * @TODO - Rename "arlo-for-wordpress" to the name your your plugin
+	 *
+	 * Unique identifier for your plugin.
+	 *
+>>>>>>> master
 	 *
 	 * The variable name is used as the text domain when internationalizing strings
 	 * of text. Its value should match the Text Domain file header in the main
@@ -502,6 +541,7 @@ class Arlo_For_Wordpress {
 	 * @return    null
 	 */	
 	
+
 	public function send_log_to_arlo($message = '') {	
 		$client = $this->get_api_client();		
 		$last_import = $this->get_importer()->get_last_import_date();
@@ -590,6 +630,7 @@ class Arlo_For_Wordpress {
 			} 
 		}
 	}
+	
 
 	/**
 	 * Fired for each blog when the plugin is activated.
@@ -611,9 +652,17 @@ class Arlo_For_Wordpress {
 		Logger::log("Plugin activated");
 
 		// now add pages
-		$this->add_pages();
-		
-		update_option('arlo_plugin_version', VersionHandler::VERSION);
+		self::add_pages();
+
+		update_option('arlo_plugin_version', self::VERSION);
+
+		//load demo data
+		$settings = get_option('arlo_settings');
+		if (empty($settings['platform_name'])) {
+			$plugin = self::get_instance();
+			$plugin->load_demo();
+			do_action('arlo_scheduler');
+		}
 	}
 
 	/**
@@ -1049,6 +1098,7 @@ class Arlo_For_Wordpress {
 		}
 	}
 	
+
 	private function delete_running_tasks() {		
 		$this->get_scheduler()->delete_running_tasks();
 		$this->get_scheduler()->delete_paused_tasks();
@@ -1134,7 +1184,7 @@ class Arlo_For_Wordpress {
 		return false;
 	}
 
-	public static function delete_custom_posts($table, $column, $post_type) {
+	public static function delete_custom_posts($table, $column, $post_type) {		
 		global $wpdb;
 
 		$table = $wpdb->prefix . 'arlo_' . $table;
@@ -1358,19 +1408,22 @@ class Arlo_For_Wordpress {
 	 * @access public
 	 * @return void
 	 */
+	 
 	public function determine_url_structure($platform_name = '') {
 		$client = $this->get_api_client();
 		
 		$new_url = $client->transport->getRemoteURL($platform_name, true, true);
-		
-		$ch = curl_init($new_url);
 
-		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_exec($ch);
-		
-		$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE); 
+		if (extension_loaded('curl')) {
+			$ch = curl_init($new_url);
+
+			curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_exec($ch);
+			
+			$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE); 
+		}
 
 		// update settings
 		update_option('arlo_new_url_structure', $httpcode == 500 ? 1 : 0);

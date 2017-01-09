@@ -549,6 +549,3 @@ function arlo_add_datamodel() {
 
 
 \Arlo\Shortcodes\Shortcodes::init(); 
-
-
-
