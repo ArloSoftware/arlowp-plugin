@@ -439,7 +439,8 @@ class Events {
         if(!isset($GLOBALS['arlo_event_list_item']) || empty($GLOBALS['arlo_event_list_item']['et_arlo_id'])) return;
         
         $conditions = array(
-            'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id']
+            'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id'],
+            'parent_id' => 0
         );
         
         $events = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), 1, $import_id);
