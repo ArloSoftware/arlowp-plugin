@@ -403,7 +403,7 @@ class Importer extends Singleton {
 				break;
 			case 'Download':
 				$import = $this->get_import_entry($this->import_id, null, 1);
-				
+
 				$this->current_task_class->uri = json_decode($import->callback_json)->SnapshotUri;
 				$this->current_task_class->filename = $this->import_id;
 				$this->current_task_class->response_json = json_decode($import->response_json);
@@ -473,8 +473,8 @@ class Importer extends Singleton {
 				$response_json = json_decode($import->response_json);
 
 				//JWE decode
-				$decoded_json = utf8_encode(Crypto::jwe_decrypt($callback_json->__jwe__, $response_json->Callback->EncryptedResponse->key->k));
-				$this->update_import_entry(['callback_json' => $decoded_json]);
+				$decoded = utf8_decode(Crypto::jwe_decrypt($callback_json->__jwe__, $response_json->Callback->EncryptedResponse->key->k));
+				$this->update_import_entry(['callback_json' => $decoded]);
 				$this->kick_off_scheduler();
 			} 
 		} catch(\Exception $e) {
