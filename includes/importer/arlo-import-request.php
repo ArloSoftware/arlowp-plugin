@@ -130,7 +130,7 @@ class ImportRequest extends BaseImporter  {
 	private function generate_encryptedresponse_object() {
 		$data_obj = new \stdClass();
 
-		$data_obj->alg = "none";
+		$data_obj->alg = "dir";
 		$data_obj->enc = $this->encription_type;
 
 		return $data_obj;

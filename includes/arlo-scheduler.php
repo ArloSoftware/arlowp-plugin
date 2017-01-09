@@ -153,11 +153,12 @@ class Scheduler extends Singleton {
 		return $this->get_tasks(1, null, null, 1);
 	}
 	
-	public function get_tasks($status = null, $priority = null, $task_id = null, $limit = null) {
+	public function get_tasks($status = null, $priority = null, $task_id = null, $limit = null, $task_data_text = '') {
 		$task_id = (isset($task_id) && is_numeric($task_id) ? $task_id : null);
-		$status = (isset($status) && is_numeric($status) ? [$status] : (is_array($status) ? $status : null));
+		$status = (isset($status) && is_numeric($status) ? [$status] : (is_array($status) ? array_filter($status, function($numeric) { return is_numeric($numeric);} ) : null));
 		$priority = (isset($priority) && is_numeric($priority) ? $priority : null);
 		$limit = (isset($limit) && is_numeric($limit) ? $limit : null);
+		$task_data_text = (!empty($task_data_text) ? $this->dbl->_real_escape($task_data_text) : null);
 		
 		$sql = "
 		SELECT
@@ -179,11 +180,12 @@ class Scheduler extends Singleton {
 			".(!is_null($status) ? "AND task_status IN (" . implode(",", $status) . ")" : "") . "
 			".(!is_null($priority) ? "AND task_priority = " . $priority : "") . "
 			".(!is_null($task_id) ? "AND task_id = " . $task_id : "") . "
+			".(!is_null($task_data_text) ? "AND data_text like '%" . $task_data_text . "%'" : "") . "
 		ORDER BY
 			task_priority,
 			task_created
 		" . (!is_null($limit) ? "LIMIT " . $limit : "");
-				
+
 		return $this->dbl->get_results($sql);
 	}
 		

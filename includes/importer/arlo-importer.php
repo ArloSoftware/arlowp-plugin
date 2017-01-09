@@ -6,6 +6,7 @@ use Arlo\Singleton;
 use Arlo\Logger;
 use Arlo\Utilities;
 use Arlo\FileHandler;
+use Arlo\Crypto;
 
 class Importer extends Singleton {
 	const MAX_RETRY_ATTEMPT = 5;
@@ -405,7 +406,7 @@ class Importer extends Singleton {
 				
 				$this->current_task_class->uri = json_decode($import->callback_json)->SnapshotUri;
 				$this->current_task_class->filename = $this->import_id;
-				$this->current_task_class->response_json = json_decode($import->response_json);			 
+				$this->current_task_class->response_json = json_decode($import->response_json);
 			break;
 			case 'ProcessFragment':
 				$this->current_task_class->set_state($this->state->subtask_state);
@@ -461,13 +462,33 @@ class Importer extends Singleton {
 	}
 
 	public function callback() {
-		$callback_json = json_decode(file_get_contents("php://input"));
+		try {
+			$callback_json = json_decode(file_get_contents("php://input"));
 
-		if (!is_null($callback_json) && !empty($callback_json->Nonce) && ($import = $this->validate_import_entry($callback_json->Nonce, $callback_json->RequestID)) !== false) {
-			$this->set_import_id($import->import_id);
-			$this->update_import_entry(['callback_json' => json_encode($callback_json) ]);
-			$this->kick_off_scheduler();
-		} 
+			if (!is_null($callback_json) && !empty($callback_json->Nonce) && 
+				($import = $this->validate_import_entry($callback_json->Nonce, $callback_json->RequestID)) !== false && !empty($callback_json->__jwe__)) {
+
+				$this->set_import_id($import->import_id);
+				$this->update_import_entry(['callback_json' => json_encode($callback_json) ]);
+				$response_json = json_decode($import->response_json);
+
+				//JWE decode
+				$decoded_json = utf8_encode(Crypto::jwe_decrypt($callback_json->__jwe__, $response_json->Callback->EncryptedResponse->key->k));
+				$this->update_import_entry(['callback_json' => $decoded_json]);
+				$this->kick_off_scheduler();
+			} 
+		} catch(\Exception $e) {
+			Logger::log($e->getMessagE(), (!empty($import->import_id)) ? $import->import_id : null);
+			Logger::log('Synchronization failed, please check the <a href="?page=arlo-for-wordpress-logs&s='.$this->import_id.'">Log</a> ', $this->import_id);
+
+			if (!empty($import->import_id)) {
+				$task = $this->scheduler->get_tasks([1,2], null, null, 1, $import->import_id);
+
+				if (!empty($task[0]->task_id)) {
+					$this->scheduler->update_task($task[0]->task_id, 3);
+				}
+			}
+		}
 	}
 
 	public function get_import_entry($import_id = null, $request_id = null, $limit = null) {
@@ -562,5 +583,5 @@ class Importer extends Singleton {
 		} else {
 			return false;
 		}
-	} 
+	}
 }
