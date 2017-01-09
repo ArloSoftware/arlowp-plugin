@@ -2,13 +2,12 @@
 
 namespace Arlo\Importer;
 
-use Arlo\Singleton;
 use Arlo\Logger;
 use Arlo\Utilities;
 use Arlo\FileHandler;
 use Arlo\Crypto;
 
-class Importer extends Singleton {
+class Importer {
 	const MAX_RETRY_ATTEMPT = 5;
 
 	protected $data_json;			

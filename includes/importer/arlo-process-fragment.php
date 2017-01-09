@@ -2,7 +2,6 @@
 
 namespace Arlo\Importer;
 
-use Arlo\Singleton;
 use Arlo\Logger;
 use Arlo\Utilities;
 use Arlo\FileHandler;

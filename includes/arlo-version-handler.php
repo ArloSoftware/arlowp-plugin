@@ -2,12 +2,9 @@
 
 namespace Arlo;
 
-require_once 'arlo-singleton.php';
-
-use Arlo\Singleton;
 use Arlo\Utilities;
 
-class VersionHandler extends Singleton {
+class VersionHandler {
 	const VERSION = '2.4.1.1';
 
 	public function __construct($dbl, $message_handler) {

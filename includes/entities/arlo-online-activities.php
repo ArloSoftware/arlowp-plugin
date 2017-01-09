@@ -2,11 +2,7 @@
 
 namespace Arlo\Entities;
 
-require_once( plugin_dir_path( __FILE__ ) . '../arlo-singleton.php');
-
-use Arlo\Singleton;
-
-class OnlineActivities extends Singleton {
+class OnlineActivities {
 	static function get($conditions = array(), $order = array(), $limit = null, $import_id = null) {
 		global $wpdb;
 	

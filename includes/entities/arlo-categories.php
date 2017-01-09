@@ -2,11 +2,7 @@
 
 namespace Arlo\Entities;
 
-require_once( plugin_dir_path( __FILE__ ) . '../arlo-singleton.php');
-
-use Arlo\Singleton;
-
-class Categories extends Singleton {
+class Categories {
 	static function get($conditions = array(), $limit = null, $import_id = null) {
 		global $wpdb;
 
