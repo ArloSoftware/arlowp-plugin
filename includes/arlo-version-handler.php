@@ -39,8 +39,8 @@ class VersionHandler {
 			$this->run_pre_data_update('2.4.1.1');
 		}	
 
-		if (version_compare($old_version, '2.5') < 0) {
-			$this->run_pre_data_update('2.5');
+		if (version_compare($old_version, '3.0') < 0) {
+			$this->run_pre_data_update('3.0');
 		}			
 		
 		arlo_add_datamodel();	
