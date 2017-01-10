@@ -5,7 +5,7 @@ namespace Arlo;
 use Arlo\Utilities;
 
 class VersionHandler {
-	const VERSION = '2.4.1.1';
+	const VERSION = '3.0';
 
 	public function __construct($dbl, $message_handler) {
 		$this->dbl = &$dbl; 	
@@ -61,8 +61,8 @@ class VersionHandler {
 			$this->do_update('2.4');
 		}
 
-		if (version_compare($old_version, '2.5') < 0) {
-			$this->do_update('2.5');
+		if (version_compare($old_version, '3.0') < 0) {
+			$this->do_update('3.0');
 		}		
 	}
 	
@@ -139,7 +139,7 @@ class VersionHandler {
 				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_venues CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
 			break;
 
-			case '2.5':
+			case '3.0':
 				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_async_tasks 
 				CHANGE task_task task_task VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
 				CHANGE task_status_text task_status_text VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,

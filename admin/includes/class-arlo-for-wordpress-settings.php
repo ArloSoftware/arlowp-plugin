@@ -586,6 +586,14 @@ class Arlo_For_Wordpress_Settings {
 	    <h4>Version ' .  VersionHandler::VERSION . '</h4>
 	    <p>
 	    	<ul class="arlo-whatsnew-list">	    
+	    		<li>New, improved, more reliable import</li>
+				<li>Revamp the codebase behind the plugin</li>
+				<li>Minor fixes and improvements</li>
+	    	</ul>
+	    </p>		
+		<h4>Version 2.4.1.2</h4>
+	    <p>
+	    	<ul class="arlo-whatsnew-list">	    
 	    		<li>Fixed wrong [arlo_event_duration] return value</li>
 				<li>Fix when [arlo_event_price] shortcode doesn\'t return the "cheapest" price</li>
 				<li>Fix when [arlo_event_next_running] shortcode returns a session date</li>

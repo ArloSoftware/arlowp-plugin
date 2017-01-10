@@ -41,16 +41,6 @@ use Arlo\SystemRequirements;
 class Arlo_For_Wordpress {
 
 	/**
-	 * Plugin version, used for cache-busting of style and script file references.
-	 *
-	 * @since   1.0.0
-	 *
-	 * @var     string
-	 */
-
-	const VERSION = '2.4.1.2';
-
-	/**
 	 * Minimum required PHP version
 	 *
 	 * @since   2.0.6

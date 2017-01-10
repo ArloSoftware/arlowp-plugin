@@ -1,3 +1,15 @@
+
+== V3.0==
+
+Enhancement
+------------------
+New, improved, more reliable import
+Revamp the codebase behind the plugin
+
+Bugfixes
+------------------
+Minor fixes and improvements
+
 == V2.4.1.2 ==
 
 Enhancement

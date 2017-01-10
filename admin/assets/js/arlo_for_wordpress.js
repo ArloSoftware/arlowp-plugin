@@ -14,7 +14,7 @@ if (typeof (Arlo) === "undefined") {
 	}
 
 	Arlo.ArloForWordPress.prototype = {
-		VERSION: '2.4.1.1',
+		VERSION: '3.0',
 		apiClient: null,
 		pluginSlug: 'arlo-for-wordpress',
 		tabIDs: [],
