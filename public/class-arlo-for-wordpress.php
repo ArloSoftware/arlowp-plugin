@@ -51,17 +51,6 @@ class Arlo_For_Wordpress {
 	const VERSION = '2.4.1.2';
 
 	/**
-	 * DB Schema hash for this version.
-	 * Need to generate with create_db_schema_hash if there is a schema change
-	 *
-	 * @since   2.4
-	 *
-	 * @var     string
-	 */
-
-	const DB_SCHEMA_HASH = '29dbebf0c27c672f52f355c59d1c1bef4ed1f486';	
-
-	/**
 	 * Minimum required PHP version
 	 *
 	 * @since   2.0.6
