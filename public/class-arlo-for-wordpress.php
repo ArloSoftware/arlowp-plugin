@@ -628,7 +628,7 @@ class Arlo_For_Wordpress {
 		// now add pages
 		self::add_pages();
 
-		update_option('arlo_plugin_version', self::VERSION);
+		update_option('arlo_plugin_version', VersionHandler::VERSION);
 
 		//load demo data
 		$settings = get_option('arlo_settings');
