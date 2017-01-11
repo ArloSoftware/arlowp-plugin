@@ -37,8 +37,8 @@ class Wordpress extends Transport
 					'Accept' => 'application/json'
 				),
 				'compress'    => true,
-                                'decompress'  => true,
-                                'stream'      => false,
+				'decompress'  => false,
+                'stream'      => false,
 				'timeout'     => $this->getRequestTimeout(),
 				'method'	  => (is_null($post_data)) ? 'GET' : 'POST',
 			);
