@@ -967,7 +967,7 @@ class Arlo_For_Wordpress {
 			return $version_handler;
 		}
 		
-		$version_handler = new VersionHandler($this->get_dbl(), $this->get_message_handler());
+		$version_handler = new VersionHandler($this->get_dbl(), $this->get_message_handler(), $this);
 		
 		$this->__set('version_handler', $version_handler);
 		

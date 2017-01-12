@@ -7,10 +7,15 @@ use Arlo\Utilities;
 class VersionHandler {
 	const VERSION = '3.0';
 
-	public function __construct($dbl, $message_handler) {
+	private $dbl;
+	private $message_handler;
+	private $plugin;
+
+	public function __construct($dbl, $message_handler, $plugin) {
 		$this->dbl = &$dbl; 	
 
 		$this->message_handler = $message_handler;	
+		$this->plugin = $plugin;
 	}	
 
 	public function get_current_installed_version () {
@@ -377,7 +382,7 @@ class VersionHandler {
 				
 				arlo_set_option('templates', $saved_templates);
 
-				$this->change_setting('arlo_send_data', 1);
+				$this->plugin->change_setting('arlo_send_data', 1);
 
 				if ($this->message_handler->get_message_by_type_count('information') == 0) {
 					
