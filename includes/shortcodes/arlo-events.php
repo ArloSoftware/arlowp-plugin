@@ -205,7 +205,7 @@ class Events {
         
         $event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
 
-        return self::event_date_formatter($atts, $event['e_finishdatetime'], $event['e_datetimeoffset'], $event['e_isonline']);        
+        return self::event_date_formatter($atts, $event['e_finishdatetime'], $event['e_datetimeoffset'], $event['e_isonline']);
     }
 
     private static function shortcode_event_session_description($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -706,23 +706,23 @@ class Events {
 
     private static function event_date_formatter($atts, $date, $offset, $is_online = false) {
         $timezone = null;
-              
-        $timewithtz = str_replace(' ', 'T', $date) . $offset;
         
+        $timewithtz = str_replace(' ', 'T', $date) . $offset;
+
         $date = new \DateTime($timewithtz);
-            
+
         if($is_online) {
             if (!empty($GLOBALS['selected_timezone_olson_names']) && is_array($GLOBALS['selected_timezone_olson_names'])) {
                 foreach ($GLOBALS['selected_timezone_olson_names'] as $TzName) {
                     try {
-                        $timezone = new \DateTimeZone($TzName->olson_name);
+                        $timezone = new \DateTimeZone($TzName);
                     } catch (Exception $e) {}
                     
                     if ($timezone !== null) {
                         break;
                     }
                 }
-                
+
                 if (!is_null($timezone)) {
                     $date->setTimezone($timezone);
                 }   

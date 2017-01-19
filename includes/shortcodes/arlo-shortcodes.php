@@ -160,12 +160,13 @@ class Shortcodes {
 		return $filter_html;
 	}
 
-	private static function getTimezones() {
+	private static function getTimezones($timezone_id = 0) {
 		global $wpdb, $arlo_plugin;
-		
+
 		$table = $wpdb->prefix . "arlo_timezones";
 		$import_id = $arlo_plugin->get_importer()->get_current_import_id();
-		
+		$timezone_id = intval($timezone_id);
+
 		$sql = "
 		SELECT
 			id,
@@ -174,6 +175,7 @@ class Shortcodes {
 			{$table}
 		WHERE
 			import_id = " . $import_id . "
+			" . ($timezone_id > 0 ? " AND id = " . $timezone_id : "") . "
 		ORDER BY name
 		";
 		return $wpdb->get_results($sql);
@@ -254,9 +256,8 @@ class Shortcodes {
 			$selected = false;
 			if((isset($_GET['timezone']) && $_GET['timezone'] == $timezone->id) || (!isset($_GET['timezone']) && $timezone->id == $items[0]['e_timezone_id'])) {
 				$selected = true;
-				//get olson timezones
-				$olson_names = self::getTimezoneOlsonNames($timezone->id);
-				$GLOBALS['selected_timezone_olson_names'] = $olson_names;
+				//get olson timezones for PHP
+				$GLOBALS['selected_timezone_olson_names'] = (isset(\Arlo\Arrays::$arlo_timezoneids_to_php_tz_identifiers[$timezone->id]) ? \Arlo\Arrays::$arlo_timezoneids_to_php_tz_identifiers[$timezone->id] : null);
 			}
 			
 			$content .= '<option value="' . $timezone->id . '" ' . ($selected ? 'selected' : '') . '>'. htmlentities($timezone->name, ENT_QUOTES, "UTF-8") . '</option>';
