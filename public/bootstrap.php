@@ -47,7 +47,7 @@ add_filter( 'the_title', function($title, $id = null){
 	$location = stripslashes(urldecode($location));
 	$search = stripslashes(urldecode($search));
 		
-	if($id === null || !in_array($id, $pages) || $id != $post->ID || !in_the_loop() ) return $title;
+	if ($id === null || !in_array($id, $pages) || $id != $post->ID || !in_the_loop() || is_nav_menu_item($id)) return $title;
 		
 	if(!$cat && empty($location) && empty($search)) return $title;
 	
@@ -283,7 +283,7 @@ function arlo_the_content($content) {
 	
 	$post_type = str_replace('arlo_', '', get_post_type($post));
 
-	if(function_exists('arlo_the_content_'.$post_type) && in_the_loop()) {
+	if(function_exists('arlo_the_content_'.$post_type) && is_singular()) {
 		return call_user_func_array('arlo_the_content_'.$post_type, func_get_args());
 	}
 
