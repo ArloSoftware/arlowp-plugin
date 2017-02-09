@@ -1394,6 +1394,8 @@ class Arlo_For_Wordpress {
 			curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+			
 			curl_exec($ch);
 			
 			$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE); 
