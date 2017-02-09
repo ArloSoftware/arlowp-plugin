@@ -553,6 +553,12 @@ class Arlo_For_Wordpress_Settings {
 	    <h3>What\'s new in this release</h3>
 		<p><strong>If you are experiencing problems after an update, please deactivate and re-activate the plugin and re-synchronize the data.</strong></p>
 	    <h4>Version ' . $this->version . '</h4>
+		<p>
+	    	<ul class="arlo-whatsnew-list">	    
+	    		<li>Fix SSL issue for new url structure</li>
+	    	</ul>
+	    </p>
+		<h4>Version 2.4.1.2</h4>
 	    <p>
 	    	<ul class="arlo-whatsnew-list">	    
 	    		<li>Fixed wrong [arlo_event_duration] return value</li>
