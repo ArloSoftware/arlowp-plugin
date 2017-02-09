@@ -521,8 +521,12 @@ class Arlo_For_Wordpress {
 		$last_import = $this->get_importer()->get_last_import_date();
 		
 		$log = Logger::create_log_csv(1000);
-				
-		$response = $client->WPLogError()->sendLog($message, $last_import, $log);
+		
+		try {
+			$response = $client->WPLogError()->sendLog($message, $last_import, $log);
+		} catch (\Exception $e) {
+			Logger::log($e->getMessage());
+		}
 	}		
 
 	
