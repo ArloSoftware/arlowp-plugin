@@ -695,7 +695,11 @@ class Arlo_For_Wordpress {
 
 		if (version_compare($old_version, '2.4.1.1') < 0) {
 			self::run_update('2.4.1.1');
-		}		
+		}	
+
+		if (version_compare($old_version, '2.4.1.3') < 0) {
+			self::run_update('2.4.1.3');
+		}	
 	}
 	
 	private static function run_pre_data_update($version) {
@@ -901,6 +905,12 @@ class Arlo_For_Wordpress {
 
 					$plugin->send_log_to_arlo($message, false);
 				}
+			break;
+			case '2.4.1.3':
+				$settings = get_option('arlo_settings');
+
+				$plugin = self::get_instance();
+				$plugin->determine_url_structure($settings['platform_name']);
 			break;					
 		}	
 	}
