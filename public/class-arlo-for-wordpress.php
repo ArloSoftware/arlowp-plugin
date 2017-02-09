@@ -33,7 +33,7 @@ class Arlo_For_Wordpress {
 	 * @var     string
 	 */
 
-	const VERSION = '2.4.1.2';
+	const VERSION = '2.4.1.3';
 
 	/**
 	 * DB Schema hash for this version.
