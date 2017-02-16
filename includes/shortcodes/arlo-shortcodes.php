@@ -220,7 +220,7 @@ class Shortcodes {
 		}
 		
 		$content = '<form method="GET" class="arlo-timezone">';
-		$content .= '<select name="timezone">';
+		$content .= '<select name="timezone"><option value="">' . __('Select a time zone', 'arlo-for-wordpress') . '</option>';
 
 		foreach(self::getTimezones() as $timezone) {		
 			$selected = false;
