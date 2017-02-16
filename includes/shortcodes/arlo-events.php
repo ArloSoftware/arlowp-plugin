@@ -732,16 +732,18 @@ class Events {
         $format = 'D g:i A';
 
         if(isset($atts['format'])) $format = $atts['format'];
-            
-        //if we haven't got timezone, we need to append the timezone abbrev
-        if ($is_online && is_null($timezone) && (preg_match('[G|g|i]', $format) === 1)) {
-            $format .= " T";
-        }
-        
+                    
         if (strpos($format, '%') === false) {
             $format = DateFormatter::date_format_to_strftime_format($format);
         }	
 
-        return strftime($format, $date->getTimestamp() + $date->getOffset());
+        $date = strftime($format, $date->getTimestamp() + $date->getOffset());
+
+        //if we haven't got timezone, we need to append the timezone abbrev
+        if ($is_online && is_null($timezone) && (preg_match('[I|M]', $format) === 1) && !empty($offset)) {
+            $date .=  " (" . $offset . ")";
+        }
+
+        return $date;
     }  
 }
