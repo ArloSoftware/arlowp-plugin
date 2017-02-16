@@ -181,34 +181,6 @@ class Shortcodes {
 		return $wpdb->get_results($sql);
 	}
 
-	private static function getTimezoneOlsonNames($timezone_id = 0) {
-		global $wpdb, $arlo_plugin;
-		
-		$timezone_id = intval($timezone_id);
-		
-		$table = $wpdb->prefix . "arlo_timezones_olson";
-		$import_id = $arlo_plugin->get_importer()->get_current_import_id();
-		$where = '';
-		
-		if ($timezone_id > 0) {
-			$where = "
-				timezone_id = {$timezone_id}
-			AND		
-			";
-		}
-		
-		$sql = "
-		SELECT
-			olson_name
-		FROM
-			{$table}
-		WHERE
-			{$where}	
-			import_id = " . $import_id . "
-		";
-		return $wpdb->get_results($sql);
-	}	
-
 	private static function shortcode_timezones($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
 		global $post, $wpdb;
 	
@@ -247,11 +219,9 @@ class Shortcodes {
 			return '';
 		}
 		
-		$olson_names = self::getTimezoneOlsonNames();	
-
 		$content = '<form method="GET" class="arlo-timezone">';
 		$content .= '<select name="timezone">';
-		
+
 		foreach(self::getTimezones() as $timezone) {		
 			$selected = false;
 			if((isset($_GET['timezone']) && $_GET['timezone'] == $timezone->id) || (!isset($_GET['timezone']) && $timezone->id == $items[0]['e_timezone_id'])) {
@@ -260,17 +230,14 @@ class Shortcodes {
 				$GLOBALS['selected_timezone_olson_names'] = (isset(\Arlo\Arrays::$arlo_timezoneids_to_php_tz_identifiers[$timezone->id]) ? \Arlo\Arrays::$arlo_timezoneids_to_php_tz_identifiers[$timezone->id] : null);
 			}
 			
-			$content .= '<option value="' . $timezone->id . '" ' . ($selected ? 'selected' : '') . '>'. htmlentities($timezone->name, ENT_QUOTES, "UTF-8") . '</option>';
+			if (isset(\Arlo\Arrays::$arlo_timezoneids_to_php_tz_identifiers[$timezone->id])) {
+				$content .= '<option value="' . $timezone->id . '" ' . ($selected ? 'selected' : '') . '>'. htmlentities($timezone->name, ENT_QUOTES, "UTF-8") . '</option>';
+			}
 		}
-		
+
 		$content .= '</select>';
 		$content .= '</form>';
 		
-		//if there is no olson names in the database, that means we couldn't do a timezone conversion
-		if (!(is_array($olson_names) && count($olson_names))) {
-			$content = '';
-		}
-
 		return $content;
 	}
 

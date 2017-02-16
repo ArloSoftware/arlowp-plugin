@@ -24,7 +24,7 @@ class Arrays {
 		18 => ['America/Belize','America/Costa_Rica','America/El_Salvador','America/Guatemala','Pacific/Easter'],
 		19 => ['America/Indiana/Knox','America/Indiana/Tell_City','America/Managua','America/Matamoros','America/Menominee','America/Merida','America/North_Dakota/Center','America/North_Dakota/New_Salem','America/Rainy_River','America/Rankin_Inlet','America/Regina','America/Swift_Current','America/Tegucigalpa','America/Winnipeg'],
 		20 => ['America/Monterrey'],
-		21 => [''],
+		
 		22 => ['America/Lima','America/Havana','America/Panama'],
 		23 => ['America/Atikokan','America/Cayman','America/Detroit','America/Grand_Turk','America/Guayaquil','America/Iqaluit','America/Jamaica','America/Kentucky/Louisville','America/Kentucky/Monticello','America/Montreal','America/Nassau','America/New_York','America/Pangnirtung','America/Port-au-Prince','America/Resolute','America/Thunder_Bay','America/Toronto'],
 		24 => ['America/Indiana/Indianapolis','America/Indiana/Petersburg','America/Indiana/Vevay','America/Indiana/Vincennes','America/Indiana/Winamac'],
