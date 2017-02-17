@@ -258,7 +258,7 @@ class UpcomingEvents {
         $arlo_delivery = isset($_GET['arlo-delivery']) ? $_GET['arlo-delivery'] : get_query_var('arlo-delivery', '');
         $arlo_eventtag = isset($_GET['arlo-eventtag']) && !empty($_GET['arlo-eventtag']) ? $_GET['arlo-eventtag'] : get_query_var('arlo-eventtag', '');
         $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
         
         if(!empty($arlo_month)) :
             $dates = explode(':',urldecode($arlo_month));

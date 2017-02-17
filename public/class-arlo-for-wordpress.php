@@ -1021,7 +1021,7 @@ class Arlo_For_Wordpress {
 			}
 			
 			if (!empty($last_import) && $last_import_ts !== false) {
-				$now = Utilities::get_now_utc();
+				$now = \Arlo\Utilities::get_now_utc();
 				
 				//older than 6 hours
 				if (intval($now->format("U")) - $last_import_ts > 60 * 60 * 6) {

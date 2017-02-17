@@ -247,7 +247,7 @@ class Shortcodes {
         $regions = get_option('arlo_regions');	
         
         $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
+        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
 
         $t1 = "{$wpdb->prefix}arlo_offers";
         

@@ -52,7 +52,7 @@ class ImportRequest extends BaseImporter  {
 	protected function save_entity($item) {}
 
 	public function run() {
-		$this->nonce = Utilities::GUIDv4(true, true);
+		$this->nonce = \Arlo\Utilities::GUIDv4(true, true);
 
 		$this->importer->set_import_entry($this->nonce);
 

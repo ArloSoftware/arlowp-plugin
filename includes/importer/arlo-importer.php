@@ -59,7 +59,7 @@ class Importer {
 	}
 
 	public function generate_import_id() {
-		return Utilities::get_random_int();
+		return \Arlo\Utilities::get_random_int();
 	}
 
 	public function set_import_id($import_id) {
@@ -89,7 +89,7 @@ class Importer {
 	}
 
 	public function set_last_import_date() {
-		$now = Utilities::get_now_utc();
+		$now = \Arlo\Utilities::get_now_utc();
        	$timestamp = $now->format("Y-m-d H:i:s");	
 	
 		update_option('arlo_last_import', $timestamp);
@@ -200,7 +200,7 @@ class Importer {
 		$this->task_id = intval($task_id);
 		$retval = true;
 
-		$this->set_import_id(Utilities::get_random_int());
+		$this->set_import_id(\Arlo\Utilities::get_random_int());
 
 		if ($this->task_id > 0) {
 			$task = $this->scheduler->get_task_data($this->task_id);

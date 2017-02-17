@@ -25,7 +25,7 @@ class VersionHandler {
 	public function set_installed_version() {
 		update_option('arlo_plugin_version', self::VERSION);
 				
-		$now = Utilities::get_now_utc();
+		$now = \Arlo\Utilities::get_now_utc();
 		update_option('arlo_updated', $now->format("Y-m-d H:i:s"));
 	}
 
