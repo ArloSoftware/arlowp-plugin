@@ -123,6 +123,17 @@ class ImportRequest extends BaseImporter  {
 		$data_obj->Nonce = $this->nonce;
 		$data_obj->EncryptedResponse = $this->generate_encryptedresponse_object();
 
+		$settings = get_option('arlo_settings');
+		if (!empty($settings['import_callback_host'])) {
+			$site_url = parse_url(get_option( 'siteurl' ));
+			$callback_url = parse_url($settings['import_callback_host']);
+			
+			$search_url = $site_url["host"] . (!empty($site_url['port']) ? ':' . $site_url['port'] : '');
+			$replace_url = $callback_url["host"] . (!empty($callback_url['port']) ? ':' . $callback_url['port'] : '');
+
+			$data_obj->Uri = str_replace($search_url, $replace_url, $data_obj->Uri);
+		}
+
 		return $data_obj;
 	}
 	

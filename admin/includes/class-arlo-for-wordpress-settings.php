@@ -176,7 +176,6 @@ class Arlo_For_Wordpress_Settings {
                             )
                 );
                 
-		// create No events to show text field
 		add_settings_field(
                         'arlo_googlemaps_api_key', 
                         '<label for="arlo_googlemaps_api_key">'.__('GoogleMaps API Key', 'arlo-for-wordpress' ).'</label>', 
@@ -188,7 +187,18 @@ class Arlo_For_Wordpress_Settings {
                             )
                 );
                 
-                                		 		
+		add_settings_field(
+                        'arlo_import_callback_host', 
+                        '<label for="arlo_import_callback_host">'.__('Import callback host', 'arlo-for-wordpress' ).'</label>', 
+                        array($this, 'arlo_simple_input_callback'), 
+                        $this->plugin_slug, 'arlo_general_section', 
+                        array(
+                            'id' => 'import_callback_host',
+                            'label_for' => 'import_callback_host',
+                            )
+                );
+
+
 		/*
 		 *
 		 * Page Section Settings
