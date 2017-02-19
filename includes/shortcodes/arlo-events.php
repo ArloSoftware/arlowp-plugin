@@ -25,6 +25,85 @@ class Events {
         });         
     }
 
+private static function shortcode_event_filters($content = '', $atts = [], $shortcode_name = '', $import_id = '') {  
+        global $post, $wpdb;
+
+        extract(shortcode_atts(array(
+            'filters'	=> 'location',
+            'resettext'	=> __('Reset', 'arlo-for-wordpress'),
+            'buttonclass'   => 'button'
+        ), $atts, $shortcode_name, $import_id));
+        
+        $filters_array = explode(',',$filters);
+
+        $regions = get_option('arlo_regions');
+        
+        $arlo_region = get_query_var('arlo-region', '');
+        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	        
+        
+        $settings = get_option('arlo_settings');  
+            
+        $filter_html = '<form id="arlo-event-filters" class="arlo-event-filters" method="get" action="' . get_page_link() . '">';
+        
+        foreach($filters_array as $filter) :
+
+            switch($filter) :
+
+                case 'location' :
+
+                    // location select
+
+                    $items = $wpdb->get_results(
+                        'SELECT 
+                            DISTINCT(e.e_locationname)
+                        FROM 
+                            ' . $wpdb->prefix . 'arlo_events AS e
+                        LEFT JOIN 
+                            ' . $wpdb->prefix . 'arlo_eventtemplates AS et
+                        ON 
+                            et.et_arlo_id = e.et_arlo_id
+                            ' . (!empty($arlo_region) ? 'AND et.et_region = "' . $arlo_region . '"' : '' ) . '
+                        WHERE 
+                            e_locationname != ""
+                        AND
+                            e.import_id = ' . $import_id . '
+                        AND 
+                            et_post_name = "' . $post->post_name . '"
+                        ' . (!empty($arlo_region) ? 'AND e.e_region = "' . $arlo_region . '"' : '' ) . '
+                        GROUP BY 
+                            e.e_locationname 
+                        ORDER BY 
+                            e.e_locationname', ARRAY_A);
+
+                    $locations = array();
+
+                    foreach ($items as $item) {
+                        $locations[] = array(
+                            'string' => $item['e_locationname'],
+                            'value' => $item['e_locationname'],
+                        );
+                    }
+
+                    $filter_html .= Shortcodes::create_filter($filter, $locations, __('All locations', 'arlo-for-wordpress'));
+
+                    break;
+
+            endswitch;
+
+        endforeach;	
+            
+        // category select
+
+
+        $filter_html .= '<div class="arlo-filters-buttons"><input type="hidden" id="arlo-page" value="' . $slug . '">';
+            
+        $filter_html .= '<a href="' . get_page_link() . '" class="' . esc_attr($buttonclass) . '">' . htmlentities($resettext, ENT_QUOTES, "UTF-8") . '</a></div>';
+
+        $filter_html .= '</form>';
+        
+        return $filter_html;        
+    }    
+
     private static function shortcode_event_tags($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_event_list_item']['e_id'])) return '';
         
@@ -100,7 +179,8 @@ class Events {
         $where = '';
         
         $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
+        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+        $arlo_location = isset($_GET['arlo-location']) && !empty($_GET['arlo-location']) ? $_GET['arlo-location'] : get_query_var('arlo-location', '');	
         
         $t1 = "{$wpdb->prefix}arlo_eventtemplates";
         $t2 = "{$wpdb->prefix}arlo_events";
@@ -110,7 +190,11 @@ class Events {
         
         if (!empty($arlo_region)) {
             $where .= ' AND ' . $t1 . '.et_region = "' . $arlo_region . '" AND ' . $t2 . '.e_region = "' . $arlo_region . '"';
-        }					
+        }
+
+        if (!empty($arlo_location)) {
+            $where .= ' AND ' . $t2 .'.e_locationname = "' . urldecode($arlo_location) . '"';
+        };        
         
         $sql = 
             "SELECT 

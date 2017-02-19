@@ -30,7 +30,11 @@
 		
         $('.arlo-timezone > select').change(function() {
             $('.arlo-timezone').submit();
-        });		
+        });	
+
+        $('.arlo-event-filters > select').change(function() {
+            $('.arlo-event-filters').submit();
+        });				
                 
         $('.arlo-filters > select').change(function() {
         	var filters = {
