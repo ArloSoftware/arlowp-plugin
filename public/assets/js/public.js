@@ -33,7 +33,21 @@
         });	
 
         $('.arlo-event-filters > select').change(function() {
-            $('.arlo-event-filters').submit();
+			var page = $('#arlo-page').val();
+
+        	if (page[page.length-1] != '/') {
+        		page = page + '/';
+        	}
+
+			if ($('#arlo-filter-region').length > 0) {
+				page += 'region-' + $('#arlo-filter-region').val() + '/';
+			}
+
+			if ($(this).val() != "") {
+				page += 'location-' + $(this).val() + '/';
+			}
+
+            document.location = page;
         });				
                 
         $('.arlo-filters > select').change(function() {
@@ -115,7 +129,6 @@
 				changeRegion(uriRegion, jQuery("#arlo-filter-region").val());
 			});		
 		}
-		
 	}        
     
     function changeRegion(uriRegion, newRegion) {
@@ -123,7 +136,7 @@
 	    //Manually set cookie
     	$.cookie("arlo-region", newRegion, { path: "/" });
 
-	    window.location.href = window.location.href.replace("/region-" + uriRegion + "/", "/region-" + newRegion + "/");
+	    window.location.href = window.location.href.replace("/region-" + uriRegion + "/", "/region-" + newRegion + "/").replace(/location-\w+(%\d+)?\w*/g,"");
 	}	
 	
 	$(document).ready(function() {

@@ -42,8 +42,14 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	        
         
         $settings = get_option('arlo_settings');  
+
+        if (!empty($settings['post_types']['event']['posts_page'])) {
+            $slug = get_post($settings['post_types']['event']['posts_page'])->post_name . '/' . $post->post_name;
+        } else {
+            $slug = get_post($post)->post_name;
+        }      
             
-        $filter_html = '<form id="arlo-event-filters" class="arlo-event-filters" method="get" action="' . get_page_link() . '">';
+        $filter_html = '<form id="arlo-event-filter" class="arlo-filters" method="get" action="' . site_url() . '/' . $slug . '/">';
         
         foreach($filters_array as $filter) :
 
@@ -95,7 +101,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         // category select
 
 
-        $filter_html .= '<div class="arlo-filters-buttons"><input type="hidden" id="arlo-page" value="' . $slug . '">';
+        $filter_html .= '<div class="arlo-filters-buttons"><input type="hidden" id="arlo-page" value="' .  $slug . '">';
             
         $filter_html .= '<a href="' . get_page_link() . '" class="' . esc_attr($buttonclass) . '">' . htmlentities($resettext, ENT_QUOTES, "UTF-8") . '</a></div>';
 
