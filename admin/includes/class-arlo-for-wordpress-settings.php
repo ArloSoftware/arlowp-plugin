@@ -598,6 +598,7 @@ class Arlo_For_Wordpress_Settings {
 	    	<ul class="arlo-whatsnew-list">	    
 	    		<li>New, improved, more reliable import</li>
 				<li>Revamp the codebase behind the plugin</li>
+				<li>New <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_filters" target="_blank">[arlo_event_filters]</a> shortcode</li>
 				<li>Minor fixes and improvements</li>
 	    	</ul>
 	    </p>		
