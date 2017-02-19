@@ -172,7 +172,6 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
                 break;
             }	
         }
-
         
         return $output;        
     }
@@ -225,9 +224,10 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
             AND 
                 $t2.e_parent_arlo_id = 0
             $where
+            GROUP BY 
+                e_arlo_id
             ORDER BY 
                 $t2.e_startdatetime";
-            
             
         $items = $wpdb->get_results($sql, ARRAY_A);
         
