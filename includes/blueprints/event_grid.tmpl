@@ -1,5 +1,6 @@
 <div class="arlo-boxed">
 	[arlo_template_region_selector]
+	[arlo_event_filters]
 	[arlo_timezones wrap="<div class='arlo-timezone-toggle'>%s</div>"]
 	<div class="arlo-template-head">
 		[arlo_event_template_summary wrap="<p>%s</p>"]
