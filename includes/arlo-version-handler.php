@@ -404,6 +404,24 @@ class VersionHandler {
 				}
 				
 			break;	
+
+			case "3.0":
+				//Add [arlo_powered_by] shortcode to the event template
+				$saved_templates = arlo_get_option('templates');
+				
+				foreach ($saved_templates as $id => $content) {
+					if (!empty($content['html'])) {
+						
+						if (strpos($content['html'], "[arlo_powered_by]") === false) {
+							$shortcode = "\n[arlo_powered_by]\n";
+
+							$saved_templates[$id]['html'] = $content['html'] . $shortcode;
+						}
+					}
+				}
+
+				arlo_set_option('templates', $saved_templates);				
+			break;
 		}	
 	}	
 }

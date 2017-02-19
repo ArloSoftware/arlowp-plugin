@@ -27,6 +27,11 @@ class Shortcodes {
 		self::add('label', function($content = '', $atts, $shortcode_name, $import_id){
 			return $content;
 		});
+
+		//powered by Arlo
+		self::add('powered_by', function ($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+       		return '<div class="arlo-powered-by"><a href="https://www.arlo.co" target="_blank">' .  sprintf(__('Powered by %s', 'arlo-for-wordpress'), '<i class="icons8-arlo-logo-for-font"></i>') . '</a></div>';
+    	});
 	}
 
 	/*
