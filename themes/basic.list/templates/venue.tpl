@@ -5,3 +5,4 @@
 [arlo_venue_directions label='<h5>Directions</h5>']
 [arlo_venue_parking label='<h5>Parking</h5>']
 [arlo_venue_map height="400" width="520"]
+[arlo_powered_by]

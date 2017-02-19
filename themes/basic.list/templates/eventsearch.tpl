@@ -24,3 +24,4 @@
 
 [arlo_no_event_text]
 [arlo_event_template_list_pagination]
+[arlo_powered_by]

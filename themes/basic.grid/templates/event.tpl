@@ -64,3 +64,4 @@
 		[arlo_content_field_text wrap='<p>%s</p>']
 	[/arlo_content_field_item]
 </div>
+[arlo_powered_by]

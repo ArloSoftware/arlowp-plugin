@@ -80,3 +80,4 @@
 	</tr>
 	[/arlo_suggest_templates]
 </table>
+[arlo_powered_by]
