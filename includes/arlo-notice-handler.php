@@ -253,9 +253,11 @@ class NoticeHandler {
 	public function webinar_notice() {
 		$message = '<p class="webinar">
 					<a target="_blank" href="https://www.arlo.co/video/wordpress-overview" target="_blank"><img src="' . plugins_url( '../assets/video-yellow.png', __FILE__) . '" style="width: 32px">' . __('Watch overview video', 'arlo-for-wordpress' ) .'</a>
-					<img src="' . plugins_url( '../assets/training-yellow.png', __FILE__) . '" style="width: 32px">
-					' . __('Join <a target="_blank" href="" class="webinar_url">Arlo for WordPress Getting started</a> webinar on <span id="webinar_date"></span>', 'arlo-for-wordpress' ) . '
-					' . __('<a target="_blank" href="" class="webinar_url">Register now!</a> or <a target="_blank" href="" id="webinar_template_url">view more times</a>', 'arlo-for-wordpress' ) . '
+					<span class="arlo-webinar">
+						<img src="' . plugins_url( '../assets/training-yellow.png', __FILE__) . '" style="width: 32px">
+						' . __('Jon <a target="_blank" href="" class="webinar_url">Arlo for WordPress Getting started</a> webinar on <span id="webinar_date"></span>', 'arlo-for-wordpress' ) . '
+						' . __('<a target="_blank" href="" class="webinar_url">Register now!</a> or <a target="_blank" href="" id="webinar_template_url">view more times</a>', 'arlo-for-wordpress' ) . '
+					</span>
 				</p>';
 		
 
