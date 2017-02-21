@@ -800,6 +800,18 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         $timewithtz = str_replace(' ', 'T', $date) . $offset;
 
         $date = new \DateTime($timewithtz);
+        $original_timezone = date_default_timezone_get();
+
+        if (!empty(\Arlo\Arrays::$arlo_timezoneids_to_php_tz_identifiers[$GLOBALS['arlo_event_list_item']['e_timezone_id']]) && is_array(\Arlo\Arrays::$arlo_timezoneids_to_php_tz_identifiers[$GLOBALS['arlo_event_list_item']['e_timezone_id']])) {
+            try {
+                $timezone = new \DateTimeZone(\Arlo\Arrays::$arlo_timezoneids_to_php_tz_identifiers[$GLOBALS['arlo_event_list_item']['e_timezone_id']][0]);
+                if ($timezone != null) {
+                    $date->setTimezone($timezone);
+                    date_default_timezone_set($timezone->getName());
+                }
+            } catch (Exception $e) {
+            }		
+        }        
 
         if($is_online) {
             if (!empty($GLOBALS['selected_timezone_olson_names']) && is_array($GLOBALS['selected_timezone_olson_names'])) {
@@ -815,6 +827,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
 
                 if (!is_null($timezone)) {
                     $date->setTimezone($timezone);
+                    date_default_timezone_set($timezone->getName());
                 }   
             }
         }
@@ -827,12 +840,22 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
             $format = DateFormatter::date_format_to_strftime_format($format);
         }	
 
-        $date = strftime($format, $date->getTimestamp() + $date->getOffset());
+        if (strpos($format, '%Z')) {
+            $format = str_replace('%Z', '{TZ_ABBREV}', $format); //T
+        }
+
+        if (strpos($format, '%z')) {
+            $format = str_replace('%z', '{TZ_OFFSET}', $format); //P
+        }        
+
+        $date = str_replace(['{TZ_ABBREV}', '{TZ_OFFSET}'], [$date->format('T'), $date->format('P')], strftime($format, $date->getTimestamp()));
 
         //if we haven't got timezone, we need to append the timezone abbrev
         if ($is_online && is_null($timezone) && (preg_match('[I|M]', $format) === 1) && !empty($offset)) {
             $date .=  " (" . $offset . ")";
         }
+
+        date_default_timezone_set($original_timezone);
 
         return $date;
     }  
