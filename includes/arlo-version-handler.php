@@ -262,9 +262,7 @@ class VersionHandler {
 				CHANGE name name VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NOT NULL,
 				DEFAULT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ";");
 
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_timezones_olson 
-				CHANGE olson_name olson_name VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NOT NULL,
-				DEFAULT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ";");
+				$this->dbl->query("DROP TABLE " . $this->dbl->prefix . "arlo_timezones_olson;");
 
 				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_log 
 				CHANGE message message TEXT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ",

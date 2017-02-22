@@ -814,8 +814,8 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         }        
 
         if($is_online) {
-            if (!empty($GLOBALS['selected_timezone_olson_names']) && is_array($GLOBALS['selected_timezone_olson_names'])) {
-                foreach ($GLOBALS['selected_timezone_olson_names'] as $TzName) {
+            if (!empty($GLOBALS['selected_timezone_names']) && is_array($GLOBALS['selected_timezone_names'])) {
+                foreach ($GLOBALS['selected_timezone_names'] as $TzName) {
                     try {
                         $timezone = new \DateTimeZone($TzName);
                     } catch (Exception $e) {}

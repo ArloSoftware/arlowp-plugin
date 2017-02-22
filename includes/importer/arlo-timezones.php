@@ -26,22 +26,6 @@ class Timezones extends BaseImporter {
 
 		if ($query === false) {
 			throw new \Exception('SQL error: ' . $this->dbl->last_error . ' ' . $this->dbl->last_query);
-		} else {
-			if (is_array($item->TzNames)) {
-				foreach ($item->TzNames as $TzName) {
-					$query = $this->dbl->insert(
-						$this->table_name . '_olson',
-						array(
-							'timezone_id' => $item->TimeZoneID,
-							'olson_name' => $TzName,
-							'import_id' => $this->import_id
-						),
-						array(
-							'%d', '%s', '%s'
-						)
-					);
-				} 
-			}
-		}		
+		} 		
 	}
 }

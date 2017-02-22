@@ -46,8 +46,7 @@ class Finish extends BaseImporter {
             'eventtemplates_categories',
             'eventtemplates_presenters',
             'eventtemplates_tags',
-            'timezones',
-            'timezones_olson'
+            'timezones'
 		);
                 		
 		foreach($tables as $table) {

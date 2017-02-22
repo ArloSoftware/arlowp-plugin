@@ -231,8 +231,8 @@ class Shortcodes {
 			$selected = false;
 			if((isset($_GET['timezone']) && $_GET['timezone'] == $timezone->id) || (!isset($_GET['timezone']) && $timezone->id == $items[0]['e_timezone_id'])) {
 				$selected = true;
-				//get olson timezones for PHP
-				$GLOBALS['selected_timezone_olson_names'] = (isset(\Arlo\Arrays::$arlo_timezoneids_to_php_tz_identifiers[$timezone->id]) ? \Arlo\Arrays::$arlo_timezoneids_to_php_tz_identifiers[$timezone->id] : null);
+				//get PHP timezones
+				$GLOBALS['selected_timezone_names'] = (isset(\Arlo\Arrays::$arlo_timezoneids_to_php_tz_identifiers[$timezone->id]) ? \Arlo\Arrays::$arlo_timezoneids_to_php_tz_identifiers[$timezone->id] : null);
 			}
 			
 			if (isset(\Arlo\Arrays::$arlo_timezoneids_to_php_tz_identifiers[$timezone->id])) {

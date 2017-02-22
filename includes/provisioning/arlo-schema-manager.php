@@ -443,17 +443,6 @@ class SchemaManager {
 		";
 
 		$this->dbl->sync_schema($sql);
-		
-		$sql2 = " 
-			CREATE TABLE IF NOT EXISTS " . $table_name . "_olson (
-			timezone_id int(11) NOT NULL,
-			olson_name varchar(255) NOT NULL,
-			import_id int(10) unsigned NOT NULL,
-			PRIMARY KEY  (timezone_id, olson_name(50), import_id)
-			) CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";
-		";
-		
-		$this->dbl->sync_schema($sql2);	
 	}
 
 	private function install_table_arlo_log() {	
