@@ -419,7 +419,11 @@ class VersionHandler {
 					}
 				}
 
-				arlo_set_option('templates', $saved_templates);				
+				arlo_set_option('templates', $saved_templates);		
+
+				//kick off an import
+				if (get_option('arlo_import_disabled', '0') != '1')
+					$plugin->get_scheduler()->set_task("import", -1);		
 			break;
 		}	
 	}	

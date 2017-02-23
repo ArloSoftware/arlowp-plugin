@@ -575,6 +575,14 @@ class Arlo_For_Wordpress {
 		if (!empty($plugin_version)) {
             $import_id  = get_option('arlo_import_id',"");
             $last_import = $plugin->get_importer()->get_last_import_date();
+
+			//check system requirements and disable the import
+			if (!SystemRequirements::overall_check()) {
+				update_option( 'arlo_import_disabled', 1 );
+			} else {
+				update_option( 'arlo_import_disabled', 0 );
+				update_option( 'arlo_plugin_disabled', 0 );
+			}			
             
             if (empty($import_id)) {
                 if (empty($last_import)) {
@@ -587,14 +595,6 @@ class Arlo_For_Wordpress {
 				$plugin->get_version_handler()->run_update($plugin_version);
 				
 				$plugin->get_schema_manager()->check_db_schema();
-			}
-
-			//check system requirements and disable the import
-			if (!SystemRequirements::overall_check()) {
-				update_option( 'arlo_import_disabled', 1 );
-			} else {
-				update_option( 'arlo_import_disabled', 0 );
-				update_option( 'arlo_plugin_disabled', 0 );
 			}
 		} else {
 			arlo_add_datamodel();
