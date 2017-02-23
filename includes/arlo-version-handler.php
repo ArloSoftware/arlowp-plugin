@@ -45,6 +45,7 @@ class VersionHandler {
 		}	
 
 		if (version_compare($old_version, '3.0') < 0) {
+			$this->run_pre_data_update('2.4.1.1');
 			$this->run_pre_data_update('3.0');
 		}			
 		
