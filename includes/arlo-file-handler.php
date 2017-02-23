@@ -62,7 +62,7 @@ class FileHandler {
 			$file = $this->$file;
 
 		if (!empty($file) && file_exists($file)) {
-			//unlink($file);
+			unlink($file);
 		}
 	}
 }
