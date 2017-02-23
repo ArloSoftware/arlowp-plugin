@@ -637,41 +637,6 @@ class Arlo_For_Wordpress_Settings {
 				<li>Many bug fixes and enhancements</li>
 	    	</ul>
 	    </p>
-	    
-	    <h4>Version 2.3.5.1</h4>
-	    <p>
-	    	<ul class="arlo-whatsnew-list">	    
-	    		<li>Fix start and end date times when the dates are returning a UTC value</li>
-	    	</ul>
-	    </p>				
-		<h4>Version 2.3.5</h4>
-	    <p>
-	    	<ul class="arlo-whatsnew-list">
-	    		<li>New asynchronous import, for more information, please visit our <a href="http://developer.arlo.co/doc/wordpress/import" target="_blank">documentation</a>.</li>
-	    		<li>Support localization for dates and times</li>
-	    		<li>Few minor bugfixes</li>
-	    	</ul>
-	    </p>		
-		<h4>Version 2.3.1</h4>
-	    <p>
-	    	<ul class="arlo-whatsnew-list">
-	    		<li>Important fix to solve the compatibility issue with some external plugin</li>
-	    		<li>Enhancement of the plugin update mechanism</li>
-	    		<li>Few minor bugfixes</li>
-	    	</ul>
-	    </p>
-	    <h4>Version 2.3</h4>	
-	    <p>
-	    	<ul class="arlo-whatsnew-list">
-	    		<li>Regionalized plugin, for more information, please visit our <a href="http://developer.arlo.co/doc/wordpress/settings#regions" target="_blank">documentation</a></li>
-	    		<li>New region selector shortcodes 
-	    		<a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/upcomingeventrelated#arlo_upcoming_region_selector" target="_blank">[arlo_upcoming_region_selector]</a>, 
-	    		<a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_template_search_region_selector" target="_blank">[arlo_template_search_region_selector]</a>, 
-	    		<a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_template_region_selector" target="_blank">[arlo_template_region_selector]</a></li>
-	    		<li>Many minor bug fixes and enhancements</li>
-	    	</ul>
-	    </p>
-	    <p>If you are experiencing problems with the URLs, please save changes to the Arlo settings page and resynchronize the data under the general tab.</p>
 	    ';
 	}
 	
