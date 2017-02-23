@@ -122,8 +122,22 @@
 	vertical-align: middle;
 }
 
+.arlo-left {
+	float: left;
+}
+
 .wp-editor-wrap {
 	margin-top: 1em;
+}
+
+.arlo-domain {
+	line-height: 27px;
+}
+
+#arlo_platform_name {
+	width: 50%;
+	float: left;
+	margin: 0 5px;
 }
 
 /* regions */
@@ -316,7 +330,8 @@ table.arlo-welcome td.logo {
     display: table;
 }
 
-.cf:after {
+.cf:after,
+.arlo-clear {
     clear: both;
 }
 
@@ -442,7 +457,15 @@ table.arlo-welcome td.logo {
 	.arlo-check input {
 		margin: 6px 10px 6px 0;
 	}
+	
 }
+
+@media screen and (max-width: 782px) {
+	.arlo-domain {
+		line-height: 35px;
+	}	
+}
+
 
 @media only screen and (min-width: 901px) {
 	

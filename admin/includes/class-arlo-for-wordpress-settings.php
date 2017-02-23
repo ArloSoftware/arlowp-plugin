@@ -109,13 +109,14 @@ class Arlo_For_Wordpress_Settings {
 		// create API Endpoint field                
 		add_settings_field(
                         'arlo_platform_name', 
-                        '<label for="arlo_platform_name">'.__('Platform Name', 'arlo-for-wordpress' ).'</label>', 
+                        '<label for="arlo_platform_name">'.__('Arlo domain', 'arlo-for-wordpress' ).'</label>', 
                         array($this, 'arlo_simple_input_callback'), 
                         $this->plugin_slug, 'arlo_general_section', 
                         array(
                             'id' => 'platform_name',
                             'label_for' => 'arlo_platform_name',
-                            'before_html' => '<div class="arlo_platform">https://my.arlo.co/</div>',
+                            'before_html' => '<div class="arlo-domain arlo-left ">https://</div>',
+							'after_html' => '<div class="arlo-domain arlo-left ">.arlo.co</div><div class="arlo-clear"></div>',
                             )
                 );                
                 
@@ -596,10 +597,10 @@ class Arlo_For_Wordpress_Settings {
 	    <h4>Version ' .  VersionHandler::VERSION . '</h4>
 	    <p>
 	    	<ul class="arlo-whatsnew-list">	    
-	    		<li>New, improved, more reliable import</li>
-				<li>Revamp the codebase behind the plugin</li>
+	    		<li>New, improved, more reliable <a href="http://developer.arlo.co/doc/wordpress/import#import-snapshot" target="_blank">snapshot import</a></li>
 				<li>New <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_filters" target="_blank">[arlo_event_filters]</a> shortcode</li>
 				<li>Minor fixes and improvements</li>
+				<li>Revamp the codebase behind the plugin</li>
 	    	</ul>
 	    </p>		
 		<h4>Version 2.4.1.2</h4>
