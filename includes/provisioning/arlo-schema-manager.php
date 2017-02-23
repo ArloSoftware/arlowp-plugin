@@ -437,6 +437,7 @@ class SchemaManager {
 			CREATE TABLE " . $table_name . " (
 			id tinyint(3) unsigned NOT NULL,
 			name varchar(256) NOT NULL,
+			windows_tz_id varchar(256) NOT NULL,
 			import_id int(10) unsigned NOT NULL,
 			PRIMARY KEY  (id, import_id)) 
 			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";	

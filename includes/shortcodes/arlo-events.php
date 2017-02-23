@@ -800,31 +800,34 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         $timewithtz = str_replace(' ', 'T', $date) . $offset;
 
         $date = new \DateTime($timewithtz);
-        $original_timezone = date_default_timezone_get();
 
-        if (!empty(\Arlo\Arrays::$arlo_timezoneids_to_php_tz_identifiers[$GLOBALS['arlo_event_list_item']['e_timezone_id']]) && is_array(\Arlo\Arrays::$arlo_timezoneids_to_php_tz_identifiers[$GLOBALS['arlo_event_list_item']['e_timezone_id']])) {
+        $utc_timezone_name = "UTC";
+
+        if (!empty(\Arlo\GeneratedStaticArrays::$arlo_timezones[$GLOBALS['arlo_event_list_item']['e_timezone_id']])) {
+            $timezone_windows_tz_id = \Arlo\GeneratedStaticArrays::$arlo_timezones[$GLOBALS['arlo_event_list_item']['e_timezone_id']]['windows_tz_id'];
+        }
+
+        if (!empty($timezone_windows_tz_id) && !empty(\Arlo\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$timezone_windows_tz_id])) {
+            $timezone = new \DateTimeZone(\Arlo\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$timezone_windows_tz_id]);
+        } else {
             try {
-                $timezone = new \DateTimeZone(\Arlo\Arrays::$arlo_timezoneids_to_php_tz_identifiers[$GLOBALS['arlo_event_list_item']['e_timezone_id']][0]);
-                if ($timezone != null) {
-                    $date->setTimezone($timezone);
-                    date_default_timezone_set($timezone->getName());
-                }
-            } catch (Exception $e) {
-            }		
-        }        
+                $timezone = new \DateTimeZone(get_option('timezone_string'));
+            } catch(\Exception $e) {
+                $timezone = new \DateTimeZone($utc_timezone_name);
+            }
+        }
 
+        if ($timezone != null) {
+            $date->setTimezone($timezone);
+            date_default_timezone_set($timezone->getName());
+        }
+      
         if($is_online) {
-            if (!empty($GLOBALS['selected_timezone_names']) && is_array($GLOBALS['selected_timezone_names'])) {
-                foreach ($GLOBALS['selected_timezone_names'] as $TzName) {
-                    try {
-                        $timezone = new \DateTimeZone($TzName);
-                    } catch (Exception $e) {}
-                    
-                    if ($timezone !== null) {
-                        break;
-                    }
-                }
-
+            if (!empty($GLOBALS['selected_timezone_names'])) {
+                try {
+                    $timezone = new \DateTimeZone($GLOBALS['selected_timezone_names']);
+                } catch (Exception $e) {}
+                
                 if (!is_null($timezone)) {
                     $date->setTimezone($timezone);
                     date_default_timezone_set($timezone->getName());
@@ -839,6 +842,10 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         if (strpos($format, '%') === false) {
             $format = DateFormatter::date_format_to_strftime_format($format);
         }	
+
+        if (!is_null($timezone) && ($timezone->getName() == $utc_timezone_name || $timezone->getName() == get_option('timezone_string')) && preg_match('[I|M]', $format) === 1 && preg_match('[Z|z]', $format) === 0) {
+            $format .= " %Z";
+        }        
 
         if (strpos($format, '%Z')) {
             $format = str_replace('%Z', '{TZ_ABBREV}', $format); //T

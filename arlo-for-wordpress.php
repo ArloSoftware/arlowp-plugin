@@ -75,6 +75,10 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-file-handler.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-logger.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-system-requirements.php');
 
+if (file_exists(plugin_dir_path( __FILE__ ) . 'includes/arlo-generated-static-arrays.php')) {
+	require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-generated-static-arrays.php');
+}
+	
 //include shortcodes
 require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-shortcodes.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-categories.php');
@@ -109,6 +113,7 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-online-activ
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-categories.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-category-items.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-category-depth.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-generate-static-arrays.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-finish.php');
 
 // start the public plugin class

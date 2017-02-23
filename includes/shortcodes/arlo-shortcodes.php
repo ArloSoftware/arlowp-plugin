@@ -175,7 +175,8 @@ class Shortcodes {
 		$sql = "
 		SELECT
 			id,
-			name
+			name,
+			windows_tz_id
 		FROM
 			{$table}
 		WHERE
@@ -183,7 +184,7 @@ class Shortcodes {
 			" . ($timezone_id > 0 ? " AND id = " . $timezone_id : "") . "
 		ORDER BY name
 		";
-		return $wpdb->get_results($sql);
+		return $wpdb->get_results($sql, ARRAY_A);
 	}
 
 	private static function shortcode_timezones($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -227,16 +228,31 @@ class Shortcodes {
 		$content = '<form method="GET" class="arlo-timezone">';
 		$content .= '<select name="timezone"><option value="">' . __('Select a time zone', 'arlo-for-wordpress') . '</option>';
 
-		foreach(self::getTimezones() as $timezone) {		
+		if (isset(\Arlo\GeneratedStaticArrays::$arlo_timezones) && is_array(\Arlo\GeneratedStaticArrays::$arlo_timezones)) {
+			$timezones = \Arlo\GeneratedStaticArrays::$arlo_timezones;
+		} else {
+			$timezones = self::getTimezones();
+		}
+
+		foreach($timezones as $timezone_id => $timezone) {
 			$selected = false;
-			if((isset($_GET['timezone']) && $_GET['timezone'] == $timezone->id) || (!isset($_GET['timezone']) && $timezone->id == $items[0]['e_timezone_id'])) {
+			if (!empty($timezone['id'])) {
+				$timezone_id = $timezone['id'];
+			}
+
+         	$timezone_windows_tz_id = $timezone['windows_tz_id'];
+			
+			if((isset($_GET['timezone']) && $_GET['timezone'] == $timezone_id) || (!isset($_GET['timezone']) && $timezone_id == $items[0]['e_timezone_id'])) {
 				$selected = true;
 				//get PHP timezones
-				$GLOBALS['selected_timezone_names'] = (isset(\Arlo\Arrays::$arlo_timezoneids_to_php_tz_identifiers[$timezone->id]) ? \Arlo\Arrays::$arlo_timezoneids_to_php_tz_identifiers[$timezone->id] : null);
+				$GLOBALS['selected_timezone_names'] = null;
+				if (!is_null($timezone_windows_tz_id)) {
+					$GLOBALS['selected_timezone_names'] = \Arlo\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$timezone_windows_tz_id];
+        		}
 			}
 			
-			if (isset(\Arlo\Arrays::$arlo_timezoneids_to_php_tz_identifiers[$timezone->id])) {
-				$content .= '<option value="' . $timezone->id . '" ' . ($selected ? 'selected' : '') . '>'. htmlentities($timezone->name, ENT_QUOTES, "UTF-8") . '</option>';
+			if (!is_null($timezone_windows_tz_id)) {
+				$content .= '<option value="' . $timezone_id . '" ' . ($selected ? 'selected' : '') . '>'. htmlentities($timezone['name'], ENT_QUOTES, "UTF-8") . '</option>';
 			}
 		}
 

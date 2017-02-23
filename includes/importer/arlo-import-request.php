@@ -20,7 +20,7 @@ class ImportRequest extends BaseImporter  {
 			'RegionID', 'Name',
 		],
 		'TimeZones' => [
-			'TimeZoneID', 'Name', 'TzNames'
+			'TimeZoneID', 'Name', 'WindowsTzID'
 		],
 		'Events' => [
 			'EventID', 'EventTemplateID', 'Name', 'Code', 'Description', 'StartDateTime', 'EndDateTime', 'TimeZoneID', 'TimeZone', 'Location', 'IsFull', 'PlacesRemaining', 'AdvertisedOffers', 'SessionsDescription', 'Presenters', 'Notice', 'ViewUri', 'RegistrationInfo', 'Provider', 'TemplateCode', 'Tags', 'Credits', 'Sessions.EventID', 'Sessions.Name', 'Sessions.Code', 'Sessions.Summary', 'Sessions.StartDateTime', 'Sessions.EndDateTime', 'Sessions.TimeZoneID', 'Sessions.TimeZone', 'Sessions.Location', 'Sessions.IsFull', 'Sessions.PlacesRemaining','Sessions.AdvertisedOffers', 'Sessions.Presenters', 'Sessions.Tags'
