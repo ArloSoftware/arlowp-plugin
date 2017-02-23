@@ -803,7 +803,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
 
         $utc_timezone_name = "UTC";
 
-        if (!empty(\Arlo\GeneratedStaticArrays::$arlo_timezones[$GLOBALS['arlo_event_list_item']['e_timezone_id']])) {
+        if (class_exists('\Arlo\GeneratedStaticArrays') && !empty(\Arlo\GeneratedStaticArrays::$arlo_timezones[$GLOBALS['arlo_event_list_item']['e_timezone_id']])) {
             $timezone_windows_tz_id = \Arlo\GeneratedStaticArrays::$arlo_timezones[$GLOBALS['arlo_event_list_item']['e_timezone_id']]['windows_tz_id'];
         }
 

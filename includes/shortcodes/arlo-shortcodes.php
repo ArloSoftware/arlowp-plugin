@@ -228,7 +228,7 @@ class Shortcodes {
 		$content = '<form method="GET" class="arlo-timezone">';
 		$content .= '<select name="timezone"><option value="">' . __('Select a time zone', 'arlo-for-wordpress') . '</option>';
 
-		if (isset(\Arlo\GeneratedStaticArrays::$arlo_timezones) && is_array(\Arlo\GeneratedStaticArrays::$arlo_timezones)) {
+		if (class_exists('\Arlo\GeneratedStaticArrays') && isset(\Arlo\GeneratedStaticArrays::$arlo_timezones) && is_array(\Arlo\GeneratedStaticArrays::$arlo_timezones)) {
 			$timezones = \Arlo\GeneratedStaticArrays::$arlo_timezones;
 		} else {
 			$timezones = self::getTimezones();
