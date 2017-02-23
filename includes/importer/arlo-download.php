@@ -99,7 +99,7 @@ class Download extends BaseImporter  {
 				break;
 
 			default:
-				Logger::log('Invalid status code: ' . $status['http_code']);
+				Logger::log_error('Invalid status code: ' . $status['http_code'] . ' ', $this->import_id);
 		}
 
 		return false;
