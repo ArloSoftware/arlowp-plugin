@@ -423,7 +423,7 @@ class VersionHandler {
 
 				//kick off an import
 				if (get_option('arlo_import_disabled', '0') != '1')
-					$plugin->get_scheduler()->set_task("import", -1);		
+					$this->plugin->get_scheduler()->set_task("import", -1);		
 			break;
 		}	
 	}	
