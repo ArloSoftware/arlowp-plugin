@@ -841,9 +841,9 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
                     
         if (strpos($format, '%') === false) {
             $format = DateFormatter::date_format_to_strftime_format($format);
-        }	
+        }	        
 
-        if (!is_null($timezone) && ($timezone->getName() == $utc_timezone_name || $timezone->getName() == get_option('timezone_string')) && preg_match('[I|M]', $format) === 1 && preg_match('[Z|z]', $format) === 0) {
+        if (!is_null($timezone) && ($timezone->getName() == $utc_timezone_name || $timezone->getName() == get_option('timezone_string') || $is_online) && preg_match('[I|M]', $format) === 1 && preg_match('[Z|z]', $format) === 0) {
             $format .= " %Z";
         }        
 
