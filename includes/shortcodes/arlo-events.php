@@ -103,7 +103,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
 
         $filter_html .= '<div class="arlo-filters-buttons"><input type="hidden" id="arlo-page" value="' .  $slug . '">';
             
-        $filter_html .= '<a href="' . get_page_link() . '" class="' . esc_attr($buttonclass) . '">' . htmlentities($resettext, ENT_QUOTES, "UTF-8") . '</a></div>';
+        $filter_html .= '<a href="' . site_url() . '/' . $slug . '" class="' . esc_attr($buttonclass) . '">' . htmlentities($resettext, ENT_QUOTES, "UTF-8") . '</a></div>';
 
         $filter_html .= '</form>';
         
