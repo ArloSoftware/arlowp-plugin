@@ -35,6 +35,8 @@ class GeneratedStaticArrays {
 			" . $this->dbl->prefix . "arlo_timezones
 		WHERE
 			import_id = " . $this->import_id . "
+		ORDER BY
+			name
 		");
 
 		foreach ($timezones as $tz) {
