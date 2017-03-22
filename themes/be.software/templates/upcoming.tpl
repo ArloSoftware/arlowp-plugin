@@ -1,4 +1,4 @@
-<div class="arlo-boxed arlo">
+<div class="arlo-boxed arlo" id="arlo">
 	[arlo_template_region_selector]
 	[arlo_upcoming_event_filters filtertext='Filter' resettext="Reset" filters='category,month,location']
 	
@@ -7,11 +7,11 @@
 		
 		<li class="arlo-cf">
 			<div class="arlo-cal">
-				<div class="arlo-month">[arlo_event_start_date format="%b"]</div>
-				<div class="arlo-day">[arlo_event_start_date format="%e"]</div>
+				<div class="arlo-month arlo-background-color1">[arlo_event_start_date format="%b"]</div>
+				<div class="arlo-day">[arlo_event_start_date format="%d"]</div>
 			</div>
 			<div class="arlo-event-details">
-				<h4 class="arlo-ellipsis">[arlo_event_template_permalink wrap='<a href="%s">'][arlo_event_template_name]</a></h4>
+				<h2>[arlo_event_template_permalink wrap='<a href="%s">'][arlo_event_template_name]</a></h2>
 				<div class="arlo-event-subheading">
 					[arlo_event_location label="" wrap="<span class='arlo-event-location'><i class='fa fa-map-marker'></i>%s</span>"]
 					
@@ -30,7 +30,7 @@
 				</div>
 
 				<div class="arlo-buttons">
-					[arlo_event_template_permalink wrap='<a href="%s" class="button arlo-more-information">']More Information</a>
+					[arlo_event_template_permalink wrap='<a href="%s" class="button arlo-more-information arlo-button arlo-background-color1">']More Information</a>
 					[arlo_event_registration]
 				</div>
 			</div>

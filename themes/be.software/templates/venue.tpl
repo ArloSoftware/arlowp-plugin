@@ -1,16 +1,18 @@
-<div class="arlo-venue-header-wrapper arlo-full-width arlo-banner-outer">
-	<div class="arlo-banner-inner">
-        [arlo_venue_name]
-    </div>
-</div>
+<div class="arlo" id="arlo">
 
-[arlo_venue_map height="180" width="640"]
+	<div class="arlo-venue-header-wrapper arlo-banner arlo-background-color1">
+	        <h1>[arlo_venue_name]</h1>
+	</div>
 
-<div class="arlo-venue-details">
-    [arlo_label label='<h3>Address</h3>']
-        [arlo_venue_address]
-    [/arlo_label]
+	[arlo_venue_map height="180" width="640"]
 
-    [arlo_venue_directions label='<h3>Directions</h3>']
-    [arlo_venue_parking label='<h3>Parking</h3>']
+	<div class="arlo-venue-details">
+	    [arlo_label label='<h4>Address</h4>']
+	        [arlo_venue_address]
+	    [/arlo_label]
+
+	    [arlo_venue_directions label='<h4>Directions</h4>']
+	    [arlo_venue_parking label='<h4>Parking</h4>']
+	</div>
+
 </div>
