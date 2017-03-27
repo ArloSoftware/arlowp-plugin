@@ -16,7 +16,7 @@
         [arlo_group_divider wrap='<tr class="arlo-group-divider"><th colspan="4">%s</th></tr>']
         <tr>
             <td>
-                [arlo_event_template_permalink wrap='<a href="%s">'][arlo_event_template_code] - [arlo_event_template_name]</a>
+                [arlo_event_template_permalink wrap='<a href="%s">'][arlo_event_template_name]</a>
             </td>
             <td>[arlo_event_template_advertised_duration]</td>
             <td>[arlo_event_price]</td>

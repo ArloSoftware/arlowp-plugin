@@ -1,4 +1,4 @@
-<div class="arlo-boxed arlo" id="arlo">
+<div class="arlo" id="arlo">
 	[arlo_template_region_selector]
 	[arlo_upcoming_event_filters filtertext='Filter' resettext="Reset" filters='category,month,location']
 	
@@ -11,7 +11,7 @@
 				<div class="arlo-day">[arlo_event_start_date format="%d"]</div>
 			</div>
 			<div class="arlo-event-details">
-				<h2>[arlo_event_template_permalink wrap='<a href="%s">'][arlo_event_template_name]</a></h2>
+				<h3 class="arlo-event-name">[arlo_event_template_permalink wrap='<a href="%s">'][arlo_event_template_name]</a></h3>
 				<div class="arlo-event-subheading">
 					[arlo_event_location label="" wrap="<span class='arlo-event-location'><i class='fa fa-map-marker'></i>%s</span>"]
 					

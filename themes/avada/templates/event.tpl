@@ -30,7 +30,7 @@
                    [/arlo_event_session_list_item]
                    [arlo_event_presenters wrap='<div class="arlo-event-presenters">%s</div>']
                    [arlo_event_credits wrap='<div class="arlo-event-credits">%s</div>']
-                   [arlo_event_offers]
+                   [arlo_event_offers wrap='<div class="arlo-color4">%s</div>']
                    [arlo_event_tags layout="list"]
                    [arlo_event_registration]
                 </div>

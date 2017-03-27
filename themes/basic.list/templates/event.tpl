@@ -1,9 +1,8 @@
 [arlo_template_region_selector]
-[arlo_event_filters]
+[arlo_event_template_filters]
 [arlo_timezones wrap="<div class='arlo-timezone-toggle'>%s</div>"]
 [arlo_event_template_summary wrap="<p>%s</p>"]
 [arlo_event_template_advertised_duration wrap="<p>%s</p>"]
-[arlo_event_template_tags]
 
 <ul class="arlo-list arlo-show-more events" data-show="3" data-show-text="Show more">
 	[arlo_event_list]
@@ -15,10 +14,10 @@
 			</div>
 			<div class="arlo-left arlo-event-details">
 				<span class="arlo-event-time">[arlo_event_start_date format="%a %I:%M %p"] - [arlo_event_end_date format="%a %I:%M %p"]</span>
-				[arlo_event_location label="Location: " wrap="<span class='arlo-event-location'>%s</span>"]
-				[arlo_event_provider label="Provider: "]
-				[arlo_event_delivery label="Delivery: " ]
-				[arlo_event_session_description wrap='<span class="arlo-event-session-description">%s</span>']
+				[arlo_event_location label="Location: " wrap="<div class='arlo-event-location'>%s</div>"]
+				[arlo_event_provider label="Provider: " wrap="<div class='arlo-event-provider'>%s</div>"]
+				[arlo_event_delivery label="Delivery: "  wrap="<div class='arlo-event-delivery'>%s</div>"]
+				[arlo_event_session_description wrap='<div class="arlo-event-session-description">%s</div>']
 				[arlo_event_presenters label="Presenters: "]
 				[arlo_event_credits]
 				[arlo_event_offers]
@@ -46,7 +45,7 @@
 			<div class="arlo-left arlo-cal">[arlo_oa_reference_term]</div>
 			
 			<div class="arlo-left">
-				[arlo_oa_code] - [arlo_oa_name]
+				[arlo_oa_name]
 				[arlo_oa_credits]
 				
 				[arlo_oa_delivery_description label="Delivery: " wrap='<div class="arlo-delivery-desc">%s</div>']
@@ -62,7 +61,7 @@
 </ul>
 
 [arlo_event_template_register_interest]
-[arlo_suggest_datelocation wrap="<div class'arlo-suggest'>%s</div>"]
+[arlo_suggest_datelocation wrap="<div class='arlo-suggest'>%s</div>"]
 
 [arlo_content_field_item]
 	[arlo_content_field_name wrap='<h5>%s</h5>']
@@ -74,7 +73,7 @@
 	[arlo_suggest_templates limit="4"]
 	<tr>
 		<td>
-			[arlo_event_template_permalink wrap='<a href="%s">'][arlo_event_template_code] - [arlo_event_template_name]</a>
+			[arlo_event_template_permalink wrap='<a href="%s">'][arlo_event_template_name]</a>
 		</td>
 		<td align="right">[arlo_event_next_running]</td>
 	</tr>

@@ -1,8 +1,4 @@
 <div class="arlo" id="arlo">
-
-    <div class="arlo-presenter-header-wrapper arlo-banner arlo-background-color1">
-            <h1>[arlo_presenter_name]</h1>
-    </div>
     <div class="arlo-presenter-details">
         [arlo_presenter_profile]
         [arlo_presenter_qualifications label='<h4>Qualifications</h4>']

@@ -93,12 +93,6 @@ body.arlo {
     font-style: italic;
 }
 
-.arlo#arlo h1 {
-    font-size: 2em;
-    /* Set 1 unit of vertical rhythm on the top and bottom margins. */
-    margin: 0.75em 0;
-}
-
 .arlo#arlo mark {
     background-color: #ff0;
     color: #000;
@@ -531,8 +525,8 @@ body.arlo {
 }
 
 .arlo#arlo .arlo-list.catalogue .arlo-cf.arlo-group-divider h2 {
-    font-size: 2.5em;
-    font-weight: 100;
+    font-size: 2em;
+    font-weight: bold;
 }
 
 .arlo#arlo .arlo-list.catalogue .arlo-cf .arlo-catalogue-column {
@@ -598,12 +592,16 @@ body.arlo {
     margin-bottom: 2em;
 }
 
+.arlo#arlo .arlo-list.catalogue .arlo-offers {
+    opacity: .5;
+}
+
 
 
 /* Upcoming events list */
 
 .arlo#arlo .arlo-list.upcoming li {
-    margin-bottom: 4em;
+    margin-bottom: 3em;
 }
 
 .arlo#arlo .arlo-cal {
@@ -627,12 +625,12 @@ body.arlo {
 
 @media (min-width: 550px) {
     .arlo#arlo .arlo-cal {
-        width: 90px;
+        width: 75px;
         font-size: 2em;
     }
 
     .arlo#arlo .upcoming .arlo-event-info {
-        margin-left: 110px;
+        margin-left: 100px;
     }
 }
 
@@ -667,9 +665,10 @@ body.arlo {
 }
 
 .arlo#arlo .upcoming .arlo-cf.arlo-group-divider {
-    font-size: 2.5em;
-    margin-bottom: 1em;
+    font-size: 2em;
+    margin-bottom: .75em;
     margin-top: 1em;
+    font-weight: bold;
 }
 
 .arlo#arlo .upcoming .arlo-event-full,
@@ -985,7 +984,6 @@ body.arlo {
 .arlo#arlo .arlo-color1,
 .arlo#arlo a:hover,
 .arlo#arlo a.arlo-template-name,
-.arlo#arlo a.arlo-template-name,
 .arlo#arlo a.arlo-template-name:hover,
 .arlo#arlo .page-numbers:not(.next):not(.prev):hover,
 .arlo#arlo .page-numbers.current:not(.next):not(.prev),
@@ -993,22 +991,22 @@ body.arlo {
 .arlo#arlo .button.arlo-waiting-list:hover,
 .arlo#arlo .arlo-event_tags-list > li,
 .arlo#arlo .arlo-event-offers .discount  {
-    color: #f46f72;
+    color: #f97070;
 }
 
 .arlo#arlo .arlo-background-color1,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a.arlo-register,
 .arlo#arlo .arlo-category-list a,
 .arlo#arlo .button.arlo-register {
-    background-color: #f46f72;
+    background-color: #f97070;
 }
 
 .arlo#arlo .arlo-border-color1,
 .arlo#arlo .arlo-list.catalogue .arlo-cf.arlo-catalogue-event {
-    border-left-color: #f46f72;
-    border-right-color: #f46f72;
-    border-top-color: #f46f72;
-    border-bottom-color: #f46f72;
+    border-left-color: #f97070;
+    border-right-color: #f97070;
+    border-top-color: #f97070;
+    border-bottom-color: #f97070;
 }
 
 .arlo#arlo .arlo-color2 {
@@ -1054,4 +1052,12 @@ body.arlo {
 .arlo#arlo .arlo-show-more-link,
 .arlo#arlo .arlo-show-more-link:hover {
     color: white;
+}
+
+.arlo#arlo .arlo-color4 {
+    color: #ffb0b0;
+}
+
+.arlo#arlo .arlo-background-color4 {
+    color: #ffb0b0;
 }

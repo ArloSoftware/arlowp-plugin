@@ -12,11 +12,11 @@
 		</th>
 		<th>Next Running</th>
 	</tr>
-    [arlo_event_template_list_item group="category" limit="1000"]
+    [arlo_event_template_list_item group="category" limit="20"]
         [arlo_group_divider wrap='<tr class="arlo-group-divider"><th colspan="4">%s</th></tr>']
         <tr>
             <td>
-                [arlo_event_template_permalink wrap='<a href="%s">'][arlo_event_template_code] - [arlo_event_template_name]</a>
+                [arlo_event_template_permalink wrap='<a href="%s">'][arlo_event_template_name]</a>
             </td>
             <td>[arlo_event_template_advertised_duration]</td>
             <td>[arlo_event_price]</td>
@@ -27,5 +27,5 @@
 
 [arlo_category_footer]
 [arlo_no_event_text]
-[arlo_event_template_list_pagination limit="1000"]
+[arlo_event_template_list_pagination limit="20"]
 [arlo_powered_by]

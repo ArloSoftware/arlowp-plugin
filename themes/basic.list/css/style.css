@@ -33,14 +33,14 @@
 
 .arlo-cal.arlo-left {
 	margin-right: 1em;
-        max-width: 24%;
+	width: 8%;
 }
 
 .arlo-cal-month {
 	background-color: #f04124;
 	border: 1px solid #f04124;
 	color: #fff;
-	display: block;
+	display: inline-block;
 	font-weight: 600;
 	width: 50px;
 }
@@ -87,14 +87,6 @@
 .arlo-event-full {
 	font-weight: 600;
 }
-
-.arlo-places-remaining {
-
-}
-
-.arlo-event-summary {
-}
-
 
 .arlo-event-location,
 .arlo-event-provider,
@@ -196,7 +188,6 @@ ul.page-numbers li {
 
 .arlo-right {
 	float: right;
-        max-width: 25%;
 }
 
 .arlo-cf:before, .arlo-cf:after {

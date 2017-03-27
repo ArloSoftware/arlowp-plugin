@@ -7,7 +7,7 @@
 
     <ul class="arlo-list catalogue">
         [arlo_event_template_list_item group="category" limit="10"]
-              [arlo_group_divider wrap='<li class="arlo-cf arlo-group-divider"><h2 class="arlo-color1 arlo-font2">%s</h2></li>']
+              [arlo_group_divider wrap='<li class="arlo-cf arlo-group-divider"><h2 class="arlo-font2">%s</h2></li>']
               <li class='arlo-cf arlo-catalogue-event arlo-background-color2'>
                 <div class="arlo-catalogue-details">
                   <div class="arlo-catalogue-column arlo-event-name">

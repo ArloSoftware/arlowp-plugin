@@ -1,6 +1,6 @@
 <div class="arlo" id="arlo">
     
-    <div class="arlo-category-header-wrapper arlo-banner arlo-background-color4">
+    <div class="arlo-category-header-wrapper arlo-banner">
             [arlo_category_title wrap='<h1>%s</h1>']
             [arlo_category_header]
     </div>
@@ -18,9 +18,9 @@
 
             <li class="arlo-cf arlo-catalogue-event">
                 [arlo_event_template_permalink wrap='
-                <h2><a href="%s" class="arlo-template-name">
+                <h3><a href="%s" class="arlo-template-name">
                     '][arlo_event_template_name]
-                </a></h2>
+                </a></h3>
                 <div class="arlo-template-details">
                     [arlo_event_template_summary wrap="<div class='arlo-summary'>%s</div>"]
                     [arlo_event_duration wrap="<div class='arlo-duration'><i class='fa fa-clock-o'></i> %s</div>"]

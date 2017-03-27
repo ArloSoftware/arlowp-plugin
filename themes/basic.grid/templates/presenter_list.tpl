@@ -1,7 +1,8 @@
 <ul class="arlo-list presenters">
     [arlo_presenter_list_item]
         <li>
-            <h5>[arlo_presenter_permalink wrap="<a href='%s'>"][arlo_presenter_name]</a></h5>
+            <h4>[arlo_presenter_permalink wrap="<a href='%s'>"][arlo_presenter_name]</a></h4>
+            [arlo_presenter_profile label='<h5>Profile</h5>']
         </li>
     [/arlo_presenter_list_item]
 </ul>

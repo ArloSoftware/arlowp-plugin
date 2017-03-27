@@ -69,12 +69,18 @@
         
    		//if boxed (grid) layout, make the boxes' height even
 		if ($('.arlo-boxed').length) {
+
+	        $(".arlo-boxed .events.arlo-show-more-hidden").show();
+
 			var boxedMaxHeight = 0;
 			$('.arlo-boxed .arlo-list li.arlo-cf:not(.arlo-group-divider)').each(function() {
 				if ($(this).height() > boxedMaxHeight) {
 					boxedMaxHeight = $(this).height()
 				}
 			});
+
+	        $(".arlo-boxed .events.arlo-show-more-hidden").hide();
+
 			$('.arlo-boxed .arlo-list li.arlo-cf:not(.arlo-group-divider)').height(boxedMaxHeight);
 		}
 		

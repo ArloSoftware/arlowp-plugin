@@ -1,8 +1,6 @@
 <div class="arlo" id="arlo">
-<div class="arlo-banner arlo-background-color1">
+<div class="arlo-banner">
   [arlo_event_template_name wrap="<h1>%s</h1>"]
-  <img src="/wp-content/plugins/arlo-training-and-event-management-system/themes/be.software/images/separator.png" alt="" width="137" height="8">
-
 </div>
 
 [arlo_template_region_selector]

@@ -14,6 +14,6 @@
     [/arlo_venue_list_item]
 </ul>
 
-[arlo_upcoming_list_pagination limit="20" wrap='<div class="arlo-pagination">%s</div>']
+[arlo_venue_list_pagination limit="20" wrap='<div class="arlo-pagination">%s</div>']
 
 </div>

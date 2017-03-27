@@ -6,8 +6,7 @@
     "externalResources": {
         "stylesheets": [
         	"https://fonts.googleapis.com/css?family=Montserrat",
-        	"https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700",
-        	"https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"],
+        	"https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700"
         "javascripts": []
     }
 }

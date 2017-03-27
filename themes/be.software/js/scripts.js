@@ -5,10 +5,10 @@ jQuery(function($){
         // add in delivery tag icons
         var content = ""; 
         $tag = jQuery(tag); 
-        if ($tag.hasClass('arlo-web_privateonsite')) { content += "  "; } 
-        if ($tag.hasClass('arlo-web_public')) { content += "  "; } 
-        if ($tag.hasClass('arlo-web_liveonline')) { content += "  "; } 
-        if ($tag.hasClass('arlo-web_selfpacedonline')) { content += "  "; } 
+        if ($tag.hasClass('arlo-web_privateonsite')) { content += "  "; } 
+        if ($tag.hasClass('arlo-web_public')) { content += "  "; } 
+        if ($tag.hasClass('arlo-web_liveonline')) { content += "  "; } 
+        if ($tag.hasClass('arlo-web_selfpacedonline')) { content += "  "; } 
         $tag.find('.arlo-delivery-icons').html(content); 
     })
 
@@ -44,7 +44,7 @@ jQuery(function($){
 
     var setEventHeights = function() {
         // find the tallest event and set other events to have that height
-        var $events = jQuery('.catalogue .arlo-cf.arlo-catalogue-event, .arlo-list.events > .arlo-cf, ul.arlo-list.event-search-list > li');
+        var $events = jQuery('.catalogue > li.arlo-cf.arlo-catalogue-event, .arlo-list.events > li.arlo-cf, ul.arlo-list.event-search-list > li.arlo-cf');
         
         // some events might be hidden behind a 'show more', need to show them temporarily so we can see their heights
         jQuery(".events.arlo-show-more-hidden").show();

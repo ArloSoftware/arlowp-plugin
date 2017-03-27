@@ -1,37 +1,37 @@
 <div class="arlo-boxed">
 	[arlo_template_region_selector]
-	[arlo_event_filters]
+	[arlo_event_template_filters]
 	[arlo_timezones wrap="<div class='arlo-timezone-toggle'>%s</div>"]
 	<div class="arlo-template-head">
 		[arlo_event_template_summary wrap="<p>%s</p>"]
 		[arlo_event_template_advertised_duration wrap="<p>%s</p>"]
 	</div>
-	[arlo_event_template_tags]
+
 	<ul class="arlo-list arlo-show-more events" data-show="3" data-show-text="Show more">
 		[arlo_event_list]
 		[arlo_event_list_item show="3"]
 		<li class="arlo-cf">
 			<div class="arlo-cal">
-				[arlo_event_start_date format="%a %d %b" wrap='<div class="arlo-date">%s</div>']
+				[arlo_event_start_date format="%a %d %b" wrap='<div class="arlo-event-headline">%s</div>']
 	
 			</div>
 			<div class="arlo-event-details">
-				<span class="arlo-event-time">[arlo_event_duration], [arlo_event_start_date format="%I:%M %p"] - [arlo_event_end_date format="%I:%M %p"]</span>
-				[arlo_event_location label="" wrap="<span class='arlo-event-location'>%s</span>"]
-				[arlo_event_session_description wrap='<span class="arlo-event-session-description">%s</span>']
+				<div class="arlo-event-time">[arlo_event_duration], [arlo_event_start_date format="%I:%M %p"] - [arlo_event_end_date format="%I:%M %p"]</div>
+				[arlo_event_location label="" wrap="<div class='arlo-event-location'>%s</div>"]
+				[arlo_event_session_list_item wrap="<div class='arlo-sessions'>%s</div>"]
+					<div class="arlo_session">
+						<h6>[arlo_event_name]</h6>
+						<div>[arlo_event_start_date format="%a %d %b %H:%M"] - [arlo_event_end_date format="%a %d %b %H:%M"]</div>
+						[arlo_event_location]
+					</div>
+				[/arlo_event_session_list_item]			
+				[arlo_event_session_description wrap='<div class="arlo-event-session-description">%s</div>']
 				[arlo_event_presenters label="Presenters: "]
 				[arlo_event_credits]
+				[arlo_event_tags layout="list" label="Tags: " wrap='<div class="arlo-tags">%s</div>']
 			</div>
 			[arlo_event_offers]
 			[arlo_event_registration]
-			[arlo_event_tags layout="list"]
-			[arlo_event_session_list_item]
-				<div class="arlo_session">
-					<h6>[arlo_event_name]</h6>
-					<div>[arlo_event_start_date format="%a %d %b H:i"] - [arlo_event_end_date format="%a %d %b %H:%M"]</div>
-					[arlo_event_location]
-				</div>
-			[/arlo_event_session_list_item]			
 		</li>
 		[/arlo_event_list_item]
 		[/arlo_event_list]
@@ -39,17 +39,13 @@
 		[arlo_oa_list]
 			[arlo_oa_list_item]
 			<li class="arlo-cf arlo-online-activity">
-				<div class="arlo-left arlo-cal">[arlo_oa_reference_term]</div>
-				<div class="arlo-left">
-					[arlo_oa_code] - [arlo_oa_name]
-					[arlo_oa_credits]
-					
-					[arlo_oa_delivery_description label="Delivery: " wrap='<div class="arlo-delivery-desc">%s</div>']
-					[arlo_oa_offers]
-				</div>
-				<div class="arlo-right">
-					[arlo_oa_registration]
-				</div>
+				[arlo_oa_reference_term wrap='<div class="arlo-event-headline">%s</div>']
+				[arlo_oa_name]
+				[arlo_oa_credits]
+				
+				[arlo_oa_delivery_description label="Delivery: " wrap='<div class="arlo-delivery-desc">%s</div>']
+				[arlo_oa_offers]
+				[arlo_oa_registration]
 			</li>
 			[/arlo_oa_list_item]
 		[/arlo_oa_list]		
