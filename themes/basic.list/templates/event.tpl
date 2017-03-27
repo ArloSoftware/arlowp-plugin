@@ -14,6 +14,7 @@
 			</div>
 			<div class="arlo-left arlo-event-details">
 				<span class="arlo-event-time">[arlo_event_start_date format="%a %I:%M %p"] - [arlo_event_end_date format="%a %I:%M %p"]</span>
+				[arlo_event_tags layout="list"]
 				[arlo_event_location label="Location: " wrap="<div class='arlo-event-location'>%s</div>"]
 				[arlo_event_provider label="Provider: " wrap="<div class='arlo-event-provider'>%s</div>"]
 				[arlo_event_delivery label="Delivery: "  wrap="<div class='arlo-event-delivery'>%s</div>"]
@@ -33,7 +34,6 @@
 				</div>
 				[/arlo_event_session_list_item]	
 			</div>
-			[arlo_event_tags layout="list"]
 		</li>
 		[/arlo_event_list_item]
 	[/arlo_event_list]
