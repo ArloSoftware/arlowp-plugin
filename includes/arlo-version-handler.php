@@ -2,18 +2,20 @@
 
 namespace Arlo;
 
-require_once 'arlo-singleton.php';
-
-use Arlo\Singleton;
 use Arlo\Utilities;
 
-class VersionHandler extends Singleton {
-	const VERSION = '2.4.1.1';
+class VersionHandler {
+	const VERSION = '3.0';
 
-	public function __construct($dbl, $message_handler, $theme_manager) {
+	private $dbl;
+	private $message_handler;
+	private $plugin;
+
+	public function __construct($dbl, $message_handler, $plugin, $theme_manager) {
 		$this->dbl = &$dbl; 	
 
-		$this->message_handler = $message_handler;
+		$this->message_handler = $message_handler;	
+		$this->plugin = $plugin;
 		$this->theme_manager = $theme_manager;
 	}	
 
@@ -24,7 +26,7 @@ class VersionHandler extends Singleton {
 	public function set_installed_version() {
 		update_option('arlo_plugin_version', self::VERSION);
 				
-		$now = Utilities::get_now_utc();
+		$now = \Arlo\Utilities::get_now_utc();
 		update_option('arlo_updated', $now->format("Y-m-d H:i:s"));
 	}
 
@@ -43,8 +45,9 @@ class VersionHandler extends Singleton {
 			$this->run_pre_data_update('2.4.1.1');
 		}	
 
-		if (version_compare($old_version, '2.5') < 0) {
-			$this->run_pre_data_update('2.5');
+		if (version_compare($old_version, '3.0') < 0) {
+			$this->run_pre_data_update('2.4.1.1');
+			$this->run_pre_data_update('3.0');
 		}			
 		
 		arlo_add_datamodel();	
@@ -65,8 +68,8 @@ class VersionHandler extends Singleton {
 			$this->do_update('2.4');
 		}
 
-		if (version_compare($old_version, '2.5') < 0) {
-			$this->do_update('2.5');
+		if (version_compare($old_version, '3.0') < 0) {
+			$this->do_update('3.0');
 		}		
 
 		if (version_compare($old_version, '3.0') < 0) {
@@ -147,7 +150,7 @@ class VersionHandler extends Singleton {
 				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_venues CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
 			break;
 
-			case '2.5':
+			case '3.0':
 				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_async_tasks 
 				CHANGE task_task task_task VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
 				CHANGE task_status_text task_status_text VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
@@ -265,9 +268,7 @@ class VersionHandler extends Singleton {
 				CHANGE name name VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NOT NULL,
 				DEFAULT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ";");
 
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_timezones_olson 
-				CHANGE olson_name olson_name VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NOT NULL,
-				DEFAULT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ";");
+				$this->dbl->query("DROP TABLE " . $this->dbl->prefix . "arlo_timezones_olson;");
 
 				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_log 
 				CHANGE message message TEXT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ",
@@ -385,7 +386,7 @@ class VersionHandler extends Singleton {
 				
 				arlo_set_option('templates', $saved_templates);
 
-				$this->change_setting('arlo_send_data', 1);
+				$this->plugin->change_setting('arlo_send_data', 1);
 
 				if ($this->message_handler->get_message_by_type_count('information') == 0) {
 					
@@ -425,6 +426,25 @@ class VersionHandler extends Singleton {
 
 				update_option('arlo_themes_settings', $stored_themes_settings, 1);
 
+				//Add [arlo_powered_by] shortcode to the event template
+				$saved_templates = arlo_get_option('templates');
+				
+				foreach ($saved_templates as $id => $content) {
+					if (!empty($content['html'])) {
+						
+						if (strpos($content['html'], "[arlo_powered_by]") === false) {
+							$shortcode = "\n[arlo_powered_by]\n";
+
+							$saved_templates[$id]['html'] = $content['html'] . $shortcode;
+						}
+					}
+				}
+
+				arlo_set_option('templates', $saved_templates);		
+
+				//kick off an import
+				if (get_option('arlo_import_disabled', '0') != '1')
+					$this->plugin->get_scheduler()->set_task("import", -1);					
 			break;
 		}	
 	}	

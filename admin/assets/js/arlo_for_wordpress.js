@@ -14,7 +14,7 @@ if (typeof (Arlo) === "undefined") {
 	}
 
 	Arlo.ArloForWordPress.prototype = {
-		VERSION: '2.4.1.1',
+		VERSION: '3.0',
 		apiClient: null,
 		pluginSlug: 'arlo-for-wordpress',
 		tabIDs: [],
@@ -471,9 +471,11 @@ if (typeof (Arlo) === "undefined") {
 						$('#webinar_template_url').attr('href', item.ViewUri);
 						
 						$('.webinar_url').attr('href', item.RegistrationInfo.RegisterUri);
-						
-						$('#arlo-webinar-admin-notice').fadeIn();
+					} else {
+						$(".arlo-webinar").html('or <a href="https://www.arlo.co/contact" target="_blank">Contact us!</a>');
 					}				
+
+					$('#arlo-webinar-admin-notice').fadeIn();					
 				},loadAPIResultsError = function(error) {
 					console.log(error);
 				},callback = {

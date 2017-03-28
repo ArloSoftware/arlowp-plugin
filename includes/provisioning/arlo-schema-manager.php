@@ -6,7 +6,7 @@ use Arlo\Logger;
 
 class SchemaManager {
 
-	const DB_SCHEMA_HASH = '4fc5c673788aebc7f6bb96e09e0af3cba27d8038';
+	const DB_SCHEMA_HASH = '8f465642e0cf9262054cd95ee7dbe85bbc30d3ff';
 
 	/* database layer */
 	private $dbl;
@@ -324,11 +324,11 @@ class SchemaManager {
 		$table_name = $this->dbl->prefix . "arlo_eventtemplates_presenters";
 		
 		$sql = "CREATE TABLE " . $table_name . " (
-			et_id int(11) NULL,
-			p_arlo_id int(11) NULL,
+			et_id int(11) NOT NULL,
+			p_arlo_id int(11) NOT NULL,
 			p_order int(11) NULL COMMENT 'Order of the presenters for the event template.',
-			import_id int(10) unsigned DEFAULT NULL,
-			PRIMARY KEY  (et_id,p_arlo_id,import_id),
+			import_id int(10) unsigned NOT NULL,
+			PRIMARY KEY  (et_id, p_arlo_id, import_id),
 			KEY cf_order (p_order),
 			KEY fk_et_id_idx (et_id ASC),
 			KEY fk_p_id_idx (p_arlo_id ASC))
@@ -350,8 +350,8 @@ class SchemaManager {
 		$sql = "CREATE TABLE " . $this->dbl->prefix . "arlo_events_tags (
 			e_id int(11) NOT NULL,
 			tag_id mediumint(8) unsigned NOT NULL,
-			import_id int(10) unsigned DEFAULT NULL,
-			PRIMARY KEY  (e_id,tag_id,import_id))
+			import_id int(10) unsigned NOT NULL,
+			PRIMARY KEY  (e_id, tag_id, import_id))
 			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . "";
 			
 		$this->dbl->sync_schema($sql);  	
@@ -359,8 +359,8 @@ class SchemaManager {
 		$sql = "CREATE TABLE " . $this->dbl->prefix . "arlo_onlineactivities_tags (
 			oa_id int(11) NOT NULL,
 			tag_id mediumint(8) unsigned NOT NULL,
-			import_id int(10) unsigned DEFAULT NULL,
-			PRIMARY KEY  (oa_id,tag_id,import_id))
+			import_id int(10) unsigned NOT NULL,
+			PRIMARY KEY  (oa_id, tag_id, import_id))
 			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . "";
 			
 		$this->dbl->sync_schema($sql);	
@@ -368,8 +368,8 @@ class SchemaManager {
 		$sql = "CREATE TABLE " . $this->dbl->prefix . "arlo_eventtemplates_tags (
 			et_id int(11) NOT NULL,
 			tag_id mediumint(8) unsigned NOT NULL,
-			import_id int(10) unsigned DEFAULT NULL,
-			PRIMARY KEY  (et_id,tag_id,import_id))
+			import_id int(10) unsigned NOT NULL,
+			PRIMARY KEY  (et_id, tag_id, import_id))
 			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . "";
 
 		$this->dbl->sync_schema($sql);
@@ -379,11 +379,11 @@ class SchemaManager {
 		$table_name = $this->dbl->prefix . "arlo_events_presenters";
 		
 		$sql = "CREATE TABLE " . $table_name . " (
-			e_id int(11) NULL,
-			p_arlo_id int(11) NULL,
+			e_id int(11) NOT NULL,
+			p_arlo_id int(11) NOT NULL,
 			p_order int(11) NULL COMMENT 'Order of the presenters for the event.',
-			import_id int(10) unsigned DEFAULT NULL,
-			PRIMARY KEY  (e_id,p_arlo_id,import_id),		
+			import_id int(10) unsigned NOT NULL,
+			PRIMARY KEY  (e_id, p_arlo_id, import_id),		
 			KEY fk_e_id_idx (e_id ASC),
 			KEY fk_p_id_idx (p_arlo_id ASC))
 			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";";
@@ -405,8 +405,8 @@ class SchemaManager {
 			c_order BIGINT(20) DEFAULT NULL,
 			c_depth_level tinyint(3) unsigned NOT NULL DEFAULT '0',
 			c_parent_id int(11) DEFAULT NULL,
-			import_id int(10) unsigned DEFAULT NULL,
-			PRIMARY KEY  (c_id,import_id),
+			import_id int(10) unsigned NOT NULL,
+			PRIMARY KEY  (c_id, import_id),
 			UNIQUE KEY c_arlo_id_key (c_arlo_id,import_id),
 			KEY c_parent_id (c_parent_id))
 			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";";
@@ -418,11 +418,11 @@ class SchemaManager {
 		$table_name = $this->dbl->prefix . "arlo_eventtemplates_categories";
 
 		$sql = "CREATE TABLE " . $table_name . " (
-			et_arlo_id int(11) NULL,
-			c_arlo_id int(11) NULL,
+			et_arlo_id int(11) NOT NULL,
+			c_arlo_id int(11) NOT NULL,
 			et_order SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0',
-			import_id int(10) unsigned DEFAULT NULL,
-			PRIMARY KEY  (et_arlo_id,c_arlo_id,import_id),
+			import_id int(10) unsigned NOT NULL,
+			PRIMARY KEY  (et_arlo_id, c_arlo_id, import_id),
 			KEY fk_et_id_idx (et_arlo_id ASC),
 			KEY fk_c_id_idx (c_arlo_id ASC))
 			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";";
@@ -437,23 +437,13 @@ class SchemaManager {
 			CREATE TABLE " . $table_name . " (
 			id tinyint(3) unsigned NOT NULL,
 			name varchar(256) NOT NULL,
-			import_id int(10) unsigned DEFAULT NULL,
-			PRIMARY KEY  (id,import_id)) 
+			windows_tz_id varchar(256) NOT NULL,
+			import_id int(10) unsigned NOT NULL,
+			PRIMARY KEY  (id, import_id)) 
 			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";	
 		";
 
 		$this->dbl->sync_schema($sql);
-		
-		$sql2 = " 
-			CREATE TABLE IF NOT EXISTS " . $table_name . "_olson (
-			timezone_id int(11) NOT NULL,
-			olson_name varchar(255) NOT NULL,
-			import_id int(10) unsigned DEFAULT NULL,
-			PRIMARY KEY  (timezone_id,olson_name(50),import_id)
-			) CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";
-		";
-		
-		$this->dbl->sync_schema($sql2);	
 	}
 
 	private function install_table_arlo_log() {	

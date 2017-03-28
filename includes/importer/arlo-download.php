@@ -32,7 +32,7 @@ class Download extends BaseImporter  {
 
 				//need to decode with the given key
 				$methods = explode('-', $this->response_json->Result->EncryptedResponse->enc);
-				$content = Crypto::decrypt($content, $this->response_json->Result->EncryptedResponse->key->k, $methods[0], $methods[1]);
+				$content = Crypto::decrypt($content, $this->response_json->Result->EncryptedResponse->key->k, $methods[0], $methods[1], 1);
 
 				$filename = self::$dir . $this->filename . '.dec.json';
 				if ($this->file_handler->write_file($filename, $content)) {
@@ -99,7 +99,7 @@ class Download extends BaseImporter  {
 				break;
 
 			default:
-				Logger::log('Invalid status code: ' . $status['http_code']);
+				Logger::log_error('Invalid status code: ' . $status['http_code'] . ' ', $this->import_id);
 		}
 
 		return false;

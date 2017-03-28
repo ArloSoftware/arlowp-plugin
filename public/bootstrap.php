@@ -47,7 +47,7 @@ add_filter( 'the_title', function($title, $id = null){
 	$location = stripslashes(urldecode($location));
 	$search = stripslashes(urldecode($search));
 		
-	if($id === null || !in_array($id, $pages) || $id != $post->ID || !in_the_loop() ) return $title;
+	if ($id === null || !in_array($id, $pages) || $id != $post->ID || !in_the_loop() || is_nav_menu_item($id)) return $title;
 		
 	if(!$cat && empty($location) && empty($search)) return $title;
 	
@@ -160,6 +160,7 @@ function arlo_register_custom_post_types() {
 				break;			
 				case 'event':					
 					add_rewrite_rule('^' . $slug . '/(\d+-[^/]*)+/?(region-([^/]*))?/?$','index.php?arlo_event=$matches[1]&arlo-region=$matches[3]','top');
+					add_rewrite_rule('^' . $slug . '/(\d+-[^/]*)+/?(region-([^/]*))?/?(location-([^/]*))?/?$','index.php?arlo_event=$matches[1]&arlo-region=$matches[3]&arlo-location=$matches[5]','top');
 					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(templatetag-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-delivery=$matches[10]&arlo-templatetag=$matches[12]&paged=$matches[14]','top');
 				break;
 				case 'eventsearch':
@@ -283,7 +284,7 @@ function arlo_the_content($content) {
 	
 	$post_type = str_replace('arlo_', '', get_post_type($post));
 
-	if(function_exists('arlo_the_content_'.$post_type) && in_the_loop()) {
+	if(function_exists('arlo_the_content_'.$post_type) && is_singular()) {
 		return call_user_func_array('arlo_the_content_'.$post_type, func_get_args());
 	}
 
@@ -309,7 +310,7 @@ function arlo_the_content_event($content) {
 	$regions = get_option('arlo_regions');	
 	
 	$arlo_region = get_query_var('arlo-region', '');
-	$arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
+	$arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
 	
 	$t1 = "{$wpdb->prefix}arlo_eventtemplates";
 	$t2 = "{$wpdb->prefix}posts";	
@@ -551,6 +552,3 @@ function arlo_add_datamodel() {
 
 
 \Arlo\Shortcodes\Shortcodes::init(); 
-
-
-

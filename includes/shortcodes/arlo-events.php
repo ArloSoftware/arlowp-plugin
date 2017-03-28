@@ -25,6 +25,91 @@ class Events {
         });         
     }
 
+private static function shortcode_event_filters($content = '', $atts = [], $shortcode_name = '', $import_id = '') {  
+        global $post, $wpdb;
+
+        extract(shortcode_atts(array(
+            'filters'	=> 'location',
+            'resettext'	=> __('Reset', 'arlo-for-wordpress'),
+            'buttonclass'   => 'button'
+        ), $atts, $shortcode_name, $import_id));
+        
+        $filters_array = explode(',',$filters);
+
+        $regions = get_option('arlo_regions');
+        
+        $arlo_region = get_query_var('arlo-region', '');
+        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	        
+        
+        $settings = get_option('arlo_settings');  
+
+        if (!empty($settings['post_types']['event']['posts_page'])) {
+            $slug = get_post($settings['post_types']['event']['posts_page'])->post_name . '/' . $post->post_name;
+        } else {
+            $slug = get_post($post)->post_name;
+        }      
+            
+        $filter_html = '<form id="arlo-event-filter" class="arlo-filters" method="get" action="' . site_url() . '/' . $slug . '/">';
+        
+        foreach($filters_array as $filter) :
+
+            switch($filter) :
+
+                case 'location' :
+
+                    // location select
+
+                    $items = $wpdb->get_results(
+                        'SELECT 
+                            DISTINCT(e.e_locationname)
+                        FROM 
+                            ' . $wpdb->prefix . 'arlo_events AS e
+                        LEFT JOIN 
+                            ' . $wpdb->prefix . 'arlo_eventtemplates AS et
+                        ON 
+                            et.et_arlo_id = e.et_arlo_id
+                            ' . (!empty($arlo_region) ? 'AND et.et_region = "' . $arlo_region . '"' : '' ) . '
+                        WHERE 
+                            e_locationname != ""
+                        AND
+                            e.import_id = ' . $import_id . '
+                        AND 
+                            et_post_name = "' . $post->post_name . '"
+                        ' . (!empty($arlo_region) ? 'AND e.e_region = "' . $arlo_region . '"' : '' ) . '
+                        GROUP BY 
+                            e.e_locationname 
+                        ORDER BY 
+                            e.e_locationname', ARRAY_A);
+
+                    $locations = array();
+
+                    foreach ($items as $item) {
+                        $locations[] = array(
+                            'string' => $item['e_locationname'],
+                            'value' => $item['e_locationname'],
+                        );
+                    }
+
+                    $filter_html .= Shortcodes::create_filter($filter, $locations, __('All locations', 'arlo-for-wordpress'));
+
+                    break;
+
+            endswitch;
+
+        endforeach;	
+            
+        // category select
+
+
+        $filter_html .= '<div class="arlo-filters-buttons"><input type="hidden" id="arlo-page" value="' .  $slug . '">';
+            
+        $filter_html .= '<a href="' . site_url() . '/' . $slug . '" class="' . esc_attr($buttonclass) . '">' . htmlentities($resettext, ENT_QUOTES, "UTF-8") . '</a></div>';
+
+        $filter_html .= '</form>';
+        
+        return $filter_html;        
+    }    
+
     private static function shortcode_event_tags($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_event_list_item']['e_id'])) return '';
         
@@ -87,7 +172,6 @@ class Events {
                 break;
             }	
         }
-
         
         return $output;        
     }
@@ -100,7 +184,8 @@ class Events {
         $where = '';
         
         $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
+        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+        $arlo_location = isset($_GET['arlo-location']) && !empty($_GET['arlo-location']) ? $_GET['arlo-location'] : get_query_var('arlo-location', '');	
         
         $t1 = "{$wpdb->prefix}arlo_eventtemplates";
         $t2 = "{$wpdb->prefix}arlo_events";
@@ -110,7 +195,11 @@ class Events {
         
         if (!empty($arlo_region)) {
             $where .= ' AND ' . $t1 . '.et_region = "' . $arlo_region . '" AND ' . $t2 . '.e_region = "' . $arlo_region . '"';
-        }					
+        }
+
+        if (!empty($arlo_location)) {
+            $where .= ' AND ' . $t2 .'.e_locationname = "' . urldecode($arlo_location) . '"';
+        };        
         
         $sql = 
             "SELECT 
@@ -135,9 +224,10 @@ class Events {
             AND 
                 $t2.e_parent_arlo_id = 0
             $where
+            GROUP BY 
+                e_arlo_id
             ORDER BY 
                 $t2.e_startdatetime";
-            
             
         $items = $wpdb->get_results($sql, ARRAY_A);
         
@@ -205,7 +295,7 @@ class Events {
         
         $event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
 
-        return self::event_date_formatter($atts, $event['e_finishdatetime'], $event['e_datetimeoffset'], $event['e_isonline']);        
+        return self::event_date_formatter($atts, $event['e_finishdatetime'], $event['e_datetimeoffset'], $event['e_isonline']);
     }
 
     private static function shortcode_event_session_description($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -382,7 +472,7 @@ class Events {
         $regions = get_option('arlo_regions');
         
         $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');		
+        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');		
         
         $output = $where = '';
         
@@ -439,7 +529,8 @@ class Events {
         if(!isset($GLOBALS['arlo_event_list_item']) || empty($GLOBALS['arlo_event_list_item']['et_arlo_id'])) return;
         
         $conditions = array(
-            'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id']
+            'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id'],
+            'parent_id' => 0
         );
         
         $events = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), 1, $import_id);
@@ -516,7 +607,7 @@ class Events {
         $regions = get_option('arlo_regions');	
         
         $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
             
         // attempt to find event template offer
         $conditions = array(
@@ -608,7 +699,7 @@ class Events {
         } else {
             $regions = get_option('arlo_regions');
             $arlo_region = get_query_var('arlo-region', '');
-            $arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+            $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
         }
         
         // merge and extract attributes
@@ -705,25 +796,41 @@ class Events {
 
     private static function event_date_formatter($atts, $date, $offset, $is_online = false) {
         $timezone = null;
-              
-        $timewithtz = str_replace(' ', 'T', $date) . $offset;
         
+        $timewithtz = str_replace(' ', 'T', $date) . $offset;
+
         $date = new \DateTime($timewithtz);
-            
+
+        $utc_timezone_name = "UTC";
+
+        if (class_exists('\Arlo\GeneratedStaticArrays') && !empty(\Arlo\GeneratedStaticArrays::$arlo_timezones[$GLOBALS['arlo_event_list_item']['e_timezone_id']])) {
+            $timezone_windows_tz_id = \Arlo\GeneratedStaticArrays::$arlo_timezones[$GLOBALS['arlo_event_list_item']['e_timezone_id']]['windows_tz_id'];
+        }
+
+        if (!empty($timezone_windows_tz_id) && !empty(\Arlo\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$timezone_windows_tz_id])) {
+            $timezone = new \DateTimeZone(\Arlo\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$timezone_windows_tz_id]);
+        } else {
+            try {
+                $timezone = new \DateTimeZone(get_option('timezone_string'));
+            } catch(\Exception $e) {
+                $timezone = new \DateTimeZone($utc_timezone_name);
+            }
+        }
+
+        if ($timezone != null) {
+            $date->setTimezone($timezone);
+            date_default_timezone_set($timezone->getName());
+        }
+      
         if($is_online) {
-            if (!empty($GLOBALS['selected_timezone_olson_names']) && is_array($GLOBALS['selected_timezone_olson_names'])) {
-                foreach ($GLOBALS['selected_timezone_olson_names'] as $TzName) {
-                    try {
-                        $timezone = new \DateTimeZone($TzName->olson_name);
-                    } catch (Exception $e) {}
-                    
-                    if ($timezone !== null) {
-                        break;
-                    }
-                }
+            if (!empty($GLOBALS['selected_timezone_names'])) {
+                try {
+                    $timezone = new \DateTimeZone($GLOBALS['selected_timezone_names']);
+                } catch (Exception $e) {}
                 
                 if (!is_null($timezone)) {
                     $date->setTimezone($timezone);
+                    date_default_timezone_set($timezone->getName());
                 }   
             }
         }
@@ -731,16 +838,32 @@ class Events {
         $format = 'D g:i A';
 
         if(isset($atts['format'])) $format = $atts['format'];
-            
-        //if we haven't got timezone, we need to append the timezone abbrev
-        if ($is_online && is_null($timezone) && (preg_match('[G|g|i]', $format) === 1)) {
-            $format .= " T";
-        }
-        
+                    
         if (strpos($format, '%') === false) {
             $format = DateFormatter::date_format_to_strftime_format($format);
-        }	
+        }	        
 
-        return strftime($format, $date->getTimestamp() + $date->getOffset());
+        if (!is_null($timezone) && ($timezone->getName() == $utc_timezone_name || $timezone->getName() == get_option('timezone_string') || $is_online) && preg_match('[I|M]', $format) === 1 && preg_match('[Z|z]', $format) === 0) {
+            $format .= " %Z";
+        }        
+
+        if (strpos($format, '%Z')) {
+            $format = str_replace('%Z', '{TZ_ABBREV}', $format); //T
+        }
+
+        if (strpos($format, '%z')) {
+            $format = str_replace('%z', '{TZ_OFFSET}', $format); //P
+        }        
+
+        $date = str_replace(['{TZ_ABBREV}', '{TZ_OFFSET}'], [$date->format('T'), $date->format('P')], strftime($format, $date->getTimestamp()));
+
+        //if we haven't got timezone, we need to append the timezone abbrev
+        if ($is_online && is_null($timezone) && (preg_match('[I|M]', $format) === 1) && !empty($offset)) {
+            $date .=  " (" . $offset . ")";
+        }
+
+        date_default_timezone_set($original_timezone);
+
+        return $date;
     }  
 }

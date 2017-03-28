@@ -2,11 +2,7 @@
 
 namespace Arlo;
 
-require_once 'arlo-singleton.php';
-
-use Arlo\Singleton;
-
-class MessageHandler extends Singleton {
+class MessageHandler {
 	
 	private $dbl;
 	private $table = '';

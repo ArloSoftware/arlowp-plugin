@@ -122,8 +122,22 @@
 	vertical-align: middle;
 }
 
+.arlo-left {
+	float: left;
+}
+
 .wp-editor-wrap {
 	margin-top: 1em;
+}
+
+.arlo-domain {
+	line-height: 27px;
+}
+
+#arlo_platform_name {
+	width: 50%;
+	float: left;
+	margin: 0 5px;
 }
 
 /* regions */
@@ -316,7 +330,8 @@ table.arlo-welcome td.logo {
     display: table;
 }
 
-.cf:after {
+.cf:after,
+.arlo-clear {
     clear: both;
 }
 
@@ -406,7 +421,6 @@ table.arlo-welcome td.logo {
 .red {
 	color: darkred;
 }
-
 
 .arlo-themes .arlo-theme {
 	width: 250px;
@@ -519,6 +533,10 @@ table.arlo-welcome td.logo {
 	padding: 0.3em 0.5em;
 }
 
+#arlo-webinar-admin-notice {
+	display: none;
+}
+
 /* media queries, these match the wordpress admin breakpoints as of WP 3.9 */
 
 @media only screen and (min-width: 601px) {
@@ -550,7 +568,15 @@ table.arlo-welcome td.logo {
 	.arlo-check input {
 		margin: 6px 10px 6px 0;
 	}
+	
 }
+
+@media screen and (max-width: 782px) {
+	.arlo-domain {
+		line-height: 35px;
+	}	
+}
+
 
 @media only screen and (min-width: 901px) {
 	

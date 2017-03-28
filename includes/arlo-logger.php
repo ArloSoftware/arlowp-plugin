@@ -21,7 +21,7 @@ class Logger {
         $table_name = $wpdb->prefix . "arlo_log";
 
         if (strtotime($timestamp) === false) {
-			$now = Utilities::get_now_utc();
+			$now = \Arlo\Utilities::get_now_utc();
         	$timestamp = $now->format("Y-m-d H:i:s");
 		}
 

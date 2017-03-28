@@ -27,6 +27,11 @@ class Shortcodes {
 		self::add('label', function($content = '', $atts, $shortcode_name, $import_id){
 			return $content;
 		});
+
+		//powered by Arlo
+		self::add('powered_by', function ($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+       		return '<div class="arlo-powered-by"><a href="https://www.arlo.co" target="_blank">' .  sprintf(__('Powered by %s', 'arlo-for-wordpress'), '<i class="icons8-arlo-logo-for-font"></i>') . '</a></div>';
+    	});
 	}
 
 	/*
@@ -160,52 +165,27 @@ class Shortcodes {
 		return $filter_html;
 	}
 
-	private static function getTimezones() {
+	private static function getTimezones($timezone_id = 0) {
 		global $wpdb, $arlo_plugin;
-		
+
 		$table = $wpdb->prefix . "arlo_timezones";
 		$import_id = $arlo_plugin->get_importer()->get_current_import_id();
-		
+		$timezone_id = intval($timezone_id);
+
 		$sql = "
 		SELECT
 			id,
-			name
+			name,
+			windows_tz_id
 		FROM
 			{$table}
 		WHERE
 			import_id = " . $import_id . "
+			" . ($timezone_id > 0 ? " AND id = " . $timezone_id : "") . "
 		ORDER BY name
 		";
-		return $wpdb->get_results($sql);
+		return $wpdb->get_results($sql, ARRAY_A);
 	}
-
-	private static function getTimezoneOlsonNames($timezone_id = 0) {
-		global $wpdb, $arlo_plugin;
-		
-		$timezone_id = intval($timezone_id);
-		
-		$table = $wpdb->prefix . "arlo_timezones_olson";
-		$import_id = $arlo_plugin->get_importer()->get_current_import_id();
-		$where = '';
-		
-		if ($timezone_id > 0) {
-			$where = "
-				timezone_id = {$timezone_id}
-			AND		
-			";
-		}
-		
-		$sql = "
-		SELECT
-			olson_name
-		FROM
-			{$table}
-		WHERE
-			{$where}	
-			import_id = " . $import_id . "
-		";
-		return $wpdb->get_results($sql);
-	}	
 
 	private static function shortcode_timezones($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
 		global $post, $wpdb;
@@ -245,31 +225,40 @@ class Shortcodes {
 			return '';
 		}
 		
-		$olson_names = self::getTimezoneOlsonNames();	
-
 		$content = '<form method="GET" class="arlo-timezone">';
-		$content .= '<select name="timezone">';
-		
-		foreach(self::getTimezones() as $timezone) {		
+		$content .= '<select name="timezone"><option value="">' . __('Select a time zone', 'arlo-for-wordpress') . '</option>';
+
+		if (class_exists('\Arlo\GeneratedStaticArrays') && isset(\Arlo\GeneratedStaticArrays::$arlo_timezones) && is_array(\Arlo\GeneratedStaticArrays::$arlo_timezones)) {
+			$timezones = \Arlo\GeneratedStaticArrays::$arlo_timezones;
+		} else {
+			$timezones = self::getTimezones();
+		}
+
+		foreach($timezones as $timezone_id => $timezone) {
 			$selected = false;
-			if((isset($_GET['timezone']) && $_GET['timezone'] == $timezone->id) || (!isset($_GET['timezone']) && $timezone->id == $items[0]['e_timezone_id'])) {
+			if (!empty($timezone['id'])) {
+				$timezone_id = $timezone['id'];
+			}
+
+         	$timezone_windows_tz_id = $timezone['windows_tz_id'];
+			
+			if((isset($_GET['timezone']) && $_GET['timezone'] == $timezone_id) || (!isset($_GET['timezone']) && $timezone_id == $items[0]['e_timezone_id'])) {
 				$selected = true;
-				//get olson timezones
-				$olson_names = self::getTimezoneOlsonNames($timezone->id);
-				$GLOBALS['selected_timezone_olson_names'] = $olson_names;
+				//get PHP timezones
+				$GLOBALS['selected_timezone_names'] = null;
+				if (!is_null($timezone_windows_tz_id)) {
+					$GLOBALS['selected_timezone_names'] = \Arlo\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$timezone_windows_tz_id];
+        		}
 			}
 			
-			$content .= '<option value="' . $timezone->id . '" ' . ($selected ? 'selected' : '') . '>'. htmlentities($timezone->name, ENT_QUOTES, "UTF-8") . '</option>';
+			if (!is_null($timezone_windows_tz_id)) {
+				$content .= '<option value="' . $timezone_id . '" ' . ($selected ? 'selected' : '') . '>'. htmlentities($timezone['name'], ENT_QUOTES, "UTF-8") . '</option>';
+			}
 		}
-		
+
 		$content .= '</select>';
 		$content .= '</form>';
 		
-		//if there is no olson names in the database, that means we couldn't do a timezone conversion
-		if (!(is_array($olson_names) && count($olson_names))) {
-			$content = '';
-		}
-
 		return $content;
 	}
 
@@ -279,7 +268,7 @@ class Shortcodes {
         $regions = get_option('arlo_regions');	
         
         $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
+        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
 
         $t1 = "{$wpdb->prefix}arlo_offers";
         

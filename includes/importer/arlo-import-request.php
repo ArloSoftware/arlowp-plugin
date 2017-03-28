@@ -20,10 +20,10 @@ class ImportRequest extends BaseImporter  {
 			'RegionID', 'Name',
 		],
 		'TimeZones' => [
-			'TimeZoneID', 'Name', 'TzNames'
+			'TimeZoneID', 'Name', 'WindowsTzID'
 		],
 		'Events' => [
-			'EventID', 'EventTemplateID', 'Name', 'Code', 'Description', 'StartDateTime', 'EndDateTime', 'TimeZoneID', 'TimeZone', 'Location', 'IsFull', 'PlacesRemaining', 'AdvertisedOffers', 'SessionsDescription', 'Presenters', 'Notice', 'ViewUri', 'RegistrationInfo', 'Provider', 'TemplateCode', 'Tags', 'Credits',
+			'EventID', 'EventTemplateID', 'Name', 'Code', 'Description', 'StartDateTime', 'EndDateTime', 'TimeZoneID', 'TimeZone', 'Location', 'IsFull', 'PlacesRemaining', 'AdvertisedOffers', 'SessionsDescription', 'Presenters', 'Notice', 'ViewUri', 'RegistrationInfo', 'Provider', 'TemplateCode', 'Tags', 'Credits', 'Sessions.EventID', 'Sessions.Name', 'Sessions.Code', 'Sessions.Summary', 'Sessions.StartDateTime', 'Sessions.EndDateTime', 'Sessions.TimeZoneID', 'Sessions.TimeZone', 'Sessions.Location', 'Sessions.IsFull', 'Sessions.PlacesRemaining','Sessions.AdvertisedOffers', 'Sessions.Presenters', 'Sessions.Tags'
 		],
 		'Templates' => [
 			'TemplateID', 'Code', 'Name', 'Description', 'AdvertisedPresenters', 'AdvertisedDuration', 'BestAdvertisedOffers', 'ViewUri', 'RegisterInterestUri', 'Categories', 'Tags',
@@ -52,7 +52,7 @@ class ImportRequest extends BaseImporter  {
 	protected function save_entity($item) {}
 
 	public function run() {
-		$this->nonce = Utilities::GUIDv4(true, true);
+		$this->nonce = \Arlo\Utilities::GUIDv4(true, true);
 
 		$this->importer->set_import_entry($this->nonce);
 
@@ -123,6 +123,17 @@ class ImportRequest extends BaseImporter  {
 		$data_obj->Nonce = $this->nonce;
 		$data_obj->EncryptedResponse = $this->generate_encryptedresponse_object();
 
+		$settings = get_option('arlo_settings');
+		if (!empty($settings['import_callback_host'])) {
+			$site_url = parse_url(get_option( 'siteurl' ));
+			$callback_url = parse_url($settings['import_callback_host']);
+			
+			$search_url = $site_url["host"] . (!empty($site_url['port']) ? ':' . $site_url['port'] : '');
+			$replace_url = $callback_url["host"] . (!empty($callback_url['port']) ? ':' . $callback_url['port'] : '');
+
+			$data_obj->Uri = str_replace($search_url, $replace_url, $data_obj->Uri);
+		}
+
 		return $data_obj;
 	}
 	
@@ -130,7 +141,7 @@ class ImportRequest extends BaseImporter  {
 	private function generate_encryptedresponse_object() {
 		$data_obj = new \stdClass();
 
-		$data_obj->alg = "none";
+		$data_obj->alg = "dir";
 		$data_obj->enc = $this->encription_type;
 
 		return $data_obj;

@@ -14,7 +14,7 @@
  * @wordpress-plugin
  * Plugin Name:       Arlo
  * Description:       Connect your WordPress to Arlo
- * Version:           2.4.1.1
+ * Version:           3.0
  * Author:            Arlo
  * Author URI:       http://arlo.co
  * Text Domain:       arlo-for-wordpress
@@ -62,6 +62,7 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/database/arlo-wp-database-
 require_once( plugin_dir_path( __FILE__ ) . 'includes/provisioning/arlo-schema-manager.php');
 
 //include extra classes
+require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-arrays.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-utilities.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-date-formatter.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-scheduler.php');
@@ -75,6 +76,10 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-logger.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-system-requirements.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-theme-manager.php');
 
+if (file_exists(plugin_dir_path( __FILE__ ) . 'includes/arlo-generated-static-arrays.php')) {
+	require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-generated-static-arrays.php');
+}
+	
 //include shortcodes
 require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-shortcodes.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-categories.php');
@@ -109,8 +114,8 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-online-activ
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-categories.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-category-items.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-category-depth.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-generate-static-arrays.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-finish.php');
-
 
 // start the public plugin class
 require_once( plugin_dir_path( __FILE__ ) . 'public/class-arlo-for-wordpress.php' );

@@ -10,8 +10,11 @@ class Finish extends BaseImporter {
 
 	public function run() {
 		if ($this->importer->get_import_lock_entries_number() == 1 && $this->importer->check_import_lock($this->import_id)) {
+
             //clean up the old entries
 			$this->cleanup_import($this->import_id);
+
+			rename(sprintf(trailingslashit(plugin_dir_path( __FILE__ )) . '../arlo-generated-static-arrays-%s.php', $this->import_id), trailingslashit(plugin_dir_path( __FILE__ )) . '../arlo-generated-static-arrays.php');
         
             // update logs
             Logger::log('Synchronization successful', $this->import_id, null, true);            
@@ -46,8 +49,7 @@ class Finish extends BaseImporter {
             'eventtemplates_categories',
             'eventtemplates_presenters',
             'eventtemplates_tags',
-            'timezones',
-            'timezones_olson'
+            'timezones'
 		);
                 		
 		foreach($tables as $table) {

@@ -42,6 +42,19 @@ use Arlo\SystemRequirements;
 class Arlo_For_Wordpress {
 
 	/**
+	 * Minimum required PHP version
+	 *
+	 * @since   2.0.6
+	 *
+	 * @var     string
+	 */
+	const MIN_PHP_VERSION = '5.4.0';
+
+	/**
+	 * @TODO - Rename "arlo-for-wordpress" to the name your your plugin
+	 *
+	 * Unique identifier for your plugin.
+	 *
 	 *
 	 * The variable name is used as the text domain when internationalizing strings
 	 * of text. Its value should match the Text Domain file header in the main
@@ -495,13 +508,18 @@ class Arlo_For_Wordpress {
 	 * @return    null
 	 */	
 	
+
 	public function send_log_to_arlo($message = '') {	
 		$client = $this->get_api_client();		
 		$last_import = $this->get_importer()->get_last_import_date();
 		
 		$log = Logger::create_log_csv(1000);
-				
-		$response = $client->WPLogError()->sendLog($message, $last_import, $log);
+		
+		try {
+			$response = $client->WPLogError()->sendLog($message, $last_import, $log);
+		} catch (\Exception $e) {
+			Logger::log($e->getMessage());
+		}
 	}		
 
 	
@@ -550,6 +568,14 @@ class Arlo_For_Wordpress {
 		if (!empty($plugin_version)) {
             $import_id  = get_option('arlo_import_id',"");
             $last_import = $plugin->get_importer()->get_last_import_date();
+
+			//check system requirements and disable the import
+			if (!SystemRequirements::overall_check()) {
+				update_option( 'arlo_import_disabled', 1 );
+			} else {
+				update_option( 'arlo_import_disabled', 0 );
+				update_option( 'arlo_plugin_disabled', 0 );
+			}			
             
             if (empty($import_id)) {
                 if (empty($last_import)) {
@@ -563,14 +589,6 @@ class Arlo_For_Wordpress {
 				
 				$plugin->get_schema_manager()->check_db_schema();
 			}
-
-			//check system requirements and disable the import
-			if (!SystemRequirements::overall_check()) {
-				update_option( 'arlo_import_disabled', 1 );
-			} else {
-				update_option( 'arlo_import_disabled', 0 );
-				update_option( 'arlo_plugin_disabled', 0 );
-			}
 		} else {
 			arlo_add_datamodel();
 
@@ -583,6 +601,7 @@ class Arlo_For_Wordpress {
 			} 
 		}
 	}
+	
 
 	/**
 	 * Fired for each blog when the plugin is activated.
@@ -607,9 +626,17 @@ class Arlo_For_Wordpress {
 		Logger::log("Plugin activated");
 
 		// now add pages
-		$this->add_pages();
-		
+		self::add_pages();
+
 		update_option('arlo_plugin_version', VersionHandler::VERSION);
+
+		//load demo data
+		$settings = get_option('arlo_settings');
+		if (empty($settings['platform_name'])) {
+			$plugin = self::get_instance();
+			$plugin->load_demo();
+			do_action('arlo_scheduler');
+		}
 	}
 
 	/**
@@ -712,6 +739,7 @@ class Arlo_For_Wordpress {
 	public function enqueue_styles() {
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css?20161031', __FILE__ ), array(), VersionHandler::VERSION );
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-darktooltip', plugins_url( 'assets/css/libs/darktooltip.min.css', __FILE__ ), array(), VersionHandler::VERSION );
+		wp_enqueue_style( $this->plugin_slug .'-icons8', plugins_url( '../admin/assets/fonts/icons8/Arlo-WP.css', __FILE__ ), array(), VersionHandler::VERSION );
 		
 		$customcss_load_type = get_option('arlo_customcss');
 		if ($customcss_load_type == 'file' && file_exists(plugin_dir_path( __FILE__ ) . 'assets/css/custom.css')) {
@@ -1015,7 +1043,7 @@ class Arlo_For_Wordpress {
 			return $version_handler;
 		}
 		
-		$version_handler = new VersionHandler($this->get_dbl(), $this->get_message_handler(), $this->get_theme_manager());
+		$version_handler = new VersionHandler($this->get_dbl(), $this->get_message_handler(), $this, $this->get_theme_manager());
 		
 		$this->__set('version_handler', $version_handler);
 		
@@ -1065,7 +1093,7 @@ class Arlo_For_Wordpress {
 			}
 			
 			if (!empty($last_import) && $last_import_ts !== false) {
-				$now = Utilities::get_now_utc();
+				$now = \Arlo\Utilities::get_now_utc();
 				
 				//older than 6 hours
 				if (intval($now->format("U")) - $last_import_ts > 60 * 60 * 6) {
@@ -1120,6 +1148,7 @@ class Arlo_For_Wordpress {
 		}
 	}
 	
+
 	private function delete_running_tasks() {		
 		$this->get_scheduler()->delete_running_tasks();
 		$this->get_scheduler()->delete_paused_tasks();
@@ -1205,7 +1234,7 @@ class Arlo_For_Wordpress {
 		return false;
 	}
 
-	public static function delete_custom_posts($table, $column, $post_type) {
+	public static function delete_custom_posts($table, $column, $post_type) {		
 		global $wpdb;
 
 		$table = $wpdb->prefix . 'arlo_' . $table;
@@ -1429,19 +1458,24 @@ class Arlo_For_Wordpress {
 	 * @access public
 	 * @return void
 	 */
+	 
 	public function determine_url_structure($platform_name = '') {
 		$client = $this->get_api_client();
 		
 		$new_url = $client->transport->getRemoteURL($platform_name, true, true);
-		
-		$ch = curl_init($new_url);
 
-		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_exec($ch);
-		
-		$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE); 
+		if (extension_loaded('curl')) {
+			$ch = curl_init($new_url);
+
+			curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+			
+			curl_exec($ch);
+			
+			$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE); 
+		}
 
 		// update settings
 		update_option('arlo_new_url_structure', $httpcode == 500 ? 1 : 0);

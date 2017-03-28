@@ -58,7 +58,6 @@ function arlo_delete_tables()
 		$wpdb->prefix . "arlo_eventtemplates_tags,  " . 
 		$wpdb->prefix . "arlo_tags,  " . 
 		$wpdb->prefix . "arlo_timezones,  " . 
-		$wpdb->prefix . "arlo_timezones_olson, " . 
 		$wpdb->prefix . "arlo_messages, " .
 		$wpdb->prefix . "arlo_log," .
 		$wpdb->prefix . "arlo_import," .

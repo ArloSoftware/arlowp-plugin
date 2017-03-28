@@ -2,12 +2,12 @@
 
 namespace Arlo\Importer;
 
-use Arlo\Singleton;
 use Arlo\Logger;
 use Arlo\Utilities;
 use Arlo\FileHandler;
+use Arlo\Crypto;
 
-class Importer extends Singleton {
+class Importer {
 	const MAX_RETRY_ATTEMPT = 5;
 
 	protected $data_json;			
@@ -32,6 +32,7 @@ class Importer extends Singleton {
 				'ImportRequest' => "Request a database snapshot",
 				'Download' => "Download snapshot file",
 				'ProcessFragment' => "Process fragments",
+				'GenerateStaticArrays' => 'Generate static arrays',
 				'Finish' => 'Finalize the import',
 			];	
 
@@ -59,7 +60,7 @@ class Importer extends Singleton {
 	}
 
 	public function generate_import_id() {
-		return Utilities::get_random_int();
+		return \Arlo\Utilities::get_random_int();
 	}
 
 	public function set_import_id($import_id) {
@@ -89,7 +90,7 @@ class Importer extends Singleton {
 	}
 
 	public function set_last_import_date() {
-		$now = Utilities::get_now_utc();
+		$now = \Arlo\Utilities::get_now_utc();
        	$timestamp = $now->format("Y-m-d H:i:s");	
 	
 		update_option('arlo_last_import', $timestamp);
@@ -200,7 +201,7 @@ class Importer extends Singleton {
 		$this->task_id = intval($task_id);
 		$retval = true;
 
-		$this->set_import_id(Utilities::get_random_int());
+		$this->set_import_id(\Arlo\Utilities::get_random_int());
 
 		if ($this->task_id > 0) {
 			$task = $this->scheduler->get_task_data($this->task_id);
@@ -402,10 +403,22 @@ class Importer extends Singleton {
 				break;
 			case 'Download':
 				$import = $this->get_import_entry($this->import_id, null, 1);
-				
-				$this->current_task_class->uri = json_decode($import->callback_json)->SnapshotUri;
-				$this->current_task_class->filename = $this->import_id;
-				$this->current_task_class->response_json = json_decode($import->response_json);			 
+				$callback_json = json_decode($import->callback_json);
+
+				if (json_last_error() != JSON_ERROR_NONE) {
+					error_log("JSON Decode error: " . json_last_error_msg());
+					Logger::log_error("JSON Decode error: " . json_last_error_msg(), $this->import_id);
+				}
+
+				if (!empty($callback_json->SnapshotUri)) {
+					$this->current_task_class->uri = $callback_json->SnapshotUri;
+
+					$this->current_task_class->filename = $this->import_id;
+					$this->current_task_class->response_json = json_decode($import->response_json);
+				} elseif (!empty($callback_json->Error)) {
+					Logger::log_error($callback_json->Error->Code . ': ' . $callback_json->Error->Message, $this->import_id);
+				}
+
 			break;
 			case 'ProcessFragment':
 				$this->current_task_class->set_state($this->state->subtask_state);
@@ -461,13 +474,33 @@ class Importer extends Singleton {
 	}
 
 	public function callback() {
-		$callback_json = json_decode(file_get_contents("php://input"));
+		try {
+			$callback_json = json_decode(utf8_encode(file_get_contents("php://input")));
 
-		if (!is_null($callback_json) && !empty($callback_json->Nonce) && ($import = $this->validate_import_entry($callback_json->Nonce, $callback_json->RequestID)) !== false) {
-			$this->set_import_id($import->import_id);
-			$this->update_import_entry(['callback_json' => json_encode($callback_json) ]);
-			$this->kick_off_scheduler();
-		} 
+			if (!is_null($callback_json) && !empty($callback_json->Nonce) && 
+				($import = $this->validate_import_entry($callback_json->Nonce, $callback_json->RequestID)) !== false && !empty($callback_json->__jwe__)) {
+
+				$this->set_import_id($import->import_id);
+				$this->update_import_entry(['callback_json' => json_encode($callback_json) ]);
+				$response_json = json_decode($import->response_json);
+
+				//JWE decode
+				$decoded = utf8_decode(Crypto::jwe_decrypt($callback_json->__jwe__, $response_json->Callback->EncryptedResponse->key->k));
+				$this->update_import_entry(['callback_json' => preg_replace('/[\x00-\x1F\x7F]/', '', $decoded)]);
+				$this->kick_off_scheduler();
+			} 
+		} catch(\Exception $e) {
+			Logger::log($e->getMessagE(), (!empty($import->import_id)) ? $import->import_id : null);
+			Logger::log('Synchronization failed, please check the <a href="?page=arlo-for-wordpress-logs&s='.$this->import_id.'">Log</a> ', $this->import_id);
+
+			if (!empty($import->import_id)) {
+				$task = $this->scheduler->get_tasks([1,2], null, null, 1, $import->import_id);
+
+				if (!empty($task[0]->task_id)) {
+					$this->scheduler->update_task($task[0]->task_id, 3);
+				}
+			}
+		}
 	}
 
 	public function get_import_entry($import_id = null, $request_id = null, $limit = null) {
@@ -562,5 +595,5 @@ class Importer extends Singleton {
 		} else {
 			return false;
 		}
-	} 
+	}
 }

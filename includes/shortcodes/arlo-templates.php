@@ -29,7 +29,7 @@ class Templates {
         $regions = get_option('arlo_regions');
         
         $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');		
+        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');		
         
         extract(shortcode_atts(array(
             'limit'	=> 5,
@@ -171,7 +171,7 @@ class Templates {
         $regions = get_option('arlo_regions');
         
         $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');		
+        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');		
         
         extract(shortcode_atts(array(
             'fields'	=> 'all',
@@ -422,7 +422,7 @@ class Templates {
             $arlo_region = $GLOBALS['arlo_eventtemplate']['et_region'];
         } else {
             $arlo_region = get_query_var('arlo-region', '');
-            $arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+            $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
         }
 
         if (!empty($arlo_region)) {
@@ -678,7 +678,7 @@ class Templates {
         $arlo_search = isset($_GET['arlo-search']) && !empty($_GET['arlo-search']) ? $_GET['arlo-search'] : get_query_var('arlo-search', '');
         $arlo_search = esc_sql(stripslashes(urldecode($arlo_search)));
         $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
         
         if(!empty($arlo_location) || (isset($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) ) :
 
