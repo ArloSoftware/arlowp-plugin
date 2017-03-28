@@ -240,7 +240,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
                 $GLOBALS['arlo_event_list_item'] = $item;
                         
                 if (!empty($atts['show']) && $key == $atts['show']) {
-                    $output .= '</ul><div class="arlo-clear-both"></div><ul class="arlo-list arlo-show-more-hidden events">';
+                    $output .= '</ul><ul class="arlo-list arlo-show-more-hidden events">';
                 }
         
                 $output .= do_shortcode($content);

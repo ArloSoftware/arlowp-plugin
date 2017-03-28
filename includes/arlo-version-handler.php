@@ -11,11 +11,12 @@ class VersionHandler {
 	private $message_handler;
 	private $plugin;
 
-	public function __construct($dbl, $message_handler, $plugin) {
+	public function __construct($dbl, $message_handler, $plugin, $theme_manager) {
 		$this->dbl = &$dbl; 	
 
 		$this->message_handler = $message_handler;	
 		$this->plugin = $plugin;
+		$this->theme_manager = $theme_manager;
 	}	
 
 	public function get_current_installed_version () {
@@ -70,6 +71,10 @@ class VersionHandler {
 		if (version_compare($old_version, '3.0') < 0) {
 			$this->do_update('3.0');
 		}		
+
+		if (version_compare($old_version, '3.0') < 0) {
+			$this->do_update('3.0');
+		}
 	}
 	
 	private function run_pre_data_update($version) {
@@ -404,7 +409,23 @@ class VersionHandler {
 				
 			break;	
 
-			case "3.0":
+			case '3.0':
+				$theme_id = 'basic.list';
+				update_option('arlo_theme', $theme_id, 1);
+
+				$settings = get_option('arlo_settings');
+
+				$theme_settings = $this->theme_manager->get_themes_settings();
+
+				$stored_themes_settings[$theme_id] = $theme_settings[$theme_id];
+				$stored_themes_settings[$theme_id]->templates = $this->theme_manager->load_default_templates($theme_id);
+
+				foreach ($settings['templates'] as $page => $template) {
+					$stored_themes_settings[$theme_id]->templates[$page]['html'] = $settings['templates'][$page]['html'];
+				}
+
+				update_option('arlo_themes_settings', $stored_themes_settings, 1);
+
 				//Add [arlo_powered_by] shortcode to the event template
 				$saved_templates = arlo_get_option('templates');
 				
@@ -423,7 +444,7 @@ class VersionHandler {
 
 				//kick off an import
 				if (get_option('arlo_import_disabled', '0') != '1')
-					$this->plugin->get_scheduler()->set_task("import", -1);		
+					$this->plugin->get_scheduler()->set_task("import", -1);					
 			break;
 		}	
 	}	

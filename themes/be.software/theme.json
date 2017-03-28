@@ -1,0 +1,12 @@
+{
+    "version": 1.0,
+    "name": "Be Software",
+    "description": "Description comes here",
+    "demoUrl": "http://be.software.wpdemo.arlo.co",
+    "externalResources": {
+        "stylesheets": [
+            "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css",
+        ],
+        "javascripts": []
+    }
+}

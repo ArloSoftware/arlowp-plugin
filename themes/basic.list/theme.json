@@ -1,0 +1,10 @@
+{
+    "version": 1.0,
+    "name": "Basic List",
+    "description": "Minimum styling to allow you to easily customize the pages",
+    "externalResources": {
+        "stylesheets": [
+        ],
+        "javascripts": []
+    }
+}

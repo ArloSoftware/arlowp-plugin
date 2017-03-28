@@ -21,7 +21,7 @@ if (typeof (Arlo) === "undefined") {
 		editor: null,
 		selectedTemplate: 'arlo-event',
 		ajaxUrl: null,
-		bluePrints: null,
+		templates: null,
 		immediateTaskIDs: [],
 		runningTaskIDs: [],
 		init: function() {
@@ -223,28 +223,25 @@ if (typeof (Arlo) === "undefined") {
 		arloReloadTemplate: function() {
 			var me = this,
 				template = $('.arlo-field-wrap:visible').attr('id'),
-				templateSufix = $(".arlo-sub-template-select:visible > select:visible").val(),			
 				editor = $('#' + template.replace("arlo-",""));
 			
 			if (typeof templateSufix !== "undefined" && templateSufix.length > 0) {
 				template += '-'+templateSufix; 
 			}
 			
-			if (me.bluePrints[template] != null && editor.length) {
-				$(editor).val(me.bluePrints[template]);
+			if (me.templates[template] != null && editor.length) {
+				$(editor).val(me.templates[template]);
 			} else {
 				alert("Couldn't find the template!");
 			}
 		},
-		arloReloadTemplateConfirm: function(previousSubTemplate) {
+		arloReloadTemplateConfirm: function() {
 			var me = this,
 				message = "Do you really want to replace the existing template with the original one?";
 
 			if (confirm(message)) {
 				me.arloReloadTemplate();
-			} else if (previousSubTemplate != null) {
-				$(".arlo-sub-template-select > select:visible").val(previousSubTemplate);
-			}
+			} 
 		},
 		markPageSetupError: function() {
 			$('.arlo-page-select > select').each(function() {
@@ -273,7 +270,7 @@ if (typeof (Arlo) === "undefined") {
 			$('.nav-tab-wrapper.main-tab .nav-tab').removeClass('nav-tab-active');
 
 			if ($('.arlo_' + tabID + '_section').length == 0) {
-				tabID = 'welcome';
+				tabID = 'theme';
 			}
 			
 			$('.arlo_' + tabID + '_section').show();
@@ -374,18 +371,11 @@ if (typeof (Arlo) === "undefined") {
 				$(temp).show();
 			});	
 			
-			// show confirm message to reload the template from the blueprint		
+			// show confirm message to reload the template from the theme		
 			$('.arlo-reload-template').on('click', function() {
 				me.arloReloadTemplateConfirm();
 			});
 			
-			var previousSubTemplate;
-			$(".arlo-sub-template-select > select").on('focus', function () {
-				previousSubTemplate = this.value;
-			}).change(function() {
-				me.arloReloadTemplateConfirm(previousSubTemplate);
-			});				
-
 			//check numeric field
 			$("#arlo_import_fragment_size").keypress(function(event) {
 				// Backspace, tab, enter, end, home, left, right
@@ -443,7 +433,22 @@ if (typeof (Arlo) === "undefined") {
 					el.parentsUntil('.arlo-message').parent().find('.notice-dismiss').trigger('click');
 					$('#arlo_send_data').removeAttr("checked");
 				});
-			});					
+			});	
+
+			$(".theme-apply").click(function(e) {
+				var message = "Do you really want to replace ALL the existing templates with the selected theme?",
+					target = $(e.currentTarget);
+
+				e.preventDefault();
+
+				if (target.hasClass('theme-reset')) {
+					message = "Do you really want to reset ALL the existing templates with the originals?"
+				}
+
+				if (confirm(message)) {
+					document.location = target.attr('href');
+				} 				
+			})
 		},
 		getEventsForWebinar: function() {
 			var me = this,

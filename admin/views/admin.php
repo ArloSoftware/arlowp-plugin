@@ -18,13 +18,14 @@
 	<div class="<?php echo ARLO_PLUGIN_PREFIX; ?>-sections-wrap">
 		<form id="<?php echo ARLO_PLUGIN_PREFIX; ?>-settings" method="post" action="options.php">
 			<h2 class="nav-tab-wrapper main-tab">
-				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#welcome" class="nav-tab" id="<?=$this->plugin_slug?>-tab-welcome">Welcome</a>
+				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#theme" class="nav-tab" id="<?=$this->plugin_slug?>-tab-theme">Theme</a>
 				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#general" class="nav-tab" id="<?=$this->plugin_slug?>-tab-general">General</a>
 				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#pages" class="nav-tab" id="<?=$this->plugin_slug?>-tab-pages">Pages</a>
 				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#regions" class="nav-tab" id="<?=$this->plugin_slug?>-tab-regions">Regions</a>
 				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#customcss" class="nav-tab" id="<?=$this->plugin_slug?>-tab-customcss">Custom CSS</a>
 				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#misc" class="nav-tab" id="<?=$this->plugin_slug?>-tab-misc">Misc</a>
 				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#systemrequirements" class="nav-tab" id="<?=$this->plugin_slug?>-tab-systemrequirements">System Requirements</a>
+				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#changelog" class="nav-tab" id="<?=$this->plugin_slug?>-tab-changelog">Changelog</a>
 			</h2>		
 			<?php settings_fields( 'arlo_settings' ); ?>
             <?php $this->do_settings_sections( $this->plugin_slug ); ?>

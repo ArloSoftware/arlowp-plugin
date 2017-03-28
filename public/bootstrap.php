@@ -449,24 +449,26 @@ function arlo_pagination($num, $limit=null) {
 }
 
 /**
- * Get the content of a blueprint file
+ * Get the content of a template for the selected theme
  *
- * @since    1.0.0
+ * @since    3.0.0
  *
- * @param    string $name name of the blueprint file to get
+ * @param    string $name name of the template to get
  *
- * @return   string the contents of the blueprint file
+ * @return   string the contents of the template file
  */
-function arlo_get_blueprint($name) {
-	$path = ARLO_PLUGIN_DIR.'/includes/blueprints/'.$name.'.tmpl';
+function arlo_get_template($name) {
 
-	if(file_exists($path)) {
+	$plugin = Arlo_For_Wordpress::get_instance();
+	$theme_manager = $plugin->get_theme_manager();
 
-		return file_get_contents($path);
+	$selected_theme_id = get_option('arlo_theme', 'basic.list');
+	$theme_templates = $theme_manager->load_default_templates($selected_theme_id);
 
-	}
+	if (isset($theme_templates[$name]) && !empty($theme_templates[$name]['html']))
+		return $theme_templates[$name]['html'];
 
-	return 'Blueprint NOT found';
+	return 'Template NOT found';
 }
 
 /**

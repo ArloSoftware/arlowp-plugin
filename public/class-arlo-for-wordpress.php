@@ -13,6 +13,7 @@ use ArloAPI\Transports\Wordpress;
 use ArloAPI\Client;
 use Arlo\Utilities;
 use Arlo\Environment;
+use Arlo\ThemeManager;
 use Arlo\SystemRequirements;
 
 /**
@@ -213,10 +214,6 @@ class Arlo_For_Wordpress {
 		'event' => array(
 			'id' => 'event',
 			'name' => 'Event',
-			'sub' => array(
-				'' => 'List',
-				'grid' => 'Grid'
-			)
 		),
 		'events' => array(
 			'id' => 'events',
@@ -232,10 +229,6 @@ class Arlo_For_Wordpress {
 			'id' => 'upcoming',
 			'shortcode' => '[arlo_upcoming_list]',
 			'name' => 'Upcoming event list',
-			'sub' => array(
-				'' => 'List',
-				'grid' => 'Grid'
-			)
 		),
 		'presenter' => array(
 			'id' => 'presenter',
@@ -623,6 +616,9 @@ class Arlo_For_Wordpress {
 		// flush permalinks upon plugin deactivation
 		flush_rewrite_rules();
 
+		//set default themes
+		$this->set_default_theme();
+
 		// must happen before adding pages
 		$this->set_default_options();
 		
@@ -644,6 +640,30 @@ class Arlo_For_Wordpress {
 	}
 
 	/**
+	 * Set the default theme
+	 *
+	 * @since    3.0.0
+	 *
+	 */	
+	public function set_default_theme() {
+		$theme_id = get_option('arlo_theme', '');
+
+		//set default theme
+		if (empty($theme_id)) {
+			$theme_manager = $this->get_theme_manager();	
+			$theme_settings = $theme_manager->get_themes_settings();
+
+			$theme_id = 'basic.list';
+
+			$stored_themes_settings[$theme_id] = $theme_settings[$theme_id];
+			$stored_themes_settings[$theme_id]->templates = $theme_manager->load_default_templates($theme_id);
+
+			update_option('arlo_themes_settings', $stored_themes_settings, 1);
+			update_option('arlo_theme', $theme_id, 1);
+		}
+	}
+
+	/**
 	 * Set the default values for arlo wp_options table option
 	 *
 	 * @since    1.0.0
@@ -657,8 +677,8 @@ class Arlo_For_Wordpress {
 			foreach($this::$templates as $id => $template) {
 				if (empty($settings['templates'][$id]['html'])) {
 					$settings['templates'][$id] = array(
-						'html' => arlo_get_blueprint($id)
-					);				
+						'html' => arlo_get_template($id)
+					);
 				}
 			}
 			
@@ -673,7 +693,7 @@ class Arlo_For_Wordpress {
 			
 			foreach($this::$templates as $id => $template) {
 				$default_settings['templates'][$id] = array(
-					'html' => arlo_get_blueprint($id)
+					'html' => arlo_get_template($id)
 				);
 			}		
 			
@@ -726,6 +746,26 @@ class Arlo_For_Wordpress {
 			$customcss_timestamp = get_option('arlo_customcss_timestamp');
 			wp_enqueue_style( $this->plugin_slug .'-custom-styles', plugins_url( 'assets/css/custom.css', __FILE__ ), array(), $customcss_timestamp );		
 		}	
+
+		//enqueue theme related styles
+		$stored_themes_settings = get_option( 'arlo_themes_settings', [] );
+		$theme_id = get_option( 'arlo_theme');
+		
+		if (isset($stored_themes_settings[$theme_id])) {
+			//internal resources
+			if (isset($stored_themes_settings[$theme_id]->internalResources->stylesheets) && is_array($stored_themes_settings[$theme_id]->internalResources->stylesheets)) {
+				foreach ($stored_themes_settings[$theme_id]->internalResources->stylesheets as $key => $stylesheet) {
+					wp_enqueue_style( $this->plugin_slug . '-theme-internal-stylesheet-' . $key, $stylesheet, [], $stored_themes_settings[$theme_id]->version );
+				}
+			} 
+
+			//external resources
+			if (isset($stored_themes_settings[$theme_id]->externalResources->stylesheets) && is_array($stored_themes_settings[$theme_id]->externalResources->stylesheets)) {
+				foreach ($stored_themes_settings[$theme_id]->externalResources->stylesheets as $key => $stylesheet) {
+					wp_enqueue_style( $this->plugin_slug . '-theme-external-stylesheet-' . $key, $stylesheet, [], VersionHandler::VERSION );
+				}
+			} 			
+		}		
 	}
 	
 	/**
@@ -858,7 +898,26 @@ class Arlo_For_Wordpress {
 		wp_localize_script( $this->plugin_slug . '-plugin-script', 'WPUrls', array(
 			'home_url' => get_home_url(),
 		) );
-		
+
+		//enqueue theme related scripts
+		$stored_themes_settings = get_option( 'arlo_themes_settings', [] );
+		$theme_id = get_option( 'arlo_theme');
+
+		if (isset($stored_themes_settings[$theme_id])) {
+			//internal resources
+			if (isset($stored_themes_settings[$theme_id]->internalResources->javascripts) && is_array($stored_themes_settings[$theme_id]->internalResources->javascripts)) {
+				foreach ($stored_themes_settings[$theme_id]->internalResources->javascripts as $key => $script) {
+					wp_enqueue_script( $this->plugin_slug . '-theme-internal-script-' . $key, $script, array( 'jquery' ), $stored_themes_settings[$theme_id]->version );
+				}
+			} 
+
+			//external resources
+			if (isset($stored_themes_settings[$theme_id]->externalResources->javascripts) && is_array($stored_themes_settings[$theme_id]->externalResources->javascripts)) {
+				foreach ($stored_themes_settings[$theme_id]->externalResources->javascripts as $key => $script) {
+					wp_enqueue_script( $this->plugin_slug . '-theme-external-script-' . $key, $script, [], VersionHandler::VERSION );
+				}
+			} 			
+		}
 	}
 	
 	/**  Local Setter  */
@@ -888,6 +947,18 @@ class Arlo_For_Wordpress {
 		
 		return $scheduler;
 	}
+
+	public function get_theme_manager() {
+		if($theme_manager = $this->__get('theme_manager')) {
+			return $theme_manager;
+		}
+		
+		$theme_manager = new ThemeManager($this, $this->get_dbl());
+		
+		$this->__set('theme_manager', $theme_manager);
+		
+		return $theme_manager;
+	}	
 
 	public function get_importer() {
 		if($importer = $this->__get('importer')) {
@@ -972,7 +1043,7 @@ class Arlo_For_Wordpress {
 			return $version_handler;
 		}
 		
-		$version_handler = new VersionHandler($this->get_dbl(), $this->get_message_handler(), $this);
+		$version_handler = new VersionHandler($this->get_dbl(), $this->get_message_handler(), $this, $this->get_theme_manager());
 		
 		$this->__set('version_handler', $version_handler);
 		
