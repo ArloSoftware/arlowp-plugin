@@ -291,6 +291,9 @@ if (typeof (Arlo) === "undefined") {
 					
 				break;
 			}
+
+			setTimeout(function() {document.location.hash = tabID},1);
+
 		},
 		getLastImportLog: function (callback, successful) {
 			var me = this,

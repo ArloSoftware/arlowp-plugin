@@ -1,7 +1,10 @@
 {
     "version": 1.0,
+    "order": 3,
+    "icon": "icons8-grid-2",
     "name": "Basic Grid",
-    "description": "Minimum styling to allow you to easily customize the pages",
+    "description": "Minimum styling to allow you to easily customize pages",
+    "forDesigners": true,
     "externalResources": {
         "stylesheets": [
         ],

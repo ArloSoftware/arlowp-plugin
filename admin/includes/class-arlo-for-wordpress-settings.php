@@ -686,25 +686,36 @@ class Arlo_For_Wordpress_Settings {
 		$theme_manager = $plugin->get_theme_manager();
 
 		$themes = $theme_manager->get_themes_settings();
-		$themes = array_merge($themes, $themes, $themes, $themes);
 
 		$selected_theme_id = get_option('arlo_theme', 'basic.list');
 
 	    echo '
-	    <h4>Select a pre-built theme</h4>
+	    <h3>Select Arlo for WordPress control theme </h3>
+		<p>' . __('Arlo powered pages will be updated to match the Arlo control theme selected.', 'arlo-for-wordpress' ) . '</p>
+		<p>
+			<ul>
+				<li>Learn about themes <a href="javascript:;" data-fancybox="modal" data-src="#arlo-themes-for-designers">"For designers"</a></li>
+				<li>Learn how to <a href="">override existing styles</a> by adding <a href="#" class="arlo-settings-link" id="theme_customcss">Custom CSS</a></li>
+			</ul>
+		</p>
 		<ul class="arlo-themes">';
 		foreach ($themes as $theme_id => $theme_data) {
-			$desc = [];
+			$desc = $images = [];
+
+			if (!empty($theme_data->images) && is_array($theme_data->images)) {
+				foreach ($theme_data->images as $image) {
+					$images[] = '<img src="' . $theme_data->url . $image . '">';
+				}
+			}
+
 			$overlay = '
 					<div class="arlo-theme-desc-text">
-						<div class="arlo-theme-name">' . htmlentities(strip_tags($theme_data->name)) . '</div>
+						' . (!empty($theme_data->icon) ? '<div class="arlo-theme-icon"><i class="icons8 ' . $theme_data->icon . ' size-48 "></i></div>' : '<div class="arlo-theme-name">' . htmlentities(strip_tags($theme_data->name)) . '</div>') . '
 						<div class="arlo-theme-description">' . htmlentities(strip_tags($theme_data->description)) . '</div>
 					</div>
 				';
 
-			foreach ($theme_data->images as $image) {
-				$desc[] = '<img src="' . $image . '">';
-			}
+			$desc = array_merge($desc, $images);
 
 			if (!count($desc)) { 
 				$desc[] = $overlay;
@@ -715,12 +726,17 @@ class Arlo_For_Wordpress_Settings {
 				<div class="arlo-theme-desc">
 					' . (!empty($theme_data->demoUrl) ? '<a href="' . $theme_data->demoUrl . '" target="_blank">' : '' ) .'
 					' . $desc[0] . '
-					<div class="arlo-theme-overlay">' . $overlay  . '</div>
+					<div class="arlo-theme-overlay ' . (count($images) == 0 ? 'arlo-theme-overlay-inverse' : '') . '">' . $overlay  . '</div>
 					' . (!empty($theme_data->demoUrl) ? '</a>' : '' ) .'
+				</div>
+				<div class="arlo-theme-information">
+					<div class="arlo-theme-name">' . htmlentities(strip_tags($theme_data->name)) . '</div>
+					' . (!empty($theme_data->forDesigners) && $theme_data->forDesigners ? '<div class="arlo-theme-for-designers">For designers</div>' : '') . '
+					<div class="arlo-clear"></div>
 				</div>
 				<div class="arlo-theme-buttons">
 					<ul>
-					' . (!empty($theme_data->demoUrl) ? '<li><a href="' . $theme_data->demoUrl . '" target="_blank">' . __('Live demo', 'arlo-for-wordpress' ) . '</a></li>' : '' ) . '
+					' . (!empty($theme_data->demoUrl) ? '<li><a href="' . $theme_data->demoUrl . '" target="_blank">' . __('View', 'arlo-for-wordpress' ) . '</a></li>' : '' ) . '
 					' . ($selected_theme_id == $theme_id ? '
 						<li class="arlo-theme-current">Current</li>
 						<li><a class="theme-apply theme-reset" href="' . wp_nonce_url(admin_url('admin.php?page=arlo-for-wordpress&apply-theme=' . urlencode($theme_id) . '&reset=1'), 'arlo-apply-theme-nonce') . '">Reset</a></li>
@@ -734,6 +750,13 @@ class Arlo_For_Wordpress_Settings {
 		}
 		echo '	
 		</ul>
+		<div class="hidden">
+			<div id="arlo-themes-for-designers">
+				<p>
+				' . __('Themes that include "For designers" label provide maximum flexibility as they inherit some of the main website’s styles. They will however require additional work by a web designer to fix any inadvertent styling issues.', 'arlo-for-wordpress' ) . '
+				<br /> <a href="">' . __('Learn more', 'arlo-for-wordpress') . '</a></p>
+			</div>
+		</div>
 	    ';
 	}	
 }

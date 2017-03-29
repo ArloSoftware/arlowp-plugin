@@ -422,9 +422,18 @@ table.arlo-welcome td.logo {
 	color: darkred;
 }
 
+.hidden {
+	display: none;
+}
+
+#arlo-themes-for-designers a:focus,
+.arlo-field a:focus {
+	box-shadow: none;
+}
+
 .arlo-themes .arlo-theme {
 	width: 250px;
-	height: 220px;
+	height: 240px;
 	float: left;
 	margin-right: 1em;
 }
@@ -437,9 +446,14 @@ table.arlo-welcome td.logo {
 	background-color: white;
 }
 
+.arlo-themes .arlo-theme .arlo-theme-desc a {
+	text-decoration: none;
+}
+
 .arlo-themes .arlo-theme .arlo-theme-desc .arlo-theme-desc-text {
 	line-height: 1em;
 	font-size: 1em;
+	margin-top: 5.5em;
 }
 
 .arlo-themes .arlo-theme .arlo-theme-desc .arlo-theme-desc-text .arlo-theme-name {
@@ -449,14 +463,22 @@ table.arlo-welcome td.logo {
 	margin-bottom: 0.5em;
 }
 
+.arlo-themes .arlo-theme .arlo-theme-desc .arlo-theme-desc-text .arlo-theme-icon {
+	width: 48px;
+	margin: 0 auto;
+	margin-top: -3em;
+	margin-bottom: 1em;
+	color: #0085BA;
+}
+
 .arlo-themes .arlo-theme .arlo-theme-desc .arlo-theme-desc-text .arlo-theme-description {
 	text-align: center;
 	color: #aaa;
 }
 
-
 .arlo-themes .arlo-theme .arlo-theme-desc img {
 	width: 100%;
+	height: 100%;
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -473,7 +495,7 @@ table.arlo-welcome td.logo {
     text-align: center;
     line-height: 183px;
     color: white;
-    background-color: black;
+    background-color: white;
     font-size: 2em;
 	opacity: 0;
 	cursor: pointer;
@@ -483,21 +505,44 @@ table.arlo-welcome td.logo {
 }
 
 .arlo-themes .arlo-theme .arlo-theme-desc .arlo-theme-overlay .arlo-theme-desc-text {
-	color: white;
+	color: black;
 	font-size: 0.5em;
 }
 
-.arlo-themes .arlo-theme .arlo-theme-desc .arlo-theme-overlay .arlo-theme-desc-text .arlo-theme-name ,
 .arlo-themes .arlo-theme .arlo-theme-desc .arlo-theme-overlay .arlo-theme-desc-text .arlo-theme-description {
+	color: black;
+}
+
+.arlo-themes .arlo-theme .arlo-theme-desc .arlo-theme-overlay.arlo-theme-overlay-inverse {
+	background-color: darkgray;
+}
+
+.arlo-themes .arlo-theme .arlo-theme-desc .arlo-theme-overlay.arlo-theme-overlay-inverse .arlo-theme-desc-text .arlo-theme-description,
+.arlo-themes .arlo-theme .arlo-theme-desc .arlo-theme-overlay.arlo-theme-overlay-inverse .arlo-theme-desc-text,
+.arlo-themes .arlo-theme .arlo-theme-desc .arlo-theme-overlay.arlo-theme-overlay-inverse .arlo-theme-desc-text .arlo-theme-icon {
 	color: white;
 }
 
 .arlo-themes .arlo-theme .arlo-theme-desc:hover .arlo-theme-overlay {
-	opacity: 0.4;
+	opacity: 0.95;
 }
 
 .arlo-themes .arlo-theme .arlo-theme-desc:hover > .arlo-theme-desc-text{
 	opacity: 0;
+}
+
+.arlo-themes .arlo-theme .arlo-theme-information {
+	margin-top: 2px;
+}
+
+.arlo-themes .arlo-theme .arlo-theme-information .arlo-theme-name {
+	font-weight: 900;
+	float: left;
+}
+
+.arlo-themes .arlo-theme .arlo-theme-information .arlo-theme-for-designers {
+	text-transform: uppercase;
+	float: right;
 }
 
 .arlo-themes .arlo-theme .arlo-theme-buttons {

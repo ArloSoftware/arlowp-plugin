@@ -38,12 +38,10 @@ class ThemeManager {
 			$theme_dir = dirname($theme_setting_file);
 			$theme_id = str_replace($this->themes_path, '', $theme_dir);
 			$settings_object = json_decode(file_get_contents($theme_setting_file));
+			$settings_object->id = $theme_id;
 			$settings_object->dir = $theme_dir;
+			$settings_object->order = (!empty($settings_object->order) && is_numeric($settings_object->order) ? $settings_object->order : 1000000);
 			$settings_object->url = str_replace($this->themes_path, $this->themes_url, $theme_dir);
-
-			$settings_object->images = array_map(function($image_path) use($plugin_dir, $plugin_url) {
-				return str_replace($this->themes_path, $this->themes_url, $image_path);
-			}, glob($theme_dir . "/images/*.{jpg,JPG,jpeg,JPEG,png,PNG,gif,GIF}", GLOB_BRACE));
 
 			//internal resources
 			$settings_object->internalResources = new \stdClass();
@@ -57,6 +55,11 @@ class ThemeManager {
 
 			$themes[$theme_id] = $settings_object;
 		}
+
+		//sort based on the order value
+		usort($themes, function($obj1, $obj2) {
+			return ($obj1->order == $obj2->order ? 0 : ($obj1->order < $obj2->order) ? -1 : 1);
+		});
 
 		$this->themes_settings = $themes;
 

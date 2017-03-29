@@ -1,7 +1,10 @@
 {
     "version": 1.0,
+    "order": 4,
+    "icon": "icons8-grid-3",
     "name": "Basic List",
     "description": "Minimum styling to allow you to easily customize the pages",
+    "forDesigners": true,
     "externalResources": {
         "stylesheets": [
         ],

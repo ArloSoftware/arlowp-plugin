@@ -1,7 +1,9 @@
 {
     "version": 1.0,
-    "name": "Avada",
-    "description": "Description comes here",
+    "order": 1,
+    "name": "Jazz",
+    "description": "Simple design that can be used on wide variety of websites",
+    "forDesigners": false,
     "demoUrl": "",
     "externalResources": {
         "stylesheets": [
@@ -9,5 +11,8 @@
         	"https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700"
         ],
         "javascripts": []
-    }
+    },
+    "images": [
+        "/images/image1.jpg"
+    ]
 }

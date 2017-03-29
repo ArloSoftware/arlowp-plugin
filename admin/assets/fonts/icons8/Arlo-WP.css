@@ -1,26 +1,11 @@
-/*
- * Icon Font Arlo-Website---iOS
- * Made with love by Icons8 [ https://icons8.com/ ] using FontCustom [ https://github.com/FontCustom/fontcustom ]
- *
- * Contacts:
- *    [ https://icons8.com/contact ]
- *
- * Follow Icon8 on
- *    Twitter [ https://twitter.com/icons_8 ]
- *    Facebook [ https://www.facebook.com/Icons8 ]
- *    Google+ [ https://plus.google.com/+Icons8 ]
- *    GitHub [ https://github.com/icons8 ]
- */
-
-
 @font-face {
   font-family: "Arlo-Website---iOS";
-  src: url("./Arlo-Website---iOS_8879e9538402cd5578ae3e2d9aa630b9.eot");
-  src: url("./Arlo-Website---iOS_8879e9538402cd5578ae3e2d9aa630b9.eot?#iefix") format("embedded-opentype"),
-       url("./Arlo-Website---iOS_8879e9538402cd5578ae3e2d9aa630b9.woff2") format("woff2"),
-       url("./Arlo-Website---iOS_8879e9538402cd5578ae3e2d9aa630b9.woff") format("woff"),
-       url("./Arlo-Website---iOS_8879e9538402cd5578ae3e2d9aa630b9.ttf") format("truetype"),
-       url("./Arlo-Website---iOS_8879e9538402cd5578ae3e2d9aa630b9.svg#Arlo-Website---iOS") format("svg");
+  src: url("../icons8/Arlo-Website---iOS_54ea82bee3b70b7db80512bccc6f1a50.eot");
+  src: url("../icons8/Arlo-Website---iOS_54ea82bee3b70b7db80512bccc6f1a50.eot?#iefix") format("embedded-opentype"),
+       url("../icons8/Arlo-Website---iOS_54ea82bee3b70b7db80512bccc6f1a50.woff2") format("woff2"),
+       url("../icons8/Arlo-Website---iOS_54ea82bee3b70b7db80512bccc6f1a50.woff") format("woff"),
+       url("../icons8/Arlo-Website---iOS_54ea82bee3b70b7db80512bccc6f1a50.ttf") format("truetype"),
+       url("../icons8/Arlo-Website---iOS_54ea82bee3b70b7db80512bccc6f1a50.svg#Arlo-Website---iOS") format("svg");
   font-weight: normal;
   font-style: normal;
 }
@@ -28,13 +13,13 @@
 @media screen and (-webkit-min-device-pixel-ratio:0) {
   @font-face {
     font-family: "Arlo-Website---iOS";
-    src: url("./Arlo-Website---iOS_8879e9538402cd5578ae3e2d9aa630b9.svg#Arlo-Website---iOS") format("svg");
+    src: url("../icons8/Arlo-Website---iOS_54ea82bee3b70b7db80512bccc6f1a50.svg#Arlo-Website---iOS") format("svg");
   }
 }
 
 [data-icons8]:before { content: attr(data-icons8); }
 
-[data-icons8]:before,
+.icons8, [data-icons8]:before,
 .icons8-apartment:before,
 .icons8-arlo-logo-for-font:before,
 .icons8-cancel:before,
@@ -52,6 +37,8 @@
 .icons8-diploma-1:before,
 .icons8-diploma-2:before,
 .icons8-embassy:before,
+.icons8-grid-2:before,
+.icons8-grid-3:before,
 .icons8-headset:before,
 .icons8-home:before,
 .icons8-java-coffee-cup-logo:before,
@@ -101,6 +88,8 @@
 .icons8-diploma-1:before { content: "\f109"; }
 .icons8-diploma-2:before { content: "\f10a"; }
 .icons8-embassy:before { content: "\f10d"; }
+.icons8-grid-2:before { content: "\f124"; }
+.icons8-grid-3:before { content: "\f125"; }
 .icons8-headset:before { content: "\f102"; }
 .icons8-home:before { content: "\f104"; }
 .icons8-java-coffee-cup-logo:before { content: "\f11c"; }
