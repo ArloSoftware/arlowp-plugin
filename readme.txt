@@ -135,6 +135,8 @@ Minor fixes and improvements
 
 New [arlo_event_filters] shortcode
 
+New builtin theme selection
+
 = 2.4.1.2 = 
 
 Remove PHP notices
