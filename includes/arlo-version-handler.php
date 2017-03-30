@@ -71,10 +71,6 @@ class VersionHandler {
 		if (version_compare($old_version, '3.0') < 0) {
 			$this->do_update('3.0');
 		}		
-
-		if (version_compare($old_version, '3.0') < 0) {
-			$this->do_update('3.0');
-		}
 	}
 	
 	private function run_pre_data_update($version) {
@@ -440,7 +436,10 @@ class VersionHandler {
 					}
 				}
 
-				arlo_set_option('templates', $saved_templates);		
+				arlo_set_option('templates', $saved_templates);	
+
+				//use the new url structure
+				update_option('arlo_new_url_structure', 1);	
 
 				//kick off an import
 				if (get_option('arlo_import_disabled', '0') != '1')
