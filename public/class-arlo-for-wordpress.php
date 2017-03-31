@@ -740,12 +740,6 @@ class Arlo_For_Wordpress {
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css?20161031', __FILE__ ), array(), VersionHandler::VERSION );
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-darktooltip', plugins_url( 'assets/css/libs/darktooltip.min.css', __FILE__ ), array(), VersionHandler::VERSION );
 		wp_enqueue_style( $this->plugin_slug .'-icons8', plugins_url( '../admin/assets/fonts/icons8/Arlo-WP.css', __FILE__ ), array(), VersionHandler::VERSION );
-		
-		$customcss_load_type = get_option('arlo_customcss');
-		if ($customcss_load_type == 'file' && file_exists(plugin_dir_path( __FILE__ ) . 'assets/css/custom.css')) {
-			$customcss_timestamp = get_option('arlo_customcss_timestamp');
-			wp_enqueue_style( $this->plugin_slug .'-custom-styles', plugins_url( 'assets/css/custom.css', __FILE__ ), array(), $customcss_timestamp );		
-		}	
 
 		//enqueue theme related styles
 		$stored_themes_settings = get_option( 'arlo_themes_settings', [] );
@@ -765,7 +759,13 @@ class Arlo_For_Wordpress {
 					wp_enqueue_style( $this->plugin_slug . '-theme-external-stylesheet-' . $key, $stylesheet, [], VersionHandler::VERSION );
 				}
 			} 			
-		}		
+		}
+
+		$customcss_load_type = get_option('arlo_customcss');
+		if ($customcss_load_type == 'file' && file_exists(plugin_dir_path( __FILE__ ) . 'assets/css/custom.css')) {
+			$customcss_timestamp = get_option('arlo_customcss_timestamp');
+			wp_enqueue_style( $this->plugin_slug .'-custom-styles', plugins_url( 'assets/css/custom.css', __FILE__ ), array(), $customcss_timestamp );		
+		}			
 	}
 	
 	/**
