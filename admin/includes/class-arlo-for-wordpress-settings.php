@@ -104,8 +104,12 @@ class Arlo_For_Wordpress_Settings {
 					//check if there is already a stored settings for the theme, or need to be reset
 					if ($_GET['reset'] == 1 || empty($stored_themes_settings[$theme_id])) {
 						$stored_themes_settings[$theme_id] = $theme_settings[$theme_id];
-						var_dump($theme_settings[$theme_id]);
 						$stored_themes_settings[$theme_id]->templates = $theme_manager->load_default_templates($theme_id);
+					}
+
+					if ($stored_themes_settings[$theme_id]->templates === false && $theme_id === "custom") {
+						$stored_themes_settings[$theme_id] = $theme_settings['basic.list'];
+						$stored_themes_settings[$theme_id]->templates = $theme_manager->load_default_templates('basic.list');
 					}
 
 					if ($stored_themes_settings[$theme_id]->templates !== false) {
@@ -116,9 +120,9 @@ class Arlo_For_Wordpress_Settings {
 						update_option('arlo_settings', $settings_object, 1);
 						update_option('arlo_themes_settings', $stored_themes_settings, 1);
 						update_option('arlo_theme', $theme_id, 1);
-
+						
 						wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages') );
-					}
+					}					
 				}
 				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress') );
 			}

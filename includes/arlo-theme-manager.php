@@ -75,10 +75,6 @@ class ThemeManager {
 	public function is_theme_valid($theme_id) {
 		$themes = $this->get_themes_settings();
 
-		$theme = array_filter($themes, function($theme) use($theme_id) {
-			return $theme->id == $theme_id; 
-		});
-
 		return is_array($themes) && isset($themes[$theme_id]) && isset($themes[$theme_id]->dir) && file_exists($themes[$theme_id]->dir);
 	}
 
