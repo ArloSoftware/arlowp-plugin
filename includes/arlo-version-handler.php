@@ -406,7 +406,7 @@ class VersionHandler {
 			break;	
 
 			case '3.0':
-				$theme_id = 'basic.list';
+				$theme_id = 'custom';
 				update_option('arlo_theme', $theme_id, 1);
 
 				$settings = get_option('arlo_settings');

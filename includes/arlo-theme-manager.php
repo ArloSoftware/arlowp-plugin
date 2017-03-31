@@ -61,13 +61,23 @@ class ThemeManager {
 			return ($obj1->order == $obj2->order ? 0 : ($obj1->order < $obj2->order) ? -1 : 1);
 		});
 
-		$this->themes_settings = $themes;
+		//need to recreate the array as an associated array because usort screws up
+		$themes_ass = [];
+		foreach ($themes as $theme) {
+			$themes_ass[$theme->id] = $theme;
+		}
+
+		$this->themes_settings = $themes_ass;
 
 		return $this->themes_settings;
 	}
 
 	public function is_theme_valid($theme_id) {
 		$themes = $this->get_themes_settings();
+
+		$theme = array_filter($themes, function($theme) use($theme_id) {
+			return $theme->id == $theme_id; 
+		});
 
 		return is_array($themes) && isset($themes[$theme_id]) && isset($themes[$theme_id]->dir) && file_exists($themes[$theme_id]->dir);
 	}

@@ -93,7 +93,7 @@ class Arlo_For_Wordpress_Settings {
 				exit;
 			}
 
-			if (isset($_GET['apply-theme']) && isset($_GET['_wpnonce']) && wp_verify_nonce($_GET['_wpnonce'], 'arlo-apply-theme-nonce')) {
+			if (!empty($_GET['apply-theme']) && isset($_GET['_wpnonce']) && wp_verify_nonce($_GET['_wpnonce'], 'arlo-apply-theme-nonce')) {
 				$theme_id = $_GET['apply-theme'];
 				$theme_manager = $plugin->get_theme_manager();
 				
@@ -104,6 +104,7 @@ class Arlo_For_Wordpress_Settings {
 					//check if there is already a stored settings for the theme, or need to be reset
 					if ($_GET['reset'] == 1 || empty($stored_themes_settings[$theme_id])) {
 						$stored_themes_settings[$theme_id] = $theme_settings[$theme_id];
+						var_dump($theme_settings[$theme_id]);
 						$stored_themes_settings[$theme_id]->templates = $theme_manager->load_default_templates($theme_id);
 					}
 
@@ -119,6 +120,7 @@ class Arlo_For_Wordpress_Settings {
 						wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages') );
 					}
 				}
+				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress') );
 			}
 						
 			add_action( 'admin_notices', array($notice_handler, "welcome_notice") );
@@ -471,7 +473,7 @@ class Arlo_For_Wordpress_Settings {
 	    $val = isset($settings_object['templates'][$id]['html']) ? $settings_object['templates'][$id]['html'] : '';
 	    
 	    
-	    $this->arlo_reload_template($id, $settings_object);
+	    $this->arlo_reload_template($id);
 	    
 	    echo '<div class="arlo-label arlo-full-width">
 	    		<label>
@@ -483,16 +485,19 @@ class Arlo_For_Wordpress_Settings {
 	    wp_editor($val, $id, array('textarea_name'=>'arlo_settings[templates]['.$id.'][html]','textarea_rows'=>'20'));
 	}
 	
-	function arlo_reload_template($template, $settings_object) {
-	
-	    echo '
-	    	<div class="arlo-label">
-	    		<label>'. __('Template', 'arlo-for-wordpress' ) . '</label>
-	    	</div>
-	    	<div class="arlo-field">
-	    		<div class="' . ARLO_PLUGIN_PREFIX . '-reload-template"><a>' . __('Reload original template', 'arlo-for-wordpress' ) . '</a></div>
-	    	</div>
-	    	<div class="cf"></div>';
+	function arlo_reload_template($template) {
+		$selected_theme_id = get_option('arlo_theme', 'basic.list');
+
+		if ($selected_theme_id != 'custom') {
+			echo '
+				<div class="arlo-label">
+					<label>'. __('Template', 'arlo-for-wordpress' ) . '</label>
+				</div>
+				<div class="arlo-field">
+					<div class="' . ARLO_PLUGIN_PREFIX . '-reload-template"><a>' . __('Reload original template', 'arlo-for-wordpress' ) . '</a></div>
+				</div>
+				<div class="cf"></div>';
+		}
 	}
 	
 	function arlo_template_source() {
@@ -692,14 +697,12 @@ class Arlo_For_Wordpress_Settings {
 	    echo '
 	    <h3>Select Arlo for WordPress control theme </h3>
 		<p>' . __('Arlo powered pages will be updated to match the Arlo control theme selected.', 'arlo-for-wordpress' ) . '</p>
-		<p>
-			<ul>
-				<li>Learn about themes <a href="javascript:;" data-fancybox="modal" data-src="#arlo-themes-for-designers">"For designers"</a></li>
-				<li>Learn how to <a href="">override existing styles</a> by adding <a href="#" class="arlo-settings-link" id="theme_customcss">Custom CSS</a></li>
-			</ul>
+		<p> 
+			Learn about themes <a href="javascript:;" data-fancybox="modal" data-src="#arlo-themes-for-designers">"For designers"</a>.
+			Learn how to <a href="">override existing styles</a> by adding <a href="#" class="arlo-settings-link" id="theme_customcss">Custom CSS</a>
 		</p>
 		<ul class="arlo-themes">';
-		foreach ($themes as $theme_id => $theme_data) {
+		foreach ($themes as $theme_num => $theme_data) {
 			$desc = $images = [];
 
 			if (!empty($theme_data->images) && is_array($theme_data->images)) {
@@ -710,8 +713,9 @@ class Arlo_For_Wordpress_Settings {
 
 			$overlay = '
 					<div class="arlo-theme-desc-text">
-						' . (!empty($theme_data->icon) ? '<div class="arlo-theme-icon"><i class="icons8 ' . $theme_data->icon . ' size-48 "></i></div>' : '<div class="arlo-theme-name">' . htmlentities(strip_tags($theme_data->name)) . '</div>') . '
-						<div class="arlo-theme-description">' . htmlentities(strip_tags($theme_data->description)) . '</div>
+						' . (!empty($theme_data->icon) ? '<div class="arlo-theme-icon"><i class="icons8 ' . $theme_data->icon . ' size-48 "></i></div>' : '') . '
+						<div class="arlo-theme-name">' . htmlentities(strip_tags($theme_data->name)) . '</div>
+						<div class="arlo-theme-description">' . $theme_data->description . '</div>
 					</div>
 				';
 
@@ -724,10 +728,8 @@ class Arlo_For_Wordpress_Settings {
 			echo '
 			<li class="arlo-theme">
 				<div class="arlo-theme-desc">
-					' . (!empty($theme_data->demoUrl) ? '<a href="' . $theme_data->demoUrl . '" target="_blank">' : '' ) .'
 					' . $desc[0] . '
 					<div class="arlo-theme-overlay ' . (count($images) == 0 ? 'arlo-theme-overlay-inverse' : '') . '">' . $overlay  . '</div>
-					' . (!empty($theme_data->demoUrl) ? '</a>' : '' ) .'
 				</div>
 				<div class="arlo-theme-information">
 					<div class="arlo-theme-name">' . htmlentities(strip_tags($theme_data->name)) . '</div>
@@ -736,14 +738,13 @@ class Arlo_For_Wordpress_Settings {
 				</div>
 				<div class="arlo-theme-buttons">
 					<ul>
-					' . (!empty($theme_data->demoUrl) ? '<li><a href="' . $theme_data->demoUrl . '" target="_blank">' . __('View', 'arlo-for-wordpress' ) . '</a></li>' : '' ) . '
-					' . ($selected_theme_id == $theme_id ? '
+					' . (!empty($theme_data->demoUrl) ? '<li><a href="' . $theme_data->demoUrl . '" target="_blank">' . __('Preview', 'arlo-for-wordpress' ) . '</a></li>' : '' ) . '
+					' . ($selected_theme_id == $theme_data->id ? '
 						<li class="arlo-theme-current">Current</li>
-						<li><a class="theme-apply theme-reset" href="' . wp_nonce_url(admin_url('admin.php?page=arlo-for-wordpress&apply-theme=' . urlencode($theme_id) . '&reset=1'), 'arlo-apply-theme-nonce') . '">Reset</a></li>
 					':'
-						<li><a class="theme-apply" href="' . wp_nonce_url(admin_url('admin.php?page=arlo-for-wordpress&apply-theme=' . urlencode($theme_id)), 'arlo-apply-theme-nonce') . '">Apply</a></li>
-						<li><a class="theme-apply theme-reset" href="' . wp_nonce_url(admin_url('admin.php?page=arlo-for-wordpress&apply-theme=' . urlencode($theme_id) . '&reset=1'), 'arlo-apply-theme-nonce') . '">Apply & Reset</a></li>
-					') . ' 
+						<li><a class="theme-apply" href="' . wp_nonce_url(admin_url('admin.php?page=arlo-for-wordpress&apply-theme=' . urlencode($theme_data->id)), 'arlo-apply-theme-nonce') . '">' . __('Apply', 'arlo-for-wordpress') . '</a></li>
+					') .
+						( $theme_data->id != 'custom' ? '<li><a class="theme-apply theme-reset" href="' . wp_nonce_url(admin_url('admin.php?page=arlo-for-wordpress&apply-theme=' . urlencode($theme_data->id) . '&reset=1'), 'arlo-apply-theme-nonce') . '">' . ($selected_theme_id == $theme_id ? __('Reset', 'arlo-for-wordpress') : __('Apply & Reset', 'arlo-for-wordpress')) . '</a></li>' : '') . '
 					</ul>
 				</div>
 			</li>';

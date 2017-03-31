@@ -2,7 +2,7 @@
     "version": 1.0,
     "order": 2,
     "name": "Be Software",
-    "description": "Description comes here",
+    "description": "Designed specifically for <a href=\"http://themes.muffingroup.com/be/software/\" target=\"_blank\">Be Software</a> WordPress theme ",
     "demoUrl": "http://be.software.wpdemo.arlo.co",
     "forDesigners": true,
     "externalResources": {
@@ -10,5 +10,8 @@
             "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"
         ],
         "javascripts": []
-    }
+    },
+    "images": [
+        "/images/image1.jpg"
+    ]
 }
