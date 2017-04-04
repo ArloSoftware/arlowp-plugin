@@ -732,13 +732,14 @@ class Arlo_For_Wordpress_Settings {
 
 			echo '
 			<li class="arlo-theme">
-				<div class="arlo-theme-desc">
+				<div class="arlo-theme-desc ' . (count($images) == 0 ? 'arlo-theme-inverse' : '') . '">
+					' . (!empty($theme_data->forDesigners) && $theme_data->forDesigners ? '<div class="arlo-themes-developer-banner">For<br />designers</div>' : '') . '
+					
 					' . $desc[0] . '
-					<div class="arlo-theme-overlay ' . (count($images) == 0 ? 'arlo-theme-overlay-inverse' : '') . '">' . $overlay  . '</div>
+					<div class="arlo-theme-overlay">' . $overlay  . '</div>
 				</div>
 				<div class="arlo-theme-information">
 					<div class="arlo-theme-name">' . htmlentities(strip_tags($theme_data->name)) . '</div>
-					' . (!empty($theme_data->forDesigners) && $theme_data->forDesigners ? '<div class="arlo-theme-for-designers">For designers</div>' : '') . '
 					<div class="arlo-clear"></div>
 				</div>
 				<div class="arlo-theme-buttons">

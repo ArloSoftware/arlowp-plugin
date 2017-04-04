@@ -443,6 +443,7 @@ table.arlo-welcome td.logo {
 	height: 183px;
 	position: relative;
 	background-color: white;
+	overflow: hidden;
 }
 
 .arlo-themes .arlo-theme .arlo-theme-desc a {
@@ -512,19 +513,19 @@ table.arlo-welcome td.logo {
 	color: black;
 }
 
-.arlo-themes .arlo-theme .arlo-theme-desc .arlo-theme-overlay.arlo-theme-overlay-inverse {
+.arlo-themes .arlo-theme .arlo-theme-desc.arlo-theme-inverse .arlo-theme-overlay {
 	background-color: darkgray;
 }
 
-.arlo-themes .arlo-theme .arlo-theme-desc .arlo-theme-overlay.arlo-theme-overlay-inverse .arlo-theme-desc-text .arlo-theme-description,
-.arlo-themes .arlo-theme .arlo-theme-desc .arlo-theme-overlay.arlo-theme-overlay-inverse .arlo-theme-desc-text,
-.arlo-themes .arlo-theme .arlo-theme-desc .arlo-theme-overlay.arlo-theme-overlay-inverse .arlo-theme-desc-text .arlo-theme-name,
-.arlo-themes .arlo-theme .arlo-theme-desc .arlo-theme-overlay.arlo-theme-overlay-inverse .arlo-theme-desc-text .arlo-theme-icon  {
+.arlo-themes .arlo-theme .arlo-theme-desc.arlo-theme-inverse .arlo-theme-overlay .arlo-theme-desc-text .arlo-theme-description,
+.arlo-themes .arlo-theme .arlo-theme-desc.arlo-theme-inverse .arlo-theme-overlay .arlo-theme-desc-text,
+.arlo-themes .arlo-theme .arlo-theme-desc.arlo-theme-inverse .arlo-theme-overlay .arlo-theme-desc-text .arlo-theme-name,
+.arlo-themes .arlo-theme .arlo-theme-desc.arlo-theme-inverse .arlo-theme-overlay .arlo-theme-desc-text .arlo-theme-icon  {
 	color: white;
 }
 
 .arlo-themes .arlo-theme .arlo-theme-desc:hover .arlo-theme-overlay {
-	opacity: 0.95;
+	opacity: 1;
 }
 
 .arlo-themes .arlo-theme .arlo-theme-desc:hover > .arlo-theme-desc-text{
@@ -540,9 +541,31 @@ table.arlo-welcome td.logo {
 	float: left;
 }
 
-.arlo-themes .arlo-theme .arlo-theme-information .arlo-theme-for-designers {
+.arlo-themes .arlo-theme .arlo-themes-developer-banner {
+    top: -30px;
+    right: -90px;
+    left: auto;
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    width: 200px;
+    background: darkgray;
+    position: absolute;
+    text-align: center;
+    line-height: 1.5em;
+    padding: 42px 0 7px;
+    font-weight: bold;
+    color: white;
+    font-size: 11px;
 	text-transform: uppercase;
-	float: right;
+	box-shadow: 0 0 8px rgba(0,0,0,0.3);
+	z-index: 20;
+	-webkit-transition: opacity .25s ease-in-out;
+	-moz-transition: opacity .25s ease-in-out;
+	transition: opacity .25s ease-in-out;
+}
+
+.arlo-themes .arlo-theme .arlo-theme-desc.arlo-theme-inverse:hover .arlo-themes-developer-banner {
+	box-shadow: none;
 }
 
 .arlo-themes .arlo-theme .arlo-theme-buttons {
@@ -558,7 +581,7 @@ table.arlo-welcome td.logo {
 	float: left;
 	text-transform: uppercase;
 	color: white;
-	margin-right: 0.4em;
+	margin-right: 0.3em;
 }
 
 .arlo-themes .arlo-theme .arlo-theme-buttons li a {
