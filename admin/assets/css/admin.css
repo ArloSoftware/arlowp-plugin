@@ -582,6 +582,10 @@ table.arlo-welcome td.logo {
 	display: none;
 }
 
+a .icons8 {
+	text-decoration: none;
+}
+
 /* media queries, these match the wordpress admin breakpoints as of WP 3.9 */
 
 @media only screen and (min-width: 601px) {
