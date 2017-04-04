@@ -1,11 +1,11 @@
 @font-face {
   font-family: "Arlo-Website---iOS";
-  src: url("../icons8/Arlo-Website---iOS_54ea82bee3b70b7db80512bccc6f1a50.eot");
-  src: url("../icons8/Arlo-Website---iOS_54ea82bee3b70b7db80512bccc6f1a50.eot?#iefix") format("embedded-opentype"),
-       url("../icons8/Arlo-Website---iOS_54ea82bee3b70b7db80512bccc6f1a50.woff2") format("woff2"),
-       url("../icons8/Arlo-Website---iOS_54ea82bee3b70b7db80512bccc6f1a50.woff") format("woff"),
-       url("../icons8/Arlo-Website---iOS_54ea82bee3b70b7db80512bccc6f1a50.ttf") format("truetype"),
-       url("../icons8/Arlo-Website---iOS_54ea82bee3b70b7db80512bccc6f1a50.svg#Arlo-Website---iOS") format("svg");
+  src: url("../icons8/Arlo-Website---iOS_15f96acfe684d558926773025693617f.eot");
+  src: url("../icons8/Arlo-Website---iOS_15f96acfe684d558926773025693617f.eot?#iefix") format("embedded-opentype"),
+       url("../icons8/Arlo-Website---iOS_15f96acfe684d558926773025693617f.woff2") format("woff2"),
+       url("../icons8/Arlo-Website---iOS_15f96acfe684d558926773025693617f.woff") format("woff"),
+       url("../icons8/Arlo-Website---iOS_15f96acfe684d558926773025693617f.ttf") format("truetype"),
+       url("../icons8/Arlo-Website---iOS_15f96acfe684d558926773025693617f.svg#Arlo-Website---iOS") format("svg");
   font-weight: normal;
   font-style: normal;
 }
@@ -13,7 +13,7 @@
 @media screen and (-webkit-min-device-pixel-ratio:0) {
   @font-face {
     font-family: "Arlo-Website---iOS";
-    src: url("../icons8/Arlo-Website---iOS_54ea82bee3b70b7db80512bccc6f1a50.svg#Arlo-Website---iOS") format("svg");
+    src: url("../icons8/Arlo-Website---iOS_15f96acfe684d558926773025693617f.svg#Arlo-Website---iOS") format("svg");
   }
 }
 
@@ -33,6 +33,7 @@
 .icons8-cup:before,
 .icons8-curriculum:before,
 .icons8-department:before,
+.icons8-design:before,
 .icons8-diploma:before,
 .icons8-diploma-1:before,
 .icons8-diploma-2:before,
@@ -84,6 +85,7 @@
 .icons8-cup:before { content: "\f11f"; }
 .icons8-curriculum:before { content: "\f10c"; }
 .icons8-department:before { content: "\f10e"; }
+.icons8-design:before { content: "\f127"; }
 .icons8-diploma:before { content: "\f10b"; }
 .icons8-diploma-1:before { content: "\f109"; }
 .icons8-diploma-2:before { content: "\f10a"; }
