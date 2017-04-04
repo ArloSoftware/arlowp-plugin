@@ -225,7 +225,7 @@ class Arlo_For_Wordpress_Settings {
                 
 		add_settings_field(
                         'arlo_import_callback_host', 
-                        '<label for="arlo_import_callback_host">'.__('Import callback host', 'arlo-for-wordpress' ).'</label>', 
+                        '<label for="arlo_import_callback_host">'.__('Import callback host', 'arlo-for-wordpress' ).' <a href="http://developer.arlo.co/doc/wordpress/settings#import-callback-host" target="_blank"><i class="icons8 icons8-help-filled size-16"></i></a></label>', 
                         array($this, 'arlo_simple_input_callback'), 
                         $this->plugin_slug, 'arlo_general_section', 
                         array(
