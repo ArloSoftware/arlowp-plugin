@@ -620,6 +620,7 @@ class Arlo_For_Wordpress_Settings {
 				<li>New <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_filters" target="_blank">[arlo_event_filters]</a> shortcode</li>
 				<li>Minor fixes and improvements</li>
 				<li>Revamp the codebase behind the plugin</li>
+				<li>New built-in theme selection</li>
 	    	</ul>
 	    </p>		
 		<h4>Version 2.4.1.2</h4>

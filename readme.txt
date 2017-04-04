@@ -11,6 +11,14 @@ Seamlessly integrate Arlo's market leading training and event management system 
 
 == Description ==
 = Arlo training and event management system =
+
+Arlo for WordPress helps you build great looking websites for promoting your events and courses. Offer website visitors an interactive and engaging experience with the ability to fully customise the look and feel. The plugin also comes with pre-built page themes providing flexibility for designers, and plug-and-play themes for the less savvy. [Read more](https://www.arlo.co/wordpress-training-and-event-management-plugin) about creating beautiful looking training and event websites using Arlo for WordPress.
+
+Pre-built plugin themes:
+* [BeSoftware](http://be.software.wpdemo.arlo.co/)
+* Jazz
+
+
 [youtube https://www.youtube.com/watch?v=-uUhu90cvoc]
 
 Arlo is a cloud-based training and event management system for managing, marketing and delivering physical and online training and event services. It provides streamlined event scheduling, online registrations, invoicing and receipting, runs marketing activities, and manages client records and relationships. The service can be rapidly deployed and seamlessly integrated within your website and connected with your other business applications.
@@ -20,6 +28,20 @@ Arlo is a cloud-based training and event management system for managing, marketi
 * [Apps integration](https://www.arlo.co/integration-and-apps) - Integrate Arlo with your other business applications such as feedback survey software, accounting software, email marketing, and webinar software.
 * [Online delivery](https://www.arlo.co/features/online-delivery) - Easily manage online presentations, such as live webinars for sales and training, and self-paced e-learning.
 * [Customer relationship management](https://www.arlo.co/features/customer-relationship-management) - Manage information about existing clients, and easily run campaigns to target potential customers. Arlo is a fully featured customer relationship management tool. 
+
+= Requirements =
+* PHP Version - WordPress PHP version must be 5.4 or higher.
+* Shared Server Hosting - Slow shared server hosting can cause issues with the data import. If you have shared server hosting please ensure you [set up a Cron Job](http://developer.arlo.co/doc/wordpress/import#import-cron-job).
+* WordPress version - Your WordPress should be kept updated to the latest version available. 
+* Cache plugins - Caching plugins can interfere with the Arlo WordPress plugin. Once changes have been made to the Arlo plugin, ensure you clear or reset your caching plugins if you have them. 
+* [Google Maps API key](https://developer.arlo.co/doc/wordpress/settings#general-settings) is required for the maps on the venue profile pages (You need to enable the [Google Static Maps API](https://developers.google.com/maps/documentation/javascript/get-api-key) for the project).
+* Arlo platform (Sign-up for a [free Arlo trial](https://www.arlo.co/register)) 
+
+= Support & Documentation =
+* [Arlo online help centre](https://support.arlo.co/hc/en-gb/categories/201429706-Website-Integration)
+* [Arlo for WordPress developer documentation](http://developer.arlo.co/doc/wordpress/index)
+* [Arlo for Wordpress frequently asked questions (FAQ)](https://support.arlo.co/hc/en-gb/articles/115000392503-WordPress-Plugin-Frequently-Asked-Questions-FAQ-)
+* [Submit a Arlo support request](https://support.arlo.co/hc/en-gb/requests/new/)
 
 = Arlo WordPress integration - built for web developers! =
 Create beautiful and interactive training and event websites using the Arlo for WordPress plugin. Access an extensive library of WordPress Shortcodes, Templates, and Widgets, all designed specifically for web developer to make integration easy.  
@@ -387,6 +409,9 @@ Title starts with a ":" when a category is selected, but the page hasn't got a n
 Import error/success message
 
 = 2.1 = 
+
 Initial public release
 
 == Upgrade Notice ==
+
+Please make sure that you have a backup (from the files and from the database) before you do any upgrade. 
