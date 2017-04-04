@@ -111,6 +111,10 @@ For more information about the shortcodes please visit the [Arlo developer site]
 
 == Frequently Asked Questions ==
 
+= Where can I find all Arlo for WordPress FAQ’s? =
+
+You can find all [Arlo for WordPress FAQ’s](https://support.arlo.co/hc/en-gb/articles/115000392503-WordPress-Plugin-Frequently-Asked-Questions-FAQ-) on the Arlo online support portal. 
+
 = Can I use my existing WordPress theme? =
 
 Yes! The Arlo Training and Event Management plugin works out-of-the-box with nearly every WordPress theme. But if you want to customize, you have to use a 3rd party plugin to add external css to your site.
