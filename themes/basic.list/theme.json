@@ -5,6 +5,7 @@
     "name": "Basic List",
     "description": "Minimum styling to allow you to easily customize the pages",
     "forDesigners": true,
+    "demoUrl": "https://support.arlo.co/hc/en-gb/articles/115001601263",
     "externalResources": {
         "stylesheets": [
         ],
