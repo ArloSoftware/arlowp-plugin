@@ -1,8 +1,4 @@
 <div class="arlo" id="arlo">
-<div class="arlo-banner">
-  [arlo_event_template_name wrap="<h1>%s</h1>"]
-</div>
-
 [arlo_template_region_selector]
 [arlo_timezones wrap="<div class='arlo-timezone-toggle'>%s</div>"]
 [arlo_event_template_summary wrap="<p class='arlo-event-template-summary'>%s</p>"]

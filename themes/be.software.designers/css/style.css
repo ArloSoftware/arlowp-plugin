@@ -587,6 +587,7 @@ body.arlo {
     list-style: none;
     background-image: none;
     display: block;
+    border: none;
 }
 
 .arlo#arlo .arlo-list.arlo-cols-5 > li {
@@ -634,6 +635,7 @@ body.arlo {
     margin-bottom: 4em;
     overflow: auto;
     height: auto !important;
+    padding: 0;
 }
 
 .arlo#arlo .arlo-cal {
@@ -663,6 +665,7 @@ body.arlo {
 .arlo#arlo .arlo-event-details {
     margin-left: 85px;
     overflow: auto;
+    max-width: none;
 }
 
 .arlo#arlo .arlo-event-details h2 {
@@ -703,6 +706,11 @@ body.arlo {
     text-align: right;
     margin-bottom: .5em;
     text-align: center;
+    font-size: 1em;
+}
+
+.arlo#arlo .arlo-tooltip-button {
+    text-align: left;
 }
 
 @media (min-width: 550px) {
@@ -871,6 +879,7 @@ body.arlo {
 .arlo#arlo .arlo-event-registration {
     clear: both;
     margin-top: 1em;
+    text-align: left;
 }
 
 .arlo#arlo ul.arlo-list.events {
@@ -937,6 +946,11 @@ body.arlo {
 
 .arlo#arlo .arlo-places-remaining {
     margin-left: .5em;
+    font-size: 1em;
+}
+
+.arlo#arlo .arlo-event-offers .discount {
+    color: #FFD101;
 }
 
 
