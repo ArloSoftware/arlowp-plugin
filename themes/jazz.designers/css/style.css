@@ -358,14 +358,15 @@ body.arlo {
 .arlo#arlo .button,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running span,
-.arlo#arlo .prev.page-numbers,
-.arlo#arlo .next.page-numbers,
+.arlo#arlo a.prev.page-numbers,
+.arlo#arlo a.next.page-numbers,
 .arlo#arlo .arlo-category-list a,
 .arlo#arlo select,
 .arlo#arlo .arlo-filters-buttons a,
-.arlo#arlo .arlo-show-more-link {
+.arlo#arlo a.arlo-show-more-link,
+.arlo#arlo .arlo-social-media a {
     padding: .5em 1em;
-    display: block;
+    display: inline-block;
     border-radius: 6px;
     text-align: center;
     letter-spacing: 1px;
@@ -392,7 +393,8 @@ body.arlo {
     .arlo#arlo .arlo-category-list a,
     .arlo#arlo select,
     .arlo#arlo .arlo-filters-buttons a,
-    .arlo#arlo .arlo-show-more-link {
+    .arlo#arlo .arlo-show-more-link,
+    .arlo#arlo .arlo-social-media a {
         display: inline-block;
     }
 }
@@ -403,7 +405,8 @@ body.arlo {
 .arlo#arlo .prev.page-numbers:after,
 .arlo#arlo .next.page-numbers:after,
 .arlo#arlo .arlo-category-list a:after,
-.arlo#arlo .arlo-show-more-link:after {
+.arlo#arlo .arlo-show-more-link:after,
+.arlo#arlo .arlo-social-media a:after {
     content: "";
     position: absolute;
     left: 0;
@@ -417,13 +420,28 @@ body.arlo {
     background: rgba(0,0,0,.05);
 }
 
+.arlo#arlo .arlo-button:hover,
+.arlo#arlo .button:hover,
+.arlo#arlo .arlo-list.catalogue .arlo-next-running a:hover,
+.arlo#arlo .arlo-list.catalogue .arlo-next-running span:hover,
+.arlo#arlo a.prev.page-numbers:hover,
+.arlo#arlo a.next.page-numbers:hover,
+.arlo#arlo .arlo-category-list a:hover,
+.arlo#arlo select:hover,
+.arlo#arlo .arlo-filters-buttons a:hover,
+.arlo#arlo a.arlo-show-more-link:hover,
+.arlo#arlo .arlo-social-media a:hover {
+    text-decoration: none;
+}
+
 .arlo#arlo .arlo-button:hover:after,
 .arlo#arlo .button:hover:after,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a:hover:after,
 .arlo#arlo .prev.page-numbers:hover:after,
 .arlo#arlo .next.page-numbers:hover:after,
 .arlo#arlo .arlo-category-list a:hover:after,
-.arlo#arlo .arlo-show-more-link:hover:after {
+.arlo#arlo .arlo-show-more-link:hover:after,
+.arlo#arlo .arlo-social-media a:hover:after {
     width: 100%;
 }
 
@@ -642,6 +660,7 @@ body.arlo {
 .arlo#arlo .arlo-list.events {
     margin-bottom: 1.5em;
     width: 100%;
+    clear: both;
 }
 
 .arlo#arlo .arlo-list.events .arlo-event {
@@ -931,7 +950,8 @@ body.arlo {
 .arlo#arlo .upcoming .arlo-places-remaining,
 .arlo#arlo .button.arlo-waiting-list:hover,
 .arlo#arlo .arlo-event_tags-list > li,
-.arlo#arlo .arlo-event-offers .discount  {
+.arlo#arlo .arlo-event-offers .discount,
+.arlo#arlo .arlo-social-media a:hover  {
     color: #f97070;
 }
 
@@ -959,7 +979,8 @@ body.arlo {
 .arlo#arlo .next.page-numbers,
 .arlo#arlo select,
 .arlo#arlo .upcoming .button.arlo-waiting-list,
-.arlo#arlo .presenter-events li {
+.arlo#arlo .presenter-events li,
+.arlo#arlo .arlo-social-media a {
     background-color: #f8f8f8;
 }
 
@@ -972,7 +993,8 @@ body.arlo {
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a,
 .arlo#arlo .arlo-category-list a,
 .arlo#arlo .arlo-color3,
-.arlo#arlo .button.arlo-waiting-list {
+.arlo#arlo .button.arlo-waiting-list,
+.arlo#arlo .arlo-social-media a {
     color: #383838;
 }
 

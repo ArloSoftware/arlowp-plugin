@@ -434,9 +434,10 @@ body.arlo {
 .arlo#arlo .prev.page-numbers,
 .arlo#arlo .next.page-numbers,
 .arlo#arlo .arlo-category-list a,
-.arlo#arlo .arlo-filters select,
+.arlo#arlo select,
 .arlo#arlo .arlo-filters-buttons a,
-.arlo#arlo .arlo-show-more-link {
+.arlo#arlo .arlo-show-more-link,
+.arlo#arlo .arlo-social-media a {
     padding: .5em 1em;
     display: block;
     border-radius: 6px;
@@ -463,9 +464,10 @@ body.arlo {
     .arlo#arlo .prev.page-numbers,
     .arlo#arlo .next.page-numbers,
     .arlo#arlo .arlo-category-list a,
-    .arlo#arlo .arlo-filters select,
+    .arlo#arlo select,
     .arlo#arlo .arlo-filters-buttons a,
-    .arlo#arlo .arlo-show-more-link {
+    .arlo#arlo .arlo-show-more-link,
+    .arlo#arlo .arlo-social-media a {
         display: inline-block;
     }
 }
@@ -476,18 +478,19 @@ body.arlo {
 .arlo#arlo .prev.page-numbers:after,
 .arlo#arlo .next.page-numbers:after,
 .arlo#arlo .arlo-category-list a:after,
-.arlo#arlo .arlo-show-more-link:after {
-	content: "";
-	position: absolute;
-	left: 0;
-	top: 0;
-	height: 100%;
-	width: 0;
-	z-index: 1;
-	-webkit-transition: all .3s;
-	-moz-transition: all .3s;
-	transition: all .3s;
-	background: rgba(0,0,0,.05);
+.arlo#arlo .arlo-show-more-link:after,
+.arlo#arlo .arlo-social-media a:after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 0;
+    z-index: 1;
+    -webkit-transition: all .3s;
+    -moz-transition: all .3s;
+    transition: all .3s;
+    background: rgba(0,0,0,.05);
 }
 
 .arlo#arlo .arlo-button:hover:after,
@@ -496,8 +499,9 @@ body.arlo {
 .arlo#arlo .prev.page-numbers:hover:after,
 .arlo#arlo .next.page-numbers:hover:after,
 .arlo#arlo .arlo-category-list a:hover:after,
-.arlo#arlo .arlo-show-more-link:hover:after {
-	width: 100%;
+.arlo#arlo .arlo-show-more-link:hover:after,
+.arlo#arlo .arlo-social-media a:hover:after {
+    width: 100%;
 }
 
 
@@ -602,6 +606,7 @@ body.arlo {
 
 .arlo#arlo .arlo-list.upcoming li {
     margin-bottom: 3em;
+    padding: 0;
 }
 
 .arlo#arlo .arlo-cal {
@@ -613,6 +618,14 @@ body.arlo {
     line-height: 1;
     font-size: 1.4em;
     padding: 1em .25em;
+}
+
+.arlo#arlo .arlo-event-details {
+    max-width: none;
+}
+
+.arlo#arlo .arlo-event-registration {
+    text-align: left;
 }
 
 .arlo#arlo .upcoming .arlo-cal .arlo-day {
@@ -706,12 +719,14 @@ body.arlo {
 .arlo#arlo .arlo-list.events {
     margin-bottom: 1.5em;
     width: 100%;
+    clear: both;
 }
 
 .arlo#arlo .arlo-list.events .arlo-event {
     display: inline-block;
     vertical-align: top;
     margin-bottom: .5em;
+    padding: 0;
 }
 
 .arlo#arlo .arlo-list.events .arlo-online-activity,
@@ -733,6 +748,7 @@ body.arlo {
     padding: 1.5em 1.8em;
     line-height: 1.8;
     margin-top: .5em;
+    margin-bottom: 1em;
 }
 
 .arlo#arlo .arlo-list.events .arlo-online-activity h3 {
@@ -767,6 +783,7 @@ body.arlo {
 .arlo#arlo .arlo-list.events .arlo-event-registration,
 .arlo#arlo .arlo-list.events .arlo-oa-registration {
     margin-top: 1em;
+    text-align: left;
 }
 
 .arlo#arlo .arlo-event_tags-list > li {
@@ -824,6 +841,7 @@ body.arlo {
 
 .arlo#arlo .arlo-tooltip-button {
     font-weight: bold;
+    text-align: left;
 }
 
 .arlo#arlo .arlo-event .arlo-event-full {
@@ -867,6 +885,13 @@ body.arlo {
     max-width: 100%;
 }
 
+@media (min-width: 550px) {
+    .arlo#arlo .arlo-social-media a {
+        margin-right: .5em;
+    }
+}
+
+
 
 
 /* Sessions tooltips */
@@ -904,34 +929,35 @@ body.arlo {
     margin-bottom: 1em;
 }
 
-.arlo#arlo .arlo-filters select,
+.arlo#arlo select,
 .arlo#arlo .arlo-filters-buttons,
 .arlo#arlo .arlo-filters-buttons a {
     width: 100%;
 }
 
 @media (min-width: 750px) {
-    .arlo#arlo .arlo-filters select,
+    .arlo#arlo select,
     .arlo#arlo .arlo-filters-buttons,
     .arlo#arlo .arlo-filters-buttons a {
         width: auto;
     }
 
-    .arlo#arlo .arlo-filters select {
+    .arlo#arlo select {
         margin-right: .5em;
     }
 }
 
-.arlo#arlo .arlo-filters select {
+.arlo#arlo select {
     border: none;
     margin-bottom: .5em;
 }
 
 .arlo#arlo .arlo-filters-buttons {
     display: inline-block;
+    margin-top: 0;
 }
 
-.arlo#arlo .arlo-filters select,
+.arlo#arlo select,
 .arlo#arlo .arlo-filters-buttons {
     float: left;
 }
@@ -990,7 +1016,8 @@ body.arlo {
 .arlo#arlo .upcoming .arlo-places-remaining,
 .arlo#arlo .button.arlo-waiting-list:hover,
 .arlo#arlo .arlo-event_tags-list > li,
-.arlo#arlo .arlo-event-offers .discount  {
+.arlo#arlo .arlo-event-offers .discount,
+.arlo#arlo .arlo-social-media a:hover {
     color: #f97070;
 }
 
@@ -1016,9 +1043,10 @@ body.arlo {
 .arlo#arlo .arlo-background-color2,
 .arlo#arlo .prev.page-numbers,
 .arlo#arlo .next.page-numbers,
-.arlo#arlo .arlo-filters select,
+.arlo#arlo select,
 .arlo#arlo .upcoming .button.arlo-waiting-list,
-.arlo#arlo .presenter-events li {
+.arlo#arlo .presenter-events li,
+.arlo#arlo .arlo-social-media a {
     background-color: #f8f8f8;
 }
 
@@ -1031,7 +1059,8 @@ body.arlo {
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a,
 .arlo#arlo .arlo-category-list a,
 .arlo#arlo .arlo-color3,
-.arlo#arlo .button.arlo-waiting-list {
+.arlo#arlo .button.arlo-waiting-list,
+.arlo#arlo .arlo-social-media a {
     color: #383838;
 }
 

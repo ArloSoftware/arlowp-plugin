@@ -2,8 +2,12 @@
 
 [arlo_presenter_profile label='<h5>Profile</h5>']
 [arlo_presenter_qualifications label='<h5>Qualifications</h5>']
-[arlo_presenter_social_link network='Facebook' linktext='Check out my Facebook!']
-[arlo_presenter_social_link network='Twitter' linktext='Check out my Twitter!']
+
+<div class="arlo-social-media">
+	[arlo_presenter_social_link network='Facebook' linktext='Facebook']
+	[arlo_presenter_social_link network='Twitter' linktext='Twitter']
+	[arlo_presenter_social_link network='Linkedin' linktext='Linkedin']
+</div>
 
 [arlo_label label='<h5>Events</h5>']
     [arlo_presenter_events_list]
