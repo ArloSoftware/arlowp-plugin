@@ -4,73 +4,27 @@ $arlo_plugin = Arlo_For_Wordpress::get_instance();
 $arlo_plugin_slug = $arlo_plugin->get_plugin_slug();
 
 /*
- * Add event category to title when filtered by a category
+ * Change meta title
  */
-add_filter( 'the_title', function($title, $id = null){
-	global $post, $arlo_plugin;
-	
-	$import_id = $arlo_plugin->get_importer()->get_current_import_id();	
-	
-	$title = htmlentities($title, ENT_QUOTES, "UTF-8", false);
-	
-	$settings = get_option('arlo_settings');
-	
-	$pages = [];
-	
-	if (!empty($settings['post_types']['event']['posts_page'])) {
-		array_push($pages, $settings['post_types']['event']['posts_page']);
-	}
-	
-	if (!empty($settings['post_types']['eventsearch']['posts_page'])) {
-		array_push($pages, $settings['post_types']['eventsearch']['posts_page']);
+add_filter( 'document_title_parts', function($title) {
+	global $post;
+
+	$new_title = set_title($title['title'], $post->ID, true);
+
+	if (!empty($new_title['subtitle'])) {
+		$title['title'] = $new_title['subtitle'] . ' - ' . $new_title['title'];
 	}
 
-	if (!empty($settings['post_types']['upcoming']['posts_page'])) {
-		array_push($pages, $settings['post_types']['upcoming']['posts_page']);
-	}
-	
-	$subtitle = '';
-	
-	$arlo_category = isset($_GET['arlo-category']) && !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : get_query_var('arlo-category', '');
-	
-	$cat_slug = !empty($arlo_category) ? $arlo_category : '';	
-	
-	$cat = null;
-	
-	if (!empty($cat_slug))
-		$cat = \Arlo\Entities\Categories::get(array('slug' => $cat_slug), null, $import_id);
-		
-		
-	$location = !empty($_GET['arlo-location']) ? $_GET['arlo-location'] : get_query_var('arlo-location', '');
-	$search = !empty($_GET['arlo-search']) ? $_GET['arlo-search'] : get_query_var('arlo-search', '');	
-		
-	$location = stripslashes(urldecode($location));
-	$search = stripslashes(urldecode($search));
-		
-	if ($id === null || !in_array($id, $pages) || $id != $post->ID || !in_the_loop() || is_nav_menu_item($id)) return $title;
-		
-	if(!$cat && empty($location) && empty($search)) return $title;
-	
-	if (!empty($cat->c_name)) {
-		$subtitle = $cat->c_name;
-		
-		if (!empty($location)) {
-			$subtitle .= ' (' . $location . ')';
-		}
-	} else if (!empty($location)) {
-		$subtitle = htmlentities($location);		
-	} else if (!empty($search)) {
-		$subtitle = htmlentities($search);
-	}
-	
-	// append category name to events page
-	if (!empty($subtitle)) {
-		$subtitle = htmlentities($subtitle, ENT_QUOTES, "UTF-8");
-		$subtitle = '<span class="cat-title-ext">' . (!empty($title) ? ': ':'') . $subtitle . ' </span>';
-	}
-        
-	return $title . $subtitle;
-	
+	return $title;
+}, 10, 2);
+
+/*
+ * Add event category to title when filtered by a category
+ */
+add_filter( 'the_title', function($title, $id = null) {
+	$new_title = set_title($title, $id);
+
+	return $new_title['title'] . (!empty($new_title['subtitle']) ? '<span class="cat-title-ext">' . (!empty($new_title['title']) ? ': ':'') . $new_title['subtitle'] . ' </span>' : '' ) ;
 }, 10, 2);
 
 /*
@@ -106,6 +60,81 @@ add_filter('page_template', function($template){
 
 	return $template;
 }, 100, 1);
+
+/**
+ * set the title based on category, search and location
+ *
+ * @since    3.0.0
+ *
+ */
+ 
+function set_title($title, $id = null, $meta = false){
+	global $post, $arlo_plugin;
+
+	$import_id = $arlo_plugin->get_importer()->get_current_import_id();	
+	
+	$title = htmlentities($title, ENT_QUOTES, "UTF-8", false);
+	
+	$settings = get_option('arlo_settings');
+	
+	$pages = [];
+	
+	if (!empty($settings['post_types']['event']['posts_page'])) {
+		array_push($pages, $settings['post_types']['event']['posts_page']);
+	}
+	
+	if (!empty($settings['post_types']['eventsearch']['posts_page'])) {
+		array_push($pages, $settings['post_types']['eventsearch']['posts_page']);
+	}
+
+	if (!empty($settings['post_types']['upcoming']['posts_page'])) {
+		array_push($pages, $settings['post_types']['upcoming']['posts_page']);
+	}
+	
+	$subtitle = '';
+	
+	$arlo_category = isset($_GET['arlo-category']) && !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : get_query_var('arlo-category', '');
+	
+	$cat_slug = !empty($arlo_category) ? $arlo_category : '';	
+	
+	$cat = null;
+
+	if (!empty($cat_slug))
+		$cat = \Arlo\Entities\Categories::get(array('slug' => $cat_slug), null, $import_id);
+		
+		
+	$location = !empty($_GET['arlo-location']) ? $_GET['arlo-location'] : get_query_var('arlo-location', '');
+	$search = !empty($_GET['arlo-search']) ? $_GET['arlo-search'] : get_query_var('arlo-search', '');	
+		
+	$location = stripslashes(urldecode($location));
+	$search = stripslashes(urldecode($search));
+
+	if ($id === null || !in_array($id, $pages) || $id != $post->ID || (!in_the_loop() && !$meta) || is_nav_menu_item($id)) return ['title' => $title];
+	
+	if(!$cat && empty($location) && empty($search)) return ['title' => $title];
+	
+	if (!empty($cat->c_name)) {
+		$subtitle = $cat->c_name;
+		
+		if (!empty($location)) {
+			$subtitle .= ' (' . $location . ')';
+		}
+	} else if (!empty($location)) {
+		$subtitle = htmlentities($location);		
+	} else if (!empty($search)) {
+		$subtitle = htmlentities($search);
+	}
+	
+	// append category name to events page
+	if (!empty($subtitle)) {
+		$subtitle = htmlentities($subtitle, ENT_QUOTES, "UTF-8");
+	}
+        
+	return [
+		'title' => $title,
+		'subtitle' => $subtitle
+	];
+}
 
 /**
  * Registers the arlo custom post types
