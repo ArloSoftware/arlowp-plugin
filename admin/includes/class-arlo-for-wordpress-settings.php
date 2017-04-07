@@ -761,7 +761,7 @@ class Arlo_For_Wordpress_Settings {
 			<div id="arlo-themes-for-designers">
 				<p>
 				' . __('Themes that include "For designers" label provide maximum flexibility as they inherit some of the main website’s styles. They will however require additional work by a web designer to fix any inadvertent styling issues.', 'arlo-for-wordpress' ) . '
-				<br /> <a href="">' . __('Learn more', 'arlo-for-wordpress') . '</a></p>
+				<br /> <a href="https://support.arlo.co/hc/en-gb/articles/115001738403" target="_blank">' . __('Learn more', 'arlo-for-wordpress') . '</a></p>
 			</div>
 		</div>
 	    ';
