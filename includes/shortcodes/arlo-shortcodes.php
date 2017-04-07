@@ -23,7 +23,12 @@ class Shortcodes {
 			return self::shortcode_timezones($content, $atts, $shortcode_name, $import_id);	
 		});
 
-		// timezones
+		// search_field
+		self::add('search_field', function($content = '', $atts, $shortcode_name, $import_id){
+			return self::shortcode_search_field($content, $atts, $shortcode_name, $import_id);	
+		});
+
+		// label
 		self::add('label', function($content = '', $atts, $shortcode_name, $import_id){
 			return $content;
 		});
@@ -186,6 +191,33 @@ class Shortcodes {
 		";
 		return $wpdb->get_results($sql, ARRAY_A);
 	}
+
+	private static function shortcode_search_field($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+		global $post, $wpdb;
+
+		extract(shortcode_atts(array(
+			'showbutton' => "true",
+			'buttonclass' => '',
+			'inputclass' => '',
+			'placeholder' => __('Search for an event', 'arlo-for-wordpress'),
+            'buttontext'	=> __('Search', 'arlo-for-wordpress'),
+        ), $atts, $shortcode_name, $import_id));
+
+		$settings = get_option('arlo_settings');
+		if (!empty($settings['post_types']['eventsearch']['posts_page'])) {
+
+			$slug = get_post($settings['post_types']['eventsearch']['posts_page'])->post_name;
+				
+			$search_term = !empty($_GET['arlo-search']) ? $_GET['arlo-search'] : get_query_var('arlo-search', '');
+			
+			return '
+			<form class="arlo-search" action="'.site_url().'/'.$slug.'/">
+				<input type="text" class="arlo-search-field ' . $inputclass . '" placeholder="'. $placeholder .'" name="arlo-search" value="' . stripslashes(esc_attr(urldecode($search_term))) . '">
+				' . ($showbutton == "true" ? '<input type="submit" class="arlo-search-button ' . $buttonclass . '" value="' . $buttontext . '">' : '') . '
+			</form>
+			';	
+		}
+	}	
 
 	private static function shortcode_timezones($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
 		global $post, $wpdb;
