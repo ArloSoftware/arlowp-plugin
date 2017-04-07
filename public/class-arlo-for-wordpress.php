@@ -134,7 +134,7 @@ class Arlo_For_Wordpress {
 
 			array(
 				'name'				=> 'events',
-				'title'				=> 'Events',
+				'title'				=> 'Catalogue',
 				'content' 			=> '[arlo_event_template_list]',
 				'child_post_type'	=> 'event'
 			),
@@ -146,7 +146,7 @@ class Arlo_For_Wordpress {
 			),			
 			array(
 				'name'				=> 'upcoming',
-				'title'				=> 'Upcoming Events',
+				'title'				=> 'Upcoming',
 				'content' 			=> '[arlo_upcoming_list]'
 			),
 			array(
