@@ -721,6 +721,7 @@ class Arlo_For_Wordpress_Settings {
 						' . (!empty($theme_data->icon) ? '<div class="arlo-theme-icon"><i class="icons8 ' . $theme_data->icon . ' size-48 "></i></div>' : '') . '
 						<div class="arlo-theme-name">' . htmlentities(strip_tags($theme_data->name)) . '</div>
 						<div class="arlo-theme-description">' . $theme_data->description . '</div>
+						' . (!empty($theme_data->forDesigners) && $theme_data->forDesigners ? '<div class="arlo-theme-for-designer">Learn about themes <a href="javascript:;" data-fancybox="modal" data-src="#arlo-themes-for-designers">"For designers"</a></div>' : '') . '
 					</div>
 				';
 
@@ -733,7 +734,7 @@ class Arlo_For_Wordpress_Settings {
 			echo '
 			<li class="arlo-theme">
 				<div class="arlo-theme-desc ' . (count($images) == 0 ? 'arlo-theme-inverse' : '') . '">
-					' . (!empty($theme_data->forDesigners) && $theme_data->forDesigners ? '<div class="arlo-themes-developer-banner">For<br />designers</div>' : '') . '
+					' . (!empty($theme_data->forDesigners) && $theme_data->forDesigners ? '<div class="arlo-themes-developer-banner" data-fancybox="modal" data-src="#arlo-themes-for-designers">For<br />designers</div>' : '') . '
 					
 					' . $desc[0] . '
 					<div class="arlo-theme-overlay">' . $overlay  . '</div>

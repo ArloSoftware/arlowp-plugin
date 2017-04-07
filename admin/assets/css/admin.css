@@ -453,7 +453,7 @@ table.arlo-welcome td.logo {
 .arlo-themes .arlo-theme .arlo-theme-desc .arlo-theme-desc-text {
 	line-height: 1em;
 	font-size: 1em;
-	margin-top: 5.5em;
+	margin-top: 5em;
 }
 
 .arlo-themes .arlo-theme .arlo-theme-desc .arlo-theme-desc-text .arlo-theme-name {
@@ -513,6 +513,12 @@ table.arlo-welcome td.logo {
 	color: black;
 }
 
+.arlo-themes .arlo-theme .arlo-theme-desc .arlo-theme-desc-text .arlo-theme-for-designer {
+	color:red;
+	margin-top: 1em;
+	text-align: center;
+}
+
 .arlo-themes .arlo-theme .arlo-theme-desc.arlo-theme-inverse .arlo-theme-overlay {
 	background-color: darkgray;
 }
@@ -530,6 +536,10 @@ table.arlo-welcome td.logo {
 
 .arlo-themes .arlo-theme .arlo-theme-desc:hover > .arlo-theme-desc-text{
 	opacity: 0;
+}
+
+.arlo-themes .arlo-theme .arlo-theme-desc:hover.arlo-theme-inverse .arlo-theme-desc-text .arlo-theme-for-designer {
+	color: white;
 }
 
 .arlo-themes .arlo-theme .arlo-theme-information {
@@ -562,6 +572,7 @@ table.arlo-welcome td.logo {
 	-webkit-transition: opacity .25s ease-in-out;
 	-moz-transition: opacity .25s ease-in-out;
 	transition: opacity .25s ease-in-out;
+	cursor: pointer;
 }
 
 .arlo-themes .arlo-theme .arlo-theme-desc.arlo-theme-inverse:hover .arlo-themes-developer-banner {
