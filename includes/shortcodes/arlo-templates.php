@@ -585,7 +585,7 @@ class Templates {
         
         // merge and extract attributes
         extract(shortcode_atts(array(
-            'text'	=> __('Suggest another date/location', 'arlo-for-wordpress'),
+            'text'	=> __('None of these dates work for you? %s Suggest another date & time %s', 'arlo-for-wordpress'),
         ), $atts, $shortcode_name, $import_id));
         
         if(!isset($GLOBALS['arlo_eventtemplate']['et_registerinteresturi']) || empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) return '';
@@ -623,7 +623,7 @@ class Templates {
             return '';
         }
         
-        $content = '<a href="' . $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'] . '" class="arlo-register-interest">' . htmlentities($text, ENT_QUOTES, "UTF-8") . '</a>';
+        $content = sprintf(htmlentities($text, ENT_QUOTES, "UTF-8"), '<a href="' . $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'] . '" class="arlo-register-interest">', '</a>');
 
         return $content;
     }   
