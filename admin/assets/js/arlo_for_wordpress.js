@@ -439,16 +439,18 @@ if (typeof (Arlo) === "undefined") {
 			});	
 
 			$(".theme-apply").click(function(e) {
-				var message = "Do you really want to replace ALL the existing templates with the selected theme?",
+				var pre_message = "WARNING: ",
+					post_message = " You will not be able to recover any customisations if you proceed.",
+					message = "Do you really want to replace ALL the current templates with the selected theme?",
 					target = $(e.currentTarget);
 
 				e.preventDefault();
 
 				if (target.hasClass('theme-reset')) {
-					message = "Do you really want to reset ALL the existing templates with the originals?"
+					message = "Are you sure you want to delete / reset any customisations you have made and reapply the default theme?"
 				}
 
-				if (confirm(message)) {
+				if (confirm(pre_message + message + post_message)) {
 					document.location = target.attr('href');
 				} 				
 			})
