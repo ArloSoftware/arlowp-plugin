@@ -4,7 +4,7 @@
     </div>
 
     [arlo_template_region_selector]
-    [arlo_event_template_filters]
+    [arlo_event_filters]
     [arlo_timezones wrap="<div class='arlo-timezone-toggle'>%s</div>"]
 
     <ul class="arlo-list arlo-show-more events" data-show="3" data-show-text="Show more">
