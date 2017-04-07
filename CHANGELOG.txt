@@ -6,6 +6,7 @@ Enhancement
 New, improved, more reliable import
 Revamp the codebase behind the plugin
 New [arlo_event_filters] shortcode
+New [arlo_search_field] shortcode
 New built-in theme selection
 
 Bugfixes

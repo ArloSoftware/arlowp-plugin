@@ -622,6 +622,7 @@ class Arlo_For_Wordpress_Settings {
 	    	<ul class="arlo-whatsnew-list">	    
 	    		<li>New, improved, more reliable <a href="http://developer.arlo.co/doc/wordpress/import#import-snapshot" target="_blank">snapshot import</a></li>
 				<li>New <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_filters" target="_blank">[arlo_event_filters]</a> shortcode</li>
+				<li>New <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/#arlo_search_field" target="_blank">[arlo_search_field]</a> shortcode</li>
 				<li>Minor fixes and improvements</li>
 				<li>Revamp the codebase behind the plugin</li>
 				<li>New built-in theme selection</li>

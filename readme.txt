@@ -161,6 +161,8 @@ Minor fixes and improvements
 
 New [arlo_event_filters] shortcode
 
+New [arlo_search_field] shortcode
+
 New builtin theme selection
 
 = 2.4.1.2 = 
