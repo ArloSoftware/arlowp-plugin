@@ -326,7 +326,11 @@ class Arlo_For_Wordpress_Settings {
 		 
 		add_settings_section('arlo_theme_section', null, null, $this->plugin_slug );				
 		add_settings_field( 'arlo_theme', null, array($this, 'arlo_theme_callback'), $this->plugin_slug, 'arlo_theme_section', array('id'=>'theme') );
-		
+
+		/* Theme Section Settings */ 
+		 
+		add_settings_section('arlo_support_section', null, null, $this->plugin_slug );				
+		add_settings_field( 'arlo_support', null, array($this, 'arlo_support_callback'), $this->plugin_slug, 'arlo_support_section', array('id'=>'support') );
 
 		/* System requirements */
 
@@ -689,6 +693,21 @@ class Arlo_For_Wordpress_Settings {
 		}
 
 		echo '</table>';
+	} 
+
+	function arlo_support_callback () {
+		echo '
+		<h3>' . __('Support', 'arlo-for-wordpress') . '</h3>
+		<p>
+			<ul class="arlo-whatsnew-list">
+				<li><a href="http://developer.arlo.co/doc/wordpress/index" target="_blank">Arlo for WordPress developer documentation</a> - Technical documentation on the setup and configuration of the Arlo for WordPress plugin. </li>
+				<li><a href="https://support.arlo.co/hc/en-gb/sections/202320663-Website-Integration-Information" target="_blank">General Arlo website integration documentation</a> - General documentation on Arlo website integration including checkout and registration page options, custom URLs and the Arlo web team’s services.   </li>
+				<li><a href="https://support.arlo.co/hc/en-gb/sections/202320703-WordPress-Plugin" target="_blank">Arlo for WordPress support  documentation</a> - Documentation on Arlo for WordPress plugin including the synchronisation between Arlo and WordPress, FAQ’s and troubleshooting.  </li>
+				<li><a href="https://support.arlo.co/hc/en-gb/sections/115000452543-WordPress-Control-Themes" target="_blank">Arlo for WordPress control themes</a> - Documentation on the available Arlo for WordPress control themes and customisation options.</li>
+				<li>Can\'t find what you\'re looking for? <a href="https://support.arlo.co/hc/en-gb/requests/new/" target="_blank">Submit a ticket</a></li>
+			</ul>
+		</p>
+		';
 	} 
 
 	function arlo_theme_callback($args) {

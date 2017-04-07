@@ -26,6 +26,7 @@
 				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#misc" class="nav-tab" id="<?=$this->plugin_slug?>-tab-misc">Misc</a>
 				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#systemrequirements" class="nav-tab" id="<?=$this->plugin_slug?>-tab-systemrequirements">System Requirements</a>
 				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#changelog" class="nav-tab" id="<?=$this->plugin_slug?>-tab-changelog">Changelog</a>
+				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#support" class="nav-tab" id="<?=$this->plugin_slug?>-tab-support">Support</a>
 			</h2>		
 			<?php settings_fields( 'arlo_settings' ); ?>
             <?php $this->do_settings_sections( $this->plugin_slug ); ?>
