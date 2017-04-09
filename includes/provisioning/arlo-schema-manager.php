@@ -479,13 +479,13 @@ class SchemaManager {
 			
 		$sql = "CREATE TABLE $table_name (
 			  	id mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
-				request_id varchar(63) CHARACTER SET " . $this->dbl->charset . " NOT NULL,  
+				request_id varchar(63) NOT NULL,  
 				import_id int(10) unsigned NOT NULL,
 				fragmented bit(1) NOT NULL DEFAULT b'1', 
 				response_json text NULL DEFAULT NULL,
 				callback_json text NULL DEFAULT NULL,
-				nonce varchar(63) CHARACTER SET " . $this->dbl->charset . " NOT NULL,
-				type enum('full') CHARACTER SET " . $this->dbl->charset . " NOT NULL DEFAULT 'full',
+				nonce varchar(63) NOT NULL,
+				type enum('full') NOT NULL DEFAULT 'full',
 				created datetime NOT NULL COMMENT 'in UTC',
 				modified datetime DEFAULT NULL COMMENT 'in UTC',
 				expired datetime NOT NULL COMMENT 'in UTC',

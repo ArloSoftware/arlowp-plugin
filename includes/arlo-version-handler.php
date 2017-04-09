@@ -158,10 +158,13 @@ class VersionHandler {
 
 				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_eventtemplates 
 				CHANGE et_code et_code VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
+				CHANGE et_name et_name VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
 				CHANGE et_post_name et_post_name VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
 				CHANGE et_advertised_duration et_advertised_duration VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
 				CHANGE et_region et_region VARCHAR(5) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
 				CHANGE et_descriptionsummary et_descriptionsummary TEXT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
+				CHANGE 	et_registerinteresturi 	et_registerinteresturi TEXT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
+				CHANGE 	et_viewuri 	et_viewuri TEXT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
 				DEFAULT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ";");
 				
 				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_contentfields 
