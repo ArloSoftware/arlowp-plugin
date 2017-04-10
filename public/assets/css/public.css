@@ -383,6 +383,8 @@ p.arlo-no-results {
 	font-size: 10px;
 	opacity: 0.5;
 	text-decoration: none;
+	clear:both;
+	margin-bottom: 1em;
 }
 
 .arlo-powered-by i {
