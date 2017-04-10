@@ -1,6 +1,6 @@
 {
     "version": 1.0,
-    "order": 4,
+    "order": 3,
     "name": "Block",
     "description": "Design includes key information displayed within boxes",
     "forDesigners": false,
