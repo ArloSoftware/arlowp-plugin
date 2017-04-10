@@ -353,7 +353,7 @@ function arlo_the_content_event($content) {
 	LEFT JOIN 
 		$t2 post 
 	ON 
-		et.et_post_name = post.post_name 
+		et.et_post_id = post.ID
 	WHERE 
 		post.post_type = 'arlo_event' 
 	AND 

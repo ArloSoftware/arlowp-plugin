@@ -332,6 +332,7 @@ class UpcomingEvents {
             et.et_id,
             et.et_name, 
             et.et_post_name, 
+            et.et_post_id,
             et.et_descriptionsummary, 
             et.et_registerinteresturi, 
             et.et_region,

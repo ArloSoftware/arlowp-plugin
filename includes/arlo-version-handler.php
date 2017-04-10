@@ -147,44 +147,6 @@ class VersionHandler {
 			break;
 
 			case '3.0':
-
-				$this->dbl->init_charset();
-
-				$charset = $this->dbl->get_var("SELECT character_set_name
-							FROM information_schema.columns
-							WHERE 1 
-							AND TABLE_NAME =  '" . $this->dbl->prefix . "posts'
-							AND COLUMN_NAME =  'post_name'");
-				
-				if (is_null($charset)) 
-					$charset = $this->dbl->charset;
-
-				$collation_query_string = '';
-				$collation = $this->dbl->get_var("SELECT COLLATION_NAME
-								FROM information_schema.columns
-								WHERE 1 
-								AND TABLE_NAME =  '" . $this->dbl->prefix . "posts'
-								AND COLUMN_NAME =  'post_name'");
-				
-				if (!is_null($collation))
-					$collation_query_string = " COLLATE " . $collation;
-
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_async_tasks CONVERT TO CHARACTER SET " . $charset . $collation_query_string);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_async_task_data CONVERT TO CHARACTER SET " . $charset . $collation_query_string);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_eventtemplates CONVERT TO CHARACTER SET " . $charset . $collation_query_string);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_contentfields CONVERT TO CHARACTER SET " . $charset . $collation_query_string);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events CONVERT TO CHARACTER SET " . $charset . $collation_query_string);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_onlineactivities CONVERT TO CHARACTER SET " . $charset . $collation_query_string);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_venues CONVERT TO CHARACTER SET " . $charset . $collation_query_string);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_presenters CONVERT TO CHARACTER SET " . $charset . $collation_query_string);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_categories CONVERT TO CHARACTER SET " . $charset . $collation_query_string);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_offers CONVERT TO CHARACTER SET " . $charset . $collation_query_string);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_tags CONVERT TO CHARACTER SET " . $charset . $collation_query_string);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_categories CONVERT TO CHARACTER SET " . $charset . $collation_query_string);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_timezones CONVERT TO CHARACTER SET " . $charset . $collation_query_string);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_log CONVERT TO CHARACTER SET " . $charset . $collation_query_string);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_messages CONVERT TO CHARACTER SET " . $charset . $collation_query_string);
-
 				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events DROP e_summary;");
 				$this->dbl->query("DROP TABLE " . $this->dbl->prefix . "arlo_timezones_olson;");
 			break;					
@@ -319,6 +281,31 @@ class VersionHandler {
 			break;	
 
 			case '3.0':
+				//update post_id in the templates table
+				$import_id = get_option('arlo_import_id','');
+				if (!empty($import_id)) {
+					$sql = '
+					SELECT
+						et_id,
+						et_post_name
+					FROM 
+						' .  $this->dbl->prefix . 'arlo_eventtemplates
+					WHERE
+						import_id = ' . $import_id . '
+					AND
+						(et_post_id IS NULL OR et_post_id = 0)
+					';
+					$items = $this->dbl->get_results($sql);
+					if (is_array($items) && count($items)) {
+						foreach($items as $key => $item) {
+							$post = arlo_get_post_by_name($item->et_post_name, 'arlo_event');
+							if (!is_null($post) && !empty($post->ID) && $post->ID > 0) {
+								$this->dbl->update($this->dbl->prefix . 'arlo_eventtemplates', array( 'et_post_id' => $post->ID), array( 'et_id' => $item->et_id ));
+							}
+						}
+					}
+				}
+
 				$theme_id = 'custom';
 				update_option('arlo_theme', $theme_id, 1);
 
@@ -356,7 +343,7 @@ class VersionHandler {
 
 				//kick off an import
 				if (get_option('arlo_import_disabled', '0') != '1')
-					$this->plugin->get_scheduler()->set_task("import", -1);					
+					//$this->plugin->get_scheduler()->set_task("import", -1);					
 			break;
 		}	
 	}	

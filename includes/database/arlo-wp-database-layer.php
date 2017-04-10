@@ -85,4 +85,8 @@ class WPDatabaseLayer extends DatabaseLayer {
 	public function get_col_charset($table, $column) {
 		return $this->wpdb->get_col_charset($table, $column);
 	}
+
+	public function update( $table, $data, $where, $format = null, $where_format = null ) {
+		return $this->wpdb->update($table, $data, $where, $format, $where_format);
+	}
 }

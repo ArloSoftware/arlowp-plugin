@@ -124,7 +124,7 @@ class Arlo_For_Wordpress_OnlineActivities extends Arlo_For_Wordpress_Lists  {
 		LEFT JOIN
 			" . $this->wpdb->prefix . "posts AS posts
 		ON
-			et.et_post_name = posts.post_name
+			et.et_post_id = posts.ID
 		WHERE
 			" . $where . "
 		GROUP BY

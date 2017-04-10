@@ -309,7 +309,8 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 			e.e_startdatetime, 
 			e.e_locationname, 
 			et.et_name, 
-			et.et_post_name
+			et.et_post_name,
+			et.et_post_id
 		FROM 
 			$t1 AS e 
 		LEFT JOIN 

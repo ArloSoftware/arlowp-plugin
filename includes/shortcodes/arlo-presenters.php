@@ -224,7 +224,7 @@ class Presenters {
 
         $items = $wpdb->get_results(
             "SELECT 
-                et.et_name, et.et_post_name 
+                et.et_name, et.et_post_name,et_post_id
             FROM 
                 $t1 et
             LEFT JOIN 

@@ -131,12 +131,14 @@ class SchemaManager {
 			et_name varchar(255) NULL,
 			et_descriptionsummary text NULL,
 			et_post_name varchar(255) NULL,
+			et_post_id int(10) unsigned DEFAULT NULL, 
 			et_advertised_duration varchar(255) NULL,
 			import_id int(10) unsigned DEFAULT NULL,
 			et_registerinteresturi text NULL,
 			et_viewuri text NULL,
 			et_region varchar(5) NULL,
 			PRIMARY KEY  (et_id),
+			KEY et_post_id (et_post_id), 
 			KEY et_arlo_id (et_arlo_id),
 			KEY et_region (et_region))
 			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";";

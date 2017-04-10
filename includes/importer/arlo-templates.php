@@ -16,32 +16,38 @@ class Templates extends BaseImporter {
 
 	protected function save_entity($item) {
 		$this->slug = sanitize_title($item->TemplateID . ' ' . $item->Name);
-		$query = $this->dbl->query(
-			$this->dbl->prepare( 
-				"INSERT INTO " . $this->table_name ." 
-				(et_arlo_id, et_code, et_name, et_descriptionsummary, et_advertised_duration, et_post_name, import_id, et_registerinteresturi, et_viewuri, et_region) 
-				VALUES ( %d, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
-				", 
-				$item->TemplateID,
-				@$item->Code,
-				$item->Name,
-				@$item->Description->Summary,
-				@$item->AdvertisedDuration,
-				$this->slug,
-				$this->import_id,
-				!empty($item->RegisterInterestUri) ? $item->RegisterInterestUri : '',
-				!empty($item->ViewUri) ? $item->ViewUri : '',
-				(!empty($item->Region) ? $item->Region : '')
-			)
-		);
-						
-		if ($query === false) {
-			throw new \Exception('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query);
+		$post_id = $this->save_update_wp_post($item->Name, @$item->Description->Summary);
+
+		if ($post_id > 0) {
+			$query = $this->dbl->query(
+				$this->dbl->prepare( 
+					"INSERT INTO " . $this->table_name ." 
+					(et_arlo_id, et_code, et_name, et_descriptionsummary, et_advertised_duration, et_post_name, et_post_id, import_id, et_registerinteresturi, et_viewuri, et_region) 
+					VALUES ( %d, %s, %s, %s, %s, %s, %d, %s, %s, %s, %s) 
+					", 
+					$item->TemplateID,
+					@$item->Code,
+					$item->Name,
+					@$item->Description->Summary,
+					@$item->AdvertisedDuration,
+					$this->slug,
+					$post_id,
+					$this->import_id,
+					!empty($item->RegisterInterestUri) ? $item->RegisterInterestUri : '',
+					!empty($item->ViewUri) ? $item->ViewUri : '',
+					(!empty($item->Region) ? $item->Region : '')
+				)
+			);
+
+			if ($query === false) {
+				throw new \Exception('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query);
+			}
+			
+		} else {
+			throw new \Exception('WP Post creation error ' . $this->slug);
 		}
 		
 		$this->id = $this->dbl->insert_id;
-		
-		$this->save_update_wp_post($item->Name, @$item->Description->Summary);
 
 		//tags
 		if (isset($item->Tags) && !empty($item->Tags)) {
@@ -84,11 +90,13 @@ class Templates extends BaseImporter {
 		$post = arlo_get_post_by_name($this->slug, 'arlo_event');
 		
 		if(!$post) {					
-			wp_insert_post($post_config_array, true);						
+			$post_id = wp_insert_post($post_config_array, true);						
 		} else {
 			$post_config_array['ID'] = $post->ID;
-			wp_update_post($post_config_array);				
+			$post_id = wp_update_post($post_config_array);
 		}
+
+		return $post_id;
 	} 	
 
 	private function save_categories($categories, $template_id) {

@@ -74,7 +74,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
                         AND
                             e.import_id = ' . $import_id . '
                         AND 
-                            et_post_name = "' . $post->post_name . '"
+                            et_post_id = ' . $post->ID . '
                         ' . (!empty($arlo_region) ? 'AND e.e_region = "' . $arlo_region . '"' : '' ) . '
                         GROUP BY 
                             e.e_locationname 
@@ -220,7 +220,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
             WHERE 
                 $t1.import_id = $import_id
             AND
-                $t1.et_post_name = '$post->post_name'
+                $t1.et_post_id = $post->ID
             AND 
                 $t2.e_parent_arlo_id = 0
             $where

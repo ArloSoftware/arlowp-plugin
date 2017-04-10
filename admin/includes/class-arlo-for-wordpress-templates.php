@@ -134,7 +134,7 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 		LEFT JOIN 
 			" . $this->wpdb->prefix . "posts
 		ON
-			post_name = et_post_name			
+			ID = et_post_id
 		WHERE
 			" . $where . "
 		GROUP BY

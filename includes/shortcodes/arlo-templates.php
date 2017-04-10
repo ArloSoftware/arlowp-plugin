@@ -119,6 +119,7 @@ class Templates {
                 et.et_name,
                 et.et_descriptionsummary,
                 et.et_post_name,
+                et.et_post_id,
                 et.et_registerinteresturi 
             FROM 
                 {$wpdb->prefix}arlo_eventtemplates AS et
@@ -192,7 +193,7 @@ class Templates {
         if (!empty($GLOBALS['arlo_event_list_item']['et_id'])) {
             $where = $t1 . ".et_id = " . $GLOBALS['arlo_event_list_item']['et_id'];
         } else {
-            $where = $t1 . ".et_post_name = '" . $post->post_name . "'";
+            $where = $t1 . ".et_post_id = " . $post->ID;
         }
                 
         $sql = "
@@ -614,7 +615,7 @@ class Templates {
             AND
                 $t1.import_id = $t2.import_id
             WHERE 
-                $t1.et_post_name = '$post->post_name'
+                $t1.et_post_id = $post->ID
             AND
                 $t2.import_id = $import_id
             ", ARRAY_A);
@@ -810,7 +811,7 @@ class Templates {
             $t1 et 
         $join
         LEFT JOIN $t2 post 
-            ON et.et_post_name = post.post_name 
+            ON et.et_post_id = post.ID 
         LEFT JOIN $t3 etc
             ON etc.et_arlo_id = et.et_arlo_id AND etc.import_id = et.import_id
         LEFT JOIN $t4 c

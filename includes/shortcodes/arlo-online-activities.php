@@ -64,7 +64,7 @@ class OnlineActivities {
             AND
                 $t1.import_id = " . $import_id . "
             WHERE 
-                $t1.et_post_name = '$post->post_name'
+                $t1.et_post_name = $post->ID
             AND
                 $t2.import_id = ". $import_id ."
             $where
