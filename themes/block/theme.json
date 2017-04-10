@@ -2,7 +2,7 @@
     "version": 1.0,
     "order": 4,
     "name": "Block",
-    "description": "Block",
+    "description": "Design includes key information displayed within boxes",
     "forDesigners": false,
     "demoUrl": "",
     "externalResources": {
