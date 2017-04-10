@@ -534,13 +534,19 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
             'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id'],
             'parent_id' => 0
         );
-        
-        $events = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), 1, $import_id);
-        
-        if(empty($events)) return;
-        
-        $start = $events->e_startdatetime;
-        $end = $events->e_finishdatetime;
+
+        if (!empty($GLOBALS['arlo_event_list_item']['e_startdatetime']) && !empty($GLOBALS['arlo_event_list_item']['e_finishdatetime'])) {
+            $start = $GLOBALS['arlo_event_list_item']['e_startdatetime'];
+            $end = $GLOBALS['arlo_event_list_item']['e_finishdatetime'];
+        } else {
+            $events = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), 1, $import_id);
+            
+            if(empty($events)) return;
+            
+            $start = $events->e_startdatetime;
+            $end = $events->e_finishdatetime;
+        }
+
         $difference = strtotime($end)-strtotime($start);// seconds
 
         $hours = floor($difference/60/60);
