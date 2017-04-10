@@ -491,7 +491,7 @@ function arlo_get_template($name) {
 	$plugin = Arlo_For_Wordpress::get_instance();
 	$theme_manager = $plugin->get_theme_manager();
 
-	$selected_theme_id = get_option('arlo_theme', 'basic.list');
+	$selected_theme_id = get_option('arlo_theme', Arlo_For_Wordpress::DEFAULT_THEME);
 	$theme_templates = $theme_manager->load_default_templates($selected_theme_id);
 
 	if (isset($theme_templates[$name]) && !empty($theme_templates[$name]['html']))

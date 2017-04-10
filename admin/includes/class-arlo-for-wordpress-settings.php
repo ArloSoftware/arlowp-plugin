@@ -494,7 +494,7 @@ class Arlo_For_Wordpress_Settings {
 	}
 	
 	function arlo_reload_template($template) {
-		$selected_theme_id = get_option('arlo_theme', 'basic.list');
+		$selected_theme_id = get_option('arlo_theme', Arlo_For_Wordpress::DEFAULT_THEME);
 
 		if ($selected_theme_id != 'custom') {
 			echo '
@@ -512,7 +512,7 @@ class Arlo_For_Wordpress_Settings {
 		$plugin = Arlo_For_Wordpress::get_instance();
 		$theme_manager = $plugin->get_theme_manager();
 
-		$selected_theme_id = get_option('arlo_theme', 'basic.list');
+		$selected_theme_id = get_option('arlo_theme', Arlo_For_Wordpress::DEFAULT_THEME);
 		$theme_templates = $theme_manager->load_default_templates($selected_theme_id);
 		
 		$templates = [];
@@ -717,7 +717,7 @@ class Arlo_For_Wordpress_Settings {
 
 		$themes = $theme_manager->get_themes_settings();
 
-		$selected_theme_id = get_option('arlo_theme', 'basic.list');
+		$selected_theme_id = get_option('arlo_theme', Arlo_For_Wordpress::DEFAULT_THEME);
 
 	    echo '
 	    <h3>Select Arlo for WordPress control theme </h3>

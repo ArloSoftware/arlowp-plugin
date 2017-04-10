@@ -548,16 +548,16 @@ class Arlo_For_Wordpress_Admin {
 	public function settings_saved($old) {
 		$new = get_option('arlo_settings', array());
 		$old_regions = get_option('arlo_regions', array());
-
+		
 		//save theme changes
-		$theme_id = get_option('arlo_theme', 'basic.list');
+		$theme_id = get_option('arlo_theme', Arlo_For_Wordpress::DEFAULT_THEME);
 		$stored_themes_settings = get_option( 'arlo_themes_settings', [] );
 		$stored_themes_settings[$theme_id]->templates = $new['templates'];
 		update_option('arlo_themes_settings', $stored_themes_settings, 1);
 			
 		if($old['platform_name'] != $new['platform_name'] && !empty($new['platform_name'])) {
-		
-			$plugin = Arlo_For_Wordpress::get_instance();			
+			
+			$plugin = Arlo_For_Wordpress::get_instance();
 			$plugin->determine_url_structure($new['platform_name']);
 			
 			$scheduler = $plugin->get_scheduler();

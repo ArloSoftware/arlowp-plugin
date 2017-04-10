@@ -51,6 +51,15 @@ class Arlo_For_Wordpress {
 	const MIN_PHP_VERSION = '5.4.0';
 
 	/**
+	 * The default loaded theme
+	 *
+	 * @since   3.0
+	 *
+	 * @var     string
+	 */
+	const DEFAULT_THEME = 'jazz';
+
+	/**
 	 * @TODO - Rename "arlo-for-wordpress" to the name your your plugin
 	 *
 	 * Unique identifier for your plugin.
@@ -653,7 +662,7 @@ class Arlo_For_Wordpress {
 			$theme_manager = $this->get_theme_manager();	
 			$theme_settings = $theme_manager->get_themes_settings();
 
-			$theme_id = 'basic.list';
+			$theme_id = Arlo_For_Wordpress::DEFAULT_THEME;
 
 			$stored_themes_settings[$theme_id] = $theme_settings[$theme_id];
 			$stored_themes_settings[$theme_id]->templates = $theme_manager->load_default_templates($theme_id);
