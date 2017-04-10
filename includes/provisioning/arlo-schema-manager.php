@@ -6,7 +6,7 @@ use Arlo\Logger;
 
 class SchemaManager {
 
-	const DB_SCHEMA_HASH = 'e95ddffa75e8ced470d12a1f1cb9e4153af8a4a0';
+	const DB_SCHEMA_HASH = '48ea9f90faccf74546d647038566f6e3b6c20dc0';
 
 	/* database layer */
 	private $dbl;
@@ -51,6 +51,7 @@ class SchemaManager {
 	}
 
 	public function check_db_schema() {
+		error_log($this->create_db_schema_hash());
  		if ($this->create_db_schema_hash() !== self::DB_SCHEMA_HASH) {
 			$message = [
 				'<p>' . __('Arlo for WordPress has detected that there may be a problem with the structure of event information in your database, or that a recent upgrade may not have completed correctly.', 'arlo-for-wordpress' ) . '</p>',
