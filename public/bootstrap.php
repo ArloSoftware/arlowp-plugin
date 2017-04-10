@@ -401,7 +401,7 @@ function arlo_the_content_presenter($content) {
 		"SELECT p.*, post.ID as post_id
 		FROM $t1 p 
 		LEFT JOIN $t2 post 
-		ON p.p_post_name = post.post_name 
+		ON p.p_post_id = post.ID
 		WHERE post.post_type = 'arlo_presenter' AND post.ID = $post->ID
 		ORDER BY p.p_lastname ASC", ARRAY_A);
 

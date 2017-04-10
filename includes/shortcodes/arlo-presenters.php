@@ -44,7 +44,7 @@ class Presenters {
             LEFT JOIN 
                 $t2 post 
             ON 
-                p.p_post_name = post.post_name 
+                p.p_post_id = post.ID
             WHERE 
                 post.post_type = 'arlo_presenter'
             AND
@@ -76,7 +76,7 @@ class Presenters {
             LEFT JOIN 
                 $t2 post 
             ON 
-                p.p_post_name = post.post_name 
+                p.p_post_id = post.ID
             WHERE 
                 post.post_type = 'arlo_presenter'
             AND

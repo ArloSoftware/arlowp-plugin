@@ -281,9 +281,9 @@ class VersionHandler {
 			break;	
 
 			case '3.0':
-				//update post_id in the templates table
 				$import_id = get_option('arlo_import_id','');
 				if (!empty($import_id)) {
+					//update post_id in the templates table
 					$sql = '
 					SELECT
 						et_id,
@@ -301,6 +301,28 @@ class VersionHandler {
 							$post = arlo_get_post_by_name($item->et_post_name, 'arlo_event');
 							if (!is_null($post) && !empty($post->ID) && $post->ID > 0) {
 								$this->dbl->update($this->dbl->prefix . 'arlo_eventtemplates', array( 'et_post_id' => $post->ID), array( 'et_id' => $item->et_id ));
+							}
+						}
+					}
+
+					//update post_id in the presenters table
+					$sql = '
+					SELECT
+						p_id,
+						p_post_name
+					FROM 
+						' .  $this->dbl->prefix . 'arlo_presenters
+					WHERE
+						import_id = ' . $import_id . '
+					AND
+						(p_post_id IS NULL OR p_post_id = 0)
+					';
+					$items = $this->dbl->get_results($sql);
+					if (is_array($items) && count($items)) {
+						foreach($items as $key => $item) {
+							$post = arlo_get_post_by_name($item->p_post_name, 'arlo_presenter');
+							if (!is_null($post) && !empty($post->ID) && $post->ID > 0) {
+								$this->dbl->update($this->dbl->prefix . 'arlo_presenters', array( 'p_post_id' => $post->ID), array( 'p_id' => $item->p_id ));
 							}
 						}
 					}

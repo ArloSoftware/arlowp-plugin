@@ -14,36 +14,10 @@ class Presenters extends BaseImporter {
 
 	protected function save_entity($item) { 
 		$slug = sanitize_title($item->PresenterID . ' ' . $item->FirstName . ' ' . $item->LastName);
-		$query = $this->dbl->query( $this->dbl->prepare( 
-			"INSERT INTO 
-				" . $this->table_name ." 
-				(p_arlo_id, p_firstname, p_lastname, p_viewuri, p_profile, p_qualifications, p_interests, p_twitterid, p_facebookid, p_linkedinid, p_post_name, import_id) 
-				VALUES 
-				( %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) 
-			", 
-			$item->PresenterID,
-			$item->FirstName,
-			$item->LastName,
-			@$item->ViewUri,
-			@$item->Profile->ProfessionalProfile->Text,
-			@$item->Profile->Qualifications->Text,
-			@$item->Profile->Interests->Text,
-			@$item->SocialNetworkInfo->TwitterID,
-			@$item->SocialNetworkInfo->FacebookID,
-			@$item->SocialNetworkInfo->LinkedInID,
-			$slug,
-			$this->import_id
-		) );
-						
-		if ($query === false) {
-			throw new \Exception('SQL error: ' . $this->dbl->last_error . ' ' . $this->dbl->last_query);
-		}
-		
-		$name = $item->FirstName . ' ' . $item->LastName;
-		
-		// create associated custom post, if it dosen't exist
-		if(!arlo_get_post_by_name($slug, 'arlo_presenter')) {
-			wp_insert_post(array(
+
+		$post = arlo_get_post_by_name($slug, 'arlo_presenter');
+		if (is_null($post)) {
+			$post_id = wp_insert_post(array(
 				'post_title'    => $name,
 				'post_content'  => '',
 				'post_status'   => 'publish',
@@ -51,6 +25,45 @@ class Presenters extends BaseImporter {
 				'post_type'		=> 'arlo_presenter',
 				'post_name'		=> $slug
 			));
+		} else {
+			$post_id = $post->ID;
+		}
+
+		if (is_numeric($post_id) && $post_id > 0) {
+			$query = $this->dbl->query( $this->dbl->prepare( 
+				"INSERT INTO 
+					" . $this->table_name ." 
+					(p_arlo_id, p_firstname, p_lastname, p_viewuri, p_profile, p_qualifications, p_interests, p_twitterid, p_facebookid, p_linkedinid, p_post_name, p_post_id, import_id) 
+					VALUES 
+					( %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, %s ) 
+				", 
+				$item->PresenterID,
+				$item->FirstName,
+				$item->LastName,
+				@$item->ViewUri,
+				@$item->Profile->ProfessionalProfile->Text,
+				@$item->Profile->Qualifications->Text,
+				@$item->Profile->Interests->Text,
+				@$item->SocialNetworkInfo->TwitterID,
+				@$item->SocialNetworkInfo->FacebookID,
+				@$item->SocialNetworkInfo->LinkedInID,
+				$slug,
+				$post_id,
+				$this->import_id
+			) );
+
+			if ($query === false) {
+				throw new \Exception('SQL error: ' . $this->dbl->last_error . ' ' . $this->dbl->last_query);
+			}
+		} else {
+			throw new \Exception('Presenter post creation error: ' . $slug);
+		}
+		
+		$name = $item->FirstName . ' ' . $item->LastName;
+		
+		// create associated custom post, if it dosen't exist
+		if(!arlo_get_post_by_name($slug, 'arlo_presenter')) {
+			
 		}
 	}
 }

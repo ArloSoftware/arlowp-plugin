@@ -371,7 +371,8 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         SELECT 
             p.p_firstname, 
             p.p_lastname, 
-            p.p_post_name 
+            p.p_post_name,
+            p.p_post_id 
         FROM 
             $t1 exp 
         INNER JOIN 

@@ -278,9 +278,11 @@ class SchemaManager {
 			p_facebookid varchar(255) NULL,
 			p_linkedinid varchar(255) NULL,
 			p_post_name varchar(255) NULL,
+			p_post_id int(10) unsigned DEFAULT NULL,
 			import_id int(10) unsigned DEFAULT NULL,
 			PRIMARY KEY  (p_id),
-			KEY p_arlo_id (p_arlo_id))
+			KEY p_arlo_id (p_arlo_id),
+			KEY p_post_id (p_post_id))
 			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";";
 
 		$this->dbl->sync_schema($sql);

@@ -128,6 +128,7 @@ class Arlo_For_Wordpress_Presenters extends Arlo_For_Wordpress_Lists  {
 			p_facebookid,
 			p_linkedinid,
 			p_post_name,
+			p_post_id,
 			e.e_name
 		FROM
 			". $this->table_name . " AS p
@@ -142,7 +143,7 @@ class Arlo_For_Wordpress_Presenters extends Arlo_For_Wordpress_Lists  {
 		LEFT JOIN 
 			" . $this->wpdb->prefix . "posts
 		ON
-			post_name = p_post_name
+			ID = p_post_id
 		WHERE
 			" . $where . "	
 		GROUP BY

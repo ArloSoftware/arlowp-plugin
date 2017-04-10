@@ -332,7 +332,7 @@ class NoticeHandler {
 					LEFT JOIN
 						{$this->dbl->prefix}posts
 					ON
-						p_post_name = post_name		
+						p_post_id = ID
 					AND
 						post_status = 'publish'
 					WHERE 
