@@ -128,7 +128,7 @@ class NoticeHandler {
 
 		echo $this->create_notice($message);
 		
-		if (strtolower($this->settings['platform_name']) === "websitetestdata") {
+		if (strtolower($this->settings['platform_name']) === \Arlo_For_Wordpress::DEFAULT_PLATFORM) {
 			
 			$message->class = 'updated';
 			$message->title = 'Connected to demo data';

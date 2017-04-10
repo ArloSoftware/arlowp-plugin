@@ -114,7 +114,14 @@ class Venues {
     private static function shortcode_venue_map($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         $settings = get_option('arlo_settings');
         
-        if (empty($settings['googlemaps_api_key'])) return;
+        $api_key = $settings['googlemaps_api_key']; 
+        if (empty($api_key)) {
+            if (strtolower($settings['platform_name']) == \Arlo_For_Wordpress::DEFAULT_PLATFORM) {
+                $api_key = \Arlo_For_Wordpress::GOOGLE_MAPS_API_KEY;
+            } else {
+                return;
+            }
+        }
         
         // merge and extract attributes
         extract(shortcode_atts(array(
@@ -136,7 +143,7 @@ class Venues {
             $map .= $lat . ',' . $long;
             $map .= '&size=' . $width . 'x' . $height;
             $map .= '&zoom=' . $zoom;
-            $map .= '&key=' . $settings['googlemaps_api_key'] . '"';
+            $map .= '&key=' . $api_key . '"';
             $map .= ' height="' . $height . '"';
             $map .= ' width="' . $width . '"';
             $map .= ' alt="' . esc_attr(sprintf(__('Map of %s', 'arlo-for-wordpress'), $name)) . '"'; 

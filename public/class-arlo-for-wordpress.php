@@ -60,6 +60,24 @@ class Arlo_For_Wordpress {
 	const DEFAULT_THEME = 'jazz';
 
 	/**
+	 * The default platform name
+	 *
+	 * @since   3.0
+	 *
+	 * @var     string
+	 */
+	const DEFAULT_PLATFORM = 'websitetestdata';
+
+	/**
+	 * Google maps API key for the default platform
+	 *
+	 * @since   3.0
+	 *
+	 * @var     string
+	 */
+	const GOOGLE_MAPS_API_KEY = 'AIzaSyCJO87A9heNXZUThrJudaxiu0X4mqy3cvw';
+
+	/**
 	 * @TODO - Rename "arlo-for-wordpress" to the name your your plugin
 	 *
 	 * Unique identifier for your plugin.
@@ -1174,7 +1192,7 @@ class Arlo_For_Wordpress {
 		update_user_meta($user->ID, $notice_id, 1);
 		
 		if (empty($settings['platform_name'])) {
-			$settings['platform_name'] = 'websitetestdata';
+			$settings['platform_name'] = Arlo_For_Wordpress::DEFAULT_PLATFORM;
 		}
 		
 		$error = [];
