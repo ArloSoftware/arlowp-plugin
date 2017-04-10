@@ -150,21 +150,27 @@ class VersionHandler {
 
 				$this->dbl->init_charset();
 
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_async_tasks CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_async_task_data CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_eventtemplates CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_contentfields CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_onlineactivities CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_venues CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_presenters CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_categories CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_offers CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_tags CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_categories CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_timezones CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_log CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_messages CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
+				$charset = $this->dbl->get_col_charset($this->dbl->prefix."posts", "post_name");
+
+				if (false === $charset) {
+					$charset = $this->dbl->charset;
+				}
+
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_async_tasks CONVERT TO CHARACTER SET " . $charset);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_async_task_data CONVERT TO CHARACTER SET " . $charset);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_eventtemplates CONVERT TO CHARACTER SET " . $charset);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_contentfields CONVERT TO CHARACTER SET " . $charset);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events CONVERT TO CHARACTER SET " . $charset);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_onlineactivities CONVERT TO CHARACTER SET " . $charset);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_venues CONVERT TO CHARACTER SET " . $charset);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_presenters CONVERT TO CHARACTER SET " . $charset);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_categories CONVERT TO CHARACTER SET " . $charset);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_offers CONVERT TO CHARACTER SET " . $charset);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_tags CONVERT TO CHARACTER SET " . $charset);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_categories CONVERT TO CHARACTER SET " . $charset);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_timezones CONVERT TO CHARACTER SET " . $charset);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_log CONVERT TO CHARACTER SET " . $charset);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_messages CONVERT TO CHARACTER SET " . $charset);
 
 				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events DROP e_summary;");
 				$this->dbl->query("DROP TABLE " . $this->dbl->prefix . "arlo_timezones_olson;");

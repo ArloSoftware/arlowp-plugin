@@ -182,5 +182,17 @@ abstract class DatabaseLayer {
 	 */
 	abstract function determine_charset( $charset, $collate );
 
+	/**
+	 * Retrieves the character set for the given column.
+	 *
+	 * @since 4.2.0
+	 * @access public
+	 *
+	 * @param string $table  Table name.
+	 * @param string $column Column name.
+	 * @return string|false|WP_Error Column character set as a string. False if the column has no
+	 *                               character set. WP_Error object if there was an error.
+	 */
+	abstract function get_col_charset( $table, $column );
 
 }
