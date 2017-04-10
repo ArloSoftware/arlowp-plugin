@@ -438,7 +438,7 @@ function arlo_the_content_venue($content) {
 		"SELECT v.*, post.ID as post_id
 		FROM $t1 v 
 		LEFT JOIN $t2 post 
-		ON v.v_post_name = post.post_name 
+		ON v.v_post_id = post.ID
 		WHERE post.post_type = 'arlo_venue' AND post.ID = $post->ID
 		ORDER BY v.v_name ASC", ARRAY_A);
 

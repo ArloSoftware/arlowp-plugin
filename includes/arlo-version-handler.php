@@ -326,6 +326,28 @@ class VersionHandler {
 							}
 						}
 					}
+
+					//update post_id in the venues table
+					$sql = '
+					SELECT
+						v_id,
+						v_post_name
+					FROM 
+						' .  $this->dbl->prefix . 'arlo_venues
+					WHERE
+						import_id = ' . $import_id . '
+					AND
+						(v_post_id IS NULL OR v_post_id = 0)
+					';
+					$items = $this->dbl->get_results($sql);
+					if (is_array($items) && count($items)) {
+						foreach($items as $key => $item) {
+							$post = arlo_get_post_by_name($item->v_post_name, 'arlo_venue');
+							if (!is_null($post) && !empty($post->ID) && $post->ID > 0) {
+								$this->dbl->update($this->dbl->prefix . 'arlo_venues', array( 'v_post_id' => $post->ID), array( 'v_id' => $item->v_id ));
+							}
+						}
+					}
 				}
 
 				$theme_id = 'custom';

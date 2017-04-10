@@ -204,7 +204,8 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         $sql = 
             "SELECT 
                 $t2.*, 
-                $t3.v_post_name 
+                $t3.v_post_name,
+                $t3.v_post_id 
             FROM 
                 $t2
             LEFT JOIN 

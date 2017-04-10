@@ -254,9 +254,11 @@ class SchemaManager {
 			v_facilityinfodirections text NULL,
 			v_facilityinfoparking text NULL,
 			v_post_name varchar(255) NULL,
+			v_post_id int(10) unsigned DEFAULT NULL,
 			import_id int(10) unsigned DEFAULT NULL,
 			PRIMARY KEY  (v_id),
-			KEY v_arlo_id (v_arlo_id))
+			KEY v_arlo_id (v_arlo_id),
+			KEY v_post_id (v_post_id))
 			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";";
 
 		$this->dbl->sync_schema($sql);

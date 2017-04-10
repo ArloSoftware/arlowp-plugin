@@ -43,7 +43,7 @@ class Venues {
             LEFT JOIN 
                 $t2 post 
             ON 
-                v.v_post_name = post.post_name 
+                v.v_post_id = post.ID
             WHERE 
                 post.post_type = 'arlo_venue'
             AND
@@ -74,7 +74,7 @@ class Venues {
             LEFT JOIN 
                 $t2 post 
             ON 
-                v.v_post_name = post.post_name
+                v.v_post_id = post.ID
             WHERE 
                 post.post_type = 'arlo_venue'
             AND

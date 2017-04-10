@@ -344,6 +344,7 @@ class UpcomingEvents {
             o_offeramounttaxinclusive, 
             o.o_taxrateshortcode, 
             v.v_post_name, 
+            v.v_post_id,
             c.c_arlo_id            
             ';
 

@@ -142,6 +142,7 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 			v.v_facilityinfodirections,
 			v.v_facilityinfoparking,
 			v.v_post_name,
+			v.v_post_id,
 			e.e_name
 		FROM
 			". $this->table_name . "
@@ -152,7 +153,7 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 		LEFT JOIN 
 			" . $this->wpdb->prefix . "posts
 		ON
-			post_name = v_post_name
+			ID = v_post_id
 		WHERE
 			" . $where . "	
 		GROUP BY
