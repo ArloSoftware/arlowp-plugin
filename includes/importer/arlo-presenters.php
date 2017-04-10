@@ -15,18 +15,21 @@ class Presenters extends BaseImporter {
 	protected function save_entity($item) { 
 		$slug = sanitize_title($item->PresenterID . ' ' . $item->FirstName . ' ' . $item->LastName);
 
-		$post = arlo_get_post_by_name($slug, 'arlo_presenter');
-		if (is_null($post)) {
-			$post_id = wp_insert_post(array(
+		$post_config_array = array(
 				'post_title'    => $name,
 				'post_content'  => '',
 				'post_status'   => 'publish',
 				'post_author'   => 1,
 				'post_type'		=> 'arlo_presenter',
 				'post_name'		=> $slug
-			));
+			);
+
+		$post = arlo_get_post_by_name($slug, 'arlo_presenter');
+		if (is_null($post) || false === $post) {
+			$post_id = wp_insert_post($post_config_array);
 		} else {
-			$post_id = $post->ID;
+			$post_config_array['ID'] = $post->ID;
+			$post_id = wp_update_post($post_config_array);
 		}
 
 		if (is_numeric($post_id) && $post_id > 0) {
