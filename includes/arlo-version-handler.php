@@ -147,136 +147,27 @@ class VersionHandler {
 			break;
 
 			case '3.0':
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_async_tasks 
-				CHANGE task_task task_task VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE task_status_text task_status_text VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				DEFAULT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ";");
 
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_async_task_data 
-				CHANGE data_text data_text TEXT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NOT NULL,
-				DEFAULT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ";");
+				$this->dbl->init_charset();
 
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_eventtemplates 
-				CHANGE et_code et_code VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE et_name et_name VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE et_post_name et_post_name VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE et_advertised_duration et_advertised_duration VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE et_region et_region VARCHAR(5) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE et_descriptionsummary et_descriptionsummary TEXT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE 	et_registerinteresturi 	et_registerinteresturi TEXT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE 	et_viewuri 	et_viewuri TEXT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				DEFAULT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ";");
-				
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_contentfields 
-				CHANGE cf_fieldname cf_fieldname VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE e_contenttype e_contenttype VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE cf_text cf_text TEXT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				DEFAULT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ";");
-
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events 
-				CHANGE e_code e_code VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE e_name e_name VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE e_datetimeoffset e_datetimeoffset VARCHAR(6) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE e_timezone e_timezone VARCHAR(10) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE e_locationname e_locationname VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE e_locationroomname e_locationroomname VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE e_sessiondescription e_sessiondescription VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE e_credits e_credits VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE e_viewuri e_viewuri VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE e_registermessage e_registermessage VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE e_registeruri e_registeruri VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE e_providerorganisation e_providerorganisation VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE e_providerwebsite e_providerwebsite VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE e_region e_region VARCHAR(5) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE e_notice e_notice TEXT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				DEFAULT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ";");
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_async_tasks CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_async_task_data CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_eventtemplates CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_contentfields CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_onlineactivities CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_venues CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_presenters CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_categories CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_offers CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_tags CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_categories CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_timezones CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_log CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_messages CONVERT TO CHARACTER SET " . $this->dbl->charset . " COLLATE " . $this->dbl->collate);
 
 				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events DROP e_summary;");
-
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_onlineactivities 
-				CHANGE oa_arlo_id oa_arlo_id VARCHAR(64) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE oa_code oa_code VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE oa_name oa_name VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE oa_delivery_description oa_delivery_description VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE oa_viewuri oa_viewuri VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE oa_reference_terms oa_reference_terms VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE oa_credits oa_credits VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE oa_registermessage oa_registermessage VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE oa_registeruri oa_registeruri VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE oa_region oa_region VARCHAR(5) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				DEFAULT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ";");
-
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_venues 
-				CHANGE v_name v_name VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE v_physicaladdressline1 v_physicaladdressline1 VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE v_physicaladdressline2 v_physicaladdressline2 VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE v_physicaladdressline3 v_physicaladdressline3 VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE v_physicaladdressline4 v_physicaladdressline4 VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE v_physicaladdresssuburb v_physicaladdresssuburb VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE v_physicaladdresscity v_physicaladdresscity VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE v_physicaladdressstate v_physicaladdressstate VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE v_physicaladdresspostcode v_physicaladdresspostcode VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE v_physicaladdresscountry v_physicaladdresscountry VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE v_viewuri v_viewuri VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE v_post_name v_post_name VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE v_facilityinfodirections v_facilityinfodirections TEXT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ",
-				CHANGE v_facilityinfoparking v_facilityinfoparking TEXT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ",
-				DEFAULT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ";");
-
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_presenters 
-				CHANGE p_firstname p_firstname VARCHAR(64) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE p_lastname p_lastname VARCHAR(64) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE p_viewuri p_viewuri VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE p_twitterid p_twitterid VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE p_facebookid p_facebookid VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE p_linkedinid p_linkedinid VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE p_post_name p_post_name VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE p_profile p_profile TEXT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ",
-				CHANGE p_qualifications p_qualifications TEXT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ",
-				CHANGE p_interests p_interests TEXT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ",
-				DEFAULT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ";");			
-
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_categories 
-				CHANGE c_name c_name VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NOT NULL DEFAULT '',
-				CHANGE c_slug c_slug VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NOT NULL DEFAULT '',
-				CHANGE c_header c_header TEXT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ",
-				CHANGE c_footer c_footer TEXT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ",
-				DEFAULT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ";");
-
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_offers
-				CHANGE o_label o_label VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE o_currencycode o_currencycode VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE o_formattedamounttaxexclusive o_formattedamounttaxexclusive VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE o_formattedamounttaxinclusive o_formattedamounttaxinclusive VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE o_taxrateshortcode o_taxrateshortcode VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE o_taxratename o_taxratename VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE o_region o_region VARCHAR(5) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE o_message o_message TEXT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL,
-				DEFAULT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ";");
-
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_tags 
-				CHANGE tag tag VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NOT NULL,
-				DEFAULT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ";");	
-
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_categories 
-				CHANGE c_name c_name VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NOT NULL DEFAULT '',
-				CHANGE c_slug c_slug VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NOT NULL DEFAULT '',
-				DEFAULT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ";");		
-
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_timezones 
-				CHANGE name name VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NOT NULL,
-				DEFAULT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ";");
-
 				$this->dbl->query("DROP TABLE " . $this->dbl->prefix . "arlo_timezones_olson;");
-
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_log 
-				CHANGE message message TEXT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ",
-				DEFAULT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ";");
-
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_messages 
-				CHANGE title title VARCHAR(255) CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NULL DEFAULT NULL,
-				CHANGE message message TEXT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . " NOT NULL,
-				DEFAULT CHARACTER SET " . $this->dbl->charset  . " COLLATE " . $this->dbl->collate . ";");	
 			break;					
 		}
 	}	
