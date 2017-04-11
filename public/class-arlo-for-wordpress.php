@@ -1197,7 +1197,7 @@ class Arlo_For_Wordpress {
 		
 		$error = [];
 		
-		foreach (self::$pages as $id => $page) {
+		foreach (self::$post_types as $id => $page) {
 			//try to find and publish the page
 			$args = array(
   				'name' => $id,
