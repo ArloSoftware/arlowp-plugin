@@ -64,14 +64,14 @@ class OnlineActivities {
             AND
                 $t1.import_id = " . $import_id . "
             WHERE 
-                $t1.et_post_name = $post->ID
+                $t1.et_post_id = $post->ID
             AND
                 $t2.import_id = ". $import_id ."
             $where
             ";
         
         $items = $wpdb->get_results($sql, ARRAY_A);
-        
+       
         $output = '';
         
         if (is_array($items) && count($items)) {
