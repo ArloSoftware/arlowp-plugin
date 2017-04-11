@@ -421,7 +421,8 @@ body.arlo {
 .arlo#arlo .arlo-show-more-link:after,
 .arlo#arlo .arlo-social-media a:after,
 .arlo#arlo .arlo-list.event-search .arlo-next-running a:after,
-.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a:after {
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a:after,
+.arlo#arlo .arlo-list.event-search .arlo-next-running a:after {
     content: "";
     position: absolute;
     left: 0;
@@ -460,8 +461,9 @@ body.arlo {
 .arlo#arlo .arlo-category-list a:hover:after,
 .arlo#arlo .arlo-show-more-link:hover:after,
 .arlo#arlo .arlo-social-media a:hover:after,
-.arlo#arlo .arlo-list.event-search .arlo-next-running a:hover:after
-.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a:hover:after {
+.arlo#arlo .arlo-list.event-search .arlo-next-running a:hover:after,
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a:hover:after,
+.arlo#arlo .arlo-list.event-search .arlo-next-running a:hover:after {
     width: 100%;
 }
 
@@ -831,8 +833,10 @@ body.arlo {
     margin-bottom: 1em;
 }
 
-.arlo#arlo .arlo-search-field {
+.arlo#arlo input.arlo-search-field,
+.arlo#arlo input.arlo-search-field:focus {
     padding: 1em;
+    background-color: transparent;
 }
 
 .arlo#arlo .event-search > li {
@@ -1179,7 +1183,8 @@ body.arlo {
 .arlo .arlo-categories-widget a,
 .arlo#arlo a.next.page-numbers, 
 .arlo#arlo .arlo-list.event-search .arlo-next-running a,
-.arlo#arlo .upcoming .arlo-event-name a {
+.arlo#arlo .upcoming .arlo-event-name a,
+.arlo#arlo select {
     color: #383838;
 }
 
@@ -1202,9 +1207,9 @@ body.arlo {
 .arlo#arlo .arlo-show-more-link:hover,
 .arlo#arlo .arlo-list.event-search .arlo-next-running a.arlo-register,
 .arlo#arlo .arlo-list.event-search .arlo-next-running a.arlo-register:hover,
+.arlo#arlo .arlo-list.event-search .arlo-next-running span,
 .arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a.arlo-register,
-.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a.arlo-register:hover,
-.arlo#arlo .arlo-list.event-search .arlo-next-running span {
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a.arlo-register:hover {
     color: white;
 }
 
@@ -1215,6 +1220,7 @@ body.arlo {
 .arlo#arlo .arlo-background-color4 {
     color: #f9b3b3;
 }
+
 
 /* Suggest templates */
 

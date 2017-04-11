@@ -1,5 +1,7 @@
 [arlo_template_region_selector]
 
+[arlo_search_field placeholder="Search events" buttonclass="arlo-button" showbutton="true"]
+
 <table class="table event-templates">
 	<tr>
 		<th>Name</th>

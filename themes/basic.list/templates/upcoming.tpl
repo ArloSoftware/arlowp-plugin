@@ -11,7 +11,7 @@
                 <div>[arlo_event_start_date format="%d %b %Y"]</div>
                 
                 [arlo_label wrap="<span class='arlo-event-time'>%s</span>"]
-                    [arlo_event_start_date format="%a %I:%M %p"][arlo_event_end_date format="%a %I:%M %p" label=" - "]
+                    [arlo_event_start_date format="%a %I:%M %p"][arlo_event_end_date format="%a %I:%M %p" wrap=" - %s"]
                 [/arlo_label]
 
                 [arlo_event_location label="Location: " wrap="<div class='arlo-event-location'>%s</div>"]

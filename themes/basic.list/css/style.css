@@ -1,9 +1,9 @@
-/* This stylesheet is used to style the public-facing components of the plugin. */
-
 .arlo .arlo-list,
 .arlo .arlo-list > li,
 .arlo .arlo-category-list,
-.arlo .arlo-category-list li {
+.arlo .arlo-category-list li,
+.arlo .arlo-event-credits,
+.arlo .arlo-event-credits li {
 	list-style-type: none;
 	list-style: none;
 	margin-left: 0;

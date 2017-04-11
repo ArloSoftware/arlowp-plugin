@@ -1,6 +1,6 @@
 <div class="arlo" id="arlo">
 	[arlo_template_region_selector]
-    [arlo_timezones wrap="<div class='arlo-timezone-toggle'>%s</div>"]
+
 	[arlo_upcoming_event_filters filtertext='Filter' resettext="Reset" filters='category,month,location']
 	<ul class="arlo-list upcoming">
 		[arlo_upcoming_list_item limit="20"]

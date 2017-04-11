@@ -983,11 +983,6 @@ body.arlo {
     margin-bottom: .75em;
 }
 
-.arlo#arlo .arlo-search-field,
-.arlo#arlo .arlo-search-button {
-    width: 100%;
-}
-
 @media (min-width: 550px) {
     .arlo#arlo .arlo-search-field,
     .arlo#arlo .arlo-search-button {
@@ -1003,6 +998,11 @@ body.arlo {
 .arlo#arlo .arlo-search {
     margin-bottom: 1em;
     background-color: rgba(0, 0, 0, 0.03);
+}
+
+.arlo#arlo input.arlo-search-field,
+.arlo#arlo input.arlo-search-field:focus {
+    background-color: transparent;
 }
 
 .arlo#arlo .arlo-search-field,
@@ -1264,6 +1264,7 @@ body.arlo {
 /* Colours */
 
 .arlo#arlo .arlo-color1,
+.arlo#arlo a,
 .arlo#arlo a:hover,
 .arlo#arlo a.arlo-template-name:hover,
 .arlo#arlo .page-numbers:not(.next):not(.prev):hover,
@@ -1385,6 +1386,8 @@ body.arlo {
 .arlo#arlo .upcoming .arlo-cal .arlo-day:after {
     background-color: white;
 }
+
+
 
 /* Suggest templates */
 
