@@ -18,7 +18,7 @@
 					<span class="arlo-event-time">
 						<i class="fa fa-clock-o"></i>[arlo_event_duration], [arlo_event_start_date format="%I:%M %p"] - [arlo_event_end_date format="%I:%M %p"]
 					</span>
-					[arlo_event_provider wrap='<span class="arlo-event-provider">%s</span>']
+					[arlo_event_provider wrap='<span class="arlo-event-provider">Provided by %s</span>']
 					[arlo_event_session_list_item]
 					   <div class="arlo_session">
 					       <h6>[arlo_event_name]</h6>

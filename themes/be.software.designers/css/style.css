@@ -942,6 +942,7 @@ body.arlo {
     font-size: 1.2em;
     font-style: italic;
     overflow: auto;
+    line-height: 1.3;
 }
 
 .arlo#arlo .arlo-event-time,
