@@ -65,4 +65,19 @@
        </div>
     [/arlo_content_field_item]
     </div>
+
+    <div class="arlo-suggest-template-container">
+        <h3>Similar courses</h3>
+        <table class="arlo-suggest-templates">
+            [arlo_suggest_templates limit="4"]
+            <tr>
+                <td class="arlo-suggest-template-name">
+                    [arlo_event_template_permalink wrap='<a href="%s">'][arlo_event_template_name]</a>
+                </td>
+                <td class="arlo-suggest-template-event-link">[arlo_event_next_running buttonclass="button"]</td>
+            </tr>
+            [/arlo_suggest_templates]
+        </table>
+    </div>
+    [arlo_powered_by]
 </div>
