@@ -82,7 +82,7 @@ class Presenters {
             AND
                 p.import_id = $import_id
             ORDER 
-                BY p.p_lastname ASC
+                BY p.p_firstname ASC, p.p_lastname ASC
             LIMIT 
                 $offset, $limit", ARRAY_A);
 
