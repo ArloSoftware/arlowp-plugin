@@ -161,7 +161,7 @@ class Arlo_For_Wordpress {
 
 			array(
 				'name'				=> 'events',
-				'title'				=> 'Catalogue',
+				'title'				=> 'Events',
 				'content' 			=> '[arlo_event_template_list]',
 				'child_post_type'	=> 'event'
 			),
@@ -173,7 +173,7 @@ class Arlo_For_Wordpress {
 			),			
 			array(
 				'name'				=> 'upcoming',
-				'title'				=> 'Upcoming',
+				'title'				=> 'Upcoming Events',
 				'content' 			=> '[arlo_upcoming_list]'
 			),
 			array(
@@ -1197,7 +1197,7 @@ class Arlo_For_Wordpress {
 		
 		$error = [];
 		
-		foreach (self::$post_types as $id => $page) {
+		foreach (self::$pages as $id => $page) {
 			//try to find and publish the page
 			$args = array(
   				'name' => $id,
@@ -1210,7 +1210,7 @@ class Arlo_For_Wordpress {
 			
 			if (!(is_array($posts) && count($posts) == 1)) {
 				$args = array(
-	  				'name' => $page['name'],
+	  				
 	  				'post_type' => 'page',
 	  				'post_status' => array('publish','draft'),
 	  				'numberposts' => 1
