@@ -601,6 +601,7 @@ table.arlo-welcome td.logo {
 	padding: 0.3em 0.5em;
 	background-color: lightgray;
 	display: inline-block;
+	font-size: 0.95em;
 }
 
 .arlo-themes .arlo-theme .arlo-theme-buttons li a:hover {
@@ -610,6 +611,7 @@ table.arlo-welcome td.logo {
 .arlo-themes .arlo-theme .arlo-theme-buttons li.arlo-theme-current {
 	background-color: #ffd100;
 	padding: 0.3em 0.5em;
+	font-size: 0.95em;
 }
 
 #arlo-webinar-admin-notice {
