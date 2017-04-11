@@ -709,7 +709,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
             $arlo_region = get_query_var('arlo-region', '');
             $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
         }
-        
+
         // merge and extract attributes
         extract(shortcode_atts(array(
             'buttonclass' => '',
@@ -779,7 +779,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
                     $display_text = str_replace(['{%date%}', '{%location%}'], [$date, $location], $text);
                     
                     if ($event->e_registeruri && !$event->e_isfull) {
-                        $return_links[] = ($layout == 'list' ? "<li>" : "") . '<a href="' . $event->e_registeruri . '" class="' . esc_attr($dateclass) . ' arlo-register">' . $display_text  . '</a>' . ($layout == 'list' ? "</li>" : "");
+                        $return_links[] = ($layout == 'list' ? "<li>" : "") . '<a href="' . $event->e_registeruri . '" class="' . esc_attr($buttonclass) . ' arlo-register">' . $display_text  . '</a>' . ($layout == 'list' ? "</li>" : "");
                     } else {
                         $return_links[] = ($layout == 'list' ? "<li>" : "") . '<span class="' . esc_attr($dateclass) . '">' . $display_text . '</span>' . ($layout == 'list' ? "</li>" : "");
                     }
@@ -791,7 +791,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
             $reference_terms = json_decode($oa->oa_reference_terms, true);
             
             if (is_array($reference_terms) && isset($reference_terms['Plural']))
-                $return .= '<a href="' . $oa->oa_registeruri . '" class="arlo-register">' . $reference_terms['Plural'] . '</a>';
+                $return .= '<a href="' . $oa->oa_registeruri . '" class="' . esc_attr($buttonclass) . ' arlo-register">' . $reference_terms['Plural'] . '</a>';
         }
         
         if ($layout == "list") {
