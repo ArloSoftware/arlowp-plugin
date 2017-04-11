@@ -34,17 +34,19 @@ jQuery(function($){
         }
     }
 
-    setNumberOfEventColumns('ul.arlo-list.catalogue, ul.arlo-list.events, ul.arlo-list.event-search-list');
+    var selectors = 'ul.arlo-list.catalogue, ul.arlo-list.events';
+
+    setNumberOfEventColumns(selectors);
 
     jQuery(window).resize(function() {
-        setNumberOfEventColumns('ul.arlo-list.catalogue, ul.arlo-list.events, ul.arlo-list.event-search-list');
+        setNumberOfEventColumns(selectors);
     });
 
 
 
     var setEventHeights = function() {
         // find the tallest event and set other events to have that height
-        var $events = jQuery('.catalogue > li.arlo-cf.arlo-catalogue-event, .arlo-list.events > li.arlo-cf, ul.arlo-list.event-search-list > li.arlo-cf');
+        var $events = jQuery('.catalogue > li.arlo-cf.arlo-catalogue-event, .arlo-list.events > li.arlo-cf');
         
         // some events might be hidden behind a 'show more', need to show them temporarily so we can see their heights
         jQuery(".events.arlo-show-more-hidden").show();

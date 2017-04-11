@@ -19,7 +19,7 @@
                   </div>
 
                   <div class="arlo-catalogue-column arlo-template-details">
-                    [arlo_event_price wrap="<div class='arlo-offers'>%s</div>"]
+                    [arlo_event_price wrap="<div class='arlo-offers'>%s</div>" showfrom="false"]
                   </div>
 
                 </div>

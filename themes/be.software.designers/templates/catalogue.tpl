@@ -23,8 +23,8 @@
                 </a></h3>
                 <div class="arlo-template-details">
                     [arlo_event_template_summary wrap="<div class='arlo-summary'>%s</div>"]
-                    [arlo_event_duration wrap="<div class='arlo-duration'><i class='fa fa-clock-o'></i> %s</div>"]
-                    [arlo_event_price wrap="<div class='arlo-offers arlo-color2'>%s</div>"]
+                  [arlo_event_template_advertised_duration wrap='<div class="arlo-advertised-duration">%s</div>']
+                    [arlo_event_price wrap="<div class='arlo-offers arlo-color2'>%s</div>" showfrom="false"]
                     [arlo_event_template_tags layout="class" wrap='<div class="arlo-delivery arlo-color4 %s">Delivery<div class="arlo-delivery-icons"></div></div>']
 
                     <div class="arlo-next-running">

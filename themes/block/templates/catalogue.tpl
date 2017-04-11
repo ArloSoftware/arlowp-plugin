@@ -16,7 +16,7 @@
                   [arlo_event_template_advertised_duration wrap='<div class="arlo-advertised-duration arlo-background-color1">%s</div>']
                   [arlo_event_template_summary wrap='<div class="arlo-summary">%s</div>']
 
-                  [arlo_event_price wrap="<div class='arlo-offers'><i class='icons8-price-tag-filled'></i> %s</div>"]
+                  [arlo_event_price wrap="<div class='arlo-offers'><i class='icons8-price-tag-filled'></i> %s</div>" showfrom="false"]
 
                   [arlo_event_next_running wrap='<div class="arlo-next-running">%s</div>']
             </li>

@@ -19,7 +19,14 @@
                 [arlo_event_delivery label="Delivery: " wrap="<div class='arlo-event-delivery'>%s</div>"]
                 [arlo_event_template_advertised_duration label="Duration: "]
                 [arlo_event_session_description wrap='<span class="arlo-event-session-description">%s</span>']
-                [arlo_upcoming_offer wrap="<div class='arlo-event-offers'>%s</div>"]
+                [arlo_event_offers wrap='<div class="arlo-event-offers">%s</div>']
+                [arlo_event_session_list_item]
+                   <div class="arlo_session">
+                       <h6>[arlo_event_name]</h6>
+                       <div>[arlo_event_start_date format="%a %d %b %H:%M"] - [arlo_event_end_date format="%a %d %b %H:%M"]</div>
+                       [arlo_event_location]
+                   </div>
+                [/arlo_event_session_list_item]
             </div>
             <div class="arlo-right">
                 [arlo_event_registration]

@@ -19,7 +19,7 @@
                 [arlo_event_template_permalink wrap='<a href="%s">'][arlo_event_template_name]</a>
             </td>
             <td>[arlo_event_template_advertised_duration]</td>
-            <td>[arlo_event_price]</td>
+            <td>[arlo_event_price showfrom="false"]</td>
             <td>[arlo_event_next_running]</td>
         </tr>
     [/arlo_event_template_list_item]
