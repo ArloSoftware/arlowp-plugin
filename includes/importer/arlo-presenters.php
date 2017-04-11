@@ -13,8 +13,10 @@ class Presenters extends BaseImporter {
 	}
 
 	protected function save_entity($item) { 
-		$slug = sanitize_title($item->PresenterID . ' ' . $item->FirstName . ' ' . $item->LastName);
+		$name = $item->FirstName . ' ' . $item->LastName;
 
+		$slug = sanitize_title($item->PresenterID . ' ' . $name);
+		
 		$post_config_array = array(
 				'post_title'    => $name,
 				'post_content'  => '',
@@ -61,8 +63,6 @@ class Presenters extends BaseImporter {
 		} else {
 			throw new \Exception('Presenter post creation error: ' . $slug);
 		}
-		
-		$name = $item->FirstName . ' ' . $item->LastName;
 		
 		// create associated custom post, if it dosen't exist
 		if(!arlo_get_post_by_name($slug, 'arlo_presenter')) {
