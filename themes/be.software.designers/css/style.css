@@ -1194,3 +1194,19 @@ body.arlo {
 .arlo .arlo-categories-widget li a:hover {
     color: white;
 }
+
+/* Suggest templates */
+
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates,
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates td {
+    border: none;
+}
+
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates tr td:first-of-type {
+    border-left-width: 2px;
+}
+
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link {
+    text-align: right;
+    font-size: 0.8em;
+}
