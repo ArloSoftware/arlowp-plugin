@@ -60,8 +60,9 @@ class SchemaManager {
 			$this->install_schema();
 
 			$message = [
-				'<p>' . __('Arlo for WordPress has detected that there may be a problem with the structure of event information in your database, or that a recent upgrade may not have completed correctly.', 'arlo-for-wordpress' ) . '</p>',
-				'<p>' . __('We had to delete and recreate all the Arlo related database tables which means there is no data available on your website until the import has finished.', 'arlo-for-wordpress' ) . '</p>'
+				'<p>' . __('Arlo for WordPress has detected that there may be a problem with the structure of event information in your database. Event information is being repaired with a new copy.', 'arlo-for-wordpress' ) . '</p>',
+				'<p>' . __('This repair may take a few minutes, and during this time information about your events will be temporarily unavailable for visitors on your site.', 'arlo-for-wordpress' ) . '</p>',
+				'<p>' . sprintf(__('You can monitor the progress of the new import at the <a href="%s">Arlo Settings</a> page.', 'arlo-for-wordpress'), admin_url( 'admin.php?page=' . $this->plugin->plugin_slug)) . '</p>'
 			 ];
 			 
 			$this->message_handler->set_message('error', __('Plugin upgrade warning', 'arlo-for-wordpress' ), implode('', $message), true);
