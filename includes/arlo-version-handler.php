@@ -24,10 +24,13 @@ class VersionHandler {
 	}
 
 	public function set_installed_version() {
+		$schema_manager = $this->plugin->get_schema_manager();
 		update_option('arlo_plugin_version', self::VERSION);
 				
 		$now = \Arlo\Utilities::get_now_utc();
 		update_option('arlo_updated', $now->format("Y-m-d H:i:s"));
+		
+		update_option('arlo_schema_version', $schema_manager::DB_SCHEMA_VERSION);
 	}
 
 	public function run_update($from_version) {

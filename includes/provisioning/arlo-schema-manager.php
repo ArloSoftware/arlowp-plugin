@@ -7,6 +7,7 @@ use Arlo\Logger;
 class SchemaManager {
 
 	const DB_SCHEMA_HASH = '48ea9f90faccf74546d647038566f6e3b6c20dc0';
+	const DB_SCHEMA_VERSION = '3.0.0';
 
 	/* database layer */
 	private $dbl;
@@ -72,6 +73,10 @@ class SchemaManager {
 			Logger::log("The current database shema could be wrong");
 		 }
 	}	
+
+	public function check_db_version($current_version) {
+		return version_compare($current_version, self::DB_SCHEMA_VERSION);
+	}
 
 	public function install_schema() {
 		$this->dbl->suppress_errors(false);
