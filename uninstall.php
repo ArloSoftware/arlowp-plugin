@@ -35,8 +35,9 @@ function arlo_uninstall() {
  * @param:
  * @return:
  */
-function arlo_delete_tables()
-{
+function arlo_delete_tables() {
+	//should use the SchemaManager->delete_tables
+	
     global $wpdb;
 	$sql="
 	DROP TABLE IF EXISTS " .

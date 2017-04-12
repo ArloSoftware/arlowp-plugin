@@ -1058,7 +1058,7 @@ class Arlo_For_Wordpress {
 			return $schema_manager;
 		}
 		
-		$schema_manager = new SchemaManager($this->get_dbl(), $this->get_message_handler());
+		$schema_manager = new SchemaManager($this->get_dbl(), $this->get_message_handler(), $this);
 		
 		$this->__set('schema_manager', $schema_manager);
 		

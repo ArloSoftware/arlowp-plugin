@@ -32,7 +32,7 @@ class NoticeHandler {
 	}
 
 	public function global_notices() {
-		$messages = $this->message_handler->get_messages('import_error', true);
+		$messages = array_merge($this->message_handler->get_messages('import_error', true), $this->message_handler->get_messages('error', true));
 		
 		foreach ($messages as $message) {
 			echo $this->create_notice($message);

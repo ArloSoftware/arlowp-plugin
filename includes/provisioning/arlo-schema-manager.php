@@ -12,10 +12,12 @@ class SchemaManager {
 	private $dbl;
 
 	private $message_handler;
+	private $plugin;
 
-	public function __construct($dbl, $message_handler) {
+	public function __construct($dbl, $message_handler, $plugin) {
 		$this->dbl = &$dbl;
 		$this->message_handler = $message_handler;
+		$this->plugin = $plugin;
 	}
 
 	public function create_db_schema_hash( ) {
@@ -51,14 +53,21 @@ class SchemaManager {
 	}
 
 	public function check_db_schema() {
-		error_log($this->create_db_schema_hash());
  		if ($this->create_db_schema_hash() !== self::DB_SCHEMA_HASH) {
+			//delete tables and re-create them
+			$this->delete_tables();
+			$this->install_schema();
+
 			$message = [
 				'<p>' . __('Arlo for WordPress has detected that there may be a problem with the structure of event information in your database, or that a recent upgrade may not have completed correctly.', 'arlo-for-wordpress' ) . '</p>',
-				'<p>' . __('Please deactivate and reactivate the Arlo for WordPress plugin to complete the upgrade.', 'arlo-for-wordpress' ) . '</p>'
+				'<p>' . __('We had to delete and recreate all the Arlo related database tables which means there is no data available on your website until the import has finished.', 'arlo-for-wordpress' ) . '</p>'
 			 ];
 			 
-			$this->message_handler->set_message('error', __('Plugin upgrade warning', 'arlo-for-wordpress' ), implode('', $message), false);
+			$this->message_handler->set_message('error', __('Plugin upgrade warning', 'arlo-for-wordpress' ), implode('', $message), true);
+			
+			//kick off an import
+			if (get_option('arlo_import_disabled', '0') != '1')
+				$this->plugin->get_scheduler()->set_task("import", -1);	
 
 			Logger::log("The current database shema could be wrong");
 		 }
@@ -519,5 +528,35 @@ class SchemaManager {
 			CHARACTER SET " . $this->dbl->charset . " COLLATE=" . $this->dbl->collate . ";";
 
 		$this->dbl->sync_schema($sql);
+	}
+
+	public function delete_tables() {
+		//should be used in the uninstall.php
+		$sql="
+			DROP TABLE IF EXISTS " .
+				$this->dbl->prefix . "arlo_async_tasks," .
+				$this->dbl->prefix . "arlo_async_task_data," . 
+				$this->dbl->prefix . "arlo_categories," . 
+				$this->dbl->prefix . "arlo_contentfields, " . 
+				$this->dbl->prefix . "arlo_events, " . 		
+				$this->dbl->prefix . "arlo_events_presenters, " . 
+				$this->dbl->prefix . "arlo_eventtemplates," . 
+				$this->dbl->prefix . "arlo_eventtemplates_categories," . 		
+				$this->dbl->prefix . "arlo_eventtemplates_presenters, " .
+				$this->dbl->prefix . "arlo_onlineactivities, " . 
+				$this->dbl->prefix . "arlo_onlineactivities_tags, " .
+				$this->dbl->prefix . "arlo_offers, " . 		
+				$this->dbl->prefix . "arlo_presenters, " . 
+				$this->dbl->prefix . "arlo_venues, " . 
+				$this->dbl->prefix . "arlo_events_tags, " . 
+				$this->dbl->prefix . "arlo_eventtemplates_tags,  " . 
+				$this->dbl->prefix . "arlo_tags,  " . 
+				$this->dbl->prefix . "arlo_timezones,  " . 
+				$this->dbl->prefix . "arlo_messages, " .
+				$this->dbl->prefix . "arlo_log," .
+				$this->dbl->prefix . "arlo_import," .
+				$this->dbl->prefix . "arlo_import_lock";
+
+		$this->dbl->query($sql);
 	}
 }
