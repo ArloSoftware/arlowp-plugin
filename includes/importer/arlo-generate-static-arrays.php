@@ -3,6 +3,7 @@
 namespace Arlo\Importer;
 
 use Arlo\Logger;
+use Arlo\FileHandler;
 
 class GenerateStaticArrays extends BaseImporter {
 
@@ -16,7 +17,7 @@ class GeneratedStaticArrays {
 	public static $arlo_timezones = %s;
 }', $this->get_arlo_timezones());
 
-		if (file_put_contents(sprintf(trailingslashit(plugin_dir_path( __FILE__ )) . '../arlo-generated-static-arrays-%s.php', $this->import_id), $content) === false) {
+		if ($this->file_handler->write_file(trailingslashit(plugin_dir_path( __FILE__ )) . '../' . sprintf('arlo-generated-static-arrays-%s.php', $this->import_id), $content) === false) {
 			Logger::log_error('Couldn\'t create static array file', $this->import_id);
         } 
 
