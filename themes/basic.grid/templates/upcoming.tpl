@@ -14,7 +14,7 @@
 				[arlo_event_location label="" wrap="<div class='arlo-event-location'>%s</div>"]
 				[arlo_event_session_description wrap='<div class="arlo-event-session-description">%s</div>']
 				[arlo_event_presenters label="Presenters: " wrap='<div class="arlo-event-presenters">%s</div>']
-				[arlo_event_provider label="Provider: " wrap='<div class="arlo-event-provider">%s</div>']
+				[arlo_event_provider label="Provider: " wrap='<div class="arlo-event-provider">Provided by %s</div>']
 				[arlo_event_template_advertised_duration label="Duration: " wrap='<div class="arlo-event-duration">%s</div>']
 				
                 [arlo_event_session_list_item]

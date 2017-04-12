@@ -12,17 +12,26 @@
 
 			<div class="arlo-event-info">
 			    <div class="arlo-event-details">
-				<h4 class="arlo-event-name">[arlo_event_template_permalink wrap='<a href="%s">'][arlo_event_template_name]</a></h4>
+				<h4 class="arlo-event-name">[arlo_event_template_permalink wrap='<a href="%s" class="arlo-color2">'][arlo_event_template_name]</a></h4>
 				     <div class="arlo-event-subhead">
 					[arlo_event_location label="" wrap="<div class='arlo-event-location'><i class='icons8-marker-filled'></i> %s</div>"]
+					[arlo_event_session_description wrap='<div class="arlo-event-session-description">%s</div>']
 					[arlo_event_presenters wrap='<div class="arlo-event-presenters"><i class="icons8-gender-neutral-user-filled"></i> %s</div>']
+					[arlo_event_provider wrap='<div class="arlo-event-provider">Provided by %s</div>']
+					[arlo_event_session_list_item]
+					   <div class="arlo_session">
+					       <h6>[arlo_event_name]</h6>
+					       <div>[arlo_event_start_date format="%a %d %b %H:%M"] - [arlo_event_end_date format="%a %d %b %H:%M"]</div>
+					       [arlo_event_location]
+					   </div>
+					[/arlo_event_session_list_item]
 				   </div>
 				</div>
 				<div class="arlo-event-time">[arlo_event_duration], [arlo_event_start_date format="%I:%M %p"] - [arlo_event_end_date format="%I:%M %p"]</div>
 				<div class="arlo-template-summary">
 					[arlo_event_template_summary]
 				</div>
-				[arlo_upcoming_offer wrap='<div class="arlo-offers"><i class="icons8-price-tag-filled"></i> %s</div>']
+				[arlo_event_offers wrap='<div class="arlo-offers">%s</div>']
 				[arlo_event_registration]
 			    </div>
 		</li>	

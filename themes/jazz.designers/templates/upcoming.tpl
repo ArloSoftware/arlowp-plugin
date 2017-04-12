@@ -1,6 +1,6 @@
 <div class="arlo" id="arlo">
 	[arlo_template_region_selector]
-    [arlo_timezones wrap="<div class='arlo-timezone-toggle'>%s</div>"]
+
 	[arlo_upcoming_event_filters filtertext='Filter' resettext="Reset" filters='category,month,location']
 	<ul class="arlo-list upcoming">
 		[arlo_upcoming_list_item limit="20"]
@@ -19,7 +19,7 @@
 					[arlo_event_location label="" wrap="<div class='arlo-event-location'>%s</div>"]
 					[arlo_event_session_description wrap='<div class="arlo-event-session-description">%s</div>']
 					[arlo_event_presenters wrap='<div class="arlo-event-presenters">%s</div>']
-					[arlo_event_provider wrap='<div class="arlo-event-provider">%s</div>']
+					[arlo_event_provider wrap='<div class="arlo-event-provider">Provided by %s</div>']
 					[arlo_event_session_list_item]
 					   <div class="arlo_session">
 					       <h6>[arlo_event_name]</h6>

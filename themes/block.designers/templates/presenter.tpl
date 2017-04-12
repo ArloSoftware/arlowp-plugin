@@ -2,6 +2,7 @@
 
 [arlo_presenter_profile label='<h5>Profile</h5>']
 [arlo_presenter_qualifications label='<h5>Qualifications</h5>']
+[arlo_presenter_interests label='<h5>Interests</h5>']
 
 <div class="arlo-social-media">
 [arlo_presenter_social_link network='Facebook' linktext='<i class="icons8-facebook-filled"></i> Facebook']

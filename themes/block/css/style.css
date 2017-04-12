@@ -983,11 +983,6 @@ body.arlo {
     margin-bottom: .75em;
 }
 
-.arlo#arlo .arlo-search-field,
-.arlo#arlo .arlo-search-button {
-    width: 100%;
-}
-
 @media (min-width: 550px) {
     .arlo#arlo .arlo-search-field,
     .arlo#arlo .arlo-search-button {
@@ -1003,6 +998,11 @@ body.arlo {
 .arlo#arlo .arlo-search {
     margin-bottom: 1em;
     background-color: rgba(0, 0, 0, 0.03);
+}
+
+.arlo#arlo input.arlo-search-field,
+.arlo#arlo input.arlo-search-field:focus {
+    background-color: transparent;
 }
 
 .arlo#arlo .arlo-search-field,
@@ -1264,6 +1264,7 @@ body.arlo {
 /* Colours */
 
 .arlo#arlo .arlo-color1,
+.arlo#arlo a,
 .arlo#arlo a:hover,
 .arlo#arlo a.arlo-template-name:hover,
 .arlo#arlo .page-numbers:not(.next):not(.prev):hover,
@@ -1287,7 +1288,6 @@ body.arlo {
 .arlo#arlo .arlo-list.event-search .arlo-next-running a.arlo-register,
 .arlo#arlo .arlo-category-list a,
 .arlo#arlo .button.arlo-register,
-.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a,
 .arlo#arlo .upcoming .arlo-cf.arlo-group-divider:after,
 .arlo#arlo .catalogue .arlo-cf.arlo-group-divider:after,
 .arlo#arlo .upcoming .arlo-event-subhead > div:after,
@@ -1364,7 +1364,6 @@ body.arlo {
 .arlo#arlo .arlo-category-list a,
 .arlo#arlo .arlo-filters-buttons a,
 .arlo#arlo .button.arlo-register:hover,
-.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a:hover,
 .arlo#arlo .arlo-show-more-link:hover,
 .arlo#arlo .arlo-contrast-color,
 .arlo#arlo .upcoming .button.arlo-waiting-list:hover,
@@ -1373,6 +1372,7 @@ body.arlo {
 .arlo#arlo .button.arlo-waiting-list:hover,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a:hover,
 .arlo#arlo .arlo-list.event-search .arlo-next-running a:hover,
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a:hover,
 .arlo#arlo .arlo-advertised-duration,
 .arlo#arlo .arlo-event .arlo-event-full,
 .arlo#arlo .arlo-event_tags-list > li,
@@ -1386,6 +1386,8 @@ body.arlo {
 .arlo#arlo .upcoming .arlo-cal .arlo-day:after {
     background-color: white;
 }
+
+
 
 /* Suggest templates */
 

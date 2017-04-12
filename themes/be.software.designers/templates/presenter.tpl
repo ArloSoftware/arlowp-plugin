@@ -2,6 +2,7 @@
     <div class="arlo-presenter-details">
         [arlo_presenter_profile]
         [arlo_presenter_qualifications label='<h4>Qualifications</h4>']
+        [arlo_presenter_interests label='<h4>Interests</h4>']
 
         <div class="arlo-social-links">
             [arlo_presenter_social_link network='linkedin' linktext='<img src="/wp-content/plugins/arlo-training-and-event-management-system/themes/be.software/images/icon_linkedin.png" alt="LinkedIn">']

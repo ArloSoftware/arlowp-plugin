@@ -421,7 +421,8 @@ body.arlo {
 .arlo#arlo .arlo-show-more-link:after,
 .arlo#arlo .arlo-social-media a:after,
 .arlo#arlo .arlo-list.event-search .arlo-next-running a:after,
-.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a:after {
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a:after,
+.arlo#arlo .arlo-list.event-search .arlo-next-running a:after {
     content: "";
     position: absolute;
     left: 0;
@@ -461,7 +462,8 @@ body.arlo {
 .arlo#arlo .arlo-show-more-link:hover:after,
 .arlo#arlo .arlo-social-media a:hover:after,
 .arlo#arlo .arlo-list.event-search .arlo-next-running a:hover:after,
-.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a:hover:after {
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a:hover:after,
+.arlo#arlo .arlo-list.event-search .arlo-next-running a:hover:after {
     width: 100%;
 }
 
@@ -831,8 +833,10 @@ body.arlo {
     margin-bottom: 1em;
 }
 
-.arlo#arlo .arlo-search-field {
+.arlo#arlo input.arlo-search-field,
+.arlo#arlo input.arlo-search-field:focus {
     padding: 1em;
+    background-color: transparent;
 }
 
 .arlo#arlo .event-search > li {
@@ -1138,7 +1142,8 @@ body.arlo {
 .arlo#arlo .arlo-border-color1,
 .arlo#arlo .arlo-list.catalogue .arlo-cf.arlo-catalogue-event,
 .arlo .arlo-categories-widget li a,
-.arlo .arlo-widget-upcoming .arlo-cal.arlo-left,.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates tr,
+.arlo .arlo-widget-upcoming .arlo-cal.arlo-left,
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates tr,
 .arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates tr td:first-of-type {
     border-left-color: #f97070;
     border-right-color: #f97070;
@@ -1178,7 +1183,8 @@ body.arlo {
 .arlo .arlo-categories-widget a,
 .arlo#arlo a.next.page-numbers, 
 .arlo#arlo .arlo-list.event-search .arlo-next-running a,
-.arlo#arlo .upcoming .arlo-event-name a {
+.arlo#arlo .upcoming .arlo-event-name a,
+.arlo#arlo select {
     color: #383838;
 }
 
