@@ -32,7 +32,7 @@
                    [arlo_event_credits wrap='<div class="arlo-event-credits">%s</div>']
                    [arlo_event_offers wrap='<div class="arlo-color4">%s</div>']
                    [arlo_event_tags layout="list"]
-                   [arlo_event_registration]
+                   [arlo_event_registration class="arlo-button"]
                 </div>
         </li>
         [/arlo_event_list_item]
@@ -47,7 +47,7 @@
                     
                     [arlo_oa_delivery_description wrap='<div class="arlo-delivery-desc">%s</div>']
                     [arlo_oa_offers]
-                    [arlo_oa_registration]
+                    [arlo_oa_registration class="arlo-button"]
             </li>
             [/arlo_oa_list_item]
         [/arlo_oa_list]     

@@ -847,8 +847,8 @@ body.arlo {
     margin-top: 1em;
 }
 
-.arlo#arlo .arlo-next-running a,
-.arlo#arlo .arlo-next-running span,
+.arlo#arlo .event-search .arlo-next-running a,
+.arlo#arlo .event-search .arlo-next-running span,
 .arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a {
     font-size: .9em;
     padding: .5em .8em;
