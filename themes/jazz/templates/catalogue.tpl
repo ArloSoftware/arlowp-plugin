@@ -2,7 +2,7 @@
     
 [arlo_categories wrap='<div class="arlo-categories">%s</div>']
 [arlo_template_region_selector]
-[arlo_event_template_filters]
+[arlo_event_template_filters buttonclass="arlo-button"]
 [arlo_category_header wrap='<div class="arlo-category-header">%s</div>']
 
     <ul class="arlo-list catalogue">
