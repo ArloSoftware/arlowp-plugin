@@ -774,7 +774,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
                     
                     $location = $event->e_locationname;
                     
-                    $date = strftime($format, strtotime($event->e_startdatetime));
+                    $date = self::event_date_formatter(['format' => $format], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline);
 
                     $display_text = str_replace(['{%date%}', '{%location%}'], [$date, $location], $text);
                     
