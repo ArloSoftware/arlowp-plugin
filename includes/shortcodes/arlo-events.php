@@ -803,6 +803,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
     
 
     private static function event_date_formatter($atts, $date, $offset, $is_online = false) {
+        global $arlo_plugin;
         $timezone = null;
         
         $timewithtz = str_replace(' ', 'T', $date) . $offset;
@@ -811,12 +812,9 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
 
         $utc_timezone_name = "UTC";
 
-        if (class_exists('\Arlo\GeneratedStaticArrays') && !empty(\Arlo\GeneratedStaticArrays::$arlo_timezones[$GLOBALS['arlo_event_list_item']['e_timezone_id']])) {
-            $timezone_windows_tz_id = \Arlo\GeneratedStaticArrays::$arlo_timezones[$GLOBALS['arlo_event_list_item']['e_timezone_id']]['windows_tz_id'];
-        }
-
-        if (!empty($timezone_windows_tz_id) && !empty(\Arlo\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$timezone_windows_tz_id])) {
-            $timezone = new \DateTimeZone(\Arlo\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$timezone_windows_tz_id]);
+        $timezone_array = $arlo_plugin->get_timezone_manager()->get_indexed_timezones($GLOBALS['arlo_event_list_item']['e_timezone_id']);
+        if (!is_null($timezone_array) && !empty($timezone_array['windows_tz_id']) && !empty(\Arlo\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$timezone_array['windows_tz_id']])) {
+            $timezone = new \DateTimeZone(\Arlo\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$timezone_array['windows_tz_id']]);
         } else {
             try {
                 $timezone = new \DateTimeZone(get_option('timezone_string'));

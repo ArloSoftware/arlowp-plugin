@@ -170,28 +170,6 @@ class Shortcodes {
 		return $filter_html;
 	}
 
-	private static function getTimezones($timezone_id = 0) {
-		global $wpdb, $arlo_plugin;
-
-		$table = $wpdb->prefix . "arlo_timezones";
-		$import_id = $arlo_plugin->get_importer()->get_current_import_id();
-		$timezone_id = intval($timezone_id);
-
-		$sql = "
-		SELECT
-			id,
-			name,
-			windows_tz_id
-		FROM
-			{$table}
-		WHERE
-			import_id = " . $import_id . "
-			" . ($timezone_id > 0 ? " AND id = " . $timezone_id : "") . "
-		ORDER BY name
-		";
-		return $wpdb->get_results($sql, ARRAY_A);
-	}
-
 	private static function shortcode_search_field($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
 		global $post, $wpdb;
 
@@ -220,7 +198,8 @@ class Shortcodes {
 	}	
 
 	private static function shortcode_timezones($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-		global $post, $wpdb;
+		//TODO: nasty to use the global $arlo_plugin, need to refactor 
+		global $post, $wpdb, $arlo_plugin;
 	
 		// only allow this to be used on the eventtemplate page
 		if($post->post_type != 'arlo_event') {
@@ -260,11 +239,7 @@ class Shortcodes {
 		$content = '<form method="GET" class="arlo-timezone">';
 		$content .= '<select name="timezone"><option value="">' . __('Select a time zone', 'arlo-for-wordpress') . '</option>';
 
-		if (class_exists('\Arlo\GeneratedStaticArrays') && isset(\Arlo\GeneratedStaticArrays::$arlo_timezones) && is_array(\Arlo\GeneratedStaticArrays::$arlo_timezones)) {
-			$timezones = \Arlo\GeneratedStaticArrays::$arlo_timezones;
-		} else {
-			$timezones = self::getTimezones();
-		}
+		$timezones = $arlo_plugin->get_timezone_manager()->get_timezones();
 
 		foreach($timezones as $timezone_id => $timezone) {
 			$selected = false;

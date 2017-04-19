@@ -578,6 +578,3 @@ function arlo_add_datamodel() {
 
 	$plugin->get_schema_manager()->install_schema();
 }
-
-
-\Arlo\Shortcodes\Shortcodes::init(); 

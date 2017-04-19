@@ -13,9 +13,7 @@ class Finish extends BaseImporter {
 
             //clean up the old entries
 			$this->cleanup_import($this->import_id);
-
-			rename(sprintf(trailingslashit(plugin_dir_path( __FILE__ )) . '../arlo-generated-static-arrays-%s.php', $this->import_id), trailingslashit(plugin_dir_path( __FILE__ )) . '../arlo-generated-static-arrays.php');
-        
+       
             // update logs
             Logger::log('Synchronization successful', $this->import_id, null, true);            
 			

@@ -14,6 +14,7 @@ use ArloAPI\Client;
 use Arlo\Utilities;
 use Arlo\Environment;
 use Arlo\ThemeManager;
+use Arlo\TimeZoneManager;
 use Arlo\SystemRequirements;
 
 /**
@@ -351,6 +352,8 @@ class Arlo_For_Wordpress {
 		add_action( 'init', 'set_search_redirect');
 		
 		add_action( 'wp', 'set_region_redirect');
+
+		\Arlo\Shortcodes\Shortcodes::init(); 
 	}
 
 	/**
@@ -1051,6 +1054,18 @@ class Arlo_For_Wordpress {
 		$this->__set('dbl', $dbl);
 		
 		return $dbl;
+	}	
+
+	public function get_timezone_manager() {
+		if($timezone_manager = $this->__get('timezone_manager')) {
+			return $timezone_manager;
+		}
+		
+		$timezone_manager = new TimeZoneManager($this, $this->get_dbl());
+		
+		$this->__set('timezone_manager', $timezone_manager);
+		
+		return $timezone_manager;
 	}	
 
 	public function get_schema_manager() {

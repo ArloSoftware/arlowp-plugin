@@ -32,7 +32,6 @@ class Importer {
 				'ImportRequest' => "Request a database snapshot",
 				'Download' => "Download snapshot file",
 				'ProcessFragment' => "Process fragments",
-				'GenerateStaticArrays' => 'Generate static arrays',
 				'Finish' => 'Finalize the import',
 			];	
 
