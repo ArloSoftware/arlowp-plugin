@@ -239,7 +239,7 @@ class Shortcodes {
 		$content = '<form method="GET" class="arlo-timezone">';
 		$content .= '<select name="timezone"><option value="">' . __('Select a time zone', 'arlo-for-wordpress') . '</option>';
 
-		$timezones = $arlo_plugin->get_timezone_manager()->get_timezones();
+		$timezones = $arlo_plugin->get_timezone_manager()->get_indexed_timezones();
 
 		foreach($timezones as $timezone_id => $timezone) {
 			$selected = false;
