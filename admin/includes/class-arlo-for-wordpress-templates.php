@@ -91,7 +91,7 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 	}
 	
 	protected function get_sql_where_array() {
-		return ["et.import_id = '" . $this->import_id . "'"];
+		return ["et.import_id = " . $this->import_id];
 	}
 	
 	protected function get_searchable_fields() {

@@ -141,7 +141,7 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 		
 	protected function get_sql_where_array() {
 		return [
-			"e.import_id = '" . $this->import_id . "'",
+			"e.import_id = " . $this->import_id,
 			"e.e_parent_arlo_id = 0"
 		];
 	}
@@ -185,7 +185,7 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			e.e_providerorganisation,
 			e.e_providerwebsite,
 			e.e_isonline,
-			(SELECT GROUP_CONCAT(e_region) FROM " . $this->wpdb->prefix . "arlo_events WHERE e_arlo_id = e.e_arlo_id AND import_id = '" . $this->import_id . "' AND e.import_id = '" . $this->import_id . "' GROUP BY e_arlo_id) AS e_region,
+			(SELECT GROUP_CONCAT(e_region) FROM " . $this->wpdb->prefix . "arlo_events WHERE e_arlo_id = e.e_arlo_id AND import_id = " . $this->import_id . " AND e.import_id = " . $this->import_id . " GROUP BY e_arlo_id) AS e_region,
 			et.et_name,
 			et.et_descriptionsummary,
 			(SELECT COUNT(1) FROM " . $this->wpdb->prefix . "arlo_events WHERE e_parent_arlo_id = e.e_arlo_id AND e_region = e.e_region) as e_session_num,
