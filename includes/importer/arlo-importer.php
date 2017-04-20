@@ -32,6 +32,7 @@ class Importer {
 				'ImportRequest' => "Request a database snapshot",
 				'Download' => "Download snapshot file",
 				'ProcessFragment' => "Process fragments",
+				'CategoryDepth' => 'Updating category depth',
 				'Finish' => 'Finalize the import',
 			];	
 
@@ -448,7 +449,7 @@ class Importer {
 			$subtask_state = $this->current_task_class->get_state();
 			
 			if (!is_null($subtask_state)) {
-				$subtask_desc = ': ' . $subtask_state['current_subtask_num'] . '/' . count($this->current_task_class->import_tasks) . ' ' . $subtask_state['current_subtask_desc'];
+				$subtask_desc = ': ' . ($subtask_state['current_subtask_num'] + 1) . '/' . count($this->current_task_class->import_tasks) . ' ' . $subtask_state['current_subtask_desc'];
 			}
 		}
 

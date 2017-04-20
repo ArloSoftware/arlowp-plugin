@@ -22,7 +22,6 @@ class ProcessFragment extends BaseImporter {
 				'OnlineActivities' => 'Importing online activities',
 				'Categories' => 'Importing categories',
 				'CategoryItems' => 'Updating templates order in category',
-				'CategoryDepth' => 'Updating category depth',
 			];	
 
 	public $current_task;
@@ -34,7 +33,6 @@ class ProcessFragment extends BaseImporter {
 
 	private $irregular_tasks = [
 				'Download',
-				'CategoryDepth',
 			];
 
 	public $uri;
