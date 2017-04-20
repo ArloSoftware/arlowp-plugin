@@ -122,8 +122,6 @@ abstract class BaseImporter {
 			 	throw new \Exception('Tag type failed: ' . $type);
 			break;		
 		}
-
-		
 		
 		if (isset($tags) && is_array($tags)) {
 			$exisiting_tags = [];
@@ -143,14 +141,14 @@ abstract class BaseImporter {
 			foreach ($rows as $row) {
 				$exisiting_tags[$row['tag']] = $row['id'];
 			}
-			unset($rows);
+			unset($rows);		
 			
 			foreach ($tags as $tag) {
 				if (empty($exisiting_tags[$tag])) {
 					$query = $this->dbl->query( $this->dbl->prepare( 
 						"INSERT INTO " . $this->dbl->prefix . "arlo_tags
 						(tag, import_id) 
-						VALUES ( %s, %s ) 
+						VALUES ( %s, %d ) 
 						", 
 						$tag,
 						$this->import_id
@@ -167,7 +165,7 @@ abstract class BaseImporter {
 					$query = $this->dbl->query( $this->dbl->prepare( 
 						"INSERT INTO {$table_name}
 						(" . $field . ", tag_id, import_id) 
-						VALUES ( %d, %d, %s ) 
+						VALUES ( %d, %d, %d ) 
 						", 
 						$id,
 						$exisiting_tags[$tag],
@@ -179,7 +177,7 @@ abstract class BaseImporter {
 					}
 				} else {
 					throw new \Exception('Couldn\'t find tag: ' . $tag );
-				}
+				}					
 			}
 		}
 	}

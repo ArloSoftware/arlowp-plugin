@@ -6,8 +6,6 @@ use Arlo\Logger;
 
 class Events extends BaseImporter {
 
-	private $event_id;
-
 	public function __construct($importer, $dbl, $message_handler, $data, $iteration = 0, $api_client = null, $file_handler = null, $scheduler = null) {
 		parent::__construct($importer, $dbl, $message_handler, $data, $iteration, $api_client, $file_handler, $scheduler);
 
@@ -16,11 +14,11 @@ class Events extends BaseImporter {
 
 	protected function save_entity($item) {
 		if (!empty($item->EventID) && is_numeric($item->EventID) && $item->EventID > 0) {
-			$this->save_event_data($item, 0);
+			$entity_id = $this->save_event_data($item, 0);
 
 			//only save for events, not for sessions
 			if (isset($item->Tags) && !empty($item->Tags)) {
-				$this->save_tags($item->Tags, $this->event_id, 'event');
+				$this->save_tags($item->Tags, $entity_id, 'event');
 			}
 		}
 	}
@@ -66,16 +64,16 @@ class Events extends BaseImporter {
 			throw new \Exception('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query);
 		}	
 		
-		$this->event_id = $this->dbl->insert_id;
+		$entity_id = $this->dbl->insert_id;
 		
 		//advertised offers
 		if(!empty($item->AdvertisedOffers) && is_array($item->AdvertisedOffers)) {
-			$this->save_advertised_offer($item->AdvertisedOffers, $item->Region, null, $this->event_id);
+			$this->save_advertised_offer($item->AdvertisedOffers, $item->Region, null, $entity_id);
 		}
 		
 		// prsenters
 		if(!empty($item->Presenters) && is_array($item->Presenters)) {
-			$this->save_presenters($item->Presenters);
+			$this->save_presenters($item->Presenters, $entity_id);
 		}
 		
 		//Save session information
@@ -84,10 +82,12 @@ class Events extends BaseImporter {
 				$this->save_event_data($session, $item->EventID, $item->Region);
 			}
 		}
+
+		return $entity_id;
 	}
 
-	private function save_presenters($presenters = []) {
-		if (empty($this->event_id)) throw new \Exception('No eventID given: ' . __CLASS__ . '::' . __FUNCTION__);
+	private function save_presenters($presenters = [], $event_id) {
+		if (empty($event_id)) throw new \Exception('No eventID given: ' . __CLASS__ . '::' . __FUNCTION__);
 
 		if(!empty($presenters) && is_array($presenters)) {
 			foreach($presenters as $index => $presenter) {
@@ -96,7 +96,7 @@ class Events extends BaseImporter {
 					(e_id, p_arlo_id, p_order, import_id) 
 					VALUES ( %d, %d, %d, %s ) 
 					", 
-				    $this->event_id,
+				    $event_id,
 				    $presenter->PresenterID,
 				    $index,
 				    $this->import_id
