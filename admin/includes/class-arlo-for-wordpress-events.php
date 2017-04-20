@@ -106,6 +106,21 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 				break;
 			case 'e_startdatetime':
 			case 'e_finishdatetime':
+				//convert to the given timezone, if available
+				if (!empty($this->timezones[$item->e_timezone_id])) {
+					 $timewithtz = str_replace(' ', 'T', $item->$column_name) . $item->e_datetimeoffset;
+					 
+        			 $date = new \DateTime($timewithtz);
+
+					 $timezone = new \DateTimeZone(\Arlo\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$this->timezones[$item->e_timezone_id]['windows_tz_id']]);
+					 
+					 if ($timezone != null) {
+            			$date->setTimezone($timezone);
+
+						return strftime("%Y-%m-%d %H:%M:%S", $date->getTimestamp() + $date->getOffset()) . " " . $date->format("T");
+					 }
+				}
+				
 				return $item->$column_name . " " . $item->e_timezone;
 			break;
 			case 'v_name':
@@ -172,7 +187,9 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			e.e_name,
 			e.e_startdatetime,
 			e.e_finishdatetime,
+			e.e_datetimeoffset,
 			e.e_timezone,
+			e.e_timezone_id,
 			v.v_name,
 			e.e_locationname,
 			e.e_locationroomname,

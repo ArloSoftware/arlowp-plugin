@@ -27,6 +27,7 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	protected $paged;
 	protected $import_id;
 	protected $plugin_slug;
+	protected $timezones;
 	
 	protected static $filter_column_mapping = array(
 		'et_id' => 'et.et_arlo_id',
@@ -65,6 +66,33 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 		$this->version = VersionHandler::VERSION;	
 		$this->wpdb = &$wpdb;
 		$this->platform_name = $settings['platform_name'];	
+
+		$this->timezones = $this->get_timezones();
+	}
+
+	private function get_timezones() {
+		global $wpdb;
+		$timezones = [];
+
+		$sql = "
+		SELECT
+			id,
+			name,
+			windows_tz_id
+		FROM
+			" . $wpdb->prefix . "arlo_timezones
+		WHERE
+			import_id = " . $this->import_id . "
+		ORDER BY name		
+		";
+
+		$items = $wpdb->get_results($sql, ARRAY_A);
+
+		foreach ($items as $timezone) {
+			$timezones[$timezone['id']] = $timezone;
+		}
+
+		return $timezones;
 	}
 	
 	private function init_sql_variables() {
