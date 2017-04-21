@@ -660,6 +660,11 @@ class Arlo_For_Wordpress {
 
 		update_option('arlo_plugin_version', VersionHandler::VERSION);
 
+		if (!SystemRequirements::overall_check()) {
+			update_option( 'arlo_plugin_disabled', 1 );
+			update_option( 'arlo_import_disabled', 1 );
+		} 		
+
 		//load demo data
 		$settings = get_option('arlo_settings');
 		if (empty($settings['platform_name'])) {
