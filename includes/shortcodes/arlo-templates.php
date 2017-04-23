@@ -467,12 +467,12 @@ class Templates {
         $settings = get_option('arlo_settings');  
             
         if (!empty($settings['post_types']['event']['posts_page'])) {
-            $slug = get_post($settings['post_types']['event']['posts_page'])->post_name;
+            $page_link = get_permalink(get_post($settings['post_types']['event']['posts_page']));
         } else {
-            $slug = get_post($post)->post_name;
+            $page_link = get_permalink(get_post($post));
         }
 
-        $filter_html = '<form id="arlo-event-filter" class="arlo-filters" method="get" action="'.site_url().'/'.$slug.'/">';
+        $filter_html = '<form id="arlo-event-filter" class="arlo-filters" method="get" action="'. $page_link .'">';
         
         foreach($filters_array as $filter) :
 
@@ -572,9 +572,9 @@ class Templates {
         // category select
 
 
-        $filter_html .= '<div class="arlo-filters-buttons"><input type="hidden" id="arlo-page" value="' . $slug . '">';
+        $filter_html .= '<div class="arlo-filters-buttons"><input type="hidden" id="arlo-page" value="' . $page_link . '">';
             
-        $filter_html .= '<a href="' . get_page_link() . '" class="' . esc_attr($buttonclass) . '">' . htmlentities($resettext, ENT_QUOTES, "UTF-8") . '</a></div>';
+        $filter_html .= '<a href="' . $page_link . '" class="' . esc_attr($buttonclass) . '">' . htmlentities($resettext, ENT_QUOTES, "UTF-8") . '</a></div>';
 
         $filter_html .= '</form>';
         

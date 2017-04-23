@@ -772,7 +772,7 @@ class Arlo_For_Wordpress {
 	 * @since    1.0.0
 	 */
 	public function enqueue_styles() {
-		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css?20161031', __FILE__ ), array(), VersionHandler::VERSION );
+		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css?20170424', __FILE__ ), array(), VersionHandler::VERSION );
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-darktooltip', plugins_url( 'assets/css/libs/darktooltip.min.css', __FILE__ ), array(), VersionHandler::VERSION );
 		wp_enqueue_style( $this->plugin_slug .'-icons8', plugins_url( '../admin/assets/fonts/icons8/Arlo-WP.css', __FILE__ ), array(), VersionHandler::VERSION );
 
@@ -924,7 +924,7 @@ class Arlo_For_Wordpress {
 	 * @since    1.0.0
 	 */
 	public function enqueue_scripts() {
-		wp_enqueue_script( $this->plugin_slug . '-plugin-script', plugins_url( 'assets/js/public.js?20161031', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION );
+		wp_enqueue_script( $this->plugin_slug . '-plugin-script', plugins_url( 'assets/js/public.js?20170424', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION );
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script-darktooltip', plugins_url( 'assets/js/libs/jquery.darktooltip.min.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION );
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script-cookie', plugins_url( 'assets/js/libs/jquery.cookie.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION );
 		wp_localize_script( $this->plugin_slug . '-plugin-script', 'objectL10n', array(

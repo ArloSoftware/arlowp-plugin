@@ -62,15 +62,12 @@
         	};
         	
         	var page = $('#arlo-page').val();
-        	if (page.indexOf('/') !== 0) {
-        		page = '/' + page;
-        	}
         	
         	if (page[page.length-1] != '/') {
         		page = page + '/';
         	}
         	
-        	var url = WPUrls.home_url + page;
+        	var url = page;
         	
         	for (var i in filters) {
         		if (filters.hasOwnProperty(i) && $('#' + filters[i]).length == 1 && $('#' + filters[i]).val().trim() != '') {
