@@ -467,7 +467,7 @@ class Templates {
         $settings = get_option('arlo_settings');  
             
         if (!empty($settings['post_types']['event']['posts_page'])) {
-            $page_link = get_permalink(get_post($settings['post_types']['event']['posts_page']));
+            $page_link = site_url() . '/' . get_page_uri(get_post($settings['post_types']['event']['posts_page'])->ID);
         } else {
             $page_link = get_permalink(get_post($post));
         }
