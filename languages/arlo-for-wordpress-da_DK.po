@@ -2,519 +2,480 @@
 # This file is distributed under the same license as the Arlo package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Arlo 2.2\n"
+"Project-Id-Version: Arlo For WordPress v3.0.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/arlowp-plugin\n"
-"POT-Creation-Date: 2016-05-03 11:01+0200\n"
+"POT-Creation-Date: 2017-04-24 14:02+1200\n"
+"PO-Revision-Date: 2017-04-24 14:09+1200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: da_DK\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-07-20 17:22+1200\n"
-"Language-Team: \n"
-"X-Generator: Poedit 1.8.8\n"
-"Last-Translator: \n"
+"X-Generator: Poedit 2.0.1\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Language: da_DK\n"
 
-#: admin/class-arlo-for-wordpress-admin.php:239
+#: admin/class-arlo-for-wordpress-admin.php:235
 msgid "Arlo for WordPress"
 msgstr ""
 
-#: admin/class-arlo-for-wordpress-admin.php:239
+#: admin/class-arlo-for-wordpress-admin.php:235
 msgid ""
 "Arlo is almost ready. Just enter your details and you&apos;re good to go."
 msgstr ""
 
-#: admin/class-arlo-for-wordpress-admin.php:276
-#: admin/includes/class-arlo-for-wordpress-events.php:19
-#: admin/views/admin-orig.php:38
+#: admin/class-arlo-for-wordpress-admin.php:272
+#: admin/includes/class-arlo-for-wordpress-events.php:20
 msgid "Events"
 msgstr "Kurser"
 
-#: admin/class-arlo-for-wordpress-admin.php:277
-#: admin/includes/class-arlo-for-wordpress-templates.php:19
-#: admin/views/admin-orig.php:93
+#: admin/class-arlo-for-wordpress-admin.php:273
+msgid "Online Activities"
+msgstr ""
+
+#: admin/class-arlo-for-wordpress-admin.php:274
+#: admin/includes/class-arlo-for-wordpress-templates.php:20
 msgid "Templates"
 msgstr ""
 
-#: admin/class-arlo-for-wordpress-admin.php:278
-#: admin/includes/class-arlo-for-wordpress-sessions.php:19
-#: public/bootstrap.php:2247
+#: admin/class-arlo-for-wordpress-admin.php:275
+#: admin/includes/class-arlo-for-wordpress-sessions.php:20
+#: includes/shortcodes/arlo-events.php:479
 msgid "Sessions"
 msgstr "Hold"
 
-#: admin/class-arlo-for-wordpress-admin.php:279
-#: admin/includes/class-arlo-for-wordpress-presenters.php:19
-#: admin/views/admin-orig.php:58
+#: admin/class-arlo-for-wordpress-admin.php:276
+#: admin/includes/class-arlo-for-wordpress-presenters.php:20
 msgid "Presenters"
 msgstr "Instruktører"
 
-#: admin/class-arlo-for-wordpress-admin.php:280
-#: admin/includes/class-arlo-for-wordpress-venues.php:19
+#: admin/class-arlo-for-wordpress-admin.php:277
+#: admin/includes/class-arlo-for-wordpress-venues.php:20
 msgid "Venues"
 msgstr "Lokationer"
 
-#: admin/class-arlo-for-wordpress-admin.php:350
+#: admin/class-arlo-for-wordpress-admin.php:278
+msgid "Logs"
+msgstr ""
+
+#: admin/class-arlo-for-wordpress-admin.php:363
 msgid "Settings"
 msgstr ""
 
-#: admin/class-arlo-for-wordpress-admin.php:481
+#: admin/class-arlo-for-wordpress-admin.php:494
 msgid "Recommended shortcodes"
 msgstr ""
 
-#: admin/class-arlo-for-wordpress-admin.php:482
+#: admin/class-arlo-for-wordpress-admin.php:495
 msgid "More about shortcodes"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-events.php:18
-#: public/class-arlo-for-wordpress.php:2266
+#: admin/includes/class-arlo-for-wordpress-events.php:19
+#: includes/arlo-notice-handler.php:323
 msgid "Event"
 msgstr "Kursus"
 
-#: admin/includes/class-arlo-for-wordpress-events.php:40
-#: admin/includes/class-arlo-for-wordpress-templates.php:30
+#: admin/includes/class-arlo-for-wordpress-events.php:41
+#: admin/includes/class-arlo-for-wordpress-onlineactivities.php:41
+#: admin/includes/class-arlo-for-wordpress-templates.php:31
 msgid "Code"
 msgstr "Kode"
 
-#: admin/includes/class-arlo-for-wordpress-events.php:41
-#: admin/includes/class-arlo-for-wordpress-presenters.php:40
-#: admin/includes/class-arlo-for-wordpress-sessions.php:41
-#: admin/includes/class-arlo-for-wordpress-templates.php:31
+#: admin/includes/class-arlo-for-wordpress-events.php:42
+#: admin/includes/class-arlo-for-wordpress-onlineactivities.php:42
+#: admin/includes/class-arlo-for-wordpress-presenters.php:41
+#: admin/includes/class-arlo-for-wordpress-sessions.php:42
+#: admin/includes/class-arlo-for-wordpress-templates.php:32
 msgid "Name"
 msgstr "Navn"
 
-#: admin/includes/class-arlo-for-wordpress-events.php:42
-#: admin/includes/class-arlo-for-wordpress-sessions.php:42
+#: admin/includes/class-arlo-for-wordpress-events.php:43
+#: admin/includes/class-arlo-for-wordpress-sessions.php:43
 msgid "Start date"
 msgstr "Start dato"
 
-#: admin/includes/class-arlo-for-wordpress-events.php:43
-#: admin/includes/class-arlo-for-wordpress-sessions.php:43
+#: admin/includes/class-arlo-for-wordpress-events.php:44
+#: admin/includes/class-arlo-for-wordpress-sessions.php:44
 msgid "Finish date"
 msgstr "Slut dato"
 
-#: admin/includes/class-arlo-for-wordpress-events.php:44
-#: admin/includes/class-arlo-for-wordpress-sessions.php:44
-#: admin/includes/class-arlo-for-wordpress-venues.php:40
+#: admin/includes/class-arlo-for-wordpress-events.php:45
+#: admin/includes/class-arlo-for-wordpress-sessions.php:45
+#: admin/includes/class-arlo-for-wordpress-venues.php:41
 msgid "Venue name"
 msgstr "Lokationsnavn"
 
-#: admin/includes/class-arlo-for-wordpress-events.php:45
-#: admin/includes/class-arlo-for-wordpress-sessions.php:45
+#: admin/includes/class-arlo-for-wordpress-events.php:46
+#: admin/includes/class-arlo-for-wordpress-sessions.php:46
 msgid "Summary"
 msgstr "Kort beskrivelse"
 
-#: admin/includes/class-arlo-for-wordpress-events.php:46
-#: admin/includes/class-arlo-for-wordpress-sessions.php:46
-#: admin/includes/class-arlo-for-wordpress-templates.php:32
+#: admin/includes/class-arlo-for-wordpress-events.php:47
+#: admin/includes/class-arlo-for-wordpress-sessions.php:47
+#: admin/includes/class-arlo-for-wordpress-templates.php:33
 msgid "Description"
 msgstr "Beskrivelse"
 
-#: admin/includes/class-arlo-for-wordpress-events.php:47
+#: admin/includes/class-arlo-for-wordpress-events.php:48
 msgid "Notice"
 msgstr "Bemærk"
 
-#: admin/includes/class-arlo-for-wordpress-events.php:48
+#: admin/includes/class-arlo-for-wordpress-events.php:49
 msgid "Num. of sessions"
 msgstr "Antal sessions"
 
-#: admin/includes/class-arlo-for-wordpress-presenters.php:18
-#: public/bootstrap.php:2165
-msgid "Presenter"
-msgstr "Instruktør"
+#: admin/includes/class-arlo-for-wordpress-events.php:50
+#: admin/includes/class-arlo-for-wordpress-onlineactivities.php:44
+#: admin/includes/class-arlo-for-wordpress-sessions.php:48
+#: admin/includes/class-arlo-for-wordpress-templates.php:36
+msgid "Regions"
+msgstr "Kommuner"
 
-#: admin/includes/class-arlo-for-wordpress-presenters.php:41
+#: admin/includes/class-arlo-for-wordpress-loglist.php:35
+#, fuzzy
+#| msgid "Country"
+msgid "Log entry"
+msgstr "Land"
+
+#: admin/includes/class-arlo-for-wordpress-loglist.php:36
+msgid "Log entries"
+msgstr ""
+
+#: admin/includes/class-arlo-for-wordpress-loglist.php:184
+msgid "ID"
+msgstr ""
+
+#: admin/includes/class-arlo-for-wordpress-loglist.php:185
+msgid "Import ID"
+msgstr ""
+
+#: admin/includes/class-arlo-for-wordpress-loglist.php:186
+msgid "Message"
+msgstr ""
+
+#: admin/includes/class-arlo-for-wordpress-loglist.php:187
+#, fuzzy
+msgid "Created date"
+msgstr "Start dato"
+
+#: admin/includes/class-arlo-for-wordpress-onlineactivities.php:19
+msgid "Online activity"
+msgstr ""
+
+#: admin/includes/class-arlo-for-wordpress-onlineactivities.php:20
+msgid "Online activities"
+msgstr ""
+
+#: admin/includes/class-arlo-for-wordpress-onlineactivities.php:43
+msgid "Delivery desc."
+msgstr ""
+
+#: admin/includes/class-arlo-for-wordpress-presenters.php:19
+#: includes/shortcodes/arlo-events.php:405
+#, fuzzy
+#| msgid "Presenter"
+msgid "Presenter"
+msgid_plural "Presenters"
+msgstr[0] "Instruktør"
+msgstr[1] "Instruktør"
+
+#: admin/includes/class-arlo-for-wordpress-presenters.php:42
 msgid "Profile"
 msgstr "Profil"
 
-#: admin/includes/class-arlo-for-wordpress-presenters.php:42
+#: admin/includes/class-arlo-for-wordpress-presenters.php:43
 msgid "Qualifications"
 msgstr "Kvalifikationer"
 
-#: admin/includes/class-arlo-for-wordpress-presenters.php:43
+#: admin/includes/class-arlo-for-wordpress-presenters.php:44
 msgid "Interests"
 msgstr "Interesser"
 
-#: admin/includes/class-arlo-for-wordpress-presenters.php:44
+#: admin/includes/class-arlo-for-wordpress-presenters.php:45
 msgid "Twitter"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-presenters.php:45
+#: admin/includes/class-arlo-for-wordpress-presenters.php:46
 msgid "Facebook"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-presenters.php:46
+#: admin/includes/class-arlo-for-wordpress-presenters.php:47
 msgid "LinkedIn"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-sessions.php:18
+#: admin/includes/class-arlo-for-wordpress-sessions.php:19
 msgid "Session"
 msgstr "Hold"
 
-#: admin/includes/class-arlo-for-wordpress-sessions.php:40
+#: admin/includes/class-arlo-for-wordpress-sessions.php:41
 msgid "Event code"
 msgstr "Kursuskode"
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:77
+#: admin/includes/class-arlo-for-wordpress-settings.php:142
 msgid "General Settings"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:82
-msgid "Platform Name"
+#: admin/includes/class-arlo-for-wordpress-settings.php:147
+msgid "Arlo domain"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:96
+#: admin/includes/class-arlo-for-wordpress-settings.php:162
 msgid "Last import"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:100
+#: admin/includes/class-arlo-for-wordpress-settings.php:166
 msgid "Synchronize now"
 msgstr "Synkroniser nu"
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:107
+#: admin/includes/class-arlo-for-wordpress-settings.php:173
 msgid "Price shown"
 msgstr "Vist pris"
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:113
+#: admin/includes/class-arlo-for-wordpress-settings.php:179
 msgid "\"Free\" text"
 msgstr "\"Gratis\" tekst"
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:119
-#: public/bootstrap.php:2078 public/bootstrap.php:2618
-#: public/bootstrap.php:3440
+#: admin/includes/class-arlo-for-wordpress-settings.php:185
+#: includes/shortcodes/arlo-events.php:607
+#: includes/shortcodes/arlo-shortcodes.php:317
+#: includes/shortcodes/arlo-upcoming-events.php:93
 msgid "Free"
 msgstr "Gratis"
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:126
+#: admin/includes/class-arlo-for-wordpress-settings.php:192
 msgid "\"No events to show\" text"
 msgstr "Der er ingen kursusdatoer"
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:132
-#: public/bootstrap.php:1418 public/bootstrap.php:2582
+#: admin/includes/class-arlo-for-wordpress-settings.php:198
+#: includes/shortcodes/arlo-templates.php:276
+#: includes/shortcodes/arlo-upcoming-events.php:59
 msgid "No events to show"
 msgstr "Ingen kurser at finde her"
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:139
+#: admin/includes/class-arlo-for-wordpress-settings.php:205
 msgid "No event on a template text"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:145
-#: public/bootstrap.php:1867
+#: admin/includes/class-arlo-for-wordpress-settings.php:211
+#: includes/shortcodes/arlo-templates.php:388
 msgid ""
 "Interested in attending? Have a suggestion about running this course near "
 "you?"
 msgstr "Hør om dette kursus kan holdes som firma-kursus hos dig"
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:276
-#: admin/includes/class-arlo-for-wordpress-settings.php:314
+#: admin/includes/class-arlo-for-wordpress-settings.php:217
+msgid "GoogleMaps API Key"
+msgstr ""
+
+#: admin/includes/class-arlo-for-wordpress-settings.php:228
+msgid "Import callback host"
+msgstr ""
+
+#: admin/includes/class-arlo-for-wordpress-settings.php:277
+msgid "Miscellaneous"
+msgstr ""
+
+#: admin/includes/class-arlo-for-wordpress-settings.php:281
+msgid "Allow to send data to Arlo"
+msgstr ""
+
+#: admin/includes/class-arlo-for-wordpress-settings.php:289
+msgid "Import fragment size (in bytes, max 10 MB)"
+msgstr ""
+
+#: admin/includes/class-arlo-for-wordpress-settings.php:301
+msgid "Download log"
+msgstr ""
+
+#: admin/includes/class-arlo-for-wordpress-settings.php:309
+msgid "Subscribe to our WP newsletter"
+msgstr ""
+
+#: admin/includes/class-arlo-for-wordpress-settings.php:337
+msgid "System requirements"
+msgstr ""
+
+#: admin/includes/class-arlo-for-wordpress-settings.php:450
+#: admin/includes/class-arlo-for-wordpress-settings.php:488
+#, php-format
 msgid "%s page"
 msgstr "%s side"
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:300
+#: admin/includes/class-arlo-for-wordpress-settings.php:474
 msgid "Host page"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:303
+#: admin/includes/class-arlo-for-wordpress-settings.php:477
+#, php-format
 msgid "Page must contain the %s shortcode"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:326
-msgid "Style and layout"
-msgstr ""
-
-#: admin/includes/class-arlo-for-wordpress-settings.php:344
-msgid "Reload original template"
-msgstr ""
-
-#: admin/includes/class-arlo-for-wordpress-templates.php:18
+#: admin/includes/class-arlo-for-wordpress-settings.php:502
+#: admin/includes/class-arlo-for-wordpress-templates.php:19
 msgid "Template"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-templates.php:33
-#: admin/includes/class-arlo-for-wordpress-templates.php:63
-#: public/bootstrap.php:3509
-msgid "Register interest"
-msgstr "Skriv dig op som interesseret til dette kursus"
-
-#: admin/includes/class-arlo-for-wordpress-templates.php:34
-msgid "Num. of events"
-msgstr "Antal kurser"
-
-#: admin/includes/class-arlo-for-wordpress-venues.php:18
-msgid "Venue"
-msgstr "Lokation"
-
-#: admin/includes/class-arlo-for-wordpress-venues.php:41
-msgid "Address"
-msgstr "Adresse"
-
-#: admin/includes/class-arlo-for-wordpress-venues.php:42
-msgid "City"
-msgstr "By"
-
-#: admin/includes/class-arlo-for-wordpress-venues.php:43
-msgid "Postcode"
-msgstr "Postnr."
-
-#: admin/includes/class-arlo-for-wordpress-venues.php:44
-msgid "Country"
-msgstr "Land"
-
-#: admin/includes/class-arlo-for-wordpress-venues.php:45
-msgid "Directions"
-msgstr "Rutevejledning"
-
-#: admin/includes/class-arlo-for-wordpress-venues.php:46
-msgid "Parking"
-msgstr "Parkering"
-
-#: admin/views/admin-orig.php:22 admin/views/admin.php:32
-msgid "API help text"
+#: admin/includes/class-arlo-for-wordpress-settings.php:505
+msgid "Reload original template"
 msgstr ""
 
-#: admin/views/admin-orig.php:23
-msgid "API Endpoint"
+#: admin/includes/class-arlo-for-wordpress-settings.php:701
+msgid "Support"
 msgstr ""
 
-#: admin/views/admin-orig.php:27
-msgid "Please enter a valid URL"
+#: admin/includes/class-arlo-for-wordpress-settings.php:724
+msgid ""
+"Arlo powered pages will be updated to match the Arlo control theme selected."
 msgstr ""
 
-#: admin/views/admin-orig.php:33
-msgid "Slugs help text"
-msgstr ""
-
-#: admin/views/admin-orig.php:34
-msgid "Slugs / Permalinks"
-msgstr ""
-
-#: admin/views/admin-orig.php:41 admin/views/admin-orig.php:42
-#: admin/views/admin-orig.php:51 admin/views/admin-orig.php:52
-#: admin/views/admin-orig.php:61 admin/views/admin-orig.php:62
-#: admin/views/admin-orig.php:71 admin/views/admin-orig.php:72
-msgid "Can only contain numbers, lowercase letters and hyphens (-)"
-msgstr ""
-
-#: admin/views/admin-orig.php:48
-msgid "Upcoming Events"
-msgstr "Kurser i nærmeste fremtid"
-
-#: admin/views/admin-orig.php:68
-msgid "Locations"
-msgstr "Lokationer"
-
-#: admin/views/admin-orig.php:78 admin/views/admin.php:34
-msgid "Cron help text"
-msgstr ""
-
-#: admin/views/admin-orig.php:79
-msgid "Setup Cron"
-msgstr ""
-
-#: admin/views/admin-orig.php:86
-msgid "I have setup my own cron jobs"
-msgstr ""
-
-#: admin/views/admin-orig.php:92
-msgid "Templates help text"
-msgstr ""
-
-#: admin/views/admin-orig.php:95
+#: admin/includes/class-arlo-for-wordpress-settings.php:768
 msgid "Preview"
 msgstr ""
 
-#: admin/views/admin-orig.php:97
-msgid "Events Template"
+#: admin/includes/class-arlo-for-wordpress-settings.php:772
+msgid "Apply"
 msgstr ""
 
-#: admin/views/admin-orig.php:98
-msgid "Presenters Template"
-msgstr ""
-
-#: admin/views/admin-orig.php:99
-msgid "Locations Template"
-msgstr ""
-
-#: admin/views/admin-orig.php:116
-msgid "Save Changes"
-msgstr ""
-
-#: admin/views/admin.php:33
-msgid "Slug help text"
-msgstr ""
-
-#: admin/views/admin.php:35
-msgid "Template help text"
-msgstr ""
-
-#: admin/views/list.php:23
-msgid "Search"
-msgstr "Søg"
-
-#: public/bootstrap.php:1710 public/bootstrap.php:2640
+#: admin/includes/class-arlo-for-wordpress-settings.php:774
+#: includes/shortcodes/arlo-events.php:33
+#: includes/shortcodes/arlo-templates.php:461
+#: includes/shortcodes/arlo-upcoming-events.php:111
 msgid "Reset"
 msgstr ""
 
-#: public/bootstrap.php:1739 public/bootstrap.php:2671
-msgid "All categories"
-msgstr "Alle kategorier"
-
-#: public/bootstrap.php:1748 public/bootstrap.php:2680
-msgid "All delivery options"
-msgstr "Alle typer"
-
-#: public/bootstrap.php:1775 public/bootstrap.php:2727
-msgid "All locations"
-msgstr "Alle lokationer"
-
-#: public/bootstrap.php:1805 public/bootstrap.php:2757
-msgid "Select tag"
+#: admin/includes/class-arlo-for-wordpress-settings.php:774
+msgid "Apply & Reset"
 msgstr ""
 
-#: public/bootstrap.php:2035
-msgid "Event is full"
-msgstr "Kurset er fyldt"
-
-#: public/bootstrap.php:2039
-msgid "Join waiting list"
-msgstr "Skriv dig på ventelisten"
-
-#: public/bootstrap.php:2045
-msgid "%d place remaining"
-msgid_plural "%d places remaining"
-msgstr[0] "%d plads tilbage"
-msgstr[1] "%d pladser tilbage"
-
-#: public/bootstrap.php:2105 public/bootstrap.php:2117
-msgid "excl. %s"
-msgstr "ekskl. %s"
-
-#: public/bootstrap.php:2105 public/bootstrap.php:2117
-msgid "incl. %s"
-msgstr "inkl. %s"
-
-#: public/bootstrap.php:2246
-msgid "Session information"
-msgstr "Hold-info"
-
-#: public/bootstrap.php:2625
-msgid " excl. %s"
-msgstr " ekskl. %s"
-
-#: public/bootstrap.php:2625
-msgid " incl. %s"
-msgstr " inkl. %s"
-
-#: public/bootstrap.php:2700
-msgid "All months"
-msgstr "Alle måneder"
-
-#: public/bootstrap.php:2881
-msgid "Map of %s"
-msgstr ""
-
-#: public/bootstrap.php:3251
-msgid "Suggest another date/location"
-msgstr "Foreslå en anden dato eller lokation"
-
-#: public/bootstrap.php:3393
-msgid "1 day"
-msgstr "1 dag"
-
-#: public/bootstrap.php:3401
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d time"
-msgstr[1] "%d timer"
-
-#: public/bootstrap.php:3409
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d minut"
-msgstr[1] "%d minutter"
-
-#: public/bootstrap.php:3419
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d dag"
-msgstr[1] "%d dage"
-
-#: public/bootstrap.php:3426
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d uge"
-msgstr[1] "%d uger"
-
-#: public/bootstrap.php:3476
-msgid "From"
-msgstr "Fra"
-
-#: public/class-arlo-for-wordpress.php:350
-msgid "The minimum required PHP version for the Arlo plugin is %s"
-msgstr ""
-
-#: public/class-arlo-for-wordpress.php:733
-msgid "Show me more dates"
-msgstr "Vis flere datoer"
-
-#: public/class-arlo-for-wordpress.php:2102
-msgid "Once every 15 minutes"
-msgstr "Hvert 15. minut"
-
-#: public/class-arlo-for-wordpress.php:2161
-msgid "The given platform name is not exists"
-msgstr ""
-
-#: public/class-arlo-for-wordpress.php:2190
-msgid "Couldn't set the following post types: %s"
-msgstr ""
-
-#: public/class-arlo-for-wordpress.php:2262
-msgid "Start editing your new pages"
-msgstr ""
-
-#: public/class-arlo-for-wordpress.php:2264
+#: admin/includes/class-arlo-for-wordpress-settings.php:784
 msgid ""
-"View <a href=\"%s\" target=\"_blank\">%s</a>, <a href=\"%s\" target=\"_blank"
-"\">%s</a>, <a href=\"%s\" target=\"_blank\">%s</a>, <a href=\"%s\" target="
-"\"_blank\">%s</a>, <a href=\"%s\" target=\"_blank\">%s</a>, <a href=\"%s\" "
-"target=\"_blank\">%s</a> or <a href=\"%s\" target=\"_blank\">%s</a> pages"
+"Themes that include \"For designers\" label provide maximum flexibility as "
+"they inherit some of the main website’s styles. They will however require "
+"additional work by a web designer to fix any inadvertent styling issues."
 msgstr ""
-"Vis <a href=\"%s\" target=\"_blank\">%s</a>, <a href=\"%s\" target=\"_blank"
-"\">%s</a>, <a href=\"%s\" target=\"_blank\">%s</a>, <a href=\"%s\" target="
-"\"_blank\">%s</a>, <a href=\"%s\" target=\"_blank\">%s</a>, <a href=\"%s\" "
-"target=\"_blank\">%s</a> or <a href=\"%s\" target=\"_blank\">%s</a> sider"
 
-#: public/class-arlo-for-wordpress.php:2268
-msgid "Catalogue"
-msgstr "Kursuskatalog"
+#: admin/includes/class-arlo-for-wordpress-settings.php:785
+msgid "Learn more"
+msgstr ""
 
-#: public/class-arlo-for-wordpress.php:2272
-msgid "Presenter profile"
-msgstr "Instruktør-profil"
+#: admin/includes/class-arlo-for-wordpress-templates.php:34
+#: admin/includes/class-arlo-for-wordpress-templates.php:66
+#: includes/shortcodes/arlo-events.php:757
+msgid "Register interest"
+msgstr "Skriv dig op som interesseret til dette kursus"
 
-#: public/class-arlo-for-wordpress.php:2274
-msgid "Presenters list"
-msgstr "Liste over instruktører"
+#: admin/includes/class-arlo-for-wordpress-templates.php:35
+msgid "Num. of events"
+msgstr "Antal kurser"
 
-#: public/class-arlo-for-wordpress.php:2276
-msgid "Venue information"
-msgstr "Info om lokationen"
+#: admin/includes/class-arlo-for-wordpress-templates.php:74
+msgid "OA"
+msgstr ""
 
-#: public/class-arlo-for-wordpress.php:2278
-msgid "Venues list"
-msgstr "Liste over lokationer"
+#: admin/includes/class-arlo-for-wordpress-venues.php:19
+msgid "Venue"
+msgstr "Lokation"
 
-#: public/class-arlo-for-wordpress.php:2279
+#: admin/includes/class-arlo-for-wordpress-venues.php:42
+msgid "Address"
+msgstr "Adresse"
+
+#: admin/includes/class-arlo-for-wordpress-venues.php:43
+msgid "City"
+msgstr "By"
+
+#: admin/includes/class-arlo-for-wordpress-venues.php:44
+msgid "Postcode"
+msgstr "Postnr."
+
+#: admin/includes/class-arlo-for-wordpress-venues.php:45
+msgid "Country"
+msgstr "Land"
+
+#: admin/includes/class-arlo-for-wordpress-venues.php:46
+msgid "Directions"
+msgstr "Rutevejledning"
+
+#: admin/includes/class-arlo-for-wordpress-venues.php:47
+msgid "Parking"
+msgstr "Parkering"
+
+#: admin/views/admin.php:37
+msgid "API help text"
+msgstr ""
+
+#: admin/views/admin.php:38
+msgid "Slug help text"
+msgstr ""
+
+#: admin/views/admin.php:39
+msgid "Cron help text"
+msgstr ""
+
+#: admin/views/admin.php:40
+msgid "Template help text"
+msgstr ""
+
+#: admin/views/list.php:25 includes/shortcodes/arlo-shortcodes.php:181
+msgid "Search"
+msgstr "Søg"
+
+#: includes/arlo-notice-handler.php:149
+msgid "Permalink setting change required."
+msgstr ""
+
+#: includes/arlo-notice-handler.php:150
+#, php-format
 msgid ""
-"Edit the page <a href=\"#pages\" class=\"arlo-pages-setup\">templates</a> "
-"for each of these websites pages below."
+"Arlo for WordPress requires <a target=\"_blank\" href=\"%s\">Permalinks</a> "
+"to be set to \"Post name\"."
 msgstr ""
 
-#: public/class-arlo-for-wordpress.php:2303
-msgid "Welcome to Arlo for WordPress"
+#: includes/arlo-notice-handler.php:158
+#, php-format
+msgid ""
+"The Arlo for WordPress plugin has been disabled, please check the <a href="
+"\"%s\" class=\"%s\">System Requirements</a> page"
 msgstr ""
 
-#: public/class-arlo-for-wordpress.php:2310
+#: includes/arlo-notice-handler.php:161
+msgid "Plugin disabled"
+msgstr ""
+
+#: includes/arlo-notice-handler.php:171
+#, php-format
+msgid ""
+"The import for the Arlo for WordPress plugin has been disabled, but the "
+"current existing data is still available. Please check the <a href=\"%s\" "
+"class=\"%s\">System Requirements</a> page"
+msgstr ""
+
+#: includes/arlo-notice-handler.php:174
+msgid "Import disabled"
+msgstr ""
+
+#: includes/arlo-notice-handler.php:187
+msgid "Page setup required."
+msgstr ""
+
+#: includes/arlo-notice-handler.php:188
+msgid ""
+"Arlo for WordPress requires you to setup the pages which will host event "
+"information."
+msgstr ""
+
+#: includes/arlo-notice-handler.php:188
+#, php-format
+msgid "<a href=\"%s\" class=\"arlo-pages-setup\">Setup pages</a>"
+msgstr ""
+
+#: includes/arlo-notice-handler.php:188 includes/arlo-version-handler.php:277
+#, php-format
+msgid ""
+"<a target=\"_blank\" href=\"%s\">View documentation</a> for more information."
+msgstr ""
+
+#: includes/arlo-notice-handler.php:195
 msgid ""
 "Create beautiful and interactive training and event websites using the Arlo "
 "for WordPress plugin. Access an extensive library of WordPress Shortcodes, "
@@ -522,73 +483,358 @@ msgid ""
 "integration easy."
 msgstr ""
 
-#: public/class-arlo-for-wordpress.php:2311
+#: includes/arlo-notice-handler.php:196
 msgid ""
 "<a href=\"https://developer.arlo.co/doc/wordpress/index\" target=\"_blank"
 "\">Learn how to use</a> Arlo for WordPress or visit <a href=\"http://www."
 "arlo.co\" target=\"_blank\">www.arlo.co</a> to find out more about Arlo."
 msgstr ""
 
-#: public/class-arlo-for-wordpress.php:2312
+#: includes/arlo-notice-handler.php:197
 msgid "Try with demo data"
 msgstr ""
 
-#: public/class-arlo-for-wordpress.php:2312
+#: includes/arlo-notice-handler.php:197
 msgid "Get started with free trial"
 msgstr ""
 
-#: public/class-arlo-for-wordpress.php:2339
+#: includes/arlo-notice-handler.php:200
+msgid "Welcome to Arlo for WordPress"
+msgstr ""
+
+#: includes/arlo-notice-handler.php:221
 msgid "Are you a web developer building a site for a client?"
 msgstr ""
 
-#: public/class-arlo-for-wordpress.php:2340
+#: includes/arlo-notice-handler.php:222
+#, php-format
 msgid ""
 "<a target=\"_blank\" href=\"%s\">Contact us to become an Arlo partner</a>"
 msgstr ""
 
-#: public/class-arlo-for-wordpress.php:2357
+#: includes/arlo-notice-handler.php:239
+#, php-format
+msgid "<a target=\"_blank\" href=\"%s\">Watch overview video</a>"
+msgstr ""
+
+#: includes/arlo-notice-handler.php:240
+msgid "to see Arlo for WordPress in action."
+msgstr ""
+
+#: includes/arlo-notice-handler.php:255
 msgid "Watch overview video"
 msgstr ""
 
-#: public/class-arlo-for-wordpress.php:2359
+#: includes/arlo-notice-handler.php:258
 msgid ""
-"Join <a target=\"_blank\" href=\"\" class=\"webinar_url\">Arlo for WordPress "
+"Jon <a target=\"_blank\" href=\"\" class=\"webinar_url\">Arlo for WordPress "
 "Getting started</a> webinar on <span id=\"webinar_date\"></span>"
 msgstr ""
 
-#: public/class-arlo-for-wordpress.php:2360
+#: includes/arlo-notice-handler.php:259
 msgid ""
 "<a target=\"_blank\" href=\"\" class=\"webinar_url\">Register now!</a> or <a "
 "target=\"_blank\" href=\"\" id=\"webinar_template_url\">view more times</a>"
 msgstr ""
 
-#: public/class-arlo-for-wordpress.php:2371
-msgid "Permalink setting change required."
+#: includes/arlo-notice-handler.php:286
+#, php-format
+msgid "Couldn't set the following post types: %s"
 msgstr ""
 
-#: public/class-arlo-for-wordpress.php:2371
+#: includes/arlo-notice-handler.php:348
+msgid "Presenter profile"
+msgstr "Instruktør-profil"
+
+#: includes/arlo-notice-handler.php:373
+msgid "Venue information"
+msgstr "Info om lokationen"
+
+#: includes/arlo-notice-handler.php:378
+msgid "Start editing your new pages"
+msgstr ""
+
+#: includes/arlo-notice-handler.php:379
+#, fuzzy, php-format
+#| msgid ""
+#| "View <a href=\"%s\" target=\"_blank\">%s</a>, <a href=\"%s\" target="
+#| "\"_blank\">%s</a>, <a href=\"%s\" target=\"_blank\">%s</a>, <a href=\"%s"
+#| "\" target=\"_blank\">%s</a>, <a href=\"%s\" target=\"_blank\">%s</a>, <a "
+#| "href=\"%s\" target=\"_blank\">%s</a> or <a href=\"%s\" target=\"_blank\">"
+#| "%s</a> pages"
 msgid ""
-"Arlo for WordPress requires <a target=\"_blank\" href=\"%s\">Permalinks</a> "
-"to be set to \"Post name\"."
+"View %s <a href=\"%s\" target=\"_blank\">%s</a>, <a href=\"%s\" target="
+"\"_blank\">%s</a>, %s <a href=\"%s\" target=\"_blank\">%s</a> %s or <a href="
+"\"%s\" target=\"_blank\">%s</a> pages"
 msgstr ""
+"Vis <a href=\"%s\" target=\"_blank\">%s</a>, <a href=\"%s\" target=\"_blank"
+"\">%s</a>, <a href=\"%s\" target=\"_blank\">%s</a>, <a href=\"%s\" target="
+"\"_blank\">%s</a>, <a href=\"%s\" target=\"_blank\">%s</a>, <a href=\"%s\" "
+"target=\"_blank\">%s</a> or <a href=\"%s\" target=\"_blank\">%s</a> sider"
 
-#: public/class-arlo-for-wordpress.php:2379
-msgid "Page setup required."
-msgstr ""
+#: includes/arlo-notice-handler.php:382
+msgid "Catalogue"
+msgstr "Kursuskatalog"
 
-#: public/class-arlo-for-wordpress.php:2379
+#: includes/arlo-notice-handler.php:387
+msgid "Presenters list"
+msgstr "Liste over instruktører"
+
+#: includes/arlo-notice-handler.php:390
+msgid "Venues list"
+msgstr "Liste over lokationer"
+
+#: includes/arlo-notice-handler.php:391
 msgid ""
-"Arlo for WordPress requires you to setup the pages which will host event "
-"information."
+"Edit the page <a href=\"#pages\" class=\"arlo-pages-setup\">templates</a> "
+"for each of these websites pages below."
 msgstr ""
 
-#: public/class-arlo-for-wordpress.php:2379
-msgid "<a href=\"%s\" class=\"arlo-pages-setup\">Setup pages</a>"
-msgstr ""
-
-#: public/class-arlo-for-wordpress.php:2380
+#: includes/arlo-version-handler.php:268
 msgid ""
-"<a target=\"_blank\" href=\"%s\">View documentation</a> for more information."
+"Arlo for WordPress will automatically send technical data to Arlo if "
+"problems are encountered when synchronising your event information. The data "
+"is sent securely and will help our team when providing support for this "
+"plugin. You can turn this off anytime in the"
+msgstr ""
+
+#: includes/arlo-version-handler.php:268
+msgid "setting"
+msgstr ""
+
+#: includes/arlo-version-handler.php:269
+msgid "Turn off"
+msgstr ""
+
+#: includes/arlo-version-handler.php:272
+msgid "Send error data to Arlo"
+msgstr ""
+
+#: includes/arlo-version-handler.php:277
+msgid ""
+"Arlo for WordPress requires that the Cron feature in WordPress is enabled, "
+"or replaced with an external trigger."
+msgstr ""
+
+#: includes/arlo-version-handler.php:278
+msgid ""
+"You may safely dismiss this warning if your system administrator has "
+"installed an external Cron solution."
+msgstr ""
+
+#: includes/arlo-version-handler.php:281
+msgid "WordPress Cron is disabled"
+msgstr ""
+
+#: includes/provisioning/arlo-schema-manager.php:63
+msgid ""
+"Arlo for WordPress has detected that there may be a problem with the "
+"structure of event information in your database. Event information is being "
+"repaired with a new copy."
+msgstr ""
+
+#: includes/provisioning/arlo-schema-manager.php:64
+msgid ""
+"This repair may take a few minutes, and during this time information about "
+"your events will be temporarily unavailable for visitors on your site."
+msgstr ""
+
+#: includes/provisioning/arlo-schema-manager.php:65
+#, php-format
+msgid ""
+"You can monitor the progress of the new import at the <a href=\"%s\">Arlo "
+"Settings</a> page."
+msgstr ""
+
+#: includes/provisioning/arlo-schema-manager.php:68
+msgid "Plugin upgrade warning"
+msgstr ""
+
+#: includes/shortcodes/arlo-events.php:89
+#: includes/shortcodes/arlo-templates.php:532
+#: includes/shortcodes/arlo-upcoming-events.php:188
+msgid "All locations"
+msgstr "Alle lokationer"
+
+#: includes/shortcodes/arlo-events.php:339
+msgid "Event is full"
+msgstr "Kurset er fyldt"
+
+#: includes/shortcodes/arlo-events.php:343
+msgid "Join waiting list"
+msgstr "Skriv dig på ventelisten"
+
+#: includes/shortcodes/arlo-events.php:349
+#, php-format
+msgid "%d place remaining"
+msgid_plural "%d places remaining"
+msgstr[0] "%d plads tilbage"
+msgstr[1] "%d pladser tilbage"
+
+#: includes/shortcodes/arlo-events.php:478
+msgid "Session information"
+msgstr "Hold-info"
+
+#: includes/shortcodes/arlo-events.php:555
+msgid "1 day"
+msgstr "1 dag"
+
+#: includes/shortcodes/arlo-events.php:563
+#, php-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d time"
+msgstr[1] "%d timer"
+
+#: includes/shortcodes/arlo-events.php:571
+#, php-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d minut"
+msgstr[1] "%d minutter"
+
+#: includes/shortcodes/arlo-events.php:581
+#, php-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d dag"
+msgstr[1] "%d dage"
+
+#: includes/shortcodes/arlo-events.php:588
+#, php-format
+msgid "%d week"
+msgid_plural "%d weeks"
+msgstr[0] "%d uge"
+msgstr[1] "%d uger"
+
+#: includes/shortcodes/arlo-events.php:682
+msgid "From"
+msgstr "Fra"
+
+#: includes/shortcodes/arlo-shortcodes.php:38
+#, php-format
+msgid "Powered by %s"
+msgstr ""
+
+#: includes/shortcodes/arlo-shortcodes.php:180
+msgid "Search for an event"
+msgstr ""
+
+#: includes/shortcodes/arlo-shortcodes.php:240
+msgid "Select a time zone"
+msgstr ""
+
+#: includes/shortcodes/arlo-shortcodes.php:344
+#: includes/shortcodes/arlo-shortcodes.php:356
+#, php-format
+msgid "excl. %s"
+msgstr "ekskl. %s"
+
+#: includes/shortcodes/arlo-shortcodes.php:344
+#: includes/shortcodes/arlo-shortcodes.php:356
+#, php-format
+msgid "incl. %s"
+msgstr "inkl. %s"
+
+#: includes/shortcodes/arlo-templates.php:391
+#, fuzzy
+#| msgid "Register interest"
+msgid "Register your interest now"
+msgstr "Skriv dig op som interesseret til dette kursus"
+
+#: includes/shortcodes/arlo-templates.php:490
+#: includes/shortcodes/arlo-upcoming-events.php:139
+msgid "All categories"
+msgstr "Alle kategorier"
+
+#: includes/shortcodes/arlo-templates.php:499
+#: includes/shortcodes/arlo-upcoming-events.php:144
+msgid "All delivery options"
+msgstr "Alle typer"
+
+#: includes/shortcodes/arlo-templates.php:564
+#: includes/shortcodes/arlo-upcoming-events.php:217
+msgid "Select tag"
+msgstr ""
+
+#: includes/shortcodes/arlo-templates.php:589
+#, php-format
+msgid "None of these dates work for you? %s Suggest another date & time %s"
+msgstr ""
+"Er der ingen af disse datoer som passer dig? %s Foreslå en anden dato %s"
+
+#: includes/shortcodes/arlo-upcoming-events.php:100
+#, php-format
+msgid " excl. %s"
+msgstr " ekskl. %s"
+
+#: includes/shortcodes/arlo-upcoming-events.php:100
+#, php-format
+msgid " incl. %s"
+msgstr " inkl. %s"
+
+#: includes/shortcodes/arlo-upcoming-events.php:159
+msgid "All months"
+msgstr "Alle måneder"
+
+#: includes/shortcodes/arlo-venues.php:149
+#, php-format
+msgid "Map of %s"
+msgstr ""
+
+#: public/class-arlo-for-wordpress.php:931
+msgid "Show me more dates"
+msgstr "Vis flere datoer"
+
+#: public/class-arlo-for-wordpress.php:1153
+msgid ""
+"Arlo for WordPress encountered problems when synchronising your event "
+"information. Information about your events may be out of date."
+msgstr ""
+
+#: public/class-arlo-for-wordpress.php:1153
+#, php-format
+msgid "The last successful synchronisation was %s UTC"
+msgstr ""
+
+#: public/class-arlo-for-wordpress.php:1154
+msgid "View diagnostic logs"
+msgstr ""
+
+#: public/class-arlo-for-wordpress.php:1154
+#, fuzzy
+#| msgid "Venue information"
+msgid "for more information."
+msgstr "Info om lokationen"
+
+#: public/class-arlo-for-wordpress.php:1157
+msgid "Event synchronisation error"
+msgstr ""
+
+#: public/class-arlo-for-wordpress.php:1315
+#, fuzzy
+#| msgid "Once every 15 minutes"
+msgid "Once every 5 minutes"
+msgstr "Hvert 15. minut"
+
+#: public/class-arlo-for-wordpress.php:1319
+msgid "Once every 15 minutes"
+msgstr "Hvert 15. minut"
+
+#: public/class-arlo-for-wordpress.php:1323
+#, fuzzy
+#| msgid "Once every 15 minutes"
+msgid "Once every hour"
+msgstr "Hvert 15. minut"
+
+#: public/class-arlo-for-wordpress.php:1327
+#, fuzzy
+#| msgid "Once every 15 minutes"
+msgid "Every 30 minutes"
+msgstr "Hvert 15. minut"
+
+#: public/class-arlo-for-wordpress.php:1408
+msgid "The provided platform name does not exist."
 msgstr ""
 
 #: widgets/categories-widget/class-arlo-for-wordpress-categories-widget.php:57
@@ -638,15 +884,15 @@ msgstr "Der er ingen kategorier at vise"
 msgid "Arlo event search"
 msgstr "Alro kursus-søgning"
 
-#: widgets/search-widget/views/widget.php:8
+#: widgets/search-widget/views/widget.php:5
 msgid "Event search"
 msgstr "Kursus-søgning"
 
-#: widgets/upcoming-widget/class-arlo-for-wordpress-upcoming-widget.php:57
+#: widgets/upcoming-widget/class-arlo-for-wordpress-upcoming-widget.php:59
 msgid "Arlo Upcoming Events"
 msgstr "Kurser i kommende fremtid"
 
-#: widgets/upcoming-widget/class-arlo-for-wordpress-upcoming-widget.php:60
+#: widgets/upcoming-widget/class-arlo-for-wordpress-upcoming-widget.php:62
 msgid "Display Upcoming Events."
 msgstr "Vis kurser i nærmeste fremtid"
 
@@ -654,11 +900,11 @@ msgstr "Vis kurser i nærmeste fremtid"
 msgid "Number of events to show"
 msgstr "Antal kurser der skal vises"
 
-#: widgets/upcoming-widget/views/widget.php:8
+#: widgets/upcoming-widget/views/widget.php:5
 msgid "Upcoming event"
 msgstr "Nært forekommende kursus"
 
-#: widgets/upcoming-widget/views/widget.php:49
+#: widgets/upcoming-widget/views/widget.php:46
 msgid "No upcoming events found"
 msgstr "Ingen nært forekommende kurser fundet"
 
@@ -679,6 +925,14 @@ msgstr ""
 msgid "http://arlo.co"
 msgstr ""
 
-#. Text for register button
-msgid "Register"
-msgstr "Tilmeld"
+#~ msgid "Upcoming Events"
+#~ msgstr "Kurser i nærmeste fremtid"
+
+#~ msgid "Locations"
+#~ msgstr "Lokationer"
+
+#~ msgid "Suggest another date/location"
+#~ msgstr "Foreslå en anden dato eller lokation"
+
+#~ msgid "Register"
+#~ msgstr "Tilmeld"
