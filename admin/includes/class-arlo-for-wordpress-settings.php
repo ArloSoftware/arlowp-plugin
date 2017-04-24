@@ -619,6 +619,16 @@ class Arlo_For_Wordpress_Settings {
 		<p><strong>If you are experiencing problems after an update, please deactivate and re-activate the plugin and re-synchronize the data.</strong></p>
 	    <h4>Version ' .  VersionHandler::VERSION . '</h4>
 	    <p>
+	    	<ul class="arlo-whatsnew-list">	  
+				<li>Enhance time zone indicators on events</li>
+	    		<li>Fix permission issues with WPEngine hosting</li>
+				<li>Fix missing session information on a reginalized platform</li>
+				<li>Fix saving tags for multisession events</li>
+				<li>Other minor fixes and improvements</li>
+	    	</ul>
+	    </p>		
+		<h4>Version 3.0</h4>
+	    <p>
 	    	<ul class="arlo-whatsnew-list">	    
 	    		<li>New, improved, more reliable <a href="http://developer.arlo.co/doc/wordpress/import#import-snapshot" target="_blank">snapshot import</a></li>
 				<li>New <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_filters" target="_blank">[arlo_event_filters]</a> shortcode</li>

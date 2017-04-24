@@ -1,5 +1,18 @@
+== V3.0.1 ==
 
-== V3.0==
+Enhancement
+------------------
+Enhance import process
+Fix permission issues with WPEngine hosting
+Enhance time zone indicators on events
+
+Bugfixes
+------------------
+Fix missing session information on a reginalized platform
+Fix saving tags for multisession events
+
+
+== V3.0 ==
 
 Enhancement
 ------------------

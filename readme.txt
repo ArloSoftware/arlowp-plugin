@@ -15,8 +15,10 @@ Seamlessly integrate Arlo's market leading training and event management system 
 Arlo for WordPress helps you build great looking websites for promoting your events and courses. Offer website visitors an interactive and engaging experience with the ability to fully customise the look and feel. The plugin also comes with pre-built page themes providing flexibility for designers, and plug-and-play themes for the less savvy. [Read more](https://www.arlo.co/wordpress-training-and-event-management-plugin) about creating beautiful looking training and event websites using Arlo for WordPress.
 
 Pre-built plugin themes:
-* [BeSoftware](http://be.software.wpdemo.arlo.co/)
-* Jazz
+
+* [BeSoftware](https://support.arlo.co/hc/en-gb/articles/115001645886-Theme-BeSoftware)
+* [Jazz](https://support.arlo.co/hc/en-gb/articles/115001600463-Theme-Jazz)
+* [Block](https://support.arlo.co/hc/en-gb/articles/115001797703-Theme-Block)
 
 
 [youtube https://www.youtube.com/watch?v=-uUhu90cvoc]
@@ -154,6 +156,18 @@ The Arlo - Training and Event Management, and online registration plugin is only
 11. Theme Jazz - Upcoming events
 
 == Changelog ==
+
+= 3.0.1 =
+
+Enhance import process
+
+Enhance time zone indicators on events
+
+Fix permission issues with WPEngine hosting
+
+Fix missing session information on a reginalized platform
+
+Fix saving tags for multisession events
 
 = 3.0 =
 
