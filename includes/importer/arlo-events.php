@@ -23,7 +23,7 @@ class Events extends BaseImporter {
 		}
 	}
 
-	private function save_event_data($item = [], $parent_id = 0) {		
+	private function save_event_data($item = [], $parent_id = 0, $region = '') {		
 		$query = $this->dbl->query(
 			$this->dbl->prepare( 
 				"INSERT INTO " . $this->table_name ." 
@@ -55,7 +55,7 @@ class Events extends BaseImporter {
 				@$item->Provider->WebsiteUri,
 				@$item->Location->IsOnline,
 				(!empty($item->Credits) ? json_encode($item->Credits) : ''),
-				(!empty($item->Region) ? $item->Region : ''),
+				(!empty($item->Region) ? $item->Region : $region),
 				$this->import_id
 			)
 		);
