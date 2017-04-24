@@ -34,7 +34,8 @@ class Wordpress extends Transport
 				'headers' => array(
 					'X-Plugin-Version' => $plugin_version,
 					'Content-type' => 'application/json',
-					'Accept' => 'application/json'
+					'Accept' => 'application/json',
+					'Expect' => '',
 				),
 				'compress'    => true,
 				'decompress'  => false,
