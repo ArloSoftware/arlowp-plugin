@@ -845,7 +845,9 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
             $format = DateFormatter::date_format_to_strftime_format($format);
         }
 
-        if (!is_null($timezone) && ($timezone->getName() == $utc_timezone_name || $timezone->getName() != get_option('timezone_string') || (!empty($GLOBALS['selected_timezone_names']) && $GLOBALS['selected_timezone_names'] == $timezone->getName()) || $is_online) && preg_match('[I|M]', $format) === 1 && preg_match('[Z|z]', $format) === 0) {
+        $wp_timezone = new \DateTimeZone(get_option('timezone_string'));
+
+        if (!is_null($timezone) && ($timezone->getName() == $utc_timezone_name || $wp_timezone->getOffset($date) != $timezone->getOffset($date) || (!empty($GLOBALS['selected_timezone_names']) && $GLOBALS['selected_timezone_names'] == $timezone->getName()) || $is_online) && preg_match('[I|M]', $format) === 1 && preg_match('[Z|z]', $format) === 0) {
             $format .= " %Z";
         }        
 
