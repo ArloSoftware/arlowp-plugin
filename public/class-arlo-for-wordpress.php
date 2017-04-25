@@ -630,6 +630,9 @@ class Arlo_For_Wordpress {
 				update_option( 'arlo_import_disabled', 1 );
 			} 
 		}
+
+		//force the plugin to use new url structure
+		update_option('arlo_new_url_structure', 1);	
 	}
 	
 
