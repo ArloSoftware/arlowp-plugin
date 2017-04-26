@@ -14,34 +14,24 @@
 
 	$qty = (is_array($events)) ? count($events) : 0;
 
-	if($qty > 0) {
-
-		// start the list
+	if (is_array($events) && count($events)) {
 		$output = '<ul class="arlo-list arlo-widget-upcoming">';
 
-		for($i = 0; $i < $qty; $i++) {
-
-			$date = new DateTime($events[$i]->e_startdatetime);
-
-			$id = arlo_get_post_by_name($events[$i]->et_post_name, 'arlo_event');
-
+		foreach ($events as $event) {
+			$id = arlo_get_post_by_name($event->et_post_name, 'arlo_event');
 			$link = get_permalink($id->ID);
 
-			// the event link
 			$output .= '<li class="arlo-cf">';
 			$output .= '<div class="arlo-left arlo-cal">';
-			$output .= '<span class="arlo-cal-month">'.$date->format('M').'</span>';
-			$output .= '<span class="arlo-cal-day">'.$date->format('d').'</span>';
+			$output .= '<span class="arlo-cal-month">' . \Arlo\Shortcodes\Events::event_date_formatter(['format' => 'M'], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline) . '</span>';
+			$output .= '<span class="arlo-cal-day">' . \Arlo\Shortcodes\Events::event_date_formatter(['format' => 'd'], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline) . '</span>';
 			$output .= '</div>';
-			$output .= '<p><a href="'.$link.'">' . htmlentities($events[$i]->et_name, ENT_QUOTES, "UTF-8") . '</a></p>';
-			$output .= '<p>' . htmlentities($events[$i]->e_locationname, ENT_QUOTES, "UTF-8") . '</p>';
+			$output .= '<p><a href="'.$link.'">' . htmlentities($event->et_name, ENT_QUOTES, "UTF-8") . '</a></p>';
+			$output .= '<p>' . htmlentities($event->e_locationname, ENT_QUOTES, "UTF-8") . '</p>';
 			$output .= '</li>';
-
 		}
 
-		// end the list
 		$output .= '</ul>';
-
 	} else {
 		$output = '<p>'. __('No upcoming events found', 'arlo-for-wordpress-upcoming-widget') .'</p>';
 	}

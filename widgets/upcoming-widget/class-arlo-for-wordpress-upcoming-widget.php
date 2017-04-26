@@ -308,6 +308,8 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 		SELECT 
 			e.e_startdatetime, 
 			e.e_locationname, 
+			e.e_datetimeoffset,
+			e.e_isonline,
 			et.et_name, 
 			et.et_post_name,
 			et.et_post_id
@@ -324,7 +326,7 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 		ORDER BY 
 			e.e_startdatetime
 		LIMIT 0, $qty";
-		
+
 		$upcoming_array = $wpdb->get_results($sql);
 
 		return $upcoming_array;

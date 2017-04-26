@@ -798,7 +798,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
     }
     
 
-    private static function event_date_formatter($atts, $date, $offset, $is_online = false) {
+    public static function event_date_formatter($atts, $date, $offset, $is_online = false) {
         global $arlo_plugin;
         $timezone = null;
         
