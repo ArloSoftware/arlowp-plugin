@@ -39,7 +39,7 @@ class CategoryDepth extends BaseImporter {
 				$query = $this->dbl->query( $this->dbl->prepare($sql, $counts['num'], $counts['c_arlo_id']) );
 				
 				if ($query === false) {
-					throw new \Exception('SQL error: ' . $this->dbl->last_error . ' ' . $this->dbl->last_query);
+					throw new \Exception('SQL error: ' . $this->dbl->last_error );
 				}
 			}		
 		}
@@ -128,7 +128,7 @@ class CategoryDepth extends BaseImporter {
 			
 			$query = $this->dbl->query( $this->dbl->prepare($sql, $order + $cat->c_order, $cat->c_arlo_id, $this->import_id) );
 			if ($query === false) {
-				throw new \Exception('SQL error: ' . $this->dbl->last_error . ' ' . $this->dbl->last_query);
+				throw new \Exception('SQL error: ' . $this->dbl->last_error );
 			} else if (is_array($cat->children)) {
 				$this->set_category_depth_order($cat->children, $max_depth, $order, $this->import_id);
 			}

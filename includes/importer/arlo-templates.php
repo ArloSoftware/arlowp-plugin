@@ -115,7 +115,7 @@ class Templates extends BaseImporter {
 				) );
 												
 				if ($query === false) {
-					Logger::log('SQL error: ' . $this->dbl->last_error . ' ' . $this->dbl->last_query, $this->import_id);
+					Logger::log('SQL error: ' . $this->dbl->last_error , $this->import_id);
 				}
 			}
 		}
@@ -138,7 +138,7 @@ class Templates extends BaseImporter {
 				) );
 												
 				if ($query === false) {
-					throw new \Exception('SQL error: ' . $this->dbl->last_error . ' ' . $this->dbl->last_query);
+					throw new \Exception('SQL error: ' . $this->dbl->last_error );
 				}
 			}
 		}		
@@ -163,7 +163,7 @@ class Templates extends BaseImporter {
 				));
 				
 				if ($query === false) {
-					throw new \Exception('SQL error: ' . $this->dbl->last_error . ' ' . $this->dbl->last_query);
+					throw new \Exception('SQL error: ' . $this->dbl->last_error );
 				}
 			}		
 		}
