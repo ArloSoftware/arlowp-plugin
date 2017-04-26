@@ -227,7 +227,11 @@ class Importer {
 			
 			set_error_handler ( function($num, $str, $file, $line, $context = null) {
 				error_log($str . ' in ' . $file . ' on line ' . $line);
-				throw new \Exception($str);
+
+				//pretty nasty, but need to know if our plugin throws the error or something else (like a cache plugin)
+				if (strpos($file, 'arlo') !== false) {
+					throw new \Exception($str);
+				}
 			}, E_ALL & ~E_USER_NOTICE & ~E_NOTICE  & ~E_DEPRECATED);
 			
 			try {
