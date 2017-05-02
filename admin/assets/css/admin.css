@@ -14,8 +14,16 @@
 	margin-left: 2em;
 }
 
+.arlo-yellow {
+	color: #ffd20d;
+}
+
 .arlo-gray {
 	color: #ccc;
+}
+
+.arlo-blue {
+	color: #0073aa;
 }
 
 .arlo-inlineblock {
@@ -112,10 +120,12 @@
 	color: #444;
 }
 
-.toplevel_page_arlo-for-wordpress p.webinar img, 
-.toplevel_page_arlo-for-wordpress p.developer img {
-	vertical-align: middle;
+.toplevel_page_arlo-for-wordpress p.webinar i {
 	margin: 0px 6px;
+}
+
+.toplevel_page_arlo-for-wordpress p.developer strong span {
+	font-size: 1.3em;
 }
 
 .arlo-middle {

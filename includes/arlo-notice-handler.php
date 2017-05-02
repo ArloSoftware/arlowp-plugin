@@ -54,7 +54,7 @@ class NoticeHandler {
 		$global_message = '';
 		if ($message->global) {
 			$global_message = '<td class="logo" valign="top" style="width: 60px; padding-top: 1em;">
-						<a href="http://www.arlo.co" target="_blank"><img src="' . plugins_url( '../assets/icon-128x128.png', __FILE__) . '" style="width: 48px"></a>
+						<a href="http://www.arlo.co" target="_blank"><i class="icons8 size-48 arlo-yellow icons8-arlo-logo-for-font arlo-middle"></i></a>
 					</td>';
 		}
 
@@ -132,13 +132,15 @@ class NoticeHandler {
 			
 			$message->class = 'updated';
 			$message->title = 'Connected to demo data';
+			$message->global = true;
 			$message->message = '<p>
 						Your site is currently using demo event, presenter, and venue data. Start an Arlo trial to load your own events!
 					</p>
 					<p>
 						<a class="button button-primary" href="https://www.arlo.co/register">Get started with free Arlo trial</a>&nbsp;&nbsp;&nbsp;&nbsp;
 						<a class="button button-primary arlo-block" href="#general" id="arlo-connet-platform">Connect existing Arlo platform</a>
-					</p>';
+					</p>
+					<p>' . __('<a href="https://developer.arlo.co/doc/wordpress/index" target="_blank">Learn how to use</a> Arlo for WordPress or visit <a href="http://www.arlo.co" target="_blank">www.arlo.co</a> to find out more about Arlo.', 'arlo-for-wordpress' ) . '</p>';
 
 			echo $this->create_notice($message);
 		}
@@ -153,7 +155,6 @@ class NoticeHandler {
 		echo $this->create_notice($message_obj);	
 	}
 
-	
 	public function plugin_disabled() {
 		$message = '<p>' . sprintf(__('The Arlo for WordPress plugin has been disabled, please check the <a href="%s" class="%s">System Requirements</a> page'), '?page=arlo-for-wordpress#systemrequirements', 'arlo-pages-systemrequirements') . '</p>';
 
@@ -192,21 +193,7 @@ class NoticeHandler {
 	}	
 
 	public function welcome_notice() {
-		$message = '<p>' . __( 'Create beautiful and interactive training and event websites using the Arlo for WordPress plugin. Access an extensive library of WordPress Shortcodes, Templates, and Widgets, all designed specifically for web developers to make integration easy.', 'arlo-for-wordpress' ) . '</p>
-						<p>' . __('<a href="https://developer.arlo.co/doc/wordpress/index" target="_blank">Learn how to use</a> Arlo for WordPress or visit <a href="http://www.arlo.co" target="_blank">www.arlo.co</a> to find out more about Arlo.', 'arlo-for-wordpress' ) . '</p>
-						<p>' . (empty($this->settings['platform_name']) ? '<a href="?page=arlo-for-wordpress&load-demo" class="button button-primary">' . __('Try with demo data', 'arlo-for-wordpress' ) . '</a> &nbsp; &nbsp; ' : '') .'<a href="http://www.arlo.co/register" target="_blank"  class="button button-primary">' . __('Get started with free trial', 'arlo-for-wordpress' ) . '</a></p>';
-
-		$message_obj = $this->create_message_object(
-				__('Welcome to Arlo for WordPress', 'arlo-for-wordpress' ),
-				$message,
-				'notice',
-				true,
-				true
-				);
-			
-		echo $this->create_user_notice('welcome', $message_obj);	
-		
-		$this->wp_video_notice();
+	
 		$this->load_demo_notice(!empty($_SESSION['arlo-demo']) ? $_SESSION['arlo-demo'] : []);
 		$this->webinar_notice();
 		$this->developer_notice();
@@ -216,9 +203,9 @@ class NoticeHandler {
 	
 	public function developer_notice() {
 		$message = '<p class="developer">
-					
-					<img src="' . plugins_url( '../assets/tips-yellow.png', __FILE__) . '" style="width: 32px">
-					' . __('Are you a web developer building a site for a client?', 'arlo-for-wordpress' ) . '
+					<i class="icons8 icons8-us-dollar-2 size-36 arlo-blue arlo-middle"></i>
+					' . __('Become an Arlo reseller and receive a ', 'arlo-for-wordpress' ) . '
+					' . sprintf('<strong><span>%s</span> %s</strong>', __('20%', 'arlo-for-wordpress' ),  __('sales commission', 'arlo-for-wordpress' )) . '
 					' . sprintf(__('<a target="_blank" href="%s">Contact us to become an Arlo partner</a>', 'arlo-for-wordpress' ), 'https://www.arlo.co/contact') . '
 				</p>';
 		
@@ -232,29 +219,12 @@ class NoticeHandler {
 
 		echo $this->create_user_notice('developer', $message_obj);	
 	}
-
-	public function wp_video_notice() {
-		$message = '<p class="developer">
-					<img src="' . plugins_url( '../assets/video-yellow.png', __FILE__) . '" style="width: 32px">
-					' . sprintf(__('<a target="_blank" href="%s">Watch overview video</a>', 'arlo-for-wordpress' ), 'https://www.arlo.co/videos#-uUhu90cvoc') . '
-					' . __('to see Arlo for WordPress in action.', 'arlo-for-wordpress' ) . '
-				</p>';
-
-		$message_obj = $this->create_message_object(
-				null,
-				$message,
-				'notice',
-				false,
-				true);
-
-		echo $this->create_user_notice('wp_video', $message_obj);	
-	}	
 	
 	public function webinar_notice() {
 		$message = '<p class="webinar">
-					<a target="_blank" href="https://www.arlo.co/video/wordpress-overview" target="_blank"><img src="' . plugins_url( '../assets/video-yellow.png', __FILE__) . '" style="width: 32px">' . __('Watch overview video', 'arlo-for-wordpress' ) .'</a>
+					<a target="_blank" href="https://www.arlo.co/video/wordpress-overview" target="_blank"><i class="icons8 icons8-circled-play size-36 arlo-yellow arlo-middle "></i>' . __('Watch overview video', 'arlo-for-wordpress' ) .'</a>
 					<span class="arlo-webinar">
-						<img src="' . plugins_url( '../assets/training-yellow.png', __FILE__) . '" style="width: 32px">
+						<i class="icons8 icons8-headset size-36 arlo-yellow arlo-middle"></i>
 						' . __('Jon <a target="_blank" href="" class="webinar_url">Arlo for WordPress Getting started</a> webinar on <span id="webinar_date"></span>', 'arlo-for-wordpress' ) . '
 						' . __('<a target="_blank" href="" class="webinar_url">Register now!</a> or <a target="_blank" href="" id="webinar_template_url">view more times</a>', 'arlo-for-wordpress' ) . '
 					</span>

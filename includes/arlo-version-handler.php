@@ -73,7 +73,11 @@ class VersionHandler {
 
 		if (version_compare($old_version, '3.0') < 0) {
 			$this->do_update('3.0');
-		}		
+		}	
+
+		if (version_compare($old_version, '3.0.2') < 0) {
+			$this->do_update('3.0.2');
+		}				
 	}
 	
 	private function run_pre_data_update($version) {
@@ -391,6 +395,10 @@ class VersionHandler {
 				//kick off an import
 				if (get_option('arlo_import_disabled', '0') != '1')
 					$this->plugin->get_scheduler()->set_task("import", -1);					
+			break;
+
+			case '3.0.2':
+				delete_metadata('user', 0 , 'arlo-developer-admin-notice', '0', true);
 			break;
 		}	
 	}	

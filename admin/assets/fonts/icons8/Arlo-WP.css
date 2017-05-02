@@ -1,12 +1,12 @@
 
 @font-face {
   font-family: "Arlo-Website---iOS";
-  src: url("../icons8/Arlo-Website---iOS_e49d3125abf06774f3f05d776c79fed9.eot");
-  src: url("../icons8/Arlo-Website---iOS_e49d3125abf06774f3f05d776c79fed9.eot?#iefix") format("embedded-opentype"),
-       url("../icons8/Arlo-Website---iOS_e49d3125abf06774f3f05d776c79fed9.woff2") format("woff2"),
-       url("../icons8/Arlo-Website---iOS_e49d3125abf06774f3f05d776c79fed9.woff") format("woff"),
-       url("../icons8/Arlo-Website---iOS_e49d3125abf06774f3f05d776c79fed9.ttf") format("truetype"),
-       url("../icons8/Arlo-Website---iOS_e49d3125abf06774f3f05d776c79fed9.svg#Arlo-Website---iOS") format("svg");
+  src: url("../icons8/Arlo-Website---iOS_70d5ea805b42b17ec1e843c786148aab.eot");
+  src: url("../icons8/Arlo-Website---iOS_70d5ea805b42b17ec1e843c786148aab.eot?#iefix") format("embedded-opentype"),
+       url("../icons8/Arlo-Website---iOS_70d5ea805b42b17ec1e843c786148aab.woff2") format("woff2"),
+       url("../icons8/Arlo-Website---iOS_70d5ea805b42b17ec1e843c786148aab.woff") format("woff"),
+       url("../icons8/Arlo-Website---iOS_70d5ea805b42b17ec1e843c786148aab.ttf") format("truetype"),
+       url("../icons8/Arlo-Website---iOS_70d5ea805b42b17ec1e843c786148aab.svg#Arlo-Website---iOS") format("svg");
   font-weight: normal;
   font-style: normal;
 }
@@ -14,7 +14,7 @@
 @media screen and (-webkit-min-device-pixel-ratio:0) {
   @font-face {
     font-family: "Arlo-Website---iOS";
-    src: url("../fonts/Arlo-Website---iOS_e49d3125abf06774f3f05d776c79fed9.svg#Arlo-Website---iOS") format("svg");
+    src: url("../icons8/Arlo-Website---iOS_70d5ea805b42b17ec1e843c786148aab.svg#Arlo-Website---iOS") format("svg");
   }
 }
 
@@ -28,6 +28,7 @@
 .icons8-checked-checkbox-2:before,
 .icons8-checked-checkbox-2-filled:before,
 .icons8-checkmark:before,
+.icons8-circled-play:before,
 .icons8-classroom:before,
 .icons8-coffee-maker:before,
 .icons8-coffee-to-go:before,
@@ -61,6 +62,8 @@
 .icons8-tv:before,
 .icons8-tv-show:before,
 .icons8-unchecked-checkbox:before,
+.icons8-us-dollar:before,
+.icons8-us-dollar-2:before,
 .icons8-user-groups:before,
 .icons8-video-paylist:before {
   display: inline-block;
@@ -84,6 +87,7 @@
 .icons8-checked-checkbox-2:before { content: "\f114"; }
 .icons8-checked-checkbox-2-filled:before { content: "\f118"; }
 .icons8-checkmark:before { content: "\f122"; }
+.icons8-circled-play:before { content: "\f12e"; }
 .icons8-classroom:before { content: "\f10f"; }
 .icons8-coffee-maker:before { content: "\f11e"; }
 .icons8-coffee-to-go:before { content: "\f11d"; }
@@ -117,6 +121,8 @@
 .icons8-tv:before { content: "\f112"; }
 .icons8-tv-show:before { content: "\f111"; }
 .icons8-unchecked-checkbox:before { content: "\f115"; }
+.icons8-us-dollar:before { content: "\f12f"; }
+.icons8-us-dollar-2:before { content: "\f130"; }
 .icons8-user-groups:before { content: "\f113"; }
 .icons8-video-paylist:before { content: "\f110"; }
 
