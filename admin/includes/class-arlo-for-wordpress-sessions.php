@@ -108,7 +108,7 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 	
 	public function column_e_code($item) {
 		$actions = array(
-            'edit' => sprintf('<a href="https://my.arlo.co/%s/Console/#/events/%d" target="_blank">Edit</a>', $this->platform_name, $item->e_parent_arlo_id)
+            'edit' => sprintf('<a href="https://%s.arlo.co/management/Console/#/events/%d" target="_blank">Edit</a>', $this->platform_name, $item->e_parent_arlo_id)
         );
         
 		return sprintf('%1$s %2$s', $item->e_code, $this->row_actions($actions) );
@@ -174,11 +174,11 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 	}	
 	
 	public function get_new_link() {
-		return sprintf('https://my.arlo.co/%s/Console/#/events/new/', $this->platform_name );
+		return sprintf('https://%s.arlo.co/management/Console/#/events/new/', $this->platform_name );
 	}
 	
 	public function get_list_link() {
-		return sprintf('https://my.arlo.co/%s/Courses/Courses2.aspx', $this->platform_name );
+		return sprintf('https://%s.arlo.co/management/Courses/Courses2.aspx', $this->platform_name );
 	}			
 		
 }

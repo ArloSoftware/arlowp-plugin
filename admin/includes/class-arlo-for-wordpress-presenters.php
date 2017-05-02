@@ -105,7 +105,7 @@ class Arlo_For_Wordpress_Presenters extends Arlo_For_Wordpress_Lists  {
 	
 	function column_name($item) {
 		$actions = array(
-            'edit' => sprintf('<a href="https://my.arlo.co/%s/Users/User.aspx?id=%d" target="_blank">Edit</a>', $this->platform_name, $item->p_arlo_id),
+            'edit' => sprintf('<a href="https://%s.arlo.co/management/Users/User.aspx?id=%d" target="_blank">Edit</a>', $this->platform_name, $item->p_arlo_id),
             'view' => sprintf('<a href="%s" target="_blank">View</a>', $item->guid),
         );
         
@@ -152,11 +152,11 @@ class Arlo_For_Wordpress_Presenters extends Arlo_For_Wordpress_Lists  {
 	}	
 	
 	public function get_new_link() {
-		return sprintf('https://my.arlo.co/%s/Users/User.aspx?i=1&r=p', $this->platform_name );
+		return sprintf('https://%s.arlo.co/management/Users/User.aspx?i=1&r=p', $this->platform_name );
 	}
 	
 	public function get_list_link() {
-		return sprintf('https://my.arlo.co/%s/Users/Contacts2.aspx?t=presenters', $this->platform_name );
+		return sprintf('https://%s.arlo.co/management/Users/Contacts2.aspx?t=presenters', $this->platform_name );
 	}
 		
 }
