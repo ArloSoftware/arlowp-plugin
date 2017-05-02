@@ -618,7 +618,15 @@ class Arlo_For_Wordpress_Settings {
 	    <h3>What\'s new in this release</h3>
 		<p><strong>If you are experiencing problems after an update, please deactivate and re-activate the plugin and re-synchronize the data.</strong></p>
 	    <h4>Version ' .  VersionHandler::VERSION . '</h4>
-	    <p>
+
+		<p>
+	    	<ul class="arlo-whatsnew-list">	  
+				<li>Fix timezone issues on the upcoming events widget</li>
+	    		<li>Fix timezone error if the WP hasn\'t got a named timezone</li>
+	    	</ul>
+	    </p>			    
+		<h4>Version 3.0.1</h4>
+		<p>
 	    	<ul class="arlo-whatsnew-list">	  
 				<li>Enhance time zone indicators on events</li>
 	    		<li>Fix permission issues with WPEngine hosting</li>

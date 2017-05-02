@@ -3,7 +3,7 @@ Contributors: ArloSoftware, adamfentosi
 Tags: online registration, event registration, training management,  event management, event plugin, training company software, training calendar, training administration, training management software, training provider, solution, events calendar, wordpress events, event ticketing, wordpress lms, class registration, conference registration,  ticket, registration, event manager, training, booking, ticketing
 Requires at least: 4.4
 Tested up to: 4.7.3
-Stable tag: 3.0.1
+Stable tag: 3.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -156,6 +156,12 @@ The Arlo - Training and Event Management, and online registration plugin is only
 11. Theme Jazz - Upcoming events
 
 == Changelog ==
+
+= 3.0.2 =
+
+Fix timezone issues on the upcoming events widget
+
+Fix timezone error if the WP hasn't got a named timezone
 
 = 3.0.1 =
 

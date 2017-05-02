@@ -1,3 +1,11 @@
+== V3.0.2 ==
+
+Bugfixes
+------------------
+Fix timezone issues on the upcoming events widget
+Fix timezone error if the WP hasn't got a named timezone
+
+
 == V3.0.1 ==
 
 Enhancement
