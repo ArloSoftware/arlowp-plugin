@@ -201,7 +201,8 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
             "SELECT 
                 $t2.*, 
                 $t3.v_post_name,
-                $t3.v_post_id 
+                $t3.v_post_id,
+                $t3.v_viewuri 
             FROM 
                 $t2
             LEFT JOIN 
@@ -265,17 +266,36 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
 
     private static function shortcode_event_location($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_event_list_item']['e_locationname']) && !isset($GLOBALS['arlo_event_session_list_item']['e_locationname'])) return '';
+
+        // merge and extract attributes
+        extract(shortcode_atts(array(
+            'link' => 'permalink'
+        ), $atts, $link));
         
         $event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
 
         $location = htmlentities($event['e_locationname'], ENT_QUOTES, "UTF-8");
 
-        if(!($event['e_isonline'] || $event['v_id'] == 0 || $event['e_locationvisible'] == 0)) {
-            $permalink = get_permalink(arlo_get_post_by_name($event['v_post_name'], 'arlo_venue'));
+        switch ($link) {
+            case 'permalink': 
+                if(!($event['e_isonline'] || $event['v_id'] == 0 || $event['e_locationvisible'] == 0)) {
+                    $permalink = get_permalink(arlo_get_post_by_name($event['v_post_name'], 'arlo_venue'));
+                }                   
+            break;
+            case 'viewuri': 
+                if($event['e_locationvisible'] == 1) {
+                    $permalink = $event['v_viewuri'];
+                }
+            break;            
+            default: 
+                $permalink = $link;
+            break;
+        }
 
-            $location = '<a href="'.$permalink.'">'.$location.'</a>';
-        }        
-
+        if (!empty($permalink)) {
+            $location = '<a href="'.$permalink.'">'.$location.'</a>';    
+        }
+        
         return $location;
     }
 
@@ -369,7 +389,8 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
             p.p_firstname, 
             p.p_lastname, 
             p.p_post_name,
-            p.p_post_id 
+            p.p_post_id,
+            p.p_viewuri 
         FROM 
             $t1 exp 
         INNER JOIN 
@@ -390,54 +411,42 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         // merge and extract attributes
         extract(shortcode_atts(array(
             'layout' => '',
-            'link' => 'true'
+            'link' => 'permalink'
         ), $atts, $shortcode_name, $import_id));
-
-        $np = count($items);
 
         $output = '';
 
-        if($link === 'false') $link = false;
-
-        if($layout == 'list') {
-
-            $output .= '<figure>';
-            $output .= '<figcaption class="arlo-event-presenters-title">'._n('Presenter', 'Presenters', $np, 'arlo-for-wordpress').'</figcaption>';
+        if ($layout == 'list') {
             $output .= '<ul class="arlo-list event-presenters">';
+        }
 
-            foreach($items as $item) {
+        $presenters = array();
 
-                $permalink = get_permalink(arlo_get_post_by_name($item['p_post_name'], 'arlo_presenter'));
+        foreach($items as $item) {
 
-                $link_start = ($link) ? '<a href="'.$permalink.'">' : '' ;
-
-                $link_end = ($link) ? '</a>' : '' ;
-
-                $output .= '<li>' . $link_start . htmlentities($item['p_firstname'], ENT_QUOTES, "UTF-8") . ' ' . htmlentities($item['p_lastname'], ENT_QUOTES, "UTF-8") . $link_end . '</li>';
-
+            switch($link) {
+                case 'permalink': 
+                    $permalink = get_permalink(arlo_get_post_by_name($item['p_post_name'], 'arlo_presenter'));
+                    break;
+                case 'viewuri': 
+                    $permalink = $item['p_viewuri'];
+                    break;
+                case 'false':
+                    $permalink = '';
+                    break;
+                default: 
+                    $permalink = $link;
             }
 
+            $presenter_name = htmlentities($item['p_firstname'], ENT_QUOTES, "UTF-8") . ' ' . htmlentities($item['p_lastname'], ENT_QUOTES, "UTF-8");
+
+            $presenters[] = ($layout == 'list' ? '<li>' : '') . (!empty($link) ? '<a href="' . $permalink . '">' . $presenter_name . '</a>' : $presenter_name) . ($layout == 'list' ? '<li>' : '');
+        }
+
+        $output .= implode(($layout == 'list' ? '' : ', '), $presenters);
+
+        if ($layout == 'list') {
             $output .= '</ul>';
-            $output .= '</figure>';
-
-        } else {
-
-            $presenters = array();
-
-            foreach($items as $item) {
-
-                $permalink = get_permalink(arlo_get_post_by_name($item['p_post_name'], 'arlo_presenter'));
-
-                $link_start = ($link) ? '<a href="'.$permalink.'">' : '' ;
-
-                $link_end = ($link) ? '</a>' : '' ;
-
-                $presenters[] = $link_start . htmlentities($item['p_firstname'], ENT_QUOTES, "UTF-8") . ' ' . htmlentities($item['p_lastname'], ENT_QUOTES, "UTF-8") . $link_end;
-
-            }
-
-            $output .= implode(', ', $presenters);
-
         }
 
         return $output;        
