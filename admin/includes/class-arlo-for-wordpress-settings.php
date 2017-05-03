@@ -621,6 +621,9 @@ class Arlo_For_Wordpress_Settings {
 
 		<p>
 	    	<ul class="arlo-whatsnew-list">	  
+				<li>New \'link\' attribute for <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_location" target="_blank">[arlo_event_location]</a> and <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_presenters" target="_blank">[arlo_event_presenters]</a> shortcodes</li>
+				<li>New <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_link" target="_blank">[arlo_venue_link]</a> shortcode</li>
+				<li>New <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/presenterrelated#arlo_presenter_link" target="_blank">[arlo_presenter_link]</a> shortcode</li>
 				<li>Fix timezone issues on the upcoming events widget</li>
 	    		<li>Fix timezone error if the WP hasn\'t got a named timezone</li>
 	    	</ul>

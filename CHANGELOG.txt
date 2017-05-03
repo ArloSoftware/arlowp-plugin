@@ -1,4 +1,10 @@
-== V3.0.2 ==
+== V3.1 ==
+
+Enhancement
+------------------
+New 'link' attribute for [arlo_event_location] and [arlo_event_presenters] shortcodes
+New [arlo_venue_link] shortcode
+New [arlo_presenter_link] shortcode
 
 Bugfixes
 ------------------

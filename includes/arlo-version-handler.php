@@ -5,7 +5,7 @@ namespace Arlo;
 use Arlo\Utilities;
 
 class VersionHandler {
-	const VERSION = '3.0.2';
+	const VERSION = '3.1';
 
 	private $dbl;
 	private $message_handler;
@@ -75,8 +75,8 @@ class VersionHandler {
 			$this->do_update('3.0');
 		}	
 
-		if (version_compare($old_version, '3.0.2') < 0) {
-			$this->do_update('3.0.2');
+		if (version_compare($old_version, '3.1') < 0) {
+			$this->do_update('3.1');
 		}				
 	}
 	
@@ -397,7 +397,7 @@ class VersionHandler {
 					$this->plugin->get_scheduler()->set_task("import", -1);					
 			break;
 
-			case '3.0.2':
+			case '3.1':
 				delete_metadata('user', 0 , 'arlo-developer-admin-notice', '0', true);
 			break;
 		}	
