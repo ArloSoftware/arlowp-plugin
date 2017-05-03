@@ -425,6 +425,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         foreach($items as $item) {
 
             switch($link) {
+                case 'yes':
                 case 'permalink': 
                     $permalink = get_permalink(arlo_get_post_by_name($item['p_post_name'], 'arlo_presenter'));
                     break;
