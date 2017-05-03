@@ -104,6 +104,12 @@ class Venues {
 
         return htmlentities($GLOBALS['arlo_venue_list_item']['v_name'], ENT_QUOTES, "UTF-8");        
     }
+
+    private static function shortcode_venue_link($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if(!isset($GLOBALS['arlo_venue_list_item']['v_viewuri'])) return '';
+
+        return htmlentities($GLOBALS['arlo_venue_list_item']['v_viewuri'], ENT_QUOTES, "UTF-8");        
+    }    
     
     private static function shortcode_venue_permalink($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_venue_list_item']['post_id'])) return '';
