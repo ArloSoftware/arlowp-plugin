@@ -489,10 +489,19 @@ class Importer {
 				$response_json = json_decode($import->response_json);
 
 				//JWE decode
-				$decoded = utf8_decode(Crypto::jwe_decrypt($callback_json->__jwe__, $response_json->Callback->EncryptedResponse->key->k));
-				$this->update_import_entry(['callback_json' => preg_replace('/[\x00-\x1F\x7F]/', '', $decoded)]);
-				$this->kick_off_scheduler();
-			} 
+				$decoded = preg_replace('/[\x00-\x1F\x7F]/', '', utf8_decode(Crypto::jwe_decrypt($callback_json->__jwe__, $response_json->Callback->EncryptedResponse->key->k)));
+				$decoded_json = json_decode($decoded);
+				if (!empty($decoded_json->SnapshotUri)) {
+					$this->update_import_entry(['callback_json' => $decoded]);
+					$this->kick_off_scheduler();
+				} else {
+					if (!empty($decoded_json->Error)) {
+						throw new \Exception($decoded_json->Error->Code . ': ' . $decoded_json->Error->Message);
+					} else {
+						throw new \Exception('Error in the response for the snapshot request');
+					}
+				}	
+			}
 		} catch(\Exception $e) {
 			Logger::log($e->getMessagE(), (!empty($import->import_id)) ? $import->import_id : null);
 			Logger::log('Synchronization failed, please check the <a href="?page=arlo-for-wordpress-logs&s='.$this->import_id.'">Log</a> ', $this->import_id);

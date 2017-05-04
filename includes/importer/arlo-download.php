@@ -39,6 +39,8 @@ class Download extends BaseImporter  {
 					$this->is_finished = true;
 				}
 				unset($content);
+			} else {
+				throw new \Exception('The downloaded file is empty');
 			}
 		} else {
 			throw new \Exception('The URI couldn\'t be empty');
