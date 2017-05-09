@@ -501,6 +501,8 @@ class Importer {
 						throw new \Exception('Error in the response for the snapshot request');
 					}
 				}	
+			} else {
+				throw new \Exception('no Nonce');
 			}
 		} catch(\Exception $e) {
 			Logger::log($e->getMessagE(), (!empty($import->import_id)) ? $import->import_id : null);
