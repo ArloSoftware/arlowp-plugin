@@ -260,7 +260,7 @@ class NoticeHandler {
 			);
 		} else {
 			if ($meta !== '0') {			
-				if (!empty($this->settings['platform_name']) && $events !== false && $upcoming !== false && $presenters !== false && $venues !== false) {		
+				if (!empty($this->settings['platform_name']) && $events !== false && $upcoming !== false && $presenters !== false && $venues !== false && !empty($import_id)) {		
 					//Get the first event template wich has event
 					$sql = "
 					SELECT 
