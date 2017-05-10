@@ -186,11 +186,11 @@ class Shortcodes {
 
 			$slug = get_post($settings['post_types']['eventsearch']['posts_page'])->post_name;
 				
-			$search_term = !empty($_GET['arlo-search']) ? $_GET['arlo-search'] : get_query_var('arlo-search', '');
+			$search_term = stripslashes(esc_attr(urldecode(!empty($_GET['arlo-search']) ? $_GET['arlo-search'] : get_query_var('arlo-search', ''))));
 			
 			return '
 			<form class="arlo-search" action="'.site_url().'/'.$slug.'/">
-				<input type="text" class="arlo-search-field ' . $inputclass . '" placeholder="'. $placeholder .'" name="arlo-search" value="' . stripslashes(esc_attr(urldecode($search_term))) . '">
+				<input type="text" class="arlo-search-field ' . $inputclass . '" placeholder="'. $placeholder .'" name="arlo-search" value="' . $search_term . '">
 				' . ($showbutton == "true" ? '<input type="submit" class="arlo-search-button ' . $buttonclass . '" value="' . $buttontext . '">' : '') . '
 			</form>
 			';	

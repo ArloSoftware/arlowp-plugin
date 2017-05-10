@@ -407,20 +407,25 @@ class Importer {
 				break;
 			case 'Download':
 				$import = $this->get_import_entry($this->import_id, null, 1);
-				$callback_json = json_decode($import->callback_json);
 
-				if (json_last_error() != JSON_ERROR_NONE) {
-					error_log("JSON Decode error: " . json_last_error_msg());
-					Logger::log_error("JSON Decode error: " . json_last_error_msg(), $this->import_id);
-				}
+				if (!is_null($import)) {
+					$callback_json = json_decode($import->callback_json);
 
-				if (!empty($callback_json->SnapshotUri)) {
-					$this->current_task_class->uri = $callback_json->SnapshotUri;
+					if (json_last_error() != JSON_ERROR_NONE) {
+						error_log("JSON Decode error: " . json_last_error_msg());
+						Logger::log_error("JSON Decode error: " . json_last_error_msg(), $this->import_id);
+					}
 
-					$this->current_task_class->filename = $this->import_id;
-					$this->current_task_class->response_json = json_decode($import->response_json);
-				} elseif (!empty($callback_json->Error)) {
-					Logger::log_error($callback_json->Error->Code . ': ' . $callback_json->Error->Message, $this->import_id);
+					if (!empty($callback_json->SnapshotUri)) {
+						$this->current_task_class->uri = $callback_json->SnapshotUri;
+
+						$this->current_task_class->filename = $this->import_id;
+						$this->current_task_class->response_json = json_decode($import->response_json);
+					} elseif (!empty($callback_json->Error)) {
+						Logger::log_error($callback_json->Error->Code . ': ' . $callback_json->Error->Message, $this->import_id);
+					}
+				} else {
+					Logger::log_error('Couldn\'t retrive the import from database', $this->import_id);
 				}
 
 			break;
@@ -502,7 +507,7 @@ class Importer {
 					}
 				}	
 			} else {
-				throw new \Exception('no Nonce');
+				throw new \Exception('no Nonce or the requested import is not valid');
 			}
 		} catch(\Exception $e) {
 			Logger::log($e->getMessagE(), (!empty($import->import_id)) ? $import->import_id : null);
@@ -522,8 +527,11 @@ class Importer {
 		$utc_date = gmdate("Y-m-d H:i:s"); 
 
 		$import_id = (!empty($import_id) && is_numeric($import_id) ? $import_id : null);
-		$nonce = (!empty($nonce) ? $nonce : null);
 		$limit = (!empty($limit) && is_numeric($limit) ? $limit : null);
+		$request_id = (!empty($request_id) ? $request_id : null);
+
+		if (is_null($request_id) && is_null($import_id)) 
+			return null; 
 
 		$table_name = $this->dbl->prefix . "arlo_import";
 
@@ -542,7 +550,7 @@ class Importer {
 		WHERE
 			1
 			' . (!is_null($import_id) ? ' AND import_id = ' . $import_id : '' ) . '
-			' . (!is_null($request_id) ? ' AND request_id = "' . $request_id . '"' : '' ) . '
+			' . (!is_null($request_id) ? ' AND request_id = "' . esc_sql($request_id) . '"' : '' ) . '
 		AND
 			expired >= "' . $utc_date . '"
 		' . (!is_null($limit) ? ' LIMIT ' . $limit : '' ) . '

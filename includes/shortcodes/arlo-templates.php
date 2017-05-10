@@ -53,7 +53,7 @@ class Templates {
                             ON
                                 ett.tag_id = t.id AND t.import_id = " . $import_id . "
                             WHERE
-                                t.tag LIKE '{$tagprefix}%'
+                                t.tag LIKE '" . esc_sql($tagprefix) . "%'
                             AND
                                 ett.import_id = " . $import_id . "
                             AND
@@ -183,7 +183,7 @@ class Templates {
         if (strtolower($fields) != 'all') {
             $where_fields = explode(',', $fields);
             $where_fields = array_map(function($field) {
-                return '"' . trim($field) . '"';
+                return '"' . trim(esc_sql($field)) . '"';
             }, $where_fields);
         }
         
@@ -249,7 +249,7 @@ class Templates {
 
         if (isset($GLOBALS['show_only_at_bottom']) && $GLOBALS['show_only_at_bottom']) return;
 
-        $limit = !empty($atts['limit']) ? $atts['limit'] : get_option('posts_per_page');
+        $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
         
         $sql = self::generate_list_sql($atts, $import_id, true);
 
@@ -657,7 +657,7 @@ class Templates {
             return;
         } 
 
-        $limit = !empty($atts['limit']) ? $atts['limit'] : get_option('posts_per_page');
+        $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
         $page = !empty($_GET['paged']) ? intval($_GET['paged']) : intval(get_query_var('paged'));
         $offset = ($page > 0) ? $page * $limit - $limit: 0 ;
 
@@ -672,11 +672,11 @@ class Templates {
         $where = "WHERE post.post_type = 'arlo_event' AND et.import_id = " . $import_id;
         $join = "";
         
-        $arlo_location = isset($_GET['arlo-location']) && !empty($_GET['arlo-location']) ? $_GET['arlo-location'] : get_query_var('arlo-location', '');
-        $arlo_category = isset($_GET['arlo-category']) && !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : get_query_var('arlo-category', '');
-        $arlo_delivery = isset($_GET['arlo-delivery']) ? $_GET['arlo-delivery'] : get_query_var('arlo-delivery', '');
-        $arlo_templatetag = isset($_GET['arlo-templatetag']) && !empty($_GET['arlo-templatetag']) ? $_GET['arlo-templatetag'] : get_query_var('arlo-templatetag', '');
-        $arlo_search = isset($_GET['arlo-search']) && !empty($_GET['arlo-search']) ? $_GET['arlo-search'] : get_query_var('arlo-search', '');
+        $arlo_location = !empty($_GET['arlo-location']) ? esc_sql($_GET['arlo-location']) : get_query_var('arlo-location', '');
+        $arlo_category = !empty($_GET['arlo-category']) ? esc_sql($_GET['arlo-category']) : get_query_var('arlo-category', '');
+        $arlo_delivery = intval(isset($_GET['arlo-delivery']) ? $_GET['arlo-delivery'] : get_query_var('arlo-delivery', ''));
+        $arlo_templatetag = !empty($_GET['arlo-templatetag']) ? esc_sql($_GET['arlo-templatetag']) : get_query_var('arlo-templatetag', '');
+        $arlo_search = !empty($_GET['arlo-search']) ? $_GET['arlo-search'] : get_query_var('arlo-search', '');
         $arlo_search = esc_sql(stripslashes(urldecode($arlo_search)));
         $arlo_region = get_query_var('arlo-region', '');
         $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
@@ -735,11 +735,8 @@ class Templates {
 
             $cat_id = 0;
 
-            if(!empty($arlo_category)) {
-                $cat_slug = $arlo_category;
-            } else {
-                $cat_slug = $atts['category'];
-            }
+            $cat_slug = esc_sql((!empty($arlo_category) ? $arlo_category : $atts['category']));
+
             $where .= " AND ( c.c_slug = '$cat_slug'";
             
             $cat_id = $wpdb->get_var("

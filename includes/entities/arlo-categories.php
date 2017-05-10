@@ -33,9 +33,9 @@ class Categories {
 				
 				case 'slug':
 					if(is_array($value)) {
-						$where[] = "c.c_slug IN (" . implode(',', $value) . ")";
+						$where[] = "c.c_slug IN (" . implode(',', esc_sql($value)) . ")";
 					} else if(!empty($value)) {
-						$where[] = "c.c_slug = '$value'";
+						$where[] = "c.c_slug = '" . esc_sql($value) . "'";
 						$limit = 1;
 					}
 				break;

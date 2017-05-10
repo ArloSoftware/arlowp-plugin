@@ -33,7 +33,7 @@ class UpcomingEvents {
     private static function shortcode_upcoming_list_pagination($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $wpdb;
         
-        $limit = isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page');
+        $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
 
         $sql = self::generate_list_sql($atts, $import_id, true);        
 
@@ -115,15 +115,11 @@ class UpcomingEvents {
         $filters_array = explode(',',$filters);
         
         $settings = get_option('arlo_settings');
-            
-        if (!empty($settings['post_types']['upcoming']['posts_page'])) {
-            $slug = str_replace(get_home_url(), "", get_page_link(get_post($settings['post_types']['upcoming']['posts_page'])->ID));
-        } else {
-            $slug = str_replace(get_home_url(), "", get_page_link());
-        }
-        
-        $filter_html = '<form class="arlo-filters" method="get" action="'.site_url().'/'.$slug.'">';
 
+        $page_link = get_permalink(get_post($post));       
+            
+        $filter_html = '<form class="arlo-filters" method="get" action="' . $page_link . '">';
+            
         foreach($filters_array as $filter) :
 
             switch($filter) :
@@ -220,8 +216,8 @@ class UpcomingEvents {
             endswitch;
         endforeach;
 
-        $filter_html .= '<div class="arlo-filters-buttons"><input type="hidden" id="arlo-page" value="' . $slug . '"> ';    
-        $filter_html .= '<a href="'.get_page_link().'" class="' . esc_attr($buttonclass) . '">' . htmlentities($resettext, ENT_QUOTES, "UTF-8") . '</a></div>';
+        $filter_html .= '<div class="arlo-filters-buttons"><input type="hidden" id="arlo-page" value="' .  $page_link . '"> ';    
+        $filter_html .= '<a href="' . $page_link . '" class="' . esc_attr($buttonclass) . '">' . htmlentities($resettext, ENT_QUOTES, "UTF-8") . '</a></div>';
 
         $filter_html .= '</form>';
         
@@ -236,7 +232,7 @@ class UpcomingEvents {
         global $wpdb;
         $regions = get_option('arlo_regions');
 
-        $limit = isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page');
+        $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
         $page = !empty($_GET['paged']) ? intval($_GET['paged']) : intval(get_query_var('paged'));
         $offset = ($page > 0) ? $page * $limit - $limit: 0 ;
 
@@ -252,11 +248,11 @@ class UpcomingEvents {
         $where = 'WHERE CURDATE() < DATE(e.e_startdatetime)  AND e_parent_arlo_id = 0 AND e.import_id = '.$import_id;
         $join = '';
 
-        $arlo_month = isset($_GET['arlo-month']) && !empty($_GET['arlo-month']) ? $_GET['arlo-month'] : get_query_var('arlo-month', '');
-        $arlo_location = isset($_GET['arlo-location']) && !empty($_GET['arlo-location']) ? $_GET['arlo-location'] : get_query_var('arlo-location', '');
-        $arlo_category = isset($_GET['arlo-category']) && !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : get_query_var('arlo-category', '');
-        $arlo_delivery = isset($_GET['arlo-delivery']) ? $_GET['arlo-delivery'] : get_query_var('arlo-delivery', '');
-        $arlo_eventtag = isset($_GET['arlo-eventtag']) && !empty($_GET['arlo-eventtag']) ? $_GET['arlo-eventtag'] : get_query_var('arlo-eventtag', '');
+        $arlo_month = !empty($_GET['arlo-month']) ? esc_sql($_GET['arlo-month']) : get_query_var('arlo-month', '');
+        $arlo_location = !empty($_GET['arlo-location']) ?  esc_sql($_GET['arlo-location']) : get_query_var('arlo-location', '');
+        $arlo_category = !empty($_GET['arlo-category']) ?  esc_sql($_GET['arlo-category']) : get_query_var('arlo-category', '');
+        $arlo_delivery = intval(isset($_GET['arlo-delivery']) ?  $_GET['arlo-delivery'] : get_query_var('arlo-delivery', ''));
+        $arlo_eventtag = !empty($_GET['arlo-eventtag']) ?  esc_sql($_GET['arlo-eventtag']) : get_query_var('arlo-eventtag', '');
         $arlo_region = get_query_var('arlo-region', '');
         $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
         

@@ -30,7 +30,7 @@ class Venues {
     private static function shortcode_venue_list_pagination($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $wpdb;   
         
-        $limit = isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page');
+        $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
 
         $t1 = "{$wpdb->prefix}arlo_venues";
         $t2 = "{$wpdb->prefix}posts";
@@ -59,7 +59,7 @@ class Venues {
     private static function shortcode_venue_list_item($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $wpdb;
 	
-        $limit = isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page');
+        $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
         $offset = (get_query_var('paged') && intval(get_query_var('paged')) > 0) ? intval(get_query_var('paged')) * $limit - $limit: 0 ;
 
         $t1 = "{$wpdb->prefix}arlo_venues";

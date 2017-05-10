@@ -124,10 +124,13 @@ class ProcessFragment extends BaseImporter {
 			switch($this->current_task) {
 				case 'Download':
 					$import = $this->importer->get_import_entry($this->import_id, null, 1);
-					
-					$this->current_task_class->uri = $this->uri;
-					$this->current_task_class->filename = $this->filename;
-					$this->current_task_class->response_json = json_decode($import->response_json);			 
+					if (!is_null($import)) {
+						$this->current_task_class->uri = $this->uri;
+						$this->current_task_class->filename = $this->filename;
+						$this->current_task_class->response_json = json_decode($import->response_json);			 
+					} else {
+						throw new \Exception('Couldn\'t retrive the import from database');
+					}
 				break;
 			}
 			try {

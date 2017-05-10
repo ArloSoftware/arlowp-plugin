@@ -57,7 +57,7 @@ class Offers {
 					$where[] = "o.o_isdiscountoffer = " . ($value ? 1 : 0);
 				break;
 				case 'region':
-					$where[] = "o.o_region = '" . $value . "'";
+					$where[] = "o.o_region = '" . esc_sql($value) . "'";
 				break;
 			}
 		}

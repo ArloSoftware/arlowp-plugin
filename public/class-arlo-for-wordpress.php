@@ -1349,7 +1349,7 @@ class Arlo_For_Wordpress {
 					
 					$location = $url;
 				} else {
-					$event = \Arlo\Entities\Templates::get(array('id' => $_GET['arlo_id']), array(), 1, $import_id);
+					$event = \Arlo\Entities\Templates::get(array('id' => intval($_GET['arlo_id'])), array(), 1, $import_id);
 					
 					if(!$event) return;
 					
@@ -1362,7 +1362,7 @@ class Arlo_For_Wordpress {
 			break;
 			
 			case 'venue':
-				$venue = \Arlo\Entities\Venues::get(array('id' => $_GET['arlo_id']), array(), 1, $import_id);
+				$venue = \Arlo\Entities\Venues::get(array('id' => intval($_GET['arlo_id'])), array(), 1, $import_id);
 				
 				if(!$venue) return;
 				
@@ -1374,7 +1374,7 @@ class Arlo_For_Wordpress {
 			break;
 			
 			case 'presenter':
-				$presenter = \Arlo\Entities\Presenters::get(array('id' => $_GET['arlo_id']), array(), 1, $import_id);
+				$presenter = \Arlo\Entities\Presenters::get(array('id' => intval($_GET['arlo_id'])), array(), 1, $import_id);
 				
 				if(!$presenter) return;
 				

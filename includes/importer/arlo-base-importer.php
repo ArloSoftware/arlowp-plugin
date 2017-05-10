@@ -132,7 +132,7 @@ abstract class BaseImporter {
 			FROM
 				" . $this->dbl->prefix . "arlo_tags 
 			WHERE 
-				tag IN ('" . implode("', '", $tags) . "')
+				tag IN ('" . implode("', '", esc_sql($tags)) . "')
 			AND
 				import_id = " . $this->import_id . "
 			";

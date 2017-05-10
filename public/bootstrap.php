@@ -363,7 +363,6 @@ function arlo_the_content_event($content) {
 		BY et.et_name ASC
 	";
 	
-	
 	$item = $wpdb->get_row($sql, ARRAY_A);	
 
 	$GLOBALS['arlo_eventtemplate'] = $item;
@@ -462,7 +461,7 @@ function arlo_the_content_venue($content) {
  */
 function arlo_pagination($num, $limit=null) {
 	// the wordpress posts per page option value
-	$limit = is_null($limit) ? get_option('posts_per_page') : $limit;
+	$limit = intval(is_null($limit) ? get_option('posts_per_page') : $limit);
 	
 	$big = 999999999;
 	
