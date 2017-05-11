@@ -618,7 +618,12 @@ class Arlo_For_Wordpress_Settings {
 	    <h3>What\'s new in this release</h3>
 		<p><strong>If you are experiencing problems after an update, please deactivate and re-activate the plugin and re-synchronize the data.</strong></p>
 	    <h4>Version ' .  VersionHandler::VERSION . '</h4>
-
+		<p>
+	    	<ul class="arlo-whatsnew-list">	  
+				<li>Improve error logging and reliability for data synchronization</li>
+			</ul>
+		</p>
+		<h4>Version 3.1</h4>
 		<p>
 	    	<ul class="arlo-whatsnew-list">	  
 				<li>New \'link\' attribute for <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_location" target="_blank">[arlo_event_location]</a> and <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_presenters" target="_blank">[arlo_event_presenters]</a> shortcodes</li>
