@@ -706,7 +706,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         $return = "";
 
         $arlo_location = isset($_GET['arlo-location']) && !empty($_GET['arlo-location']) ? esc_sql($_GET['arlo-location']) : get_query_var('arlo-location', '');
-        $arlo_delivery = intval(isset($_GET['arlo-delivery']) ? $_GET['arlo-delivery'] : get_query_var('arlo-delivery', ''));
+        $arlo_delivery = isset($_GET['arlo-delivery']) ?  intval($_GET['arlo-delivery']) : get_query_var('arlo-delivery', '');
         
         if (!empty($GLOBALS['arlo_eventtemplate']['et_region'])) {
             $arlo_region = $GLOBALS['arlo_eventtemplate']['et_region'];

@@ -674,7 +674,7 @@ class Templates {
         
         $arlo_location = !empty($_GET['arlo-location']) ? esc_sql($_GET['arlo-location']) : get_query_var('arlo-location', '');
         $arlo_category = !empty($_GET['arlo-category']) ? esc_sql($_GET['arlo-category']) : get_query_var('arlo-category', '');
-        $arlo_delivery = intval(isset($_GET['arlo-delivery']) ? $_GET['arlo-delivery'] : get_query_var('arlo-delivery', ''));
+        $arlo_delivery = isset($_GET['arlo-delivery']) ?  intval($_GET['arlo-delivery']) : get_query_var('arlo-delivery', '');
         $arlo_templatetag = !empty($_GET['arlo-templatetag']) ? esc_sql($_GET['arlo-templatetag']) : get_query_var('arlo-templatetag', '');
         $arlo_search = !empty($_GET['arlo-search']) ? $_GET['arlo-search'] : get_query_var('arlo-search', '');
         $arlo_search = esc_sql(stripslashes(urldecode($arlo_search)));
