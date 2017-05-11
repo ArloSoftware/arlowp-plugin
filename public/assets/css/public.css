@@ -387,11 +387,11 @@ p.arlo-no-results {
 	margin-bottom: 1em;
 }
 
-.arlo-powered-by i {
-	display: inline-block;
-    margin-left: 0.2em;
+.arlo-powered-by img {
+	display: inline-block !important;
 	margin-right: 0.2em;
-    font-size: 32px !important;
+    height: 38px;
+	margin-top: -4px;
 	vertical-align: middle;
 }
 
@@ -406,4 +406,3 @@ p.arlo-no-results {
 	box-shadow: none !important;
 	text-shadow: none !important;
 }
->>>>>>> master
