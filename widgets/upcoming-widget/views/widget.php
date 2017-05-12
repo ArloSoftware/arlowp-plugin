@@ -23,8 +23,8 @@
 
 			$output .= '<li class="arlo-cf">';
 			$output .= '<div class="arlo-left arlo-cal">';
-			$output .= '<span class="arlo-cal-month">' . \Arlo\Shortcodes\Events::event_date_formatter(['format' => 'M'], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline) . '</span>';
-			$output .= '<span class="arlo-cal-day">' . \Arlo\Shortcodes\Events::event_date_formatter(['format' => 'd'], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline) . '</span>';
+			$output .= '<span class="arlo-cal-month">' . \Arlo\Shortcodes\Events::event_date_formatter(['format' => 'M'], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id) . '</span>';
+			$output .= '<span class="arlo-cal-day">' . \Arlo\Shortcodes\Events::event_date_formatter(['format' => 'd'], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id) . '</span>';
 			$output .= '</div>';
 			$output .= '<p><a href="'.$link.'">' . htmlentities($event->et_name, ENT_QUOTES, "UTF-8") . '</a></p>';
 			$output .= '<p>' . htmlentities($event->e_locationname, ENT_QUOTES, "UTF-8") . '</p>';

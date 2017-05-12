@@ -310,6 +310,7 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 			e.e_locationname, 
 			e.e_datetimeoffset,
 			e.e_isonline,
+			e.e_timezone_id,
 			et.et_name, 
 			et.et_post_name,
 			et.et_post_id

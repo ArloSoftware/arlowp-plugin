@@ -304,7 +304,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
 
         $event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
         
-        return self::event_date_formatter($atts, $event['e_startdatetime'], $event['e_datetimeoffset'], $event['e_isonline']);
+        return self::event_date_formatter($atts, $event['e_startdatetime'], $event['e_datetimeoffset'], $event['e_isonline'], $event['e_timezone_id']);
     }
 
     private static function shortcode_event_end_date($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -312,7 +312,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         
         $event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
 
-        return self::event_date_formatter($atts, $event['e_finishdatetime'], $event['e_datetimeoffset'], $event['e_isonline']);
+        return self::event_date_formatter($atts, $event['e_finishdatetime'], $event['e_datetimeoffset'], $event['e_isonline'], $event['e_timezone_id']);
     }
 
     private static function shortcode_event_session_description($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -502,6 +502,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
                 e_finishdatetime,
                 e_datetimeoffset,
                 e_isonline,
+                e_timezone_id,
                 0 AS v_id
             FROM
                 {$wpdb->prefix}arlo_events
@@ -779,8 +780,8 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
                     }
                     
                     $location = $event->e_locationname;
-                    
-                    $date = self::event_date_formatter(['format' => $format], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline);
+                   
+                    $date = self::event_date_formatter(['format' => $format], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
 
                     $display_text = str_replace(['{%date%}', '{%location%}'], [$date, $location], $text);
                     
@@ -808,7 +809,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
     }
     
 
-    public static function event_date_formatter($atts, $date, $offset, $is_online = false) {
+    public static function event_date_formatter($atts, $date, $offset, $is_online = false, $timezoneid = null) {
         global $arlo_plugin;
         $timezone = null;
         
@@ -818,7 +819,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
 
         $utc_timezone_name = "UTC";
 
-        $timezone_array = $arlo_plugin->get_timezone_manager()->get_indexed_timezones($GLOBALS['arlo_event_list_item']['e_timezone_id']);
+        $timezone_array = $arlo_plugin->get_timezone_manager()->get_indexed_timezones($timezoneid);
         if (!is_null($timezone_array) && !empty($timezone_array['windows_tz_id']) && !empty(\Arlo\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$timezone_array['windows_tz_id']])) {
             $timezone = new \DateTimeZone(\Arlo\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$timezone_array['windows_tz_id']]);
         } else {
