@@ -174,7 +174,7 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 
 		$instance = $old_instance;
 
-		$instance['title'] = strip_tags( stripslashes($new_instance['title']) );
+		$instance['title'] = strip_tags( wp_unslash($new_instance['title']) );
 		$instance['number'] = intval($new_instance['number']);
 
 

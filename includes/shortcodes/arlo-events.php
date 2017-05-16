@@ -182,7 +182,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         
         $arlo_region = get_query_var('arlo-region', '');
         $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
-        $arlo_location = !empty($_GET['arlo-location']) ? stripslashes_deep($_GET['arlo-location']) : stripslashes_deep(urldecode(get_query_var('arlo-location')));
+        $arlo_location = !empty($_GET['arlo-location']) ? wp_unslash($_GET['arlo-location']) : wp_unslash(urldecode(get_query_var('arlo-location')));
         
         $t1 = "{$wpdb->prefix}arlo_eventtemplates";
         $t2 = "{$wpdb->prefix}arlo_events";
@@ -710,7 +710,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         if(!isset($GLOBALS['arlo_eventtemplate']) || empty($GLOBALS['arlo_eventtemplate']['et_arlo_id'])) return;
         $return = "";
 
-        $arlo_location = !empty($_GET['arlo-location']) ? stripslashes_deep($_GET['arlo-location']) : stripslashes_deep(urldecode(get_query_var('arlo-location')));
+        $arlo_location = !empty($_GET['arlo-location']) ? wp_unslash($_GET['arlo-location']) : wp_unslash(urldecode(get_query_var('arlo-location')));
         $arlo_delivery = isset($_GET['arlo-delivery']) ?  $_GET['arlo-delivery'] : get_query_var('arlo-delivery');
         
         if (!empty($GLOBALS['arlo_eventtemplate']['et_region'])) {

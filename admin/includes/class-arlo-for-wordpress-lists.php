@@ -142,7 +142,7 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 		if (!empty($_GET['s'])) {
 			$search_fields = $this->get_searchable_fields();
 			foreach ($search_fields as $field) {
-				$where[] = $field . " LIKE '%" . esc_sql($_GET['s']) . "%'";
+				$where[] = $field . " LIKE '%" . esc_sql(wp_unslash($_GET['s'])) . "%'";
 			}
 		}
 		

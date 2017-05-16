@@ -93,7 +93,7 @@ function set_title($title, $id = null, $meta = false){
 	
 	$subtitle = '';
 	
-	$arlo_category = !empty($_GET['arlo-category']) ? stripslashes_deep($_GET['arlo-category']) : stripslashes_deep(urldecode(get_query_var('arlo-category')));
+	$arlo_category = !empty($_GET['arlo-category']) ? wp_unslash($_GET['arlo-category']) : wp_unslash(urldecode(get_query_var('arlo-category')));
 	
 	$cat_slug = !empty($arlo_category) ? $arlo_category : '';	
 	
@@ -103,8 +103,8 @@ function set_title($title, $id = null, $meta = false){
 		$cat = \Arlo\Entities\Categories::get(array('slug' => $cat_slug), null, $import_id);
 		
 		
-	$arlo_location = !empty($_GET['arlo-location']) ? stripslashes_deep($_GET['arlo-location']) : stripslashes_deep(urldecode(get_query_var('arlo-location')));
-	$arlo_search = !empty($_GET['arlo-search']) ? stripslashes_deep($_GET['arlo-search']) : stripslashes_deep(urldecode(get_query_var('arlo-search')));
+	$arlo_location = !empty($_GET['arlo-location']) ? wp_unslash($_GET['arlo-location']) : wp_unslash(urldecode(get_query_var('arlo-location')));
+	$arlo_search = !empty($_GET['arlo-search']) ? wp_unslash($_GET['arlo-search']) : wp_unslash(urldecode(get_query_var('arlo-search')));
 		
 	if ($id === null || !in_array($id, $pages) || $id != $post->ID || (!in_the_loop() && !$meta) || is_nav_menu_item($id)) return ['title' => $title];
 	
@@ -228,7 +228,7 @@ function arlo_register_custom_post_types() {
 	if (strpos($_SERVER['QUERY_STRING'], 'arlo-search') !== false && !empty($_GET['arlo-search'])) {
 		if(isset($settings['post_types']['eventsearch']['posts_page']) && $settings['post_types']['eventsearch']['posts_page'] != 0) {
 			$slug = substr(substr(str_replace(get_home_url(), '', get_permalink($settings['post_types']['eventsearch']['posts_page'])), 0, -1), 1);
-			$location = '/' . $slug . '/search/' . rawurlencode(stripslashes_deep($_GET['arlo-search'])) . '/';
+			$location = '/' . $slug . '/search/' . rawurlencode(wp_unslash($_GET['arlo-search'])) . '/';
 			wp_redirect( get_home_url() . $location );
 			exit();
 		}

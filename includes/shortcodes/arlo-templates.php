@@ -676,11 +676,11 @@ class Templates {
 
         $join = "";
 
-        $arlo_location = !empty($_GET['arlo-location']) ? stripslashes_deep($_GET['arlo-location']) : stripslashes_deep(urldecode(get_query_var('arlo-location')));
-        $arlo_category = !empty($_GET['arlo-category']) ? stripslashes_deep($_GET['arlo-category']) : stripslashes_deep(urldecode(get_query_var('arlo-category')));
+        $arlo_location = !empty($_GET['arlo-location']) ? wp_unslash($_GET['arlo-location']) : wp_unslash(urldecode(get_query_var('arlo-location')));
+        $arlo_category = !empty($_GET['arlo-category']) ? wp_unslash($_GET['arlo-category']) : wp_unslash(urldecode(get_query_var('arlo-category')));
         $arlo_delivery = isset($_GET['arlo-delivery']) ?  $_GET['arlo-delivery'] : get_query_var('arlo-delivery');
-        $arlo_templatetag = !empty($_GET['arlo-templatetag']) ? stripslashes_deep($_GET['arlo-templatetag']) : stripslashes_deep(urldecode(get_query_var('arlo-templatetag')));
-        $arlo_search = !empty($_GET['arlo-search']) ? stripslashes_deep($_GET['arlo-search']) : stripslashes_deep(urldecode(get_query_var('arlo-search')));
+        $arlo_templatetag = !empty($_GET['arlo-templatetag']) ? wp_unslash($_GET['arlo-templatetag']) : wp_unslash(urldecode(get_query_var('arlo-templatetag')));
+        $arlo_search = !empty($_GET['arlo-search']) ? wp_unslash($_GET['arlo-search']) : wp_unslash(urldecode(get_query_var('arlo-search')));
         $arlo_region = get_query_var('arlo-region', '');
         $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
         

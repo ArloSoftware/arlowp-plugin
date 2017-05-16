@@ -172,7 +172,7 @@ class Arlo_For_Wordpress_Categories_Widget extends WP_Widget {
 
 		$instance = $old_instance;
 
-		$instance['title'] = strip_tags( stripslashes($new_instance['title']) );
+		$instance['title'] = strip_tags( wp_unslash($new_instance['title']) );
 		$instance['depth'] = intval($new_instance['depth']);
 		$instance['parent'] = $new_instance['parent'];
 

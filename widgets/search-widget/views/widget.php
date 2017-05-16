@@ -10,7 +10,7 @@
 		
 		$slug = get_post($settings['post_types']['eventsearch']['posts_page'])->post_name;
 			
-		$arlo_search = !empty($_GET['arlo-search']) ? stripslashes_deep($_GET['arlo-search']) : stripslashes_deep(urldecode(get_query_var('arlo-search')));
+		$arlo_search = !empty($_GET['arlo-search']) ? wp_unslash($_GET['arlo-search']) : wp_unslash(urldecode(get_query_var('arlo-search')));
 		
 		echo '
 		<form class="arlo-search-widget" action="'.site_url().'/'.$slug.'/">

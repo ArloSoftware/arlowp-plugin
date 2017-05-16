@@ -24,7 +24,7 @@ class Categories {
     private static function shortcode_categories($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         $return = '';
         
-        $arlo_category = !empty($_GET['arlo-category']) ? stripslashes_deep($_GET['arlo-category']) : stripslashes_deep(urldecode(get_query_var('arlo-category')));
+        $arlo_category = !empty($_GET['arlo-category']) ? wp_unslash($_GET['arlo-category']) : wp_unslash(urldecode(get_query_var('arlo-category')));
         
         // calculate depth
         $depth = (isset($atts['depth'])) ? (int)$atts['depth'] : 1;
@@ -76,7 +76,7 @@ class Categories {
     }
 
     private static function shortcode_category_title($content = '', $atts, $shortcode_name, $import_id = '') {
-        $arlo_category = !empty($_GET['arlo-category']) ? stripslashes_deep($_GET['arlo-category']) : stripslashes_deep(urldecode(get_query_var('arlo-category')));
+        $arlo_category = !empty($_GET['arlo-category']) ? wp_unslash($_GET['arlo-category']) : wp_unslash(urldecode(get_query_var('arlo-category')));
         
         if (!empty($arlo_category)) {
             $category = CategoriesEntity::get(array('id' => current(explode('-', $arlo_category))), 1, $import_id);
@@ -90,7 +90,7 @@ class Categories {
     }
 
     private static function shortcode_category_header($content = '', $atts, $shortcode_name, $import_id = '') {
-        $arlo_category = !empty($_GET['arlo-category']) ? stripslashes_deep($_GET['arlo-category']) : stripslashes_deep(urldecode(get_query_var('arlo-category')));
+        $arlo_category = !empty($_GET['arlo-category']) ? wp_unslash($_GET['arlo-category']) : wp_unslash(urldecode(get_query_var('arlo-category')));
         
         if (!empty($arlo_category)) {
             $category = CategoriesEntity::get(array('id' => current(explode('-', $arlo_category))), 1, $import_id);
@@ -104,7 +104,7 @@ class Categories {
     } 
 
     private static function shortcode_category_footer ($content = '', $atts, $shortcode_name, $import_id = ''){
-        $arlo_category = !empty($_GET['arlo-category']) ? stripslashes_deep($_GET['arlo-category']) : stripslashes_deep(urldecode(get_query_var('arlo-category')));
+        $arlo_category = !empty($_GET['arlo-category']) ? wp_unslash($_GET['arlo-category']) : wp_unslash(urldecode(get_query_var('arlo-category')));
         
         if (!empty($arlo_category)) {
             $category = CategoriesEntity::get(array('id' => current(explode('-', $arlo_category))), 1, $import_id);

@@ -146,7 +146,7 @@ class Shortcodes {
 		if (!is_null($label))
 			$filter_html .= '<option value="">' . esc_html($label) . '</option>';
 
-		$selected_value = !empty($_GET['arlo-' . $type]) ? stripslashes_deep($_GET['arlo-' . $type]) : stripslashes_deep(urldecode(get_query_var('arlo-' . $type)));
+		$selected_value = !empty($_GET['arlo-' . $type]) ? wp_unslash($_GET['arlo-' . $type]) : wp_unslash(urldecode(get_query_var('arlo-' . $type)));
 			
 		foreach($items as $key => $item) {
 
@@ -183,7 +183,7 @@ class Shortcodes {
 
 			$slug = get_post($settings['post_types']['eventsearch']['posts_page'])->post_name;
 				
-			$search_term = !empty($_GET['arlo-search']) ? stripslashes_deep($_GET['arlo-search']) : stripslashes_deep(urldecode(get_query_var('arlo-search')));
+			$search_term = !empty($_GET['arlo-search']) ? wp_unslash($_GET['arlo-search']) : wp_unslash(urldecode(get_query_var('arlo-search')));
 			
 			return '
 			<form class="arlo-search" action="'.site_url().'/'.$slug.'/">
