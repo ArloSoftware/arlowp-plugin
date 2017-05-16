@@ -76,7 +76,7 @@ class Arlo_For_Wordpress_OnlineActivities extends Arlo_For_Wordpress_Lists  {
 	
 	function column_oa_code($item) {
 		$actions = array(
-            'edit' => sprintf('<a href="https://%s.arlo.co/management/Console/#/onlineactivities/%d" target="_blank">Edit</a>', esc_attr($this->platform_name), $item->oa_arlo_id),
+            'edit' => sprintf('<a href="https://%s.arlo.co/management/Console/#/onlineactivities/%d" target="_blank">Edit</a>', esc_url($this->platform_name), $item->oa_arlo_id),
         );
         
         if (!empty($item->guid)) {
@@ -133,10 +133,10 @@ class Arlo_For_Wordpress_OnlineActivities extends Arlo_For_Wordpress_Lists  {
 	}	
 	
 	public function get_new_link() {
-		return sprintf('https://%s.arlo.co/management/Console/#/onlineactivities/new/', $this->platform_name );
+		return sprintf('https://%s.arlo.co/management/Console/#/onlineactivities/new/', esc_url($this->platform_name) );
 	}
 	
 	public function get_list_link() {
-		return sprintf('https://%s.arlo.co/management/Console/#/onlineactivities/', $this->platform_name );
+		return sprintf('https://%s.arlo.co/management/Console/#/onlineactivities/', esc_url($this->platform_name) );
 	}			
 }
