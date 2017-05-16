@@ -178,10 +178,11 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         $regions = get_option('arlo_regions');
         
         $where = '';
+        $parameters = [];
         
         $arlo_region = get_query_var('arlo-region', '');
         $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
-        $arlo_location = isset($_GET['arlo-location']) && !empty($_GET['arlo-location']) ? esc_sql($_GET['arlo-location']) : get_query_var('arlo-location', '');	
+        $arlo_location = !empty($_GET['arlo-location']) ? stripslashes_deep($_GET['arlo-location']) : stripslashes_deep(urldecode(get_query_var('arlo-location')));
         
         $t1 = "{$wpdb->prefix}arlo_eventtemplates";
         $t2 = "{$wpdb->prefix}arlo_events";
@@ -190,11 +191,14 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         $t6 = "{$wpdb->prefix}arlo_offers";
         
         if (!empty($arlo_region)) {
-            $where .= ' AND ' . $t1 . '.et_region = "' . $arlo_region . '" AND ' . $t2 . '.e_region = "' . $arlo_region . '"';
+            $where .= ' AND ' . $t1 . '.et_region = %s AND ' . $t2 . '.e_region = %s';
+            $parameters[] = $arlo_region;
+            $parameters[] = $arlo_region;
         }
 
         if (!empty($arlo_location)) {
-            $where .= ' AND ' . $t2 .'.e_locationname = "' . urldecode($arlo_location) . '"';
+            $where .= ' AND ' . $t2 .'.e_locationname = %s';
+            $parameters[] = urldecode($arlo_location);
         };        
         
         $sql = 
@@ -226,8 +230,8 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
                 e_arlo_id
             ORDER BY 
                 $t2.e_startdatetime";
-            
-        $items = $wpdb->get_results($sql, ARRAY_A);
+           
+        $items = $wpdb->get_results($wpdb->prepare($sql, $parameters), ARRAY_A);
         
         $output = '';
         
@@ -359,7 +363,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         $registration .= (($isfull) ? '<span class="arlo-event-full">' . __('Event is full', 'arlo-for-wordpress') . '</span>' : '');
         // test if there is a register uri string, if so display the button
         if(!is_null($registeruri) && $registeruri != '') {
-            $registration .= '<a class="' . $class . ' ' . (($isfull) ? 'arlo-waiting-list' : 'arlo-register') . '" href="'. esc_attr($registeruri) . '" target="_blank">';
+            $registration .= '<a class="' . esc_attr($class) . ' ' . (($isfull) ? 'arlo-waiting-list' : 'arlo-register') . '" href="'. esc_attr($registeruri) . '" target="_blank">';
             $registration .= (($isfull) ? __('Join waiting list', 'arlo-for-wordpress') : __($registermessage, 'arlo-for-wordpress')) . '</a>';
         } else {
             $registration .= $registermessage;
@@ -706,8 +710,8 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         if(!isset($GLOBALS['arlo_eventtemplate']) || empty($GLOBALS['arlo_eventtemplate']['et_arlo_id'])) return;
         $return = "";
 
-        $arlo_location = isset($_GET['arlo-location']) && !empty($_GET['arlo-location']) ? esc_sql($_GET['arlo-location']) : get_query_var('arlo-location', '');
-        $arlo_delivery = isset($_GET['arlo-delivery']) ?  intval($_GET['arlo-delivery']) : get_query_var('arlo-delivery', '');
+        $arlo_location = !empty($_GET['arlo-location']) ? stripslashes_deep($_GET['arlo-location']) : stripslashes_deep(urldecode(get_query_var('arlo-location')));
+        $arlo_delivery = isset($_GET['arlo-delivery']) ?  $_GET['arlo-delivery'] : get_query_var('arlo-delivery');
         
         if (!empty($GLOBALS['arlo_eventtemplate']['et_region'])) {
             $arlo_region = $GLOBALS['arlo_eventtemplate']['et_region'];
@@ -736,7 +740,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         
         $conditions = array(
             'template_id' => $GLOBALS['arlo_eventtemplate']['et_arlo_id'],
-            'date' => 'e.e_startdatetime > NOW()',
+            'e.e_startdatetime > NOW()' => null,
             'parent_id' => 0
         );
         
@@ -745,16 +749,16 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         );	
         
         if (!empty($arlo_region)) {
-            $conditions['region'] = 'e.e_region = "' . $arlo_region . '"';
-            $oaconditions['region'] = 'oa.oa_region = "' . $arlo_region . '"';
+            $conditions['e.e_region = %s'] = $arlo_region;
+            $oaconditions['oa.oa_region = %s'] = $arlo_region;
         }
 
         if (!empty($arlo_location)) {
-            $conditions['location'] = "e.e_locationname = '" . urldecode($arlo_location) . "'";
+            $conditions['e.e_locationname = %s'] = $arlo_location;
         }
 
         if(!empty($arlo_delivery) && is_numeric($arlo_delivery)) {
-            $conditions['delivery'] .= "e.e_isonline = " . intval($arlo_delivery);
+            $conditions['e.e_isonline = %d'] = $arlo_delivery;
         }
         
         $events = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), $limit, $import_id);
@@ -783,10 +787,10 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
                    
                     $date = self::event_date_formatter(['format' => $format], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
 
-                    $display_text = str_replace(['{%date%}', '{%location%}'], [$date, $location], $text);
+                    $display_text = str_replace(['{%date%}', '{%location%}'], [esc_html($date), esc_html($location)], $text);
                     
                     if ($event->e_registeruri && !$event->e_isfull) {
-                        $return_links[] = ($layout == 'list' ? "<li>" : "") . '<a href="' . $event->e_registeruri . '" class="' . esc_attr($buttonclass) . ' arlo-register">' . $display_text  . '</a>' . ($layout == 'list' ? "</li>" : "");
+                        $return_links[] = ($layout == 'list' ? "<li>" : "") . '<a href="' . esc_attr($event->e_registeruri) . '" class="' . esc_attr($buttonclass) . ' arlo-register">' . $display_text  . '</a>' . ($layout == 'list' ? "</li>" : "");
                     } else {
                         $return_links[] = ($layout == 'list' ? "<li>" : "") . '<span class="' . esc_attr($dateclass) . '">' . $display_text . '</span>' . ($layout == 'list' ? "</li>" : "");
                     }

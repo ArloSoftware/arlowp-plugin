@@ -69,13 +69,13 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 			case 'v_physicaladdresspostcode':
 			case 'v_physicaladdresscountry':
 			case 'v_physicaladdresscity':
-				return htmlentities($item->$column_name, ENT_QUOTES, "UTF-8");
+				return esc_html($item->$column_name);
 			case 'address':
 				$address = [];
 				for($i = 1; $i<5; $i++) {
 					$key = 'v_physicaladdressline' . $i;
 					if (!empty($item->$key)) {
-						$address[] = htmlentities($item->$key, ENT_QUOTES, "UTF-8");
+						$address[] = esc_html($item->$key);
 					}
 				}
 				return implode(', ', $address);
@@ -92,11 +92,11 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 	
 	public function column_v_name($item) {
 		$actions = array(
-            'edit' => sprintf('<a href="https://%s.arlo.co/management/Venues/Venue.aspx?id=%d" target="_blank">Edit</a>', $this->platform_name, $item->v_arlo_id),
+            'edit' => sprintf('<a href="https://%s.arlo.co/management/Venues/Venue.aspx?id=%d" target="_blank">Edit</a>', esc_attr($this->platform_name), $item->v_arlo_id),
             'view' => sprintf('<a href="%s" target="_blank">View</a>', $item->guid),
         );
 
-		return sprintf('%1$s %2$s', htmlentities($item->v_name, ENT_QUOTES, "UTF-8"), $this->row_actions($actions) );
+		return sprintf('%1$s %2$s', esc_html($item->v_name), $this->row_actions($actions) );
 	}
 	
 	protected function get_sql_where_array() {

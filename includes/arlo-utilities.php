@@ -54,7 +54,7 @@ class Utilities {
     public static function get_random_int() {
         $guid = explode("-", self::GUIDv4());
         
-        return hexdec($guid[0]);
+        return substr((string)hexdec($guid[0]), 0, 8);
     }
 
     public static function glob_recursive($pattern, $flags = 0) {

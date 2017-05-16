@@ -834,19 +834,19 @@ class Arlo_For_Wordpress {
 
 			//has to be the same order as in public.js to construct the same order
 			if (!empty($_GET['arlo-category'])) {
-				$url .= '/cat-' . urlencode($_GET['arlo-category']);
+				$url .= '/cat-' . stripslashes_deep($_GET['arlo-category']);
 			}
 			
 			if (!empty($_GET['arlo-month'])) {
-				$url .= '/month-' . urlencode($_GET['arlo-month']);
+				$url .= '/month-' . stripslashes_deep($_GET['arlo-month']);
 			}
 			
 			if (!empty($_GET['arlo-location'])) {
-				$url .= '/location-' . urlencode($_GET['arlo-location']);
+				$url .= '/location-' . stripslashes_deep($_GET['arlo-location']);
 			}
 
 			if (isset($_GET['arlo-delivery']) && is_numeric($_GET['arlo-delivery'])) {
-				$url .= '/delivery-' . urlencode($_GET['arlo-delivery']);
+				$url .= '/delivery-' . intval($_GET['arlo-delivery']);
 			}
 
 			if (!empty($_GET['arlo-eventtag'])) {
@@ -856,7 +856,7 @@ class Arlo_For_Wordpress {
 						$_GET['arlo-eventtag'] = $tag['tag'];
 					}
 				}
-				$url .= '/eventtag-' . urlencode($_GET['arlo-eventtag']);
+				$url .= '/eventtag-' . stripslashes_deep($_GET['arlo-eventtag']);
 			}
 			
 			if (!empty($_GET['arlo-templatetag'])) {
@@ -867,10 +867,10 @@ class Arlo_For_Wordpress {
 					}					
 				}
 			
-				$url .= '/templatetag-' . urlencode($_GET['arlo-templatetag']);
+				$url .= '/templatetag-' . stripslashes_deep($_GET['arlo-templatetag']);
 			}
 			
-			echo '<link rel="canonical" href="' . $url . '/" />';
+			echo '<link rel="canonical" href="' . esc_url($url) . '/" />';
 		}
 	}	
 	
@@ -1487,15 +1487,14 @@ class Arlo_For_Wordpress {
 	public function get_tag_by_id($tag_id) {
 		global $wpdb;		
 		
-		$tag = $wpdb->get_row(
+		$tag = $wpdb->get_row($wpdb->prepare(
 		"SELECT 
 			id, 
 			tag
 		FROM 
 			" . $wpdb->prefix . "arlo_tags
 		WHERE 
-			id = " . intval($tag_id), ARRAY_A);
-			
+			id = %d", [$tag_id]), ARRAY_A);
 
 		return $tag;
 	}	

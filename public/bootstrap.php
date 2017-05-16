@@ -12,7 +12,7 @@ add_filter( 'document_title_parts', function($title) {
 	$new_title = set_title($title['title'], $post->ID, true);
 
 	if (!empty($new_title['subtitle'])) {
-		$title['title'] = $new_title['subtitle'] . ' - ' . $new_title['title'];
+		$title['title'] = esc_attr($new_title['subtitle'] . ' - ' . $new_title['title']);
 	}
 
 	return $title;
@@ -24,7 +24,7 @@ add_filter( 'document_title_parts', function($title) {
 add_filter( 'the_title', function($title, $id = null) {
 	$new_title = set_title($title, $id);
 
-	return $new_title['title'] . (!empty($new_title['subtitle']) ? '<span class="cat-title-ext">' . (!empty($new_title['title']) ? ': ':'') . $new_title['subtitle'] . ' </span>' : '' ) ;
+	return esc_html($new_title['title']) . (!empty($new_title['subtitle']) ? '<span class="cat-title-ext">' . (!empty($new_title['title']) ? ': ':'') . esc_html($new_title['subtitle']) . ' </span>' : '' ) ;
 }, 10, 2);
 
 /*
@@ -93,7 +93,7 @@ function set_title($title, $id = null, $meta = false){
 	
 	$subtitle = '';
 	
-	$arlo_category = isset($_GET['arlo-category']) && !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : get_query_var('arlo-category', '');
+	$arlo_category = !empty($_GET['arlo-category']) ? stripslashes_deep($_GET['arlo-category']) : stripslashes_deep(urldecode(get_query_var('arlo-category')));
 	
 	$cat_slug = !empty($arlo_category) ? $arlo_category : '';	
 	
@@ -103,33 +103,25 @@ function set_title($title, $id = null, $meta = false){
 		$cat = \Arlo\Entities\Categories::get(array('slug' => $cat_slug), null, $import_id);
 		
 		
-	$location = !empty($_GET['arlo-location']) ? $_GET['arlo-location'] : get_query_var('arlo-location', '');
-	$search = !empty($_GET['arlo-search']) ? $_GET['arlo-search'] : get_query_var('arlo-search', '');	
+	$arlo_location = !empty($_GET['arlo-location']) ? stripslashes_deep($_GET['arlo-location']) : stripslashes_deep(urldecode(get_query_var('arlo-location')));
+	$arlo_search = !empty($_GET['arlo-search']) ? stripslashes_deep($_GET['arlo-search']) : stripslashes_deep(urldecode(get_query_var('arlo-search')));
 		
-	$location = stripslashes(urldecode($location));
-	$search = stripslashes(urldecode($search));
-
 	if ($id === null || !in_array($id, $pages) || $id != $post->ID || (!in_the_loop() && !$meta) || is_nav_menu_item($id)) return ['title' => $title];
 	
-	if(!$cat && empty($location) && empty($search)) return ['title' => $title];
+	if(!$cat && empty($arlo_location) && empty($arlo_search)) return ['title' => $title];
 	
 	if (!empty($cat->c_name)) {
 		$subtitle = $cat->c_name;
 		
-		if (!empty($location)) {
-			$subtitle .= ' (' . $location . ')';
+		if (!empty($arlo_location)) {
+			$subtitle .= ' (' . $arlo_location . ')';
 		}
-	} else if (!empty($location)) {
-		$subtitle = htmlentities($location);		
-	} else if (!empty($search)) {
-		$subtitle = htmlentities($search);
+	} else if (!empty($arlo_location)) {
+		$subtitle = $arlo_location;
+	} else if (!empty($arlo_location)) {
+		$subtitle = $arlo_location;
 	}
-	
-	// append category name to events page
-	if (!empty($subtitle)) {
-		$subtitle = htmlentities($subtitle, ENT_QUOTES, "UTF-8");
-	}
-        
+	        
 	return [
 		'title' => $title,
 		'subtitle' => $subtitle
@@ -236,7 +228,7 @@ function arlo_register_custom_post_types() {
 	if (strpos($_SERVER['QUERY_STRING'], 'arlo-search') !== false && !empty($_GET['arlo-search'])) {
 		if(isset($settings['post_types']['eventsearch']['posts_page']) && $settings['post_types']['eventsearch']['posts_page'] != 0) {
 			$slug = substr(substr(str_replace(get_home_url(), '', get_permalink($settings['post_types']['eventsearch']['posts_page'])), 0, -1), 1);
-			$location = '/' . $slug . '/search/' . urlencode(stripslashes_deep($_GET['arlo-search'])) . '/';
+			$location = '/' . $slug . '/search/' . rawurlencode(stripslashes_deep($_GET['arlo-search'])) . '/';
 			wp_redirect( get_home_url() . $location );
 			exit();
 		}

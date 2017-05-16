@@ -78,17 +78,17 @@ class Arlo_For_Wordpress_Presenters extends Arlo_For_Wordpress_Lists  {
 		switch ($column_name) {
 			case 'p_twitterid':
 				if (!empty($item->$column_name)) {
-					return '<a href="http://twitter.com/' . $item->$column_name . '" target="_blank">Twitter</a>';
+					return '<a href="http://twitter.com/' . esc_url($item->$column_name) . '" target="_blank">Twitter</a>';
 				}
 				break;
 			case 'p_facebookid':
 				if (!empty($item->$column_name)) {
-					return '<a href="http://www.facebook.com/' . $item->$column_name . '" target="_blank">Facebook</a>';
+					return '<a href="http://www.facebook.com/' . esc_url($item->$column_name) . '" target="_blank">Facebook</a>';
 				}
 				break;
 			case 'p_linkedinid':
 				if (!empty($item->$column_name)) {
-					return '<a href="http://www.linkedin.com/' . $item->$column_name . '" target="_blank">LinkedIn</a>';
+					return '<a href="http://www.linkedin.com/' . esc_url($item->$column_name) . '" target="_blank">LinkedIn</a>';
 				}
 				break;
 			case 'p_profile':
@@ -109,7 +109,7 @@ class Arlo_For_Wordpress_Presenters extends Arlo_For_Wordpress_Lists  {
             'view' => sprintf('<a href="%s" target="_blank">View</a>', $item->guid),
         );
         
-		return sprintf('%1$s %2$s', htmlentities($item->p_firstname . ' ' . $item->p_lastname, ENT_QUOTES, "UTF-8"), $this->row_actions($actions) );
+		return sprintf('%1$s %2$s', esc_html($item->p_firstname . ' ' . $item->p_lastname), $this->row_actions($actions) );
 	}
 	
 	public function get_sql_query() {

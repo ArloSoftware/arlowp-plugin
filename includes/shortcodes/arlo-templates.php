@@ -444,13 +444,13 @@ class Templates {
     private static function shortcode_event_template_summary($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_eventtemplate']['et_descriptionsummary'])) return '';
 
-        return $GLOBALS['arlo_eventtemplate']['et_descriptionsummary'];        
+        return esc_html($GLOBALS['arlo_eventtemplate']['et_descriptionsummary']);
     }
 
     private static function shortcode_event_template_advertised_duration($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_eventtemplate']['et_advertised_duration'])) return '';
 
-        return $GLOBALS['arlo_eventtemplate']['et_advertised_duration'];        
+        return esc_html($GLOBALS['arlo_eventtemplate']['et_advertised_duration']);
     }
 
     private static function shortcode_event_template_filters($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -661,6 +661,8 @@ class Templates {
         $page = !empty($_GET['paged']) ? intval($_GET['paged']) : intval(get_query_var('paged'));
         $offset = ($page > 0) ? $page * $limit - $limit: 0 ;
 
+        $parameters = [];
+
         $t1 = "{$wpdb->prefix}arlo_eventtemplates";
         $t2 = "{$wpdb->prefix}posts";
         $t3 = "{$wpdb->prefix}arlo_eventtemplates_categories";
@@ -669,15 +671,16 @@ class Templates {
         $t6 = "{$wpdb->prefix}arlo_eventtemplates_tags";
         $t7 = "{$wpdb->prefix}arlo_tags";
             
-        $where = "WHERE post.post_type = 'arlo_event' AND et.import_id = " . $import_id;
+        $where = "WHERE post.post_type = 'arlo_event' AND et.import_id = %d";
+        $parameters[] = $import_id;
+
         $join = "";
-        
-        $arlo_location = !empty($_GET['arlo-location']) ? esc_sql($_GET['arlo-location']) : get_query_var('arlo-location', '');
-        $arlo_category = !empty($_GET['arlo-category']) ? esc_sql($_GET['arlo-category']) : get_query_var('arlo-category', '');
-        $arlo_delivery = isset($_GET['arlo-delivery']) ?  intval($_GET['arlo-delivery']) : get_query_var('arlo-delivery', '');
-        $arlo_templatetag = !empty($_GET['arlo-templatetag']) ? esc_sql($_GET['arlo-templatetag']) : get_query_var('arlo-templatetag', '');
-        $arlo_search = !empty($_GET['arlo-search']) ? $_GET['arlo-search'] : get_query_var('arlo-search', '');
-        $arlo_search = esc_sql(stripslashes(urldecode($arlo_search)));
+
+        $arlo_location = !empty($_GET['arlo-location']) ? stripslashes_deep($_GET['arlo-location']) : stripslashes_deep(urldecode(get_query_var('arlo-location')));
+        $arlo_category = !empty($_GET['arlo-category']) ? stripslashes_deep($_GET['arlo-category']) : stripslashes_deep(urldecode(get_query_var('arlo-category')));
+        $arlo_delivery = isset($_GET['arlo-delivery']) ?  $_GET['arlo-delivery'] : get_query_var('arlo-delivery');
+        $arlo_templatetag = !empty($_GET['arlo-templatetag']) ? stripslashes_deep($_GET['arlo-templatetag']) : stripslashes_deep(urldecode(get_query_var('arlo-templatetag')));
+        $arlo_search = !empty($_GET['arlo-search']) ? stripslashes_deep($_GET['arlo-search']) : stripslashes_deep(urldecode(get_query_var('arlo-search')));
         $arlo_region = get_query_var('arlo-region', '');
         $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
         
@@ -687,15 +690,18 @@ class Templates {
             $where .= " AND e.e_parent_arlo_id = 0";
             
             if(!empty($arlo_location)) :
-                $where .= " AND e.e_locationname = '" . urldecode($arlo_location) . "'";
+                $where .= " AND e.e_locationname = %s ";
+                $parameters[] = $arlo_location;
             endif;	
             
             if(isset($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) :
-                $where .= " AND e.e_isonline = " . $arlo_delivery;
+                $where .= " AND e.e_isonline = %d ";
+                $parameters[] = $arlo_delivery;
             endif;	
             
             if (!empty($arlo_region)) {
-                $where .= ' AND e.e_region = "' . $arlo_region . '"';
+                $where .= ' AND e.e_region = %s';
+                $parameters[] = $arlo_region;
             }								
             
         endif;	
@@ -705,10 +711,12 @@ class Templates {
             
             
             if (!is_numeric($arlo_templatetag)) {
-                $where .= " AND tag.tag = '" . urldecode($arlo_templatetag) . "'";
+                $where .= " AND tag.tag = %s ";
+                $parameters[] = $arlo_templatetag;
                 $join .= " LEFT JOIN $t7 tag ON tag.id = ett.tag_id AND ett.import_id = tag.import_id";
             } else {
-                $where .= " AND ett.tag_id = " . intval($arlo_templatetag);
+                $where .= " AND ett.tag_id = %d ";
+                $parameters[] = intval($arlo_templatetag);
             }
         endif;
         
@@ -716,39 +724,44 @@ class Templates {
         if (!empty($arlo_search)) {
             $where .= '
             AND (
-                    et_code like "%' . $arlo_search . '%"
+                    et_code like %s
                 OR
-                    et_name like "%' . $arlo_search . '%"
+                    et_name like %s
                 OR 
-                    et_descriptionsummary like "%' . $arlo_search . '%"
+                    et_descriptionsummary like %s
             )
             ';
+            $parameters[] = '%' . $arlo_search . '%';
+            $parameters[] = '%' . $arlo_search . '%';
+            $parameters[] = '%' . $arlo_search . '%';
             
             $atts['show_child_elements'] = "true";
         }	
         
         if (!empty($arlo_region)) {
-            $where .= ' AND et.et_region = "' . $arlo_region . '"';
+            $where .= ' AND et.et_region = %s';
+            $parameters[] = $arlo_region;
         }		
                 
         if(!empty($arlo_category) || !empty($atts['category'])) {
 
             $cat_id = 0;
 
-            $cat_slug = esc_sql((!empty($arlo_category) ? $arlo_category : $atts['category']));
+            $cat_slug = (!empty($arlo_category) ? $arlo_category : $atts['category']);
 
-            $where .= " AND ( c.c_slug = '$cat_slug'";
+            $where .= " AND ( c.c_slug = %s";
+            $parameters[] = $cat_slug;
             
-            $cat_id = $wpdb->get_var("
+            $cat_id = $wpdb->get_var($wpdb->prepare("
             SELECT
                 c_arlo_id
             FROM 
                 {$wpdb->prefix}arlo_categories
             WHERE 
-                c_slug = '{$cat_slug}'
+                c_slug = %s
             AND
-                import_id = " . $import_id . "
-            ");
+                import_id = %d
+            ", [$cat_slug, $import_id]));
             
             if (is_null($cat_id)) {
                 $cat_id = 0;
@@ -768,14 +781,16 @@ class Templates {
                     
                     
                     if (is_array($ids) && count($ids)) {
-                        $where .= " OR c.c_arlo_id IN (" . implode(',', $ids) . ")";
+                        $where .= " OR c.c_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $ids)) . ")";
+                        $parameters = array_merge($parameters, $value);
                     }
                 }
             } 
             
             $where .= ')';
         } else if (!(isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true")) {
-            $where .= ' AND (c.c_parent_id = (SELECT c_arlo_id FROM ' . $t4 . ' WHERE c_parent_id = 0 AND import_id = ' . $import_id . ') OR c.c_parent_id IS NULL)';
+            $where .= ' AND (c.c_parent_id = (SELECT c_arlo_id FROM ' . $t4 . ' WHERE c_parent_id = 0 AND import_id = %d) OR c.c_parent_id IS NULL)';
+            $parameters[] = $import_id;
         }	
         
         // grouping
@@ -818,7 +833,11 @@ class Templates {
         $order
         $limit_field";
 
-        return $sql;
-
+        $query = $wpdb->prepare($sql, $parameters);
+        if ($query) {
+            return $query;
+        } else {
+            throw new \Exception("Couldn't prepapre SQL statement");
+        }
     }
 }

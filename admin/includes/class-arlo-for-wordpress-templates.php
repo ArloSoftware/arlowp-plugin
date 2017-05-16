@@ -55,7 +55,7 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 		switch ($column_name) {
 			case 'et_code':
 			case 'et_region':
-				return $item->$column_name;
+				return esc_html($item->$column_name);
 			case 'et_name':
 			case 'et_descriptionsummary':
 				if (!empty($item->$column_name))
@@ -63,12 +63,12 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 				break;
 			case 'et_registerinteresturi':
 				if (!empty($item->$column_name)) 		
-					return '<a href="' . $item->$column_name . '" target="_blank">' . __( 'Register interest', 'arlo-for-wordpress' ) . '</a>';
+					return '<a href="' . esc_attr($item->$column_name) . '" target="_blank">' . __( 'Register interest', 'arlo-for-wordpress' ) . '</a>';
 				break;
 			case 'et_event_num':
 				$retval = '0';
 				if (intval($item->$column_name) > 0)
-					$retval = '<a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug . '-events&et_id=' . $item->et_arlo_id)  .'" >' . $item->$column_name . '</a>';
+					$retval = '<a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug . '-events&et_id=' . $item->et_arlo_id)  .'" >' . esc_html($item->$column_name) . '</a>';
 				
 				if (intval($item->oa_id) > 0) {
 					$retval .= ' / <a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug . '-onlineactivities&et_id=' . $item->et_arlo_id)  .'" >' . __( 'OA', 'arlo-for-wordpress' ) . '</a>';
@@ -83,11 +83,11 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 	
 	function column_et_code($item) {
 		$actions = array(
-            'edit' => sprintf('<a href="https://%s.arlo.co/management/Courses/Course.aspx?id=%d" target="_blank">Edit</a>', $this->platform_name, $item->et_arlo_id),
+            'edit' => sprintf('<a href="https://%s.arlo.co/management/Courses/Course.aspx?id=%d" target="_blank">Edit</a>', esc_attr($this->platform_name), $item->et_arlo_id),
             'view' => sprintf('<a href="%s" target="_blank">View</a>', $item->guid),
         );
         
-		return sprintf('%1$s %2$s', $item->et_code, $this->row_actions($actions) );
+		return sprintf('%1$s %2$s', esc_html($item->et_code), $this->row_actions($actions) );
 	}
 	
 	protected function get_sql_where_array() {

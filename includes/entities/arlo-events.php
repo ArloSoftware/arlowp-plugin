@@ -8,39 +8,52 @@ class Events {
 	
 		$query = "SELECT e.* FROM {$wpdb->prefix}arlo_events AS e";
 		
-		$where = array("import_id = " . $import_id);
-	
+		$parameters = [];
+		
+		$where = array("import_id = %d");
+		$parameters[] =  $import_id;
+
 		// conditions
 		foreach($conditions as $key => $value) {
 			// what to do?
 			switch($key) {
 				case 'id':
-					if(is_array($value)) {
-						$where[] = "e.e_arlo_id IN (" . implode(',', $value) . ")";
+					if(is_array($value) && count($value)) {
+						$where[] = "e.e_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $value)) . ")";
+						$parameters = array_merge($parameters, $value);
 					} else {
-						$where[] = "e.e_arlo_id = $value";
+						$where[] = "e.e_arlo_id = %d";
+						$parameters[] = $value;
+
 						$limit = 1;
 					}
 				break;
 				case 'event_template_id':
 				case 'template_id':
-					if(is_array($value)) {
-						$where[] = "e.et_arlo_id IN (" . implode(',', $value) . ")";
+					if(is_array($value) && count($value)) {
+						$where[] = "e.et_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $value)) . ")";
+						$parameters = array_merge($parameters, $value);
 					} else {
-						$where[] = "e.et_arlo_id = $value";
+						$where[] = "e.et_arlo_id = %d";
+						$parameters[] = $value;
 					}
 				break;
 
 				case 'parent_id':
- 					if(is_array($value)) {
- 						$where[] = "e.e_parent_arlo_id IN (" . implode(',', $value) . ")";
+ 					if(is_array($value) && count($value)) {
+ 						$where[] = "e.e_parent_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $value)) . ")";
+						$parameters = array_merge($parameters, $value);
  					} else {
- 						$where[] = "e.e_parent_arlo_id = $value";
+ 						$where[] = "e.e_parent_arlo_id = %d";
+						$parameters[] = $value;
  					}
  				break;	
 				
 				default:
-					$where[] = $value;
+					$where[] = $key;
+
+					if (strpos($key, '%') !== false && !is_null($value))
+						$parameters[] = $value;
 				break;
 			}
 		}
@@ -56,15 +69,14 @@ class Events {
 		}
 		
 		//limit
-		
-		if ($limit > 1) {
-			$limit = ' LIMIT ' . $limit;
+		$limit = ($limit > 1 ? ' LIMIT ' . $limit : '');
+
+		$query = $wpdb->prepare($query.$where.$order, $parameters);
+
+		if ($query) {
+			return (!empty($limit)) ? $wpdb->get_results($query.$limit) : $wpdb->get_row($query);
 		} else {
-			$limit = '';
+			throw new \Exception("Couldn't prepare the SQL statement");
 		}
-		
-		$result = (!empty($limit)) ? $wpdb->get_results($query.$where.$order.$limit) : $wpdb->get_row($query.$where.$order);
-		
-		return $result;
 	}
 }

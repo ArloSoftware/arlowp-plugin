@@ -127,7 +127,7 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	
 	private function get_num_rows() {	
 		$sql = $this->get_sql_query();
-			
+
 		$result = $this->wpdb->get_results($sql);
 				
 		return $this->wpdb->num_rows;
@@ -142,7 +142,7 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 		if (!empty($_GET['s'])) {
 			$search_fields = $this->get_searchable_fields();
 			foreach ($search_fields as $field) {
-				$where[] = $field . " LIKE '%" . $_GET['s'] . "%'";
+				$where[] = $field . " LIKE '%" . esc_sql($_GET['s']) . "%'";
 			}
 		}
 		
@@ -161,8 +161,8 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 		if (!empty($_GET['e_parent_id']) && !empty(self::$filter_column_mapping['e_parent_id']) && intval($_GET['e_parent_id'] > 0)) {
 			$where[] = self::$filter_column_mapping['e_parent_id'] .' = ' . intval($_GET['e_parent_id']);
 		}
-		
-		
+	
+
 		return $where;	
 	}
 	

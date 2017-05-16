@@ -51,7 +51,7 @@ class UpcomingEvents {
         $output = '';
 
         $sql = self::generate_list_sql($atts, $import_id);	
-                            
+                           
         $items = $wpdb->get_results($sql, ARRAY_A);
 
         if(empty($items)) :
@@ -231,6 +231,7 @@ class UpcomingEvents {
     private static function generate_list_sql($atts, $import_id, $for_pagination = false) {
         global $wpdb;
         $regions = get_option('arlo_regions');
+        $parameters = [];
 
         $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
         $page = !empty($_GET['paged']) ? intval($_GET['paged']) : intval(get_query_var('paged'));
@@ -245,48 +246,57 @@ class UpcomingEvents {
         $t7 = "{$wpdb->prefix}arlo_events_tags";
         $t8 = "{$wpdb->prefix}arlo_tags";
 
-        $where = 'WHERE CURDATE() < DATE(e.e_startdatetime)  AND e_parent_arlo_id = 0 AND e.import_id = '.$import_id;
         $join = '';
+        $where = 'WHERE CURDATE() < DATE(e.e_startdatetime)  AND e_parent_arlo_id = 0 AND e.import_id = %d';
+        $parameters[] = $import_id;
 
-        $arlo_month = !empty($_GET['arlo-month']) ? esc_sql($_GET['arlo-month']) : get_query_var('arlo-month', '');
-        $arlo_location = !empty($_GET['arlo-location']) ?  esc_sql($_GET['arlo-location']) : get_query_var('arlo-location', '');
-        $arlo_category = !empty($_GET['arlo-category']) ?  esc_sql($_GET['arlo-category']) : get_query_var('arlo-category', '');
-        $arlo_delivery = isset($_GET['arlo-delivery']) ?  intval($_GET['arlo-delivery']) : get_query_var('arlo-delivery', '');
-        $arlo_eventtag = !empty($_GET['arlo-eventtag']) ?  esc_sql($_GET['arlo-eventtag']) : get_query_var('arlo-eventtag', '');
+        $arlo_location = !empty($_GET['arlo-location']) ? stripslashes_deep($_GET['arlo-location']) : stripslashes_deep(urldecode(get_query_var('arlo-location')));
+        $arlo_category = !empty($_GET['arlo-category']) ? stripslashes_deep($_GET['arlo-category']) : stripslashes_deep(urldecode(get_query_var('arlo-category')));
+        $arlo_delivery = isset($_GET['arlo-delivery']) ?  $_GET['arlo-delivery'] : get_query_var('arlo-delivery');
+        $arlo_month = !empty($_GET['arlo-month']) ? stripslashes_deep($_GET['arlo-month']) : stripslashes_deep(urldecode(get_query_var('arlo-month')));
+        $arlo_eventtag = !empty($_GET['arlo-eventtag']) ? stripslashes_deep($_GET['arlo-eventtag']) : stripslashes_deep(urldecode(get_query_var('arlo-eventtag')));
         $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');        
         
         if(!empty($arlo_month)) :
             $dates = explode(':',urldecode($arlo_month));
-            $where .= " AND (DATE(e.e_startdatetime) BETWEEN DATE('$dates[0]')";
-            $where .= " AND DATE('$dates[1]'))";
-
+            $where .= ' AND (DATE(e.e_startdatetime) BETWEEN DATE(%s) AND DATE(%s))';
+            $parameters[] = $dates[0];
+            $parameters[] = $dates[1];
         endif;
+
         if(!empty($arlo_location)) :
-            $where .= " AND e.e_locationname = '" . urldecode($arlo_location) . "'";
+            $where .= ' AND e.e_locationname = %s';
+            $parameters[] = $arlo_location;
         endif;
 
         if(!empty($arlo_category)) :
-            $where .= " AND c.c_arlo_id = " . intval(current(explode('-', $arlo_category)));
+            $where .= ' AND c.c_arlo_id = %d';
+            $parameters[] = intval(current(explode('-', $arlo_category)));
         endif;
 
         if(isset($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) :
-            $where .= " AND e.e_isonline = " . intval($arlo_delivery);
+            $where .= ' AND e.e_isonline = %d';
+            $parameters[] = intval($arlo_delivery);
         endif;	
             
         if(!empty($arlo_eventtag)) :
             $join .= " LEFT JOIN $t7 etag ON etag.e_id = e.e_id AND etag.import_id = e.import_id";
 
             if (!is_numeric($arlo_eventtag)) {
-                $where .= " AND tag.tag = '" . urldecode($arlo_eventtag) . "'";
+                $where .= ' AND tag.tag = %s';
+                $parameters[] = $arlo_eventtag;
                 $join .= " LEFT JOIN $t8 AS tag ON tag.id = etag.tag_id AND tag.import_id = etag.import_id";
             } else {
-                $where .= " AND etag.tag_id = " . intval($arlo_eventtag);
+                $where .= " AND etag.tag_id = %d";
+                $parameters[] = intval($arlo_eventtag);
             }
         endif;		
         
         if (!empty($arlo_region)) {
-            $where .= ' AND et.et_region = "' . $arlo_region . '" AND e.e_region = "' . $arlo_region . '"';
+            $where .= ' AND et.et_region = %s AND e.e_region = %s';
+            $parameters[] = $arlo_region;
+            $parameters[] = $arlo_region;
         }	
 
         $field_list = '
@@ -401,9 +411,11 @@ class UpcomingEvents {
         $order
         $limit_field";
 
-        return $sql;
-
+        $query = $wpdb->prepare($sql, $parameters);
+        if ($query) {
+            return $query;
+        } else {
+            throw new \Exception("Couldn't prepapre SQL statement");
+        }
     }
-    
-         
 }

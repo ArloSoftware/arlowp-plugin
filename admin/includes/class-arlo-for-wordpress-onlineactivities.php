@@ -61,12 +61,12 @@ class Arlo_For_Wordpress_OnlineActivities extends Arlo_For_Wordpress_Lists  {
 			case 'oa_code':
 			case 'oa_region':
 			case 'oa_delivery_description':
-				return htmlentities($item->$column_name, ENT_QUOTES, "UTF-8");
+				return esc_html($item->$column_name);
 			case 'oa_name':
-				$field = '<div class="arlo-event-name">' . htmlentities($item->oa_name, ENT_QUOTES, "UTF-8") . '</div>';
+				$field = '<div class="arlo-event-name">' . esc_html($item->oa_name) . '</div>';
 												
 				if (!empty($item->oa_registeruri)) 		
-					$field .= '<div class="arlo-event_registeruri"><a href="'.$item->oa_registeruri.'" target="_blank">' . strip_tags($item->oa_registermessage) . '</a></div>';
+					$field .= '<div class="arlo-event_registeruri"><a href="' . esc_attr($item->oa_registeruri) . '" target="_blank">' . strip_tags($item->oa_registermessage) . '</a></div>';
 
 				return $field;
 			default:
@@ -76,14 +76,14 @@ class Arlo_For_Wordpress_OnlineActivities extends Arlo_For_Wordpress_Lists  {
 	
 	function column_oa_code($item) {
 		$actions = array(
-            'edit' => sprintf('<a href="https://%s.arlo.co/management/Console/#/onlineactivities/%d" target="_blank">Edit</a>', $this->platform_name, $item->oa_arlo_id),
+            'edit' => sprintf('<a href="https://%s.arlo.co/management/Console/#/onlineactivities/%d" target="_blank">Edit</a>', esc_attr($this->platform_name), $item->oa_arlo_id),
         );
         
         if (!empty($item->guid)) {
         	$actions['view'] = sprintf('<a href="%s" target="_blank">View</a>', $item->guid);
         }
         
-		return sprintf('%1$s %2$s', $item->oa_code, $this->row_actions($actions) );
+		return sprintf('%1$s %2$s', esc_html($item->oa_code), $this->row_actions($actions) );
 	}
 		
 	protected function get_sql_where_array() {

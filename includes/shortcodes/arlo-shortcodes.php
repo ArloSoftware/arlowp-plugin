@@ -141,12 +141,12 @@ class Shortcodes {
 	}
 
 	public static function create_filter($type, $items, $label=null) {
-		$filter_html = '<select id="arlo-filter-' . $type . '" name="arlo-' . $type . '">';
+		$filter_html = '<select id="arlo-filter-' . esc_attr($type) . '" name="arlo-' . esc_attr($type) . '">';
 		
 		if (!is_null($label))
-			$filter_html .= '<option value="">' . $label . '</option>';
-		
-		$selected_value = (isset($_GET['arlo-' . $type]) ? urldecode($_GET['arlo-' . $type]) : get_query_var('arlo-' . $type, ''));
+			$filter_html .= '<option value="">' . esc_html($label) . '</option>';
+
+		$selected_value = !empty($_GET['arlo-' . $type]) ? stripslashes_deep($_GET['arlo-' . $type]) : stripslashes_deep(urldecode(get_query_var('arlo-' . $type)));
 			
 		foreach($items as $key => $item) {
 
@@ -157,12 +157,9 @@ class Shortcodes {
 				);
 			}
 			
-			$selected = (strlen($selected_value) && urldecode($selected_value) == $item['value']) ? ' selected="selected"' : '';
+			$selected = (strlen($selected_value) && $selected_value == $item['value']) ? ' selected="selected"' : '';
 			
-			$filter_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>';
-			$filter_html .= htmlentities($item['string'], ENT_QUOTES, "UTF-8", false);
-			$filter_html .= '</option>';
-
+			$filter_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>' . esc_html($item['string']) . '</option>';
 		}
 
 		$filter_html .= '</select>';
@@ -186,12 +183,12 @@ class Shortcodes {
 
 			$slug = get_post($settings['post_types']['eventsearch']['posts_page'])->post_name;
 				
-			$search_term = stripslashes(esc_attr(urldecode(!empty($_GET['arlo-search']) ? $_GET['arlo-search'] : get_query_var('arlo-search', ''))));
+			$search_term = !empty($_GET['arlo-search']) ? stripslashes_deep($_GET['arlo-search']) : stripslashes_deep(urldecode(get_query_var('arlo-search')));
 			
 			return '
 			<form class="arlo-search" action="'.site_url().'/'.$slug.'/">
-				<input type="text" class="arlo-search-field ' . $inputclass . '" placeholder="'. $placeholder .'" name="arlo-search" value="' . $search_term . '">
-				' . ($showbutton == "true" ? '<input type="submit" class="arlo-search-button ' . $buttonclass . '" value="' . $buttontext . '">' : '') . '
+				<input type="text" class="arlo-search-field ' . esc_attr($inputclass) . '" placeholder="'. esc_attr($placeholder) .'" name="arlo-search" value="' . esc_attr($search_term) . '">
+				' . ($showbutton == "true" ? '<input type="submit" class="arlo-search-button ' . esc_attr($buttonclass) . '" value="' . esc_attr($buttontext) . '">' : '') . '
 			</form>
 			';	
 		}
@@ -259,7 +256,7 @@ class Shortcodes {
 			}
 			
 			if (!is_null($timezone_windows_tz_id)) {
-				$content .= '<option value="' . $timezone_id . '" ' . ($selected ? 'selected' : '') . '>'. htmlentities($timezone['name'], ENT_QUOTES, "UTF-8") . '</option>';
+				$content .= '<option value="' . intval($timezone_id) . '" ' . ($selected ? 'selected' : '') . '>'. esc_html($timezone['name']) . '</option>';
 			}
 		}
 
@@ -340,23 +337,23 @@ class Shortcodes {
             // display label if there is one
             $offers .= (!is_null($o_label) || $o_label != '') ? $o_label.' ':'';
             if($amount > 0) {
-                $offers .= '<span class="amount">'.$famount.'</span> ';
+                $offers .= '<span class="amount">' . esc_html($famount) . '</span> ';
                 // only include the excl. tax if the offer is not replaced			
                 $offers .= $replaced ? '' : '<span class="arlo-price-tax">' . ($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode) : sprintf(__('incl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode) . '</span>');
             } else {
-                $offers .= '<span class="amount free">'.$free_text.'</span> ';
+                $offers .= '<span class="amount free">' . $free_text . '</span> ';
             }
             // display message if there is one
-            $offers .= (!is_null($o_message) || $o_message != '') ? ' '.$o_message:'';
+            $offers .= (!is_null($o_message) || $o_message != '') ? ' ' . esc_html($o_message) : '';
             // if a replacement offer exists
             if($replaced) {
                 $offers .= '</span><span ' . ($replacement_discount ? 'class="discount"' : '') . '>';
                 
                 // display replacement offer label if there is one
-                $offers .= (!is_null($replacement_label) || $replacement_label != '') ? $replacement_label.' ':'';
+                $offers .= (!is_null($replacement_label) || $replacement_label != '') ? esc_html($replacement_label) . ' ' : '';
                 $offers .= '<span class="amount">' . ($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $replacement_amount_taxexclusive : $replacement_amount_taxinclusive) . '</span> <span class="arlo-price-tax">'.($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode) : sprintf(__('incl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode)) . '</span>';
                 // display replacement offer message if there is one
-                $offers .= (!is_null($replacement_message) || $replacement_message != '') ? ' '.$replacement_message:'';
+                $offers .= (!is_null($replacement_message) || $replacement_message != '') ? ' ' . esc_html($replacement_message) : '';
 
             } // end if
 

@@ -24,7 +24,7 @@ class Categories {
     private static function shortcode_categories($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         $return = '';
         
-        $arlo_category = isset($_GET['arlo-category']) && !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : get_query_var('arlo-category', '');
+        $arlo_category = !empty($_GET['arlo-category']) ? stripslashes_deep($_GET['arlo-category']) : stripslashes_deep(urldecode(get_query_var('arlo-category')));
         
         // calculate depth
         $depth = (isset($atts['depth'])) ? (int)$atts['depth'] : 1;
@@ -39,7 +39,7 @@ class Categories {
         $start_at = (isset($atts['parent'])) ? (int)$atts['parent'] : 0;
         if(!isset($atts['parent']) && $start_at == 0 && !empty($arlo_category)) {
             $slug = $arlo_category;
-            $start_at = current(explode('-', $slug));
+            $start_at = intval(current(explode('-', $slug)));
         }
         
         if($title) {
@@ -51,7 +51,7 @@ class Categories {
             
             $current = CategoriesEntity::get($conditions, 1, $import_id);
             
-            $return .= sprintf($title, $current->c_name);
+            $return .= sprintf($title, esc_html($current->c_name));
         }
         
         if ($depth > 0) {
@@ -76,7 +76,7 @@ class Categories {
     }
 
     private static function shortcode_category_title($content = '', $atts, $shortcode_name, $import_id = '') {
-        $arlo_category = isset($_GET['arlo-category']) && !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : get_query_var('arlo-category', '');
+        $arlo_category = !empty($_GET['arlo-category']) ? stripslashes_deep($_GET['arlo-category']) : stripslashes_deep(urldecode(get_query_var('arlo-category')));
         
         if (!empty($arlo_category)) {
             $category = CategoriesEntity::get(array('id' => current(explode('-', $arlo_category))), 1, $import_id);
@@ -90,7 +90,7 @@ class Categories {
     }
 
     private static function shortcode_category_header($content = '', $atts, $shortcode_name, $import_id = '') {
-        $arlo_category = isset($_GET['arlo-category']) && !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : get_query_var('arlo-category', '');
+        $arlo_category = !empty($_GET['arlo-category']) ? stripslashes_deep($_GET['arlo-category']) : stripslashes_deep(urldecode(get_query_var('arlo-category')));
         
         if (!empty($arlo_category)) {
             $category = CategoriesEntity::get(array('id' => current(explode('-', $arlo_category))), 1, $import_id);
@@ -104,7 +104,7 @@ class Categories {
     } 
 
     private static function shortcode_category_footer ($content = '', $atts, $shortcode_name, $import_id = ''){
-        $arlo_category = isset($_GET['arlo-category']) && !empty($_GET['arlo-category']) ? $_GET['arlo-category'] : get_query_var('arlo-category', '');
+        $arlo_category = !empty($_GET['arlo-category']) ? stripslashes_deep($_GET['arlo-category']) : stripslashes_deep(urldecode(get_query_var('arlo-category')));
         
         if (!empty($arlo_category)) {
             $category = CategoriesEntity::get(array('id' => current(explode('-', $arlo_category))), 1, $import_id);

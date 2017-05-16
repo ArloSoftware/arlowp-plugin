@@ -100,7 +100,7 @@ class CategoryDepth extends BaseImporter {
 			WHERE
 				c_arlo_id = %d
 			AND
-				import_id = %s
+				import_id = %d
 			";
 			$query = $this->dbl->query( $this->dbl->prepare($sql, $cat->depth_level, $cat->c_arlo_id, $this->import_id) );
 			if (isset($cat->children) && is_array($cat->children)) {
@@ -123,7 +123,7 @@ class CategoryDepth extends BaseImporter {
 			WHERE
 				c_arlo_id = %d
 			AND
-				import_id = %s	
+				import_id = %d	
 			";
 			
 			$query = $this->dbl->query( $this->dbl->prepare($sql, $order + $cat->c_order, $cat->c_arlo_id, $this->import_id) );

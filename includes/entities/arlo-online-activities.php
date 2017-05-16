@@ -8,7 +8,10 @@ class OnlineActivities {
 	
 		$query = "SELECT oa.* FROM {$wpdb->prefix}arlo_onlineactivities AS oa";
 		
-		$where = array("import_id = " . $import_id);
+		$parameters = [];
+		
+		$where = array("import_id = %d");
+		$parameters[] =  $import_id;
 	
 		// conditions
 		foreach($conditions as $key => $value) {
@@ -16,23 +19,28 @@ class OnlineActivities {
 			switch($key) {
 				case 'id':
 					if(is_array($value)) {
-						$where[] = "oa.oa_arlo_id IN (" . implode(',', $value) . ")";
+						$where[] = "oa.oa_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $value)) . ")";
+						$parameters = array_merge($parameters, $value);
 					} else {
-						$where[] = "oa.oa_arlo_id = $value";
+						$where[] = "oa.oa_arlo_id = %d";
+						$parameters[] = $value;
 						$limit = 1;
 					}
 				break;
 				
 				case 'template_id':
 					if(is_array($value)) {
-						$where[] = "oa.oat_arlo_id IN (" . implode(',', $value) . ")";
+						$where[] = "oa.oat_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $value)) . ")";
+						$parameters = array_merge($parameters, $value);
 					} else {
-						$where[] = "oa.oat_arlo_id = $value";
+						$where[] = "oa.oat_arlo_id = %d";
+						$parameters[] = $value;
 					}
 				break;
 				
 				default:
-					$where[] = $value;
+					$where[] = $key;
+					$parameters[] = $value;
 				break;
 			}
 		}
@@ -49,14 +57,14 @@ class OnlineActivities {
 		
 		//limit
 		
-		if ($limit > 1) {
-			$limit = ' LIMIT ' . $limit;
+		$limit = ($limit > 1 ? ' LIMIT ' . $limit : '');
+
+		$query = $wpdb->prepare($query.$where.$order, $parameters);
+		
+		if ($query) {
+			return (!empty($limit)) ? $wpdb->get_results($query.$limit) : $wpdb->get_row($query);
 		} else {
-			$limit = '';
+			throw new \Exception("Couldn't prepare the SQL statement");
 		}
-		
-		$result = (!empty($limit)) ? $wpdb->get_results($query.$where.$order.$limit) : $wpdb->get_row($query.$where.$order);
-		
-		return $result;
 	}
 }
