@@ -78,17 +78,17 @@ class Arlo_For_Wordpress_Presenters extends Arlo_For_Wordpress_Lists  {
 		switch ($column_name) {
 			case 'p_twitterid':
 				if (!empty($item->$column_name)) {
-					return '<a href="http://twitter.com/' . esc_url($item->$column_name) . '" target="_blank">Twitter</a>';
+					return '<a href="http://twitter.com/' . esc_attr($item->$column_name) . '" target="_blank">Twitter</a>';
 				}
 				break;
 			case 'p_facebookid':
 				if (!empty($item->$column_name)) {
-					return '<a href="http://www.facebook.com/' . esc_url($item->$column_name) . '" target="_blank">Facebook</a>';
+					return '<a href="http://www.facebook.com/' . esc_attr($item->$column_name) . '" target="_blank">Facebook</a>';
 				}
 				break;
 			case 'p_linkedinid':
 				if (!empty($item->$column_name)) {
-					return '<a href="http://www.linkedin.com/' . esc_url($item->$column_name) . '" target="_blank">LinkedIn</a>';
+					return '<a href="http://www.linkedin.com/' . esc_attr($item->$column_name) . '" target="_blank">LinkedIn</a>';
 				}
 				break;
 			case 'p_profile':
@@ -105,7 +105,7 @@ class Arlo_For_Wordpress_Presenters extends Arlo_For_Wordpress_Lists  {
 	
 	function column_name($item) {
 		$actions = array(
-            'edit' => sprintf('<a href="https://%s.arlo.co/management/Users/User.aspx?id=%d" target="_blank">Edit</a>', $this->platform_name, $item->p_arlo_id),
+            'edit' => sprintf('<a href="https://%s/management/Users/User.aspx?id=%d" target="_blank">Edit</a>', esc_attr($this->platform_url), $item->p_arlo_id),
             'view' => sprintf('<a href="%s" target="_blank">View</a>', $item->guid),
         );
         

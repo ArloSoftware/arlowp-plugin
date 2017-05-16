@@ -22,6 +22,7 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 
 	protected $wpdb;	
 	protected $platform_name;
+	protected $platform_url;
 	protected $order;
 	protected $orderby;
 	protected $paged;
@@ -65,7 +66,10 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 		$this->plugin_slug = $plugin->plugin_slug;
 		$this->version = VersionHandler::VERSION;	
 		$this->wpdb = &$wpdb;
+
 		$this->platform_name = $settings['platform_name'];	
+		$this->platform_url = strpos($this->platform_name, '.') !== false ? $this->platform_name : $this->platform_name . '.arlo.co';
+
 
 		$this->timezones = $this->get_timezones();
 	}
