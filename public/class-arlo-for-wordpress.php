@@ -1343,7 +1343,9 @@ class Arlo_For_Wordpress {
 			case 'event':
 				//check if it's a private event				
 				if (!empty($_GET['e']) || !empty($_GET['t']) && !empty($settings['platform_name'])) {
-					$url = 'http://' . $settings['platform_name'] . '.arlo.co/events/' . intval($_GET['arlo_id']) . '-fake-redirect-url?';
+					$platform_url = strpos($settings['platform_name'], '.') !== false ? $settings['platform_name'] : $settings['platform_name'] . '.arlo.co';
+					
+					$url = 'http://' . $platform_url . '/events/' . intval($_GET['arlo_id']) . '-fake-redirect-url?';
 					$url .= (!empty($_GET['e']) ? 'e=' . $_GET['e'] : '');
 					$url .= (!empty($_GET['t']) ? 't=' . $_GET['t'] : '');
 					
