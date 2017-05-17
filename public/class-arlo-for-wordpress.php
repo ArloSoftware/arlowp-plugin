@@ -916,7 +916,7 @@ class Arlo_For_Wordpress {
 			$settings = get_option('arlo_settings');
 			
 			if (!empty($settings['customcss'])) {
-				echo "\n<style>\n" . $settings['customcss'] . "\n</style>\n";
+				echo "\n<style type=\"text/css\">\n" . preg_replace('/<\/style>/i', '', $settings['customcss']) . "\n</style>\n";
 			}
 		}
 	}
@@ -1344,7 +1344,7 @@ class Arlo_For_Wordpress {
 				//check if it's a private event				
 				if (!empty($_GET['e']) || !empty($_GET['t']) && !empty($settings['platform_name'])) {
 					$platform_url = strpos($settings['platform_name'], '.') !== false ? $settings['platform_name'] : $settings['platform_name'] . '.arlo.co';
-					
+
 					$url = 'http://' . $platform_url . '/events/' . intval($_GET['arlo_id']) . '-fake-redirect-url?';
 					$url .= (!empty($_GET['e']) ? 'e=' . $_GET['e'] : '');
 					$url .= (!empty($_GET['t']) ? 't=' . $_GET['t'] : '');
