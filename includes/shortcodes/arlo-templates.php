@@ -623,6 +623,10 @@ class Templates {
         if(empty($items)) {
             return '';
         }
+
+        if (strpos($text, '%s') === false) {
+            $text = '%s' . $text . '%s';
+        }
         
         $content = sprintf(htmlentities($text, ENT_QUOTES, "UTF-8"), '<a href="' . $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'] . '" class="arlo-register-interest">', '</a>');
 
