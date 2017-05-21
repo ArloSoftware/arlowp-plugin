@@ -34,5 +34,5 @@
 [arlo_category_footer wrap='<div class="arlo-category-footer">%s</div>']
 [arlo_no_event_text]
 [arlo_event_template_list_pagination limit="10" wrap='<div class="arlo-pagination">%s</div>']
-
+[arlo_powered_by]
 </div>

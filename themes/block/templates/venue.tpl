@@ -13,5 +13,5 @@
 
 [arlo_venue_parking label='<h5><i class="icons8-parking"></i> Parking</h5>']
 [arlo_venue_directions label='<h5><i class="icons8-compass"></i> Directions</h5>']
-
+[arlo_powered_by]
 </div>

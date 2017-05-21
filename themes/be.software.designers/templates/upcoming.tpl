@@ -53,4 +53,5 @@
 	<div class="arlo-pagination">
 	    [arlo_upcoming_list_pagination limit="10"]
 	</div>
+	[arlo_powered_by]
 </div>

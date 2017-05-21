@@ -19,5 +19,5 @@
 </ul>
 
 [arlo_venue_list_pagination wrap='<div class="arlo-pagination">%s</div>']
-
+[arlo_powered_by]
 </div>

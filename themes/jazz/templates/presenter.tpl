@@ -13,5 +13,5 @@
 [arlo_label label='<h5>Events</h5>']
     [arlo_presenter_events_list]
 [/arlo_label]
-
+[arlo_powered_by]
 </div>

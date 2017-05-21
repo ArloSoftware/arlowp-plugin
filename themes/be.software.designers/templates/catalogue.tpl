@@ -43,4 +43,5 @@
     </div>
 
     [arlo_category_footer wrap="<div class='arlo-category-footer-wrapper'><div class='arlo-category-footer'>%s</div></div>"]
+    [arlo_powered_by]
 </div>

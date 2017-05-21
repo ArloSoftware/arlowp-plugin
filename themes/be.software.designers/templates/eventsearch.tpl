@@ -31,5 +31,5 @@
         [arlo_event_template_list_pagination limit="10"]
     </div>
     [arlo_no_event_text]
-
+    [arlo_powered_by]
 </div>

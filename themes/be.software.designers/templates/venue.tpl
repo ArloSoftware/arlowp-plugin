@@ -17,5 +17,5 @@
 	    [arlo_venue_directions label='<h4>Directions</h4>']
 	    [arlo_venue_parking label='<h4>Parking</h4>']
 	</div>
-
+    [arlo_powered_by]
 </div>

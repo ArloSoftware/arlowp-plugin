@@ -14,5 +14,5 @@
             [arlo_presenter_events_list]
         [/arlo_label]
     </div>
-
+    [arlo_powered_by]
 </div>
