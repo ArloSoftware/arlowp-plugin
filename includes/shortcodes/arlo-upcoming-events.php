@@ -107,7 +107,7 @@ class UpcomingEvents {
         global $post, $wpdb;
 
         extract(shortcode_atts(array(
-            'filters'	=> 'category,month,location,delivery',
+            'filters'	=> 'category,month,location,delivery,presenter',
             'resettext'	=> __('Reset', 'arlo-for-wordpress'),
             'buttonclass'   => 'button'
         ), $atts, $shortcode_name, $import_id));
@@ -212,7 +212,34 @@ class UpcomingEvents {
 
                     $filter_html .= Shortcodes::create_filter($filter, $tags, __('Select tag', 'arlo-for-wordpress'));				
                     
-                    break;				
+                    break;	
+                case 'presenter' :
+                
+                    $items = $wpdb->get_results(
+                        "SELECT DISTINCT
+                            t.id,
+                            t.tag
+                        FROM 
+                            {$wpdb->prefix}arlo_events_tags AS etag
+                        LEFT JOIN 
+                            {$wpdb->prefix}arlo_tags AS t
+                        ON
+                            t.id = etag.tag_id
+                        ORDER BY tag", ARRAY_A);
+
+                    $presenters = array();
+
+                    foreach ($items as $item) {
+                        $tags[] = array(
+                            'string' => $item['presenter'],
+                            'value' => $item['presenter'],
+                        );
+                    }
+
+                    $filter_html .= Shortcodes::create_filter($filter, $tags, __('Select presenter', 'arlo-for-wordpress'));
+
+                    break;
+
             endswitch;
         endforeach;
 
