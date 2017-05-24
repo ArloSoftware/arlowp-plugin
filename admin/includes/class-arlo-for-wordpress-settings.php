@@ -620,6 +620,17 @@ class Arlo_For_Wordpress_Settings {
 	    <h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
 	    	<ul class="arlo-whatsnew-list">	  
+				<li>New presenter filter for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/upcomingeventrelated#arlo_upcoming_event_filters" target="_blank">[arlo_upcoming_event_filters]</a></li>
+				<li>Support new URL structure on the admin pages and for private events</li>
+				<li>Fix broken link in <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_suggest_datelocation" target="_blank">[arlo_suggest_datelocation]</a> when used the "text" attribute</li>
+			</ul>
+		</p>		
+
+
+
+		<h4>Version 3.1.2</h4>
+		<p>
+	    	<ul class="arlo-whatsnew-list">	  
 				<li>Improve error logging and reliability for data synchronization</li>
 			</ul>
 		</p>
