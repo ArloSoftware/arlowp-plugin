@@ -236,7 +236,7 @@ class UpcomingEvents {
                         if (!is_null($item['p_firstname']) && !is_null($item['p_firstname'])) {
                             $presenters[] = array(
                                 'string' => $item['p_firstname'] . " " . $item['p_lastname'],
-                                'value' => $item['p_firstname'] . "-" . $item['p_lastname'],
+                                'value' => $item['p_arlo_id'] . "-" . $item['p_firstname'] . "-" . $item['p_lastname'],
                             );
                         }
                     }
@@ -290,7 +290,7 @@ class UpcomingEvents {
         $arlo_delivery = isset($_GET['arlo-delivery']) ?  $_GET['arlo-delivery'] : get_query_var('arlo-delivery');
         $arlo_month = !empty($_GET['arlo-month']) ? wp_unslash($_GET['arlo-month']) : wp_unslash(urldecode(get_query_var('arlo-month')));
         $arlo_eventtag = !empty($_GET['arlo-eventtag']) ? wp_unslash($_GET['arlo-eventtag']) : wp_unslash(urldecode(get_query_var('arlo-eventtag')));
-        $arlo_presenter = !empty($_GET['arlo-presenter']) ?  esc_sql($_GET['arlo_presenter']) : get_query_var('arlo-presenter', '');
+        $arlo_presenter = !empty($_GET['arlo-presenter']) ? wp_unslash($_GET['arlo-presenter']) : wp_unslash(urldecode(get_query_var('arlo-presenter')));
         $arlo_region = get_query_var('arlo-region', '');
         $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');        
         
@@ -331,9 +331,8 @@ class UpcomingEvents {
         
         if(!empty($arlo_presenter)) :
             $join .= " LEFT JOIN $t9 epresenter ON epresenter.e_id = e.e_id AND epresenter.import_id = e.import_id";
-            $where .= " AND concat(presenter.p_firstname, '-', presenter.p_lastname) = '" . urldecode($arlo_presenter) . "'";
-            $parameters[] = $arlo_presenter;
-            $join .= " LEFT JOIN $t10 AS presenter ON presenter.p_arlo_id = epresenter.p_arlo_id";
+            $where .= " AND p_arlo_id = %d";
+            $parameters[] = intval(current(explode('-', $arlo_presenter)));
         endif;      
 
         if (!empty($arlo_region)) {
