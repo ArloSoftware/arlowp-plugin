@@ -5,7 +5,7 @@ namespace Arlo;
 use Arlo\Utilities;
 
 class VersionHandler {
-	const VERSION = '3.1.2';
+	const VERSION = '3.1.3';
 
 	private $dbl;
 	private $message_handler;
@@ -77,7 +77,11 @@ class VersionHandler {
 
 		if (version_compare($old_version, '3.1') < 0) {
 			$this->do_update('3.1');
-		}				
+		}	
+
+		if (version_compare($old_version, '3.1.3') < 0) {
+			$this->do_update('3.1.3');
+		}						
 	}
 	
 	private function run_pre_data_update($version) {
@@ -400,6 +404,12 @@ class VersionHandler {
 			case '3.1':
 				delete_metadata('user', 0 , 'arlo-developer-admin-notice', '0', true);
 			break;
+
+			case '3.1.3':
+				//kick off an import
+				if (get_option('arlo_import_disabled', '0') != '1')
+					$this->plugin->get_scheduler()->set_task("import", -1);	
+			break;			
 		}	
 	}	
 }
