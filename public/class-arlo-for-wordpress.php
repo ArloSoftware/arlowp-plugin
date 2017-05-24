@@ -849,6 +849,10 @@ class Arlo_For_Wordpress {
 				$url .= '/delivery-' . intval($_GET['arlo-delivery']);
 			}
 
+			if (!empty($_GET['arlo-presenter'])) {
+				$url .= '/presenter-' . urlencode($_GET['arlo-presenter']);
+			}
+
 			if (!empty($_GET['arlo-eventtag'])) {
 				if (is_numeric($_GET['arlo-eventtag'])) {
 					$tag = self::get_tag_by_id($_GET['arlo-eventtag']);

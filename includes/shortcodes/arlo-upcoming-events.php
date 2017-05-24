@@ -51,9 +51,9 @@ class UpcomingEvents {
         $output = '';
 
         $sql = self::generate_list_sql($atts, $import_id);	
-                           
+             
         $items = $wpdb->get_results($sql, ARRAY_A);
-
+                  
         if(empty($items)) :
         
             $no_event_text = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', 'arlo-for-wordpress');
@@ -107,7 +107,7 @@ class UpcomingEvents {
         global $post, $wpdb;
 
         extract(shortcode_atts(array(
-            'filters'	=> 'category,month,location,delivery,presenter',
+            'filters'	=> 'category,month,location,delivery',
             'resettext'	=> __('Reset', 'arlo-for-wordpress'),
             'buttonclass'   => 'button'
         ), $atts, $shortcode_name, $import_id));
@@ -116,7 +116,7 @@ class UpcomingEvents {
         
         $settings = get_option('arlo_settings');
 
-        $page_link = get_permalink(get_post($post));       
+        $page_link = get_permalink(get_post($post));
             
         $filter_html = '<form class="arlo-filters" method="get" action="' . $page_link . '">';
             
@@ -212,33 +212,39 @@ class UpcomingEvents {
 
                     $filter_html .= Shortcodes::create_filter($filter, $tags, __('Select tag', 'arlo-for-wordpress'));				
                     
-                    break;	
+                    break;
+
                 case 'presenter' :
-                
                     $items = $wpdb->get_results(
                         "SELECT DISTINCT
-                            t.id,
-                            t.tag
+                            p.p_arlo_id,
+                            p.p_firstname,
+                            p.p_lastname
                         FROM 
-                            {$wpdb->prefix}arlo_events_tags AS etag
+                            {$wpdb->prefix}arlo_events_presenters AS epresenter
                         LEFT JOIN 
-                            {$wpdb->prefix}arlo_tags AS t
+                            {$wpdb->prefix}arlo_presenters AS p
                         ON
-                            t.id = etag.tag_id
-                        ORDER BY tag", ARRAY_A);
+                            p.p_arlo_id = epresenter.p_arlo_id
+                        WHERE 
+                            epresenter.import_id = $import_id
+                        ORDER BY p_firstname", ARRAY_A);
 
                     $presenters = array();
 
                     foreach ($items as $item) {
-                        $tags[] = array(
-                            'string' => $item['presenter'],
-                            'value' => $item['presenter'],
-                        );
+                        if (!is_null($item['p_firstname']) && !is_null($item['p_firstname'])) {
+                            $presenters[] = array(
+                                'string' => $item['p_firstname'] . " " . $item['p_lastname'],
+                                'value' => $item['p_firstname'] . "-" . $item['p_lastname'],
+                            );
+                        }
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter, $tags, __('Select presenter', 'arlo-for-wordpress'));
+                    $filter_html .= Shortcodes::create_filter($filter, $presenters, __('Select presenter', 'arlo-for-wordpress'));
+                    
+                    break;  
 
-                    break;
 
             endswitch;
         endforeach;
@@ -272,6 +278,8 @@ class UpcomingEvents {
         $t6 = "{$wpdb->prefix}arlo_categories";
         $t7 = "{$wpdb->prefix}arlo_events_tags";
         $t8 = "{$wpdb->prefix}arlo_tags";
+        $t9 = "{$wpdb->prefix}arlo_events_presenters";
+        $t10 = "{$wpdb->prefix}arlo_presenters";
 
         $join = '';
         $where = 'WHERE CURDATE() < DATE(e.e_startdatetime)  AND e_parent_arlo_id = 0 AND e.import_id = %d';
@@ -282,6 +290,7 @@ class UpcomingEvents {
         $arlo_delivery = isset($_GET['arlo-delivery']) ?  $_GET['arlo-delivery'] : get_query_var('arlo-delivery');
         $arlo_month = !empty($_GET['arlo-month']) ? wp_unslash($_GET['arlo-month']) : wp_unslash(urldecode(get_query_var('arlo-month')));
         $arlo_eventtag = !empty($_GET['arlo-eventtag']) ? wp_unslash($_GET['arlo-eventtag']) : wp_unslash(urldecode(get_query_var('arlo-eventtag')));
+        $arlo_presenter = !empty($_GET['arlo-presenter']) ?  esc_sql($_GET['arlo_presenter']) : get_query_var('arlo-presenter', '');
         $arlo_region = get_query_var('arlo-region', '');
         $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');        
         
@@ -318,8 +327,15 @@ class UpcomingEvents {
                 $where .= " AND etag.tag_id = %d";
                 $parameters[] = intval($arlo_eventtag);
             }
-        endif;		
+        endif;
         
+        if(!empty($arlo_presenter)) :
+            $join .= " LEFT JOIN $t9 epresenter ON epresenter.e_id = e.e_id AND epresenter.import_id = e.import_id";
+            $where .= " AND concat(presenter.p_firstname, '-', presenter.p_lastname) = '" . urldecode($arlo_presenter) . "'";
+            $parameters[] = $arlo_presenter;
+            $join .= " LEFT JOIN $t10 AS presenter ON presenter.p_arlo_id = epresenter.p_arlo_id";
+        endif;      
+
         if (!empty($arlo_region)) {
             $where .= ' AND et.et_region = %s AND e.e_region = %s';
             $parameters[] = $arlo_region;

@@ -59,6 +59,7 @@
         		'delivery-': 'arlo-filter-delivery',
         		'eventtag-': 'arlo-filter-eventtag',
         		'templatetag-': 'arlo-filter-templatetag',
+        		'presenter-': 'arlo-filter-presenter'
         	};
         	
         	var page = $('#arlo-page').val();
@@ -66,7 +67,7 @@
         	if (page[page.length-1] != '/') {
         		page = page + '/';
         	}
-        	
+
         	var url = page;
         	
         	for (var i in filters) {
