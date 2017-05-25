@@ -850,7 +850,7 @@ class Arlo_For_Wordpress {
 			}
 
 			if (!empty($_GET['arlo-presenter'])) {
-				$url .= '/presenter-' . urlencode($_GET['arlo-presenter']);
+				$url .= '/presenter-' . wp_unslash($_GET['arlo-presenter']);
 			}
 
 			if (!empty($_GET['arlo-eventtag'])) {
