@@ -10,11 +10,11 @@
 		
 		$slug = get_post($settings['post_types']['eventsearch']['posts_page'])->post_name;
 			
-		$arlo_search = !empty($_GET['arlo-search']) ? wp_unslash($_GET['arlo-search']) : wp_unslash(urldecode(get_query_var('arlo-search')));
-		
+		$arlo_search = \Arlo\Utilities::clean_string_url_parameter('arlo-search');
+
 		echo '
 		<form class="arlo-search-widget" action="'.site_url().'/'.$slug.'/">
-			<input type="text" class="search-field" name="arlo-search" value="' . esc_attr( $search_term ) . '">
+			<input type="text" class="search-field" name="arlo-search" value="' . esc_attr( $arlo_search ) . '">
 		</form>
 		';	
 	}

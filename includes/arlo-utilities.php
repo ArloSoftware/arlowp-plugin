@@ -25,6 +25,23 @@ class Utilities {
 		return $now;    
     }
 
+    public static function clean_string_url_parameter($parameter_name) {
+        return !empty($_GET[$parameter_name]) ? wp_unslash($_GET[$parameter_name]) : wp_unslash(urldecode(get_query_var($parameter_name)));
+    }
+
+    public static function clean_int_url_parameter($parameter_name) {
+        if (isset($_GET[$parameter_name])) {
+            return intval($_GET[$parameter_name]);
+        } else {
+            $value = get_query_var($parameter_name);
+            if (!empty($value)) {
+                return intval($value);
+            }
+        }
+
+        return null;
+    }
+
 	public static function GUIDv4 ($trim = true, $remove_hyphens = false) {
         
 

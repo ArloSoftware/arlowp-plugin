@@ -93,18 +93,16 @@ function set_title($title, $id = null, $meta = false){
 	
 	$subtitle = '';
 	
-	$arlo_category = !empty($_GET['arlo-category']) ? wp_unslash($_GET['arlo-category']) : wp_unslash(urldecode(get_query_var('arlo-category')));
+	$arlo_category = \Arlo\Utilities::clean_string_url_parameter('arlo-category');
+	$arlo_location = \Arlo\Utilities::clean_string_url_parameter('arlo-location');
+	$arlo_search = \Arlo\Utilities::clean_string_url_parameter('arlo-search');
 	
 	$cat_slug = !empty($arlo_category) ? $arlo_category : '';	
 	
 	$cat = null;
 
 	if (!empty($cat_slug))
-		$cat = \Arlo\Entities\Categories::get(array('slug' => $cat_slug), null, $import_id);
-		
-		
-	$arlo_location = !empty($_GET['arlo-location']) ? wp_unslash($_GET['arlo-location']) : wp_unslash(urldecode(get_query_var('arlo-location')));
-	$arlo_search = !empty($_GET['arlo-search']) ? wp_unslash($_GET['arlo-search']) : wp_unslash(urldecode(get_query_var('arlo-search')));
+		$cat = \Arlo\Entities\Categories::get(array('slug' => $cat_slug), null, $import_id);		
 		
 	if ($id === null || !in_array($id, $pages) || $id != $post->ID || (!in_the_loop() && !$meta) || is_nav_menu_item($id)) return ['title' => $title];
 	

@@ -285,12 +285,12 @@ class UpcomingEvents {
         $where = 'WHERE CURDATE() < DATE(e.e_startdatetime)  AND e_parent_arlo_id = 0 AND e.import_id = %d';
         $parameters[] = $import_id;
 
-        $arlo_location = !empty($_GET['arlo-location']) ? wp_unslash($_GET['arlo-location']) : wp_unslash(urldecode(get_query_var('arlo-location')));
-        $arlo_category = !empty($_GET['arlo-category']) ? wp_unslash($_GET['arlo-category']) : wp_unslash(urldecode(get_query_var('arlo-category')));
-        $arlo_delivery = isset($_GET['arlo-delivery']) ?  $_GET['arlo-delivery'] : get_query_var('arlo-delivery');
-        $arlo_month = !empty($_GET['arlo-month']) ? wp_unslash($_GET['arlo-month']) : wp_unslash(urldecode(get_query_var('arlo-month')));
-        $arlo_eventtag = !empty($_GET['arlo-eventtag']) ? wp_unslash($_GET['arlo-eventtag']) : wp_unslash(urldecode(get_query_var('arlo-eventtag')));
-        $arlo_presenter = !empty($_GET['arlo-presenter']) ? wp_unslash($_GET['arlo-presenter']) : wp_unslash(urldecode(get_query_var('arlo-presenter')));
+        $arlo_location = \Arlo\Utilities::clean_string_url_parameter('arlo-location');
+        $arlo_category = \Arlo\Utilities::clean_string_url_parameter('arlo-category');
+        $arlo_delivery = \Arlo\Utilities::clean_int_url_parameter('arlo-delivery');
+        $arlo_month = \Arlo\Utilities::clean_string_url_parameter('arlo-month');
+        $arlo_eventtag = \Arlo\Utilities::clean_string_url_parameter('arlo-eventtag');
+        $arlo_presenter = \Arlo\Utilities::clean_string_url_parameter('arlo-presenter');
         $arlo_region = get_query_var('arlo-region', '');
         $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');        
         
