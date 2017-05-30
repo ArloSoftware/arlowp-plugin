@@ -48,6 +48,11 @@ class Events {
 						$parameters[] = $value;
  					}
  				break;	
+
+				case 'region':
+					$where[] = "e.e_region = %s";
+					$parameters[] = $value;
+				break;
 				
 				default:
 					$where[] = $key;

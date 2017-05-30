@@ -540,11 +540,19 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
 
     private static function shortcode_event_duration($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_event_list_item']) || empty($GLOBALS['arlo_event_list_item']['et_arlo_id'])) return;
+
+        $regions = get_option('arlo_regions');	
+        $arlo_region = get_query_var('arlo-region', '');
+        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
         
         $conditions = array(
             'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id'],
             'parent_id' => 0
         );
+
+        if (!empty($arlo_region)) {
+            $conditions['region'] = $arlo_region; 
+        }
 
         if (!empty($GLOBALS['arlo_event_list_item']['e_startdatetime']) && !empty($GLOBALS['arlo_event_list_item']['e_finishdatetime'])) {
             $start = $GLOBALS['arlo_event_list_item']['e_startdatetime'];
@@ -614,7 +622,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
             'showfrom' => 'true',
         ), $atts, $shortcode_name, $import_id));
         
-        
+
         $settings = get_option('arlo_settings');  
         $price_setting = (isset($settings['price_setting'])) ? $settings['price_setting'] : ARLO_PLUGIN_PREFIX . '-exclgst';
         $price_field = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? 'o_offeramounttaxexclusive' : 'o_offeramounttaxinclusive';
@@ -624,7 +632,6 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         $offer;
         
         $regions = get_option('arlo_regions');	
-        
         $arlo_region = get_query_var('arlo-region', '');
         $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
             
@@ -637,17 +644,21 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         if (!empty($arlo_region)) {
             $conditions['region'] = $arlo_region; 
         }
-        
+
         $offer = \Arlo\Entities\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $import_id);
-        
+
         // if none, try the associated events
         if(!$offer) {
             $conditions = array(
                 'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id']
             );
-            
+
+            if (!empty($arlo_region)) {
+                $conditions['region'] = $arlo_region; 
+            }	            
+
             $event = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), 1, $import_id);
-            
+
             if(empty($event)) return;
             
             $conditions = array(
@@ -661,8 +672,8 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
             
             $offer = \Arlo\Entities\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $import_id);
         }
-        
-        
+
+       
         // if none, try the associated online activity
         if(!$offer) {
             $conditions = array(
@@ -684,7 +695,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
             
             $offer = \Arlo\Entities\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $import_id);
         }	
-        
+
         if(empty($offer)) return;
         
         // if $0.00, return "Free"
