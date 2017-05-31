@@ -14,7 +14,7 @@ class Offers {
 		$parameters[] = $import_id;
 
 		$join = [];
-	
+
 		// conditions
 		foreach($conditions as $key => $value) {
 			// what to do?
@@ -55,7 +55,7 @@ class Offers {
 					$join[] = "
 					LEFT JOIN {$wpdb->prefix}arlo_eventtemplates AS et USING (et_id) 
 					";
-					$where = array("et.import_id = %d ");
+					$where[] = "et.import_id = %d ";
 					$parameters[] = $import_id;
 
 					if(is_array($value) && count($value)) {
