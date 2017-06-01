@@ -12,6 +12,7 @@ class Shortcodes {
 		Presenters::init();
 		Events::init();
 		UpcomingEvents::init();
+		OnlineActivitiesList::init();
 
 		// group devider
 		self::add('group_divider', function($content = '', $atts, $shortcode_name, $import_id){

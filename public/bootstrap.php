@@ -176,6 +176,9 @@ function arlo_register_custom_post_types() {
 			switch($id) {
 				case 'upcoming':
 					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(eventtag-([^/]*))?/?(presenter-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-delivery=$matches[10]&arlo-eventtag=$matches[12]&arlo-presenter=$matches[14]&paged=$matches[16]','top');
+				break;
+				case 'onlineactivities':
+					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(oatag-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-oatag=$matches[6]&paged=$matches[8]','top');
 				break;			
 				case 'event':					
 					add_rewrite_rule('^' . $slug . '/(\d+-[^/]*)+/?(region-([^/]*))?/?$','index.php?arlo_event=$matches[1]&arlo-region=$matches[3]','top');
@@ -206,6 +209,7 @@ function arlo_register_custom_post_types() {
 	add_rewrite_tag('%arlo-location%', '([^&]+)');
 	add_rewrite_tag('%arlo-delivery%', '([^&]+)');
 	add_rewrite_tag('%arlo-eventtag%', '([^&]+)');
+	add_rewrite_tag('%arlo-oatag%', '([^&]+)');
 	add_rewrite_tag('%arlo-presenter%', '([^&]+)');
 	add_rewrite_tag('%arlo-templatetag%', '([^&]+)');
 	add_rewrite_tag('%arlo-search%', '([^&]+)');

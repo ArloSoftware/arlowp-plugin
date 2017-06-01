@@ -148,6 +148,12 @@ class Arlo_For_Wordpress {
 			'singular_name' => 'Event search',
 			'regionalized' => true
 		),
+		'onlineactivities' => array(
+			'slug' => 'onlineactivities',
+			'name' => 'Online activities',
+			'singular_name' => 'Online activity',
+			'regonalized' => true
+		)
     );
     
 	/**
@@ -258,6 +264,11 @@ class Arlo_For_Wordpress {
 			'shortcode' => '[arlo_upcoming_list]',
 			'name' => 'Upcoming event list',
 		),
+		'onlineactivities' => array(
+			'id' => 'onlineactivities',
+			'shortcode' => '[arlo_all_oa_list]',
+			'name' => 'Online activity list'
+		),
 		'presenter' => array(
 			'id' => 'presenter',
 			'name' => 'Presenter'
@@ -275,7 +286,7 @@ class Arlo_For_Wordpress {
 			'id' => 'venues',
 			'shortcode' => '[arlo_venue_list]',
 			'name' => 'Venue list'
-		),
+		)
     );
 
 	/**
@@ -821,7 +832,7 @@ class Arlo_For_Wordpress {
 		
 		$filter_enabled_page_ids = [];
 		
-		$filter_enabled_arlo_pages = ['upcoming', 'event'];
+		$filter_enabled_arlo_pages = ['upcoming', 'event', 'onlineactivities'];
 				
 		foreach($filter_enabled_arlo_pages as $page) {
 			if (!empty($settings['post_types'][$page]['posts_page'])) {
@@ -863,6 +874,16 @@ class Arlo_For_Wordpress {
 				$url .= '/eventtag-' . wp_unslash($_GET['arlo-eventtag']);
 			}
 			
+			if (!empty($_GET['arlo-oatag'])) {
+				if (is_numeric($_GET['arlo-oatag'])) {
+					$tag = self::get_tag_by_id($_GET['arlo-oatag']);
+					if (!empty($tag['tag'])) {
+						$_GET['arlo-oatag'] = $tag['tag'];
+					}
+				}
+				$url .= '/oatag-' . wp_unslash($_GET['arlo-oatag']);
+			}
+
 			if (!empty($_GET['arlo-templatetag'])) {
 				if (is_numeric($_GET['arlo-templatetag'])) {
 					$tag = self::get_tag_by_id($_GET['arlo-templatetag']);
