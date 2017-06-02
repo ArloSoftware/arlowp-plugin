@@ -43,8 +43,12 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         
         $settings = get_option('arlo_settings');  
 
-        $page_link = get_permalink(get_post($post));       
-            
+        if (!empty($settings['post_types']['event']['posts_page'])) {
+            $page_link = get_permalink(get_post($settings['post_types']['event']['posts_page']));
+        } else {
+            $page_link = get_permalink(get_post($post));
+        }
+
         $filter_html = '<form id="arlo-event-filter" class="arlo-filters" method="get" action="' . $page_link . '">';
         
         foreach($filters_array as $filter) :
