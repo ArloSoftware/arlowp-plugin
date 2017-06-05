@@ -431,7 +431,7 @@ class Templates {
         }
         
         $et_id = arlo_get_post_by_name($GLOBALS['arlo_eventtemplate']['et_post_name'], 'arlo_event');
-        
+
         return get_permalink($et_id) . $region_link_suffix;        
     }
 
@@ -459,7 +459,11 @@ class Templates {
         extract(shortcode_atts(array(
             'filters'	=> 'category,location,delivery',
             'resettext'	=> __('Reset', 'arlo-for-wordpress'),
-            'buttonclass'   => 'button'
+            'buttonclass'   => 'button',
+            'categoryfilterlabel' => __('All categories', 'arlo-for-wordpress'),
+            'locationfilterlabel' => __('All locations', 'arlo-for-wordpress'),
+            'deliveryfilterlabel' => __('All delivery options', 'arlo-for-wordpress'),
+            'tagsfilterlabel' => __('Select tag', 'arlo-for-wordpress')
         ), $atts, $shortcode_name, $import_id));
         
         $filters_array = explode(',',$filters);
@@ -487,7 +491,7 @@ class Templates {
                     }
                     
                     if (is_array($cats)) {
-                        $filter_html .= Shortcodes::create_filter('category', CategoriesEntity::child_categories($cats), __('All categories', 'arlo-for-wordpress'));
+                        $filter_html .= Shortcodes::create_filter('category', CategoriesEntity::child_categories($cats), $categoryfilterlabel);
                     }
                     
                     break;
@@ -496,7 +500,7 @@ class Templates {
 
                     // delivery select
 
-                    $filter_html .= Shortcodes::create_filter($filter, \Arlo_For_Wordpress::$delivery_labels, __('All delivery options', 'arlo-for-wordpress'));
+                    $filter_html .= Shortcodes::create_filter($filter, \Arlo_For_Wordpress::$delivery_labels, $deliveryfilterlabel);
 
                     break;				
 
@@ -529,7 +533,7 @@ class Templates {
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter, $locations, __('All locations', 'arlo-for-wordpress'));
+                    $filter_html .= Shortcodes::create_filter($filter, $locations, $locationfilterlabel);
 
                     break;
                     
@@ -561,7 +565,7 @@ class Templates {
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter, $tags, __('Select tag', 'arlo-for-wordpress'));				
+                    $filter_html .= Shortcodes::create_filter($filter, $tags, $tagsfilterlabel);				
                     
                     break;
 

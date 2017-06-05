@@ -177,7 +177,9 @@ class OnlineActivitiesList {
         extract(shortcode_atts(array(
             'filters'   => 'category,oatag',
             'resettext' => __('Reset', 'arlo-for-wordpress'),
-            'buttonclass'   => 'button'
+            'buttonclass'   => 'button',
+            'categoryfilterlabel' => __('All categories', 'arlo-for-wordpress'),
+            'oatagfilterlabel' => __('Select tag', 'arlo-for-wordpress')
         ), $atts, $shortcode_name, $import_id));
 
         $filters_array = explode(',',$filters);
@@ -200,7 +202,7 @@ class OnlineActivitiesList {
                     }
 
                     if (is_array($cats)) {
-                        $filter_html .= Shortcodes::create_filter($filter, CategoriesEntity::child_categories($cats), __('All categories', 'arlo-for-wordpress'));                  
+                        $filter_html .= Shortcodes::create_filter($filter, CategoriesEntity::child_categories($cats), $categoryfilterlabel);                  
                     }
 
                     break;
@@ -231,7 +233,7 @@ class OnlineActivitiesList {
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter, $tags, __('Select tag', 'arlo-for-wordpress'));              
+                    $filter_html .= Shortcodes::create_filter($filter, $tags, $oatagfilterlabel);              
 
                     break;
 

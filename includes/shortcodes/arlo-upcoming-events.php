@@ -109,7 +109,13 @@ class UpcomingEvents {
         extract(shortcode_atts(array(
             'filters'	=> 'category,month,location,delivery',
             'resettext'	=> __('Reset', 'arlo-for-wordpress'),
-            'buttonclass'   => 'button'
+            'buttonclass'   => 'button',
+            'categoryfilterlabel' => __('All categories', 'arlo-for-wordpress'),
+            'monthfilterlabel' => __('All months', 'arlo-for-wordpress'),
+            'locationfilterlabel' => __('All locations', 'arlo-for-wordpress'),
+            'deliveryfilterlabel' => __('All delivery options', 'arlo-for-wordpress'),
+            'eventtagsfilterlabel' => __('Select tag', 'arlo-for-wordpress'),
+            'presenterfilterlabel' => __('All presenters', 'arlo-for-wordpress')
         ), $atts, $shortcode_name, $import_id));
 
         $filters_array = explode(',',$filters);
@@ -132,12 +138,12 @@ class UpcomingEvents {
                     }
 
                     if (is_array($cats)) {
-                        $filter_html .= Shortcodes::create_filter($filter, CategoriesEntity::child_categories($cats), __('All categories', 'arlo-for-wordpress'));					
+                        $filter_html .= Shortcodes::create_filter($filter, CategoriesEntity::child_categories($cats), $categoryfilterlabel);					
                     }
 
                     break;                    
                 case 'delivery' :
-                    $filter_html .= Shortcodes::create_filter($filter, \Arlo_For_Wordpress::$delivery_labels, __('All delivery options', 'arlo-for-wordpress'));
+                    $filter_html .= Shortcodes::create_filter($filter, \Arlo_For_Wordpress::$delivery_labels, $deliveryfilterlabel);
 
                     break;                                    
                 case 'month' :
@@ -152,7 +158,7 @@ class UpcomingEvents {
 
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter, $months, __('All months', 'arlo-for-wordpress'));
+                    $filter_html .= Shortcodes::create_filter($filter, $months, $monthfilterlabel);
 
                     break;
                 case 'location' :
@@ -181,7 +187,7 @@ class UpcomingEvents {
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter, $locations, __('All locations', 'arlo-for-wordpress'));
+                    $filter_html .= Shortcodes::create_filter($filter, $locations, $locationfilterlabel);
 
                     break;          
                 case 'eventtag' :
@@ -210,7 +216,7 @@ class UpcomingEvents {
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter, $tags, __('Select tag', 'arlo-for-wordpress'));				
+                    $filter_html .= Shortcodes::create_filter($filter, $tags, $eventtagsfilterlabel);				
                     
                     break;
 
@@ -241,7 +247,7 @@ class UpcomingEvents {
                         }
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter, $presenters, __('Select presenter', 'arlo-for-wordpress'));
+                    $filter_html .= Shortcodes::create_filter($filter, $presenters, $presenterfilterlabel);
                     
                     break;  
 
