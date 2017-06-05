@@ -133,7 +133,8 @@ class Venues {
         extract(shortcode_atts(array(
             'height'	=> 400,
             'width'  	=> 400,
-            'zoom'		=> 16
+            'zoom'		=> 16,
+            'type'      => 'static'
         ), $atts, $shortcode_name, $import_id));
 
         $name = $GLOBALS['arlo_venue_list_item']['v_name'];
@@ -141,22 +142,44 @@ class Venues {
         $long = $GLOBALS['arlo_venue_list_item']['v_geodatapointlongitude'];
 
         if($lat != 0 || $long != 0) {
+            if ($type == 'static') {
+                if(intval($height) <= 0) $height = 400;
+                if(intval($width) <= 0) $width = 400;
 
-            if(intval($height) <= 0) $height = 400;
-            if(intval($width) <= 0) $width = 400;
+                $map = '<img src="https://maps.googleapis.com/maps/api/staticmap?markers=color:green%7C';
+                $map .= $lat . ',' . $long;
+                $map .= '&size=' . $width . 'x' . $height;
+                $map .= '&zoom=' . $zoom;
+                $map .= '&key=' . $api_key . '"';
+                $map .= ' height="' . $height . '"';
+                $map .= ' width="' . $width . '"';
+                $map .= ' alt="' . esc_attr(sprintf(__('Map of %s', 'arlo-for-wordpress'), $name)) . '"'; 
+                $map .= ' />';
 
-            $map = '<img src="https://maps.googleapis.com/maps/api/staticmap?markers=color:green%7C';
-            $map .= $lat . ',' . $long;
-            $map .= '&size=' . $width . 'x' . $height;
-            $map .= '&zoom=' . $zoom;
-            $map .= '&key=' . $api_key . '"';
-            $map .= ' height="' . $height . '"';
-            $map .= ' width="' . $width . '"';
-            $map .= ' alt="' . esc_attr(sprintf(__('Map of %s', 'arlo-for-wordpress'), $name)) . '"'; 
-            $map .= ' />';
+                return $map;
+            }
 
-            return $map;
-        }        
+            if ($type == 'dynamic') {
+                if(intval($height) <= 0) $height = 400;
+                if(intval($width) <= 0) $width = 400;
+
+                $map = '<iframe src="https://www.google.com/maps/embed/v1/place?q=' ;
+                $map .= $lat . ',' . $long;
+                $map .= '&zoom=' . $zoom;
+                $map .= '&key=' . $api_key ;
+                $map .= '"';
+                $map .= ' height="' . $height . '"';
+                $map .= ' width="' . $width . '"';
+                $map .= ' frameborder="0" style="border:0"';
+
+                $map .= ' alt="' . esc_attr(sprintf(__('Map of %s', 'arlo-for-wordpress'), $name)) . '"'; 
+                $map .= ' allowfullscreen></iframe>';
+
+                return $map;
+            }
+
+        }
+
     }
     
     private static function shortcode_venue_address($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
