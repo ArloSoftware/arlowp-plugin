@@ -53,6 +53,7 @@
 .arlo#arlo h6,
 .arlo#arlo p {
     margin: 1em 0 .5em;
+    padding: 0;
 }
 
 .arlo#arlo h1,
@@ -86,6 +87,10 @@
 
 .arlo#arlo h6 {
     font-size: 1.2em;
+}
+
+.arlo#arlo .arlo-online-activity h4 {
+    margin-top: 0;
 }
 
 

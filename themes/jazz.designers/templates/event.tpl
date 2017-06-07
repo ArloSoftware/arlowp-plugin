@@ -50,7 +50,7 @@
                     [arlo_oa_registration]
             </li>
             [/arlo_oa_list_item]
-        [/arlo_oa_list]     
+        [/arlo_oa_list]
         
     </ul>
 
