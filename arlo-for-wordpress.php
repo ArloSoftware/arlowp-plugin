@@ -86,7 +86,6 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-events.php
 require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-presenters.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-venues.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-upcoming-events.php');
-require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-online-activities-list.php');
 
 // Include Arlo entities
 require_once( plugin_dir_path( __FILE__ ) . 'includes/entities/arlo-templates.php');

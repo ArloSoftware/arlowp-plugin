@@ -53,7 +53,7 @@ class UpcomingEvents {
         $sql = self::generate_list_sql($atts, $import_id);	
              
         $items = $wpdb->get_results($sql, ARRAY_A);
-                  
+
         if(empty($items)) :
         
             $no_event_text = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', 'arlo-for-wordpress');
@@ -65,9 +65,7 @@ class UpcomingEvents {
             foreach($items as $item) {
 
                 if(is_null($previous) || date('m',strtotime($item['e_startdatetime'])) != date('m',strtotime($previous['e_startdatetime']))) {
-
                     $item['show_divider'] = strftime('%B', strtotime($item['e_startdatetime']));
-
                 }
 
                 $GLOBALS['arlo_event_list_item'] = $item;

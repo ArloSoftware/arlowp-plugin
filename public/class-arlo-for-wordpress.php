@@ -195,6 +195,12 @@ class Arlo_For_Wordpress {
 				'content' 			=> '[arlo_venue_list]',
 				'child_post_type'	=> 'venue'
 			),
+			array(
+				'name'				=> 'onlineactivities',
+				'title'				=> 'Online Activities',
+				'content' 			=> '[arlo_all_oa_list]',
+				'child_post_type'	=> 'event'
+			),
 		);  
 
     

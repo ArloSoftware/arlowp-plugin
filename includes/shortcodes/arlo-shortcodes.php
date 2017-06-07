@@ -12,11 +12,11 @@ class Shortcodes {
 		Presenters::init();
 		Events::init();
 		UpcomingEvents::init();
-		OnlineActivitiesList::init();
 
 		// group devider
 		self::add('group_divider', function($content = '', $atts, $shortcode_name, $import_id){
 			if(isset($GLOBALS['arlo_event_list_item']['show_divider'])) return $GLOBALS['arlo_event_list_item']['show_divider'];
+			if(isset($GLOBALS['arlo_oa_list_item']['show_divider'])) return $GLOBALS['arlo_oa_list_item']['show_divider'];
 		});
 
 		// timezones
