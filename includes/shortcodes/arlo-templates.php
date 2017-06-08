@@ -786,7 +786,7 @@ class Templates {
                     
                     if (is_array($ids) && count($ids)) {
                         $where .= " OR c.c_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $ids)) . ")";
-                        $parameters = array_merge($parameters, $value);
+                        $parameters = array_merge($parameters, $ids);
                     }
                 }
             } 
