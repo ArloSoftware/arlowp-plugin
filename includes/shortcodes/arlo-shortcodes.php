@@ -93,11 +93,18 @@ class Shortcodes {
 			'wrap' => '%s',
 			'label' => '',
 			'strip_html'	=> 'false',
+			'decode_quotes_in_shortcodes' => 'false',
 		), $atts, $shortcode_name));
 	
 		// need to decide ordering - currently makes sense to process the specific filter first
 		$content = apply_filters('arlo_shortcode_content_'.$shortcode_name, $content, $atts, $shortcode_name);
 		$content = apply_filters('arlo_shortcode_content', $content, $atts, $shortcode_name);
+
+		if ($decode_quotes_in_shortcodes === 'true') {
+			if (preg_match('/\[(?:[^\/])(?:[^\]\[]*)(?:&quot;|&apos;)(?:[^\]\[]*)\]/', $content) === 1) {
+				$content = str_replace(['&quot;','&apos;'], ['"','\''], $content);
+			}
+		}
 		
 		// run any shortcodes prior to conituning
 		$content = do_shortcode($content);
