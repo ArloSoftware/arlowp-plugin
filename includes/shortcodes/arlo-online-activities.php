@@ -362,9 +362,7 @@ class OnlineActivities {
         extract(shortcode_atts(array(
             'filters'   => 'category,oatag',
             'resettext' => __('Reset', 'arlo-for-wordpress'),
-            'buttonclass'   => 'button',
-            'categoryfilterlabel' => __('All categories', 'arlo-for-wordpress'),
-            'oatagfilterlabel' => __('Select tag', 'arlo-for-wordpress')
+            'buttonclass'   => 'button'
         ), $atts, $shortcode_name, $import_id));
 
         $filters_array = explode(',',$filters);
@@ -374,7 +372,9 @@ class OnlineActivities {
         $page_link = get_permalink(get_post($post));
             
         $filter_html = '<form class="arlo-filters" method="get" action="' . $page_link . '">';
-            
+
+        $filter_group = "onlineactivities";
+
         foreach($filters_array as $filter) :
 
             switch($filter) :
@@ -387,7 +387,7 @@ class OnlineActivities {
                     }
 
                     if (is_array($cats)) {
-                        $filter_html .= Shortcodes::create_filter($filter, CategoriesEntity::child_categories($cats), $categoryfilterlabel);                  
+                        $filter_html .= Shortcodes::create_filter($filter_group, $filter, CategoriesEntity::child_categories($cats), __('All categories', 'arlo-for-wordpress'));                  
                     }
 
                     break;
@@ -418,7 +418,7 @@ class OnlineActivities {
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter, $tags, $oatagfilterlabel);              
+                    $filter_html .= Shortcodes::create_filter($filter_group, $filter, $tags, __('Select tag', 'arlo-for-wordpress'));              
 
                     break;
 

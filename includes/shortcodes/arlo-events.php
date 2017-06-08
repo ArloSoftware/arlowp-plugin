@@ -31,8 +31,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         extract(shortcode_atts(array(
             'filters'	=> 'location',
             'resettext'	=> __('Reset', 'arlo-for-wordpress'),
-            'buttonclass'   => 'button',
-            'locationfilterlabel' => __('All locations', 'arlo-for-wordpress')
+            'buttonclass'   => 'button'
         ), $atts, $shortcode_name, $import_id));
         
         $filters_array = explode(',',$filters);
@@ -44,7 +43,9 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         
         $settings = get_option('arlo_settings');  
 
-        $page_link = get_permalink(get_post($post));       
+        $page_link = get_permalink(get_post($post));
+
+        $filter_group = 'event';
             
         $filter_html = '<form id="arlo-event-filter" class="arlo-filters" method="get" action="' . $page_link . '">';
         
@@ -87,7 +88,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter, $locations, $locationfilterlabel);
+                    $filter_html .= Shortcodes::create_filter($filter_group, $filter, $locations, $locationfilterlabel);
 
                     break;
 

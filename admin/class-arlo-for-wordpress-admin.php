@@ -465,7 +465,7 @@ class Arlo_For_Wordpress_Admin {
 
 		if ( ! isset( $wp_settings_fields[$page][$section] ) )
 			return;
-					
+
 		foreach ( (array) $wp_settings_fields[$page][$section] as $field ) {
 			$field['args']['label_for'] = !empty($field['args']['label_for']) ? $field['args']['label_for'] : "";
 			echo '<div class="' . ARLO_PLUGIN_PREFIX.'-field-wrap cf ' . ARLO_PLUGIN_PREFIX . '-' . strtolower(esc_attr($field['args']['label_for'])) . '" id="' . ARLO_PLUGIN_PREFIX . '-' . strtolower(esc_attr($field['args']['label_for'])) . '">';
@@ -548,7 +548,7 @@ class Arlo_For_Wordpress_Admin {
 	public function settings_saved($old) {
 		$new = get_option('arlo_settings', array());
 		$old_regions = get_option('arlo_regions', array());
-		
+
 		//save theme changes
 		$theme_id = get_option('arlo_theme', Arlo_For_Wordpress::DEFAULT_THEME);
 		$stored_themes_settings = get_option( 'arlo_themes_settings', [] );
@@ -586,7 +586,8 @@ class Arlo_For_Wordpress_Admin {
 				} 
 			}	
 		}
-		
+
+
 		//normalize regions
 		$regions = array();
 		if (is_array($new['regionid']) && count($new['regionid'])) {
@@ -598,7 +599,26 @@ class Arlo_For_Wordpress_Admin {
 		}
 		
 		update_option('arlo_regions', $regions);
-				
+
+
+
+		//normalize filters options
+		$filters = array();
+		if (is_array($new['arlo_filter_settings']) && count($new['arlo_filter_settings'])) {
+			foreach($new['arlo_filter_settings'] as $filter_group_name => $filter_group) {
+				foreach ($filter_group as $filter_name => $filter_values) {
+					for ($index = 0; $index < count( $filter_values['filteroldvalue'] ); $index++) {
+						if ( !empty($filter_values['filteroldvalue'][$index]) || !empty($filter_values['filternewvalue'][$index]) ) {
+							$filters[$filter_group_name][$filter_name][ $filter_values['filteroldvalue'][$index] ] = $filter_values['filternewvalue'][$index];
+						}
+					}
+				}
+			}
+		}
+		
+		update_option('arlo_filter_settings', $filters);
+
+
 		// need to check for posts-page change here
 		// loop through each post type and check if the posts-page has changed
 		foreach($new['post_types'] as $id => $post_type) {

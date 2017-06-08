@@ -267,6 +267,18 @@ class Arlo_For_Wordpress_Settings {
 		 
 		add_settings_section('arlo_customcss_section', null, null, $this->plugin_slug );				
 		add_settings_field( 'arlo_customcss', null, array($this, 'arlo_simple_textarea_callback'), $this->plugin_slug, 'arlo_customcss_section', array('id'=>'customcss', 'after_html' => '<p>Learn how to <a href="https://support.arlo.co/hc/en-gb/articles/115001714006" target="_blank">override existing styles</a> by adding <a href="#" class="arlo-settings-link" id="theme_customcss">Custom CSS</a></p>') );
+
+
+		/*
+		 *
+		 * Filters Section Settings
+		 *
+		 */ 
+		 
+		add_settings_section('arlo_filters_section', null, null, $this->plugin_slug );	
+
+		add_settings_field('arlo_filters', null, array($this, 'arlo_filter_settings_callback'), $this->plugin_slug, 'arlo_filters_section',  array('id'=>'filters'));    
+
 		
 		/*
 		 *
@@ -398,7 +410,119 @@ class Arlo_For_Wordpress_Settings {
 		echo $output;
 	}
 	
-	
+	function arlo_filter_settings_callback() {
+		$settings_object = get_option('arlo_settings');
+		$setting_id = 'filter_settings';
+		$filter_settings = get_option('arlo_filter_settings', array());
+		
+		$output = '<div id="'.ARLO_PLUGIN_PREFIX.'-filter-select" class="cf">';
+
+		$output .= '<h3>Filter Settings</h3>';
+
+		$output .= '<label>Select page: </label>';
+
+		$output .= '<select name="arlo_settings['.$setting_id.']" id="arlo-filter-settings">';
+
+		$available_filters = array(
+			'event' => array('location' => 'Location'),
+			'upcoming' => array('category' => 'Category', 'month' => 'Month', 'location' => 'Location', 'delivery' => 'Delivery', 'eventtag' => 'Event tag', 'presenter' => 'Presenter'),
+			'onlineactivities' => array('oatag' => 'Online activity tag', 'category' => 'Category'),
+			'template' => array('category' => 'Category', 'delivery' => 'Delivery', 'location' => 'Location', 'templatetag' => 'Tag')
+		);
+
+		$filter_names = array(
+			'event' => 'Event',
+			'upcoming' => 'Upcoming',
+			'onlineactivities' => 'Online activities',
+			'template' => 'Catalogue'
+		);
+
+		$filters_settings_html = '';
+
+		foreach($available_filters as $filter_group => $filter_group_values) {
+		    $key = ARLO_PLUGIN_PREFIX . '-' . $key;
+		    $selected = $key == $val ? 'selected="selected"' : '';
+		    $output .= '<option ' . $selected . ' value="'.$filter_group.'" >'.$filter_names[$filter_group].'</option>';
+
+		    $filters_settings_html .= '<div id="arlo-' . $filter_group . '-filters" class="arlo-filter-group">';
+
+		    foreach($available_filters[$filter_group] as $filter_key => $filter) {
+		    	$filters_settings_html .= '<div class="arlo-filter-settings">';
+
+		    	$filters_settings_html .= '<h4>' . $filter . '</h4>';
+
+			    $filters_settings_html .= '
+				    <div id="arlo-filters-header">
+						<div class="arlo-filter-old-value">Option text</div>
+						<div class="arlo-filter-new-value">Replacement text</div>
+						<div class="arlo-filter-toggle">Hide this option?</div>
+				    </div>
+			    ';
+
+			    $filters_settings_html .= '
+				    <div id="arlo-filter-empty">
+						<ul>
+							<li>
+								<div class="arlo-filter-old-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][filteroldvalue][]"></div>
+								<div class="arlo-filter-controls">
+									<i class="icons8-minus icons8 size-21"></i>
+									<i class="icons8-plus icons8 size-21"></i>
+								</div>
+								<div class="arlo-filter-new-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][filternewvalue][]"></div>
+							</li>
+						</ul>
+				    </div>
+				    ';
+
+				$filters_settings_html .= '<ul class="arlo-available-filters">';
+
+				$key = 0;
+				if (is_array($filter_settings[$filter_group][$filter_key]) && count($filter_settings[$filter_group][$filter_key])) {
+
+					foreach($filter_settings[$filter_group][$filter_key] as $old_value => $new_value) {
+
+						$filters_settings_html .=  '<li>
+							<div class="arlo-filter-old-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][filteroldvalue][]" value="'.$old_value.'"></div>
+							<div class="arlo-filter-controls">
+								<i class="icons8-minus icons8 size-21"></i>
+								<i class="icons8-plus icons8 size-21"></i>
+							</div>
+							<div class="arlo-filter-new-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][filternewvalue][]" value="' . $new_value . '"></div>
+						  </li>
+						 ';
+					}
+
+				}
+		
+				$filters_settings_html .= '<li>
+						<div class="arlo-filter-old-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][filteroldvalue][]"></div>
+						<div class="arlo-filter-controls">
+							<i class="icons8-minus icons8 size-21"></i>
+							<i class="icons8-plus icons8 size-21"></i>
+						</div>
+						<div class="arlo-filter-new-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][filternewvalue][]"></div>
+				  </li>
+				</ul>';
+
+				$filters_settings_html .= '</div><hr>';
+		    }
+
+
+
+		    $filters_settings_html .= '</div>';
+
+		}
+				
+		$output .= '</select>';
+
+		$output .= $filters_settings_html;
+
+		$output .= '</div>';
+
+		echo $output;
+	}	
+
+
 	function arlo_checkbox_callback($args) {
 		if (empty($args['option_name'])) return;
 		

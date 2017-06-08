@@ -136,13 +136,17 @@ class Shortcodes {
 		
 		if (!in_array($page_name, $valid_page_names) || !(is_array($regions) && count($regions))) return "";
 			
-		$regionselector_html .= self::create_filter('region', $regions);					
+		$regionselector_html .= self::create_filter(null, 'region', $regions);					
 		
 		return $regionselector_html;
 	}
 
-	public static function create_filter($type, $items, $label=null) {
+	public static function create_filter($group, $type, $items, $label=null) {
+		$replace_labels = get_option('arlo_filter_settings')[$group][$type];
+
 		$filter_html = '<select id="arlo-filter-' . esc_attr($type) . '" name="arlo-' . esc_attr($type) . '">';
+
+		$label = $replace_labels[$label] ? $replace_labels[$label] : $label;
 		
 		if (!is_null($label))
 			$filter_html .= '<option value="">' . esc_html($label) . '</option>';
@@ -157,10 +161,12 @@ class Shortcodes {
 					'value' => $key
 				);
 			}
+
+			$value_label = $replace_labels[$item['string']] ? $replace_labels[$item['string']] : $item['string'];
 			
 			$selected = (strlen($selected_value) && $selected_value == $item['value']) ? ' selected="selected"' : '';
 			
-			$filter_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>' . esc_html($item['string']) . '</option>';
+			$filter_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>' . $value_label . '</option>';
 		}
 
 		$filter_html .= '</select>';
