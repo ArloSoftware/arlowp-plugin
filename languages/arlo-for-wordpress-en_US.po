@@ -899,3 +899,35 @@ msgstr ""
 #. Author URI of the plugin/theme
 msgid "http://arlo.co"
 msgstr ""
+
+# Location filter title
+msgid "Location"
+msgstr ""
+
+# Category filter title
+msgid "Category"
+msgstr ""
+
+# Month filter title
+msgid "Month"
+msgstr ""
+
+# Delivery filter title
+msgid "Delivery"
+msgstr ""
+
+# Event tag filter title
+msgid "Event tag"
+msgstr ""
+
+# Presenter filter title
+msgid "Presenter"
+msgstr ""
+
+# Online activity tag filter title
+msgid "Online activity tag"
+msgstr ""
+
+# Tag filter title
+msgid "Tag"
+msgstr ""

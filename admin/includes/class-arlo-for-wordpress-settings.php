@@ -446,10 +446,11 @@ class Arlo_For_Wordpress_Settings {
 
 		    $filters_settings_html .= '<div id="arlo-' . $filter_group . '-filters" class="arlo-filter-group">';
 
+
 		    foreach($available_filters[$filter_group] as $filter_key => $filter) {
 		    	$filters_settings_html .= '<div class="arlo-filter-settings">';
 
-		    	$filters_settings_html .= '<h4>' . $filter . '</h4>';
+		    	$filters_settings_html .= '<h4>' . __($filter,'arlo-for-wordpress') . '</h4>';
 
 			    $filters_settings_html .= '
 				    <div id="arlo-filters-header">
@@ -468,6 +469,12 @@ class Arlo_For_Wordpress_Settings {
 									<i class="icons8-minus icons8 size-21"></i>
 									<i class="icons8-plus icons8 size-21"></i>
 								</div>
+								<div class="arlo-filter-toggle">
+									<select name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][filterhideoption][]">
+										<option value="1" >Show</option>
+										<option value="0" >Hide</option>
+									</select>
+								</div>
 								<div class="arlo-filter-new-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][filternewvalue][]"></div>
 							</li>
 						</ul>
@@ -480,12 +487,25 @@ class Arlo_For_Wordpress_Settings {
 				if (is_array($filter_settings[$filter_group][$filter_key]) && count($filter_settings[$filter_group][$filter_key])) {
 
 					foreach($filter_settings[$filter_group][$filter_key] as $old_value => $new_value) {
+						$is_hidden = false;
+
+						if ($filter_settings["arlohiddenfilters"][$filter_group][$filter_key]) {
+							$is_hidden = in_array($old_value,$filter_settings["arlohiddenfilters"][$filter_group][$filter_key]);
+						}
+
+						$selected = $is_hidden ? ' selected="selected"' : '';
 
 						$filters_settings_html .=  '<li>
 							<div class="arlo-filter-old-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][filteroldvalue][]" value="'.$old_value.'"></div>
 							<div class="arlo-filter-controls">
 								<i class="icons8-minus icons8 size-21"></i>
 								<i class="icons8-plus icons8 size-21"></i>
+							</div>
+							<div class="arlo-filter-toggle">
+								<select name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][filterhideoption][]">
+									<option value="1" >Show</option>
+									<option ' . $selected . 'value="0" >Hide</option>
+								</select>
 							</div>
 							<div class="arlo-filter-new-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][filternewvalue][]" value="' . $new_value . '"></div>
 						  </li>
@@ -499,6 +519,12 @@ class Arlo_For_Wordpress_Settings {
 						<div class="arlo-filter-controls">
 							<i class="icons8-minus icons8 size-21"></i>
 							<i class="icons8-plus icons8 size-21"></i>
+						</div>
+						<div class="arlo-filter-toggle">
+							<select name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][filterhideoption][]">
+								<option value="1" >Show</option>
+								<option value="0" >Hide</option>
+							</select>
 						</div>
 						<div class="arlo-filter-new-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][filternewvalue][]"></div>
 				  </li>

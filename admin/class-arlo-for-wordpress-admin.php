@@ -601,21 +601,33 @@ class Arlo_For_Wordpress_Admin {
 		update_option('arlo_regions', $regions);
 
 
-
 		//normalize filters options
 		$filters = array();
 		if (is_array($new['arlo_filter_settings']) && count($new['arlo_filter_settings'])) {
 			foreach($new['arlo_filter_settings'] as $filter_group_name => $filter_group) {
 				foreach ($filter_group as $filter_name => $filter_values) {
 					for ($index = 0; $index < count( $filter_values['filteroldvalue'] ); $index++) {
-						if ( !empty($filter_values['filteroldvalue'][$index]) || !empty($filter_values['filternewvalue'][$index]) ) {
-							$filters[$filter_group_name][$filter_name][ $filter_values['filteroldvalue'][$index] ] = $filter_values['filternewvalue'][$index];
+
+						$old_value = esc_html($filter_values['filteroldvalue'][$index]);
+						$new_value = esc_html($filter_values['filternewvalue'][$index]);
+
+						if ( !empty($old_value) || !empty($new_value) ) {
+							$filters[$filter_group_name][$filter_name][$old_value] = $new_value;
+						}
+
+						if ( $filter_values["filterhideoption"][$index] == "0" ) {
+
+							if (!isset($filters['arlohiddenfilters'][$filter_group_name][$filter_name])) {
+							    $filters['arlohiddenfilters'][$filter_group_name][$filter_name] = array();
+							}
+
+							array_push($filters['arlohiddenfilters'][$filter_group_name][$filter_name], $old_value);
 						}
 					}
 				}
 			}
 		}
-		
+
 		update_option('arlo_filter_settings', $filters);
 
 

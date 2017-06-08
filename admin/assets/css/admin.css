@@ -659,6 +659,20 @@ a .icons8 {
 	width: 570px;
 }
 
+.arlo-filter-group li > .arlo-filter-toggle {
+	float: right;
+}
+
+.arlo-filter-group li > .arlo-filter-toggle,
+#arlo-filters-header > div.arlo-filter-toggle {
+	width: 118px;
+}
+
+.arlo-filter-group li > .arlo-filter-toggle input {
+	margin: 0 auto;
+	display: block;
+}
+
 
 /* media queries, these match the wordpress admin breakpoints as of WP 3.9 */
 

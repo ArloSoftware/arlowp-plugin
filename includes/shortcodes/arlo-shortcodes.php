@@ -143,6 +143,7 @@ class Shortcodes {
 
 	public static function create_filter($group, $type, $items, $label=null) {
 		$replace_labels = get_option('arlo_filter_settings')[$group][$type];
+		$hidden_filters = get_option('arlo_filter_settings')['arlohiddenfilters'];
 
 		$filter_html = '<select id="arlo-filter-' . esc_attr($type) . '" name="arlo-' . esc_attr($type) . '">';
 
@@ -154,7 +155,6 @@ class Shortcodes {
 		$selected_value = \Arlo\Utilities::clean_string_url_parameter('arlo-' . $type);
 			
 		foreach($items as $key => $item) {
-
 			if (empty($item['string']) && empty($item['value'])) {
 				$item = array(
 					'string' => $item,
@@ -162,11 +162,19 @@ class Shortcodes {
 				);
 			}
 
-			$value_label = $replace_labels[$item['string']] ? $replace_labels[$item['string']] : $item['string'];
-			
-			$selected = (strlen($selected_value) && $selected_value == $item['value']) ? ' selected="selected"' : '';
-			
-			$filter_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>' . $value_label . '</option>';
+			$is_hidden = false;
+
+			if ($hidden_filters[$group][$type]) {
+				$is_hidden = in_array(esc_html($item['string']),$hidden_filters[$group][$type]);
+			}
+
+			if (!$is_hidden) {
+				$value_label = $replace_labels[$item['string']] ? $replace_labels[$item['string']] : $item['string'];
+				
+				$selected = (strlen($selected_value) && $selected_value == $item['value']) ? ' selected="selected"' : '';
+				
+				$filter_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>' . $value_label . '</option>';
+			}
 		}
 
 		$filter_html .= '</select>';
