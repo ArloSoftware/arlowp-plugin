@@ -338,7 +338,7 @@ class Scheduler {
 		}
 
 		return array(
-			'timeout'   => 0.01,
+			'timeout'   => 50,
 			'blocking'  => false,
 			'cookies'   => $_COOKIE,
 			'sslverify' => apply_filters( 'https_local_ssl_verify', false ),
