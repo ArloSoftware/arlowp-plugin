@@ -134,7 +134,7 @@ class Venues {
             'height'	=> 400,
             'width'  	=> 400,
             'zoom'		=> 16,
-            'type'      => 'static'
+            'type'      => 'dynamic'
         ), $atts, $shortcode_name, $import_id));
 
         $name = $GLOBALS['arlo_venue_list_item']['v_name'];
