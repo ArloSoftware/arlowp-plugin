@@ -223,10 +223,23 @@ class OnlineActivities {
             $previous = null;
 
             foreach($items as $item) {
-                if(isset($atts['group']) && $atts['group'] == 'category') {
-                    if(is_null($previous) || $item['c_arlo_id'] != $previous['c_arlo_id']) {
-                        $item['show_divider'] = $item['c_name'];
+                if(isset($atts['group'])) {
+
+                    switch($atts['group']) {
+                        case 'category':
+                            if(is_null($previous) || $item['c_arlo_id'] != $previous['c_arlo_id']) {
+                                $item['show_divider'] = $item['c_name'];
+                            }
+                        break;
+                        case 'alpha':
+                            if(is_null($previous) || strtolower(mb_substr($item['oa_name'], 0, 1)) != strtolower(mb_substr($previous['oa_name'], 0, 1))) {
+                                $item['show_divider'] = mb_substr($item['oa_name'], 0, 1);
+                            }
+                        break;
                     }
+
+
+
                 }
 
                 $GLOBALS['arlo_eventtemplate'] = $item;
@@ -264,6 +277,7 @@ class OnlineActivities {
         $t3 = "{$wpdb->prefix}arlo_eventtemplates_categories";
         $t4 = "{$wpdb->prefix}arlo_onlineactivities_tags";
         $t5 = "{$wpdb->prefix}arlo_categories";
+        $t6 = "{$wpdb->prefix}arlo_eventtemplates_tags";
 
         if (!empty($arlo_region)) {
             $where .= '" AND ' . $t1 . '.oa_region = "' . $arlo_region . '"';
@@ -271,6 +285,7 @@ class OnlineActivities {
 
         $arlo_category = \Arlo\Utilities::clean_int_url_parameter('arlo-category');
         $arlo_tag = \Arlo\Utilities::clean_int_url_parameter('arlo-oatag');
+        $arlo_templatetag = \Arlo\Utilities::clean_int_url_parameter('arlo-templatetag');
 
         if(!empty($arlo_category)) :
             $join .= " LEFT JOIN $t3 et_category ON et_category.et_arlo_id = oa.oat_arlo_id";
@@ -284,6 +299,14 @@ class OnlineActivities {
 
             $where .= " AND oa_tag.tag_id = %d";
             $parameters[] = $arlo_tag;
+        endif;
+
+        if(!empty($arlo_templatetag)) :
+            $join .= " LEFT JOIN $t6 ett ON ett.et_id = et.et_id AND ett.import_id = et.import_id";
+            
+            $where .= " AND ett.tag_id = %d";
+
+            $parameters[] = $arlo_templatetag;
         endif;
 
         $field_list = '
@@ -320,6 +343,8 @@ class OnlineActivities {
             $limit_field = "
             LIMIT 
                 $offset, $limit";
+
+            $order = "ORDER BY oa.oa_name ASC";
         }   
 
         $sql = 
@@ -349,9 +374,11 @@ class OnlineActivities {
             WHERE
                 oa.import_id = ". $import_id ."
             $where
+            $order
             $limit_field
             ";
         
+
         return $wpdb->prepare($sql, $parameters);
     }  
 
@@ -360,7 +387,7 @@ class OnlineActivities {
         global $post, $wpdb;
 
         extract(shortcode_atts(array(
-            'filters'   => 'category,oatag',
+            'filters'   => 'category',
             'resettext' => __('Reset', 'arlo-for-wordpress'),
             'buttonclass'   => 'button'
         ), $atts, $shortcode_name, $import_id));
@@ -420,6 +447,38 @@ class OnlineActivities {
 
                     $filter_html .= Shortcodes::create_filter($filter_group, $filter, $tags, __('Select tag', 'arlo-for-wordpress'));              
 
+                    break;
+
+                case 'templatetag' :
+                    //template tag select
+                    
+                    $items = $wpdb->get_results(
+                        "SELECT DISTINCT
+                            t.id,
+                            t.tag
+                        FROM 
+                            {$wpdb->prefix}arlo_eventtemplates_tags AS ett
+                        LEFT JOIN 
+                            {$wpdb->prefix}arlo_tags AS t
+                        ON
+                            t.id = ett.tag_id
+                        AND
+                            t.import_id = ett.import_id
+                        WHERE 
+                            ett.import_id = $import_id
+                        ORDER BY tag", ARRAY_A);
+
+                    $tags = array();
+                    
+                    foreach ($items as $item) {
+                        $tags[] = array(
+                            'string' => $item['tag'],
+                            'value' => $item['id'] . '-' . $item['tag'],
+                        );
+                    }
+
+                    $filter_html .= Shortcodes::create_filter($filter_group, $filter, $tags, __('Select tag', 'arlo-for-wordpress'));               
+                    
                     break;
 
             endswitch;
