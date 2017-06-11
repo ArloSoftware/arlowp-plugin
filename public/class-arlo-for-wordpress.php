@@ -296,6 +296,51 @@ class Arlo_For_Wordpress {
     );
 
 	/**
+	 * $available_filters: defines the available filters for the plugin
+	 *
+	 * @since    1.0.0
+	 *
+	 * @var      array
+	 */
+
+	public static  $available_filters = array(
+		'event' => array(
+			'name' => 'Event',
+			'filters' => array(
+				'location' => 'Location'
+			)
+		),
+		'upcoming' => array(
+			'name' => 'Upcoming',
+			'filters' => array(
+				'category' => 'Category', 
+				'month' => 'Month', 
+				'location' => 'Location', 
+				'delivery' => 'Delivery', 
+				'eventtag' => 'Event tag', 
+				'presenter' => 'Presenter'
+			)
+		),
+		'onlineactivities' => array(
+			'name' => 'Online activities',
+			'filters' => array(
+				'oatag' => 'Online activity tag', 
+				'category' => 'Category'
+			)
+		),
+		'template' => array(
+			'name' => 'Catalogue',
+			'filters' => array(
+				'category' => 'Category', 
+				'delivery' => 'Delivery', 
+				'location' => 'Location', 
+				'templatetag' => 'Tag'
+			)
+		)
+	);
+
+
+	/**
 	 * Initialize the plugin by setting localization and loading public scripts
 	 * and styles.
 	 *
@@ -837,10 +882,8 @@ class Arlo_For_Wordpress {
 		$page_id = (empty($obj->ID) ? $page_id : $obj->ID);	
 		
 		$filter_enabled_page_ids = [];
-		
-		$filter_enabled_arlo_pages = ['upcoming', 'event', 'onlineactivities'];
-				
-		foreach($filter_enabled_arlo_pages as $page) {
+						
+		foreach($this::$available_filters as $page => $filters) {
 			if (!empty($settings['post_types'][$page]['posts_page'])) {
 				$filter_enabled_page_ids[] = intval($settings['post_types'][$page]['posts_page']);
 			}			

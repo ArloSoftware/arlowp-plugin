@@ -136,19 +136,21 @@ class Shortcodes {
 		
 		if (!in_array($page_name, $valid_page_names) || !(is_array($regions) && count($regions))) return "";
 			
-		$regionselector_html .= self::create_filter(null, 'region', $regions);					
+		$regionselector_html .= self::create_filter('region', $regions);
 		
 		return $regionselector_html;
 	}
 
-	public static function create_filter($group, $type, $items, $label=null) {
-		$replace_labels = get_option('arlo_filter_settings')[$group][$type];
+	public static function create_filter($type, $items, $label=null, $group=null) {
+		if ($group != null) {
+			$replace_labels = get_option('arlo_filter_settings')[$group][$type];
+			$label = $replace_labels[$label] ? $replace_labels[$label] : $label;
+		}
+
 		$hidden_filters = get_option('arlo_filter_settings')['arlohiddenfilters'];
 
 		$filter_html = '<select id="arlo-filter-' . esc_attr($type) . '" name="arlo-' . esc_attr($type) . '">';
 
-		$label = $replace_labels[$label] ? $replace_labels[$label] : $label;
-		
 		if (!is_null($label))
 			$filter_html .= '<option value="">' . esc_html($label) . '</option>';
 
@@ -169,11 +171,15 @@ class Shortcodes {
 			}
 
 			if (!$is_hidden) {
-				$value_label = $replace_labels[$item['string']] ? $replace_labels[$item['string']] : $item['string'];
-				
+				$value_label = $item['string'];
+
+				if ($replace_labels != null) {
+					$value_label = $replace_labels[$item['string']] ? $replace_labels[$item['string']] : $value_label;
+				}
+
 				$selected = (strlen($selected_value) && $selected_value == $item['value']) ? ' selected="selected"' : '';
 				
-				$filter_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>' . $value_label . '</option>';
+				$filter_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>' . esc_html($value_label) . '</option>';
 			}
 		}
 

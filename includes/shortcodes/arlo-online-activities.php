@@ -414,7 +414,7 @@ class OnlineActivities {
                     }
 
                     if (is_array($cats)) {
-                        $filter_html .= Shortcodes::create_filter($filter_group, $filter, CategoriesEntity::child_categories($cats), __('All categories', 'arlo-for-wordpress'));                  
+                        $filter_html .= Shortcodes::create_filter($filter, CategoriesEntity::child_categories($cats), __('All categories', 'arlo-for-wordpress'),$filter_group);                  
                     }
 
                     break;
@@ -445,7 +445,7 @@ class OnlineActivities {
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter_group, $filter, $tags, __('Select tag', 'arlo-for-wordpress'));              
+                    $filter_html .= Shortcodes::create_filter($filter, $tags, __('Select tag', 'arlo-for-wordpress'),$filter_group);              
 
                     break;
 
@@ -477,7 +477,7 @@ class OnlineActivities {
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter_group, $filter, $tags, __('Select tag', 'arlo-for-wordpress'));               
+                    $filter_html .= Shortcodes::create_filter($filter, $tags, __('Select tag', 'arlo-for-wordpress'),$filter_group);               
                     
                     break;
 

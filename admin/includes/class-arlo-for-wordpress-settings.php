@@ -423,31 +423,19 @@ class Arlo_For_Wordpress_Settings {
 
 		$output .= '<select name="arlo_settings['.$setting_id.']" id="arlo-filter-settings">';
 
-		$available_filters = array(
-			'event' => array('location' => 'Location'),
-			'upcoming' => array('category' => 'Category', 'month' => 'Month', 'location' => 'Location', 'delivery' => 'Delivery', 'eventtag' => 'Event tag', 'presenter' => 'Presenter'),
-			'onlineactivities' => array('oatag' => 'Online activity tag', 'category' => 'Category'),
-			'template' => array('category' => 'Category', 'delivery' => 'Delivery', 'location' => 'Location', 'templatetag' => 'Tag')
-		);
-
-		$filter_names = array(
-			'event' => 'Event',
-			'upcoming' => 'Upcoming',
-			'onlineactivities' => 'Online activities',
-			'template' => 'Catalogue'
-		);
+		$available_filters = Arlo_For_Wordpress::$available_filters;
 
 		$filters_settings_html = '';
 
 		foreach($available_filters as $filter_group => $filter_group_values) {
 		    $key = ARLO_PLUGIN_PREFIX . '-' . $key;
 		    $selected = $key == $val ? 'selected="selected"' : '';
-		    $output .= '<option ' . $selected . ' value="'.$filter_group.'" >'.$filter_names[$filter_group].'</option>';
+		    $output .= '<option ' . $selected . ' value="'.$filter_group.'" >'.$filter_group_values['name'].'</option>';
 
 		    $filters_settings_html .= '<div id="arlo-' . $filter_group . '-filters" class="arlo-filter-group">';
 
 
-		    foreach($available_filters[$filter_group] as $filter_key => $filter) {
+		    foreach($available_filters[$filter_group]['filters'] as $filter_key => $filter) {
 		    	$filters_settings_html .= '<div class="arlo-filter-settings">';
 
 		    	$filters_settings_html .= '<h4>' . __($filter,'arlo-for-wordpress') . '</h4>';

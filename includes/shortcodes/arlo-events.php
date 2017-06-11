@@ -88,7 +88,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter_group, $filter, $locations, $locationfilterlabel);
+                    $filter_html .= Shortcodes::create_filter($filter, $locations, $locationfilterlabel, $filter_group);
 
                     break;
 
