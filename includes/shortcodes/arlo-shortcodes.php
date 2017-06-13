@@ -29,6 +29,10 @@ class Shortcodes {
 			return self::shortcode_search_field($content, $atts, $shortcode_name, $import_id);	
 		});
 
+		self::add('upcoming_widget', function($content = '', $atts, $shortcode_name, $import_id){
+			return self::shortcode_upcoming_widget($content, $atts, $shortcode_name, $import_id);	
+		});
+
 		// label
 		self::add('label', function($content = '', $atts, $shortcode_name, $import_id){
 			return $content;
@@ -186,6 +190,24 @@ class Shortcodes {
 		$filter_html .= '</select>';
 
 		return $filter_html;
+	}
+
+	private static function shortcode_upcoming_widget($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+		extract(shortcode_atts(array(
+			'title' => '',
+			'limit' => 5,
+			'eventtag' => '',
+			'templatetag' => ''
+        ), $atts, $shortcode_name, $import_id));
+
+        return the_widget(Arlo_For_Wordpress_Upcoming_Widget,array(
+        	'number' => $limit,
+        	'title' => $title,
+        	'eventtag' => $eventtag,
+        	'templatetag' => $templatetag,
+        	'template' => $content
+        ));
+
 	}
 
 	private static function shortcode_search_field($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
