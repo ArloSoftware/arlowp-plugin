@@ -141,6 +141,17 @@ class Venues {
         $lat = $GLOBALS['arlo_venue_list_item']['v_geodatapointlatitude'];
         $long = $GLOBALS['arlo_venue_list_item']['v_geodatapointlongitude'];
 
+        $query = '';
+        $query .= $GLOBALS['arlo_venue_list_item']["v_physicaladdressline1"] ? $GLOBALS['arlo_venue_list_item']["v_physicaladdressline1"] : ""; 
+        $query .= $GLOBALS['arlo_venue_list_item']["v_physicaladdressline2"] ? ", " . $GLOBALS['arlo_venue_list_item']["v_physicaladdressline2"] : ""; 
+        $query .= $GLOBALS['arlo_venue_list_item']["v_physicaladdressline3"] ? ", " . $GLOBALS['arlo_venue_list_item']["v_physicaladdressline3"] : ""; 
+        $query .= $GLOBALS['arlo_venue_list_item']["v_physicaladdressline4"] ? ", " . $GLOBALS['arlo_venue_list_item']["v_physicaladdressline4"] : ""; 
+        $query .= $GLOBALS['arlo_venue_list_item']["v_physicaladdresssuburb"] ? ", " . $GLOBALS['arlo_venue_list_item']["v_physicaladdresssuburb"] : ""; 
+        $query .= $GLOBALS['arlo_venue_list_item']["v_physicaladdresscity"] ? ", " . $GLOBALS['arlo_venue_list_item']["v_physicaladdresscity"] : ""; 
+        $query .= $GLOBALS['arlo_venue_list_item']["v_physicaladdressstate"] ? ", " . $GLOBALS['arlo_venue_list_item']["v_physicaladdressstate"] : ""; 
+        $query .= $GLOBALS['arlo_venue_list_item']["v_physicaladdresspostcode"] ? ", " . $GLOBALS['arlo_venue_list_item']["v_physicaladdresspostcode"] : ""; 
+        $query .= $GLOBALS['arlo_venue_list_item']["v_physicaladdresscountry"] ? ", " . $GLOBALS['arlo_venue_list_item']["v_physicaladdresscountry"] : "";
+
         if($lat != 0 || $long != 0) {
             if ($type == 'static') {
                 if(intval($height) <= 0) $height = 400;
@@ -164,7 +175,7 @@ class Venues {
                 if(intval($width) <= 0) $width = 400;
 
                 $map = '<iframe src="https://www.google.com/maps/embed/v1/place?q=' ;
-                $map .= $lat . ',' . $long;
+                $map .= $query;
                 $map .= '&zoom=' . $zoom;
                 $map .= '&key=' . $api_key ;
                 $map .= '"';
