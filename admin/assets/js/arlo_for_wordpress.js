@@ -139,6 +139,13 @@ if (typeof (Arlo) === "undefined") {
 		addFilter: function(parent) {
 			var newElement = parent.parent().find('#arlo-filter-empty ul li').clone();
 
+			var setting_id = Math.floor(Math.random() * 1000000);
+
+			newElement.find('input').each( function(index,element) {
+				var name = $(element).attr('name').replace('setting_id',setting_id);
+				$(element).attr('name',name);
+			});
+
 			if (newElement.length == 1) {
 				parent.append(newElement);
 			}

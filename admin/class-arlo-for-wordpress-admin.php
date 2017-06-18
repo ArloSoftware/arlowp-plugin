@@ -605,23 +605,29 @@ class Arlo_For_Wordpress_Admin {
 		$filters = array();
 		if (is_array($new['arlo_filter_settings']) && count($new['arlo_filter_settings'])) {
 			foreach($new['arlo_filter_settings'] as $filter_group_name => $filter_group) {
-				foreach ($filter_group as $filter_name => $filter_values) {
-					for ($index = 0; $index < count( $filter_values['filteroldvalue'] ); $index++) {
-
-						$old_value = esc_html($filter_values['filteroldvalue'][$index]);
-						$new_value = esc_html($filter_values['filternewvalue'][$index]);
+				foreach ($filter_group as $filter_name => $filter_settings) {
+					foreach ($filter_settings as $filter_setting_id => $filter_setting) {
+						$old_value = esc_html($filter_setting['filteroldvalue']);
+						$new_value = esc_html($filter_setting['filternewvalue']);
 
 						if ( !empty($old_value) || !empty($new_value) ) {
 							$filters[$filter_group_name][$filter_name][$old_value] = $new_value;
 						}
 
-						if ( $filter_values["filterhideoption"][$index] == "0" ) {
-
+						if ( $filter_setting["filterhideoption"] == "hidden" ) {
 							if (!isset($filters['arlohiddenfilters'][$filter_group_name][$filter_name])) {
 							    $filters['arlohiddenfilters'][$filter_group_name][$filter_name] = array();
 							}
 
 							array_push($filters['arlohiddenfilters'][$filter_group_name][$filter_name], $old_value);
+						} else {
+							if ($filters['arlohiddenfilters'][$filter_group_name][$filter_name] !== null) {
+								$old_value_index = array_search($old_value, $filters['arlohiddenfilters'][$filter_group_name][$filter_name]);
+
+								if ($old_value_index) {
+									unset( $filters['arlohiddenfilters'][$filter_group_name][$filter_name][$old_value_index] );
+								}
+							}
 						}
 					}
 				}
