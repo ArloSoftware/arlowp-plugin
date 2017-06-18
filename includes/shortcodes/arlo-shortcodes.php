@@ -29,8 +29,8 @@ class Shortcodes {
 			return self::shortcode_search_field($content, $atts, $shortcode_name, $import_id);	
 		});
 
-		self::add('upcoming_widget', function($content = '', $atts, $shortcode_name, $import_id){
-			return self::shortcode_upcoming_widget($content, $atts, $shortcode_name, $import_id);	
+		self::add('upcoming_widget_list', function($content = '', $atts, $shortcode_name, $import_id){
+			return self::shortcode_upcoming_widget_list($content, $atts, $shortcode_name, $import_id);	
 		});
 
 		// label
@@ -192,22 +192,27 @@ class Shortcodes {
 		return $filter_html;
 	}
 
-	private static function shortcode_upcoming_widget($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-		extract(shortcode_atts(array(
-			'title' => '',
-			'limit' => 5,
+	private static function shortcode_upcoming_widget_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+		$atts = shortcode_atts(array(
 			'eventtag' => '',
-			'templatetag' => ''
-        ), $atts, $shortcode_name, $import_id));
+			'limit' => ''
+        ), $atts, $shortcode_name, $import_id);
 
-        return the_widget(Arlo_For_Wordpress_Upcoming_Widget,array(
-        	'number' => $limit,
-        	'title' => $title,
-        	'eventtag' => $eventtag,
-        	'templatetag' => $templatetag,
-        	'template' => $content
-        ));
+		$limit = '';
+		if (!empty($atts['limit'])) {
+			$limit = " limit='".$atts['limit']."' ";
+		}
 
+		$eventtag = '';
+		if (!empty($atts['eventtag'])) {
+			$eventtag = " eventtag='".$atts['eventtag']."' ";
+		}
+
+        $template = $content ? $content : arlo_get_template('upcoming_widget');
+
+		$shortcode = "<ul class='arlo-widget-upcoming arlo-list'>[arlo_upcoming_list_item $limit $eventtag]".$template."[/arlo_upcoming_list_item]</ul>";
+
+        return do_shortcode($shortcode);
 	}
 
 	private static function shortcode_search_field($content = '', $atts = [], $shortcode_name = '', $import_id = '') {

@@ -46,13 +46,25 @@ class UpcomingEvents {
 
     private static function shortcode_upcoming_list_item($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $wpdb;
+
         $settings = get_option('arlo_settings');
 
         $output = '';
 
-        $sql = self::generate_list_sql($atts, $import_id);	
+        $args = func_get_args();
+                
+        $cache_key = md5(serialize($args));
+        $cache_category = 'ArloUpcomingListItem';
+
+        if($cached = wp_cache_get($cache_key, $cache_category)) {
+            return $cached;
+        }
+
+        $sql = self::generate_list_sql($atts, $import_id);
              
         $items = $wpdb->get_results($sql, ARRAY_A);
+
+        wp_cache_add( $cache_key, $items, $cache_category, 30 );
 
         if(empty($items)) :
         
@@ -289,7 +301,7 @@ class UpcomingEvents {
         $arlo_category = \Arlo\Utilities::clean_string_url_parameter('arlo-category');
         $arlo_delivery = \Arlo\Utilities::clean_int_url_parameter('arlo-delivery');
         $arlo_month = \Arlo\Utilities::clean_string_url_parameter('arlo-month');
-        $arlo_eventtag = \Arlo\Utilities::clean_string_url_parameter('arlo-eventtag');
+        $arlo_eventtag = isset($atts['eventtag']) ? $atts['eventtag'] : \Arlo\Utilities::clean_string_url_parameter('arlo-eventtag');
         $arlo_presenter = \Arlo\Utilities::clean_string_url_parameter('arlo-presenter');
         $arlo_region = get_query_var('arlo-region', '');
         $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');        
@@ -309,6 +321,22 @@ class UpcomingEvents {
         if(!empty($arlo_category)) :
             $where .= ' AND c.c_arlo_id = %d';
             $parameters[] = intval(current(explode('-', $arlo_category)));
+
+            $join .= "LEFT JOIN 
+                    $t5 etc
+                        ON 
+                            etc.et_arlo_id = et.et_arlo_id 
+                        AND 
+                            etc.import_id = et.import_id
+
+                    LEFT JOIN 
+                    $t6 c
+                        ON 
+                            c.c_arlo_id = etc.c_arlo_id
+                        AND
+                            c.import_id = etc.import_id
+                ";
+
         endif;
 
         if(isset($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) :
@@ -343,8 +371,7 @@ class UpcomingEvents {
 
         $field_list = '
                 DISTINCT e.e_id, 
-                e.e_locationname, 
-                c.c_arlo_id
+                e.e_locationname
             ';
         $limit_field = $order = '';
 
@@ -392,8 +419,7 @@ class UpcomingEvents {
             o_offeramounttaxinclusive, 
             o.o_taxrateshortcode, 
             v.v_post_name, 
-            v.v_post_id,
-            c.c_arlo_id            
+            v.v_post_id   
             ';
 
             $order = '
@@ -403,7 +429,7 @@ class UpcomingEvents {
             $limit_field = "
             LIMIT 
                 $offset, $limit";
-        }	
+        }
         
         $sql = "
         SELECT DISTINCT
@@ -434,22 +460,10 @@ class UpcomingEvents {
             ) o
         ON 
             e.e_id = o.e_id
-        LEFT JOIN 
-            $t5 etc
-        ON 
-            et.et_arlo_id = etc.et_arlo_id 
-        AND 
-            et.import_id = etc.import_id
-        LEFT JOIN 
-            $t6 c
-        ON 
-            c.c_arlo_id = etc.c_arlo_id
-        AND
-            c.import_id = etc.import_id
         $join
         $where
         GROUP BY 
-            etc.et_arlo_id, e.e_id
+            et.et_arlo_id, e.e_id
         $order
         $limit_field";
 
