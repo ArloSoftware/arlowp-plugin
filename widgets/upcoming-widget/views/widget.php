@@ -17,7 +17,7 @@
 
     $template = $instance['template'] ? $instance['template'] : arlo_get_template('upcoming_widget');
 
-	$shortcode = "<ul class='arlo-widget-upcoming arlo-list'>[arlo_upcoming_list_item $limit $eventtag]".$template."[/arlo_upcoming_list_item]</ul>";
+    $content = "[arlo_upcoming_widget_list $limit $eventtag]" . $template . "[/arlo_upcoming_widget_list]";
 
 	// output the events list
-	echo do_shortcode($shortcode);
+	echo do_shortcode($content);

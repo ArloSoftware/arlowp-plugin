@@ -4,6 +4,8 @@ namespace Arlo\Shortcodes;
 use Arlo\Entities\Categories as CategoriesEntity;
 
 class UpcomingEvents {
+    private static $upcoming_list_item_atts;
+
     public static function init() {
         $class = new \ReflectionClass(__CLASS__);
 
@@ -24,7 +26,19 @@ class UpcomingEvents {
 
     private static function shortcode_upcoming_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
+
+        $region = get_query_var('arlo-region', '');
         
+        self::$upcoming_list_item_atts = array(
+            'location' => \Arlo\Utilities::clean_string_url_parameter('arlo-location'),
+            'category' => \Arlo\Utilities::clean_string_url_parameter('arlo-category'),
+            'delivery' => \Arlo\Utilities::clean_int_url_parameter('arlo-delivery'),
+            'month' => \Arlo\Utilities::clean_string_url_parameter('arlo-month'),
+            'eventtag' => isset($atts['eventtag']) ? $atts['eventtag'] : \Arlo\Utilities::clean_string_url_parameter('arlo-eventtag'),
+            'presenter' => \Arlo\Utilities::clean_string_url_parameter('arlo-presenter'),
+            'region' => (!empty($region) && \Arlo\Utilities::array_ikey_exists($region, $regions) ? $region : '')
+        );
+
         $templates = arlo_get_option('templates');
         $content = $templates['upcoming']['html'];
         return do_shortcode($content);        
@@ -35,14 +49,47 @@ class UpcomingEvents {
         
         $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
 
+        if (empty($atts)) {
+            $atts = [];
+        }
+
+        if (empty(self::$upcoming_list_item_atts)) {
+            self::$upcoming_list_item_atts = [];
+        }
+
+        $atts = array_merge($atts,self::$upcoming_list_item_atts);
+
         $sql = self::generate_list_sql($atts, $import_id, true);        
 
         $items = $wpdb->get_results($sql, ARRAY_A);
-            
+        
         $num = $wpdb->num_rows;
 
         return arlo_pagination($num,$limit);        
     }  
+
+    private static function shortcode_upcoming_widget_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        $atts = shortcode_atts(array(
+            'eventtag' => '',
+            'limit' => ''
+        ), $atts, $shortcode_name, $import_id);
+
+        if (!empty($atts['limit'])) {
+            self::$upcoming_list_item_atts = array(
+                'limit' => $atts['limit']
+            );
+        }
+
+        if (!empty($atts['eventtag'])) {
+            self::$upcoming_list_item_atts = array(
+                'eventtag' => $atts['eventtag']
+            );
+        }
+
+        $template = $content ? $content : arlo_get_template('upcoming_widget');
+
+        return do_shortcode($template);
+    }
 
     private static function shortcode_upcoming_list_item($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $wpdb;
@@ -52,19 +99,20 @@ class UpcomingEvents {
         $output = '';
 
         $args = func_get_args();
-                
-        $cache_key = md5(serialize($args));
-        $cache_category = 'ArloUpcomingListItem';
 
-        if($cached = wp_cache_get($cache_key, $cache_category)) {
-            return $cached;
+        if (empty($atts)) {
+            $atts = [];
         }
 
-        $sql = self::generate_list_sql($atts, $import_id);
-             
-        $items = $wpdb->get_results($sql, ARRAY_A);
+        if (empty(self::$upcoming_list_item_atts)) {
+            self::$upcoming_list_item_atts = [];
+        }
 
-        wp_cache_add( $cache_key, $items, $cache_category, 30 );
+        $atts = array_merge($atts,self::$upcoming_list_item_atts);
+
+        $sql = self::generate_list_sql($atts, $import_id);
+
+        $items = $wpdb->get_results($sql, ARRAY_A);
 
         if(empty($items)) :
         
@@ -72,7 +120,6 @@ class UpcomingEvents {
             $output = '<p class="arlo-no-results">' . $no_event_text . '</p>';
             
         else :
-
             $previous = null;
             foreach($items as $item) {
 
@@ -297,15 +344,14 @@ class UpcomingEvents {
         $where = 'WHERE CURDATE() < DATE(e.e_startdatetime)  AND e_parent_arlo_id = 0 AND e.import_id = %d';
         $parameters[] = $import_id;
 
-        $arlo_location = \Arlo\Utilities::clean_string_url_parameter('arlo-location');
-        $arlo_category = \Arlo\Utilities::clean_string_url_parameter('arlo-category');
-        $arlo_delivery = \Arlo\Utilities::clean_int_url_parameter('arlo-delivery');
-        $arlo_month = \Arlo\Utilities::clean_string_url_parameter('arlo-month');
-        $arlo_eventtag = isset($atts['eventtag']) ? $atts['eventtag'] : \Arlo\Utilities::clean_string_url_parameter('arlo-eventtag');
-        $arlo_presenter = \Arlo\Utilities::clean_string_url_parameter('arlo-presenter');
-        $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');        
-        
+        $arlo_location = !empty($atts['location']) ? $atts['location'] : null;
+        $arlo_category = !empty($atts['category']) ? $atts['category'] : null;
+        $arlo_delivery = !empty($atts['delivery']) ? $atts['delivery'] : null;
+        $arlo_month = !empty($atts['month']) ? $atts['month'] : null;
+        $arlo_eventtag = !empty($atts['eventtag']) ? $atts['eventtag'] : null;
+        $arlo_presenter = !empty($atts['presenter']) ? $atts['presenter'] : null;
+        $arlo_region = !empty($atts['region']) ? $atts['region'] : null;
+
         if(!empty($arlo_month)) :
             $dates = explode(':',urldecode($arlo_month));
             $where .= ' AND (DATE(e.e_startdatetime) BETWEEN DATE(%s) AND DATE(%s))';
