@@ -614,14 +614,14 @@ class Arlo_For_Wordpress_Admin {
 							$filters[$filter_group_name][$filter_name][$old_value] = $new_value;
 						}
 
-						if ( $filter_setting["filterhideoption"] == "hidden" ) {
+						if ( !empty($filter_setting["filterhideoption"]) ) {
 							if (!isset($filters['arlohiddenfilters'][$filter_group_name][$filter_name])) {
 							    $filters['arlohiddenfilters'][$filter_group_name][$filter_name] = array();
 							}
 
 							array_push($filters['arlohiddenfilters'][$filter_group_name][$filter_name], $old_value);
 						} else {
-							if ($filters['arlohiddenfilters'][$filter_group_name][$filter_name] !== null) {
+							if (!empty($filters['arlohiddenfilters'][$filter_group_name][$filter_name])) {
 								$old_value_index = array_search($old_value, $filters['arlohiddenfilters'][$filter_group_name][$filter_name]);
 
 								if ($old_value_index) {

@@ -45,11 +45,11 @@ class ThemeManager {
 
 			//internal resources
 			$settings_object->internalResources = new \stdClass();
-			$settings_object->internalResources->stylesheets = array_map(function($stylesheet_path) use($plugin_dir, $plugin_url) {
+			$settings_object->internalResources->stylesheets = array_map(function($stylesheet_path) {
 				return str_replace($this->themes_path, $this->themes_url, $stylesheet_path);
 			}, glob($theme_dir . "/css/*.{css,CSS}", GLOB_BRACE));
 
-			$settings_object->internalResources->javascripts = array_map(function($script_path) use($plugin_dir, $plugin_url) {
+			$settings_object->internalResources->javascripts = array_map(function($script_path) {
 				return str_replace($this->themes_path, $this->themes_url, $script_path);
 			}, glob($theme_dir . "/js/*.{js,JS}", GLOB_BRACE));			
 

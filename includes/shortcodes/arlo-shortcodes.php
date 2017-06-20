@@ -29,10 +29,6 @@ class Shortcodes {
 			return self::shortcode_search_field($content, $atts, $shortcode_name, $import_id);	
 		});
 
-		self::add('upcoming_widget_list', function($content = '', $atts, $shortcode_name, $import_id){
-			return self::shortcode_upcoming_widget_list($content, $atts, $shortcode_name, $import_id);	
-		});
-
 		// label
 		self::add('label', function($content = '', $atts, $shortcode_name, $import_id){
 			return $content;
@@ -146,12 +142,13 @@ class Shortcodes {
 	}
 
 	public static function create_filter($type, $items, $label=null, $group=null) {
-		if ($group != null) {
-			$replace_labels = get_option('arlo_filter_settings')[$group][$type];
-			$label = $replace_labels[$label] ? $replace_labels[$label] : $label;
+		if (!empty(get_option('arlo_filter_settings')[$group][$type][$label]) ) {
+			$label = get_option('arlo_filter_settings')[$group][$type][$label];
 		}
 
-		$hidden_filters = get_option('arlo_filter_settings')['arlohiddenfilters'];
+		if (!empty(get_option('arlo_filter_settings')['arlohiddenfilters'])) {
+			$hidden_filters = get_option('arlo_filter_settings')['arlohiddenfilters'];
+		}
 
 		$filter_html = '<select id="arlo-filter-' . esc_attr($type) . '" name="arlo-' . esc_attr($type) . '">';
 
@@ -169,50 +166,26 @@ class Shortcodes {
 			}
 
 			$is_hidden = false;
-
-			if ($hidden_filters[$group][$type]) {
+			if (!empty($hidden_filters[$group][$type])) {
 				$is_hidden = in_array(esc_html($item['string']),$hidden_filters[$group][$type]);
 			}
 
 			if (!$is_hidden) {
-				$value_label = $item['string'];
+				$value_label = esc_html($item['string']);
 
-				if ($replace_labels != null) {
-					$value_label = $replace_labels[$item['string']] ? $replace_labels[$item['string']] : $value_label;
+				if (!empty(get_option('arlo_filter_settings')[$group][$type][$value_label])) {
+					$value_label = get_option('arlo_filter_settings')[$group][$type][$value_label];
 				}
 
 				$selected = (strlen($selected_value) && $selected_value == $item['value']) ? ' selected="selected"' : '';
 				
-				$filter_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>' . esc_html($value_label) . '</option>';
+				$filter_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>' . $value_label . '</option>';
 			}
 		}
 
 		$filter_html .= '</select>';
 
 		return $filter_html;
-	}
-
-	private static function shortcode_upcoming_widget_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-		$atts = shortcode_atts(array(
-			'eventtag' => '',
-			'limit' => ''
-        ), $atts, $shortcode_name, $import_id);
-
-		$limit = '';
-		if (!empty($atts['limit'])) {
-			$limit = " limit='".$atts['limit']."' ";
-		}
-
-		$eventtag = '';
-		if (!empty($atts['eventtag'])) {
-			$eventtag = " eventtag='".$atts['eventtag']."' ";
-		}
-
-        $template = $content ? $content : arlo_get_template('upcoming_widget');
-
-		$shortcode = "<ul class='arlo-widget-upcoming arlo-list'>[arlo_upcoming_list_item $limit $eventtag]".$template."[/arlo_upcoming_list_item]</ul>";
-
-        return do_shortcode($shortcode);
 	}
 
 	private static function shortcode_search_field($content = '', $atts = [], $shortcode_name = '', $import_id = '') {

@@ -423,19 +423,14 @@ class Arlo_For_Wordpress_Settings {
 
 		$output .= '<select name="arlo_settings['.$setting_id.']" id="arlo-filter-settings">';
 
-		$available_filters = Arlo_For_Wordpress::$available_filters;
-
 		$filters_settings_html = '';
 
-		foreach($available_filters as $filter_group => $filter_group_values) {
-		    $key = ARLO_PLUGIN_PREFIX . '-' . $key;
-		    $selected = $key == $val ? 'selected="selected"' : '';
-		    $output .= '<option ' . $selected . ' value="'.$filter_group.'" >'.$filter_group_values['name'].'</option>';
+		foreach(Arlo_For_Wordpress::$available_filters as $filter_group => $filter_group_values) {
+		    $output .= '<option value="'.$filter_group.'" >'.$filter_group_values['name'].'</option>';
 
 		    $filters_settings_html .= '<div id="arlo-' . $filter_group . '-filters" class="arlo-filter-group">';
 
-
-		    foreach($available_filters[$filter_group]['filters'] as $filter_key => $filter) {
+		    foreach($filter_group_values['filters'] as $filter_key => $filter) {
 		    	$filters_settings_html .= '<div class="arlo-filter-settings">';
 
 		    	$filters_settings_html .= '<h4>' . __($filter,'arlo-for-wordpress') . '</h4>';
@@ -470,7 +465,7 @@ class Arlo_For_Wordpress_Settings {
 
 				if (is_array($filter_settings)) {
 
-					if (is_array($filter_settings[$filter_group][$filter_key]) && count($filter_settings[$filter_group][$filter_key])) {
+					if (!empty($filter_settings[$filter_group][$filter_key]) && count($filter_settings[$filter_group][$filter_key])) {
 
 						foreach($filter_settings[$filter_group][$filter_key] as $old_value => $new_value) {
 							$is_hidden = false;
@@ -943,7 +938,7 @@ class Arlo_For_Wordpress_Settings {
 					':'
 						<li><a class="theme-apply" href="' . wp_nonce_url(admin_url('admin.php?page=arlo-for-wordpress&apply-theme=' . urlencode($theme_data->id)), 'arlo-apply-theme-nonce') . '">' . __('Apply', 'arlo-for-wordpress') . '</a></li>
 					') .
-						( $theme_data->id != 'custom' ? '<li><a class="theme-apply theme-reset" href="' . wp_nonce_url(admin_url('admin.php?page=arlo-for-wordpress&apply-theme=' . urlencode($theme_data->id) . '&reset=1'), 'arlo-apply-theme-nonce') . '">' . ($selected_theme_id == $theme_id ? __('Reset', 'arlo-for-wordpress') : __('Apply & Reset', 'arlo-for-wordpress')) . '</a></li>' : '') . '
+						( $theme_data->id != 'custom' ? '<li><a class="theme-apply theme-reset" href="' . wp_nonce_url(admin_url('admin.php?page=arlo-for-wordpress&apply-theme=' . urlencode($theme_data->id) . '&reset=1'), 'arlo-apply-theme-nonce') . '">' . ($selected_theme_id == $theme_data->id ? __('Reset', 'arlo-for-wordpress') : __('Apply & Reset', 'arlo-for-wordpress')) . '</a></li>' : '') . '
 					</ul>
 				</div>
 			</li>';

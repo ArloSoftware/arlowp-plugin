@@ -49,9 +49,12 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
             
         $filter_html = '<form id="arlo-event-filter" class="arlo-filters" method="get" action="' . $page_link . '">';
         
-        foreach($filters_array as $filter) :
+        foreach(\Arlo_For_Wordpress::$available_filters[$filter_group]['filters'] as $filter_key => $filter):
 
-            switch($filter) :
+            if (!in_array($filter_key, $filters_array))
+                continue;
+            
+            switch($filter_key) :
 
                 case 'location' :
 
@@ -88,7 +91,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter, $locations, $locationfilterlabel, $filter_group);
+                    $filter_html .= Shortcodes::create_filter($filters_array, $locations, $locationfilterlabel, $filter_group);
 
                     break;
 
@@ -276,7 +279,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         // merge and extract attributes
         extract(shortcode_atts(array(
             'link' => 'permalink'
-        ), $atts, $link));
+        ), $atts, $shortcode_name));
         
         $event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
 
@@ -852,6 +855,8 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
             date_default_timezone_set($timezone->getName());
         }
 
+        $selected_timezone = null;
+
         if (!empty($GLOBALS['selected_timezone_names']))
             $selected_timezone = new \DateTimeZone($GLOBALS['selected_timezone_names']);
       
@@ -876,6 +881,8 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
             $format = DateFormatter::date_format_to_strftime_format($format);
         }
 
+        $wp_timezone = null;
+
         try {
             $wp_timezone = new \DateTimeZone(get_option('timezone_string'));
         } catch (\Exception $e) {}
@@ -899,7 +906,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
             $date .=  " (" . $offset . ")";
         }
 
-        date_default_timezone_set($original_timezone);
+        date_default_timezone_set($timezone->getName());
 
         return $date;
     }  

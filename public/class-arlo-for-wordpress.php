@@ -298,7 +298,7 @@ class Arlo_For_Wordpress {
 	/**
 	 * $available_filters: defines the available filters for the plugin
 	 *
-	 * @since    1.0.0
+	 * @since    3.2.0
 	 *
 	 * @var      array
 	 */

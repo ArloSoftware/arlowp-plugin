@@ -164,8 +164,8 @@ class UpcomingEvents {
         global $post, $wpdb;
 
         extract(shortcode_atts(array(
-            'filters'	=> 'category,month,location,delivery',
-            'resettext'	=> __('Reset', 'arlo-for-wordpress'),
+            'filters'   => 'category,month,location,delivery',
+            'resettext' => __('Reset', 'arlo-for-wordpress'),
             'buttonclass'   => 'button'
         ), $atts, $shortcode_name, $import_id));
 
@@ -179,24 +179,27 @@ class UpcomingEvents {
 
         $filter_group = "upcoming";
             
-        foreach($filters_array as $filter) :
+        foreach(\Arlo_For_Wordpress::$available_filters[$filter_group]['filters'] as $filter_key => $filter):
 
-            switch($filter) :
+            if (!in_array($filter_key, $filters_array))
+                continue;
+
+            switch($filter_key) :
 
                 case 'category' :
                     //root category select
-                    $cats = CategoriesEntity::getTree(0, 1, 0, $import_id);	
+                    $cats = CategoriesEntity::getTree(0, 1, 0, $import_id); 
                     if (!empty($cats)) {
                         $cats = CategoriesEntity::getTree($cats[0]->c_arlo_id, 100, 0, $import_id);
                     }
 
                     if (is_array($cats)) {
-                        $filter_html .= Shortcodes::create_filter($filter, CategoriesEntity::child_categories($cats), __('All categories', 'arlo-for-wordpress'),$filter_group);					
+                        $filter_html .= Shortcodes::create_filter($filter_key, CategoriesEntity::child_categories($cats), __('All categories', 'arlo-for-wordpress'),$filter_group);                    
                     }
 
                     break;
                 case 'delivery' :
-                    $filter_html .= Shortcodes::create_filter($filter, \Arlo_For_Wordpress::$delivery_labels, __('All delivery options', 'arlo-for-wordpress'),$filter_group);
+                    $filter_html .= Shortcodes::create_filter($filter_key, \Arlo_For_Wordpress::$delivery_labels, __('All delivery options', 'arlo-for-wordpress'),$filter_group);
 
                     break;                                    
                 case 'month' :
@@ -211,7 +214,7 @@ class UpcomingEvents {
 
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter, $months, __('All months', 'arlo-for-wordpress'),$filter_group);
+                    $filter_html .= Shortcodes::create_filter($filter_key, $months, __('All months', 'arlo-for-wordpress'),$filter_group);
 
                     break;
                 case 'location' :
@@ -240,7 +243,7 @@ class UpcomingEvents {
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter, $locations, __('All locations', 'arlo-for-wordpress'),$filter_group);
+                    $filter_html .= Shortcodes::create_filter($filter_key, $locations, __('All locations', 'arlo-for-wordpress'),$filter_group);
 
                     break;          
                 case 'eventtag' :
@@ -269,7 +272,7 @@ class UpcomingEvents {
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter, $tags, __('Select tag', 'arlo-for-wordpress'),$filter_group);				
+                    $filter_html .= Shortcodes::create_filter($filter_key, $tags, __('Select tag', 'arlo-for-wordpress'),$filter_group);                
                     
                     break;
 
@@ -300,7 +303,7 @@ class UpcomingEvents {
                         }
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter, $presenters, __('All presenters', 'arlo-for-wordpress'),$filter_group);
+                    $filter_html .= Shortcodes::create_filter($filter_key, $presenters, __('All presenters', 'arlo-for-wordpress'),$filter_group);
                     
                     break;  
 
@@ -388,7 +391,7 @@ class UpcomingEvents {
         if(isset($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) :
             $where .= ' AND e.e_isonline = %d';
             $parameters[] = intval($arlo_delivery);
-        endif;	
+        endif;  
             
         if(!empty($arlo_eventtag)) :
             $join .= " LEFT JOIN $t7 etag ON etag.e_id = e.e_id AND etag.import_id = e.import_id";
@@ -413,7 +416,7 @@ class UpcomingEvents {
             $where .= ' AND et.et_region = %s AND e.e_region = %s';
             $parameters[] = $arlo_region;
             $parameters[] = $arlo_region;
-        }	
+        }   
 
         $field_list = '
                 DISTINCT e.e_id, 

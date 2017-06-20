@@ -214,6 +214,8 @@ class OnlineActivities {
         $sql = self::generate_all_oa_list_sql($atts, $import_id);
 
         $items = $wpdb->get_results($sql, ARRAY_A);
+
+        $output = '';
                   
         if(empty($items)) :
             $no_event_text = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No online activities to show', 'arlo-for-wordpress');
@@ -271,6 +273,10 @@ class OnlineActivities {
         $offset = ($page > 0) ? $page * $limit - $limit: 0 ;
 
         $output = '';
+
+        $join = '';
+        $where = '';
+        $parameters = array();
 
         $t1 = "{$wpdb->prefix}arlo_onlineactivities";
         $t2 = "{$wpdb->prefix}arlo_eventtemplates";
@@ -402,9 +408,12 @@ class OnlineActivities {
 
         $filter_group = "onlineactivities";
 
-        foreach($filters_array as $filter) :
+        foreach(\Arlo_For_Wordpress::$available_filters[$filter_group]['filters'] as $filter_key => $filter):
 
-            switch($filter) :
+            if (!in_array($filter_key, $filters_array))
+                continue;
+
+            switch($filter_key) :
 
                 case 'category' :
                     $cats = CategoriesEntity::getTree(0, 1, 0, $import_id);
@@ -414,7 +423,7 @@ class OnlineActivities {
                     }
 
                     if (is_array($cats)) {
-                        $filter_html .= Shortcodes::create_filter($filter, CategoriesEntity::child_categories($cats), __('All categories', 'arlo-for-wordpress'),$filter_group);                  
+                        $filter_html .= Shortcodes::create_filter($filter_key, CategoriesEntity::child_categories($cats), __('All categories', 'arlo-for-wordpress'),$filter_group);                  
                     }
 
                     break;
@@ -445,7 +454,7 @@ class OnlineActivities {
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter, $tags, __('Select tag', 'arlo-for-wordpress'),$filter_group);              
+                    $filter_html .= Shortcodes::create_filter($filter_key, $tags, __('Select tag', 'arlo-for-wordpress'),$filter_group);              
 
                     break;
 
@@ -477,7 +486,7 @@ class OnlineActivities {
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter, $tags, __('Select tag', 'arlo-for-wordpress'),$filter_group);               
+                    $filter_html .= Shortcodes::create_filter($filter_key, $tags, __('Select tag', 'arlo-for-wordpress'),$filter_group);               
                     
                     break;
 
