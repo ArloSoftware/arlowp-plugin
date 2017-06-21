@@ -4,7 +4,7 @@ namespace Arlo\Shortcodes;
 use Arlo\Entities\Categories as CategoriesEntity;
 
 class UpcomingEvents {
-    private static $upcoming_list_item_atts;
+    private static $upcoming_list_item_atts = [];
 
     public static function init() {
         $class = new \ReflectionClass(__CLASS__);
@@ -35,6 +35,7 @@ class UpcomingEvents {
             'delivery' => \Arlo\Utilities::clean_int_url_parameter('arlo-delivery'),
             'month' => \Arlo\Utilities::clean_string_url_parameter('arlo-month'),
             'eventtag' => isset($atts['eventtag']) ? $atts['eventtag'] : \Arlo\Utilities::clean_string_url_parameter('arlo-eventtag'),
+            'templatetag' => isset($atts['templatetag']) ? $atts['templatetag'] : \Arlo\Utilities::clean_string_url_parameter('arlo-templatetag'),
             'presenter' => \Arlo\Utilities::clean_string_url_parameter('arlo-presenter'),
             'region' => (!empty($region) && \Arlo\Utilities::array_ikey_exists($region, $regions) ? $region : '')
         );
@@ -71,19 +72,20 @@ class UpcomingEvents {
     private static function shortcode_upcoming_widget_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         $atts = shortcode_atts(array(
             'eventtag' => '',
+            'templatetag' => '',
             'limit' => ''
         ), $atts, $shortcode_name, $import_id);
 
         if (!empty($atts['limit'])) {
-            self::$upcoming_list_item_atts = array(
-                'limit' => $atts['limit']
-            );
+            self::$upcoming_list_item_atts['limit'] = $atts['limit'];
         }
 
         if (!empty($atts['eventtag'])) {
-            self::$upcoming_list_item_atts = array(
-                'eventtag' => $atts['eventtag']
-            );
+            self::$upcoming_list_item_atts['eventtag'] = $atts['eventtag'];
+        }
+
+        if (!empty($atts['templatetag'])) {
+            self::$upcoming_list_item_atts['templatetag'] = $atts['templatetag'];
         }
 
         $template = $content ? $content : arlo_get_template('upcoming_widget');
@@ -276,6 +278,36 @@ class UpcomingEvents {
                     
                     break;
 
+                case 'templatetag' :
+                    $items = $wpdb->get_results(
+                        "SELECT DISTINCT
+                            t.id,
+                            t.tag
+                        FROM 
+                            {$wpdb->prefix}arlo_eventtemplates_tags AS ettag
+                        LEFT JOIN 
+                            {$wpdb->prefix}arlo_tags AS t
+                        ON
+                            t.id = ettag.tag_id
+                        AND
+                            t.import_id = ettag.import_id
+                        WHERE 
+                            ettag.import_id = $import_id
+                        ORDER BY tag", ARRAY_A);
+
+                    $tags = array();
+
+                    foreach ($items as $item) {
+                        $tags[] = array(
+                            'string' => $item['tag'],
+                            'value' => $item['tag'],
+                        );
+                    }
+
+                    $filter_html .= Shortcodes::create_filter($filter_key, $tags, __('Select tag', 'arlo-for-wordpress'),$filter_group);                
+                    
+                    break;
+
                 case 'presenter' :
                     $items = $wpdb->get_results(
                         "SELECT DISTINCT
@@ -330,7 +362,7 @@ class UpcomingEvents {
 
         $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
         $page = !empty($_GET['paged']) ? intval($_GET['paged']) : intval(get_query_var('paged'));
-        $offset = ($page > 0) ? $page * $limit - $limit: 0 ;
+        $offset = ($page > 0) ? $page * $limit - $limit: 0;
 
         $t1 = "{$wpdb->prefix}arlo_events";
         $t2 = "{$wpdb->prefix}arlo_eventtemplates";
@@ -342,6 +374,7 @@ class UpcomingEvents {
         $t8 = "{$wpdb->prefix}arlo_tags";
         $t9 = "{$wpdb->prefix}arlo_events_presenters";
         $t10 = "{$wpdb->prefix}arlo_presenters";
+        $t11 = "{$wpdb->prefix}arlo_eventtemplates_tags";
 
         $join = '';
         $where = 'WHERE CURDATE() < DATE(e.e_startdatetime)  AND e_parent_arlo_id = 0 AND e.import_id = %d';
@@ -352,6 +385,7 @@ class UpcomingEvents {
         $arlo_delivery = !empty($atts['delivery']) ? $atts['delivery'] : null;
         $arlo_month = !empty($atts['month']) ? $atts['month'] : null;
         $arlo_eventtag = !empty($atts['eventtag']) ? $atts['eventtag'] : null;
+        $arlo_templatetag = !empty($atts['templatetag']) ? $atts['templatetag'] : null;
         $arlo_presenter = !empty($atts['presenter']) ? $atts['presenter'] : null;
         $arlo_region = !empty($atts['region']) ? $atts['region'] : null;
 
@@ -406,6 +440,19 @@ class UpcomingEvents {
             }
         endif;
         
+        if(!empty($arlo_templatetag)) :
+            $join .= " LEFT JOIN $t11 ettag ON ettag.et_id = et.et_id AND ettag.import_id = et.import_id";
+
+            if (!is_numeric($arlo_templatetag)) {
+                $where .= ' AND ttag.tag = %s';
+                $parameters[] = $arlo_templatetag;
+                $join .= " LEFT JOIN $t8 AS ttag ON ttag.id = ettag.tag_id AND ttag.import_id = ettag.import_id";
+            } else {
+                $where .= " AND ettag.tag_id = %d";
+                $parameters[] = intval($arlo_templatetag);
+            }
+        endif;
+
         if(!empty($arlo_presenter)) :
             $join .= " LEFT JOIN $t9 epresenter ON epresenter.e_id = e.e_id AND epresenter.import_id = e.import_id";
             $where .= " AND p_arlo_id = %d";
@@ -517,6 +564,7 @@ class UpcomingEvents {
         $limit_field";
 
         $query = $wpdb->prepare($sql, $parameters);
+
         if ($query) {
             return $query;
         } else {

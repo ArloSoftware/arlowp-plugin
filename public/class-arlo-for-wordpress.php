@@ -318,6 +318,7 @@ class Arlo_For_Wordpress {
 				'location' => 'Location', 
 				'delivery' => 'Delivery', 
 				'eventtag' => 'Event tag', 
+				'templatetag' => 'Template tag', 
 				'presenter' => 'Presenter'
 			)
 		),

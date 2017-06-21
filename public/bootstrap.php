@@ -45,6 +45,7 @@ add_action('parse_query', function($wp_query){
 add_filter('page_template', function($template){
 	global $post;
 
+
 	if(in_array($post->post_type, array('arlo_event', 'arlo_presenter', 'arlo_venue'))) {
 		$type = str_replace('arlo_', '', $post->post_type);
 				
@@ -175,7 +176,7 @@ function arlo_register_custom_post_types() {
 		if($page_id) {
 			switch($id) {
 				case 'upcoming':
-					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(eventtag-([^/]*))?/?(presenter-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-delivery=$matches[10]&arlo-eventtag=$matches[12]&arlo-presenter=$matches[14]&paged=$matches[16]','top');
+					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(eventtag-([^/]*))?/?(presenter-([^/]*))?/?(templatetag-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-delivery=$matches[10]&arlo-eventtag=$matches[12]&arlo-presenter=$matches[14]&arlo-templatetag=$matches[16]&paged=$matches[18]','top');
 				break;
 				case 'onlineactivities':
 					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(oatag-([^/]*))?/?(page/([^/]*))?/?(templatetag-([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-oatag=$matches[6]&paged=$matches[8]&arlo-templatetag=$matches[10]','top');

@@ -15,9 +15,14 @@
 		$eventtag = " eventtag='".$instance['eventtag']."' ";
 	}
 
+	$templatetag = '';
+	if (!empty($instance['templatetag'])) {
+		$templatetag = " templatetag='".$instance['templatetag']."' ";
+	}
+
     $template = $instance['template'] ? $instance['template'] : arlo_get_template('upcoming_widget');
 
-    $content = "[arlo_upcoming_widget_list $limit $eventtag]" . $template . "[/arlo_upcoming_widget_list]";
+    $content = "[arlo_upcoming_widget_list $limit $eventtag $templatetag ]" . $template . "[/arlo_upcoming_widget_list]";
 
 	// output the events list
 	echo do_shortcode($content);
