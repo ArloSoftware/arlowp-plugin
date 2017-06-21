@@ -9,10 +9,12 @@ $arlo_plugin_slug = $arlo_plugin->get_plugin_slug();
 add_filter( 'document_title_parts', function($title) {
 	global $post;
 
-	$new_title = set_title($title['title'], $post->ID, true);
+	if ($post) {
+		$new_title = set_title($title['title'], $post->ID, true);
 
-	if (!empty($new_title['subtitle'])) {
-		$title['title'] = esc_attr($new_title['subtitle'] . ' - ' . $new_title['title']);
+		if (!empty($new_title['subtitle'])) {
+			$title['title'] = esc_attr($new_title['subtitle'] . ' - ' . $new_title['title']);
+		}
 	}
 
 	return $title;

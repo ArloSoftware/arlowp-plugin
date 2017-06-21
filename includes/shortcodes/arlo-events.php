@@ -235,7 +235,11 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
             ORDER BY 
                 $t2.e_startdatetime";
            
-        $items = $wpdb->get_results($wpdb->prepare($sql, $parameters), ARRAY_A);
+        if (count($parameters)) {
+            $sql = $wpdb->prepare($sql, $parameters);
+        }
+
+        $items = $wpdb->get_results($sql, ARRAY_A);
         
         $output = '';
         
@@ -278,7 +282,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         // merge and extract attributes
         extract(shortcode_atts(array(
             'link' => 'permalink'
-        ), $atts, $link));
+        ), $atts, $shortcode_name, $import_id));
         
         $event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
 
@@ -830,7 +834,8 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
 
     public static function event_date_formatter($atts, $date, $offset, $is_online = false, $timezoneid = null) {
         global $arlo_plugin;
-        $timezone = null;
+        $timezone = $wp_timezone = $selected_timezone = null;
+        $original_timezone = date_default_timezone_get();
         
         $timewithtz = str_replace(' ', 'T', $date) . $offset;
 

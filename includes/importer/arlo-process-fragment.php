@@ -71,18 +71,18 @@ class ProcessFragment extends BaseImporter {
 		$state = [
 			'finished_subtask' => null,
 			'current_subtask' => null,
-			'current_subtask_desc' => $this->import_tasks[$this->current_task],
+			'current_subtask_desc' => isset($this->import_tasks[$this->current_task]) ? $this->import_tasks[$this->current_task] : '',
 			'current_subtask_num' => array_search($this->current_task, array_keys($this->import_tasks)),
 			'iteration' => null,
 			'iteration_finished' => ($this->iteration_finished ? 1 : 0),
 			'current_subtask_retry' => $this->current_task_retry,
 		];
 	
-		if ($this->current_task_class->is_finished) {
+		if (isset($this->current_task_class) && $this->current_task_class->is_finished) {
 			$state['finished_subtask'] = $this->current_task;
 		} else {
 			$state['current_subtask'] = $this->current_task;
-			$state['iteration'] = $this->current_task_class->iteration;
+			$state['iteration'] = isset($this->current_task_class->iteration) ? $this->current_task_class->iteration : 0;
 		}
 
 		return $state;
