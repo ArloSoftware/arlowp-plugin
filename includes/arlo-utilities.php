@@ -34,7 +34,7 @@ class Utilities {
             return intval($_GET[$parameter_name]);
         } else {
             $value = get_query_var($parameter_name);
-            if (!empty($value)) {
+            if (is_numeric($value)) {
                 return intval($value);
             }
         }
