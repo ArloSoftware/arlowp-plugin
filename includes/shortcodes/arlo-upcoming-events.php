@@ -34,7 +34,7 @@ class UpcomingEvents {
             'category' => \Arlo\Utilities::clean_string_url_parameter('arlo-category'),
             'delivery' => \Arlo\Utilities::clean_int_url_parameter('arlo-delivery'),
             'month' => \Arlo\Utilities::clean_string_url_parameter('arlo-month'),
-            'eventtag' => isset($atts['eventtag']) ? $atts['eventtag'] : \Arlo\Utilities::clean_string_url_parameter('arlo-eventtag'),
+            'eventtag' => \Arlo\Utilities::clean_string_url_parameter('arlo-eventtag'),
             'templatetag' => isset($atts['templatetag']) ? $atts['templatetag'] : \Arlo\Utilities::clean_string_url_parameter('arlo-templatetag'),
             'presenter' => \Arlo\Utilities::clean_string_url_parameter('arlo-presenter'),
             'region' => (!empty($region) && \Arlo\Utilities::array_ikey_exists($region, $regions) ? $region : '')
@@ -48,14 +48,10 @@ class UpcomingEvents {
     private static function shortcode_upcoming_list_pagination($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $wpdb;
         
-        $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
+        $limit = intval(isset(self::$upcoming_list_item_atts['limit']) ? self::$upcoming_list_item_atts['limit'] : get_option('posts_per_page'));
 
         if (empty($atts)) {
             $atts = [];
-        }
-
-        if (empty(self::$upcoming_list_item_atts)) {
-            self::$upcoming_list_item_atts = [];
         }
 
         $atts = array_merge($atts,self::$upcoming_list_item_atts);
@@ -104,10 +100,6 @@ class UpcomingEvents {
 
         if (empty($atts)) {
             $atts = [];
-        }
-
-        if (empty(self::$upcoming_list_item_atts)) {
-            self::$upcoming_list_item_atts = [];
         }
 
         $atts = array_merge($atts,self::$upcoming_list_item_atts);
@@ -382,7 +374,7 @@ class UpcomingEvents {
 
         $arlo_location = !empty($atts['location']) ? $atts['location'] : null;
         $arlo_category = !empty($atts['category']) ? $atts['category'] : null;
-        $arlo_delivery = !empty($atts['delivery']) ? $atts['delivery'] : null;
+        $arlo_delivery = $atts['delivery'] !== null ? $atts['delivery'] : null;
         $arlo_month = !empty($atts['month']) ? $atts['month'] : null;
         $arlo_eventtag = !empty($atts['eventtag']) ? $atts['eventtag'] : null;
         $arlo_templatetag = !empty($atts['templatetag']) ? $atts['templatetag'] : null;
