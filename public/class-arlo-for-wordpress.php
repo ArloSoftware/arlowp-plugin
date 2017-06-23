@@ -379,6 +379,7 @@ class Arlo_For_Wordpress {
 	public function run_scheduler() {
 		session_write_close();
 		check_ajax_referer( 'arlo_import', 'nonce' );
+		sleep(1); //try to wait 1 second to let the previous async task finished and closed the DB connection
 		$this->cron_scheduler();
 		wp_die();
 	}

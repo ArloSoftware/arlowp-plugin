@@ -250,10 +250,7 @@ class Scheduler {
 	}
 	
 	public function process_task($task = array()) {
-		$task_task = $task[0]->task_task;
-
-		if (!empty($task_task)) {
-			
+		if (isset($task[0]) && !empty($task_task = $task[0]->task_task)) {
 			$this->schedule_cron();
 			if (!$this->is_process_running($task_task)) {
 				$this->lock_process($task_task);
@@ -307,10 +304,40 @@ class Scheduler {
 	}	
 
 	public function kick_off_scheduler() {
-		$url = add_query_arg( $this->get_query_args(), $this->get_query_url() );
+		$url = add_query_arg( $this->get_query_args(), $this->get_query_url() );	
+
+		$this->try_kick_off_scheduler($url);
+	}
+
+	private function try_kick_off_scheduler($url) {
+		$limit = 10;
+		$tries = 0;
+		$sleep_seconds = 3;
+
 		$args = $this->get_post_args();
-				
-		wp_remote_post( esc_url_raw( $url ), $args );
+
+		do {
+			$success = false;
+			$response = wp_remote_post( esc_url_raw( $url ), $args );
+
+			if (is_wp_error($response)) {
+				$error_message = $response->get_error_messages();
+				sleep($sleep_seconds);
+			} else if ( substr($response['response']['code'], 0, 1) != 2 ) {
+				$error_message = 'Unknown error';
+				if (!empty($response['response']['code'])) {
+					$error_message = $response['response']['message'];
+				} 
+
+				sleep($sleep_seconds);
+			} else {
+				$success = true;
+			}
+		} while(!$success && ++$tries < $limit);
+
+		if (!$success && isset($error_message) && $tries >= $limit) {
+			throw new \Arlo\SchedulerException('Kick off scheduler error: ' . (is_array($error_message) ? implode(', ', $error_message) : $error_message));
+		}
 	}
 
 	private function get_query_args() {
@@ -339,7 +366,7 @@ class Scheduler {
 
 		return array(
 			'timeout'   => 50,
-			'blocking'  => false,
+			'blocking'  => true,
 			'cookies'   => $_COOKIE,
 			'sslverify' => apply_filters( 'https_local_ssl_verify', false ),
 		);

@@ -224,7 +224,7 @@ class Importer {
 
 		//if an import is already running, exit
         if ($this->acquire_import_lock()) {
-			
+
 			set_error_handler ( function($num, $str, $file, $line, $context = null) {
 				error_log($str . ' in ' . $file . ' on line ' . $line);
 
@@ -261,7 +261,7 @@ class Importer {
 					$this->kick_off_scheduler();
 				}
 			} catch(\Exception $e) {
-				if ($this->should_retry($this->get_state())) {
+				if ($this->should_retry($this->get_state()) && !($e instanceof \Arlo\SchedulerException)) {
 					//pause the task 
 					$this->scheduler->update_task($this->task_id, 1);
 					$this->kick_off_scheduler();
@@ -479,7 +479,7 @@ class Importer {
 
 	private function kick_off_scheduler() {
 		$this->scheduler->unlock_process('import');
-		$this->scheduler->kick_off_scheduler();		
+		$this->scheduler->kick_off_scheduler();
 	}
 
 	public function callback() {
