@@ -15,7 +15,8 @@
 }
 
 .arlo .arlo-list.events > li,
-.arlo .arlo-list.upcoming > li {
+.arlo .arlo-list.upcoming > li,
+.arlo .arlo-list.arlo-online-activities > li {
 	border: 1px solid #ccc;
 	margin-bottom: 1em;
 	margin-left: 0px;

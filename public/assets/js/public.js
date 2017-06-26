@@ -59,6 +59,7 @@
         		'delivery-': 'arlo-filter-delivery',
         		'eventtag-': 'arlo-filter-eventtag',
         		'templatetag-': 'arlo-filter-templatetag',
+	    		'oatag-': 'arlo-filter-oatag',
         		'presenter-': 'arlo-filter-presenter'
         	};
         	

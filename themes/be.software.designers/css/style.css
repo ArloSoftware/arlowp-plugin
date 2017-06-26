@@ -367,6 +367,16 @@ body.arlo {
     background-color: #FFD101;
 }
 
+.arlo#arlo .arlo-color5 {
+    color: #0086E3;
+}
+
+.arlo#arlo .arlo-background-color5 {
+    background-color: #0086E3;
+}
+
+
+
 
 
 /* Buttons */
@@ -1210,4 +1220,58 @@ body.arlo {
 .arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link {
     text-align: right;
     font-size: 0.8em;
+}
+
+
+
+/* Online activities list */
+
+.arlo#arlo .arlo-online-activity {
+    clear: both;
+    margin-bottom: 3em;
+}
+
+.arlo#arlo .arlo-icon {
+    float: left;
+    margin-right: .5em;
+    font-size: 3em;
+    line-height: 1;
+}
+
+.arlo#arlo .arlo-online-activity .arlo-buttons {
+    margin-top: 1em;
+}
+
+.arlo#arlo .arlo-online-activity .arlo-summary {
+    clear: both;
+}
+
+@media (min-width: 550px) {
+    .arlo#arlo .arlo-online-activity .arlo-buttons {
+        float: right;
+        margin-top: 0;
+    }
+
+    .arlo#arlo .arlo-online-activity .arlo-buttons > * {
+        display: inline-block;
+    }
+
+    .arlo#arlo .arlo-icon {
+        float: left;
+        width: 100px;
+        font-size: 4.5em;
+        margin-right: 0;
+    }
+
+    .arlo#arlo .arlo-content {
+        margin-left: 100px;
+    }
+
+    .arlo#arlo .arlo-online-activity .arlo-summary {
+        clear: none;
+    }
+}
+
+.arlo#arlo .arlo-filters {
+    margin-bottom: 1em;
 }

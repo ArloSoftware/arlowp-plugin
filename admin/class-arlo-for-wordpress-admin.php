@@ -465,7 +465,7 @@ class Arlo_For_Wordpress_Admin {
 
 		if ( ! isset( $wp_settings_fields[$page][$section] ) )
 			return;
-					
+
 		foreach ( (array) $wp_settings_fields[$page][$section] as $field ) {
 			$field['args']['label_for'] = !empty($field['args']['label_for']) ? $field['args']['label_for'] : "";
 			echo '<div class="' . ARLO_PLUGIN_PREFIX.'-field-wrap cf ' . ARLO_PLUGIN_PREFIX . '-' . strtolower(esc_attr($field['args']['label_for'])) . '" id="' . ARLO_PLUGIN_PREFIX . '-' . strtolower(esc_attr($field['args']['label_for'])) . '">';
@@ -548,7 +548,7 @@ class Arlo_For_Wordpress_Admin {
 	public function settings_saved($old) {
 		$new = get_option('arlo_settings', array());
 		$old_regions = get_option('arlo_regions', array());
-		
+
 		//save theme changes
 		$theme_id = get_option('arlo_theme', Arlo_For_Wordpress::DEFAULT_THEME);
 		$stored_themes_settings = get_option( 'arlo_themes_settings', [] );
@@ -586,7 +586,8 @@ class Arlo_For_Wordpress_Admin {
 				} 
 			}	
 		}
-		
+
+
 		//normalize regions
 		$regions = array();
 		if (is_array($new['regionid']) && count($new['regionid'])) {
@@ -598,7 +599,44 @@ class Arlo_For_Wordpress_Admin {
 		}
 		
 		update_option('arlo_regions', $regions);
-				
+
+
+		//normalize filters options
+		$filters = array();
+		if (is_array($new['arlo_filter_settings']) && count($new['arlo_filter_settings'])) {
+			foreach($new['arlo_filter_settings'] as $filter_group_name => $filter_group) {
+				foreach ($filter_group as $filter_name => $filter_settings) {
+					foreach ($filter_settings as $filter_setting_id => $filter_setting) {
+						$old_value = esc_html($filter_setting['filteroldvalue']);
+						$new_value = esc_html($filter_setting['filternewvalue']);
+
+						if ( !empty($old_value) || !empty($new_value) ) {
+							$filters[$filter_group_name][$filter_name][$old_value] = $new_value;
+						}
+
+						if ( !empty($filter_setting["filterhideoption"]) ) {
+							if (!isset($filters['arlohiddenfilters'][$filter_group_name][$filter_name])) {
+							    $filters['arlohiddenfilters'][$filter_group_name][$filter_name] = array();
+							}
+
+							array_push($filters['arlohiddenfilters'][$filter_group_name][$filter_name], $old_value);
+						} else {
+							if (!empty($filters['arlohiddenfilters'][$filter_group_name][$filter_name])) {
+								$old_value_index = array_search($old_value, $filters['arlohiddenfilters'][$filter_group_name][$filter_name]);
+
+								if ($old_value_index) {
+									unset( $filters['arlohiddenfilters'][$filter_group_name][$filter_name][$old_value_index] );
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		update_option('arlo_filter_settings', $filters);
+
+
 		// need to check for posts-page change here
 		// loop through each post type and check if the posts-page has changed
 		foreach($new['post_types'] as $id => $post_type) {

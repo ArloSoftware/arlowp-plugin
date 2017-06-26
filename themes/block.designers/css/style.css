@@ -398,7 +398,6 @@ body.arlo {
 /* Buttons */
 
 .arlo#arlo .arlo-button,
-.arlo#arlo .button,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running span,
 .arlo#arlo .arlo-list.event-search .arlo-next-running a,
@@ -408,7 +407,8 @@ body.arlo {
 .arlo#arlo .arlo-category-list a,
 .arlo#arlo select,
 .arlo#arlo .arlo-filters-buttons a,
-.arlo#arlo .arlo-show-more-link {
+.arlo#arlo .arlo-show-more-link,
+.arlo#arlo .arlo-oa-registration .arlo-register {
     padding: .6em 1.2em;
     display: block;
     text-align: center;
@@ -429,7 +429,6 @@ body.arlo {
 
 @media (min-width: 550px) {
     .arlo#arlo .arlo-button,
-    .arlo#arlo .button,
     .arlo#arlo .arlo-list.catalogue .arlo-next-running a,
     .arlo#arlo .arlo-list.catalogue .arlo-next-running span,
     .arlo#arlo .prev.page-numbers,
@@ -439,19 +438,20 @@ body.arlo {
     .arlo#arlo .arlo-filters-buttons a,
     .arlo#arlo .arlo-show-more-link,
     .arlo#arlo .arlo-list.event-search .arlo-next-running a,
-    .arlo#arlo .arlo-list.event-search .arlo-next-running span {
+    .arlo#arlo .arlo-list.event-search .arlo-next-running span,
+    .arlo#arlo .arlo-oa-registration .arlo-register {
         display: inline-block;
     }
 }
 
 .arlo#arlo .arlo-button:after,
-.arlo#arlo .button:after,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a:after,
 .arlo#arlo .prev.page-numbers:after,
 .arlo#arlo .next.page-numbers:after,
 .arlo#arlo .arlo-category-list a:after,
 .arlo#arlo .arlo-show-more-link:after,
-.arlo#arlo .arlo-list.event-search .arlo-next-running a:after {
+.arlo#arlo .arlo-list.event-search .arlo-next-running a:after,
+.arlo#arlo .arlo-oa-registration .arlo-register:after {
     content: "";
     position: absolute;
     left: 0;
@@ -467,18 +467,17 @@ body.arlo {
 }
 
 .arlo#arlo .arlo-button:hover:after,
-.arlo#arlo .button:hover:after,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a:hover:after,
 .arlo#arlo .prev.page-numbers:hover:after,
 .arlo#arlo .next.page-numbers:hover:after,
 .arlo#arlo .arlo-category-list a:hover:after,
 .arlo#arlo .arlo-show-more-link:hover:after,
-.arlo#arlo .arlo-list.event-search .arlo-next-running a:hover:after {
+.arlo#arlo .arlo-list.event-search .arlo-next-running a:hover:after,
+.arlo#arlo .arlo-oa-registration .arlo-register:hover:after {
     background: rgba(0,0,0,.15);
 }
 
 .arlo#arlo .arlo-button:hover,
-.arlo#arlo .button:hover,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running span:hover,
 .arlo#arlo .arlo-category-list a:hover,
 .arlo#arlo .arlo-filters-buttons a:hover {
@@ -487,8 +486,8 @@ body.arlo {
 
 .arlo#arlo .prev.page-numbers,
 .arlo#arlo .next.page-numbers,
-.arlo#arlo .upcoming .button.arlo-waiting-list,
-.arlo#arlo .button.arlo-waiting-list,
+.arlo#arlo .upcoming .arlo-button.arlo-waiting-list,
+.arlo#arlo .arlo-button.arlo-waiting-list,
 .arlo#arlo .arlo-show-more-link,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a,
 .arlo#arlo .arlo-show-more-link:hover,
@@ -657,6 +656,7 @@ body.arlo {
 }
 
 .arlo#arlo .upcoming .arlo-cf.arlo-group-divider,
+.arlo#arlo .arlo-online-activities .arlo-cf.arlo-group-divider,
 .arlo#arlo .catalogue .arlo-cf.arlo-group-divider {
     margin-bottom: 3em;
     margin-top: 1em;
@@ -669,12 +669,14 @@ body.arlo {
 }
 
 .arlo#arlo .upcoming .arlo-cf.arlo-group-divider h3,
+.arlo#arlo .arlo-online-activities .arlo-cf.arlo-group-divider h3,
 .arlo#arlo .catalogue .arlo-cf.arlo-group-divider h3 {
     font-weight: normal;
 }
 
 .arlo#arlo .upcoming .arlo-cf.arlo-group-divider:after,
-.arlo#arlo .catalogue .arlo-cf.arlo-group-divider:after {
+.arlo#arlo .catalogue .arlo-cf.arlo-group-divider:after,
+.arlo#arlo .arlo-online-activities .arlo-cf.arlo-group-divider:after {
     content: " ";
     height: 2px;
     width: 8%;
@@ -1140,6 +1142,33 @@ body.arlo {
 
 
 
+/* Online activities list */
+
+.arlo#arlo .arlo-online-activity {
+    margin-bottom: 3em;
+}
+
+.arlo#arlo .arlo-online-activity .arlo-reference-term {
+    text-transform: uppercase;
+    display: inline-block;
+    letter-spacing: 2px;
+}
+
+.arlo#arlo .arlo-online-activity .arlo-reference-term i {
+    opacity: .5;
+}
+
+.arlo#arlo .arlo-online-activity .arlo-event-offers {
+    font-size: 1.3em;
+}
+
+.arlo#arlo .arlo-online-activity .arlo-oa-registration {
+    margin-top: 1em;
+}
+
+
+
+
 /* Sessions tooltips */
 
 .arlo .dark-tooltip {
@@ -1270,12 +1299,12 @@ body.arlo {
 .arlo#arlo .page-numbers:not(.next):not(.prev):hover,
 .arlo#arlo .page-numbers.current:not(.next):not(.prev),
 .arlo#arlo .upcoming .arlo-places-remaining,
-.arlo#arlo .button.arlo-waiting-list:hover,
+.arlo#arlo .arlo-button.arlo-waiting-list:hover,
 .arlo#arlo .arlo-event-offers .discount,
 .arlo#arlo .prev.page-numbers,
 .arlo#arlo .next.page-numbers,
-.arlo#arlo .upcoming .button.arlo-waiting-list,
-.arlo#arlo .button.arlo-waiting-list,
+.arlo#arlo .upcoming .arlo-button.arlo-waiting-list,
+.arlo#arlo .arlo-button.arlo-waiting-list,
 .arlo#arlo .arlo-show-more-link,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a,
 .arlo .arlo-widget-upcoming a:hover,
@@ -1287,21 +1316,23 @@ body.arlo {
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a.arlo-register,
 .arlo#arlo .arlo-list.event-search .arlo-next-running a.arlo-register,
 .arlo#arlo .arlo-category-list a,
-.arlo#arlo .button.arlo-register,
+.arlo#arlo .arlo-button.arlo-register,
 .arlo#arlo .upcoming .arlo-cf.arlo-group-divider:after,
 .arlo#arlo .catalogue .arlo-cf.arlo-group-divider:after,
+.arlo#arlo .arlo-online-activities .arlo-cf.arlo-group-divider:after,
 .arlo#arlo .upcoming .arlo-event-subhead > div:after,
 .arlo#arlo .prev.page-numbers:hover,
 .arlo#arlo .next.page-numbers:hover,
-.arlo#arlo .upcoming .button.arlo-waiting-list:hover,
-.arlo#arlo .button.arlo-waiting-list:hover,
+.arlo#arlo .upcoming .arlo-button.arlo-waiting-list:hover,
+.arlo#arlo .arlo-button.arlo-waiting-list:hover,
 .arlo#arlo .arlo-show-more-link:hover,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a:hover,
 .arlo#arlo .arlo-list.event-search .arlo-next-running a:hover,
 .arlo#arlo .arlo-event_tags-list > li,
 .arlo .arlo-widget-upcoming .arlo-cal-month,
 .arlo .arlo-categories-widget li a:hover,
-.arlo#arlo .arlo-search-button {
+.arlo#arlo .arlo-search-button,
+.arlo#arlo .arlo-oa-registration .arlo-register {
     background-color: #00cdc1;
 }
 
@@ -1310,8 +1341,8 @@ body.arlo {
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a:hover,
 .arlo#arlo .arlo-list.event-search .arlo-next-running a:hover,
 .arlo#arlo .arlo-list.event-search .arlo-next-running a,
-.arlo#arlo .upcoming .button.arlo-waiting-list:hover, 
-.arlo#arlo .button.arlo-waiting-list:hover,
+.arlo#arlo .upcoming .arlo-button.arlo-waiting-list:hover, 
+.arlo#arlo .arlo-button.arlo-waiting-list:hover,
 .arlo#arlo .prev.page-numbers:hover, 
 .arlo#arlo .next.page-numbers:hover,
 .arlo#arlo .arlo-show-more-link:hover {
@@ -1356,20 +1387,19 @@ body.arlo {
 
 
 .arlo#arlo .arlo-button,
-.arlo#arlo .button,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a.arlo-register,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running span,
 .arlo#arlo .arlo-list.event-search .arlo-next-running a.arlo-register,
 .arlo#arlo .arlo-list.event-search .arlo-next-running span,
 .arlo#arlo .arlo-category-list a,
 .arlo#arlo .arlo-filters-buttons a,
-.arlo#arlo .button.arlo-register:hover,
+.arlo#arlo .arlo-button.arlo-register:hover,
 .arlo#arlo .arlo-show-more-link:hover,
 .arlo#arlo .arlo-contrast-color,
-.arlo#arlo .upcoming .button.arlo-waiting-list:hover,
+.arlo#arlo .upcoming .arlo-button.arlo-waiting-list:hover,
 .arlo#arlo .prev.page-numbers:hover, 
 .arlo#arlo .next.page-numbers:hover,
-.arlo#arlo .button.arlo-waiting-list:hover,
+.arlo#arlo .arlo-button.arlo-waiting-list:hover,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a:hover,
 .arlo#arlo .arlo-list.event-search .arlo-next-running a:hover,
 .arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a:hover,
@@ -1378,7 +1408,8 @@ body.arlo {
 .arlo#arlo .arlo-event_tags-list > li,
 .arlo#arlo .arlo-event-credits li,
 .arlo .arlo-widget-upcoming .arlo-cal-month,
-.arlo .arlo-categories-widget li a:hover {
+.arlo .arlo-categories-widget li a:hover,
+.arlo#arlo .arlo-oa-registration .arlo-register {
     color: white;
 }
 

@@ -16,6 +16,7 @@ class Shortcodes {
 		// group devider
 		self::add('group_divider', function($content = '', $atts, $shortcode_name, $import_id){
 			if(isset($GLOBALS['arlo_event_list_item']['show_divider'])) return $GLOBALS['arlo_event_list_item']['show_divider'];
+			if(isset($GLOBALS['arlo_oa_list_item']['show_divider'])) return $GLOBALS['arlo_oa_list_item']['show_divider'];
 		});
 
 		// timezones
@@ -142,31 +143,51 @@ class Shortcodes {
 		
 		if (!in_array($page_name, $valid_page_names) || !(is_array($regions) && count($regions))) return "";
 			
-		$regionselector_html .= self::create_filter('region', $regions);					
+		$regionselector_html .= self::create_filter('region', $regions);
 		
 		return $regionselector_html;
 	}
 
-	public static function create_filter($type, $items, $label=null) {
+	public static function create_filter($type, $items, $label=null, $group=null) {
+		if (!empty(get_option('arlo_filter_settings')[$group][$type][$label]) ) {
+			$label = get_option('arlo_filter_settings')[$group][$type][$label];
+		}
+
+		if (!empty(get_option('arlo_filter_settings')['arlohiddenfilters'])) {
+			$hidden_filters = get_option('arlo_filter_settings')['arlohiddenfilters'];
+		}
+
 		$filter_html = '<select id="arlo-filter-' . esc_attr($type) . '" name="arlo-' . esc_attr($type) . '">';
-		
+
 		if (!is_null($label))
 			$filter_html .= '<option value="">' . esc_html($label) . '</option>';
 
 		$selected_value = \Arlo\Utilities::clean_string_url_parameter('arlo-' . $type);
 			
 		foreach($items as $key => $item) {
-
 			if (empty($item['string']) && empty($item['value'])) {
 				$item = array(
 					'string' => $item,
 					'value' => $key
 				);
 			}
-			
-			$selected = (strlen($selected_value) && $selected_value == $item['value']) ? ' selected="selected"' : '';
-			
-			$filter_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>' . esc_html($item['string']) . '</option>';
+
+			$is_hidden = false;
+			if (!empty($hidden_filters[$group][$type])) {
+				$is_hidden = in_array(esc_html($item['string']),$hidden_filters[$group][$type]);
+			}
+
+			if (!$is_hidden) {
+				$value_label = esc_html($item['string']);
+
+				if (!empty(get_option('arlo_filter_settings')[$group][$type][$value_label])) {
+					$value_label = get_option('arlo_filter_settings')[$group][$type][$value_label];
+				}
+
+				$selected = (strlen($selected_value) && $selected_value == $item['value']) ? ' selected="selected"' : '';
+				
+				$filter_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>' . $value_label . '</option>';
+			}
 		}
 
 		$filter_html .= '</select>';

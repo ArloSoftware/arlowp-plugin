@@ -152,27 +152,32 @@
 
 /* regions */
 
-#arlo-regions, #arlo-regions-header {
+#arlo-regions, 
+#arlo-regions-header {
 	width: 500px;
 }
 
-#arlo-regions-header {
+#arlo-regions-header,
+#arlo-filters-header {
 	margin-bottom: 3em;
 }
 
-#arlo-regions-header > div {
+#arlo-regions-header > div,
+#arlo-filters-header > div {
 	float: left;
 	text-align: center;
 	margin-left: 1em;
 }
 
-#arlo-regions li {
+#arlo-regions li,
+.arlo-filter-group li {
 	clear:both;
 	height: 2em;
 	padding: 0.3em 0;
 }
 
-#arlo-regions li > div {
+#arlo-regions li > div,
+.arlo-filter-group li > div {
 	float: left;
 	margin-left: 1em;
 }
@@ -182,30 +187,37 @@
 }
 
 #arlo-regions .arlo-region-name,
-#arlo-regions .arlo-region-controls {
+#arlo-regions .arlo-region-controls,
+.arlo-filter-group .arlo-filter-name,
+.arlo-filter-group .arlo-filter-controls {
 	float: right;
 }
 
-#arlo-regions .arlo-region-highlight {
+#arlo-regions .arlo-region-highlight,
+.arlo-filter-group .arlo-region-highlight {
 	height: 1.7em;
 	border: 1px dotted #333;
 }
 
+.arlo-order-number,
 .arlo-order-number {
 	width: 30px;
 	text-align: center;
 	vertical-align: middle;
 }
 
-.arlo-region-id, .arlo-region-name {
+.arlo-region-id, .arlo-region-name,
+.arlo-filter-old-value, .arlo-filter-new-value {
 	width: 170px;
 }
 
-.arlo-region-controls {
+.arlo-region-controls,
+.arlo-filter-controls {
 	width: 60px;
 }
 
-.arlo-region-controls i {
+.arlo-region-controls i,
+.arlo-filter-controls i {
 	margin-left: 0.2em;
 	margin-top: 0.2em;
 	display: inline-block;
@@ -213,15 +225,18 @@
 	float: left;
 }
 
-.arlo-region-controls i.icons8-plus {
+.arlo-region-controls i.icons8-plus,
+.arlo-filter-controls i.icons8-plus {
 	display: none;
 }
 
-#arlo-regions li:last-of-type .arlo-region-controls i.icons8-plus {
+#arlo-regions li:last-of-type .arlo-region-controls i.icons8-plus,
+.arlo-filter-group li:last-of-type .arlo-filter-controls i.icons8-plus {
 	display: inline-block;
 }
 
-#arlo-region-empty {
+#arlo-region-empty,
+#arlo-filter-empty {
 	display: none;
 }
 
@@ -631,6 +646,33 @@ table.arlo-welcome td.logo {
 a .icons8 {
 	text-decoration: none;
 }
+
+
+/* filters section */
+
+.arlo_filters_section .arlo-filter-group {
+	display: none;
+}
+
+.arlo-filter-group, 
+#arlo-filters-header {
+	width: 570px;
+}
+
+.arlo-filter-group li > .arlo-filter-toggle {
+	float: right;
+}
+
+.arlo-filter-group li > .arlo-filter-toggle,
+#arlo-filters-header > div.arlo-filter-toggle {
+	width: 118px;
+}
+
+.arlo-filter-group li > .arlo-filter-toggle input {
+	margin: 0 auto;
+	display: block;
+}
+
 
 /* media queries, these match the wordpress admin breakpoints as of WP 3.9 */
 

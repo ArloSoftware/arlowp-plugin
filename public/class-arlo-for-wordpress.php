@@ -148,6 +148,12 @@ class Arlo_For_Wordpress {
 			'singular_name' => 'Event search',
 			'regionalized' => true
 		),
+		'onlineactivities' => array(
+			'slug' => 'onlineactivities',
+			'name' => 'Online activities',
+			'singular_name' => 'Online activity',
+			'regonalized' => true
+		)
     );
     
 	/**
@@ -188,6 +194,12 @@ class Arlo_For_Wordpress {
 				'title'				=> 'Venues',
 				'content' 			=> '[arlo_venue_list]',
 				'child_post_type'	=> 'venue'
+			),
+			array(
+				'name'				=> 'onlineactivities',
+				'title'				=> 'Online Activities',
+				'content' 			=> '[arlo_all_oa_list]',
+				'child_post_type'	=> 'event'
 			),
 		);  
 
@@ -258,6 +270,11 @@ class Arlo_For_Wordpress {
 			'shortcode' => '[arlo_upcoming_list]',
 			'name' => 'Upcoming event list',
 		),
+		'onlineactivities' => array(
+			'id' => 'onlineactivities',
+			'shortcode' => '[arlo_all_oa_list]',
+			'name' => 'Online activity list'
+		),
 		'presenter' => array(
 			'id' => 'presenter',
 			'name' => 'Presenter'
@@ -275,8 +292,54 @@ class Arlo_For_Wordpress {
 			'id' => 'venues',
 			'shortcode' => '[arlo_venue_list]',
 			'name' => 'Venue list'
-		),
+		)
     );
+
+	/**
+	 * $available_filters: defines the available filters for the plugin
+	 *
+	 * @since    3.2.0
+	 *
+	 * @var      array
+	 */
+
+	public static  $available_filters = array(
+		'event' => array(
+			'name' => 'Event',
+			'filters' => array(
+				'location' => 'Location'
+			)
+		),
+		'upcoming' => array(
+			'name' => 'Upcoming',
+			'filters' => array(
+				'category' => 'Category', 
+				'month' => 'Month', 
+				'location' => 'Location', 
+				'delivery' => 'Delivery', 
+				'eventtag' => 'Event tag', 
+				'templatetag' => 'Template tag', 
+				'presenter' => 'Presenter'
+			)
+		),
+		'onlineactivities' => array(
+			'name' => 'Online activities',
+			'filters' => array(
+				'oatag' => 'Online activity tag', 
+				'category' => 'Category'
+			)
+		),
+		'template' => array(
+			'name' => 'Catalogue',
+			'filters' => array(
+				'category' => 'Category', 
+				'delivery' => 'Delivery', 
+				'location' => 'Location', 
+				'templatetag' => 'Tag'
+			)
+		)
+	);
+
 
 	/**
 	 * Initialize the plugin by setting localization and loading public scripts
@@ -821,10 +884,8 @@ class Arlo_For_Wordpress {
 		$page_id = (empty($obj->ID) ? $page_id : $obj->ID);	
 		
 		$filter_enabled_page_ids = [];
-		
-		$filter_enabled_arlo_pages = ['upcoming', 'event'];
-				
-		foreach($filter_enabled_arlo_pages as $page) {
+						
+		foreach($this::$available_filters as $page => $filters) {
 			if (!empty($settings['post_types'][$page]['posts_page'])) {
 				$filter_enabled_page_ids[] = intval($settings['post_types'][$page]['posts_page']);
 			}			
@@ -864,6 +925,16 @@ class Arlo_For_Wordpress {
 				$url .= '/eventtag-' . wp_unslash($_GET['arlo-eventtag']);
 			}
 			
+			if (!empty($_GET['arlo-oatag'])) {
+				if (is_numeric($_GET['arlo-oatag'])) {
+					$tag = self::get_tag_by_id($_GET['arlo-oatag']);
+					if (!empty($tag['tag'])) {
+						$_GET['arlo-oatag'] = $tag['tag'];
+					}
+				}
+				$url .= '/oatag-' . wp_unslash($_GET['arlo-oatag']);
+			}
+
 			if (!empty($_GET['arlo-templatetag'])) {
 				if (is_numeric($_GET['arlo-templatetag'])) {
 					$tag = self::get_tag_by_id($_GET['arlo-templatetag']);

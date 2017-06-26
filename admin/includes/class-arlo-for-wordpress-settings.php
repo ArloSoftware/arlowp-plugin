@@ -267,6 +267,18 @@ class Arlo_For_Wordpress_Settings {
 		 
 		add_settings_section('arlo_customcss_section', null, null, $this->plugin_slug );				
 		add_settings_field( 'arlo_customcss', null, array($this, 'arlo_simple_textarea_callback'), $this->plugin_slug, 'arlo_customcss_section', array('id'=>'customcss', 'after_html' => '<p>Learn how to <a href="https://support.arlo.co/hc/en-gb/articles/115001714006" target="_blank">override existing styles</a> by adding <a href="#" class="arlo-settings-link" id="theme_customcss">Custom CSS</a></p>') );
+
+
+		/*
+		 *
+		 * Filters Section Settings
+		 *
+		 */ 
+		 
+		add_settings_section('arlo_filters_section', null, null, $this->plugin_slug );	
+
+		add_settings_field('arlo_filters', null, array($this, 'arlo_filter_settings_callback'), $this->plugin_slug, 'arlo_filters_section',  array('id'=>'filters'));    
+
 		
 		/*
 		 *
@@ -398,7 +410,125 @@ class Arlo_For_Wordpress_Settings {
 		echo $output;
 	}
 	
-	
+	function arlo_filter_settings_callback() {
+		$settings_object = get_option('arlo_settings');
+		$setting_id = 'filter_settings';
+		$filter_settings = get_option('arlo_filter_settings', array());
+		
+		$output = '<div id="'.ARLO_PLUGIN_PREFIX.'-filter-select" class="cf">';
+
+		$output .= '<h3>Filter Settings</h3>';
+
+		$output .= '<label>Select page: </label>';
+
+		$output .= '<select name="arlo_settings['.$setting_id.']" id="arlo-filter-settings">';
+
+		$filters_settings_html = '';
+
+		foreach(Arlo_For_Wordpress::$available_filters as $filter_group => $filter_group_values) {
+		    $output .= '<option value="'.$filter_group.'" >'.$filter_group_values['name'].'</option>';
+
+		    $filters_settings_html .= '<div id="arlo-' . $filter_group . '-filters" class="arlo-filter-group">';
+
+		    foreach($filter_group_values['filters'] as $filter_key => $filter) {
+		    	$filters_settings_html .= '<div class="arlo-filter-settings">';
+
+		    	$filters_settings_html .= '<h4>' . __($filter,'arlo-for-wordpress') . '</h4>';
+
+			    $filters_settings_html .= '
+				    <div id="arlo-filters-header">
+						<div class="arlo-filter-old-value">Option text</div>
+						<div class="arlo-filter-new-value">Replacement text</div>
+						<div class="arlo-filter-toggle">Hide this option?</div>
+				    </div>
+			    ';
+
+			    $filters_settings_html .= '
+				    <div id="arlo-filter-empty">
+						<ul>
+							<li>
+								<div class="arlo-filter-old-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][setting_id][filteroldvalue]"></div>
+								<div class="arlo-filter-controls">
+									<i class="icons8-minus icons8 size-21"></i>
+									<i class="icons8-plus icons8 size-21"></i>
+								</div>
+								<div class="arlo-filter-toggle">
+									<input type="checkbox" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][setting_id][filterhideoption]" value="hidden">
+								</div>
+								<div class="arlo-filter-new-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][setting_id][filternewvalue]"></div>
+							</li>
+						</ul>
+				    </div>
+				    ';
+
+				$filters_settings_html .= '<ul class="arlo-available-filters">';
+
+				if (is_array($filter_settings)) {
+
+					if (!empty($filter_settings[$filter_group][$filter_key]) && count($filter_settings[$filter_group][$filter_key])) {
+
+						foreach($filter_settings[$filter_group][$filter_key] as $old_value => $new_value) {
+							$is_hidden = false;
+					    	$existing_filter_setting_id = rand();
+
+							if ($filter_settings["arlohiddenfilters"][$filter_group][$filter_key]) {
+								$is_hidden = in_array($old_value,$filter_settings["arlohiddenfilters"][$filter_group][$filter_key]);
+							}
+
+							$checked = $is_hidden ? ' checked="checked"' : '';
+
+							$filters_settings_html .=  '<li>
+								<div class="arlo-filter-old-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$existing_filter_setting_id.'][filteroldvalue]" value="'.$old_value.'"></div>
+								<div class="arlo-filter-controls">
+									<i class="icons8-minus icons8 size-21"></i>
+									<i class="icons8-plus icons8 size-21"></i>
+								</div>
+								<div class="arlo-filter-toggle">
+									<input type="checkbox" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$existing_filter_setting_id.'][filterhideoption]" value="hidden" ' . $checked . '>
+								</div>
+								<div class="arlo-filter-new-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$existing_filter_setting_id.'][filternewvalue]" value="' . $new_value . '"></div>
+							  </li>
+							 ';
+						}
+
+					}
+
+				}
+
+				$new_filter_setting_id = rand();
+		
+				$filters_settings_html .= '<li>
+						<div class="arlo-filter-old-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$new_filter_setting_id.'][filteroldvalue]"></div>
+						<div class="arlo-filter-controls">
+							<i class="icons8-minus icons8 size-21"></i>
+							<i class="icons8-plus icons8 size-21"></i>
+						</div>
+						<div class="arlo-filter-toggle">
+							<input type="checkbox" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$new_filter_setting_id.'][filterhideoption]" value="hidden">
+						</div>
+						<div class="arlo-filter-new-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$new_filter_setting_id.'][filternewvalue]"></div>
+				  </li>
+				</ul>';
+
+				$filters_settings_html .= '</div><hr>';
+		    }
+
+
+
+		    $filters_settings_html .= '</div>';
+
+		}
+				
+		$output .= '</select>';
+
+		$output .= $filters_settings_html;
+
+		$output .= '</div>';
+
+		echo $output;
+	}	
+
+
 	function arlo_checkbox_callback($args) {
 		if (empty($args['option_name'])) return;
 		
@@ -453,10 +583,10 @@ class Arlo_For_Wordpress_Settings {
 		HACK because the keys in the $post_types arrays are bad, couldn't change because backward comp.
 		*/
 		
-		if (in_array($id, array('eventsearch', 'upcoming', 'events', 'presenters', 'venues'))) {
-			$post_type_id = !in_array($id, array('eventsearch','upcoming')) ? substr($id, 0, strlen($id)-1) : $id;
+		if (in_array($id, array('eventsearch', 'upcoming', 'events', 'presenters', 'venues', 'onlineactivities'))) {
+			$post_type_id = !in_array($id, array('eventsearch','upcoming', 'onlineactivities')) ? substr($id, 0, strlen($id)-1) : $id;
 		}
-	
+
     	if (!empty($post_type_id) && !empty(Arlo_For_Wordpress::$post_types[$post_type_id])) {
     		$post_type = Arlo_For_Wordpress::$post_types[$post_type_id];
 		    $val = isset($settings_object['post_types'][$post_type_id]['posts_page']) ? esc_attr($settings_object['post_types'][$post_type_id]['posts_page']) : 0;

@@ -616,7 +616,8 @@ body.arlo {
     }
 }
 
-.arlo#arlo .upcoming .arlo-event-name {
+.arlo#arlo .upcoming .arlo-event-name,
+.arlo#arlo .arlo-online-activities .arlo-event-name {
     margin-top: 0;
 }
 
@@ -644,7 +645,8 @@ body.arlo {
     font-size: .8em;
 }
 
-.arlo#arlo .upcoming .arlo-cf.arlo-group-divider {
+.arlo#arlo .upcoming .arlo-cf.arlo-group-divider,
+.arlo#arlo .arlo-online-activities .arlo-cf.arlo-group-divider {
     margin-bottom: .75em;
     margin-top: 1em;
     font-weight: bold;
@@ -1102,6 +1104,30 @@ body.arlo {
 
 .arlo .arlo-categories-widget li a:hover {
     border-left-width: 4px;
+}
+
+
+
+/* Online activities list */
+
+.arlo#arlo .arlo-online-activity {
+    margin-bottom: 3em;
+}
+
+.arlo#arlo .arlo-online-activity .arlo-reference-term {
+    border-left-width: 2px;
+    border-left-style: solid;
+    display:inline-block;
+    padding: .3em 1em;
+    margin-bottom: .5em;
+}
+
+.arlo#arlo .arlo-online-activity .arlo-event-offers {
+    margin-bottom: 1em;
+}
+
+#arlo.arlo .arlo-online-activities .arlo-cf.arlo-group-divider {
+    margin-bottom: 0;
 }
 
 

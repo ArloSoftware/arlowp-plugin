@@ -176,7 +176,9 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 
 		$instance['title'] = strip_tags( wp_unslash($new_instance['title']) );
 		$instance['number'] = intval($new_instance['number']);
-
+		$instance['template'] = wp_unslash($new_instance['template']);
+		$instance['eventtag'] = wp_unslash($new_instance['eventtag']);
+		$instance['templatetag'] = wp_unslash($new_instance['templatetag']);
 
 		return $instance;
 
@@ -198,6 +200,9 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 		// TODO: Store the values of the widget in their own variable
 		$title = esc_attr( $instance['title'] );
 		$number = esc_attr( $instance['number']);
+		$template = esc_attr( $instance['template']);
+		$eventtag = esc_attr( $instance['eventtag']);
+		$templatetag = esc_attr( $instance['templatetag']);
 
 		// Display the admin form
 		include( plugin_dir_path(__FILE__) . 'views/admin.php' );
@@ -284,14 +289,14 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 	    return $import_id;
 	}
 
-	public function arlo_widget_get_upcoming_list($qty) {
+	public function arlo_widget_get_upcoming_list($qty,$eventtag,$templatetag) {
 		global $wpdb;
 		
 		$regions = get_option('arlo_regions');	
 		$import_id = $this->get_import_id();
 		$arlo_region = get_query_var('arlo-region', '');
 		$arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : (!empty($_COOKIE['arlo-region']) ? $_COOKIE['arlo-region'] : '' ));
-				
+		
 		if (!empty($arlo_region)) {
 			$where['region'] = ' e_region = "' . $arlo_region . '" AND et_region = "' . $arlo_region . '"';
 		}
@@ -299,11 +304,34 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 		$where['import_id'] = "e.import_id = ".$import_id;
 		$where['date'] = " CURDATE() < DATE(e.e_startdatetime) ";
 		$where['event'] = "e_parent_arlo_id = 0";
-				
+		
 		$t1 = "{$wpdb->prefix}arlo_events";
 		$t2 = "{$wpdb->prefix}arlo_eventtemplates";
 		$t3 = "{$wpdb->prefix}arlo_venues";
-		
+        $t4 = "{$wpdb->prefix}arlo_events_tags";
+        $t5 = "{$wpdb->prefix}arlo_tags";
+        $t6 = "{$wpdb->prefix}arlo_eventtemplates_tags";
+
+        $join = '';
+
+        if(!empty($eventtag)) :
+            $join .= " LEFT JOIN $t4 etag ON etag.e_id = e.e_id AND etag.import_id = e.import_id
+            LEFT JOIN $t5 AS tag ON tag.id = etag.tag_id AND tag.import_id = etag.import_id";
+
+            $eventtag = "('" . implode($eventtag, "','") . "')";
+
+            $where["eventtag"] .= "tag.tag IN $eventtag";
+        endif;
+
+        if(!empty($templatetag)) :
+            $join .= " LEFT JOIN $t6 ettag ON ettag.et_id = et.et_id AND ettag.import_id = et.import_id
+            LEFT JOIN $t5 AS ttag ON ttag.id = ettag.tag_id AND ttag.import_id = ettag.import_id";
+
+            $templatetag = "('" . implode($templatetag, "','") . "')";
+
+            $where["templatetag"] .= "ttag.tag IN $templatetag";
+        endif;
+
 		$sql = "
 		SELECT 
 			e.e_startdatetime, 
@@ -312,6 +340,7 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 			e.e_isonline,
 			e.e_timezone_id,
 			et.et_name, 
+			et.et_id,
 			et.et_post_name,
 			et.et_post_id
 		FROM 
@@ -322,13 +351,14 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 			e.et_arlo_id = et.et_arlo_id
 		AND
 			e.import_id = et.import_id
+		$join
 		WHERE
 			" . implode(" AND ", $where) . "
 		ORDER BY 
 			e.e_startdatetime
 		LIMIT 0, $qty";
 
-		$upcoming_array = $wpdb->get_results($sql);
+		$upcoming_array = $wpdb->get_results($sql, ARRAY_A);
 
 		return $upcoming_array;
 	}

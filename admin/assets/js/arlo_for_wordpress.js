@@ -42,10 +42,17 @@ if (typeof (Arlo) === "undefined") {
 			}
 
 			me.initRegionFields();
+			me.initFilterSettingsFields();
 
 			me.getLastImportLog();
 
 			me.initEvents();
+
+			me.showFilterGroupSettings($('#arlo-filter-settings').val());
+
+			$('#arlo-filter-settings').change(function() {
+				me.showFilterGroupSettings($(this).val());
+			});
 		},
 		initRegionFields: function() {
 			var me = this;
@@ -68,6 +75,27 @@ if (typeof (Arlo) === "undefined") {
 				me.addRegion();
 				me.reNumberRegions();
 			});
+		},
+		initFilterSettingsFields: function() {
+			var me = this;
+
+			$( ".arlo-filter-group" ).disableSelection();	
+			
+			$('.arlo-filter-group').on('click', 'li .icons8-minus', function () {
+				$(this).parentsUntil("li").parent().remove();
+				if ($('.arlo-available-filters-section > li').length === 0) {
+					me.addFilter();
+				}
+			});
+			
+			$('.arlo-filter-group').on('click', 'li .icons8-plus', function () {
+				var parent = $(this).closest('.arlo-available-filters');
+				me.addFilter(parent);
+			});
+		},
+		showFilterGroupSettings: function(val) {
+			$('.arlo-filter-group').hide();
+			$("#arlo-" + val + "-filters").show();
 		},
 		checkTasks: function() {
 			var me = this,
@@ -108,6 +136,21 @@ if (typeof (Arlo) === "undefined") {
 				$('#arlo-regions').append(newElement);
 			}
 		},
+		addFilter: function(parent) {
+			var newElement = parent.parent().find('#arlo-filter-empty ul li').clone();
+
+			var setting_id = Math.floor(Math.random() * 1000000);
+
+			newElement.find('input').each( function(index,element) {
+				var name = $(element).attr('name').replace('setting_id',setting_id);
+				$(element).attr('name',name);
+			});
+
+			if (newElement.length == 1) {
+				parent.append(newElement);
+			}
+		},
+
 		createTaskPlaceholder: function(taskID) {
 			var me = this,
 				header = $('.arlo-wrap > h2'),
@@ -272,7 +315,7 @@ if (typeof (Arlo) === "undefined") {
 			if ($('.arlo_' + tabID + '_section').length == 0) {
 				tabID = 'theme';
 			}
-			
+
 			$('.arlo_' + tabID + '_section').show();
 			$('#' + me.pluginSlug + '-tab-' + tabID).addClass('nav-tab-active');
 			
@@ -313,7 +356,7 @@ if (typeof (Arlo) === "undefined") {
 		},
 		initTabNavigation: function() {
 			var me = this,
-				tabIDs = [];	
+				tabIDs = [];
 
 			//go to the pages section
 			$('.arlo-pages-setup').click(function() {

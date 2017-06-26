@@ -15,7 +15,8 @@
 }
 
 .arlo .arlo-list.events > li,
-.arlo .arlo-list.upcoming > li.arlo-event {
+.arlo .arlo-list.upcoming > li.arlo-event,
+.arlo .arlo-list.arlo-online-activities > li {
 	border: 1px solid #ccc;
 	margin-bottom: 1em;
 	margin-left: 0px;
@@ -268,7 +269,8 @@
 }
 
 .arlo .arlo-boxed .arlo-list.events .arlo-cf,
-.arlo .arlo-boxed .arlo-list.upcoming .arlo-cf {
+.arlo .arlo-boxed .arlo-list.upcoming .arlo-cf,
+.arlo .arlo-boxed .arlo-list.arlo-online-activities .arlo-cf  {
     border: 1px solid #dcdcdc;
     border-radius: 2px;
     margin-right: 12px;
@@ -277,19 +279,22 @@
 
 @media (min-width: 550px) {
 	.arlo .arlo-boxed .arlo-list.events .arlo-cf,
-	.arlo .arlo-boxed .arlo-list.upcoming .arlo-cf {
+	.arlo .arlo-boxed .arlo-list.upcoming .arlo-cf,
+	.arlo .arlo-boxed .arlo-list.arlo-online-activities .arlo-cf {
 	    width: 47%;
 	    float: left;
 	}
 }
 
-.arlo .arlo-boxed .arlo-list.upcoming .arlo-cf.arlo-group-divider {
+.arlo .arlo-boxed .arlo-list.upcoming .arlo-cf.arlo-group-divider,
+.arlo .arlo-boxed .arlo-list.arlo-online-activities .arlo-cf.arlo-group-divider {
     float: none;
     border: none;
     font-weight: 600;
     font-size: 22px;
     margin-bottom: 1em;
     clear: both;
+    padding-left: 0;
 }
 
 .arlo .arlo-boxed .arlo-event-details {
