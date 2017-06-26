@@ -913,7 +913,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
             $date .=  " (" . $offset . ")";
         }
 
-        date_default_timezone_set($timezone->getName());
+        date_default_timezone_set($original_timezone);
 
         return $date;
     }  
