@@ -167,7 +167,11 @@ class UpcomingEvents {
         
         $settings = get_option('arlo_settings');
 
-        $page_link = get_permalink(get_post($post));
+        if (!empty($settings['post_types']['upcoming']['posts_page'])) {
+            $page_link = get_permalink(get_post($settings['post_types']['upcoming']['posts_page']));
+        } else {
+            $page_link = get_permalink(get_post($post));
+        }
             
         $filter_html = '<form class="arlo-filters" method="get" action="' . $page_link . '">';
 

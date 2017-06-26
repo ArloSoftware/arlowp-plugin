@@ -36,7 +36,7 @@ class Shortcodes {
 
 		//powered by Arlo
 		self::add('powered_by', function ($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-       		return '<div class="arlo-powered-by"><a href="https://www.arlo.co" target="_blank">' .  sprintf(__('Powered by %s', 'arlo-for-wordpress'), '<img src="' . plugins_url("", __FILE__ ) . '/../../public/assets/img/Arlo-logo.svg" alt="Arlo training & Event Software">') . '</a></div>';
+       		return '<div class="arlo-powered-by"><a href="https://www.arlo.co/?utm_source=arlo%20client%20site&utm_medium=referral%20arlo%20powered%20by&utm_campaign=powered%20by" target="_blank">' .  sprintf(__('Powered by %s', 'arlo-for-wordpress'), '<img src="' . plugins_url("", __FILE__ ) . '/../../public/assets/img/Arlo-logo.svg" alt="Arlo training & Event Software">') . '</a></div>';
     	});
 	}
 
@@ -94,11 +94,18 @@ class Shortcodes {
 			'wrap' => '%s',
 			'label' => '',
 			'strip_html'	=> 'false',
+			'decode_quotes_in_shortcodes' => 'false',
 		), $atts, $shortcode_name));
 	
 		// need to decide ordering - currently makes sense to process the specific filter first
 		$content = apply_filters('arlo_shortcode_content_'.$shortcode_name, $content, $atts, $shortcode_name);
 		$content = apply_filters('arlo_shortcode_content', $content, $atts, $shortcode_name);
+
+		if ($decode_quotes_in_shortcodes === 'true') {
+			if (preg_match('/\[(?:[^\/])(?:[^\]\[]*)(?:&quot;|&apos;)(?:[^\]\[]*)\]/', $content) === 1) {
+				$content = str_replace(['&quot;','&apos;'], ['"','\''], $content);
+			}
+		}
 		
 		// run any shortcodes prior to conituning
 		$content = do_shortcode($content);

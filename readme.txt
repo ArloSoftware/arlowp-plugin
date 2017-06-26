@@ -44,6 +44,7 @@ Arlo is a cloud-based training and event management system for managing, marketi
 * [Arlo for WordPress developer documentation](http://developer.arlo.co/doc/wordpress/index)
 * [Arlo for Wordpress frequently asked questions (FAQ)](https://support.arlo.co/hc/en-gb/articles/115000392503-WordPress-Plugin-Frequently-Asked-Questions-FAQ-)
 * [Submit a Arlo support request](https://support.arlo.co/hc/en-gb/requests/new/)
+* [Manage themes](https://support.arlo.co/hc/en-gb/articles/115002905863)
 
 = Arlo WordPress integration - built for web developers! =
 Create beautiful and interactive training and event websites using the Arlo for WordPress plugin. Access an extensive library of WordPress Shortcodes, Templates, and Widgets, all designed specifically for web developer to make integration easy.  

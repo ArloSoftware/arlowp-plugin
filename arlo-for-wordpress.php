@@ -61,6 +61,9 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/database/arlo-wp-database-
 //include provisioning classes
 require_once( plugin_dir_path( __FILE__ ) . 'includes/provisioning/arlo-schema-manager.php');
 
+//include exceptions
+require_once( plugin_dir_path( __FILE__ ) . 'includes/exceptions/arlo-exceptions.php');
+
 //include extra classes
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-arrays.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-utilities.php');

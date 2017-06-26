@@ -23,7 +23,7 @@ class Events extends BaseImporter {
 		}
 	}
 
-	private function save_event_data($item = [], $parent_id = 0, $region = '') {		
+	private function save_event_data($item = [], $parent_id = 0, $region = '') {	
 		$query = $this->dbl->query(
 			$this->dbl->prepare( 
 				"INSERT INTO " . $this->table_name ." 
@@ -31,7 +31,7 @@ class Events extends BaseImporter {
 				VALUES ( %d, %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) 
 				", 
 			    $item->EventID,
-				$item->EventTemplateID,
+				@$item->EventTemplateID,
 				$parent_id,
 				@$item->Code,
 				$item->Name,
@@ -68,7 +68,7 @@ class Events extends BaseImporter {
 		
 		//advertised offers
 		if(!empty($item->AdvertisedOffers) && is_array($item->AdvertisedOffers)) {
-			$this->save_advertised_offer($item->AdvertisedOffers, $item->Region, null, $entity_id);
+			$this->save_advertised_offer($item->AdvertisedOffers, (!empty($item->Region) ? $item->Region : $region), null, $entity_id);
 		}
 		
 		// prsenters

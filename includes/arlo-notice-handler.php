@@ -14,14 +14,6 @@ class NoticeHandler {
         'import_error' => 'error',
         'information' => 'notice-warning',
     );
-
- 	private static $dismissible_notices = array(
-    	'welcome' => 'arlo-welcome-admin-notice',
-    	'developer' => 'arlo-developer-admin-notice',
-    	'webinar' => 'arlo-webinar-admin-notice',
-    	'newpages' => 'arlo-newpages-admin-notice',
-		'wp_video' => 'arlo-wp-video',
-    );	
 	
 	public function __construct($message_handler, $importer, $dbl) {
 		$this->message_handler = $message_handler;
@@ -52,7 +44,7 @@ class NoticeHandler {
 		$notice_type = (!empty($message->type) && isset(self::$message_notice_types[$message->type]) ? self::$message_notice_types[$message->type] : (!empty($message->type) ? $message->type : 'error'));
 
 		$global_message = '';
-		if ($message->global) {
+		if (!empty($message->global)) {
 			$global_message = '<td class="logo" valign="top" style="width: 60px; padding-top: 1em;">
 						<a href="http://www.arlo.co" target="_blank"><i class="icons8 size-48 arlo-yellow icons8-arlo-logo-for-font arlo-middle"></i></a>
 					</td>';
@@ -75,7 +67,7 @@ class NoticeHandler {
 	}
 
 	public function create_user_notice($notice_key, $message_obj) {
-		$notice_id = self::$dismissible_notices[$notice_key];
+		$notice_id = \Arlo_For_Wordpress::$dismissible_notices[$notice_key];
 		$user = wp_get_current_user();
 		$meta = get_user_meta($user->ID, $notice_id, true);
 
@@ -111,7 +103,7 @@ class NoticeHandler {
 	}
 
 	public function dismiss_user_notice($notice_key = '') {
-		if (!empty($notice_key) && in_array($notice_key, self::$dismissible_notices)) {
+		if (!empty($notice_key) && in_array($notice_key, \Arlo_For_Wordpress::$dismissible_notices)) {
 			$user = wp_get_current_user();
 			update_user_meta($user->ID, $_POST['id'], 0);
 		}
@@ -259,6 +251,10 @@ class NoticeHandler {
 					true)
 			);
 		} else {
+			$notice_id = \Arlo_For_Wordpress::$dismissible_notices['newpages'];
+			$user = wp_get_current_user();
+			$meta = get_user_meta($user->ID, $notice_id, true);
+
 			if ($meta !== '0') {			
 				if (!empty($this->settings['platform_name']) && $events !== false && $upcoming !== false && $presenters !== false && $venues !== false && !empty($import_id)) {		
 					//Get the first event template wich has event

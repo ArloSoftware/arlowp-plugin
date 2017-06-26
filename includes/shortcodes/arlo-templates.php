@@ -467,7 +467,7 @@ class Templates {
         $settings = get_option('arlo_settings');  
             
         if (!empty($settings['post_types']['event']['posts_page'])) {
-            $page_link = site_url() . '/' . get_page_uri(get_post($settings['post_types']['event']['posts_page'])->ID);
+            $page_link = get_permalink(get_post($settings['post_types']['event']['posts_page']));
         } else {
             $page_link = get_permalink(get_post($post));
         }
@@ -791,7 +791,7 @@ class Templates {
                     
                     if (is_array($ids) && count($ids)) {
                         $where .= " OR c.c_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $ids)) . ")";
-                        $parameters = array_merge($parameters, $value);
+                        $parameters = array_merge($parameters, $ids);
                     }
                 }
             } 
