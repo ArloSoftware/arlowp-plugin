@@ -20,7 +20,7 @@
 		$templatetag = " templatetag='".$instance['templatetag']."' ";
 	}
 
-    $template = $instance['template'] ? $instance['template'] : arlo_get_template('upcoming_widget');
+    $template = !empty($instance['template']) ? $instance['template'] : arlo_get_template('upcoming_widget');
 
     $content = "[arlo_upcoming_widget_list $limit $eventtag $templatetag ]" . $template . "[/arlo_upcoming_widget_list]";
 
