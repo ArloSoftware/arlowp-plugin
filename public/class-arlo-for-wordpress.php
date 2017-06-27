@@ -196,7 +196,7 @@ class Arlo_For_Wordpress {
 				'child_post_type'	=> 'venue'
 			),
 			array(
-				'name'				=> 'onlineactivities',
+				'name'				=> 'oa',
 				'title'				=> 'Online Activities',
 				'content' 			=> '[arlo_onlineactivites_list]',
 				'child_post_type'	=> 'event'
@@ -1315,7 +1315,6 @@ class Arlo_For_Wordpress {
 			
 			if (!(is_array($posts) && count($posts) == 1)) {
 				$args = array(
-	  				
 	  				'post_type' => 'page',
 	  				'post_status' => array('publish','draft'),
 	  				'numberposts' => 1
