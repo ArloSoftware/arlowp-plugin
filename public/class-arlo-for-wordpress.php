@@ -152,7 +152,7 @@ class Arlo_For_Wordpress {
 			'slug' => 'onlineactivities',
 			'name' => 'Online activities',
 			'singular_name' => 'Online activity',
-			'regonalized' => true
+			'regionalized' => true
 		)
     );
     

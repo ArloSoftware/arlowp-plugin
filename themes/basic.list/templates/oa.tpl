@@ -1,4 +1,5 @@
 <div class="arlo arlo-boxed" id="arlo">
+    [arlo_template_region_selector]
     [arlo_onlineactivites_filters]
 
     <ul class="arlo-online-activities arlo-list">

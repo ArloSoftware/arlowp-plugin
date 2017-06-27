@@ -264,6 +264,7 @@ class OnlineActivities {
     private static function generate_onlineactivites_list_sql($atts, $import_id, $for_pagination = false) {
         global $wpdb;
 
+        $regions = get_option('arlo_regions');
         $arlo_region = get_query_var('arlo-region', '');
         $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : ''); 
 
@@ -285,12 +286,14 @@ class OnlineActivities {
         $t5 = "{$wpdb->prefix}arlo_categories";
         $t6 = "{$wpdb->prefix}arlo_eventtemplates_tags";
 
-        if (!empty($arlo_region)) {
-            $where .= '" AND ' . $t1 . '.oa_region = "' . $arlo_region . '"';
-        }
-
-        $where .= "oa.import_id = %d";
+        $where .= " oa.import_id = %d ";
         $parameters[] = $import_id;
+
+        if (!empty($arlo_region)) {
+            $where .= ' AND oa_region = %s AND et_region = %s';
+            $parameters[] = $arlo_region;
+            $parameters[] = $arlo_region;
+        }       
 
         $arlo_category = \Arlo\Utilities::clean_string_url_parameter('arlo-category');
         $arlo_tag = \Arlo\Utilities::clean_string_url_parameter('arlo-oatag');
