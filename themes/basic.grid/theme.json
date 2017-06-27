@@ -1,6 +1,6 @@
 {
     "version": 1.1,
-    "order": 7,
+    "order": 9,
     "icon": "icons8-grid-2",
     "name": "Basic Grid",
     "description": "Minimum styling to allow you to easily customize pages",
