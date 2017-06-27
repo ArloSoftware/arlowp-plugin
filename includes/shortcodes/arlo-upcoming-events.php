@@ -35,7 +35,7 @@ class UpcomingEvents {
             'delivery' => \Arlo\Utilities::clean_int_url_parameter('arlo-delivery'),
             'month' => \Arlo\Utilities::clean_string_url_parameter('arlo-month'),
             'eventtag' => \Arlo\Utilities::clean_string_url_parameter('arlo-eventtag'),
-            'templatetag' => isset($atts['templatetag']) ? $atts['templatetag'] : \Arlo\Utilities::clean_string_url_parameter('arlo-templatetag'),
+            'templatetag' => \Arlo\Utilities::clean_string_url_parameter('arlo-templatetag'),
             'presenter' => \Arlo\Utilities::clean_string_url_parameter('arlo-presenter'),
             'region' => (!empty($region) && \Arlo\Utilities::array_ikey_exists($region, $regions) ? $region : '')
         );
@@ -48,11 +48,7 @@ class UpcomingEvents {
     private static function shortcode_upcoming_list_pagination($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $wpdb;
         
-        $limit = intval(isset(self::$upcoming_list_item_atts['limit']) ? self::$upcoming_list_item_atts['limit'] : get_option('posts_per_page'));
-
-        if (empty($atts)) {
-            $atts = [];
-        }
+        $atts['limit'] = intval(isset(self::$upcoming_list_item_atts['limit']) ? self::$upcoming_list_item_atts['limit'] : isset($atts['limit']) && is_numeric($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
 
         $atts = array_merge($atts,self::$upcoming_list_item_atts);
 
@@ -62,7 +58,7 @@ class UpcomingEvents {
         
         $num = $wpdb->num_rows;
 
-        return arlo_pagination($num,$limit);        
+        return arlo_pagination($num, $atts['limit']);        
     }  
 
     private static function shortcode_upcoming_widget_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -92,17 +88,19 @@ class UpcomingEvents {
     private static function shortcode_upcoming_list_item($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $wpdb;
 
+        if (!empty($atts['limit'])) {
+            self::$upcoming_list_item_atts['limit'] = $atts['limit'];
+        }
+
         $settings = get_option('arlo_settings');
 
         $output = '';
-
-        $args = func_get_args();
 
         if (empty($atts)) {
             $atts = [];
         }
 
-        $atts = array_merge($atts,self::$upcoming_list_item_atts);
+        $atts = array_merge($atts, self::$upcoming_list_item_atts);
 
         $sql = self::generate_list_sql($atts, $import_id);
 
