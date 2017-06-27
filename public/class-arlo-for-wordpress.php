@@ -326,6 +326,7 @@ class Arlo_For_Wordpress {
 			'name' => 'Online activities',
 			'filters' => array(
 				'oatag' => 'Online activity tag', 
+				'templatetag' => 'Template tag',
 				'category' => 'Category'
 			)
 		),

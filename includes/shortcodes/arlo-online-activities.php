@@ -289,9 +289,12 @@ class OnlineActivities {
             $where .= '" AND ' . $t1 . '.oa_region = "' . $arlo_region . '"';
         }
 
-        $arlo_category = \Arlo\Utilities::clean_int_url_parameter('arlo-category');
-        $arlo_tag = \Arlo\Utilities::clean_int_url_parameter('arlo-oatag');
-        $arlo_templatetag = \Arlo\Utilities::clean_int_url_parameter('arlo-templatetag');
+        $where .= "oa.import_id = %d";
+        $parameters[] = $import_id;
+
+        $arlo_category = \Arlo\Utilities::clean_string_url_parameter('arlo-category');
+        $arlo_tag = \Arlo\Utilities::clean_string_url_parameter('arlo-oatag');
+        $arlo_templatetag = \Arlo\Utilities::clean_string_url_parameter('arlo-templatetag');
 
         if(!empty($arlo_category)) :
             $join .= " LEFT JOIN $t3 et_category ON et_category.et_arlo_id = oa.oat_arlo_id";
@@ -378,7 +381,6 @@ class OnlineActivities {
                 c.import_id = etc.import_id
             $join
             WHERE
-                oa.import_id = ". $import_id ."
             $where
             $order
             $limit_field
@@ -408,9 +410,9 @@ class OnlineActivities {
 
         $filter_group = 'oa';
 
-        foreach(\Arlo_For_Wordpress::$available_filters[$filter_group]['filters'] as $filter_key => $filter):
+        foreach($filters_array as $filter_key):
 
-            if (!in_array($filter_key, $filters_array))
+            if (!array_key_exists($filter_key, \Arlo_For_Wordpress::$available_filters[$filter_group]['filters']))
                 continue;
 
             switch($filter_key) :
