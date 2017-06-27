@@ -1624,13 +1624,14 @@ class Arlo_For_Wordpress {
 	 * add_pages function.
 	 * 
 	 * @access public
-	 * @return void
+	 * @return associated array page_ids
 	 */
-	private function add_pages() {
+	public function add_pages($page_name = '') {
+		$page_ids = [];
 		
-		$settings = get_option('arlo_settings');
-	
 		foreach($this::$pages as $page) {
+			if (!empty($page_name) && $page['name'] != $page_name) continue;
+
 			$current_page = get_page_by_title($page['title']);
 		
 			if(is_null($current_page)) {
@@ -1641,21 +1642,13 @@ class Arlo_For_Wordpress {
 					'post_title'	=> $page['title'],
 					'post_content' 	=> $page['content']
 				));
-				
-				/*
-				if(isset($page['child_post_type'])) {
-					foreach(self::$post_types as $id => $type) {
-						if($page['child_post_type'] == $id) {
-							$settings['post_types'][$id]['posts_page'] = $post_id;
-						}
-					}
+
+				if (!empty($post_id)) {
+					$page_ids[$page['name']] = $post_id;
 				}
-				*/
 			}
 		}
-	
-		// update settings
-		update_option('arlo_settings', $settings);
+		return $page_ids;
 	}
 }
 
