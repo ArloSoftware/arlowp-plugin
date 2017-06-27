@@ -58,7 +58,6 @@ class Download extends BaseImporter  {
 
 		$settings = get_option('arlo_settings');
 		if (!empty($settings['disable_ssl_verification']) && $settings['disable_ssl_verification'] == 1) {
-			error_log(__FUNCTION__ . 'disable ssl');
 			curl_setopt($c, CURLOPT_SSL_VERIFYHOST,false);
 			curl_setopt($c, CURLOPT_SSL_VERIFYPEER,false);
 		}
