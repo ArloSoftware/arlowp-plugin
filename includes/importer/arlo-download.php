@@ -55,8 +55,13 @@ class Download extends BaseImporter  {
     	$c = curl_init();
     	curl_setopt($c, CURLOPT_URL, $url);
     	curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-	    curl_setopt($c, CURLOPT_SSL_VERIFYHOST,false);
-    	curl_setopt($c, CURLOPT_SSL_VERIFYPEER,false);
+
+		$settings = get_option('arlo_settings');
+		if (!empty($settings['disable_ssl_verification']) && $settings['disable_ssl_verification'] == 1) {
+			error_log(__FUNCTION__ . 'disable ssl');
+			curl_setopt($c, CURLOPT_SSL_VERIFYHOST,false);
+			curl_setopt($c, CURLOPT_SSL_VERIFYPEER,false);
+		}
 	    
 		$follow_allowed = (ini_get('open_basedir') || ini_get('safe_mode')) ? false : true;
 		if ($follow_allowed) {

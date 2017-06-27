@@ -323,12 +323,12 @@ class Arlo_For_Wordpress_Settings {
 				));			
 
 		add_settings_field(
-			'arlo_send_data_setting', 
-			'<label for="arlo_send_data">'.__('Allow to send data to Arlo', 'arlo-for-wordpress' ).'</label>', 
+			'arlo_disable_ssl_verification_setting', 
+			'<label for="arlo_disable_ssl_verification">'.__('Disable SSL verification for import (not recommended)', 'arlo-for-wordpress' ).'</label>', 
 			array($this, 'arlo_checkbox_callback'), 
 			$this->plugin_slug, 
 			'arlo_misc_section', 
-			['option_name' => 'arlo_send_data']);
+			['option_name' => 'disable_ssl_verification']);
 								
 			
 		add_settings_field(

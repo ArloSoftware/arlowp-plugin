@@ -1603,7 +1603,13 @@ class Arlo_For_Wordpress {
 			curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+			$settings = get_option('arlo_settings');
+			if (!empty($settings['disable_ssl_verification']) && $settings['disable_ssl_verification'] == 1) {
+				error_log(__FUNCTION__ . 'disable ssl');
+				curl_setopt($c, CURLOPT_SSL_VERIFYHOST,false);
+				curl_setopt($c, CURLOPT_SSL_VERIFYPEER,false);
+			}
 			
 			curl_exec($ch);
 			
