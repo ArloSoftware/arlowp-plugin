@@ -310,7 +310,7 @@ class Arlo_For_Wordpress_Settings {
 				));	
 
 		add_settings_field(
-			'arlo_sleep_between_import_tasks', 
+			'arlo_sleep_between_import_tasks_setting', 
 			'<label for="arlo_sleep_between_import_tasks">' . sprintf(__('Wait between import tasks (seconds, max %s sec)', 'arlo-for-wordpress' ), \Arlo\Scheduler::MAX_SLEEP_BETWEEN_TASKS).'</label>', 
 			array($this, 'arlo_simple_input_callback'), 
 			$this->plugin_slug, 
@@ -320,7 +320,16 @@ class Arlo_For_Wordpress_Settings {
 				'label_for' => 'arlo_sleep_between_import_tasks',
 				'class' => 'arlo-only-numeric',
 				'default_val' => 0,
-				));							
+				));			
+
+		add_settings_field(
+			'arlo_send_data_setting', 
+			'<label for="arlo_send_data">'.__('Allow to send data to Arlo', 'arlo-for-wordpress' ).'</label>', 
+			array($this, 'arlo_checkbox_callback'), 
+			$this->plugin_slug, 
+			'arlo_misc_section', 
+			['option_name' => 'arlo_send_data']);
+								
 			
 		add_settings_field(
 			'arlo_download_log_setting', 
