@@ -847,7 +847,7 @@ class Arlo_For_Wordpress {
 	public function enqueue_styles() {
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css?20170424', __FILE__ ), array(), VersionHandler::VERSION );
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-darktooltip', plugins_url( 'assets/css/libs/darktooltip.min.css', __FILE__ ), array(), VersionHandler::VERSION );
-		wp_enqueue_style( $this->plugin_slug .'-icons8', plugins_url( '../admin/assets/fonts/icons8/Arlo-WP.css', __FILE__ ), array(), VersionHandler::VERSION );
+		wp_enqueue_style( $this->plugin_slug .'-arlo-icons8', plugins_url( '../admin/assets/fonts/arlo-icons8/Arlo-WP.css', __FILE__ ), array(), VersionHandler::VERSION );
 
 		//enqueue theme related styles
 		$stored_themes_settings = get_option( 'arlo_themes_settings', [] );

@@ -225,13 +225,13 @@
 	float: left;
 }
 
-.arlo-region-controls i.icons8-plus,
-.arlo-filter-controls i.icons8-plus {
+.arlo-region-controls i.arlo-icons8-plus,
+.arlo-filter-controls i.arlo-icons8-plus {
 	display: none;
 }
 
-#arlo-regions li:last-of-type .arlo-region-controls i.icons8-plus,
-.arlo-filter-group li:last-of-type .arlo-filter-controls i.icons8-plus {
+#arlo-regions li:last-of-type .arlo-region-controls i.arlo-icons8-plus,
+.arlo-filter-group li:last-of-type .arlo-filter-controls i.arlo-icons8-plus {
 	display: inline-block;
 }
 
@@ -643,7 +643,7 @@ table.arlo-welcome td.logo {
 	display: none;
 }
 
-a .icons8 {
+a .arlo-icons8 {
 	text-decoration: none;
 }
 

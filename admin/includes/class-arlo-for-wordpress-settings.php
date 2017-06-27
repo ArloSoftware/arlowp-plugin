@@ -40,7 +40,7 @@ class Arlo_For_Wordpress_Settings {
 		
 		add_action( 'admin_notices', array($notice_handler, "global_notices") );
 
-		if (get_option('arlo_plugin_disabled', '0') == '1') {
+		if (get_option('arlo_plugin_disabled', '0') == '0') {
 			add_action( 'admin_notices', array($notice_handler, "plugin_disabled") );
 		} else if (get_option('arlo_import_disabled', '0') == '1') {
 			add_action( 'admin_notices', array($notice_handler, "import_disabled") );
@@ -225,7 +225,7 @@ class Arlo_For_Wordpress_Settings {
                 
 		add_settings_field(
                         'arlo_import_callback_host', 
-                        '<label for="arlo_import_callback_host">'.__('Import callback host', 'arlo-for-wordpress' ).' <a href="http://developer.arlo.co/doc/wordpress/settings#import-callback-host" target="_blank"><i class="icons8 icons8-help-filled size-16"></i></a></label>', 
+                        '<label for="arlo_import_callback_host">'.__('Import callback host', 'arlo-for-wordpress' ).' <a href="http://developer.arlo.co/doc/wordpress/settings#import-callback-host" target="_blank"><i class="arlo-icons8 arlo-icons8-help-filled size-16"></i></a></label>', 
                         array($this, 'arlo_simple_input_callback'), 
                         $this->plugin_slug, 'arlo_general_section', 
                         array(
@@ -472,8 +472,8 @@ class Arlo_For_Wordpress_Settings {
 							<li>
 								<div class="arlo-filter-old-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][setting_id][filteroldvalue]"></div>
 								<div class="arlo-filter-controls">
-									<i class="icons8-minus icons8 size-21"></i>
-									<i class="icons8-plus icons8 size-21"></i>
+									<i class="arlo-icons8-minus arlo-icons8 size-21"></i>
+									<i class="arlo-icons8-plus arlo-icons8 size-21"></i>
 								</div>
 								<div class="arlo-filter-toggle">
 									<input type="checkbox" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][setting_id][filterhideoption]" value="hidden">
@@ -503,8 +503,8 @@ class Arlo_For_Wordpress_Settings {
 							$filters_settings_html .=  '<li>
 								<div class="arlo-filter-old-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$existing_filter_setting_id.'][filteroldvalue]" value="'.$old_value.'"></div>
 								<div class="arlo-filter-controls">
-									<i class="icons8-minus icons8 size-21"></i>
-									<i class="icons8-plus icons8 size-21"></i>
+									<i class="arlo-icons8-minus arlo-icons8 size-21"></i>
+									<i class="arlo-icons8-plus arlo-icons8 size-21"></i>
 								</div>
 								<div class="arlo-filter-toggle">
 									<input type="checkbox" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$existing_filter_setting_id.'][filterhideoption]" value="hidden" ' . $checked . '>
@@ -523,8 +523,8 @@ class Arlo_For_Wordpress_Settings {
 				$filters_settings_html .= '<li>
 						<div class="arlo-filter-old-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$new_filter_setting_id.'][filteroldvalue]"></div>
 						<div class="arlo-filter-controls">
-							<i class="icons8-minus icons8 size-21"></i>
-							<i class="icons8-plus icons8 size-21"></i>
+							<i class="arlo-icons8-minus arlo-icons8 size-21"></i>
+							<i class="arlo-icons8-plus arlo-icons8 size-21"></i>
 						</div>
 						<div class="arlo-filter-toggle">
 							<input type="checkbox" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$new_filter_setting_id.'][filterhideoption]" value="hidden">
@@ -726,8 +726,8 @@ class Arlo_For_Wordpress_Settings {
 					<div class="arlo-order-number">1.</div>
 					<div class="arlo-region-id"><input type="text" name="arlo_settings[regionid][]"></div>
 					<div class="arlo-region-controls">
-						<i class="icons8-minus icons8 size-21"></i>
-						<i class="icons8-plus icons8 size-21"></i>
+						<i class="arlo-icons8-minus arlo-icons8 size-21"></i>
+						<i class="arlo-icons8-plus arlo-icons8 size-21"></i>
 					</div>			
 					<div class="arlo-region-name"><input type="text" name="arlo_settings[regionname][]"></div>
 				</li>
@@ -741,8 +741,8 @@ class Arlo_For_Wordpress_Settings {
 					<div class="arlo-order-number">' . (++$key) . '</div>
 					<div class="arlo-region-id"><input type="text" name="arlo_settings[regionid][]" value="'.$regionid.'"></div>
 					<div class="arlo-region-controls">
-						<i class="icons8-minus icons8 size-21"></i>
-						<i class="icons8-plus icons8 size-21"></i>
+						<i class="arlo-icons8-minus arlo-icons8 size-21"></i>
+						<i class="arlo-icons8-plus arlo-icons8 size-21"></i>
 					</div>			
 					<div class="arlo-region-name"><input type="text" name="arlo_settings[regionname][]" value="' . $regionname . '"></div>
 				  </li>
@@ -754,8 +754,8 @@ class Arlo_For_Wordpress_Settings {
 			<div class="arlo-order-number">' . ($key + 1) . '</div>
 			<div class="arlo-region-id"><input type="text" name="arlo_settings[regionid][]"></div>
 			<div class="arlo-region-controls">
-				<i class="icons8-minus icons8 size-21"></i>
-				<i class="icons8-plus icons8 size-21"></i>
+				<i class="arlo-icons8-minus arlo-icons8 size-21"></i>
+				<i class="arlo-icons8-plus arlo-icons8 size-21"></i>
 			</div>			
 			<div class="arlo-region-name"><input type="text" name="arlo_settings[regionname][]"></div>
 		  </li>
@@ -856,8 +856,8 @@ class Arlo_For_Wordpress_Settings {
 	}
 	
 	function arlo_systemrequirements_callback () {
-		$good = '<i class="icons8-checkmark icons8 size-21 green"></i>';
-		$bad = '<i class="icons8-cancel icons8 size-21 red"></i>';
+		$good = '<i class="arlo-icons8-checkmark arlo-icons8 size-21 green"></i>';
+		$bad = '<i class="arlo-icons8-cancel arlo-icons8 size-21 red"></i>';
 
 		echo '
 		<table class="arlo-system-requirements-table">
@@ -928,7 +928,7 @@ class Arlo_For_Wordpress_Settings {
 
 			$overlay = '
 					<div class="arlo-theme-desc-text">
-						' . (!empty($theme_data->icon) ? '<div class="arlo-theme-icon"><i class="icons8 ' . $theme_data->icon . ' size-48 "></i></div>' : '') . '
+						' . (!empty($theme_data->icon) ? '<div class="arlo-theme-icon"><i class="arlo-icons8 ' . $theme_data->icon . ' size-48 "></i></div>' : '') . '
 						<div class="arlo-theme-name">' . htmlentities(strip_tags($theme_data->name)) . '</div>
 						<div class="arlo-theme-description">' . $theme_data->description . '</div>
 						' . (!empty($theme_data->forDesigners) && $theme_data->forDesigners ? '<div class="arlo-theme-for-designer">Learn about themes <a href="javascript:;" data-fancybox="modal" data-src="#arlo-themes-for-designers">"For designers"</a></div>' : '') . '
