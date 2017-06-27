@@ -148,7 +148,7 @@ class Arlo_For_Wordpress {
 			'singular_name' => 'Event search',
 			'regionalized' => true
 		),
-		'onlineactivities' => array(
+		'oa' => array(
 			'slug' => 'onlineactivities',
 			'name' => 'Online activities',
 			'singular_name' => 'Online activity',
@@ -270,8 +270,8 @@ class Arlo_For_Wordpress {
 			'shortcode' => '[arlo_upcoming_list]',
 			'name' => 'Upcoming event list',
 		),
-		'onlineactivities' => array(
-			'id' => 'onlineactivities',
+		'oa' => array(
+			'id' => 'oa',
 			'shortcode' => '[arlo_all_oa_list]',
 			'name' => 'Online activity list'
 		),
@@ -322,7 +322,7 @@ class Arlo_For_Wordpress {
 				'presenter' => 'Presenter'
 			)
 		),
-		'onlineactivities' => array(
+		'oa' => array(
 			'name' => 'Online activities',
 			'filters' => array(
 				'oatag' => 'Online activity tag', 

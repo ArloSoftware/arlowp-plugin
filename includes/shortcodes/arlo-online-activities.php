@@ -188,7 +188,7 @@ class OnlineActivities {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
         
         $templates = arlo_get_option('templates');
-        $content = $templates['onlineactivities']['html'];
+        $content = $templates['oa']['html'];
         return do_shortcode($content);        
     }
 
@@ -406,7 +406,7 @@ class OnlineActivities {
             
         $filter_html = '<form class="arlo-filters" method="get" action="' . $page_link . '">';
 
-        $filter_group = "onlineactivities";
+        $filter_group = 'oa';
 
         foreach(\Arlo_For_Wordpress::$available_filters[$filter_group]['filters'] as $filter_key => $filter):
 

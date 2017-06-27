@@ -180,7 +180,7 @@ function arlo_register_custom_post_types() {
 				case 'upcoming':
 					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(eventtag-([^/]*))?/?(presenter-([^/]*))?/?(templatetag-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-delivery=$matches[10]&arlo-eventtag=$matches[12]&arlo-presenter=$matches[14]&arlo-templatetag=$matches[16]&paged=$matches[18]','top');
 				break;
-				case 'onlineactivities':
+				case 'oa':
 					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(oatag-([^/]*))?/?(page/([^/]*))?/?(templatetag-([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-oatag=$matches[6]&paged=$matches[8]&arlo-templatetag=$matches[10]','top');
 				break;			
 				case 'event':					
@@ -200,7 +200,7 @@ function arlo_register_custom_post_types() {
 				break;
 			}
 		}
-		
+	
 		register_post_type('arlo_' . $id, $args);
 	}
 	
