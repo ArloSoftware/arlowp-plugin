@@ -2,15 +2,15 @@
 msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
-"Project-Id-Version: Arlo For WordPress\n"
-"POT-Creation-Date: 2017-04-24 14:08+1200\n"
-"PO-Revision-Date: 2017-04-24 14:00+1200\n"
+"Project-Id-Version: Arlo\n"
+"POT-Creation-Date: 2017-06-27 16:32+1200\n"
+"PO-Revision-Date: 2017-06-27 16:31+1200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.0.1\n"
+"X-Generator: Poedit 2.0.2\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-Flags-xgettext: --add-comments=translators:\n"
 "X-Poedit-WPHeader: arlo-for-wordpress.php\n"
@@ -46,7 +46,7 @@ msgstr ""
 
 #: admin/class-arlo-for-wordpress-admin.php:275
 #: admin/includes/class-arlo-for-wordpress-sessions.php:20
-#: includes/shortcodes/arlo-events.php:479
+#: includes/shortcodes/arlo-events.php:501
 msgid "Sessions"
 msgstr ""
 
@@ -77,7 +77,7 @@ msgid "More about shortcodes"
 msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-events.php:19
-#: includes/arlo-notice-handler.php:323
+#: includes/arlo-notice-handler.php:289
 msgid "Event"
 msgstr ""
 
@@ -174,11 +174,8 @@ msgid "Delivery desc."
 msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-presenters.php:19
-#: includes/shortcodes/arlo-events.php:405
 msgid "Presenter"
-msgid_plural "Presenters"
-msgstr[0] ""
-msgstr[1] ""
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-presenters.php:42
 msgid "Profile"
@@ -237,9 +234,9 @@ msgid "\"Free\" text"
 msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-settings.php:185
-#: includes/shortcodes/arlo-events.php:607
-#: includes/shortcodes/arlo-shortcodes.php:317
-#: includes/shortcodes/arlo-upcoming-events.php:93
+#: includes/shortcodes/arlo-events.php:638
+#: includes/shortcodes/arlo-shortcodes.php:343
+#: includes/shortcodes/arlo-upcoming-events.php:144
 msgid "Free"
 msgstr ""
 
@@ -249,7 +246,7 @@ msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-settings.php:198
 #: includes/shortcodes/arlo-templates.php:276
-#: includes/shortcodes/arlo-upcoming-events.php:59
+#: includes/shortcodes/arlo-upcoming-events.php:113
 msgid "No events to show"
 msgstr ""
 
@@ -272,96 +269,107 @@ msgstr ""
 msgid "Import callback host"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:277
+#: admin/includes/class-arlo-for-wordpress-settings.php:289
 msgid "Miscellaneous"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:281
+#: admin/includes/class-arlo-for-wordpress-settings.php:293
 msgid "Allow to send data to Arlo"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:289
+#: admin/includes/class-arlo-for-wordpress-settings.php:301
 msgid "Import fragment size (in bytes, max 10 MB)"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:301
+#: admin/includes/class-arlo-for-wordpress-settings.php:314
+#, php-format
+msgid "Wait between import tasks (seconds, max %s sec)"
+msgstr ""
+
+#: admin/includes/class-arlo-for-wordpress-settings.php:327
+msgid "Disable SSL verification for import (not recommended)"
+msgstr ""
+
+#: admin/includes/class-arlo-for-wordpress-settings.php:336
 msgid "Download log"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:309
+#: admin/includes/class-arlo-for-wordpress-settings.php:344
 msgid "Subscribe to our WP newsletter"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:337
+#: admin/includes/class-arlo-for-wordpress-settings.php:372
 msgid "System requirements"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:450
-#: admin/includes/class-arlo-for-wordpress-settings.php:488
+#: admin/includes/class-arlo-for-wordpress-settings.php:603
+#: admin/includes/class-arlo-for-wordpress-settings.php:641
 #, php-format
 msgid "%s page"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:474
+#: admin/includes/class-arlo-for-wordpress-settings.php:627
 msgid "Host page"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:477
+#: admin/includes/class-arlo-for-wordpress-settings.php:630
 #, php-format
 msgid "Page must contain the %s shortcode"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:502
+#: admin/includes/class-arlo-for-wordpress-settings.php:655
 #: admin/includes/class-arlo-for-wordpress-templates.php:19
+#: widgets/upcoming-widget/views/admin.php:24
 msgid "Template"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:505
+#: admin/includes/class-arlo-for-wordpress-settings.php:658
 msgid "Reload original template"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:701
+#: admin/includes/class-arlo-for-wordpress-settings.php:891
 msgid "Support"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:724
+#: admin/includes/class-arlo-for-wordpress-settings.php:914
 msgid ""
 "Arlo powered pages will be updated to match the Arlo control theme selected."
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:768
+#: admin/includes/class-arlo-for-wordpress-settings.php:958
 msgid "Preview"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:772
+#: admin/includes/class-arlo-for-wordpress-settings.php:962
 msgid "Apply"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:774
+#: admin/includes/class-arlo-for-wordpress-settings.php:964
 #: includes/shortcodes/arlo-events.php:33
+#: includes/shortcodes/arlo-online-activities.php:399
 #: includes/shortcodes/arlo-templates.php:461
-#: includes/shortcodes/arlo-upcoming-events.php:111
+#: includes/shortcodes/arlo-upcoming-events.php:162
 msgid "Reset"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:774
+#: admin/includes/class-arlo-for-wordpress-settings.php:964
 msgid "Apply & Reset"
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:784
+#: admin/includes/class-arlo-for-wordpress-settings.php:974
 msgid ""
 "Themes that include \"For designers\" label provide maximum flexibility as "
 "they inherit some of the main website’s styles. They will however require "
 "additional work by a web designer to fix any inadvertent styling issues."
 msgstr ""
 
-#: admin/includes/class-arlo-for-wordpress-settings.php:785
+#: admin/includes/class-arlo-for-wordpress-settings.php:975
 msgid "Learn more"
 msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-templates.php:34
 #: admin/includes/class-arlo-for-wordpress-templates.php:66
-#: includes/shortcodes/arlo-events.php:757
+#: includes/shortcodes/arlo-events.php:791
 msgid "Register interest"
 msgstr ""
 
@@ -401,49 +409,56 @@ msgstr ""
 msgid "Parking"
 msgstr ""
 
-#: admin/views/admin.php:37
+#: admin/views/admin.php:38
 msgid "API help text"
 msgstr ""
 
-#: admin/views/admin.php:38
+#: admin/views/admin.php:39
 msgid "Slug help text"
 msgstr ""
 
-#: admin/views/admin.php:39
+#: admin/views/admin.php:40
 msgid "Cron help text"
 msgstr ""
 
-#: admin/views/admin.php:40
+#: admin/views/admin.php:41
 msgid "Template help text"
 msgstr ""
 
-#: admin/views/list.php:25 includes/shortcodes/arlo-shortcodes.php:181
+#: admin/views/list.php:25 includes/shortcodes/arlo-shortcodes.php:206
 msgid "Search"
 msgstr ""
 
-#: includes/arlo-notice-handler.php:149
+#: includes/arlo-notice-handler.php:135
+msgid ""
+"<a href=\"https://developer.arlo.co/doc/wordpress/index\" target=\"_blank"
+"\">Learn how to use</a> Arlo for WordPress or visit <a href=\"http://www."
+"arlo.co\" target=\"_blank\">www.arlo.co</a> to find out more about Arlo."
+msgstr ""
+
+#: includes/arlo-notice-handler.php:143
 msgid "Permalink setting change required."
 msgstr ""
 
-#: includes/arlo-notice-handler.php:150
+#: includes/arlo-notice-handler.php:144
 #, php-format
 msgid ""
 "Arlo for WordPress requires <a target=\"_blank\" href=\"%s\">Permalinks</a> "
 "to be set to \"Post name\"."
 msgstr ""
 
-#: includes/arlo-notice-handler.php:158
+#: includes/arlo-notice-handler.php:151
 #, php-format
 msgid ""
 "The Arlo for WordPress plugin has been disabled, please check the <a href="
 "\"%s\" class=\"%s\">System Requirements</a> page"
 msgstr ""
 
-#: includes/arlo-notice-handler.php:161
+#: includes/arlo-notice-handler.php:154
 msgid "Plugin disabled"
 msgstr ""
 
-#: includes/arlo-notice-handler.php:171
+#: includes/arlo-notice-handler.php:164
 #, php-format
 msgid ""
 "The import for the Arlo for WordPress plugin has been disabled, but the "
@@ -451,111 +466,83 @@ msgid ""
 "class=\"%s\">System Requirements</a> page"
 msgstr ""
 
-#: includes/arlo-notice-handler.php:174
+#: includes/arlo-notice-handler.php:167
 msgid "Import disabled"
 msgstr ""
 
-#: includes/arlo-notice-handler.php:187
+#: includes/arlo-notice-handler.php:180
 msgid "Page setup required."
 msgstr ""
 
-#: includes/arlo-notice-handler.php:188
+#: includes/arlo-notice-handler.php:181
 msgid ""
 "Arlo for WordPress requires you to setup the pages which will host event "
 "information."
 msgstr ""
 
-#: includes/arlo-notice-handler.php:188
+#: includes/arlo-notice-handler.php:181
 #, php-format
 msgid "<a href=\"%s\" class=\"arlo-pages-setup\">Setup pages</a>"
 msgstr ""
 
-#: includes/arlo-notice-handler.php:188 includes/arlo-version-handler.php:277
+#: includes/arlo-notice-handler.php:181 includes/arlo-version-handler.php:285
 #, php-format
 msgid ""
 "<a target=\"_blank\" href=\"%s\">View documentation</a> for more information."
 msgstr ""
 
-#: includes/arlo-notice-handler.php:195
-msgid ""
-"Create beautiful and interactive training and event websites using the Arlo "
-"for WordPress plugin. Access an extensive library of WordPress Shortcodes, "
-"Templates, and Widgets, all designed specifically for web developers to make "
-"integration easy."
-msgstr ""
-
-#: includes/arlo-notice-handler.php:196
-msgid ""
-"<a href=\"https://developer.arlo.co/doc/wordpress/index\" target=\"_blank"
-"\">Learn how to use</a> Arlo for WordPress or visit <a href=\"http://www."
-"arlo.co\" target=\"_blank\">www.arlo.co</a> to find out more about Arlo."
-msgstr ""
-
-#: includes/arlo-notice-handler.php:197
-msgid "Try with demo data"
-msgstr ""
-
-#: includes/arlo-notice-handler.php:197
-msgid "Get started with free trial"
+#: includes/arlo-notice-handler.php:199
+msgid "Become an Arlo reseller and receive a "
 msgstr ""
 
 #: includes/arlo-notice-handler.php:200
-msgid "Welcome to Arlo for WordPress"
+msgid "20%"
 msgstr ""
 
-#: includes/arlo-notice-handler.php:221
-msgid "Are you a web developer building a site for a client?"
+#: includes/arlo-notice-handler.php:200
+msgid "sales commission"
 msgstr ""
 
-#: includes/arlo-notice-handler.php:222
+#: includes/arlo-notice-handler.php:201
 #, php-format
 msgid ""
 "<a target=\"_blank\" href=\"%s\">Contact us to become an Arlo partner</a>"
 msgstr ""
 
-#: includes/arlo-notice-handler.php:239
-#, php-format
-msgid "<a target=\"_blank\" href=\"%s\">Watch overview video</a>"
-msgstr ""
-
-#: includes/arlo-notice-handler.php:240
-msgid "to see Arlo for WordPress in action."
-msgstr ""
-
-#: includes/arlo-notice-handler.php:255
+#: includes/arlo-notice-handler.php:217
 msgid "Watch overview video"
 msgstr ""
 
-#: includes/arlo-notice-handler.php:258
+#: includes/arlo-notice-handler.php:220
 msgid ""
 "Jon <a target=\"_blank\" href=\"\" class=\"webinar_url\">Arlo for WordPress "
 "Getting started</a> webinar on <span id=\"webinar_date\"></span>"
 msgstr ""
 
-#: includes/arlo-notice-handler.php:259
+#: includes/arlo-notice-handler.php:221
 msgid ""
 "<a target=\"_blank\" href=\"\" class=\"webinar_url\">Register now!</a> or <a "
 "target=\"_blank\" href=\"\" id=\"webinar_template_url\">view more times</a>"
 msgstr ""
 
-#: includes/arlo-notice-handler.php:286
+#: includes/arlo-notice-handler.php:248
 #, php-format
 msgid "Couldn't set the following post types: %s"
 msgstr ""
 
-#: includes/arlo-notice-handler.php:348
+#: includes/arlo-notice-handler.php:314
 msgid "Presenter profile"
 msgstr ""
 
-#: includes/arlo-notice-handler.php:373
+#: includes/arlo-notice-handler.php:339
 msgid "Venue information"
 msgstr ""
 
-#: includes/arlo-notice-handler.php:378
+#: includes/arlo-notice-handler.php:344
 msgid "Start editing your new pages"
 msgstr ""
 
-#: includes/arlo-notice-handler.php:379
+#: includes/arlo-notice-handler.php:345
 #, php-format
 msgid ""
 "View %s <a href=\"%s\" target=\"_blank\">%s</a>, <a href=\"%s\" target="
@@ -563,25 +550,25 @@ msgid ""
 "\"%s\" target=\"_blank\">%s</a> pages"
 msgstr ""
 
-#: includes/arlo-notice-handler.php:382
+#: includes/arlo-notice-handler.php:348
 msgid "Catalogue"
 msgstr ""
 
-#: includes/arlo-notice-handler.php:387
+#: includes/arlo-notice-handler.php:353
 msgid "Presenters list"
 msgstr ""
 
-#: includes/arlo-notice-handler.php:390
+#: includes/arlo-notice-handler.php:356
 msgid "Venues list"
 msgstr ""
 
-#: includes/arlo-notice-handler.php:391
+#: includes/arlo-notice-handler.php:357
 msgid ""
 "Edit the page <a href=\"#pages\" class=\"arlo-pages-setup\">templates</a> "
 "for each of these websites pages below."
 msgstr ""
 
-#: includes/arlo-version-handler.php:268
+#: includes/arlo-version-handler.php:276
 msgid ""
 "Arlo for WordPress will automatically send technical data to Arlo if "
 "problems are encountered when synchronising your event information. The data "
@@ -589,31 +576,31 @@ msgid ""
 "plugin. You can turn this off anytime in the"
 msgstr ""
 
-#: includes/arlo-version-handler.php:268
+#: includes/arlo-version-handler.php:276
 msgid "setting"
 msgstr ""
 
-#: includes/arlo-version-handler.php:269
+#: includes/arlo-version-handler.php:277
 msgid "Turn off"
 msgstr ""
 
-#: includes/arlo-version-handler.php:272
+#: includes/arlo-version-handler.php:280
 msgid "Send error data to Arlo"
 msgstr ""
 
-#: includes/arlo-version-handler.php:277
+#: includes/arlo-version-handler.php:285
 msgid ""
 "Arlo for WordPress requires that the Cron feature in WordPress is enabled, "
 "or replaced with an external trigger."
 msgstr ""
 
-#: includes/arlo-version-handler.php:278
+#: includes/arlo-version-handler.php:286
 msgid ""
 "You may safely dismiss this warning if your system administrator has "
 "installed an external Cron solution."
 msgstr ""
 
-#: includes/arlo-version-handler.php:281
+#: includes/arlo-version-handler.php:289
 msgid "WordPress Cron is disabled"
 msgstr ""
 
@@ -641,88 +628,106 @@ msgstr ""
 msgid "Plugin upgrade warning"
 msgstr ""
 
-#: includes/shortcodes/arlo-events.php:89
-#: includes/shortcodes/arlo-templates.php:532
-#: includes/shortcodes/arlo-upcoming-events.php:188
+#: includes/shortcodes/arlo-events.php:93
+#: includes/shortcodes/arlo-templates.php:537
+#: includes/shortcodes/arlo-upcoming-events.php:244
 msgid "All locations"
 msgstr ""
 
-#: includes/shortcodes/arlo-events.php:339
+#: includes/shortcodes/arlo-events.php:371
 msgid "Event is full"
 msgstr ""
 
-#: includes/shortcodes/arlo-events.php:343
+#: includes/shortcodes/arlo-events.php:375
 msgid "Join waiting list"
 msgstr ""
 
-#: includes/shortcodes/arlo-events.php:349
+#: includes/shortcodes/arlo-events.php:381
 #, php-format
 msgid "%d place remaining"
 msgid_plural "%d places remaining"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/shortcodes/arlo-events.php:478
+#: includes/shortcodes/arlo-events.php:500
 msgid "Session information"
 msgstr ""
 
-#: includes/shortcodes/arlo-events.php:555
+#: includes/shortcodes/arlo-events.php:586
 msgid "1 day"
 msgstr ""
 
-#: includes/shortcodes/arlo-events.php:563
+#: includes/shortcodes/arlo-events.php:594
 #, php-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/shortcodes/arlo-events.php:571
+#: includes/shortcodes/arlo-events.php:602
 #, php-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/shortcodes/arlo-events.php:581
+#: includes/shortcodes/arlo-events.php:612
 #, php-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/shortcodes/arlo-events.php:588
+#: includes/shortcodes/arlo-events.php:619
 #, php-format
 msgid "%d week"
 msgid_plural "%d weeks"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/shortcodes/arlo-events.php:682
+#: includes/shortcodes/arlo-events.php:716
 msgid "From"
 msgstr ""
 
-#: includes/shortcodes/arlo-shortcodes.php:38
+#: includes/shortcodes/arlo-online-activities.php:221
+msgid "No online activities to show"
+msgstr ""
+
+#: includes/shortcodes/arlo-online-activities.php:428
+#: includes/shortcodes/arlo-templates.php:495
+#: includes/shortcodes/arlo-upcoming-events.php:195
+msgid "All categories"
+msgstr ""
+
+#: includes/shortcodes/arlo-online-activities.php:459
+#: includes/shortcodes/arlo-online-activities.php:491
+#: includes/shortcodes/arlo-templates.php:569
+#: includes/shortcodes/arlo-upcoming-events.php:273
+#: includes/shortcodes/arlo-upcoming-events.php:303
+msgid "Select tag"
+msgstr ""
+
+#: includes/shortcodes/arlo-shortcodes.php:39
 #, php-format
 msgid "Powered by %s"
 msgstr ""
 
-#: includes/shortcodes/arlo-shortcodes.php:180
+#: includes/shortcodes/arlo-shortcodes.php:205
 msgid "Search for an event"
 msgstr ""
 
-#: includes/shortcodes/arlo-shortcodes.php:240
+#: includes/shortcodes/arlo-shortcodes.php:265
 msgid "Select a time zone"
 msgstr ""
 
-#: includes/shortcodes/arlo-shortcodes.php:344
-#: includes/shortcodes/arlo-shortcodes.php:356
+#: includes/shortcodes/arlo-shortcodes.php:370
+#: includes/shortcodes/arlo-shortcodes.php:382
 #, php-format
 msgid "excl. %s"
 msgstr ""
 
-#: includes/shortcodes/arlo-shortcodes.php:344
-#: includes/shortcodes/arlo-shortcodes.php:356
+#: includes/shortcodes/arlo-shortcodes.php:370
+#: includes/shortcodes/arlo-shortcodes.php:382
 #, php-format
 msgid "incl. %s"
 msgstr ""
@@ -731,89 +736,84 @@ msgstr ""
 msgid "Register your interest now"
 msgstr ""
 
-#: includes/shortcodes/arlo-templates.php:490
-#: includes/shortcodes/arlo-upcoming-events.php:139
-msgid "All categories"
-msgstr ""
-
-#: includes/shortcodes/arlo-templates.php:499
-#: includes/shortcodes/arlo-upcoming-events.php:144
+#: includes/shortcodes/arlo-templates.php:504
+#: includes/shortcodes/arlo-upcoming-events.php:200
 msgid "All delivery options"
 msgstr ""
 
-#: includes/shortcodes/arlo-templates.php:564
-#: includes/shortcodes/arlo-upcoming-events.php:217
-msgid "Select tag"
-msgstr ""
-
-#: includes/shortcodes/arlo-templates.php:589
+#: includes/shortcodes/arlo-templates.php:594
 #, php-format
 msgid "None of these dates work for you? %s Suggest another date & time %s"
 msgstr ""
 
-#: includes/shortcodes/arlo-upcoming-events.php:100
+#: includes/shortcodes/arlo-upcoming-events.php:151
 #, php-format
 msgid " excl. %s"
 msgstr ""
 
-#: includes/shortcodes/arlo-upcoming-events.php:100
+#: includes/shortcodes/arlo-upcoming-events.php:151
 #, php-format
 msgid " incl. %s"
 msgstr ""
 
-#: includes/shortcodes/arlo-upcoming-events.php:159
+#: includes/shortcodes/arlo-upcoming-events.php:215
 msgid "All months"
 msgstr ""
 
-#: includes/shortcodes/arlo-venues.php:149
+#: includes/shortcodes/arlo-upcoming-events.php:334
+msgid "All presenters"
+msgstr ""
+
+#: includes/shortcodes/arlo-venues.php:167
+#: includes/shortcodes/arlo-venues.php:186
 #, php-format
 msgid "Map of %s"
 msgstr ""
 
-#: public/class-arlo-for-wordpress.php:931
+#: public/class-arlo-for-wordpress.php:1016
 msgid "Show me more dates"
 msgstr ""
 
-#: public/class-arlo-for-wordpress.php:1153
+#: public/class-arlo-for-wordpress.php:1238
 msgid ""
 "Arlo for WordPress encountered problems when synchronising your event "
 "information. Information about your events may be out of date."
 msgstr ""
 
-#: public/class-arlo-for-wordpress.php:1153
+#: public/class-arlo-for-wordpress.php:1238
 #, php-format
 msgid "The last successful synchronisation was %s UTC"
 msgstr ""
 
-#: public/class-arlo-for-wordpress.php:1154
+#: public/class-arlo-for-wordpress.php:1239
 msgid "View diagnostic logs"
 msgstr ""
 
-#: public/class-arlo-for-wordpress.php:1154
+#: public/class-arlo-for-wordpress.php:1239
 msgid "for more information."
 msgstr ""
 
-#: public/class-arlo-for-wordpress.php:1157
+#: public/class-arlo-for-wordpress.php:1242
 msgid "Event synchronisation error"
 msgstr ""
 
-#: public/class-arlo-for-wordpress.php:1315
+#: public/class-arlo-for-wordpress.php:1399
 msgid "Once every 5 minutes"
 msgstr ""
 
-#: public/class-arlo-for-wordpress.php:1319
+#: public/class-arlo-for-wordpress.php:1403
 msgid "Once every 15 minutes"
 msgstr ""
 
-#: public/class-arlo-for-wordpress.php:1323
+#: public/class-arlo-for-wordpress.php:1407
 msgid "Once every hour"
 msgstr ""
 
-#: public/class-arlo-for-wordpress.php:1327
+#: public/class-arlo-for-wordpress.php:1411
 msgid "Every 30 minutes"
 msgstr ""
 
-#: public/class-arlo-for-wordpress.php:1408
+#: public/class-arlo-for-wordpress.php:1494
 msgid "The provided platform name does not exist."
 msgstr ""
 
@@ -880,12 +880,16 @@ msgstr ""
 msgid "Number of events to show"
 msgstr ""
 
-#: widgets/upcoming-widget/views/widget.php:5
-msgid "Upcoming event"
+#: widgets/upcoming-widget/views/admin.php:11
+msgid "Filter by event tag"
 msgstr ""
 
-#: widgets/upcoming-widget/views/widget.php:46
-msgid "No upcoming events found"
+#: widgets/upcoming-widget/views/admin.php:15
+msgid "Filter by template tag"
+msgstr ""
+
+#: widgets/upcoming-widget/views/widget.php:5
+msgid "Upcoming event"
 msgstr ""
 
 #. Plugin Name of the plugin/theme
