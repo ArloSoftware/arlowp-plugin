@@ -43,19 +43,16 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         
         $settings = get_option('arlo_settings');  
 
-        if (!empty($settings['post_types']['event']['posts_page'])) {
-            $page_link = get_permalink(get_post($settings['post_types']['event']['posts_page']));
-        } else {
-            $page_link = get_permalink(get_post($post));
-        }
+        $page_link = get_permalink(get_post($post));
 
         $filter_html = '<form id="arlo-event-filter" class="arlo-filters" method="get" action="' . $page_link . '">';
         
-        foreach(\Arlo_For_Wordpress::$available_filters[$filter_group]['filters'] as $filter_key => $filter):
+        $filter_group = 'event';
 
-            if (!in_array($filter_key, $filters_array))
-                continue;
-            
+        foreach($filters_array as $filter_key):
+
+            if (!array_key_exists($filter_key, \Arlo_For_Wordpress::$available_filters[$filter_group]['filters']))
+                continue;            
             switch($filter_key) :
 
                 case 'location' :
@@ -93,7 +90,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filters_array, $locations, $locationfilterlabel, $filter_group);
+                    $filter_html .= Shortcodes::create_filter($filter_key, $locations, __('All locations', 'arlo-for-wordpress'), $filter_group);
 
                     break;
 
