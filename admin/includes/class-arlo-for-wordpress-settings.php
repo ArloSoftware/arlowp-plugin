@@ -40,7 +40,7 @@ class Arlo_For_Wordpress_Settings {
 		
 		add_action( 'admin_notices', array($notice_handler, "global_notices") );
 
-		if (get_option('arlo_plugin_disabled', '0') == '0') {
+		if (get_option('arlo_plugin_disabled', '0') == '1') {
 			add_action( 'admin_notices', array($notice_handler, "plugin_disabled") );
 		} else if (get_option('arlo_import_disabled', '0') == '1') {
 			add_action( 'admin_notices', array($notice_handler, "import_disabled") );
