@@ -184,7 +184,7 @@ class OnlineActivities {
     }
 
 
-    private static function shortcode_all_oa_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+    private static function shortcode_onlineactivites_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
         
         $templates = arlo_get_option('templates');
@@ -192,12 +192,12 @@ class OnlineActivities {
         return do_shortcode($content);        
     }
 
-    private static function shortcode_all_oa_list_pagination($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+    private static function shortcode_onlineactivites_list_pagination($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $wpdb;
         
         $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
 
-        $sql = self::generate_all_oa_list_sql($atts, $import_id, true);        
+        $sql = self::generate_onlineactivites_list_sql($atts, $import_id, true);        
 
         $items = $wpdb->get_results($sql, ARRAY_A);
             
@@ -207,11 +207,11 @@ class OnlineActivities {
     }  
 
 
-    private static function shortcode_all_oa_list_item($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+    private static function shortcode_onlineactivites_list_item($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $wpdb;
         $settings = get_option('arlo_settings');
 
-        $sql = self::generate_all_oa_list_sql($atts, $import_id);
+        $sql = self::generate_onlineactivites_list_sql($atts, $import_id);
 
         $items = $wpdb->get_results($sql, ARRAY_A);
 
@@ -261,7 +261,7 @@ class OnlineActivities {
     }
 
 
-    private static function generate_all_oa_list_sql($atts, $import_id, $for_pagination = false) {
+    private static function generate_onlineactivites_list_sql($atts, $import_id, $for_pagination = false) {
         global $wpdb;
 
         $arlo_region = get_query_var('arlo-region', '');
@@ -389,7 +389,7 @@ class OnlineActivities {
     }  
 
 
-    private static function shortcode_all_oa_filters($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+    private static function shortcode_onlineactivites_filters($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $post, $wpdb;
 
         extract(shortcode_atts(array(

@@ -1,8 +1,8 @@
 <div class="arlo" id="arlo">
-	[arlo_all_oa_filters]
+	[arlo_onlineactivites_filters]
 
 	<ul class="arlo-online-activities arlo-list">
-		[arlo_all_oa_list_item limit="10" group="category"]
+		[arlo_onlineactivites_list_item limit="10" group="category"]
         [arlo_group_divider wrap='<li class="arlo-cf arlo-online-activity arlo-group-divider arlo-font2"><h2>%s</h2></li>']
 		<li class="arlo-cf arlo-online-activity">
 		  <h4>
@@ -16,6 +16,6 @@
 		    [arlo_oa_offers]
 		    [arlo_oa_registration]
 		</li>
-		[/arlo_all_oa_list_item]
+		[/arlo_onlineactivites_list_item]
 	</ul>
 </div>

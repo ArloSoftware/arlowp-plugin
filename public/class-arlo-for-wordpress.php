@@ -198,7 +198,7 @@ class Arlo_For_Wordpress {
 			array(
 				'name'				=> 'onlineactivities',
 				'title'				=> 'Online Activities',
-				'content' 			=> '[arlo_all_oa_list]',
+				'content' 			=> '[arlo_onlineactivites_list]',
 				'child_post_type'	=> 'event'
 			),
 		);  
@@ -272,7 +272,7 @@ class Arlo_For_Wordpress {
 		),
 		'oa' => array(
 			'id' => 'oa',
-			'shortcode' => '[arlo_all_oa_list]',
+			'shortcode' => '[arlo_onlineactivites_list]',
 			'name' => 'Online activity list'
 		),
 		'presenter' => array(

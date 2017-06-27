@@ -1,6 +1,6 @@
 <ul class="arlo-codes">
-	<li><a href="" target="_blank">[arlo_all_oa_filters]</a></li>
-	<li><a href="" target="_blank">[arlo_all_oa_list_item]</a>
+	<li><a href="" target="_blank">[arlo_onlineactivites_filters]</a></li>
+	<li><a href="" target="_blank">[arlo_onlineactivites_list_item]</a>
 	<li>
 		<ul>
 			<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivityrelated#arlo_oa_name" target="_blank">[arlo_oa_name]</a></li>
@@ -13,5 +13,5 @@
 		</ul>
 	</li>
 	</li>
-	<li><a href="" target="_blank">[arlo_all_oa_list_pagination]</a></li>
+	<li><a href="" target="_blank">[arlo_onlineactivites_list_pagination]</a></li>
 </ul>
