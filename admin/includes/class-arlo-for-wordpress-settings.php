@@ -305,8 +305,22 @@ class Arlo_For_Wordpress_Settings {
 			array(
 				'id' => 'import_fragment_size',
 				'label_for' => 'arlo_import_fragment_size',
+				'class' => 'arlo-only-numeric',
 				'default_val' => ImportRequest::FRAGMENT_DEFAULT_BYTE_SIZE,
-				));			
+				));	
+
+		add_settings_field(
+			'arlo_sleep_between_import_tasks', 
+			'<label for="arlo_sleep_between_import_tasks">' . sprintf(__('Wait between import tasks (seconds, max %s sec)', 'arlo-for-wordpress' ), \Arlo\Scheduler::MAX_SLEEP_BETWEEN_TASKS).'</label>', 
+			array($this, 'arlo_simple_input_callback'), 
+			$this->plugin_slug, 
+			'arlo_misc_section', 
+			array(
+				'id' => 'sleep_between_import_tasks',
+				'label_for' => 'arlo_sleep_between_import_tasks',
+				'class' => 'arlo-only-numeric',
+				'default_val' => 0,
+				));							
 			
 		add_settings_field(
 			'arlo_download_log_setting', 

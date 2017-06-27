@@ -443,7 +443,12 @@ class Arlo_For_Wordpress {
 	public function run_scheduler() {
 		session_write_close();
 		check_ajax_referer( 'arlo_import', 'nonce' );
-		sleep(1); //try to wait 1 second to let the previous async task finished and closed the DB connection
+
+		//avoid too many sql connections because of the async tasks
+		$settings = get_option('arlo_settings');
+		if (!empty($settings['sleep_between_import_tasks']) && is_numeric($settings['sleep_between_import_tasks'])) 
+			sleep($settings['sleep_between_import_tasks']); 
+		
 		$this->cron_scheduler();
 		wp_die();
 	}

@@ -423,7 +423,7 @@ if (typeof (Arlo) === "undefined") {
 			});
 			
 			//check numeric field
-			$("#arlo_import_fragment_size").keypress(function(event) {
+			$(".arlo-only-numeric").keypress(function(event) {
 				// Backspace, tab, enter, end, home, left, right
 				// We don't support the del key in Opera because del == . == 46.
 				var controlKeys = [8, 9, 13, 35, 36, 37, 39];

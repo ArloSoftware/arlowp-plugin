@@ -542,6 +542,12 @@ class Arlo_For_Wordpress_Admin {
 			$new['import_fragment_size'] = ImportRequest::FRAGMENT_MAX_BYTE_SIZE;
 		}
 
+		if (empty($new['sleep_between_import_tasks']) || !is_numeric($new['sleep_between_import_tasks'])) {
+			$new['sleep_between_import_tasks'] = 0;
+		} else if ($new['sleep_between_import_tasks'] > \Arlo\Scheduler::MAX_SLEEP_BETWEEN_TASKS) {
+			$new['sleep_between_import_tasks'] = \Arlo\Scheduler::MAX_SLEEP_BETWEEN_TASKS;
+		}
+
 		return $new;
 	}
 		
