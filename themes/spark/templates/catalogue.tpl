@@ -40,7 +40,7 @@
     [arlo_no_event_text]
 
     <div class="arlo-pagination">
-        [arlo_event_template_list_pagination limit="15"]
+        [arlo_event_template_list_pagination limit="10"]
     </div>
 
     [arlo_category_footer wrap="<div class='arlo-category-footer-wrapper'><div class='arlo-category-footer'>%s</div></div>"]

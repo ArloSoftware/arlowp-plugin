@@ -194,7 +194,7 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 		// TODO: Define default values for your variables
 		$instance = wp_parse_args(
 			(array) $instance,
-			array('title'=>'','number'=> 5)
+			array('title'=>'','number'=> 5, 'template' => '', 'eventtag' => '', 'templatetag' => '')
 		);
 
 		// TODO: Store the values of the widget in their own variable

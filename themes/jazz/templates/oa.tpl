@@ -1,4 +1,5 @@
 <div class="arlo" id="arlo">
+    [arlo_template_region_selector]
 	[arlo_onlineactivites_filters]
 
 	<ul class="arlo-online-activities arlo-list">
@@ -18,4 +19,6 @@
 		</li>
 		[/arlo_onlineactivites_list_item]
 	</ul>
+
+	[arlo_onlineactivites_list_pagination limit="10" wrap='<div class="arlo-pagination">%s</div>']
 </div>
