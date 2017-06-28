@@ -26,9 +26,10 @@ class UpcomingEvents {
 
     private static function shortcode_upcoming_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
-
-        $region = get_query_var('arlo-region', '');
         
+        $arlo_region = get_query_var('arlo-region', '');
+        $regions = get_option('arlo_regions');
+
         self::$upcoming_list_item_atts = array(
             'location' => \Arlo\Utilities::clean_string_url_parameter('arlo-location'),
             'category' => \Arlo\Utilities::clean_string_url_parameter('arlo-category'),
@@ -37,7 +38,7 @@ class UpcomingEvents {
             'eventtag' => \Arlo\Utilities::clean_string_url_parameter('arlo-eventtag'),
             'templatetag' => \Arlo\Utilities::clean_string_url_parameter('arlo-templatetag'),
             'presenter' => \Arlo\Utilities::clean_string_url_parameter('arlo-presenter'),
-            'region' => (!empty($region) && \Arlo\Utilities::array_ikey_exists($region, $regions) ? $region : '')
+            'region' => (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '')
         );
 
         $templates = arlo_get_option('templates');
@@ -376,7 +377,7 @@ class UpcomingEvents {
 
         $arlo_location = !empty($atts['location']) ? $atts['location'] : null;
         $arlo_category = !empty($atts['category']) ? $atts['category'] : null;
-        $arlo_delivery = $atts['delivery'] !== null ? $atts['delivery'] : null;
+        $arlo_delivery = isset($atts['delivery']) ? $atts['delivery'] : null;
         $arlo_month = !empty($atts['month']) ? $atts['month'] : null;
         $arlo_eventtag = !empty($atts['eventtag']) ? $atts['eventtag'] : null;
         $arlo_templatetag = !empty($atts['templatetag']) ? $atts['templatetag'] : null;
