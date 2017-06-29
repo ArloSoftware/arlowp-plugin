@@ -606,6 +606,10 @@ body.arlo {
     vertical-align: top;
 }
 
+.arlo#arlo .arlo-timezone-toggle select {
+    border: none;
+}
+
 .arlo#arlo.arlo-sm .arlo-filters select {
     width: 100%;
     min-width: 100%;
