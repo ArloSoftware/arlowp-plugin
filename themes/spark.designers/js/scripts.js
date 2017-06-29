@@ -1,4 +1,30 @@
 jQuery(function ($) {
+    var setEventHeights = function() {
+        // find the tallest event and set other events to have that height
+        var $events = $('.arlo .events > .arlo-event');
+
+        // some events might be hidden behind a 'show more', need to show them temporarily so we can see their heights
+        $(".arlo .events.arlo-show-more-hidden").show();
+
+        $events.css('min-height','auto');
+
+        var tallest = 0;
+        $events.each(function(index,event){
+            var height = $(event).outerHeight();
+            if ( height > tallest ) { tallest = height };
+        });
+
+        if($(".arlo .arlo-show-more-link-container").length > 0) {
+            $(".arlo .events.arlo-show-more-hidden").hide();
+        }
+
+        // set events to tallest height + padding
+        $events.css('min-height',tallest + 10);
+    }
+
+    setTimeout(setEventHeights, 0);
+
+    $(window).resize(setEventHeights);
 
     var setWidthOfArlo= function (container) {
         // set class of Arlo module based on container width
