@@ -491,6 +491,7 @@ body.arlo {
 .arlo#arlo .arlo-list.catalogue .arlo-next-running p,
 .arlo#arlo .arlo-list.catalogue .arlo-advertised-duration span,
 .arlo#arlo .arlo-list.catalogue .arlo-offers span,
+.arlo#arlo .arlo-reference-term,
 .arlo-categories-widget .arlo-category-list li ul {
     color: #ababab;
 }
@@ -717,6 +718,7 @@ body.arlo {
 .arlo#arlo .arlo-list.upcoming>li,
 .arlo#arlo .arlo-list.catalogue>li,
 .arlo#arlo .arlo-list.events>li,
+.arlo#arlo .arlo-list.arlo-online-activities>li,
 .arlo#arlo .arlo-list.venues>li,
 .arlo#arlo .arlo-list.presenters>li {
     margin: 0;
@@ -730,6 +732,7 @@ body.arlo {
 .arlo#arlo .arlo-list.upcoming>li:nth-child(2n),
 .arlo#arlo .arlo-list.catalogue>li:nth-of-type(2n),
 .arlo#arlo .arlo-list.events>li:nth-child(2n),
+.arlo#arlo .arlo-list.arlo-online-activities>li:nth-child(2n),
 .arlo#arlo .arlo-list.venues>li:nth-child(2n),
 .arlo#arlo .arlo-list.presenters>li:nth-child(2n),
 .arlo#arlo .arlo-suggest-templates li:nth-child(2n),
@@ -1008,6 +1011,7 @@ body.arlo {
     letter-spacing: 2px;
     font-size: 2em;
 }
+
 
 .arlo#arlo .arlo-list.catalogue .arlo-template-name {
     margin-top: 0;
@@ -1424,6 +1428,29 @@ body.arlo {
 
 .arlo#arlo .arlo-social-links a img:hover {
     opacity: .6;
+}
+
+
+/* Onlne Activity */
+
+.arlo#arlo .arlo-online-activity .arlo-template-name {
+    margin-top: 0;
+    font-weight: 700;
+    line-height: 1.2em;
+}
+
+.arlo#arlo .arlo-online-activity .arlo-right {
+    text-align: right;
+}
+
+.arlo#arlo.arlo-md .arlo-online-activity .arlo-right {
+    text-align: left;
+}
+
+.arlo#arlo .arlo-reference-term {
+    margin: .5em 0;
+    font-weight: 600;
+    text-transform: uppercase;
 }
 
 
