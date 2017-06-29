@@ -1,7 +1,14 @@
 jQuery(function ($) {
+
+    var arloContainer = '#arlo.arlo';
+
     var setEventHeights = function() {
         // find the tallest event and set other events to have that height
         var $events = $('.arlo .events > .arlo-event');
+        if($(arloContainer).width() < 768) {
+            $events.css('min-height','auto');
+            return;
+        }
 
         // some events might be hidden behind a 'show more', need to show them temporarily so we can see their heights
         $(".arlo .events.arlo-show-more-hidden").show();
@@ -47,7 +54,6 @@ jQuery(function ($) {
         }
     }
 
-    var arloContainer = '#arlo.arlo';
 
     setWidthOfArlo(arloContainer);
 
