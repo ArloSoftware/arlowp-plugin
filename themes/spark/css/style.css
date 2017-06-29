@@ -310,7 +310,7 @@ body.arlo {
 .arlo#arlo .arlo-button:hover,
 .arlo#arlo .arlo-filters .arlo-filters-buttons a:hover,
 .arlo#arlo .arlo-next-running>a:hover,
-.arlo .arlo-widget-upcoming .arlo-cal-day,
+.arlo-widget-upcoming .arlo-cal-day,
 .arlo#arlo .arlo-event-offers .replaced+.discount * {
     color: #666666;
 }
@@ -368,7 +368,8 @@ body.arlo {
 .arlo#arlo ul.arlo-list.venues .arlo-venue-info-link a,
 .arlo#arlo ul.arlo-list.presenters .arlo-presenter-info-link a,
 .arlo#arlo ul.presenter-events>li a,
-.arlo .arlo-categories-widget li a:hover {
+.arlo-categories-widget .arlo-category-list li a:hover,
+.arlo-list.arlo-widget-upcoming a:hover {
     color: #ff7033;
 }
 
@@ -397,7 +398,7 @@ body.arlo {
 .arlo#arlo .arlo-oa-registration>a:hover,
 .arlo#arlo .arlo-next-running a.arlo-register:hover,
 .arlo#arlo .arlo-register:hover,
-.arlo .arlo-widget-upcoming>li:hover .arlo-cal.arlo-left {
+.arlo-widget-upcoming>li:hover .arlo-cal.arlo-left {
     border-color: #ff7033;
 }
 
@@ -491,7 +492,7 @@ body.arlo {
 .arlo#arlo .arlo-list.catalogue .arlo-next-running p,
 .arlo#arlo .arlo-list.catalogue .arlo-advertised-duration span,
 .arlo#arlo .arlo-list.catalogue .arlo-offers span,
-.arlo .arlo-categories-widget li ul {
+.arlo-categories-widget .arlo-category-list li ul {
     color: #ababab;
 }
 
@@ -700,7 +701,7 @@ body.arlo {
 .arlo#arlo ul.arlo-list,
 .arlo#arlo ul.arlo-category-list,
 .arlo#arlo ul.presenter-events,
-.arlo .arlo-categories-widget ul {
+.arlo-categories-widget ul.arlo-category-list {
     margin: 0;
     padding: 0;
     width: 100%;
@@ -708,7 +709,7 @@ body.arlo {
 
 .arlo#arlo ul.arlo-list>li,
 .arlo#arlo ul.presenter-events>li,
-.arlo .arlo-categories-widget ul li {
+.arlo-categories-widget ul.arlo-category-list li {
     list-style: none;
     background-image: none;
     display: block;
@@ -1405,41 +1406,42 @@ body.arlo {
 
 /* Upcoming events list widget */
 
-.arlo .arlo-widget-upcoming>li {
-    padding: .5em 0;
+.arlo-list.arlo-widget-upcoming > li {
+    margin-top: 0;
     margin-bottom: 0;
+    padding: .5em 0;
 }
 
-.arlo .arlo-widget-upcoming>li p {
+.arlo-widget-upcoming>li p {
     font-weight: bold;
 }
 
-.arlo .arlo-widget-upcoming>li p:last-child {
+.arlo-widget-upcoming>li p:last-child {
     font-weight: normal;
 }
 
-.arlo .arlo-widget-upcoming .arlo-cal.arlo-left {
+.arlo-widget-upcoming .arlo-cal.arlo-left {
     width: 24%;
     padding: 10px 5px;
     border: 4px solid #e6e6e6;
     transition: border-color .3s;
 }
 
-.arlo .arlo-widget-upcoming .arlo-cal-month,
-.arlo .arlo-widget-upcoming .arlo-cal-day {
+.arlo-widget-upcoming .arlo-cal-month,
+.arlo-widget-upcoming .arlo-cal-day {
     width: 100%;
     background-color: transparent;
     padding: 0;
     line-height: 1;
 }
 
-.arlo .arlo-widget-upcoming .arlo-cal-month {
+.arlo-widget-upcoming .arlo-cal-month {
     border: none;
     font-size: 13px;
     text-transform: uppercase;
 }
 
-.arlo .arlo-widget-upcoming .arlo-cal-day {
+.arlo-widget-upcoming .arlo-cal-day {
     background-color: white;
     border: none;
     font-size: 1.8em;
@@ -1449,23 +1451,23 @@ body.arlo {
 
 /* Category list widget */
 
-.arlo .arlo-categories-widget li {
+.arlo-categories-widget .arlo-category-list li {
     border-bottom: 0;
     padding: 0;
     font-weight: bold;
 }
 
-.arlo .arlo-categories-widget li a {
+.arlo-categories-widget .arlo-category-list li a {
     display: block;
     padding: .3em .8em;
     border-bottom: 1px solid rgba(0, 0, 0, 0.04);
     margin-bottom: 0;
 }
 
-.arlo .arlo-categories-widget li ul {
+.arlo-categories-widget .arlo-category-list li ul {
     padding-left: 1em;
 }
 
-.arlo .arlo-categories-widget li ul a {
+.arlo-categories-widget .arlo-category-list li ul a {
     font-weight: 600;
 }
