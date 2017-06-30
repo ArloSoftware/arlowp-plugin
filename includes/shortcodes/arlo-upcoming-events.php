@@ -74,11 +74,11 @@ class UpcomingEvents {
         }
 
         if (!empty($atts['eventtag'])) {
-            self::$upcoming_list_item_atts['eventtag'] = $atts['eventtag'];
+            self::$upcoming_list_item_atts['eventtag'] = trim($atts['eventtag']);
         }
 
         if (!empty($atts['templatetag'])) {
-            self::$upcoming_list_item_atts['templatetag'] = $atts['templatetag'];
+            self::$upcoming_list_item_atts['templatetag'] = trim($atts['templatetag']);
         }
 
         $template = $content ? $content : arlo_get_template('upcoming_widget');
