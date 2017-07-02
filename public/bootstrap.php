@@ -93,6 +93,10 @@ function set_title($title, $id = null, $meta = false){
 	if (!empty($settings['post_types']['upcoming']['posts_page'])) {
 		array_push($pages, $settings['post_types']['upcoming']['posts_page']);
 	}
+
+	if (!empty($settings['post_types']['oa']['posts_page'])) {
+		array_push($pages, $settings['post_types']['oa']['posts_page']);
+	}	
 	
 	$subtitle = '';
 	
@@ -101,7 +105,7 @@ function set_title($title, $id = null, $meta = false){
 	$arlo_search = \Arlo\Utilities::clean_string_url_parameter('arlo-search');
 	
 	$cat_slug = !empty($arlo_category) ? $arlo_category : '';	
-	
+
 	$cat = null;
 
 	if (!empty($cat_slug))
