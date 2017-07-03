@@ -158,6 +158,15 @@ The Arlo - Training and Event Management, and online registration plugin is only
 
 == Changelog ==
 
+= 3.2 =
+
+New online activities global shortcode [arlo_onlineactivites_list]
+New options for Upcoming events widget
+New settings to customize filters
+New settings for the Import
+The plugin is fully compatible with PHP 7
+Many bug fixes
+
 = 3.1.3 = 
 
 New presenter filter for [arlo_upcoming_event_filters]
