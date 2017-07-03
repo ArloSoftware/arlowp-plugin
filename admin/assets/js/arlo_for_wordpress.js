@@ -63,7 +63,7 @@ if (typeof (Arlo) === "undefined") {
 			});
 			$( "#arlo-regions" ).disableSelection();	
 			
-			$('#arlo-regions').on('click', 'li .icons8-minus', function () {
+			$('#arlo-regions').on('click', 'li .arlo-icons8-minus', function () {
 				$(this).parentsUntil("li").parent().remove();
 				if ($('#arlo-regions > li').length === 0) {
 					me.addRegion();
@@ -71,7 +71,7 @@ if (typeof (Arlo) === "undefined") {
 				me.reNumberRegions();
 			});
 			
-			$('#arlo-regions').on('click', 'li .icons8-plus', function () {
+			$('#arlo-regions').on('click', 'li .arlo-icons8-plus', function () {
 				me.addRegion();
 				me.reNumberRegions();
 			});
@@ -81,14 +81,14 @@ if (typeof (Arlo) === "undefined") {
 
 			$( ".arlo-filter-group" ).disableSelection();	
 			
-			$('.arlo-filter-group').on('click', 'li .icons8-minus', function () {
+			$('.arlo-filter-group').on('click', 'li .arlo-icons8-minus', function () {
 				$(this).parentsUntil("li").parent().remove();
 				if ($('.arlo-available-filters-section > li').length === 0) {
 					me.addFilter();
 				}
 			});
 			
-			$('.arlo-filter-group').on('click', 'li .icons8-plus', function () {
+			$('.arlo-filter-group').on('click', 'li .arlo-icons8-plus', function () {
 				var parent = $(this).closest('.arlo-available-filters');
 				me.addFilter(parent);
 			});
@@ -423,7 +423,7 @@ if (typeof (Arlo) === "undefined") {
 			});
 			
 			//check numeric field
-			$("#arlo_import_fragment_size").keypress(function(event) {
+			$(".arlo-only-numeric").keypress(function(event) {
 				// Backspace, tab, enter, end, home, left, right
 				// We don't support the del key in Opera because del == . == 46.
 				var controlKeys = [8, 9, 13, 35, 36, 37, 39];

@@ -225,7 +225,7 @@ class Arlo_For_Wordpress_Settings {
                 
 		add_settings_field(
                         'arlo_import_callback_host', 
-                        '<label for="arlo_import_callback_host">'.__('Import callback host', 'arlo-for-wordpress' ).' <a href="http://developer.arlo.co/doc/wordpress/settings#import-callback-host" target="_blank"><i class="icons8 icons8-help-filled size-16"></i></a></label>', 
+                        '<label for="arlo_import_callback_host">'.__('Import callback host', 'arlo-for-wordpress' ).' <a href="http://developer.arlo.co/doc/wordpress/settings#import-callback-host" target="_blank"><i class="arlo-icons8 arlo-icons8-help-filled size-16"></i></a></label>', 
                         array($this, 'arlo_simple_input_callback'), 
                         $this->plugin_slug, 'arlo_general_section', 
                         array(
@@ -305,8 +305,31 @@ class Arlo_For_Wordpress_Settings {
 			array(
 				'id' => 'import_fragment_size',
 				'label_for' => 'arlo_import_fragment_size',
+				'class' => 'arlo-only-numeric',
 				'default_val' => ImportRequest::FRAGMENT_DEFAULT_BYTE_SIZE,
+				));	
+
+		add_settings_field(
+			'arlo_sleep_between_import_tasks_setting', 
+			'<label for="arlo_sleep_between_import_tasks">' . sprintf(__('Wait between import tasks (seconds, max %s sec)', 'arlo-for-wordpress' ), \Arlo\Scheduler::MAX_SLEEP_BETWEEN_TASKS).'</label>', 
+			array($this, 'arlo_simple_input_callback'), 
+			$this->plugin_slug, 
+			'arlo_misc_section', 
+			array(
+				'id' => 'sleep_between_import_tasks',
+				'label_for' => 'arlo_sleep_between_import_tasks',
+				'class' => 'arlo-only-numeric',
+				'default_val' => 0,
 				));			
+
+		add_settings_field(
+			'arlo_disable_ssl_verification_setting', 
+			'<label for="arlo_disable_ssl_verification">'.__('Disable SSL verification for import (not recommended)', 'arlo-for-wordpress' ).'</label>', 
+			array($this, 'arlo_checkbox_callback'), 
+			$this->plugin_slug, 
+			'arlo_misc_section', 
+			['option_name' => 'disable_ssl_verification']);
+								
 			
 		add_settings_field(
 			'arlo_download_log_setting', 
@@ -447,15 +470,15 @@ class Arlo_For_Wordpress_Settings {
 				    <div id="arlo-filter-empty">
 						<ul>
 							<li>
-								<div class="arlo-filter-old-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][setting_id][filteroldvalue]"></div>
+								<div class="arlo-filter-old-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][setting_id][filteroldvalue]" tabindex="1"></div>
 								<div class="arlo-filter-controls">
-									<i class="icons8-minus icons8 size-21"></i>
-									<i class="icons8-plus icons8 size-21"></i>
+									<i class="arlo-icons8-minus arlo-icons8 size-21"></i>
+									<i class="arlo-icons8-plus arlo-icons8 size-21"></i>
 								</div>
 								<div class="arlo-filter-toggle">
-									<input type="checkbox" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][setting_id][filterhideoption]" value="hidden">
+									<input type="checkbox" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][setting_id][filterhideoption]" value="hidden" tabindex="3">
 								</div>
-								<div class="arlo-filter-new-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][setting_id][filternewvalue]"></div>
+								<div class="arlo-filter-new-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][setting_id][filternewvalue]" tabindex="2"></div>
 							</li>
 						</ul>
 				    </div>
@@ -478,15 +501,15 @@ class Arlo_For_Wordpress_Settings {
 							$checked = $is_hidden ? ' checked="checked"' : '';
 
 							$filters_settings_html .=  '<li>
-								<div class="arlo-filter-old-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$existing_filter_setting_id.'][filteroldvalue]" value="'.$old_value.'"></div>
+								<div class="arlo-filter-old-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$existing_filter_setting_id.'][filteroldvalue]" value="'.$old_value.'" tabindex="1"></div>
 								<div class="arlo-filter-controls">
-									<i class="icons8-minus icons8 size-21"></i>
-									<i class="icons8-plus icons8 size-21"></i>
+									<i class="arlo-icons8-minus arlo-icons8 size-21"></i>
+									<i class="arlo-icons8-plus arlo-icons8 size-21"></i>
 								</div>
 								<div class="arlo-filter-toggle">
-									<input type="checkbox" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$existing_filter_setting_id.'][filterhideoption]" value="hidden" ' . $checked . '>
+									<input type="checkbox" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$existing_filter_setting_id.'][filterhideoption]" value="hidden" ' . $checked . ' tabindex="3">
 								</div>
-								<div class="arlo-filter-new-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$existing_filter_setting_id.'][filternewvalue]" value="' . $new_value . '"></div>
+								<div class="arlo-filter-new-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$existing_filter_setting_id.'][filternewvalue]" value="' . $new_value . '" tabindex="2"></div>
 							  </li>
 							 ';
 						}
@@ -498,15 +521,15 @@ class Arlo_For_Wordpress_Settings {
 				$new_filter_setting_id = rand();
 		
 				$filters_settings_html .= '<li>
-						<div class="arlo-filter-old-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$new_filter_setting_id.'][filteroldvalue]"></div>
+						<div class="arlo-filter-old-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$new_filter_setting_id.'][filteroldvalue]" tabindex="1"></div>
 						<div class="arlo-filter-controls">
-							<i class="icons8-minus icons8 size-21"></i>
-							<i class="icons8-plus icons8 size-21"></i>
+							<i class="arlo-icons8-minus arlo-icons8 size-21"></i>
+							<i class="arlo-icons8-plus arlo-icons8 size-21"></i>
 						</div>
 						<div class="arlo-filter-toggle">
-							<input type="checkbox" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$new_filter_setting_id.'][filterhideoption]" value="hidden">
+							<input type="checkbox" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$new_filter_setting_id.'][filterhideoption]" value="hidden" tabindex="3">
 						</div>
-						<div class="arlo-filter-new-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$new_filter_setting_id.'][filternewvalue]"></div>
+						<div class="arlo-filter-new-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$new_filter_setting_id.'][filternewvalue]" tabindex="2"></div>
 				  </li>
 				</ul>';
 
@@ -583,8 +606,8 @@ class Arlo_For_Wordpress_Settings {
 		HACK because the keys in the $post_types arrays are bad, couldn't change because backward comp.
 		*/
 		
-		if (in_array($id, array('eventsearch', 'upcoming', 'events', 'presenters', 'venues', 'onlineactivities'))) {
-			$post_type_id = !in_array($id, array('eventsearch','upcoming', 'onlineactivities')) ? substr($id, 0, strlen($id)-1) : $id;
+		if (in_array($id, array('eventsearch', 'upcoming', 'events', 'presenters', 'venues', 'oa'))) {
+			$post_type_id = !in_array($id, array('eventsearch','upcoming', 'oa')) ? substr($id, 0, strlen($id)-1) : $id;
 		}
 
     	if (!empty($post_type_id) && !empty(Arlo_For_Wordpress::$post_types[$post_type_id])) {
@@ -703,8 +726,8 @@ class Arlo_For_Wordpress_Settings {
 					<div class="arlo-order-number">1.</div>
 					<div class="arlo-region-id"><input type="text" name="arlo_settings[regionid][]"></div>
 					<div class="arlo-region-controls">
-						<i class="icons8-minus icons8 size-21"></i>
-						<i class="icons8-plus icons8 size-21"></i>
+						<i class="arlo-icons8-minus arlo-icons8 size-21"></i>
+						<i class="arlo-icons8-plus arlo-icons8 size-21"></i>
 					</div>			
 					<div class="arlo-region-name"><input type="text" name="arlo_settings[regionname][]"></div>
 				</li>
@@ -718,8 +741,8 @@ class Arlo_For_Wordpress_Settings {
 					<div class="arlo-order-number">' . (++$key) . '</div>
 					<div class="arlo-region-id"><input type="text" name="arlo_settings[regionid][]" value="'.$regionid.'"></div>
 					<div class="arlo-region-controls">
-						<i class="icons8-minus icons8 size-21"></i>
-						<i class="icons8-plus icons8 size-21"></i>
+						<i class="arlo-icons8-minus arlo-icons8 size-21"></i>
+						<i class="arlo-icons8-plus arlo-icons8 size-21"></i>
 					</div>			
 					<div class="arlo-region-name"><input type="text" name="arlo_settings[regionname][]" value="' . $regionname . '"></div>
 				  </li>
@@ -731,8 +754,8 @@ class Arlo_For_Wordpress_Settings {
 			<div class="arlo-order-number">' . ($key + 1) . '</div>
 			<div class="arlo-region-id"><input type="text" name="arlo_settings[regionid][]"></div>
 			<div class="arlo-region-controls">
-				<i class="icons8-minus icons8 size-21"></i>
-				<i class="icons8-plus icons8 size-21"></i>
+				<i class="arlo-icons8-minus arlo-icons8 size-21"></i>
+				<i class="arlo-icons8-plus arlo-icons8 size-21"></i>
 			</div>			
 			<div class="arlo-region-name"><input type="text" name="arlo_settings[regionname][]"></div>
 		  </li>
@@ -750,9 +773,12 @@ class Arlo_For_Wordpress_Settings {
 	    <h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
 	    	<ul class="arlo-whatsnew-list">	  
-				<li>New presenter filter for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/upcomingeventrelated#arlo_upcoming_event_filters" target="_blank">[arlo_upcoming_event_filters]</a></li>
-				<li>Support new URL structure on the admin pages and for private events</li>
-				<li>Fix broken link in <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_suggest_datelocation" target="_blank">[arlo_suggest_datelocation]</a> when used the "text" attribute</li>
+				<li>New online activities global shortcode <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#arlo_onlineactivites_list" target="_blank">[arlo_onlineactivites_list]</a></li>
+				<li>New options for <a href="https://developer.arlo.co/doc/wordpress/widgets#widget-upcoming-events" target="_blank">Upcoming events widget</a></li>
+				<li>New settings to customize <a href="https://developer.arlo.co/doc/wordpress/settings#filters" target="_blank">Filters</a></li>
+				<li>New settings for the <a href="https://developer.arlo.co/doc/wordpress/settings#misc" target="_blank">Import</a></li>
+				<li>The plugin is fully compatible with PHP 7</li>
+				<li>Many bug fixes</li>
 			</ul>
 		</p>		
 
@@ -794,47 +820,13 @@ class Arlo_For_Wordpress_Settings {
 				<li>Revamp the codebase behind the plugin</li>
 				<li>New built-in theme selection</li>
 	    	</ul>
-	    </p>		
-		<h4>Version 2.4.1.2</h4>
-	    <p>
-	    	<ul class="arlo-whatsnew-list">	    
-	    		<li>Fixed wrong [arlo_event_duration] return value</li>
-				<li>Fix when [arlo_event_price] shortcode doesn\'t return the "cheapest" price</li>
-				<li>Fix when [arlo_event_next_running] shortcode returns a session date</li>
-	    	</ul>
-	    </p>		
-		<h4>Version 2.4.1.1</h4>
-	    <p>
-	    	<ul class="arlo-whatsnew-list">	    
-	    		<li>Improvement the stability of the import</li>
-				<li><a href="https://confirmsubscription.com/h/r/41B80B5B566BCC0B" target="_blank">Subscribe</a> to our WP newsletter</li>
-	    	</ul>
-	    </p>
-		<h4>Version 2.4</h4>		
-	    <p>
-	    	<ul class="arlo-whatsnew-list">
-	    		<li>The plugin supports <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivityrelated" target="_blank">Online Activities</a></li>
-				<li>
-					New 
-					<a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_credits" target="_blank">[arlo_event_credits]</a>,  
-					<a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_advertised_duration" target="_blank">[arlo_event_template_advertised_duration]</a>,  
-					<a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/categoryrelated#arlo_category_title" target="_blank">[arlo_category_title]</a> 
-					shortcodes
-				</li>
-				<li>New "showfrom" attribute for <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_price" target="_blank">[arlo_event_price]</a> shortcode</li>
-				<li>New "strip_html" attribute every <a href="http://developer.arlo.co/doc/wordpress/shortcodes/" target="_blank">shortcode</a></li>
-				<li>New "text" attribute for <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_next_running" target="_blank">[arlo_event_next_running] shortcode</a></li>
-				<li>Sending error data to Arlo</li>
-				<li>Detailed log</li>
-				<li>Many bug fixes and enhancements</li>
-	    	</ul>
 	    </p>
 	    ';
 	}
 	
 	function arlo_systemrequirements_callback () {
-		$good = '<i class="icons8-checkmark icons8 size-21 green"></i>';
-		$bad = '<i class="icons8-cancel icons8 size-21 red"></i>';
+		$good = '<i class="arlo-icons8-checkmark arlo-icons8 size-21 green"></i>';
+		$bad = '<i class="arlo-icons8-cancel arlo-icons8 size-21 red"></i>';
 
 		echo '
 		<table class="arlo-system-requirements-table">
@@ -905,7 +897,7 @@ class Arlo_For_Wordpress_Settings {
 
 			$overlay = '
 					<div class="arlo-theme-desc-text">
-						' . (!empty($theme_data->icon) ? '<div class="arlo-theme-icon"><i class="icons8 ' . $theme_data->icon . ' size-48 "></i></div>' : '') . '
+						' . (!empty($theme_data->icon) ? '<div class="arlo-theme-icon"><i class="arlo-icons8 ' . $theme_data->icon . ' size-48 "></i></div>' : '') . '
 						<div class="arlo-theme-name">' . htmlentities(strip_tags($theme_data->name)) . '</div>
 						<div class="arlo-theme-description">' . $theme_data->description . '</div>
 						' . (!empty($theme_data->forDesigners) && $theme_data->forDesigners ? '<div class="arlo-theme-for-designer">Learn about themes <a href="javascript:;" data-fancybox="modal" data-src="#arlo-themes-for-designers">"For designers"</a></div>' : '') . '

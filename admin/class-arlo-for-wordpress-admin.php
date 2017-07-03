@@ -164,6 +164,7 @@ class Arlo_For_Wordpress_Admin {
 		}
 		
 		wp_enqueue_style( $this->plugin_slug .'-admin-public-styles', plugins_url( 'assets/css/admin_public.css?20170424', __FILE__ ), array(), VersionHandler::VERSION );		
+		wp_enqueue_style( $this->plugin_slug .'-icons8', plugins_url( 'assets/fonts/icons8/Arlo-WP.css', __FILE__ ), array(), VersionHandler::VERSION );
 		
 		$screen = get_current_screen();	
 		
@@ -173,7 +174,6 @@ class Arlo_For_Wordpress_Admin {
 			if ($screen->id == $this->plugin_screen_hook_suffix) {
 				wp_enqueue_style( $this->plugin_slug .'-codemirror', plugins_url( 'assets/css/libs/codemirror.css', __FILE__ ), array(), VersionHandler::VERSION );
 				wp_enqueue_style( $this->plugin_slug .'-jquery-ui', plugins_url( 'assets/css/libs/jquery-ui.min.css', __FILE__ ), array(), VersionHandler::VERSION );
-				wp_enqueue_style( $this->plugin_slug .'-icons8', plugins_url( 'assets/fonts/icons8/Arlo-WP.css', __FILE__ ), array(), VersionHandler::VERSION );
 				wp_enqueue_style( $this->plugin_slug .'-fancybox', 'https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.0.47/jquery.fancybox.min.css', array(), '3.0.47' );
 			}
 		}
@@ -540,6 +540,12 @@ class Arlo_For_Wordpress_Admin {
 			$new['import_fragment_size'] = ImportRequest::FRAGMENT_DEFAULT_BYTE_SIZE;
 		} else if ($new['import_fragment_size'] > ImportRequest::FRAGMENT_MAX_BYTE_SIZE) {
 			$new['import_fragment_size'] = ImportRequest::FRAGMENT_MAX_BYTE_SIZE;
+		}
+
+		if (empty($new['sleep_between_import_tasks']) || !is_numeric($new['sleep_between_import_tasks'])) {
+			$new['sleep_between_import_tasks'] = 0;
+		} else if ($new['sleep_between_import_tasks'] > \Arlo\Scheduler::MAX_SLEEP_BETWEEN_TASKS) {
+			$new['sleep_between_import_tasks'] = \Arlo\Scheduler::MAX_SLEEP_BETWEEN_TASKS;
 		}
 
 		return $new;

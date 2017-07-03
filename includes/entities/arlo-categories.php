@@ -93,6 +93,8 @@ class Categories {
 			$item->depth_level = $level;	
 			if($depth - 1 > $level) {
 				$item->children = self::getTree($item->c_arlo_id, $depth, $level+1, $import_id);
+			} else {
+				unset($item->children);
 			}
 			$result[] = $item;
 		}

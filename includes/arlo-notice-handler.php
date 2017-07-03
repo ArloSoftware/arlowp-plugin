@@ -46,7 +46,7 @@ class NoticeHandler {
 		$global_message = '';
 		if (!empty($message->global)) {
 			$global_message = '<td class="logo" valign="top" style="width: 60px; padding-top: 1em;">
-						<a href="http://www.arlo.co" target="_blank"><i class="icons8 size-48 arlo-yellow icons8-arlo-logo-for-font arlo-middle"></i></a>
+						<a href="http://www.arlo.co" target="_blank"><i class="arlo-icons8 size-48 arlo-yellow arlo-icons8-arlo-logo-for-font arlo-middle"></i></a>
 					</td>';
 		}
 
@@ -195,7 +195,7 @@ class NoticeHandler {
 	
 	public function developer_notice() {
 		$message = '<p class="developer">
-					<i class="icons8 icons8-us-dollar-2 size-36 arlo-blue arlo-middle"></i>
+					<i class="arlo-icons8 arlo-icons8-us-dollar-2 size-36 arlo-blue arlo-middle"></i>
 					' . __('Become an Arlo reseller and receive a ', 'arlo-for-wordpress' ) . '
 					' . sprintf('<strong><span>%s</span> %s</strong>', __('20%', 'arlo-for-wordpress' ),  __('sales commission', 'arlo-for-wordpress' )) . '
 					' . sprintf(__('<a target="_blank" href="%s">Contact us to become an Arlo partner</a>', 'arlo-for-wordpress' ), 'https://www.arlo.co/contact') . '
@@ -214,9 +214,9 @@ class NoticeHandler {
 	
 	public function webinar_notice() {
 		$message = '<p class="webinar">
-					<a target="_blank" href="https://www.arlo.co/video/wordpress-overview" target="_blank"><i class="icons8 icons8-circled-play size-36 arlo-yellow arlo-middle "></i>' . __('Watch overview video', 'arlo-for-wordpress' ) .'</a>
+					<a target="_blank" href="https://www.arlo.co/video/wordpress-overview" target="_blank"><i class="arlo-icons8 arlo-icons8-circled-play size-36 arlo-yellow arlo-middle "></i>' . __('Watch overview video', 'arlo-for-wordpress' ) .'</a>
 					<span class="arlo-webinar">
-						<i class="icons8 icons8-headset size-36 arlo-yellow arlo-middle"></i>
+						<i class="arlo-icons8 arlo-icons8-headset size-36 arlo-yellow arlo-middle"></i>
 						' . __('Jon <a target="_blank" href="" class="webinar_url">Arlo for WordPress Getting started</a> webinar on <span id="webinar_date"></span>', 'arlo-for-wordpress' ) . '
 						' . __('<a target="_blank" href="" class="webinar_url">Register now!</a> or <a target="_blank" href="" id="webinar_template_url">view more times</a>', 'arlo-for-wordpress' ) . '
 					</span>

@@ -143,9 +143,7 @@ class Shortcodes {
 		
 		if (!in_array($page_name, $valid_page_names) || !(is_array($regions) && count($regions))) return "";
 			
-		$regionselector_html .= self::create_filter('region', $regions);
-		
-		return $regionselector_html;
+		return self::create_filter('region', $regions);
 	}
 
 	public static function create_filter($type, $items, $label=null, $group=null) {

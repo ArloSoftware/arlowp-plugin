@@ -3,6 +3,8 @@
 namespace Arlo;
 
 class Scheduler {
+
+	const MAX_SLEEP_BETWEEN_TASKS = 15;	
 	
 	private $max_simultaneous_task = 1;
 	private $table = '';

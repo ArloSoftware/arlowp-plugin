@@ -148,11 +148,11 @@ class Arlo_For_Wordpress {
 			'singular_name' => 'Event search',
 			'regionalized' => true
 		),
-		'onlineactivities' => array(
+		'oa' => array(
 			'slug' => 'onlineactivities',
 			'name' => 'Online activities',
 			'singular_name' => 'Online activity',
-			'regonalized' => true
+			'regionalized' => true
 		)
     );
     
@@ -196,9 +196,9 @@ class Arlo_For_Wordpress {
 				'child_post_type'	=> 'venue'
 			),
 			array(
-				'name'				=> 'onlineactivities',
+				'name'				=> 'oa',
 				'title'				=> 'Online Activities',
-				'content' 			=> '[arlo_all_oa_list]',
+				'content' 			=> '[arlo_onlineactivites_list]',
 				'child_post_type'	=> 'event'
 			),
 		);  
@@ -270,9 +270,9 @@ class Arlo_For_Wordpress {
 			'shortcode' => '[arlo_upcoming_list]',
 			'name' => 'Upcoming event list',
 		),
-		'onlineactivities' => array(
-			'id' => 'onlineactivities',
-			'shortcode' => '[arlo_all_oa_list]',
+		'oa' => array(
+			'id' => 'oa',
+			'shortcode' => '[arlo_onlineactivites_list]',
 			'name' => 'Online activity list'
 		),
 		'presenter' => array(
@@ -322,10 +322,11 @@ class Arlo_For_Wordpress {
 				'presenter' => 'Presenter'
 			)
 		),
-		'onlineactivities' => array(
+		'oa' => array(
 			'name' => 'Online activities',
 			'filters' => array(
 				'oatag' => 'Online activity tag', 
+				'templatetag' => 'Template tag',
 				'category' => 'Category'
 			)
 		),
@@ -442,7 +443,12 @@ class Arlo_For_Wordpress {
 	public function run_scheduler() {
 		session_write_close();
 		check_ajax_referer( 'arlo_import', 'nonce' );
-		sleep(1); //try to wait 1 second to let the previous async task finished and closed the DB connection
+
+		//avoid too many sql connections because of the async tasks
+		$settings = get_option('arlo_settings');
+		if (!empty($settings['sleep_between_import_tasks']) && is_numeric($settings['sleep_between_import_tasks'])) 
+			sleep($settings['sleep_between_import_tasks']); 
+		
 		$this->cron_scheduler();
 		wp_die();
 	}
@@ -841,7 +847,7 @@ class Arlo_For_Wordpress {
 	public function enqueue_styles() {
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css?20170424', __FILE__ ), array(), VersionHandler::VERSION );
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-darktooltip', plugins_url( 'assets/css/libs/darktooltip.min.css', __FILE__ ), array(), VersionHandler::VERSION );
-		wp_enqueue_style( $this->plugin_slug .'-icons8', plugins_url( '../admin/assets/fonts/icons8/Arlo-WP.css', __FILE__ ), array(), VersionHandler::VERSION );
+		wp_enqueue_style( $this->plugin_slug .'-arlo-icons8', plugins_url( '../admin/assets/fonts/arlo-icons8/Arlo-WP.css', __FILE__ ), array(), VersionHandler::VERSION );
 
 		//enqueue theme related styles
 		$stored_themes_settings = get_option( 'arlo_themes_settings', [] );
@@ -1309,7 +1315,6 @@ class Arlo_For_Wordpress {
 			
 			if (!(is_array($posts) && count($posts) == 1)) {
 				$args = array(
-	  				
 	  				'post_type' => 'page',
 	  				'post_status' => array('publish','draft'),
 	  				'numberposts' => 1
@@ -1597,7 +1602,13 @@ class Arlo_For_Wordpress {
 			curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+			$settings = get_option('arlo_settings');
+			if (!empty($settings['disable_ssl_verification']) && $settings['disable_ssl_verification'] == 1) {
+				error_log(__FUNCTION__ . 'disable ssl');
+				curl_setopt($c, CURLOPT_SSL_VERIFYHOST,false);
+				curl_setopt($c, CURLOPT_SSL_VERIFYPEER,false);
+			}
 			
 			curl_exec($ch);
 			
@@ -1613,13 +1624,14 @@ class Arlo_For_Wordpress {
 	 * add_pages function.
 	 * 
 	 * @access public
-	 * @return void
+	 * @return associated array page_ids
 	 */
-	private function add_pages() {
+	public function add_pages($page_name = '') {
+		$page_ids = [];
 		
-		$settings = get_option('arlo_settings');
-	
 		foreach($this::$pages as $page) {
+			if (!empty($page_name) && $page['name'] != $page_name) continue;
+
 			$current_page = get_page_by_title($page['title']);
 		
 			if(is_null($current_page)) {
@@ -1630,21 +1642,13 @@ class Arlo_For_Wordpress {
 					'post_title'	=> $page['title'],
 					'post_content' 	=> $page['content']
 				));
-				
-				/*
-				if(isset($page['child_post_type'])) {
-					foreach(self::$post_types as $id => $type) {
-						if($page['child_post_type'] == $id) {
-							$settings['post_types'][$id]['posts_page'] = $post_id;
-						}
-					}
+
+				if (!empty($post_id)) {
+					$page_ids[$page['name']] = $post_id;
 				}
-				*/
 			}
 		}
-	
-		// update settings
-		update_option('arlo_settings', $settings);
+		return $page_ids;
 	}
 }
 

@@ -1,0 +1,17 @@
+{
+    "version": 1.2,
+    "order": 3,
+    "name": "Spark",
+    "description": "Simple design that can be used on wide variety of websites",
+    "forDesigners": false,
+    "demoUrl": "",
+    "externalResources": {
+        "stylesheets": [
+        	"https://fonts.googleapis.com/css?family=Open+Sans:400,600,700"
+        ],
+        "javascripts": []
+    },
+    "images": [
+        "/images/image1.png"
+    ]
+}

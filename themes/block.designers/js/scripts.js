@@ -15,7 +15,9 @@ jQuery(function($){
             if ( height > tallest ) { tallest = height };
         });
 
-        $(".arlo .events.arlo-show-more-hidden").hide();
+        if($(".arlo .arlo-show-more-link-container").length > 0) {
+            $(".arlo .events.arlo-show-more-hidden").hide();
+        }
 
         // set events to tallest height
         $events.css('min-height',tallest + 10);

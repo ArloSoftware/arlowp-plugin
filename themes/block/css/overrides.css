@@ -2,8 +2,8 @@
 
 .arlo#arlo,
 .arlo .dark-tooltip,
-.arlo .arlo-widget-upcoming,
-.arlo .arlo-categories-widget {
+.arlo-widget-upcoming,
+.arlo-categories-widget {
     font-size: 16px;
     font-weight: normal;
     padding: 1em 0;
@@ -16,8 +16,8 @@
 
 .arlo#arlo *,
 .arlo .dark-tooltip *,
-.arlo .arlo-widget-upcoming *,
-.arlo .arlo-categories-widget * {
+.arlo-widget-upcoming *,
+.arlo-categories-widget * {
     font-size: inherit;
     font-family: inherit;
     font-weight: inherit;
@@ -100,8 +100,8 @@
 .arlo#arlo,
 .arlo#arlo .arlo-font1,
 .arlo .dark-tooltip,
-.arlo .arlo-widget-upcoming,
-.arlo .arlo-categories-widget {
+.arlo-widget-upcoming,
+.arlo-categories-widget {
     font-family: Roboto, Arial, sans-serif;
 }
 

@@ -93,6 +93,10 @@ function set_title($title, $id = null, $meta = false){
 	if (!empty($settings['post_types']['upcoming']['posts_page'])) {
 		array_push($pages, $settings['post_types']['upcoming']['posts_page']);
 	}
+
+	if (!empty($settings['post_types']['oa']['posts_page'])) {
+		array_push($pages, $settings['post_types']['oa']['posts_page']);
+	}	
 	
 	$subtitle = '';
 	
@@ -101,7 +105,7 @@ function set_title($title, $id = null, $meta = false){
 	$arlo_search = \Arlo\Utilities::clean_string_url_parameter('arlo-search');
 	
 	$cat_slug = !empty($arlo_category) ? $arlo_category : '';	
-	
+
 	$cat = null;
 
 	if (!empty($cat_slug))
@@ -180,7 +184,7 @@ function arlo_register_custom_post_types() {
 				case 'upcoming':
 					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(eventtag-([^/]*))?/?(presenter-([^/]*))?/?(templatetag-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-delivery=$matches[10]&arlo-eventtag=$matches[12]&arlo-presenter=$matches[14]&arlo-templatetag=$matches[16]&paged=$matches[18]','top');
 				break;
-				case 'onlineactivities':
+				case 'oa':
 					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(oatag-([^/]*))?/?(page/([^/]*))?/?(templatetag-([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-oatag=$matches[6]&paged=$matches[8]&arlo-templatetag=$matches[10]','top');
 				break;			
 				case 'event':					
@@ -200,7 +204,7 @@ function arlo_register_custom_post_types() {
 				break;
 			}
 		}
-		
+	
 		register_post_type('arlo_' . $id, $args);
 	}
 	
@@ -265,7 +269,7 @@ function arlo_register_custom_post_types() {
 	}
 			
 	foreach(Arlo_For_Wordpress::$post_types as $id => $arlo_post) {
-		if (isset($arlo_post['regionalized']) && is_bool($arlo_post['regionalized']) && $arlo_post['regionalized']) {
+		if (isset($arlo_post['regionalized']) && is_bool($arlo_post['regionalized']) && $arlo_post['regionalized'] && !empty($settings['post_types'][$id]['posts_page'])) {
 			$arlo_page_ids[intval($settings['post_types'][$id]['posts_page'])] = $id;
 		}
 	}

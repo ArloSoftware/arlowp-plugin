@@ -194,7 +194,7 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 		// TODO: Define default values for your variables
 		$instance = wp_parse_args(
 			(array) $instance,
-			array('title'=>'','number'=> 5)
+			array('title'=>'','number'=> 5, 'template' => '', 'eventtag' => '', 'templatetag' => '')
 		);
 
 		// TODO: Store the values of the widget in their own variable
@@ -276,92 +276,6 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 		wp_enqueue_script( $this->get_widget_slug().'-script', plugins_url( 'js/widget.js', __FILE__ ), array('jquery') );
 
 	} // end register_widget_scripts
-	
-	public function get_import_id() {
-		global $wpdb;
-		
-        $sql = "SELECT option_value
-			FROM {$wpdb->prefix}options 
-            WHERE option_name = 'arlo_import_id'";
-	    
-	    $import_id = $wpdb->get_var($sql);	
-	    
-	    return $import_id;
-	}
-
-	public function arlo_widget_get_upcoming_list($qty,$eventtag,$templatetag) {
-		global $wpdb;
-		
-		$regions = get_option('arlo_regions');	
-		$import_id = $this->get_import_id();
-		$arlo_region = get_query_var('arlo-region', '');
-		$arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : (!empty($_COOKIE['arlo-region']) ? $_COOKIE['arlo-region'] : '' ));
-		
-		if (!empty($arlo_region)) {
-			$where['region'] = ' e_region = "' . $arlo_region . '" AND et_region = "' . $arlo_region . '"';
-		}
-		
-		$where['import_id'] = "e.import_id = ".$import_id;
-		$where['date'] = " CURDATE() < DATE(e.e_startdatetime) ";
-		$where['event'] = "e_parent_arlo_id = 0";
-		
-		$t1 = "{$wpdb->prefix}arlo_events";
-		$t2 = "{$wpdb->prefix}arlo_eventtemplates";
-		$t3 = "{$wpdb->prefix}arlo_venues";
-        $t4 = "{$wpdb->prefix}arlo_events_tags";
-        $t5 = "{$wpdb->prefix}arlo_tags";
-        $t6 = "{$wpdb->prefix}arlo_eventtemplates_tags";
-
-        $join = '';
-
-        if(!empty($eventtag)) :
-            $join .= " LEFT JOIN $t4 etag ON etag.e_id = e.e_id AND etag.import_id = e.import_id
-            LEFT JOIN $t5 AS tag ON tag.id = etag.tag_id AND tag.import_id = etag.import_id";
-
-            $eventtag = "('" . implode($eventtag, "','") . "')";
-
-            $where["eventtag"] .= "tag.tag IN $eventtag";
-        endif;
-
-        if(!empty($templatetag)) :
-            $join .= " LEFT JOIN $t6 ettag ON ettag.et_id = et.et_id AND ettag.import_id = et.import_id
-            LEFT JOIN $t5 AS ttag ON ttag.id = ettag.tag_id AND ttag.import_id = ettag.import_id";
-
-            $templatetag = "('" . implode($templatetag, "','") . "')";
-
-            $where["templatetag"] .= "ttag.tag IN $templatetag";
-        endif;
-
-		$sql = "
-		SELECT 
-			e.e_startdatetime, 
-			e.e_locationname, 
-			e.e_datetimeoffset,
-			e.e_isonline,
-			e.e_timezone_id,
-			et.et_name, 
-			et.et_id,
-			et.et_post_name,
-			et.et_post_id
-		FROM 
-			$t1 AS e 
-		LEFT JOIN 
-			$t2 AS et
-		ON 
-			e.et_arlo_id = et.et_arlo_id
-		AND
-			e.import_id = et.import_id
-		$join
-		WHERE
-			" . implode(" AND ", $where) . "
-		ORDER BY 
-			e.e_startdatetime
-		LIMIT 0, $qty";
-
-		$upcoming_array = $wpdb->get_results($sql, ARRAY_A);
-
-		return $upcoming_array;
-	}
 
 } // end class
 

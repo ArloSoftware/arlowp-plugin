@@ -6,7 +6,7 @@
 	echo $before_title . $title . $after_title;
 
 	$limit = '';
-	if (!empty($instance['number'])) {
+	if (isset($instance['number']) && is_numeric($instance['number'])) {
 		$limit = " limit='".$instance['number']."' ";
 	}
 
@@ -20,7 +20,7 @@
 		$templatetag = " templatetag='".$instance['templatetag']."' ";
 	}
 
-    $template = $instance['template'] ? $instance['template'] : arlo_get_template('upcoming_widget');
+    $template = !empty($instance['template']) ? $instance['template'] : arlo_get_template('upcoming_widget');
 
     $content = "[arlo_upcoming_widget_list $limit $eventtag $templatetag ]" . $template . "[/arlo_upcoming_widget_list]";
 

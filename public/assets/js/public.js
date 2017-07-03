@@ -69,6 +69,10 @@
         		page = page + '/';
         	}
 
+			if ($('#arlo-filter-region').length > 0) {
+				page += 'region-' + $('#arlo-filter-region').val() + '/';
+			}
+
         	var url = page;
         	
         	for (var i in filters) {

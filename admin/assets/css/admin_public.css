@@ -9,3 +9,15 @@
 	opacity: 1;
 	filter: alpha(opacity=100);	
 }
+
+.arlo-yellow {
+	color: #ffd20d;
+}
+
+.arlo-middle {
+	vertical-align: middle;
+}
+
+a .arlo-icons8 {
+	text-decoration: none;
+}

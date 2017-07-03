@@ -20,52 +20,52 @@
 
 [data-icons8]:before { content: attr(data-icons8); }
 
-.icons8, [data-icons8]:before,
-.icons8-apartment:before,
-.icons8-arlo-logo-for-font:before,
-.icons8-cancel:before,
-.icons8-cancel-2:before,
-.icons8-checked-checkbox-2:before,
-.icons8-checked-checkbox-2-filled:before,
-.icons8-checkmark:before,
-.icons8-circled-play:before,
-.icons8-classroom:before,
-.icons8-coffee-maker:before,
-.icons8-coffee-to-go:before,
-.icons8-cup:before,
-.icons8-curriculum:before,
-.icons8-department:before,
-.icons8-design:before,
-.icons8-diploma:before,
-.icons8-diploma-1:before,
-.icons8-diploma-2:before,
-.icons8-embassy:before,
-.icons8-grid-2:before,
-.icons8-grid-3:before,
-.icons8-headset:before,
-.icons8-help:before,
-.icons8-help-filled:before,
-.icons8-home:before,
-.icons8-info:before,
-.icons8-info-filled:before,
-.icons8-java-coffee-cup-logo:before,
-.icons8-map-marker:before,
-.icons8-marker:before,
-.icons8-minus:before,
-.icons8-mouse:before,
-.icons8-play:before,
-.icons8-plus:before,
-.icons8-private:before,
-.icons8-search:before,
-.icons8-toggle-off:before,
-.icons8-toggle-off-filled:before,
-.icons8-tv:before,
-.icons8-tv-show:before,
-.icons8-unchecked-checkbox:before,
-.icons8-us-dollar:before,
-.icons8-us-dollar-2:before,
-.icons8-user-groups:before,
-.icons8-video-paylist:before {
+.arlo-icons8, [data-icons8]:before,
+.arlo-icons8-apartment:before,
+.arlo-icons8-arlo-logo-for-font:before,
+.arlo-icons8-cancel:before,
+.arlo-icons8-cancel-2:before,
+.arlo-icons8-checked-checkbox-2:before,
+.arlo-icons8-checked-checkbox-2-filled:before,
+.arlo-icons8-checkmark:before,
+.arlo-icons8-circled-play:before,
+.arlo-icons8-classroom:before,
+.arlo-icons8-coffee-maker:before,
+.arlo-icons8-coffee-to-go:before,
+.arlo-icons8-cup:before,
+.arlo-icons8-curriculum:before,
+.arlo-icons8-department:before,
+.arlo-icons8-design:before,
+.arlo-icons8-diploma:before,
+.arlo-icons8-diploma-1:before,
+.arlo-icons8-diploma-2:before,
+.arlo-icons8-embassy:before,
+.arlo-icons8-grid-2:before,
+.arlo-icons8-grid-3:before,
+.arlo-icons8-headset:before,
+.arlo-icons8-help:before,
+.arlo-icons8-help-filled:before,
+.arlo-icons8-home:before,
+.arlo-icons8-info:before,
+.arlo-icons8-info-filled:before,
+.arlo-icons8-java-coffee-cup-logo:before,
+.arlo-icons8-map-marker:before,
+.arlo-icons8-marker:before,
+.arlo-icons8-minus:before,
+.arlo-icons8-mouse:before,
+.arlo-icons8-play:before,
+.arlo-icons8-plus:before,
+.arlo-icons8-private:before,
+.arlo-icons8-search:before,
+.arlo-icons8-toggle-off:before,
+.arlo-icons8-toggle-off-filled:before,
+.arlo-icons8-tv:before,
+.arlo-icons8-tv-show:before,
+.arlo-icons8-unchecked-checkbox:before,
+.arlo-icons8-us-dollar:before,
+.arlo-icons8-us-dollar-2:before,
+.arlo-icons8-user-groups:before,
+.arlo-icons8-video-paylist:before {
   display: inline-block;
   font-family: "Arlo-Website---iOS";
   font-style: normal;
@@ -80,62 +80,62 @@
   font-smoothing: antialiased;
 }
 
-.icons8-apartment:before { content: "\f103"; }
-.icons8-arlo-logo-for-font:before { content: "\f11a"; }
-.icons8-cancel:before { content: "\f120"; }
-.icons8-cancel-2:before { content: "\f121"; }
-.icons8-checked-checkbox-2:before { content: "\f114"; }
-.icons8-checked-checkbox-2-filled:before { content: "\f118"; }
-.icons8-checkmark:before { content: "\f122"; }
-.icons8-circled-play:before { content: "\f12e"; }
-.icons8-classroom:before { content: "\f10f"; }
-.icons8-coffee-maker:before { content: "\f11e"; }
-.icons8-coffee-to-go:before { content: "\f11d"; }
-.icons8-cup:before { content: "\f11f"; }
-.icons8-curriculum:before { content: "\f10c"; }
-.icons8-department:before { content: "\f10e"; }
-.icons8-design:before { content: "\f127"; }
-.icons8-diploma:before { content: "\f10b"; }
-.icons8-diploma-1:before { content: "\f109"; }
-.icons8-diploma-2:before { content: "\f10a"; }
-.icons8-embassy:before { content: "\f10d"; }
-.icons8-grid-2:before { content: "\f124"; }
-.icons8-grid-3:before { content: "\f125"; }
-.icons8-headset:before { content: "\f102"; }
-.icons8-help:before { content: "\f129"; }
-.icons8-help-filled:before { content: "\f12a"; }
-.icons8-home:before { content: "\f104"; }
-.icons8-info:before { content: "\f12b"; }
-.icons8-info-filled:before { content: "\f12c"; }
-.icons8-java-coffee-cup-logo:before { content: "\f11c"; }
-.icons8-map-marker:before { content: "\f108"; }
-.icons8-marker:before { content: "\f107"; }
-.icons8-minus:before { content: "\f101"; }
-.icons8-mouse:before { content: "\f106"; }
-.icons8-play:before { content: "\f11b"; }
-.icons8-plus:before { content: "\f100"; }
-.icons8-private:before { content: "\f105"; }
-.icons8-search:before { content: "\f119"; }
-.icons8-toggle-off:before { content: "\f116"; }
-.icons8-toggle-off-filled:before { content: "\f117"; }
-.icons8-tv:before { content: "\f112"; }
-.icons8-tv-show:before { content: "\f111"; }
-.icons8-unchecked-checkbox:before { content: "\f115"; }
-.icons8-us-dollar:before { content: "\f12f"; }
-.icons8-us-dollar-2:before { content: "\f130"; }
-.icons8-user-groups:before { content: "\f113"; }
-.icons8-video-paylist:before { content: "\f110"; }
+.arlo-icons8-apartment:before { content: "\f103"; }
+.arlo-icons8-arlo-logo-for-font:before { content: "\f11a"; }
+.arlo-icons8-cancel:before { content: "\f120"; }
+.arlo-icons8-cancel-2:before { content: "\f121"; }
+.arlo-icons8-checked-checkbox-2:before { content: "\f114"; }
+.arlo-icons8-checked-checkbox-2-filled:before { content: "\f118"; }
+.arlo-icons8-checkmark:before { content: "\f122"; }
+.arlo-icons8-circled-play:before { content: "\f12e"; }
+.arlo-icons8-classroom:before { content: "\f10f"; }
+.arlo-icons8-coffee-maker:before { content: "\f11e"; }
+.arlo-icons8-coffee-to-go:before { content: "\f11d"; }
+.arlo-icons8-cup:before { content: "\f11f"; }
+.arlo-icons8-curriculum:before { content: "\f10c"; }
+.arlo-icons8-department:before { content: "\f10e"; }
+.arlo-icons8-design:before { content: "\f127"; }
+.arlo-icons8-diploma:before { content: "\f10b"; }
+.arlo-icons8-diploma-1:before { content: "\f109"; }
+.arlo-icons8-diploma-2:before { content: "\f10a"; }
+.arlo-icons8-embassy:before { content: "\f10d"; }
+.arlo-icons8-grid-2:before { content: "\f124"; }
+.arlo-icons8-grid-3:before { content: "\f125"; }
+.arlo-icons8-headset:before { content: "\f102"; }
+.arlo-icons8-help:before { content: "\f129"; }
+.arlo-icons8-help-filled:before { content: "\f12a"; }
+.arlo-icons8-home:before { content: "\f104"; }
+.arlo-icons8-info:before { content: "\f12b"; }
+.arlo-icons8-info-filled:before { content: "\f12c"; }
+.arlo-icons8-java-coffee-cup-logo:before { content: "\f11c"; }
+.arlo-icons8-map-marker:before { content: "\f108"; }
+.arlo-icons8-marker:before { content: "\f107"; }
+.arlo-icons8-minus:before { content: "\f101"; }
+.arlo-icons8-mouse:before { content: "\f106"; }
+.arlo-icons8-play:before { content: "\f11b"; }
+.arlo-icons8-plus:before { content: "\f100"; }
+.arlo-icons8-private:before { content: "\f105"; }
+.arlo-icons8-search:before { content: "\f119"; }
+.arlo-icons8-toggle-off:before { content: "\f116"; }
+.arlo-icons8-toggle-off-filled:before { content: "\f117"; }
+.arlo-icons8-tv:before { content: "\f112"; }
+.arlo-icons8-tv-show:before { content: "\f111"; }
+.arlo-icons8-unchecked-checkbox:before { content: "\f115"; }
+.arlo-icons8-us-dollar:before { content: "\f12f"; }
+.arlo-icons8-us-dollar-2:before { content: "\f130"; }
+.arlo-icons8-user-groups:before { content: "\f113"; }
+.arlo-icons8-video-paylist:before { content: "\f110"; }
 
-.icons8.size-16 { font-size: 16px; }
+.arlo-icons8.size-16 { font-size: 16px; }
 
-.icons8.size-21 { font-size: 21px; }
+.arlo-icons8.size-21 { font-size: 21px; }
       
-.icons8.size-24 { font-size: 24px; }
+.arlo-icons8.size-24 { font-size: 24px; }
 
-.icons8.size-36 { font-size: 36px; }
+.arlo-icons8.size-36 { font-size: 36px; }
 
-.icons8.size-48 { font-size: 48px; }
+.arlo-icons8.size-48 { font-size: 48px; }
 
-.icons8.size-60 { font-size: 60px; }
+.arlo-icons8.size-60 { font-size: 60px; }
 
-.icons8.size-72 { font-size: 72px; }
+.arlo-icons8.size-72 { font-size: 72px; }

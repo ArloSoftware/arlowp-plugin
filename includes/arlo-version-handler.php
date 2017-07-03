@@ -5,7 +5,7 @@ namespace Arlo;
 use Arlo\Utilities;
 
 class VersionHandler {
-	const VERSION = '3.1.3';
+	const VERSION = '3.2';
 
 	private $dbl;
 	private $message_handler;
@@ -81,7 +81,11 @@ class VersionHandler {
 
 		if (version_compare($old_version, '3.1.3') < 0) {
 			$this->do_update('3.1.3');
-		}						
+		}	
+
+		if (version_compare($old_version, '3.2') < 0) {
+			$this->do_update('3.2');
+		}							
 	}
 	
 	private function run_pre_data_update($version) {
@@ -409,7 +413,13 @@ class VersionHandler {
 				//kick off an import
 				if (get_option('arlo_import_disabled', '0') != '1')
 					$this->plugin->get_scheduler()->set_task("import", -1);	
-			break;			
+			break;
+			case '3.2':
+				//try to add OA page (don't publish)
+				$page_name = 'oa';
+
+				$page_ids = $this->plugin->add_pages($page_name);				
+			break;				
 		}	
 	}	
 }
