@@ -354,8 +354,18 @@ class OnlineActivities {
             LIMIT 
                 $offset, $limit";
 
-            $order = "ORDER BY oa.oa_name ASC";
-        }   
+            //ordering
+            $order = "ORDER BY et.et_name ASC";
+            
+            // if grouping is set...
+            if(isset($atts['group'])) {
+                switch($atts['group']) {
+                    case 'category':
+                        $order = "ORDER BY c.c_order ASC, etc.et_order ASC, c.c_name ASC, et.et_name ASC";
+                    break;
+                }
+            }
+        }
 
         $sql = 
             "SELECT 
