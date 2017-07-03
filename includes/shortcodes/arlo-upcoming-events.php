@@ -69,16 +69,16 @@ class UpcomingEvents {
             'limit' => ''
         ), $atts, $shortcode_name, $import_id);
 
-        if (!empty($atts['limit'])) {
+        if (isset($atts['limit']) && is_numeric($atts['limit'])) {
             self::$upcoming_list_item_atts['limit'] = $atts['limit'];
         }
 
         if (!empty($atts['eventtag'])) {
-            self::$upcoming_list_item_atts['eventtag'] = $atts['eventtag'];
+            self::$upcoming_list_item_atts['eventtag'] = trim($atts['eventtag']);
         }
 
         if (!empty($atts['templatetag'])) {
-            self::$upcoming_list_item_atts['templatetag'] = $atts['templatetag'];
+            self::$upcoming_list_item_atts['templatetag'] = trim($atts['templatetag']);
         }
 
         $template = $content ? $content : arlo_get_template('upcoming_widget');

@@ -8,7 +8,7 @@
 <ul class="arlo-list arlo-show-more events">
     [arlo_event_list]
         [arlo_event_list_item show="4"]
-        <li class="arlo-cf">
+        <li class="arlo-cf arlo-event">
 
             <div class="arlo-cal">
 				<div class="arlo-day">[arlo_event_start_date format="%d"]</div>
@@ -16,7 +16,7 @@
 			</div>
 
             <div class="arlo-event-details">
-                <div class="arlo-left arlo-event-info">
+                <div class="arlo-event-info">
                    <div class="arlo-event-time"><i class="icons8-clock"></i>[arlo_event_start_date format="D g:i A"] - [arlo_event_end_date format="D g:i A"]</div>
 
                     [arlo_event_location wrap='<div class="arlo-event-location"><i class="icons8-marker"></i>%s</div>']
@@ -32,7 +32,7 @@
                     [arlo_event_session_description wrap='<div class="arlo-event-session-description">%s</div>']
                     [arlo_event_offers wrap='<div>%s</div>']
                 </div>
-                <div class="arlo-right arlo-registration">
+                <div class="arlo-registration">
                     [arlo_event_registration]
                 </div>
             </div>
@@ -48,11 +48,10 @@
 <ul class="arlo-list online-activities">
 [arlo_oa_list]
     [arlo_oa_list_item]
-    <h3>Online Activities</h3>
     <li class="arlo-cf arlo-onlineactivity">
         <div class="arlo-oa-info arlo-left">
+            [arlo_oa_reference_term wrap="<strong class='arlo-color2'>%s</strong>"]
             [arlo_oa_credits]
-
             [arlo_oa_delivery_description wrap='<div class="arlo-delivery-desc">%s</div>']
             [arlo_oa_offers wrap='<div class="arlo-color2">%s</div>']
         </div>

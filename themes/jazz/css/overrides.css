@@ -2,8 +2,8 @@
 
 .arlo#arlo,
 .arlo .dark-tooltip,
-.arlo .arlo-widget-upcoming,
-.arlo .arlo-categories-widget {
+.arlo-widget-upcoming,
+.arlo-categories-widget {
     font-size: 14px;
     font-weight: normal;
     padding: 1em 0;
@@ -15,8 +15,8 @@
 
 .arlo#arlo *,
 .arlo .dark-tooltip *,
-.arlo .arlo-widget-upcoming *,
-.arlo .arlo-categories-widget * {
+.arlo-widget-upcoming *,
+.arlo-categories-widget * {
     font-size: inherit;
     font-family: inherit;
     font-weight: inherit;
@@ -32,8 +32,8 @@
 }
 
 .arlo#arlo a,
-.arlo .arlo-widget-upcoming a,
-.arlo .arlo-categories-widget a {
+.arlo-widget-upcoming a,
+.arlo-categories-widget a {
     text-decoration: none;
     -webkit-transition: color .3s;
     -moz-transition: color .3s;
@@ -41,8 +41,8 @@
 }
 
 .arlo#arlo a:hover,
-.arlo .arlo-widget-upcoming a:hover,
-.arlo .arlo-categories-widget a:hover {
+.arlo-widget-upcoming a:hover,
+.arlo-categories-widget a:hover {
     text-decoration: underline;
 }
 
@@ -94,13 +94,13 @@
 .arlo#arlo,
 .arlo#arlo .arlo-font1,
 .arlo .dark-tooltip,
-.arlo .arlo-widget-upcoming,
-.arlo .arlo-categories-widget {
+.arlo-widget-upcoming,
+.arlo-categories-widget {
     font-family: Montserrat, Arial, sans-serif;
 }
 
 .arlo#arlo .arlo-font2,
-.arlo .arlo-widget-upcoming .arlo-cal.arlo-left {
+.arlo-widget-upcoming .arlo-cal.arlo-left {
     font-family: Open Sans Condensed, Arial, sans-serif;
 }
 

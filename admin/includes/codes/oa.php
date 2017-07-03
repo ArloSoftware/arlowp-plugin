@@ -1,6 +1,6 @@
 <ul class="arlo-codes">
-	<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivityrelated#arlo_onlineactivites_filters" target="_blank">[arlo_onlineactivites_filters]</a></li>
-	<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivityrelated#arlo_onlineactivites_list_item" target="_blank">[arlo_onlineactivites_list_item]</a>
+	<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivitylistrelated#arlo_onlineactivites_filters" target="_blank">[arlo_onlineactivites_filters]</a></li>
+	<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivitylistrelated#arlo_onlineactivites_list_item" target="_blank">[arlo_onlineactivites_list_item]</a>
 	
 		<ul>
 			<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivityrelated#arlo_oa_name" target="_blank">[arlo_oa_name]</a></li>
@@ -12,6 +12,6 @@
 			<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivityrelated#arlo_oa_credits" target="_blank">[arlo_oa_credits]</a></li>			
 		</ul>
 	</li>
-	<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivityrelated#arlo_onlineactivites_list_item" target="_blank">[/arlo_onlineactivites_list_item]</a>
-	<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivityrelated#arlo_onlineactivites_list_pagination" target="_blank">[arlo_onlineactivites_list_pagination]</a></li>
+	<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivitylistrelated#arlo_onlineactivites_list_item" target="_blank">[/arlo_onlineactivites_list_item]</a>
+	<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivitylistrelated#arlo_onlineactivites_list_pagination" target="_blank">[arlo_onlineactivites_list_pagination]</a></li>
 </ul>

@@ -296,8 +296,8 @@ body.arlo {
 
 .arlo#arlo *,
 .arlo .dark-tooltip *,
-.arlo .arlo-widget-upcoming *,
-.arlo .arlo-categories-widget * {
+.arlo-widget-upcoming *,
+.arlo-categories-widget * {
     box-sizing: border-box;
 }
 
@@ -1086,29 +1086,29 @@ body.arlo {
 
 /* Upcoming events list widget */
 
-.arlo .arlo-widget-upcoming > li {
+.arlo-widget-upcoming > li {
     padding: .5em 0;
     margin-bottom: 0;
 }
 
-.arlo .arlo-widget-upcoming > li p {
+.arlo-widget-upcoming > li p {
     font-weight: bold;
 }
 
-.arlo .arlo-widget-upcoming > li p:last-child {
+.arlo-widget-upcoming > li p:last-child {
     font-weight: normal;
 }
 
-.arlo .arlo-widget-upcoming .arlo-cal.arlo-left {
+.arlo-widget-upcoming .arlo-cal.arlo-left {
     width: 24%;
 }
 
-.arlo .arlo-widget-upcoming .arlo-cal-month,
-.arlo .arlo-widget-upcoming .arlo-cal-day {
+.arlo-widget-upcoming .arlo-cal-month,
+.arlo-widget-upcoming .arlo-cal-day {
     width: 100%;
 }
 
-.arlo .arlo-widget-upcoming .arlo-cal-month {
+.arlo-widget-upcoming .arlo-cal-month {
     text-transform: uppercase;
     letter-spacing: 2px;
     padding: .5em 0;
@@ -1116,7 +1116,7 @@ body.arlo {
     line-height: 1;
 }
 
-.arlo .arlo-widget-upcoming .arlo-cal-day {
+.arlo-widget-upcoming .arlo-cal-day {
     background-color: rgba(0, 0, 0, 0.04);
     border: none;
     font-weight: bold;
@@ -1128,12 +1128,12 @@ body.arlo {
 
 /* Category list widget */
 
-.arlo .arlo-categories-widget li {
+.arlo-categories-widget li {
     border-bottom: 0;
     padding: 0;
 }
 
-.arlo .arlo-categories-widget li a {
+.arlo-categories-widget li a {
     display: block;
     padding: .3em .8em;
     background-color: rgba(0, 0, 0, 0.04);
@@ -1307,7 +1307,7 @@ body.arlo {
 .arlo#arlo .arlo-button.arlo-waiting-list,
 .arlo#arlo .arlo-show-more-link,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a,
-.arlo .arlo-widget-upcoming a:hover,
+.arlo-widget-upcoming a:hover,
 .arlo#arlo .arlo-list.event-search .arlo-next-running a {
     color: #00cdc1;
 }
@@ -1329,8 +1329,8 @@ body.arlo {
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a:hover,
 .arlo#arlo .arlo-list.event-search .arlo-next-running a:hover,
 .arlo#arlo .arlo-event_tags-list > li,
-.arlo .arlo-widget-upcoming .arlo-cal-month,
-.arlo .arlo-categories-widget li a:hover,
+.arlo-widget-upcoming .arlo-cal-month,
+.arlo-categories-widget li a:hover,
 .arlo#arlo .arlo-search-button,
 .arlo#arlo .arlo-oa-registration .arlo-register {
     background-color: #00cdc1;
@@ -1356,7 +1356,7 @@ body.arlo {
 .arlo#arlo .arlo-color2,
 .arlo#arlo .arlo-content-field h3,
 .arlo#arlo a.arlo-template-name,
-.arlo .arlo-widget-upcoming * {
+.arlo-widget-upcoming * {
     color: #46536b;
 }
 
@@ -1407,8 +1407,8 @@ body.arlo {
 .arlo#arlo .arlo-event .arlo-event-full,
 .arlo#arlo .arlo-event_tags-list > li,
 .arlo#arlo .arlo-event-credits li,
-.arlo .arlo-widget-upcoming .arlo-cal-month,
-.arlo .arlo-categories-widget li a:hover,
+.arlo-widget-upcoming .arlo-cal-month,
+.arlo-categories-widget li a:hover,
 .arlo#arlo .arlo-oa-registration .arlo-register {
     color: white;
 }

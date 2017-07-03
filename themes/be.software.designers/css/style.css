@@ -310,8 +310,8 @@ body.arlo {
 .arlo#arlo .arlo-next-running a:after,
 .arlo#arlo .arlo-next-running a:hover,
 .arlo#arlo .arlo-next-running a.arlo-register,
-.arlo .arlo-widget-upcoming .arlo-cal-month,
-.arlo .arlo-categories-widget li a:hover,
+.arlo-widget-upcoming .arlo-cal-month,
+.arlo-categories-widget li a:hover,
 .arlo#arlo .arlo-button {
     background-color: #1DC6BC;
 }
@@ -620,7 +620,7 @@ body.arlo {
 .arlo#arlo ul.arlo-list,
 .arlo#arlo ul.arlo-category-list,
 .arlo#arlo ul.presenter-events,
-.arlo .arlo-categories-widget ul {
+.arlo-categories-widget ul {
     margin: 0;
     padding: 0;
 }
@@ -628,7 +628,7 @@ body.arlo {
 .arlo#arlo ul.arlo-list > li,
 .arlo#arlo ul.arlo-category-list > li,
 .arlo#arlo ul.presenter-events > li,
-.arlo .arlo-categories-widget ul li {
+.arlo-categories-widget ul li {
     list-style: none;
     background-image: none;
     display: block;
@@ -1147,37 +1147,37 @@ body.arlo {
 
 /* Upcoming events list widget */
 
-.arlo .arlo-widget-upcoming > li {
+.arlo-widget-upcoming > li {
     padding: .5em 0;
     margin-bottom: 0;
 }
 
-.arlo .arlo-widget-upcoming > li p {
+.arlo-widget-upcoming > li p {
     font-weight: bold;
 }
 
-.arlo .arlo-widget-upcoming > li p:last-child {
+.arlo-widget-upcoming > li p:last-child {
     font-weight: normal;
 }
 
-.arlo .arlo-widget-upcoming .arlo-cal.arlo-left {
+.arlo-widget-upcoming .arlo-cal.arlo-left {
     width: 24%;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
 }
 
-.arlo .arlo-widget-upcoming .arlo-cal-month,
-.arlo .arlo-widget-upcoming .arlo-cal-day {
+.arlo-widget-upcoming .arlo-cal-month,
+.arlo-widget-upcoming .arlo-cal-day {
     width: 100%;
 }
 
-.arlo .arlo-widget-upcoming .arlo-cal-month {
+.arlo-widget-upcoming .arlo-cal-month {
     padding: .5em 0;
     border: none;
     line-height: 1;
     text-transform: uppercase;
 }
 
-.arlo .arlo-widget-upcoming .arlo-cal-day {
+.arlo-widget-upcoming .arlo-cal-day {
     background-color: white;
     border: none;
     font-size: 1.8em;
@@ -1189,20 +1189,20 @@ body.arlo {
 
 /* Category list widget */
 
-.arlo .arlo-categories-widget li {
+.arlo-categories-widget li {
     border-bottom: 0;
     padding: 0;
     font-weight: bold;
 }
 
-.arlo .arlo-categories-widget li a {
+.arlo-categories-widget li a {
     display: block;
     padding: .3em .8em;
     border-bottom: 1px solid rgba(0, 0, 0, 0.04);
     margin-bottom: 0;
 }
 
-.arlo .arlo-categories-widget li a:hover {
+.arlo-categories-widget li a:hover {
     color: white;
 }
 

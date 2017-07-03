@@ -1,7 +1,7 @@
 .arlo .arlo-list,
 .arlo .arlo-list > li,
-.arlo .arlo-category-list,
-.arlo .arlo-category-list li,
+.arlo-category-list,
+.arlo-category-list li,
 .arlo .arlo-event-credits,
 .arlo .arlo-event-credits li {
 	list-style-type: none;
@@ -40,14 +40,14 @@
 
 .arlo .arlo-cal.arlo-left {
 	margin-right: 1em;
-	width: 8%;
+    max-width: 24%;
 }
 
 .arlo .arlo-cal-month {
 	background-color: #f04124;
 	border: 1px solid #f04124;
 	color: #fff;
-	display: inline-block;
+	display: block;
 	font-weight: 600;
 	width: 50px;
 }
@@ -70,11 +70,11 @@
 	max-width: 50%;
 }
 
-.arlo .widget .arlo-cal-month {
+.widget .arlo-cal-month {
 	font-size: 0.75em;
 }
 
-.arlo .widget .arlo-cal-day {
+.widget .arlo-cal-day {
 	font-size: 1.5em;
 }
 
@@ -118,15 +118,15 @@
 	padding-left: 0;
 }
 
-.arlo .arlo-widget-upcoming {
+.arlo-widget-upcoming {
 	padding-left: 0px;
 }
 
-.arlo .arlo-widget-upcoming > li {
+.arlo-widget-upcoming > li {
 	margin-bottom: 0.75em;
 }
 
-.arlo .arlo-widget-upcoming > li p {
+.arlo-widget-upcoming > li p {
 	margin: 0px;
 }
 
@@ -211,7 +211,7 @@
 	clear: both;
 }
 
-.arlo .arlo-categories-widget ul ul {
+.arlo-categories-widget ul ul {
 	margin-left: 1em;
 }
 

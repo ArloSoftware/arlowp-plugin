@@ -776,7 +776,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
             $conditions['e.e_locationname = %s'] = $arlo_location;
         }
 
-        if(!empty($arlo_delivery) && is_numeric($arlo_delivery)) {
+        if(isset($arlo_delivery) && is_numeric($arlo_delivery)) {
             $conditions['e.e_isonline = %d'] = $arlo_delivery;
         }
         

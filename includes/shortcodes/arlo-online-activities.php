@@ -296,28 +296,26 @@ class OnlineActivities {
         }       
 
         $arlo_category = \Arlo\Utilities::clean_string_url_parameter('arlo-category');
-        $arlo_tag = \Arlo\Utilities::clean_string_url_parameter('arlo-oatag');
+        $arlo_oatag = \Arlo\Utilities::clean_string_url_parameter('arlo-oatag');
         $arlo_templatetag = \Arlo\Utilities::clean_string_url_parameter('arlo-templatetag');
 
         if(!empty($arlo_category)) :
-            $join .= " LEFT JOIN $t3 et_category ON et_category.et_arlo_id = oa.oat_arlo_id";
-
-            $where .= " AND et_category.c_arlo_id = %d";
+            $where .= " AND etc.c_arlo_id = %d";
             $parameters[] = $arlo_category;
         endif;
 
-        if(!empty($arlo_tag)) :
-            $join .= " LEFT JOIN $t4 oa_tag ON oa_tag.oa_id = oa.oa_id";
+        if(!empty($arlo_oatag)) :
+            $join .= " LEFT JOIN $t4 oa_tag ON oa_tag.oa_id = oa.oa_id AND oa_tag.import_id = oa.import_id";
 
             $where .= " AND oa_tag.tag_id = %d";
-            $parameters[] = $arlo_tag;
+            $parameters[] = $arlo_oatag;
         endif;
 
         if(!empty($arlo_templatetag)) :
             $join .= " LEFT JOIN $t6 ett ON ett.et_id = et.et_id AND ett.import_id = et.import_id";
-            
-            $where .= " AND ett.tag_id = %d";
 
+            $where .= " AND ett.tag_id = %d";
+            
             $parameters[] = $arlo_templatetag;
         endif;
 
@@ -356,8 +354,18 @@ class OnlineActivities {
             LIMIT 
                 $offset, $limit";
 
-            $order = "ORDER BY oa.oa_name ASC";
-        }   
+            //ordering
+            $order = "ORDER BY et.et_name ASC";
+            
+            // if grouping is set...
+            if(isset($atts['group'])) {
+                switch($atts['group']) {
+                    case 'category':
+                        $order = "ORDER BY c.c_order ASC, etc.et_order ASC, c.c_name ASC, et.et_name ASC";
+                    break;
+                }
+            }
+        }
 
         $sql = 
             "SELECT 
@@ -407,8 +415,12 @@ class OnlineActivities {
         
         $settings = get_option('arlo_settings');
 
-        $page_link = get_permalink(get_post($post));
-            
+        if (!empty($settings['post_types']['oa']['posts_page'])) {
+            $page_link = get_permalink(get_post($settings['post_types']['oa']['posts_page']));
+        } else {
+            $page_link = get_permalink(get_post($post));
+        }        
+
         $filter_html = '<form class="arlo-filters" method="get" action="' . $page_link . '">';
 
         $filter_group = 'oa';

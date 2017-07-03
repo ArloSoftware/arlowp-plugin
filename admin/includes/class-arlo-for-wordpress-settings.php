@@ -773,9 +773,12 @@ class Arlo_For_Wordpress_Settings {
 	    <h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
 	    	<ul class="arlo-whatsnew-list">	  
-				<li>New presenter filter for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/upcomingeventrelated#arlo_upcoming_event_filters" target="_blank">[arlo_upcoming_event_filters]</a></li>
-				<li>Support new URL structure on the admin pages and for private events</li>
-				<li>Fix broken link in <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_suggest_datelocation" target="_blank">[arlo_suggest_datelocation]</a> when used the "text" attribute</li>
+				<li>New online activities global shortcode <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#arlo_onlineactivites_list" target="_blank">[arlo_onlineactivites_list]</a></li>
+				<li>New options for <a href="https://developer.arlo.co/doc/wordpress/widgets#widget-upcoming-events" target="_blank">Upcoming events widget</a></li>
+				<li>New settings to customize <a href="https://developer.arlo.co/doc/wordpress/settings#filters" target="_blank">Filters</a></li>
+				<li>New settings for the <a href="https://developer.arlo.co/doc/wordpress/settings#misc" target="_blank">Import</a></li>
+				<li>The plugin is fully compatible with PHP 7</li>
+				<li>Many bug fixes</li>
 			</ul>
 		</p>		
 
@@ -816,40 +819,6 @@ class Arlo_For_Wordpress_Settings {
 				<li>Minor fixes and improvements</li>
 				<li>Revamp the codebase behind the plugin</li>
 				<li>New built-in theme selection</li>
-	    	</ul>
-	    </p>		
-		<h4>Version 2.4.1.2</h4>
-	    <p>
-	    	<ul class="arlo-whatsnew-list">	    
-	    		<li>Fixed wrong [arlo_event_duration] return value</li>
-				<li>Fix when [arlo_event_price] shortcode doesn\'t return the "cheapest" price</li>
-				<li>Fix when [arlo_event_next_running] shortcode returns a session date</li>
-	    	</ul>
-	    </p>		
-		<h4>Version 2.4.1.1</h4>
-	    <p>
-	    	<ul class="arlo-whatsnew-list">	    
-	    		<li>Improvement the stability of the import</li>
-				<li><a href="https://confirmsubscription.com/h/r/41B80B5B566BCC0B" target="_blank">Subscribe</a> to our WP newsletter</li>
-	    	</ul>
-	    </p>
-		<h4>Version 2.4</h4>		
-	    <p>
-	    	<ul class="arlo-whatsnew-list">
-	    		<li>The plugin supports <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivityrelated" target="_blank">Online Activities</a></li>
-				<li>
-					New 
-					<a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_credits" target="_blank">[arlo_event_credits]</a>,  
-					<a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_advertised_duration" target="_blank">[arlo_event_template_advertised_duration]</a>,  
-					<a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/categoryrelated#arlo_category_title" target="_blank">[arlo_category_title]</a> 
-					shortcodes
-				</li>
-				<li>New "showfrom" attribute for <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_price" target="_blank">[arlo_event_price]</a> shortcode</li>
-				<li>New "strip_html" attribute every <a href="http://developer.arlo.co/doc/wordpress/shortcodes/" target="_blank">shortcode</a></li>
-				<li>New "text" attribute for <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_next_running" target="_blank">[arlo_event_next_running] shortcode</a></li>
-				<li>Sending error data to Arlo</li>
-				<li>Detailed log</li>
-				<li>Many bug fixes and enhancements</li>
 	    	</ul>
 	    </p>
 	    ';
