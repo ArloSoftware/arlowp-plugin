@@ -37,7 +37,7 @@ class Venues {
 
         $items = $wpdb->get_results(
             "SELECT 
-                v.v_id
+                DISTINCT(v.v_arlo_id)
             FROM 
                 $t1 v 
             LEFT JOIN 
@@ -79,6 +79,8 @@ class Venues {
                 post.post_type = 'arlo_venue'
             AND
                 v.import_id = $import_id
+            GROUP BY
+                v_arlo_id
             ORDER BY 
                 v.v_name ASC
             LIMIT 
