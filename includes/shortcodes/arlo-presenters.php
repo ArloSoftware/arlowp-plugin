@@ -38,7 +38,7 @@ class Presenters {
 
         $items = $wpdb->get_results(
             "SELECT 
-                p.p_id
+                DISTINCT(p.p_arlo_id)
             FROM 
                 $t1 p 
             LEFT JOIN 
@@ -68,8 +68,20 @@ class Presenters {
         $t2 = "{$wpdb->prefix}posts";
 
         $items = $wpdb->get_results(
-            "SELECT 
-                p.*, 
+           "SELECT 
+                p_arlo_id,
+                p_id,
+                p_firstname,
+                p_lastname,
+                p_viewuri,
+                p_profile,
+                p_qualifications,
+                p_interests,
+                p_twitterid,
+                p_facebookid,
+                p_linkedinid,
+                p_post_name,
+                p_post_id,
                 post.ID as post_id
             FROM 
                 $t1 p 
@@ -81,6 +93,8 @@ class Presenters {
                 post.post_type = 'arlo_presenter'
             AND
                 p.import_id = $import_id
+            GROUP BY
+                p_arlo_id                               
             ORDER 
                 BY p.p_firstname ASC, p.p_lastname ASC
             LIMIT 
