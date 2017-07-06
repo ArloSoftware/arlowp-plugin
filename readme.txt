@@ -19,6 +19,7 @@ Pre-built plugin themes:
 * [BeSoftware](https://support.arlo.co/hc/en-gb/articles/115001645886-Theme-BeSoftware?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
 * [Jazz](https://support.arlo.co/hc/en-gb/articles/115001600463-Theme-Jazz?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
 * [Block](https://support.arlo.co/hc/en-gb/articles/115001797703-Theme-Block?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
+* [Spark](https://support.arlo.co/hc/en-gb/articles/115003325783?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) 
 
 
 [youtube https://www.youtube.com/watch?v=-uUhu90cvoc]
