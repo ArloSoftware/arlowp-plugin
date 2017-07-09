@@ -152,11 +152,11 @@ class Arlo_For_Wordpress_Presenters extends Arlo_For_Wordpress_Lists  {
 	}	
 	
 	public function get_new_link() {
-		return sprintf('https://%s/management/Users/User.aspx?i=1&r=p', esc_attr($this->platform_url) );
+		return esc_url(sprintf('https://%s/management/Users/User.aspx?i=1&r=p', $this->platform_url) );
 	}
 	
 	public function get_list_link() {
-		return sprintf('https://%s/management/Users/Contacts2.aspx?t=presenters', esc_attr($this->platform_url) );
+		return esc_url(sprintf('https://%s/management/Users/Contacts2.aspx?t=presenters', $this->platform_url) );
 	}
 		
 }

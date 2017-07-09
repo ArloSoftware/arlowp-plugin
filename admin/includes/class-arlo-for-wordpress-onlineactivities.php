@@ -133,10 +133,10 @@ class Arlo_For_Wordpress_OnlineActivities extends Arlo_For_Wordpress_Lists  {
 	}	
 	
 	public function get_new_link() {
-		return sprintf('https://%s/management/Console/#/onlineactivities/new/', esc_attr($this->platform_url) );
+		return esc_url(sprintf('https://%s/management/Console/#/onlineactivities/new/', $this->platform_url));
 	}
 	
 	public function get_list_link() {
-		return sprintf('https://%s/management/Console/#/onlineactivities/', esc_attr($this->platform_url) );
+		return esc_url(sprintf('https://%s/management/Console/#/onlineactivities/', $this->platform_url));
 	}			
 }

@@ -238,10 +238,10 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 	}	
 	
 	public function get_new_link() {
-		return sprintf('https://%s/management/Console/#/events/new/', esc_attr($this->platform_url) );
+		return esc_url(sprintf('https://%s/management/Console/#/events/new/', $this->platform_url));
 	}
 	
 	public function get_list_link() {
-		return sprintf('https://%s/management/Courses/Courses2.aspx', esc_attr($this->platform_url) );
+		return esc_url(sprintf('https://%s/management/Courses/Courses2.aspx', esc_attr($this->platform_url)));
 	}			
 }
