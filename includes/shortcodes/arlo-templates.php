@@ -272,7 +272,7 @@ class Templates {
         $items = $wpdb->get_results($sql, ARRAY_A);
             
         if(empty($items)) :
-            if (!(isset($atts['show_only_at_bottom']) && $atts['show_only_at_bottom'] == "true" && isset($GLOBALS['categories_count']) && $GLOBALS['categories_count'])) :
+            if (!(isset($atts['show_only_at_bottom']) && $atts['show_only_at_bottom'] == "true" && isset($GLOBALS['arlo_categories_count']) && $GLOBALS['arlo_categories_count'])) :
                 $GLOBALS['no_event_text'] = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', 'arlo-for-wordpress');
             endif;
         else :
@@ -388,13 +388,10 @@ class Templates {
             $no_event_text = !empty($settings['noeventontemplate_text']) ? $settings['noeventontemplate_text'] : __('Interested in attending? Have a suggestion about running this course near you?', 'arlo-for-wordpress');
             
             if (!empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) {
-                $no_event_text .= '<br /><a href="' . $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'] . '">' . __('Register your interest now', 'arlo-for-wordpress') . '</a>';
+                $no_event_text .= '<br /><a href="' . esc_url($GLOBALS['arlo_eventtemplate']['et_registerinteresturi']) . '">' . __('Register your interest now', 'arlo-for-wordpress') . '</a>';
             }
             
-            $output = '
-            <p class="arlo-no-results">' . 
-                $no_event_text . 
-            '</p>';	
+            $output = '<p class="arlo-no-results">' . esc_html($no_event_text) . '</p>';	
         }
 
         return $output;        
@@ -432,7 +429,7 @@ class Templates {
         
         $et_id = arlo_get_post_by_name($GLOBALS['arlo_eventtemplate']['et_post_name'], 'arlo_event');
 
-        return get_permalink($et_id) . $region_link_suffix;        
+        return esc_url(get_permalink($et_id) . $region_link_suffix);
     }
 
     private static function shortcode_event_template_link($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -633,7 +630,7 @@ class Templates {
             $text = '%s' . $text . '%s';
         }
         
-        $content = sprintf(htmlentities($text, ENT_QUOTES, "UTF-8"), '<a href="' . $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'] . '" class="arlo-register-interest">', '</a>');
+        $content = sprintf(esc_html($text), '<a href="' . esc_url($GLOBALS['arlo_eventtemplate']['et_registerinteresturi']) . '" class="arlo-register-interest">', '</a>');
 
         return $content;
     }   
@@ -661,7 +658,7 @@ class Templates {
 
         $regions = get_option('arlo_regions');
         
-        if (isset($atts['show_only_at_bottom']) && $atts['show_only_at_bottom'] == "true" && isset($GLOBALS['categories_count']) && $GLOBALS['categories_count']) {
+        if (isset($atts['show_only_at_bottom']) && $atts['show_only_at_bottom'] == "true" && isset($GLOBALS['arlo_categories_count']) && $GLOBALS['arlo_categories_count']) {
             $GLOBALS['show_only_at_bottom'] = true;
             return;
         } 

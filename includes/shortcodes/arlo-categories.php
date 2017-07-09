@@ -65,7 +65,7 @@ class Categories {
             
             $tree = CategoriesEntity::getTree($start_at, $depth, 0, $import_id);	
             
-            $GLOBALS['categories_count'] = count($tree);		
+            $GLOBALS['arlo_categories_count'] = count($tree);		
                     
             if(!empty($tree)) {		
                 $return .= self::generate_category_ul($tree, $counts);	
@@ -131,21 +131,11 @@ class Categories {
         $html = '<ul class="arlo-category-list">';
         
         foreach($items as $cat) {
-            $html .= '<li>';
-            $html .= '<a href="';
-            $html .= $events_url . (!empty($arlo_region) ? 'region-' . $arlo_region . '/' : '');
-            
-            if($cat->c_parent_id != 0) {
-                $html .= 'cat-' . esc_attr($cat->c_slug);
-            }
-            
-            $html .= '">';
-            $html .= htmlentities($cat->c_name, ENT_QUOTES, "UTF-8") . ( !is_null($counts) ?  sprintf($counts, $cat->c_template_num) : '' );
-            $html .= '</a>';
-            if(isset($cat->children)) {
-                $html .= self::generate_category_ul($cat->children, $counts);
-            }
-            $html .= '</li>';
+            $href = $events_url . (!empty($arlo_region) ? 'region-' . $arlo_region . '/' : '') . ($cat->c_parent_id != 0 ? 'cat-' . esc_attr($cat->c_slug) : '');
+            $cat_name = $cat->c_name . ( !is_null($counts) ?  sprintf($counts, $cat->c_template_num) : '' );
+            $child_li = (isset($cat->children) ? self::generate_category_ul($cat->children, $counts) : '');
+
+            $html .= sprintf('<li><a href="%s">%s</a>%s</li>', esc_url($href), esc_html($cat_name), $child_li);
         }
         
         $html .= '</ul>';

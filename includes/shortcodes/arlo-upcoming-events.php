@@ -110,7 +110,7 @@ class UpcomingEvents {
         if(empty($items)) :
         
             $no_event_text = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', 'arlo-for-wordpress');
-            $output = '<p class="arlo-no-results">' . $no_event_text . '</p>';
+            $output = '<p class="arlo-no-results">' . esc_html($no_event_text) . '</p>';
             
         else :
             $previous = null;
@@ -146,9 +146,8 @@ class UpcomingEvents {
         $famount = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $GLOBALS['arlo_event_list_item']['o_formattedamounttaxexclusive'] : $GLOBALS['arlo_event_list_item']['o_formattedamounttaxinclusive'];
         $tax = $GLOBALS['arlo_event_list_item']['o_taxrateshortcode'];
 
-        $offer = ($amount > 0) ? '<span class="arlo-amount">' . $famount .'</span> <span class="arlo-price-tax">'. 
-                ($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__(' excl. %s', 'arlo-for-wordpress'), $tax) : sprintf(__(' incl. %s', 'arlo-for-wordpress'), $tax)). '</span>' 
-                : '<span class="arlo-amount">' . htmlentities($free_text, ENT_QUOTES, "UTF-8") . '</span>';
+        $offer = ($amount > 0) ? '<span class="arlo-amount">' . $famount .'</span> <span class="arlo-price-tax">'. esc_html(($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__(' excl. %s', 'arlo-for-wordpress'), $tax) : sprintf(__(' incl. %s', 'arlo-for-wordpress'), $tax))). '</span>' 
+                : '<span class="arlo-amount">' . esc_html($free_text) . '</span>';
 
         return $offer;        
     }    

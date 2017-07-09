@@ -169,7 +169,7 @@ class OnlineActivities {
         $registration = '<div class="arlo-oa-registration">';
         // test if there is a register uri string, if so display the button
         if(!is_null($registeruri) && $registeruri != '') {
-            $registration .= '<a class="' . $class . ' arlo-register" href="'. esc_attr($registeruri) . '" target="_blank">' . __($registermessage, 'arlo-for-wordpress') . '</a>';
+            $registration .= '<a class="' . $class . ' arlo-register" href="'. esc_url($registeruri) . '" target="_blank">' . __($registermessage, 'arlo-for-wordpress') . '</a>';
         } else {
             $registration .= $registermessage;
         }
@@ -219,7 +219,7 @@ class OnlineActivities {
                   
         if(empty($items)) :
             $no_event_text = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No online activities to show', 'arlo-for-wordpress');
-            $output = '<p class="arlo-no-results">' . $no_event_text . '</p>';
+            $output = '<p class="arlo-no-results">' . esc_html($no_event_text) . '</p>';
             
         else :
             $previous = null;

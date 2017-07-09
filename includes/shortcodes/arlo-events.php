@@ -202,7 +202,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
 
         if (!empty($arlo_location)) {
             $where .= ' AND ' . $t2 .'.e_locationname = %s';
-            $parameters[] = urldecode($arlo_location);
+            $parameters[] = $arlo_location;
         };        
         
         $sql = 
@@ -316,7 +316,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
 
         $event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
         
-        return self::event_date_formatter($atts, $event['e_startdatetime'], $event['e_datetimeoffset'], $event['e_isonline'], $event['e_timezone_id']);
+        return esc_html(self::event_date_formatter($atts, $event['e_startdatetime'], $event['e_datetimeoffset'], $event['e_isonline'], $event['e_timezone_id']));
     }
 
     private static function shortcode_event_end_date($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -324,13 +324,13 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         
         $event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
 
-        return self::event_date_formatter($atts, $event['e_finishdatetime'], $event['e_datetimeoffset'], $event['e_isonline'], $event['e_timezone_id']);
+        return esc_html(self::event_date_formatter($atts, $event['e_finishdatetime'], $event['e_datetimeoffset'], $event['e_isonline'], $event['e_timezone_id']));
     }
 
     private static function shortcode_event_session_description($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_event_list_item']['e_sessiondescription'])) return '';
 
-        return htmlentities($GLOBALS['arlo_event_list_item']['e_sessiondescription'], ENT_QUOTES, "UTF-8");        
+        return esc_html($GLOBALS['arlo_event_list_item']['e_sessiondescription']);
     }                    
 
     private static function shortcode_event_credits($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -371,7 +371,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         $registration .= (($isfull) ? '<span class="arlo-event-full">' . __('Event is full', 'arlo-for-wordpress') . '</span>' : '');
         // test if there is a register uri string, if so display the button
         if(!is_null($registeruri) && $registeruri != '') {
-            $registration .= '<a class="' . esc_attr($class) . ' ' . (($isfull) ? 'arlo-waiting-list' : 'arlo-register') . '" href="'. esc_attr($registeruri) . '" target="_blank">';
+            $registration .= '<a class="' . esc_attr($class) . ' ' . (($isfull) ? 'arlo-waiting-list' : 'arlo-register') . '" href="'. esc_url($registeruri) . '" target="_blank">';
             $registration .= (($isfull) ? __('Join waiting list', 'arlo-for-wordpress') : __($registermessage, 'arlo-for-wordpress')) . '</a>';
         } else {
             $registration .= $registermessage;
@@ -788,7 +788,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         }
         
         if(count($events) == 0 && count($oa) == 0 && !empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) {
-            $return = '<a href="' . $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'] . '" title="' . __('Register interest', 'arlo-for-wordpress') . '" class="' . esc_attr($buttonclass) . '">' . __('Register interest', 'arlo-for-wordpress') . '</a>';
+            $return = '<a href="' . esc_url($GLOBALS['arlo_eventtemplate']['et_registerinteresturi']) . '" title="' . __('Register interest', 'arlo-for-wordpress') . '" class="' . esc_attr($buttonclass) . '">' . __('Register interest', 'arlo-for-wordpress') . '</a>';
         } else if (count($events)) {
             $return_links = [];
             
