@@ -295,11 +295,8 @@ class Shortcodes {
 	public static function advertised_offers($id, $id_field, $import_id) {
 		global $wpdb;
                
-        $regions = get_option('arlo_regions');	
-        
-        $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
-
+        $arlo_region = \Arlo\Utilities::get_region_parameter();
+		
         $t1 = "{$wpdb->prefix}arlo_offers";
         
         $sql = "
@@ -321,14 +318,14 @@ class Shortcodes {
             offer.import_id = replaced_by.import_id
         AND 
             offer.$id_field = replaced_by.$id_field	
-        " . (!empty($arlo_region) ? " AND replaced_by.o_region = '" . $arlo_region . "'" : "") . "
+        " . (!empty($arlo_region) ? " AND replaced_by.o_region = '" . esc_sql($arlo_region) . "'" : "") . "
         WHERE 
             offer.o_replaces = 0 
         AND
             offer.import_id = $import_id
         AND 
             offer.$id_field = $id
-        " . (!empty($arlo_region) ? " AND offer.o_region = '" . $arlo_region . "'" : "") . "		
+        " . (!empty($arlo_region) ? " AND offer.o_region = '" . esc_sql($arlo_region) . "'" : "") . "		
         ORDER BY 
             offer.o_order";
 

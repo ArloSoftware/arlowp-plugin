@@ -26,11 +26,8 @@ class Templates {
         if (empty($GLOBALS['arlo_eventtemplate']['et_arlo_id'])) return '';
 
         $settings = get_option('arlo_settings');  
-        $regions = get_option('arlo_regions');
-        
-        $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');		
-        
+        $arlo_region = \Arlo\Utilities::get_region_parameter();
+
         extract(shortcode_atts(array(
             'limit'	=> 5,
             'base' => 'category',
@@ -107,7 +104,7 @@ class Templates {
         } 
         
         if (!empty($arlo_region) && $regionalized === "true") {
-            $where .= ' AND et.et_region = "' . $arlo_region . '"';
+            $where .= ' AND et.et_region = "' . esc_sql($arlo_region) . '"';
         }	
         
         $sql = "
@@ -169,11 +166,8 @@ class Templates {
     private static function shortcode_content_field_item($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $post, $wpdb;
         
-        $regions = get_option('arlo_regions');
-        
-        $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');		
-        
+        $arlo_region = \Arlo\Utilities::get_region_parameter();
+
         extract(shortcode_atts(array(
             'fields'	=> 'all',
         ), $atts, $shortcode_name, $import_id));
@@ -206,7 +200,7 @@ class Templates {
             $t2
         ON 
             $t1.et_id = $t2.et_id
-        " . (!empty($arlo_region) ? " AND $t1.et_region = '" . $arlo_region . "'" : "" ) . "
+        " . (!empty($arlo_region) ? " AND $t1.et_region = '" . esc_sql($arlo_region) . "'" : "" ) . "
         WHERE 
             " . $where . "
             " . (is_array($where_fields) && count($where_fields) > 0 ? " AND cf_fieldname IN (" . implode(',', $where_fields) . ") " : "") . "
@@ -414,13 +408,10 @@ class Templates {
         
         $region_link_suffix = '';
 
-        $regions = get_option('arlo_regions');
-
         if (!empty($GLOBALS['arlo_eventtemplate']['et_region']) && is_array($regions) && count($regions)) {
             $arlo_region = $GLOBALS['arlo_eventtemplate']['et_region'];
         } else {
-            $arlo_region = get_query_var('arlo-region', '');
-            $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+            $arlo_region = \Arlo\Utilities::get_region_parameter();
         }
 
         if (!empty($arlo_region)) {
@@ -655,9 +646,7 @@ class Templates {
 
     private static function generate_list_sql($atts, $import_id, $for_pagination = false) {
         global $wpdb;
-
-        $regions = get_option('arlo_regions');
-        
+       
         if (isset($atts['show_only_at_bottom']) && $atts['show_only_at_bottom'] == "true" && isset($GLOBALS['arlo_categories_count']) && $GLOBALS['arlo_categories_count']) {
             $GLOBALS['show_only_at_bottom'] = true;
             return;
@@ -687,9 +676,8 @@ class Templates {
         $arlo_delivery = \Arlo\Utilities::clean_int_url_parameter('arlo-delivery');
         $arlo_templatetag = \Arlo\Utilities::clean_string_url_parameter('arlo-templatetag');
         $arlo_search = \Arlo\Utilities::clean_string_url_parameter('arlo-search');
-        $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
-        
+        $arlo_region = \Arlo\Utilities::get_region_parameter();
+
         if(!empty($arlo_location) || (isset($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) ) :
 
             $join .= " LEFT JOIN $t5 e ON e.et_arlo_id = et.et_arlo_id AND e.import_id = et.import_id";

@@ -124,9 +124,7 @@ class Categories {
         
         if(!is_array($items) || empty($items)) return '';
         
-        $regions = get_option('arlo_regions');	
-        $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
+        $arlo_region = \Arlo\Utilities::get_region_parameter();
         
         $html = '<ul class="arlo-category-list">';
         

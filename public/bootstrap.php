@@ -293,7 +293,7 @@ function arlo_register_custom_post_types() {
 			
 			$location = str_replace($slug, $slug.'/region-' . $selected_region , $_SERVER['REQUEST_URI']);			
 			
-			wp_redirect($location);
+			wp_redirect(esc_url($location));
 			exit();				
 		} else {
 			setcookie("arlo-region", $selected_region, time()+60*60*24*30, '/');	
@@ -338,11 +338,8 @@ function arlo_the_content_event($content) {
 	
 	$templates = arlo_get_option('templates');
 	$content = $templates['event']['html'];
-	$regions = get_option('arlo_regions');	
-	
-	$arlo_region = get_query_var('arlo-region', '');
-	$arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
-	
+    $arlo_region = \Arlo\Utilities::get_region_parameter();	
+
 	$t1 = "{$wpdb->prefix}arlo_eventtemplates";
 	$t2 = "{$wpdb->prefix}posts";	
 	
@@ -360,7 +357,7 @@ function arlo_the_content_event($content) {
 		post.post_type = 'arlo_event' 
 	AND 
 		post.ID = $post->ID
-	" . (!empty($arlo_region) ? " AND et.et_region = '" . $arlo_region . "'" : "") . "
+	" . (!empty($arlo_region) ? " AND et.et_region = '" . esc_sql($arlo_region) . "'" : "") . "
 	ORDER 
 		BY et.et_name ASC
 	";

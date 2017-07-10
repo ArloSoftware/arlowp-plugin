@@ -29,19 +29,17 @@ class OnlineActivities {
     private static function shortcode_oa_list_item($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $post, $wpdb;
         $settings = get_option('arlo_settings');
-        $regions = get_option('arlo_regions');
 
         $where = '';
                
-        $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
-        
+        $arlo_region = \Arlo\Utilities::get_region_parameter();
+
         $t1 = "{$wpdb->prefix}arlo_eventtemplates";
         $t2 = "{$wpdb->prefix}arlo_onlineactivities";
         $t6 = "{$wpdb->prefix}arlo_offers";
         
         if (!empty($arlo_region)) {
-            $where .= ' AND ' . $t1 . '.et_region = "' . $arlo_region . '" AND ' . $t2 . '.oa_region = "' . $arlo_region . '"';
+            $where .= ' AND ' . $t1 . '.et_region = "' . esc_sql($arlo_region) . '" AND ' . $t2 . '.oa_region = "' . esc_sql($arlo_region) . '"';
         }					
         
         $sql = 
@@ -264,10 +262,8 @@ class OnlineActivities {
     private static function generate_onlineactivites_list_sql($atts, $import_id, $for_pagination = false) {
         global $wpdb;
 
-        $regions = get_option('arlo_regions');
-        $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : ''); 
-
+        $arlo_region = \Arlo\Utilities::get_region_parameter();
+        
         $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
         $page = !empty($_GET['paged']) ? intval($_GET['paged']) : intval(get_query_var('paged'));
 

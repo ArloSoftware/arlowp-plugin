@@ -36,10 +36,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         
         $filters_array = explode(',',$filters);
 
-        $regions = get_option('arlo_regions');
-        
-        $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	        
+        $arlo_region = \Arlo\Utilities::get_region_parameter();
         
         $settings = get_option('arlo_settings');  
 
@@ -68,14 +65,14 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
                             ' . $wpdb->prefix . 'arlo_eventtemplates AS et
                         ON 
                             et.et_arlo_id = e.et_arlo_id
-                            ' . (!empty($arlo_region) ? 'AND et.et_region = "' . $arlo_region . '"' : '' ) . '
+                            ' . (!empty($arlo_region) ? 'AND et.et_region = "' . esc_sql($arlo_region) . '"' : '' ) . '
                         WHERE 
                             e_locationname != ""
                         AND
                             e.import_id = ' . $import_id . '
                         AND 
                             et_post_id = ' . $post->ID . '
-                        ' . (!empty($arlo_region) ? 'AND e.e_region = "' . $arlo_region . '"' : '' ) . '
+                        ' . (!empty($arlo_region) ? 'AND e.e_region = "' . esc_sql($arlo_region) . '"' : '' ) . '
                         GROUP BY 
                             e.e_locationname 
                         ORDER BY 
@@ -179,13 +176,11 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
     private static function shortcode_event_list_item($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $post, $wpdb;
         $settings = get_option('arlo_settings');
-        $regions = get_option('arlo_regions');
         
         $where = '';
         $parameters = [];
         
-        $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+        $arlo_region = \Arlo\Utilities::get_region_parameter();
         $arlo_location = \Arlo\Utilities::clean_string_url_parameter('arlo-location');
         
         $t1 = "{$wpdb->prefix}arlo_eventtemplates";
@@ -489,11 +484,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         if(!isset($GLOBALS['arlo_event_list_item']['e_arlo_id'])) return '';
         global $post, $wpdb;
         
-        $regions = get_option('arlo_regions');
-        
-        $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');		
-        
+        $arlo_region = \Arlo\Utilities::get_region_parameter();
         $output = $where = '';
         
         extract(shortcode_atts(array(
@@ -502,7 +493,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         ), $atts, $shortcode_name, $import_id));
         
         if (!empty($arlo_region)) {
-            $where = ' AND e_region = "' . $arlo_region . '"';
+            $where = ' AND e_region = "' . esc_sql($arlo_region) . '"';
         }		
         
         $sql = "
@@ -549,10 +540,8 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
     private static function shortcode_event_duration($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_event_list_item']) || empty($GLOBALS['arlo_event_list_item']['et_arlo_id'])) return;
 
-        $regions = get_option('arlo_regions');	
-        $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
-        
+        $arlo_region = \Arlo\Utilities::get_region_parameter();
+
         $conditions = array(
             'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id'],
             'parent_id' => 0
@@ -639,10 +628,8 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         
         $offer;
         
-        $regions = get_option('arlo_regions');	
-        $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
-            
+        $arlo_region = \Arlo\Utilities::get_region_parameter();
+
         // attempt to find event template offer
         $conditions = array(
             'event_template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id'],
@@ -735,9 +722,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         if (!empty($GLOBALS['arlo_eventtemplate']['et_region'])) {
             $arlo_region = $GLOBALS['arlo_eventtemplate']['et_region'];
         } else {
-            $regions = get_option('arlo_regions');
-            $arlo_region = get_query_var('arlo-region', '');
-            $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+            $arlo_region = \Arlo\Utilities::get_region_parameter();
         }
 
         // merge and extract attributes

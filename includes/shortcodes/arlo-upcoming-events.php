@@ -27,8 +27,7 @@ class UpcomingEvents {
     private static function shortcode_upcoming_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
         
-        $arlo_region = get_query_var('arlo-region', '');
-        $regions = get_option('arlo_regions');
+        $arlo_region = \Arlo\Utilities::get_region_parameter();
 
         self::$upcoming_list_item_atts = array(
             'location' => \Arlo\Utilities::clean_string_url_parameter('arlo-location'),
@@ -38,7 +37,7 @@ class UpcomingEvents {
             'eventtag' => \Arlo\Utilities::clean_string_url_parameter('arlo-eventtag'),
             'templatetag' => \Arlo\Utilities::clean_string_url_parameter('arlo-templatetag'),
             'presenter' => \Arlo\Utilities::clean_string_url_parameter('arlo-presenter'),
-            'region' => (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '')
+            'region' => $arlo_region
         );
 
         $templates = arlo_get_option('templates');
@@ -351,7 +350,6 @@ class UpcomingEvents {
 
     private static function generate_list_sql($atts, $import_id, $for_pagination = false) {
         global $wpdb;
-        $regions = get_option('arlo_regions');
         $parameters = [];
 
         $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
