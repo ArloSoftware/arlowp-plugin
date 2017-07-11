@@ -24,6 +24,7 @@
             </div>
 
         </li>
+        [arlo_oa_rich_snippet]
         [/arlo_onlineactivites_list_item]
     </ul>
 

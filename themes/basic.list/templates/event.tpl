@@ -79,4 +79,5 @@
 	</tr>
 	[/arlo_suggest_templates]
 </table>
+[arlo_event_template_rich_snippet]
 [arlo_powered_by]

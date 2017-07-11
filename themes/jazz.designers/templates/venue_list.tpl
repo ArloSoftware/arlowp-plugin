@@ -15,6 +15,7 @@
                 [arlo_venue_parking label='<h5>Parking</h5>']
                 [arlo_venue_directions label='<h5>Directions</h5>']
         </li>
+        [arlo_venue_rich_snippet]
     [/arlo_venue_list_item]
 </ul>
 

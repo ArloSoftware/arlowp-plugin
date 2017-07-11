@@ -19,6 +19,7 @@
                 [arlo_venue_directions wrap='<div class="arlo-venue-directions arlo-venue-content"><h4>Directions</h4>%s</div>']
 
             </li>
+            [arlo_venue_rich_snippet]
         [/arlo_venue_list_item]
     </ul>
 

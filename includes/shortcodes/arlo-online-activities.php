@@ -518,6 +518,39 @@ class OnlineActivities {
         return $filter_html;
     }
 
+    private static function shortcode_oa_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        $oa_snippet = array();
 
+        // Basic
+        $oa_snippet['@context'] = 'http://schema.org';
+        $oa_snippet['@type'] = 'OnDemandEvent';
+        $oa_snippet['name'] = $GLOBALS['arlo_oa_list_item']['oa_name'];
+
+        $oa_snippet['url'] = $GLOBALS['arlo_oa_list_item']['oa_viewuri'];
+
+        if (!empty($GLOBALS['arlo_oa_list_item']['et_descriptionsummary'])) {
+            $oa_snippet['description'] = $GLOBALS['arlo_oa_list_item']['et_descriptionsummary'];
+        }
+
+
+        // OFfers
+        $price_setting = (isset($settings['price_setting'])) ? $settings['price_setting'] : ARLO_PLUGIN_PREFIX . '-exclgst';
+        $price_field = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? 'o_offeramounttaxexclusive' : 'o_offeramounttaxinclusive';
+        $offers = Shortcodes::get_offers_snippet_data($GLOBALS['arlo_oa_list_item']['oa_id'], 'oa_id', $import_id, $price_field);
+
+        if (!empty($offers)) {
+            $oa_snippet["offers"] = array();
+            $oa_snippet["offers"]["@type"] = "AggregateOffer";
+
+            $oa_snippet["offers"]["highPrice"] = $offers['high_price'];
+            $oa_snippet["offers"]["lowPrice"] = $offers['low_price'];
+
+            $oa_snippet["offers"]["priceCurrency"] = $offers['currency'];
+
+            $oa_snippet["offers"]['url'] = $GLOBALS['arlo_oa_list_item']['oa_viewuri'];
+        }
+
+        return Shortcodes::create_rich_snippet( json_encode($oa_snippet) );
+    }
 
 }

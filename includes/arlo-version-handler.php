@@ -5,7 +5,7 @@ namespace Arlo;
 use Arlo\Utilities;
 
 class VersionHandler {
-	const VERSION = '3.2';
+	const VERSION = '3.3';
 
 	private $dbl;
 	private $message_handler;
@@ -85,6 +85,10 @@ class VersionHandler {
 
 		if (version_compare($old_version, '3.2') < 0) {
 			$this->do_update('3.2');
+		}
+
+		if (version_compare($old_version, '3.3') < 0) {
+			$this->do_update('3.3');
 		}							
 	}
 	
@@ -419,6 +423,45 @@ class VersionHandler {
 				$page_name = 'oa';
 
 				$page_ids = $this->plugin->add_pages($page_name);				
+			break;
+			case '3.3':
+				$saved_templates = arlo_get_option('arlo_themes_settings');
+
+				//Add [arlo_event_template_rich_snippet] shortcode to the event template
+				if (!empty($saved_templates['templates']['event']['html']) && strpos($saved_templates['templates']['event']['html'], "[arlo_event_template_rich_snippet]") === false) {
+					$saved_templates['templates']['event']['html'] = $saved_templates['templates']['event']['html'] . "\n[arlo_event_template_rich_snippet]";
+				}
+
+				//Add [arlo_presenter_rich_snippet] shortcode to the presenter
+				if (!empty($saved_templates['templates']['presenter']['html']) && strpos($saved_templates['templates']['presenter']['html'], "[arlo_presenter_rich_snippet]") === false) {
+					$saved_templates['templates']['presenter']['html'] = $saved_templates['templates']['event']['html'] . "\n[arlo_presenter_rich_snippet]";
+				}
+
+				//Add [arlo_venue_rich_snippet] shortcode to the venue
+				if (!empty($saved_templates['templates']['venue']['html']) && strpos($saved_templates['templates']['venue']['html'], "[arlo_venue_rich_snippet]") === false) {
+					$saved_templates['templates']['venue']['html'] = $saved_templates['templates']['event']['html'] . "\n[arlo_venue_rich_snippet]";
+				}
+
+
+				//Add [arlo_event_template_rich_snippet] shortcode to the catalogue
+				if (!empty($saved_templates['templates']['events']['html']) && strpos($saved_templates['templates']['events']['html'], "[arlo_event_template_rich_snippet]") === false) {
+					$pos = strpos($saved_templates['templates']['events']['html'],'[/arlo_event_template_list_item]');
+					$saved_templates['templates']['events']['html'] = substr_replace($saved_templates['templates']['events']['html'], "\n[arlo_event_template_rich_snippet]", $pos, 0);
+				}
+
+				//Add [arlo_presenter_rich_snippet] shortcode to the presenters list
+				if (!empty($saved_templates['templates']['presenters']['html']) && strpos($saved_templates['templates']['presenters']['html'], "[arlo_presenter_rich_snippet]") === false) {
+					$pos = strpos($saved_templates['templates']['presenters']['html'],'[/arlo_presenter_list_item]');
+					$saved_templates['templates']['presenters']['html'] = substr_replace($saved_templates['templates']['presenters']['html'], "\n[arlo_presenter_rich_snippet]", $pos, 0);
+				}
+
+				//Add [arlo_venue_rich_snippet] shortcode to the venues list
+				if (!empty($saved_templates['templates']['venues']['html']) && strpos($saved_templates['templates']['venues']['html'], "[arlo_venues_rich_snippet]") === false) {
+					$pos = strpos($saved_templates['templates']['venues']['html'],'[/arlo_venues_list_item]');
+					$saved_templates['templates']['venues']['html'] = substr_replace($saved_templates['templates']['venues']['html'], "\n[arlo_venues_rich_snippet]", $pos, 0);
+				}
+
+				arlo_set_option('arlo_themes_settings', $saved_templates);
 			break;				
 		}	
 	}	

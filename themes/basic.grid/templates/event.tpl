@@ -60,4 +60,5 @@
 		[arlo_content_field_text wrap='<p>%s</p>']
 	[/arlo_content_field_item]
 </div>
+[arlo_event_template_rich_snippet]
 [arlo_powered_by]

@@ -193,6 +193,39 @@ class Shortcodes {
 		return $filter_html;
 	}
 
+	public static function create_rich_snippet($content) {
+		return '<script type="application/ld+json">' . $content . '</script>';
+	}
+
+    public static function get_performer($presenter) {
+        $performer = array("@type" => "Person");
+        $name_separator = (!empty($presenter["p_firstname"]) && !empty($presenter["p_lastname"]) ? " " : "");
+        $performer["name"] = $presenter["p_firstname"] . $name_separator . $presenter["p_lastname"];
+        $performer["url"] = $presenter["p_viewuri"];
+
+        if (!empty($presenter["p_profile"])) {
+        	$performer["description"] = $presenter["p_profile"];
+        }
+
+        $same_as = array($presenter["p_viewuri"]);
+
+        if (!empty($presenter["p_twitterid"])) {
+        	array_push($same_as,"https://www.twitter.com/".$presenter["p_twitterid"]);
+        }
+
+        if (!empty($presenter["p_facebookid"])) {
+        	array_push($same_as,"https://www.facebook.com/".$presenter["p_facebookid"]);
+        }
+
+        if (!empty($presenter["p_linkedinid"])) {
+        	array_push($same_as,"https://www.linkedin.com/".$presenter["p_linkedinid"]);
+        }
+
+        $performer["sameAs"] = $same_as;
+
+        return $performer;
+    }
+
 	private static function shortcode_search_field($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
 		global $post, $wpdb;
 
@@ -292,16 +325,9 @@ class Shortcodes {
 		return $content;
 	}
 
-	public static function advertised_offers($id, $id_field, $import_id) {
+	public static function get_advertised_offers($id, $id_field, $import_id) {
 		global $wpdb;
-               
-        $regions = get_option('arlo_regions');	
-        
-        $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
 
-        $t1 = "{$wpdb->prefix}arlo_offers";
-        
         $sql = "
         SELECT 
             offer.*,
@@ -332,14 +358,48 @@ class Shortcodes {
         ORDER BY 
             offer.o_order";
 
-        $offers_array = $wpdb->get_results($sql, ARRAY_A);
+        $offers = $wpdb->get_results($sql, ARRAY_A);
+
+        return $offers;
+	}
+
+	public static function get_offers_snippet_data($id, $id_field, $import_id, $price_field) {
+        $offers_array = self::get_advertised_offers($id, $id_field, $import_id);
+
+        $high_price = 0;
+        $low_price = 0;
+        $currency = "";
+
+        foreach ($offers_array as $offer) {
+        	$low_price = ( $offer[$price_field] < $low_price || $low_price == 0 ? $offer[$price_field] : $low_price );
+        	$high_price = ( $offer[$price_field] > $high_price || $high_price == 0 ? $offer[$price_field] : $high_price );
+        	$currency = ( $offer['o_currencycode'] < $currency || $currency == 0 ? $offer['o_currencycode'] : $currency );
+        }
+
+        return array(
+        	'high_price' => $high_price,
+        	'low_price' => $low_price,
+        	'currency' => $currency
+        );
+	}
+
+	public static function advertised_offers($id, $id_field, $import_id) {
+		global $wpdb;
+               
+        $regions = get_option('arlo_regions');	
+        
+        $arlo_region = get_query_var('arlo-region', '');
+        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
+
+        $t1 = "{$wpdb->prefix}arlo_offers";
+        
+        $offers_array = self::get_advertised_offers($id, $id_field, $import_id);
 
         $offers = '<ul class="arlo-list arlo-event-offers">';
             
         $settings = get_option('arlo_settings');  
         $price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : ARLO_PLUGIN_PREFIX . '-exclgst';      
         $free_text = (isset($settings['free_text'])) ? esc_attr($settings['free_text']) : __('Free', 'arlo-for-wordpress');
-
 
         foreach($offers_array as $offer) {
 

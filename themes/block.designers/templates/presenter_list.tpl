@@ -6,6 +6,7 @@
             <h2>[arlo_presenter_permalink wrap="<a href='%s' class='arlo-color1'>"][arlo_presenter_name]</a></h2>
             <p>[arlo_presenter_profile]</p>
         </li>
+        [arlo_presenter_rich_snippet]
     [/arlo_presenter_list_item]
 </ul>
 

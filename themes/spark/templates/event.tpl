@@ -85,4 +85,5 @@
     </ul>
 </div>
 [arlo_powered_by]
+[arlo_event_template_rich_snippet]
 </div>

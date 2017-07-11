@@ -16,3 +16,4 @@
 [arlo_venue_parking label='<h5>Parking</h5>']
 [arlo_powered_by]
 </div>
+[arlo_venue_rich_snippet]

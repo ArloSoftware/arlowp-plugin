@@ -258,5 +258,58 @@ class Venues {
         if(!isset($GLOBALS['arlo_venue_list_item']['v_facilityinfoparking'])) return '';
 
         return $GLOBALS['arlo_venue_list_item']['v_facilityinfoparking'];        
-    }    
+    }
+
+    private static function shortcode_venue_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        $venue_snippet = array();
+
+        // Basic
+        $venue_snippet = array();
+        $venue_snippet["@type"] = "Place";
+        $venue_snippet["name"] = $GLOBALS['arlo_venue_list_item']["v_name"];
+
+        $venue_permalink = get_permalink(arlo_get_post_by_name($GLOBALS['arlo_venue_list_item']['v_post_name'], 'arlo_venue'));
+
+        if (!empty($venue_permalink)) {
+            $venue_snippet["url"] = $venue_permalink;
+            $venue_snippet["sameAs"] = $venue_permalink;
+        }
+
+        // Address
+        $venue_snippet["address"] = array();
+        $venue_snippet["address"]["@type"] = ["PostalAddress"];
+
+        if (!empty($GLOBALS['arlo_venue_list_item']["v_physicaladdresscity"]) 
+            || !empty($GLOBALS['arlo_venue_list_item']["v_physicaladdresspostcode"]) 
+            || !empty($GLOBALS['arlo_venue_list_item']["v_physicaladdresscountry"]) 
+            || !empty($GLOBALS['arlo_venue_list_item']["v_physicaladdressline1"])) {
+
+                if (!empty($GLOBALS['arlo_venue_list_item']["v_physicaladdressline1"])) {
+                    $address = $GLOBALS['arlo_venue_list_item']["v_physicaladdressline1"];
+
+                    $address .= ( !empty($GLOBALS['arlo_venue_list_item']["v_physicaladdressline2"]) ? ' ' . $GLOBALS['arlo_venue_list_item']["v_physicaladdressline2"] : "");
+
+                    $address .= ( !empty($GLOBALS['arlo_venue_list_item']["v_physicaladdressline3"]) ? ' ' . $GLOBALS['arlo_venue_list_item']["v_physicaladdressline3"] : "");
+
+                    $address .= ( !empty($GLOBALS['arlo_venue_list_item']["v_physicaladdressline4"]) ? ' ' . $GLOBALS['arlo_venue_list_item']["v_physicaladdressline4"] : "");
+
+                    $venue_snippet["address"]["streetAddress"] = $address;
+                }
+
+                if (!empty($GLOBALS['arlo_venue_list_item']["v_physicaladdresscity"])) {
+                    $venue_snippet["address"]["addressLocality"] = $GLOBALS['arlo_venue_list_item']["v_physicaladdresscity"];
+                }
+
+                if (!empty($GLOBALS['arlo_venue_list_item']["v_physicaladdresspostcode"])) {
+                    $venue_snippet["address"]["postalCode"] = $GLOBALS['arlo_venue_list_item']["v_physicaladdresspostcode"];
+                }
+
+                if (!empty($GLOBALS['arlo_venue_list_item']["v_physicaladdresscountry"])) {
+                    $venue_snippet["address"]["addressCountry"] = $GLOBALS['arlo_venue_list_item']["v_physicaladdresscountry"];
+                }
+        }
+
+        return Shortcodes::create_rich_snippet( json_encode($venue_snippet) ); 
+    }
+
 }

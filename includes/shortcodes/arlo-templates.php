@@ -849,4 +849,26 @@ class Templates {
             throw new \Exception("Couldn't prepapre SQL statement");
         }
     }
+
+
+    private static function shortcode_event_template_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        $event_template_snippet = array();
+
+        if (isset($GLOBALS["arlo_eventtemplate"])) {
+            $event_template_snippet['@context'] = 'http://schema.org';
+            $event_template_snippet['@type'] = 'Event';
+            $event_template_snippet['name'] = $GLOBALS['arlo_eventtemplate']['et_name'];
+
+            $event_template_snippet['url'] = $GLOBALS['arlo_eventtemplate']['et_viewuri'];
+            $event_template_snippet['sameAs'] = $GLOBALS['arlo_eventtemplate']['et_viewuri'];
+
+            $event_template_snippet['description'] = $GLOBALS['arlo_eventtemplate']['et_descriptionsummary'];
+
+            return Shortcodes::create_rich_snippet( json_encode($event_template_snippet) );
+        } else {
+            return '';
+        }
+
+    }
+
 }
