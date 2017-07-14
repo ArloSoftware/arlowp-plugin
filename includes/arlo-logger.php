@@ -29,7 +29,7 @@ class Logger {
 			$wpdb->prepare( 
 				"INSERT INTO " . $table_name . " 
 				(message, import_id, created, successful) 
-				VALUES ( %s, %s, %s, %d ) 
+				VALUES ( %s, %d, %s, %d ) 
 				", 
 			    $message,
 				$import_id,
