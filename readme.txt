@@ -12,13 +12,14 @@ Seamlessly integrate Arlo's market leading training and event management system 
 == Description ==
 = Arlo training and event management system =
 
-Arlo for WordPress helps you build great looking websites for promoting your events and courses. Offer website visitors an interactive and engaging experience with the ability to fully customise the look and feel. The plugin also comes with pre-built page themes providing flexibility for designers, and plug-and-play themes for the less savvy. [Read more](https://www.arlo.co/wordpress-training-and-event-management-plugin?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) about creating beautiful looking training and event websites using Arlo for WordPress.
+Arlo for WordPress helps you build great looking websites for promoting your events and courses. Offer website visitors an interactive and engaging experience with the ability to fully customise the look and feel. The plugin also comes with pre-built page themes providing flexibility for designers, and plug-and-play themes for the less savvy. [Read more](https://www.arlo.co/features/Arlo-for-WordPress-integration?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) about creating beautiful looking training and event websites using Arlo for WordPress.
 
 Pre-built plugin themes:
 
-* [BeSoftware](https://support.arlo.co/hc/en-gb/articles/115001645886-Theme-BeSoftware)
-* [Jazz](https://support.arlo.co/hc/en-gb/articles/115001600463-Theme-Jazz)
-* [Block](https://support.arlo.co/hc/en-gb/articles/115001797703-Theme-Block)
+* [BeSoftware](https://support.arlo.co/hc/en-gb/articles/115001645886-Theme-BeSoftware?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
+* [Jazz](https://support.arlo.co/hc/en-gb/articles/115001600463-Theme-Jazz?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
+* [Block](https://support.arlo.co/hc/en-gb/articles/115001797703-Theme-Block?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
+* [Spark](https://support.arlo.co/hc/en-gb/articles/115003325783?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) 
 
 
 [youtube https://www.youtube.com/watch?v=-uUhu90cvoc]
@@ -33,18 +34,18 @@ Arlo is a cloud-based training and event management system for managing, marketi
 
 = Requirements =
 * PHP Version - WordPress PHP version must be 5.4 or higher.
-* Shared Server Hosting - Slow shared server hosting can cause issues with the data import. If you have shared server hosting please ensure you [set up a Cron Job](http://developer.arlo.co/doc/wordpress/import#import-cron-job).
+* Shared Server Hosting - Slow shared server hosting can cause issues with the data import. If you have shared server hosting please ensure you [set up a Cron Job](http://developer.arlo.co/doc/wordpress/import#import-cron-job?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing).
 * WordPress version - Your WordPress should be kept updated to the latest version available. 
 * Cache plugins - Caching plugins can interfere with the Arlo WordPress plugin. Once changes have been made to the Arlo plugin, ensure you clear or reset your caching plugins if you have them. 
-* [Google Maps API key](https://developer.arlo.co/doc/wordpress/settings#general-settings) is required for the maps on the venue profile pages (You need to enable the [Google Static Maps API](https://developers.google.com/maps/documentation/javascript/get-api-key) for the project).
+* [Google Maps API key](https://developer.arlo.co/doc/wordpress/settings#general-settings?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) is required for the maps on the venue profile pages (You need to enable the [Google Static Maps API](https://developers.google.com/maps/documentation/javascript/get-api-key?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) for the project).
 * Arlo platform (Sign-up for a [free Arlo trial](https://www.arlo.co/register?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)) 
 
 = Support & Documentation =
-* [Arlo online help centre](https://support.arlo.co/hc/en-gb/categories/201429706-Website-Integration)
-* [Arlo for WordPress developer documentation](http://developer.arlo.co/doc/wordpress/index)
-* [Arlo for Wordpress frequently asked questions (FAQ)](https://support.arlo.co/hc/en-gb/articles/115000392503-WordPress-Plugin-Frequently-Asked-Questions-FAQ-)
-* [Submit a Arlo support request](https://support.arlo.co/hc/en-gb/requests/new/)
-* [Manage themes](https://support.arlo.co/hc/en-gb/articles/115002905863)
+* [Arlo online help centre](https://support.arlo.co/hc/en-gb/categories/201429706-Website-Integration?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
+* [Arlo for WordPress developer documentation](http://developer.arlo.co/doc/wordpress/index?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
+* [Arlo for Wordpress frequently asked questions (FAQ)](https://support.arlo.co/hc/en-gb/articles/115000392503-WordPress-Plugin-Frequently-Asked-Questions-FAQ-?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
+* [Submit a Arlo support request](https://support.arlo.co/hc/en-gb/requests/new/?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
+* [Manage themes](https://support.arlo.co/hc/en-gb/articles/115002905863?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
 
 = Arlo WordPress integration - built for web developers! =
 Create beautiful and interactive training and event websites using the Arlo for WordPress plugin. Access an extensive library of WordPress Shortcodes, Templates, and Widgets, all designed specifically for web developer to make integration easy.  
@@ -58,27 +59,27 @@ Arlo for WordPress providers you with the building blocks to create great lookin
 
 **Shortcodes** - Access a range of shortcodes to display data in your WordPress site. You can also add additional attributes to do nifty things with very little effort.
 
-* [Upcoming events](https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/upcomingeventrelated)
-* [Event](https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated)
-* [Event template](https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated)
-* [Category](https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/categoryrelated)
-* [Venue](https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated)
-* [Presenter](https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/presenterrelated)
+* [Upcoming events](https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/upcomingeventrelated?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
+* [Event](https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
+* [Event template](https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
+* [Category](https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/categoryrelated?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
+* [Venue](https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
+* [Presenter](https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/presenterrelated?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
 
 **Templates** - The plugin comes preloaded with the following templates which can all be edited.
 
-* [Event page](https://developer.arlo.co/doc/wordpress/templates#event-template)
-* [Catalogue](https://developer.arlo.co/doc/wordpress/templates#events-list-template)
-* [Upcoming events](https://developer.arlo.co/doc/wordpress/templates#upcoming-events-template)
-* [Venue list](https://developer.arlo.co/doc/wordpress/templates#venue-list-template)
-* [Venue information page](https://developer.arlo.co/doc/wordpress/templates#venue-template)
-* [Presenter list](https://developer.arlo.co/doc/wordpress/templates#presenter-list-template)
-* [Presenter profile pages](https://developer.arlo.co/doc/wordpress/templates#presenter-template)
+* [Event page](https://developer.arlo.co/doc/wordpress/templates#event-template?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
+* [Catalogue](https://developer.arlo.co/doc/wordpress/templates#events-list-template?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
+* [Upcoming events](https://developer.arlo.co/doc/wordpress/templates#upcoming-events-template?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
+* [Venue list](https://developer.arlo.co/doc/wordpress/templates#venue-list-template?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
+* [Venue information page](https://developer.arlo.co/doc/wordpress/templates#venue-template?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
+* [Presenter list](https://developer.arlo.co/doc/wordpress/templates#presenter-list-template?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
+* [Presenter profile pages](https://developer.arlo.co/doc/wordpress/templates#presenter-template?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
 
 **Widgets** - The following widgets can be added to any page in your site. 
 
-* [Arlo upcoming events](https://developer.arlo.co/doc/wordpress/widgets#widget-upcoming-events)
-* [Arlo categories](https://developer.arlo.co/doc/wordpress/widgets#widget-categories) 
+* [Arlo upcoming events](https://developer.arlo.co/doc/wordpress/widgets#widget-upcoming-events?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
+* [Arlo categories](https://developer.arlo.co/doc/wordpress/widgets#widget-categories?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) 
 
 = Get started today! =
 Sign-up for a [free Arlo trial](https://www.arlo.co/register?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) and then install the "Arlo training and event management system" plugin now!
@@ -106,17 +107,17 @@ Sign-up for a [free Arlo trial](https://www.arlo.co/register?utm_source=wordpres
 
 = Once Configured =
 
-* The Arlo plugin comes with a lot of different shortcodes, and you can customize your plugin with the shortcodes. For more information about the shortcodes please visit the [Arlo developer site](https://developer.arlo.co/doc/wordpress/index)
+* The Arlo plugin comes with a lot of different shortcodes, and you can customize your plugin with the shortcodes. For more information about the shortcodes please visit the [Arlo developer site](https://developer.arlo.co/doc/wordpress/index?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
 
 = Developers Guide =
 
-For more information about the shortcodes please visit the [Arlo developer site](https://developer.arlo.co/doc/wordpres/index)
+For more information about the shortcodes please visit the [Arlo developer site](https://developer.arlo.co/doc/wordpres/index?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
 
 == Frequently Asked Questions ==
 
 = Where can I find all Arlo for WordPress FAQ’s? =
 
-You can find all [Arlo for WordPress FAQ’s](https://support.arlo.co/hc/en-gb/articles/115000392503-WordPress-Plugin-Frequently-Asked-Questions-FAQ-) on the Arlo online support portal. 
+You can find all [Arlo for WordPress FAQ’s](https://support.arlo.co/hc/en-gb/articles/115000392503-WordPress-Plugin-Frequently-Asked-Questions-FAQ-?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) on the Arlo online support portal. 
 
 = Can I use my existing WordPress theme? =
 
@@ -128,7 +129,7 @@ Unfortunately no, you have to sign up for a [free Arlo trial](https://www.arlo.c
 
 = Where can I find documentation? =
 
-The plugin's documentation can be found in our [Arlo developer site](https://developer.arlo.co/doc/wordpress/index).
+The plugin's documentation can be found in our [Arlo developer site](https://developer.arlo.co/doc/wordpress/index?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing).
 
 = Can I use the plugin with PHP 5.3? =
 
@@ -283,7 +284,7 @@ Fix start and end date times when the dates are returning a UTC value
 
 = 2.3.5 =
 
-New asynchronous import, for more information, please visit: http://developer.arlo.co/doc/wordpress/import
+New asynchronous import, for more information, please visit: http://developer.arlo.co/doc/wordpress/import?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing
 
 Support localization for dates and times: https://github.com/ArloSoftware/arlowp-plugin/issues/141
 
