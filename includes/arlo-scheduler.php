@@ -85,7 +85,7 @@ class Scheduler {
 		WHERE
 			task_id = " . (intval($task_id)) . "
 		";
-		
+
 		$query = $this->dbl->query($sql);		
 	}
 	
@@ -306,9 +306,16 @@ class Scheduler {
 	}	
 
 	public function kick_off_scheduler() {
-		$url = add_query_arg( $this->get_query_args(), $this->get_query_url() );	
+		if ( ! has_action( 'shutdown', array( $this, 'kick_off_scheduler_on_shutdown' ) ) ) {
+			add_action( 'shutdown', array( $this, 'kick_off_scheduler_on_shutdown' ) );
+		}		
+	}
 
-		$this->try_kick_off_scheduler($url);
+	public function kick_off_scheduler_on_shutdown() {
+		$url = add_query_arg( $this->get_query_args(), $this->get_query_url() );
+		$args = $this->get_post_args();	
+	
+		wp_remote_post( esc_url_raw( $url ), $args );
 	}
 
 	private function try_kick_off_scheduler($url) {
@@ -367,8 +374,8 @@ class Scheduler {
 		}
 
 		return array(
-			'timeout'   => 50,
-			'blocking'  => true,
+			'timeout'   => 0.01,
+			'blocking'  => false,
 			'cookies'   => $_COOKIE,
 			'sslverify' => apply_filters( 'https_local_ssl_verify', false ),
 		);

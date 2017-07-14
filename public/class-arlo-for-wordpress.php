@@ -1273,10 +1273,14 @@ class Arlo_For_Wordpress {
 		foreach ($paused_running_tasks as $task) {
 			$ts = strtotime($task->task_modified);
 			$now = time() - date('Z');
-			if ($now - $ts > 4*60) {
-				$scheduler->update_task($task->task_id, 3, "Import doesn't respond within 4 minutes, stopped by the scheduler");
+			if ($now - $ts > 28*60) {
+				$task->task_data_text = json_decode($task->task_data_text);
+
+				$message = "Import doesn't respond within 28 minutes, stopped";
+				$scheduler->update_task($task->task_id, 3, 'Stopped by the scheduler: ');
+				Logger::log($message, !empty($task->task_data_text->import_id) ? $task->task_data_text->import_id : 0);
 				$scheduler->clear_cron();
-			}
+			} 
 		}
 	}
 	
@@ -1605,7 +1609,6 @@ class Arlo_For_Wordpress {
 
 			$settings = get_option('arlo_settings');
 			if (!empty($settings['disable_ssl_verification']) && $settings['disable_ssl_verification'] == 1) {
-				error_log(__FUNCTION__ . 'disable ssl');
 				curl_setopt($c, CURLOPT_SSL_VERIFYHOST,false);
 				curl_setopt($c, CURLOPT_SSL_VERIFYPEER,false);
 			}
