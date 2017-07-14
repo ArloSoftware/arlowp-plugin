@@ -12,7 +12,7 @@ Seamlessly integrate Arlo's market leading training and event management system 
 == Description ==
 = Arlo training and event management system =
 
-Arlo for WordPress helps you build great looking websites for promoting your events and courses. Offer website visitors an interactive and engaging experience with the ability to fully customise the look and feel. The plugin also comes with pre-built page themes providing flexibility for designers, and plug-and-play themes for the less savvy. [Read more](https://www.arlo.co/wordpress-training-and-event-management-plugin?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) about creating beautiful looking training and event websites using Arlo for WordPress.
+Arlo for WordPress helps you build great looking websites for promoting your events and courses. Offer website visitors an interactive and engaging experience with the ability to fully customise the look and feel. The plugin also comes with pre-built page themes providing flexibility for designers, and plug-and-play themes for the less savvy. [Read more](https://www.arlo.co/features/Arlo-for-WordPress-integration?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) about creating beautiful looking training and event websites using Arlo for WordPress.
 
 Pre-built plugin themes:
 
