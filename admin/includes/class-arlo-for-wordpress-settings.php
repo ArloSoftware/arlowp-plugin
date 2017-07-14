@@ -773,6 +773,13 @@ class Arlo_For_Wordpress_Settings {
 	    <h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
 	    	<ul class="arlo-whatsnew-list">	  
+				<li>Fix long running import issue, which can timeout the request</li>
+			</ul>
+		</p>
+
+		<h4>Version 3.2</h4>
+		<p>
+	    	<ul class="arlo-whatsnew-list">	  
 				<li>New online activities global shortcode <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#arlo_onlineactivites_list" target="_blank">[arlo_onlineactivites_list]</a></li>
 				<li>New options for <a href="https://developer.arlo.co/doc/wordpress/widgets#widget-upcoming-events" target="_blank">Upcoming events widget</a></li>
 				<li>New settings to customize <a href="https://developer.arlo.co/doc/wordpress/settings#filters" target="_blank">Filters</a></li>
@@ -781,8 +788,6 @@ class Arlo_For_Wordpress_Settings {
 				<li>Many bug fixes</li>
 			</ul>
 		</p>		
-
-
 
 		<h4>Version 3.1.2</h4>
 		<p>
