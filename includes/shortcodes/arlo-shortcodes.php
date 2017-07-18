@@ -197,17 +197,29 @@ class Shortcodes {
 		return '<script type="application/ld+json">' . $content . '</script>';
 	}
 
-    public static function get_performer($presenter) {
+    public static function get_performer($presenter, $link) {
         $performer = array("@type" => "Person");
         $name_separator = (!empty($presenter["p_firstname"]) && !empty($presenter["p_lastname"]) ? " " : "");
         $performer["name"] = $presenter["p_firstname"] . $name_separator . $presenter["p_lastname"];
-        $performer["url"] = $presenter["p_viewuri"];
+
+        $p_link = '';
+        switch ($link) {
+            case 'viewuri': 
+                $p_link = Shortcodes::get_rich_snippet_field($presenter["p_viewuri"]);
+            break;  
+            default: 
+                $p_link = get_permalink($presenter['post_id']);
+            break;
+        }
+
+
+        $performer["url"] = $p_link;
 
         if (!empty($presenter["p_profile"])) {
         	$performer["description"] = $presenter["p_profile"];
         }
 
-        $same_as = array($presenter["p_viewuri"]);
+        $same_as = array($p_link);
 
         if (!empty($presenter["p_twitterid"])) {
         	array_push($same_as,"https://www.twitter.com/".$presenter["p_twitterid"]);
@@ -327,6 +339,8 @@ class Shortcodes {
 
 	public static function get_advertised_offers($id, $id_field, $import_id) {
 		global $wpdb;
+
+		$arlo_region = \Arlo\Utilities::get_region_parameter();
 
         $sql = "
         SELECT 
@@ -451,4 +465,33 @@ class Shortcodes {
 
         return $offers;
 	}
+
+	public static function get_rich_snippet_field($field) {
+		return !empty($field) ? $field : '';
+	}
+
+    public static function get_template_permalink($post_name, $region) {
+        if(!isset($post_name)) return '';
+        
+        $region_link_suffix = '';
+
+        $regions = get_option('arlo_regions');
+
+        if (!empty($region) && is_array($regions) && count($regions)) {
+            $arlo_region = $region;
+        } else {
+            $arlo_region = get_query_var('arlo-region', '');
+            $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+        }
+
+        if (!empty($arlo_region)) {
+            $region_link_suffix = 'region-' . $arlo_region . '/';
+        }
+        
+        $et_id = arlo_get_post_by_name($post_name, 'arlo_event');
+
+        return get_permalink($et_id) . $region_link_suffix;        
+
+    }
+
 }

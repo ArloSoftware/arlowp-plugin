@@ -261,18 +261,30 @@ class Venues {
     }
 
     private static function shortcode_venue_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        extract(shortcode_atts(array(
+            'link' => 'permalink'
+        ), $atts, $shortcode_name, $import_id));
+
         $venue_snippet = array();
 
         // Basic
         $venue_snippet = array();
         $venue_snippet["@type"] = "Place";
-        $venue_snippet["name"] = $GLOBALS['arlo_venue_list_item']["v_name"];
+        $venue_snippet["name"] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_venue_list_item']['v_name']);
 
-        $venue_permalink = get_permalink(arlo_get_post_by_name($GLOBALS['arlo_venue_list_item']['v_post_name'], 'arlo_venue'));
+        $v_link = '';
+        switch ($link) {
+            case 'viewuri': 
+                $v_link = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_venue_list_item']['v_viewuri']);
+            break;  
+            default: 
+                $v_link = get_permalink(arlo_get_post_by_name(Shortcodes::get_rich_snippet_field($GLOBALS['arlo_venue_list_item']['v_post_name']), 'arlo_venue'));
+            break;
+        }
 
-        if (!empty($venue_permalink)) {
-            $venue_snippet["url"] = $venue_permalink;
-            $venue_snippet["sameAs"] = $venue_permalink;
+        if (!empty($v_link)) {
+            $venue_snippet["url"] = $v_link;
+            $venue_snippet["sameAs"] = $v_link;
         }
 
         // Address

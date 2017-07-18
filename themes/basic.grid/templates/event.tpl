@@ -33,6 +33,7 @@
 			[arlo_event_offers]
 			[arlo_event_registration]
 		</li>
+		[arlo_event_rich_snippet]
 		[/arlo_event_list_item]
 		[/arlo_event_list]
 		
@@ -47,6 +48,7 @@
 				[arlo_oa_offers]
 				[arlo_oa_registration]
 			</li>
+			[arlo_oa_rich_snippet]
 			[/arlo_oa_list_item]
 		[/arlo_oa_list]		
 		
@@ -60,5 +62,4 @@
 		[arlo_content_field_text wrap='<p>%s</p>']
 	[/arlo_content_field_item]
 </div>
-[arlo_event_template_rich_snippet]
 [arlo_powered_by]

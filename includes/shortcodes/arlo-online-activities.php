@@ -519,17 +519,33 @@ class OnlineActivities {
     }
 
     private static function shortcode_oa_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        extract(shortcode_atts(array(
+            'link' => 'permalink'
+        ), $atts, $shortcode_name, $import_id));
+        
+        $settings = get_option('arlo_settings');  
+
+        $oa_link = '';
+        switch ($link) {
+            case 'viewuri': 
+                $oa_link = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_oa_list_item']['oa_viewuri']);
+            break;  
+            default: 
+                $oa_link = Shortcodes::get_template_permalink($GLOBALS['arlo_oa_list_item']['et_post_name'], $GLOBALS['arlo_oa_list_item']['et_region']);
+            break;
+        }
+
         $oa_snippet = array();
 
         // Basic
         $oa_snippet['@context'] = 'http://schema.org';
         $oa_snippet['@type'] = 'OnDemandEvent';
-        $oa_snippet['name'] = $GLOBALS['arlo_oa_list_item']['oa_name'];
+        $oa_snippet['name'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_oa_list_item']['oa_name']);
 
-        $oa_snippet['url'] = $GLOBALS['arlo_oa_list_item']['oa_viewuri'];
+        $oa_snippet['url'] = $oa_link;
 
         if (!empty($GLOBALS['arlo_oa_list_item']['et_descriptionsummary'])) {
-            $oa_snippet['description'] = $GLOBALS['arlo_oa_list_item']['et_descriptionsummary'];
+            $oa_snippet['description'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_oa_list_item']['et_descriptionsummary']);
         }
 
 
@@ -545,9 +561,11 @@ class OnlineActivities {
             $oa_snippet["offers"]["highPrice"] = $offers['high_price'];
             $oa_snippet["offers"]["lowPrice"] = $offers['low_price'];
 
+            $oa_snippet["offers"]["price"] = $offers['low_price'];
+
             $oa_snippet["offers"]["priceCurrency"] = $offers['currency'];
 
-            $oa_snippet["offers"]['url'] = $GLOBALS['arlo_oa_list_item']['oa_viewuri'];
+            $oa_snippet["offers"]['url'] = $oa_link;
         }
 
         return Shortcodes::create_rich_snippet( json_encode($oa_snippet) );

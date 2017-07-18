@@ -726,61 +726,80 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
     }
 
     private static function shortcode_event_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        $event_snippet = array();
+        extract(shortcode_atts(array(
+            'link' => 'permalink'
+        ), $atts, $shortcode_name, $import_id));
 
+        $settings = get_option('arlo_settings');  
+
+        $event_snippet = array();
         
         // Basic
         $event_snippet['@context'] = 'http://schema.org';
         $event_snippet['@type'] = 'Event';
-        $event_snippet['name'] = $GLOBALS['arlo_event_list_item']['e_name'];
+        $event_snippet['name'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item']['e_name']);
 
-        $event_snippet['startDate'] = date(DATE_ISO8601, strtotime($GLOBALS['arlo_event_list_item']['e_startdatetime']));
-        $event_snippet['endDate'] = date(DATE_ISO8601, strtotime($GLOBALS['arlo_event_list_item']['e_finishdatetime']));
+        $event_snippet['startDate'] = !empty($GLOBALS['arlo_event_list_item']['e_startdatetime']) ? date(DATE_ISO8601, strtotime($GLOBALS['arlo_event_list_item']['e_startdatetime'])) : '';
+        $event_snippet['endDate'] = !empty($GLOBALS['arlo_event_list_item']['e_startdatetime']) ? date(DATE_ISO8601, strtotime($GLOBALS['arlo_event_list_item']['e_finishdatetime'])) : '';
 
-        $event_snippet['url'] = $GLOBALS['arlo_event_list_item']['e_viewuri'];
 
-        if (!empty($GLOBALS['arlo_event_list_item']['et_descriptionsummary'])) {
-            $event_snippet['description'] = $GLOBALS['arlo_event_list_item']['et_descriptionsummary'];
+        $et_link = '';
+        switch ($link) {
+            case 'viewuri': 
+                $et_link = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_eventtemplate']['et_viewuri']);
+            break;  
+            default: 
+                $et_link = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
+            break;
         }
 
+        if (!empty($GLOBALS['arlo_event_list_item']['et_descriptionsummary'])) {
+            $event_snippet['description'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item']['et_descriptionsummary']);
+        }
+
+        $event_snippet['url'] = $et_link;
 
         // Location
         $event_snippet["location"] = array();
         $event_snippet["location"]["@type"] = "Place";
-        $event_snippet["location"]["name"] = $GLOBALS['arlo_event_list_item']["e_locationname"];
+        $event_snippet["location"]["name"] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item']['e_locationname']);
 
-        $venue_permalink = get_permalink(arlo_get_post_by_name($GLOBALS['arlo_event_list_item']['v_post_name'], 'arlo_venue'));
 
-        if (!empty($venue_permalink)) {
-            $event_snippet["location"]["url"] = $venue_permalink;
-            $event_snippet["location"]["sameAs"] = $venue_permalink;
+        $v_link = get_permalink(arlo_get_post_by_name(Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item']['v_post_name']), 'arlo_venue'));
+
+        if (!empty($v_link)) {
+            $event_snippet["location"]["url"] = $v_link;
+            $event_snippet["location"]["sameAs"] = $v_link;
         }
-
 
         // OFfers
         $price_setting = (isset($settings['price_setting'])) ? $settings['price_setting'] : ARLO_PLUGIN_PREFIX . '-exclgst';
         $price_field = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? 'o_offeramounttaxexclusive' : 'o_offeramounttaxinclusive';
-        $offers = Shortcodes::get_offers_snippet_data($GLOBALS['arlo_event_list_item']['e_id'], 'e_id', $import_id, $price_field);
 
-        $event_snippet["offers"] = array();
-        $event_snippet["offers"]["@type"] = "AggregateOffer";
+        $offers = Shortcodes::get_offers_snippet_data( $GLOBALS['arlo_event_list_item']['e_id'], 'e_id', $import_id, $price_field);
 
-        $event_snippet["offers"]["highPrice"] = $offers['high_price'];
-        $event_snippet["offers"]["lowPrice"] = $offers['low_price'];
+        if (!empty($offers)) {
+            $event_snippet["offers"] = array();
+            $event_snippet["offers"]["@type"] = "AggregateOffer";
 
-        $event_snippet["offers"]["priceCurrency"] = $offers['currency'];
+            $event_snippet["offers"]["highPrice"] = $offers['high_price'];
+            $event_snippet["offers"]["lowPrice"] = $offers['low_price'];
+            
+            $event_snippet["offers"]["price"] = $offers['low_price'];
 
-        $event_snippet["offers"]['url'] = $GLOBALS['arlo_event_list_item']['e_viewuri'];
+            $event_snippet["offers"]["priceCurrency"] = $offers['currency'];
+
+            $event_snippet["offers"]['url'] = $et_link;
+        }
 
 
         // Presenters
         $performers = array();
         foreach (self::get_event_presenters($import_id) as $i => $presenter) {
-            array_push($performers,Shortcodes::get_performer($presenter));
+            array_push($performers,Shortcodes::get_performer($presenter,$link));
         }
 
         $event_snippet["performer"] = $performers;
-
 
         return Shortcodes::create_rich_snippet( json_encode($event_snippet) );
     }

@@ -155,7 +155,11 @@ class Presenters {
     }
 
     private static function shortcode_presenter_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        $performer = Shortcodes::get_performer($GLOBALS['arlo_presenter_list_item']);
+        extract(shortcode_atts(array(
+            'link' => 'permalink'
+        ), $atts, $shortcode_name, $import_id));
+
+        $performer = !empty($GLOBALS['arlo_presenter_list_item']) ? Shortcodes::get_performer($GLOBALS['arlo_presenter_list_item'], $link) : "";
 
         return Shortcodes::create_rich_snippet( json_encode($performer) ); 
     }
