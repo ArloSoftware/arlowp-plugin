@@ -111,7 +111,7 @@ function set_title($title, $id = null, $meta = false){
 	if (!empty($cat_slug))
 		$cat = \Arlo\Entities\Categories::get(array('slug' => $cat_slug), null, $import_id);		
 		
-	if ($id === null || !in_array($id, $pages) || $id != $post->ID || (!in_the_loop() && !$meta) || is_nav_menu_item($id)) return ['title' => $title];
+	if ($id === null || !in_array($id, $pages) || ($post && $id != $post->ID) || (!in_the_loop() && !$meta) || is_nav_menu_item($id)) return ['title' => $title];
 	
 	if(!$cat && empty($arlo_location) && empty($arlo_search)) return ['title' => $title];
 	
