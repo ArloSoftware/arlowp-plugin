@@ -1559,7 +1559,7 @@ class Arlo_For_Wordpress {
 			$this->get_notice_handler()->dismiss_user_notice($_POST['id']);
 		}		
 		
-		echo $_POST['id'];
+		echo 0;
 		wp_die();
 	}	
 
