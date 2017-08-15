@@ -111,7 +111,7 @@ Sign-up for a [free Arlo trial](https://www.arlo.co/register?utm_source=wordpres
 
 = Developers Guide =
 
-For more information about the shortcodes please visit the [Arlo developer site](https://developer.arlo.co/doc/wordpres/index?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
+For more information about the shortcodes please visit the [Arlo developer site](https://developer.arlo.co/doc/wordpress/index?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
 
 == Frequently Asked Questions ==
 
