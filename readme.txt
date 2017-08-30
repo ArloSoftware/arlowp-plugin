@@ -33,7 +33,7 @@ Arlo is a cloud-based training and event management system for managing, marketi
 * [Customer relationship management](https://www.arlo.co/features/customer-relationship-management?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) - Manage information about existing clients, and easily run campaigns to target potential customers. Arlo is a fully featured customer relationship management tool. 
 
 = Requirements =
-* PHP Version - WordPress PHP version must be 5.4 or higher.
+* PHP Version - WordPress PHP version must be 5.5 or higher.
 * Shared Server Hosting - Slow shared server hosting can cause issues with the data import. If you have shared server hosting please ensure you [set up a Cron Job](http://developer.arlo.co/doc/wordpress/import#import-cron-job?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing).
 * WordPress version - Your WordPress should be kept updated to the latest version available. 
 * Cache plugins - Caching plugins can interfere with the Arlo WordPress plugin. Once changes have been made to the Arlo plugin, ensure you clear or reset your caching plugins if you have them. 
@@ -133,7 +133,7 @@ The plugin's documentation can be found in our [Arlo developer site](https://dev
 
 = Can I use the plugin with PHP 5.3? =
 
-The minimum requirement PHP version for the plugin is PHP 5.4.
+The minimum requirement PHP version for the plugin is PHP 5.5.
 
 = Can I log a bug? =
 

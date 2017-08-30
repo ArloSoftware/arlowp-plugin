@@ -49,7 +49,7 @@ class Arlo_For_Wordpress {
 	 *
 	 * @var     string
 	 */
-	const MIN_PHP_VERSION = '5.4.0';
+	const MIN_PHP_VERSION = '5.5.0';
 
 	/**
 	 * The default loaded theme
