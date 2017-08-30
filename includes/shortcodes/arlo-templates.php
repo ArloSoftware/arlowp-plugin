@@ -42,7 +42,7 @@ class Templates {
                 
                 $where = "
                 t.tag_id IN (SELECT 
-                                GROUP_CONCAT(ett.tag_id)
+                                ett.tag_id
                             FROM 
                                 {$wpdb->prefix}arlo_eventtemplates_tags AS ett
                             LEFT JOIN 
@@ -71,7 +71,7 @@ class Templates {
                 //select the categories associated with the template
                 $where = "
                 c.c_arlo_id IN (SELECT 
-                                GROUP_CONCAT(ecc.c_arlo_id)
+                                ecc.c_arlo_id
                             FROM 
                                 {$wpdb->prefix}arlo_eventtemplates_categories AS ecc
                             WHERE
@@ -134,7 +134,7 @@ class Templates {
             LIMIT 
                 $limit";
 
-
+                
         $items = $wpdb->get_results($sql, ARRAY_A);
             
         $output = '';
