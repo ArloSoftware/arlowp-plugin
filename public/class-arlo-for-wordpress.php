@@ -857,7 +857,7 @@ class Arlo_For_Wordpress {
 			//internal resources
 			if (isset($stored_themes_settings[$theme_id]->internalResources->stylesheets) && is_array($stored_themes_settings[$theme_id]->internalResources->stylesheets)) {
 				foreach ($stored_themes_settings[$theme_id]->internalResources->stylesheets as $key => $stylesheet) {
-					wp_enqueue_style( $this->plugin_slug . '-theme-internal-stylesheet-' . $key, $stylesheet, [], $stored_themes_settings[$theme_id]->version );
+					wp_enqueue_style( $this->plugin_slug . '-theme-internal-stylesheet-' . $key, \Arlo\Utilities::remove_url_protocol($stylesheet), [], $stored_themes_settings[$theme_id]->version );
 				}
 			} 
 
@@ -1027,7 +1027,7 @@ class Arlo_For_Wordpress {
 			//internal resources
 			if (isset($stored_themes_settings[$theme_id]->internalResources->javascripts) && is_array($stored_themes_settings[$theme_id]->internalResources->javascripts)) {
 				foreach ($stored_themes_settings[$theme_id]->internalResources->javascripts as $key => $script) {
-					wp_enqueue_script( $this->plugin_slug . '-theme-internal-script-' . $key, $script, array( 'jquery' ), $stored_themes_settings[$theme_id]->version );
+					wp_enqueue_script( $this->plugin_slug . '-theme-internal-script-' . $key, \Arlo\Utilities::remove_url_protocol($script), array( 'jquery' ), $stored_themes_settings[$theme_id]->version );
 				}
 			} 
 
