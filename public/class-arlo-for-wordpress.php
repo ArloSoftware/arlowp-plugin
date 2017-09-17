@@ -684,9 +684,6 @@ class Arlo_For_Wordpress {
                 $plugin->get_importer()->set_import_id(date("Y", strtotime($last_import)));
             }
 
-			Logger::log('$plugin_version'.$plugin_version);
-			Logger::log('VersionHandler::VERSION'.VersionHandler::VERSION);
-
 			if ($plugin_version != VersionHandler::VERSION) {
 				$plugin->get_version_handler()->run_update($plugin_version);
 				
