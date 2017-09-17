@@ -54,7 +54,7 @@ class VersionHandler {
 		}			
 		
 		arlo_add_datamodel();	
-	
+
 		if (version_compare($old_version, '2.2.1') < 0) {
 			$this->do_update('2.2.1');
 		}	
@@ -425,43 +425,38 @@ class VersionHandler {
 				$page_ids = $this->plugin->add_pages($page_name);				
 			break;
 			case '3.3':
-				$saved_templates = arlo_get_option('arlo_themes_settings');
+				$saved_templates = get_option('arlo_themes_settings');
 				$current_templates = get_option('arlo_settings');
 
-				//Add [arlo_event_template_rich_snippet] shortcode to the event template
-				$this->update_template($saved_templates, 'upcoming','[/arlo_event_template_list_item]',"[arlo_event_rich_snippet]");
-				$this->update_template($current_templates, 'upcoming','[/arlo_event_template_list_item]',"[arlo_event_rich_snippet]");
+				//Add rich snippet shortcodes to templates
+				$current_templates = $this->update_template($current_templates, 'event',false,"[arlo_event_template_rich_snippet]");
+				$current_templates = $this->update_template($current_templates, 'event','[/arlo_event_list_item]',"[arlo_event_rich_snippet]");
+				$current_templates = $this->update_template($current_templates, 'event','[/arlo_oa_list_item]',"[arlo_oa_rich_snippet]");
 
-				//Add [arlo_presenter_rich_snippet] shortcode to the presenter
-				$this->update_template($saved_templates, 'presenter',false,"[arlo_presenter_rich_snippet]");
-				$this->update_template($current_templates, 'presenter',false,"[arlo_presenter_rich_snippet]");
+				$current_templates = $this->update_template($current_templates, 'presenter',false,"[arlo_presenter_rich_snippet]");
 
-				//Add [arlo_venue_rich_snippet] shortcode to the venue
-				$this->update_template($saved_templates, 'venue',false,"[arlo_venue_rich_snippet]");
-				$this->update_template($current_templates, 'venue',false,"[arlo_venue_rich_snippet]");
+				$current_templates = $this->update_template($current_templates, 'presenters','[/arlo_presenter_list_item]',"[arlo_presenter_rich_snippet]");
 
-				//Add [arlo_event_template_rich_snippet] shortcode to the catalogue
-				$this->update_template($saved_templates, 'events','[/arlo_event_template_list_item]',"[arlo_event_template_rich_snippet]");
-				$this->update_template($current_templates, 'events','[/arlo_event_template_list_item]',"[arlo_event_template_rich_snippet]");
+				$current_templates = $this->update_template($current_templates, 'venue',false,"[arlo_venue_rich_snippet]");
 
-				//Add [arlo_presenter_rich_snippet] shortcode to the presenters list
-				$this->update_template($saved_templates, 'presenters','[/arlo_presenter_list_item]',"[arlo_presenter_rich_snippet]");
-				$this->update_template($current_templates, 'presenters','[/arlo_presenter_list_item]',"[arlo_presenter_rich_snippet]");
+				$current_templates = $this->update_template($current_templates, 'venues','[/arlo_venue_list_item]',"[arlo_venues_rich_snippet]");
 
-				//Add [arlo_venue_rich_snippet] shortcode to the venues list
-				$this->update_template($saved_templates, 'venues','[/arlo_venues_list_item]',"[arlo_venues_rich_snippet]");
-				$this->update_template($current_templates, 'venues','[/arlo_venues_list_item]',"[arlo_venues_rich_snippet]");
+				$current_templates = $this->update_template($current_templates, 'events','[/arlo_event_template_list_item]',"[arlo_event_template_rich_snippet]");
 
-				arlo_set_option('arlo_themes_settings', $saved_templates);
-				set_option('arlo_settings', $current_templates);
+				$current_templates = $this->update_template($current_templates, 'eventsearch','[/arlo_event_template_list_item]',"[arlo_event_template_rich_snippet]");
+
+				$current_templates = $this->update_template($current_templates, 'upcoming','[/arlo_upcoming_list_item]',"[arlo_event_rich_snippet]");
+
+				$current_templates = $this->update_template($current_templates, 'oa','[/arlo_onlineactivites_list_item]',"[arlo_oa_rich_snippet]");
+
+				update_option('arlo_settings', $current_templates);
 			break;				
 		}	
 	}
 
 	private function update_template($templates, $page, $insert_before, $shortcode) {
-		//Add [arlo_event_template_rich_snippet] shortcode to the event template
 		if (!empty($templates['templates'][$page]['html']) && strpos($templates['templates'][$page]['html'], $shortcode) === false) {
-			$shortcode = "\n".$shortcode;
+			$shortcode = "\n".$shortcode."\n";
 
 			if ($insert_before) {
 				$pos = strpos($templates['templates'][$page]['html'],$insert_before);
@@ -471,5 +466,6 @@ class VersionHandler {
 			}
 		}
 
+		return $templates;
 	}
 }
