@@ -42,6 +42,10 @@ class Utilities {
         return null;
     }
 
+    public static function remove_url_protocol($url) {
+        return str_replace( "https:", "", str_replace("http:","",$url) );
+    }
+
     public static function get_region_parameter() {
         $regions = get_option('arlo_regions');
         $arlo_region = get_query_var('arlo-region', '');
