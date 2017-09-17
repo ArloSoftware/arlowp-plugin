@@ -127,8 +127,6 @@ class Templates {
                 et.et_arlo_id != {$GLOBALS['arlo_eventtemplate']['et_arlo_id']}
             AND
                 {$where}
-            GROUP BY
-                et.et_arlo_id
             ORDER BY 
                 RAND()
             LIMIT 
