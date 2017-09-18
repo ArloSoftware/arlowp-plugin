@@ -127,6 +127,8 @@ class Templates {
                 et.et_arlo_id != {$GLOBALS['arlo_eventtemplate']['et_arlo_id']}
             AND
                 {$where}
+            GROUP BY
+                et.et_arlo_id
             ORDER BY 
                 RAND()
             LIMIT 
@@ -786,7 +788,7 @@ class Templates {
         }	
         
         // grouping
-        $group = "GROUP BY et.et_arlo_id";	
+        $group = "";	
         $order = $limit_field = '';
         $field_list = 'et.et_id';
 
