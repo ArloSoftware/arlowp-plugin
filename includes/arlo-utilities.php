@@ -41,7 +41,7 @@ class Utilities {
 
         return null;
     }
-
+    
     public static function remove_url_protocol($url) {
         $url = parse_url($url);
         unset($url['scheme']);
@@ -52,6 +52,17 @@ class Utilities {
         $regions = get_option('arlo_regions');
         $arlo_region = get_query_var('arlo-region', '');
         return (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+    }
+
+    public static function get_current_page_arlo_type() {
+        global $post;
+
+        $settings = get_option('arlo_settings');
+        foreach ($settings['post_types'] as $key => $post_type) {
+            if ($post_type["posts_page"] == $post->ID) {
+                return $key;
+            }
+        }
     }
 
 	public static function GUIDv4 ($trim = true, $remove_hyphens = false) {

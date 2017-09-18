@@ -227,7 +227,6 @@ class Templates {
 
         return $output;
     }
-    
 
     private static function shortcode_event_template_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
@@ -238,7 +237,32 @@ class Templates {
 	    return $content;
     }
 
+    private static function shortcode_schedule($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if (get_option('arlo_plugin_disabled', '0') == '1') return;
+        
+        $templates = arlo_get_option('templates');
+        $content = $templates['schedule']['html'];
+
+        return $content;
+    }
+
     private static function shortcode_event_template_list_pagination($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        global $wpdb;
+
+        if (isset($GLOBALS['show_only_at_bottom']) && $GLOBALS['show_only_at_bottom']) return;
+
+        $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
+        
+        $sql = self::generate_list_sql($atts, $import_id, true);
+
+        $items = $wpdb->get_results($sql, ARRAY_A);
+
+        $num = $wpdb->num_rows;
+
+        return arlo_pagination($num, $limit);        
+    }
+
+    private static function shortcode_schedule_pagination($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $wpdb;
 
         if (isset($GLOBALS['show_only_at_bottom']) && $GLOBALS['show_only_at_bottom']) return;
@@ -442,20 +466,30 @@ class Templates {
     }
 
     private static function shortcode_event_template_filters($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        return self::generate_template_filters_form($atts,$shortcode_name,$import_id);
+    }
+
+    private static function shortcode_schedule_filters($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        return self::generate_template_filters_form($atts,$shortcode_name,$import_id);
+    }
+
+    private static function generate_template_filters_form($atts, $shortcode_name, $import_id) {
         global $post, $wpdb;
 
         extract(shortcode_atts(array(
-            'filters'	=> 'category,location,delivery',
-            'resettext'	=> __('Reset', 'arlo-for-wordpress'),
+            'filters'   => 'category,location,delivery',
+            'resettext' => __('Reset', 'arlo-for-wordpress'),
             'buttonclass'   => 'button'
         ), $atts, $shortcode_name, $import_id));
         
         $filters_array = explode(',',$filters);
         
-        $settings = get_option('arlo_settings');  
-            
-        if (!empty($settings['post_types']['event']['posts_page'])) {
-            $page_link = get_permalink(get_post($settings['post_types']['event']['posts_page']));
+        $settings = get_option('arlo_settings');
+
+        $page_type = \Arlo\Utilities::get_current_page_arlo_type();
+
+        if (!empty($settings['post_types'][$page]['posts_page'])) {
+            $page_link = get_permalink(get_post($settings['post_types'][$page_type]['posts_page']));
         } else {
             $page_link = get_permalink(get_post($post));
         }
@@ -474,7 +508,7 @@ class Templates {
                 case 'category' :
 
                     //root category select
-                    $cats = CategoriesEntity::getTree(0, 1, 0, $import_id);	
+                    $cats = CategoriesEntity::getTree(0, 1, 0, $import_id); 
                     if (!empty($cats)) {
                         $cats = CategoriesEntity::getTree($cats[0]->c_arlo_id, 100, 0, $import_id);
                     }
@@ -491,7 +525,7 @@ class Templates {
 
                     $filter_html .= Shortcodes::create_filter($filter_key, \Arlo_For_Wordpress::$delivery_labels, __('All delivery options', 'arlo-for-wordpress'),$filter_group);
 
-                    break;				
+                    break;              
 
                 case 'location' :
 
@@ -554,13 +588,13 @@ class Templates {
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter_key, $tags, __('Select tag', 'arlo-for-wordpress'),$filter_group);				
+                    $filter_html .= Shortcodes::create_filter($filter_key, $tags, __('Select tag', 'arlo-for-wordpress'),$filter_group);                
                     
                     break;
 
             endswitch;
 
-        endforeach;	
+        endforeach; 
             
         // category select
 
@@ -571,7 +605,7 @@ class Templates {
 
         $filter_html .= '</form>';
         
-        return $filter_html;        
+        return $filter_html;
     }
 
     private static function shortcode_suggest_datelocation($content = '', $atts = [], $shortcode_name = '', $import_id = '') {

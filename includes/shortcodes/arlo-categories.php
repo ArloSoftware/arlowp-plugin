@@ -41,7 +41,7 @@ class Categories {
             $slug = $arlo_category;
             $start_at = intval(current(explode('-', $slug)));
         }
-        
+
         if($title) {
             $conditions = array('id' => $start_at);
             
@@ -120,14 +120,15 @@ class Categories {
     // category list
     private static function generate_category_ul($items, $counts) {
         $post_types = arlo_get_option('post_types');
-        $events_url = get_page_link($post_types['event']['posts_page']);
+        $page_type = \Arlo\Utilities::get_current_page_arlo_type();
+        $events_url = get_page_link($post_types[$page_type]['posts_page']);
         
         if(!is_array($items) || empty($items)) return '';
         
         $arlo_region = \Arlo\Utilities::get_region_parameter();
         
         $html = '<ul class="arlo-category-list">';
-        
+
         foreach($items as $cat) {
             $href = $events_url . (!empty($arlo_region) ? 'region-' . $arlo_region . '/' : '') . ($cat->c_parent_id != 0 ? 'cat-' . esc_attr($cat->c_slug) : '');
             $cat_name = $cat->c_name . ( !is_null($counts) ?  sprintf($counts, $cat->c_template_num) : '' );

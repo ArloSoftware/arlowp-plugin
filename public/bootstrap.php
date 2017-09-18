@@ -179,6 +179,7 @@ function arlo_register_custom_post_types() {
 		);
 		
 		// let's try some custom rewrite rules
+
 		if($page_id) {
 			switch($id) {
 				case 'upcoming':
@@ -195,6 +196,9 @@ function arlo_register_custom_post_types() {
 				case 'eventsearch':
 					add_rewrite_rule('^' . $slug . '/?(region-([^/]*))?/search/([^/]*)?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-search=$matches[3]&paged=$matches[5]','top');
 					add_rewrite_rule('^' . $slug . '/?(region-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&paged=$matches[4]','top');
+				break;
+				case 'schedule':
+					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(templatetag-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-delivery=$matches[10]&arlo-templatetag=$matches[12]&paged=$matches[14]','top');
 				break;
 				case 'presenter':
 					add_rewrite_rule('^' . $slug . '/page/([^/]*)/?','index.php?page_id=' . $page_id . '&paged=$matches[1]','top');
@@ -269,7 +273,10 @@ function arlo_register_custom_post_types() {
 	}
 			
 	foreach(Arlo_For_Wordpress::$post_types as $id => $arlo_post) {
-		if (isset($arlo_post['regionalized']) && is_bool($arlo_post['regionalized']) && $arlo_post['regionalized'] && !empty($settings['post_types'][$id]['posts_page'])) {
+		if (isset($arlo_post['regionalized']) 
+			&& is_bool($arlo_post['regionalized']) 
+			&& $arlo_post['regionalized'] 
+			&& !empty($settings['post_types'][$id]['posts_page'])) {
 			$arlo_page_ids[intval($settings['post_types'][$id]['posts_page'])] = $id;
 		}
 	}
