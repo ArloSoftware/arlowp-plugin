@@ -43,7 +43,9 @@ class Utilities {
     }
 
     public static function remove_url_protocol($url) {
-        return str_replace( "https:", "", str_replace("http:","",$url) );
+        $url = parse_url($url);
+        unset($url['scheme']);
+        return '//'.implode($url);
     }
 
     public static function get_region_parameter() {
