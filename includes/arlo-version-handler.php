@@ -5,7 +5,7 @@ namespace Arlo;
 use Arlo\Utilities;
 
 class VersionHandler {
-	const VERSION = '3.2';
+	const VERSION = '3.3';
 
 	private $dbl;
 	private $message_handler;
@@ -85,6 +85,10 @@ class VersionHandler {
 
 		if (version_compare($old_version, '3.2') < 0) {
 			$this->do_update('3.2');
+		}
+
+		if (version_compare($old_version, '3.3') < 0) {
+			$this->do_update('3.3');
 		}							
 	}
 	
@@ -419,6 +423,16 @@ class VersionHandler {
 				$page_name = 'oa';
 
 				$page_ids = $this->plugin->add_pages($page_name);				
+			break;
+			case '3.3':
+				$settings_object = get_option('arlo_settings');
+				$regions = get_option('arlo_regions');
+
+				$settings_object['regionid'] = array_map('strtoupper',$settings_object['regionid']);
+				$regions = array_change_key_case($regions, CASE_UPPER);
+
+				update_option('arlo_regions', $regions);
+				update_option('arlo_settings', $settings_object);
 			break;				
 		}	
 	}	
