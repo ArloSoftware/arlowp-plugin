@@ -4,16 +4,13 @@
 
     $tags = $wpdb->get_results(
         "SELECT DISTINCT
-            t.tag
+            t.tag,
+            t.id
         FROM 
             {$wpdb->prefix}arlo_tags AS t
         WHERE 
             t.import_id = $import_id
         ORDER BY tag", ARRAY_A);
-
-    $tags = array_map(function($value) {
-    	return $value["tag"];
-    },$tags);
 ?>
 
 
@@ -31,8 +28,8 @@
 	<select id="<?php echo $this->get_field_id('eventtag'); ?>" name="<?php echo $this->get_field_name('eventtag'); ?>" class="widefat">
 		<option value="">All event tags</option>
 		<?php foreach($tags as $tag) {
-			$selected = $eventtag == $tag ? 'selected' : '';
-			echo '<option value="' . $tag . '" ' . $selected . '>' . $tag . "</option>";
+			$selected = $eventtag == $tag['id'] || $eventtag == $tag['tag'] ? 'selected' : '';
+			echo '<option value="' . $tag['id'] . '" ' . $selected . '>' . $tag['tag'] . "</option>";
 		} ?>
 	</select>
 </p>
@@ -41,8 +38,8 @@
 	<select id="<?php echo $this->get_field_id('templatetag'); ?>" name="<?php echo $this->get_field_name('templatetag'); ?>" class="widefat">
 		<option value="">All template tags</option>
 		<?php foreach($tags as $tag) {
-			$selected = $templatetag == $tag ? 'selected' : '';
-			echo '<option value="' . $tag . '" ' . $selected . '>' . $tag . "</option>";
+			$selected = $templatetag == $tag['id'] || $templatetag == $tag['tag'] ? 'selected' : '';
+			echo '<option value="' . $tag['id'] . '" ' . $selected . '>' . $tag['tag'] . "</option>";
 		} ?>
 	</select>
 </p>
