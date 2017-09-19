@@ -400,6 +400,8 @@ body.arlo {
 .arlo#arlo .arlo-button,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running span,
+.arlo#arlo .arlo-list.schedule .arlo-next-running a,
+.arlo#arlo .arlo-list.schedule .arlo-next-running span,
 .arlo#arlo .arlo-list.event-search .arlo-next-running a,
 .arlo#arlo .arlo-list.event-search .arlo-next-running span,
 .arlo#arlo .prev.page-numbers,
@@ -431,6 +433,8 @@ body.arlo {
     .arlo#arlo .arlo-button,
     .arlo#arlo .arlo-list.catalogue .arlo-next-running a,
     .arlo#arlo .arlo-list.catalogue .arlo-next-running span,
+    .arlo#arlo .arlo-list.schedule .arlo-next-running a,
+    .arlo#arlo .arlo-list.schedule .arlo-next-running span,
     .arlo#arlo .prev.page-numbers,
     .arlo#arlo .next.page-numbers,
     .arlo#arlo .arlo-category-list a,
@@ -446,6 +450,7 @@ body.arlo {
 
 .arlo#arlo .arlo-button:after,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a:after,
+.arlo#arlo .arlo-list.schedule .arlo-next-running a:after,
 .arlo#arlo .prev.page-numbers:after,
 .arlo#arlo .next.page-numbers:after,
 .arlo#arlo .arlo-category-list a:after,
@@ -468,6 +473,7 @@ body.arlo {
 
 .arlo#arlo .arlo-button:hover:after,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a:hover:after,
+.arlo#arlo .arlo-list.schedule .arlo-next-running a:hover:after,
 .arlo#arlo .prev.page-numbers:hover:after,
 .arlo#arlo .next.page-numbers:hover:after,
 .arlo#arlo .arlo-category-list a:hover:after,
@@ -479,6 +485,7 @@ body.arlo {
 
 .arlo#arlo .arlo-button:hover,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running span:hover,
+.arlo#arlo .arlo-list.schedule .arlo-next-running span:hover,
 .arlo#arlo .arlo-category-list a:hover,
 .arlo#arlo .arlo-filters-buttons a:hover {
     border-bottom: none;
@@ -490,6 +497,7 @@ body.arlo {
 .arlo#arlo .arlo-button.arlo-waiting-list,
 .arlo#arlo .arlo-show-more-link,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a,
+.arlo#arlo .arlo-list.schedule .arlo-next-running a,
 .arlo#arlo .arlo-show-more-link:hover,
 .arlo#arlo .arlo-list.event-search .arlo-next-running a {
     border: 2px solid;
@@ -555,7 +563,8 @@ body.arlo {
     padding: .1em 1em;
 }
 
-.arlo#arlo .arlo-list.catalogue .arlo-next-running a.arlo-register {
+.arlo#arlo .arlo-list.catalogue .arlo-next-running a.arlo-register,
+.arlo#arlo .arlo-list.schedule .arlo-next-running a.arlo-register {
     border: none;
 }
 
@@ -657,7 +666,8 @@ body.arlo {
 
 .arlo#arlo .upcoming .arlo-cf.arlo-group-divider,
 .arlo#arlo .arlo-online-activities .arlo-cf.arlo-group-divider,
-.arlo#arlo .catalogue .arlo-cf.arlo-group-divider {
+.arlo#arlo .catalogue .arlo-cf.arlo-group-divider,
+.arlo#arlo .schedule .arlo-cf.arlo-group-divider {
     margin-bottom: 3em;
     margin-top: 1em;
     display: inline-block;
@@ -670,13 +680,15 @@ body.arlo {
 
 .arlo#arlo .upcoming .arlo-cf.arlo-group-divider h3,
 .arlo#arlo .arlo-online-activities .arlo-cf.arlo-group-divider h3,
-.arlo#arlo .catalogue .arlo-cf.arlo-group-divider h3 {
+.arlo#arlo .catalogue .arlo-cf.arlo-group-divider h3,
+.arlo#arlo .schedule .arlo-cf.arlo-group-divider h3 {
     font-weight: normal;
 }
 
 .arlo#arlo .upcoming .arlo-cf.arlo-group-divider:after,
 .arlo#arlo .catalogue .arlo-cf.arlo-group-divider:after,
-.arlo#arlo .arlo-online-activities .arlo-cf.arlo-group-divider:after {
+.arlo#arlo .arlo-online-activities .arlo-cf.arlo-group-divider:after,
+.arlo#arlo .schedule .arlo-cf.arlo-group-divider:after {
     content: " ";
     height: 2px;
     width: 8%;
@@ -1168,6 +1180,61 @@ body.arlo {
 
 
 
+/* Schedule */
+
+.arlo#arlo .arlo-schedule-event:nth-child(odd) {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+.arlo#arlo .arlo-schedule-event:nth-child(even) {
+    background-color: white;
+}
+
+.arlo#arlo .arlo-schedule-event {
+    -webkit-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out;
+}
+
+.arlo#arlo .arlo-schedule-event:hover {
+    -webkit-transform: translateY(-5px);
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+.arlo#arlo .arlo-schedule-event {
+    padding: .75em;
+}
+
+@media (min-width: 550px) {
+    .arlo#arlo .arlo-schedule-event {
+        padding: 0;
+    }
+
+    .arlo#arlo .arlo-schedule-event .arlo-schedule-column {
+        float: left;
+        padding: .75em;
+    }
+
+    .arlo#arlo .arlo-schedule-event .arlo-schedule-column.arlo-event-details {
+        width: 45%;
+    }
+
+    .arlo#arlo .arlo-schedule-event .arlo-schedule-column.arlo-price {
+        width: 20%;
+    }
+
+    .arlo#arlo .arlo-schedule-event .arlo-schedule-column.arlo-next-running {
+        width: 35%;
+        text-align: right;
+    }
+}
+
+.arlo#arlo .schedule .arlo-cf.arlo-group-divider {
+    margin-top: 3em;
+    margin-bottom: 2em;
+}
+
+
 
 /* Sessions tooltips */
 
@@ -1255,10 +1322,15 @@ body.arlo {
     clear: both;
 }
 
+.arlo#arlo .page-numbers {
+    display: inline-block;
+}
+
 .arlo#arlo .page-numbers.prev,
 .arlo#arlo .page-numbers.next {
     margin-top: 1em;
     margin-bottom: 1em;
+    width: 100%;
 }
 
 @media (min-width: 550px) {
@@ -1270,6 +1342,7 @@ body.arlo {
     .arlo#arlo .page-numbers.next {
         margin-top: .1em;
         margin-bottom: .1em;
+        width: auto;
     }
 }
 
@@ -1307,6 +1380,7 @@ body.arlo {
 .arlo#arlo .arlo-button.arlo-waiting-list,
 .arlo#arlo .arlo-show-more-link,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a,
+.arlo#arlo .arlo-list.schedule .arlo-next-running a,
 .arlo-widget-upcoming a:hover,
 .arlo#arlo .arlo-list.event-search .arlo-next-running a {
     color: #00cdc1;
@@ -1315,6 +1389,7 @@ body.arlo {
 .arlo#arlo .arlo-background-color1,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a.arlo-register,
 .arlo#arlo .arlo-list.event-search .arlo-next-running a.arlo-register,
+.arlo#arlo .arlo-list.schedule .arlo-next-running a.arlo-register,
 .arlo#arlo .arlo-category-list a,
 .arlo#arlo .arlo-button.arlo-register,
 .arlo#arlo .upcoming .arlo-cf.arlo-group-divider:after,
@@ -1328,11 +1403,13 @@ body.arlo {
 .arlo#arlo .arlo-show-more-link:hover,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a:hover,
 .arlo#arlo .arlo-list.event-search .arlo-next-running a:hover,
+.arlo#arlo .arlo-list.schedule .arlo-next-running a:hover,
 .arlo#arlo .arlo-event_tags-list > li,
 .arlo-widget-upcoming .arlo-cal-month,
 .arlo-categories-widget li a:hover,
 .arlo#arlo .arlo-search-button,
-.arlo#arlo .arlo-oa-registration .arlo-register {
+.arlo#arlo .arlo-oa-registration .arlo-register,
+.arlo#arlo .schedule .arlo-cf.arlo-group-divider:after {
     background-color: #00cdc1;
 }
 
@@ -1341,6 +1418,7 @@ body.arlo {
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a:hover,
 .arlo#arlo .arlo-list.event-search .arlo-next-running a:hover,
 .arlo#arlo .arlo-list.event-search .arlo-next-running a,
+.arlo#arlo .arlo-list.schedule .arlo-next-running a:hover,
 .arlo#arlo .upcoming .arlo-button.arlo-waiting-list:hover, 
 .arlo#arlo .arlo-button.arlo-waiting-list:hover,
 .arlo#arlo .prev.page-numbers:hover, 
@@ -1381,6 +1459,7 @@ body.arlo {
 .arlo#arlo .arlo-background-color3,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running span,
 .arlo#arlo .arlo-list.event-search .arlo-next-running span,
+.arlo#arlo .arlo-list.schedule .arlo-next-running span,
 .arlo#arlo .arlo-event-credits li {
     background-color: #747a87;
 }
@@ -1391,6 +1470,8 @@ body.arlo {
 .arlo#arlo .arlo-list.catalogue .arlo-next-running span,
 .arlo#arlo .arlo-list.event-search .arlo-next-running a.arlo-register,
 .arlo#arlo .arlo-list.event-search .arlo-next-running span,
+.arlo#arlo .arlo-list.schedule .arlo-next-running a.arlo-register,
+.arlo#arlo .arlo-list.schedule .arlo-next-running span,
 .arlo#arlo .arlo-category-list a,
 .arlo#arlo .arlo-filters-buttons a,
 .arlo#arlo .arlo-button.arlo-register:hover,
@@ -1402,6 +1483,7 @@ body.arlo {
 .arlo#arlo .arlo-button.arlo-waiting-list:hover,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a:hover,
 .arlo#arlo .arlo-list.event-search .arlo-next-running a:hover,
+.arlo#arlo .arlo-list.schedule .arlo-next-running a:hover,
 .arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a:hover,
 .arlo#arlo .arlo-advertised-duration,
 .arlo#arlo .arlo-event .arlo-event-full,

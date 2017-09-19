@@ -482,6 +482,7 @@ body.arlo {
 
 /* Light colour used for secondary texts. Default: gray */
 
+.arlo#arlo .arlo-color7,
 .arlo#arlo ul.upcoming .arlo-event-provider,
 .arlo#arlo ul.upcoming .arlo-event-time,
 .arlo#arlo ul.upcoming .arlo-event-location,
@@ -720,7 +721,8 @@ body.arlo {
 .arlo#arlo .arlo-list.events>li,
 .arlo#arlo .arlo-list.arlo-online-activities>li,
 .arlo#arlo .arlo-list.venues>li,
-.arlo#arlo .arlo-list.presenters>li {
+.arlo#arlo .arlo-list.presenters>li,
+.arlo#arlo ul.schedule>li {
     margin: 0;
     padding: 50px 1em;
     border-top: none;
@@ -736,7 +738,8 @@ body.arlo {
 .arlo#arlo .arlo-list.venues>li:nth-child(2n),
 .arlo#arlo .arlo-list.presenters>li:nth-child(2n),
 .arlo#arlo .arlo-suggest-templates li:nth-child(2n),
-.arlo#arlo ul.presenter-events>li:nth-child(2n) {
+.arlo#arlo ul.presenter-events>li:nth-child(2n),
+.arlo#arlo ul.schedule>li:nth-child(2n) {
     background: #fafafa;
 }
 
@@ -1082,6 +1085,49 @@ body.arlo {
 .arlo#arlo .arlo-category-footer ul {
     list-style-position: inside;
 }
+
+
+/* Schedule */
+
+.arlo#arlo .schedule .arlo-schedule-event {
+    padding: 1em;
+}
+
+.arlo#arlo .schedule .arlo-offers {
+    font-weight: bold;
+}
+
+
+.arlo#arlo .schedule .arlo-next-running {
+    color: transparent;
+}
+
+@media (min-width: 750px) {
+    .arlo#arlo .schedule .arlo-schedule-event {
+        padding: .5em;
+    }
+    
+    .arlo#arlo .schedule .arlo-schedule-column {
+        float: left;
+        padding: .2em;
+    }
+
+    .arlo#arlo .schedule .arlo-event-name {
+        width: 50%;
+    }
+
+    .arlo#arlo .schedule .arlo-price {
+        width: 20%;
+    }
+
+    .arlo#arlo .schedule .arlo-next-running {
+        width: 30%;
+        text-align: right;
+    }
+}
+
+
+
 
 
 /* Event template */
