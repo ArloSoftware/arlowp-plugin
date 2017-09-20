@@ -207,6 +207,12 @@ class Arlo_For_Wordpress {
 				'content' 			=> '[arlo_onlineactivites_list]',
 				'child_post_type'	=> 'event'
 			),
+			array(
+				'name'				=> 'schedule',
+				'title'				=> 'Schedule',
+				'content' 			=> '[arlo_schedule]',
+				'child_post_type'	=> 'event'
+			),
 		);  
 
     
@@ -694,7 +700,7 @@ class Arlo_For_Wordpress {
                 }
                 $plugin->get_importer()->set_import_id(date("Y", strtotime($last_import)));
             }
-                        
+
 			if ($plugin_version != VersionHandler::VERSION) {
 				$plugin->get_version_handler()->run_update($plugin_version);
 				

@@ -5,7 +5,7 @@ namespace Arlo;
 use Arlo\Utilities;
 
 class VersionHandler {
-	const VERSION = '3.2';
+	const VERSION = '3.3';
 
 	private $dbl;
 	private $message_handler;
@@ -57,7 +57,7 @@ class VersionHandler {
 	
 		if (version_compare($old_version, '2.2.1') < 0) {
 			$this->do_update('2.2.1');
-		}	
+		}
 		
 		if (version_compare($old_version, '2.3') < 0) {
 			$this->do_update('2.3');
@@ -73,19 +73,23 @@ class VersionHandler {
 
 		if (version_compare($old_version, '3.0') < 0) {
 			$this->do_update('3.0');
-		}	
+		}
 
 		if (version_compare($old_version, '3.1') < 0) {
 			$this->do_update('3.1');
-		}	
+		}
 
 		if (version_compare($old_version, '3.1.3') < 0) {
 			$this->do_update('3.1.3');
-		}	
+		}
 
 		if (version_compare($old_version, '3.2') < 0) {
 			$this->do_update('3.2');
-		}							
+		}
+
+		if (version_compare($old_version, '3.3') < 0) {
+			$this->do_update('3.3');
+		}
 	}
 	
 	private function run_pre_data_update($version) {
@@ -419,7 +423,39 @@ class VersionHandler {
 				$page_name = 'oa';
 
 				$page_ids = $this->plugin->add_pages($page_name);				
-			break;				
-		}	
-	}	
+			break;
+			case '3.3':
+				$page_name = 'schedule';
+				$page_ids = $this->plugin->add_pages($page_name);	
+
+				Logger::log('running udpate');			
+
+				$theme_settings = get_option( 'arlo_themes_settings', [] );
+				$settings = get_option( 'arlo_settings', [] );
+				$selected_theme_id = get_option( 'arlo_theme' );
+
+				foreach ($theme_settings as $theme_name => $theme_setting) {					
+					if ($selected_theme_id !== 'custom') {
+						$schedule_template = file_get_contents($theme_settings[$theme_name]->dir . '/templates/schedule.tpl');
+
+						if (!empty($schedule_template)) {
+							if (!array_key_exists('schedule',$theme_setting->templates)) {
+								$theme_settings[$theme_name]->templates['schedule'] = array( 'html' => $schedule_template );
+							}
+
+							if ($theme_name == $selected_theme_id) {
+								if (!array_key_exists('schedule',$settings['templates'])) {
+									$settings['templates']['schedule'] = array( 'html' => $schedule_template );
+								}
+							}
+						}
+					}
+				}
+
+				update_option( 'arlo_themes_settings', $theme_settings );
+				update_option( 'arlo_settings', $settings );
+
+			break;
+		}
+	}
 }
