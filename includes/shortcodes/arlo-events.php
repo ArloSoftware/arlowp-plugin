@@ -271,6 +271,12 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         return htmlentities($event['e_name'], ENT_QUOTES, "UTF-8");        
     }
 
+    private static function shortcode_event_notice($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if(!isset($GLOBALS['arlo_event_list_item']['e_notice'])) return '';
+        
+        return htmlentities($GLOBALS['arlo_event_list_item']['e_notice'], ENT_QUOTES, "UTF-8");  
+    }
+
     private static function shortcode_event_location($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_event_list_item']['e_locationname']) && !isset($GLOBALS['arlo_event_session_list_item']['e_locationname'])) return '';
 
