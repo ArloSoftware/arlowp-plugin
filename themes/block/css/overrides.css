@@ -89,7 +89,13 @@
     font-size: 1.2em;
 }
 
-.arlo#arlo .arlo-online-activity h4 {
+.arlo#arlo .arlo-online-activity h4,
+.arlo#arlo .arlo-schedule-event .arlo-template-name h5 {
+    margin-top: 0;
+}
+
+.arlo#arlo .schedule .arlo-cf.arlo-group-divider:first-child,
+.arlo#arlo .schedule .arlo-cf.arlo-group-divider:first-child h3 {
     margin-top: 0;
 }
 

@@ -57,7 +57,7 @@ class VersionHandler {
 
 		if (version_compare($old_version, '2.2.1') < 0) {
 			$this->do_update('2.2.1');
-		}	
+		}
 		
 		if (version_compare($old_version, '2.3') < 0) {
 			$this->do_update('2.3');
@@ -428,12 +428,17 @@ class VersionHandler {
 				$theme_settings = get_option( 'arlo_themes_settings', [] );
 				$settings = get_option( 'arlo_settings', [] );
 				$regions = get_option('arlo_regions');
+
+				//Add Schedule template and OA template
+				$page_name = 'schedule';
+				$page_ids = $this->plugin->add_pages($page_name);	
+
 				$selected_theme_id = get_option( 'arlo_theme' );
 
 				foreach ($theme_settings as $theme_name => $theme_setting) {					
 					if ($selected_theme_id !== 'custom') {
 						$oa_template = file_get_contents($theme_settings[$theme_name]->dir . '/templates/oa.tpl');
-
+						
 						if (!empty($oa_template)) {
 							if (!array_key_exists('oa',$theme_setting->templates)) {
 								$theme_settings[$theme_name]->templates['oa'] = array( 'html' => $oa_template );
@@ -442,6 +447,20 @@ class VersionHandler {
 							if ($theme_name == $selected_theme_id) {
 								if (!array_key_exists('oa',$settings['templates'])) {
 									$settings['templates']['oa'] = array( 'html' => $oa_template );
+								}
+							}
+						}
+
+						$schedule_template = file_get_contents($theme_settings[$theme_name]->dir . '/templates/schedule.tpl');
+						
+						if (!empty($schedule_template)) {
+							if (!array_key_exists('schedule',$theme_setting->templates)) {
+								$theme_settings[$theme_name]->templates['schedule'] = array( 'html' => $schedule_template );
+							}
+
+							if ($theme_name == $selected_theme_id) {
+								if (!array_key_exists('schedule',$settings['templates'])) {
+									$settings['templates']['schedule'] = array( 'html' => $schedule_template );
 								}
 							}
 						}

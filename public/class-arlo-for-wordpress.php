@@ -148,6 +148,12 @@ class Arlo_For_Wordpress {
 			'singular_name' => 'Event search',
 			'regionalized' => true
 		),
+		'schedule' => array(
+			'slug' => 'schedule',
+			'name' => 'Schedule',
+			'singular_name' => 'Schedule',
+			'regionalized' => true
+		),
 		'oa' => array(
 			'slug' => 'onlineactivities',
 			'name' => 'Online activities',
@@ -199,6 +205,12 @@ class Arlo_For_Wordpress {
 				'name'				=> 'oa',
 				'title'				=> 'Online Activities',
 				'content' 			=> '[arlo_onlineactivites_list]',
+				'child_post_type'	=> 'event'
+			),
+			array(
+				'name'				=> 'schedule',
+				'title'				=> 'Schedule',
+				'content' 			=> '[arlo_schedule]',
 				'child_post_type'	=> 'event'
 			),
 		);  
@@ -259,6 +271,11 @@ class Arlo_For_Wordpress {
 			'id' => 'events',
 			'shortcode' => '[arlo_event_template_list]',
 			'name' => 'Catalogue'
+		),
+		'schedule' => array(
+			'id' => 'schedule',
+			'shortcode' => '[arlo_schedule]',
+			'name' => 'Schedule',
 		),
 		'eventsearch' => array(
 			'id' => 'eventsearch',
@@ -857,7 +874,7 @@ class Arlo_For_Wordpress {
 			//internal resources
 			if (isset($stored_themes_settings[$theme_id]->internalResources->stylesheets) && is_array($stored_themes_settings[$theme_id]->internalResources->stylesheets)) {
 				foreach ($stored_themes_settings[$theme_id]->internalResources->stylesheets as $key => $stylesheet) {
-					wp_enqueue_style( $this->plugin_slug . '-theme-internal-stylesheet-' . $key, \Arlo\Utilities::remove_url_protocol($stylesheet), [], $stored_themes_settings[$theme_id]->version );
+					wp_enqueue_style( $this->plugin_slug . '-theme-internal-stylesheet-' . $key, $stylesheet, [], $stored_themes_settings[$theme_id]->version );
 				}
 			} 
 
@@ -1027,7 +1044,7 @@ class Arlo_For_Wordpress {
 			//internal resources
 			if (isset($stored_themes_settings[$theme_id]->internalResources->javascripts) && is_array($stored_themes_settings[$theme_id]->internalResources->javascripts)) {
 				foreach ($stored_themes_settings[$theme_id]->internalResources->javascripts as $key => $script) {
-					wp_enqueue_script( $this->plugin_slug . '-theme-internal-script-' . $key, \Arlo\Utilities::remove_url_protocol($script), array( 'jquery' ), $stored_themes_settings[$theme_id]->version );
+					wp_enqueue_script( $this->plugin_slug . '-theme-internal-script-' . $key, $script, array( 'jquery' ), $stored_themes_settings[$theme_id]->version );
 				}
 			} 
 

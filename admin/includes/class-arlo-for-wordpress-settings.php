@@ -611,8 +611,8 @@ class Arlo_For_Wordpress_Settings {
 		HACK because the keys in the $post_types arrays are bad, couldn't change because backward comp.
 		*/
 		
-		if (in_array($id, array('eventsearch', 'upcoming', 'events', 'presenters', 'venues', 'oa'))) {
-			$post_type_id = !in_array($id, array('eventsearch','upcoming', 'oa')) ? substr($id, 0, strlen($id)-1) : $id;
+		if (in_array($id, array('eventsearch', 'upcoming', 'events', 'presenters', 'venues', 'oa', 'schedule'))) {
+			$post_type_id = in_array($id, array('events','presenters', 'venues')) ? substr($id, 0, strlen($id)-1) : $id;
 		}
 
     	if (!empty($post_type_id) && !empty(Arlo_For_Wordpress::$post_types[$post_type_id])) {

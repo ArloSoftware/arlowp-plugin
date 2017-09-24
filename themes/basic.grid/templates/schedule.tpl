@@ -1,6 +1,6 @@
 [arlo_categories title="<h5>%s Categories</h5>" wrap='<div class="arlo-categories">%s</div>']
 [arlo_template_region_selector]
-[arlo_event_template_filters]
+[arlo_schedule_filters]
 [arlo_category_header]
 
 <table class="table event-templates">
@@ -22,11 +22,10 @@
             <td>[arlo_event_price showfrom="false"]</td>
             <td>[arlo_event_next_running]</td>
         </tr>
-        [arlo_event_template_rich_snippet]
     [/arlo_event_template_list_item]
 </table>
 
 [arlo_category_footer]
 [arlo_no_event_text]
-[arlo_event_template_list_pagination limit="20"]
+[arlo_schedule_pagination limit="20"]
 [arlo_powered_by]
