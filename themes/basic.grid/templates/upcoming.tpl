@@ -33,6 +33,7 @@
             [arlo_event_offers wrap='<div class="arlo-event-offers">%s</div>']
 			[arlo_event_registration]
 		</li>	
+		[arlo_event_rich_snippet]
 		[/arlo_upcoming_list_item]
 	</ul>
 	<div class="arlo-clear-both"></div>

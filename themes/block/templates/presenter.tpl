@@ -15,3 +15,5 @@
 [/arlo_label]
 [arlo_powered_by]
 </div>
+
+[arlo_presenter_rich_snippet]

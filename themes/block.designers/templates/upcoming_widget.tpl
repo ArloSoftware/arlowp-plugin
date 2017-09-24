@@ -11,5 +11,6 @@
 
 	<p>[arlo_event_location]</p>
    </li>
+   [arlo_event_rich_snippet]
 [/arlo_upcoming_list_item]
 </ul>

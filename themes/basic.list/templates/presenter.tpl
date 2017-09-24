@@ -10,3 +10,5 @@
     [arlo_presenter_events_list]
 [/arlo_label]
 [arlo_powered_by]
+
+[arlo_presenter_rich_snippet]

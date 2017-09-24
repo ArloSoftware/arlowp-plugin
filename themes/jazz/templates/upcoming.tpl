@@ -36,6 +36,7 @@
 				[arlo_event_registration class="arlo-button"]
 			    </div>
 		</li>	
+		[arlo_event_rich_snippet]
 		[/arlo_upcoming_list_item]
 	</ul>
 	<div class="arlo-clear-both"></div>

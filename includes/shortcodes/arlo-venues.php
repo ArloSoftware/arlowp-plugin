@@ -258,5 +258,70 @@ class Venues {
         if(!isset($GLOBALS['arlo_venue_list_item']['v_facilityinfoparking'])) return '';
 
         return $GLOBALS['arlo_venue_list_item']['v_facilityinfoparking'];        
-    }    
+    }
+
+    private static function shortcode_venue_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        extract(shortcode_atts(array(
+            'link' => 'permalink'
+        ), $atts, $shortcode_name, $import_id));
+
+        $venue_snippet = array();
+
+        // Basic
+        $venue_snippet = array();
+        $venue_snippet["@type"] = "Place";
+        $venue_snippet["name"] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_venue_list_item']['v_name']);
+
+        $v_link = '';
+        switch ($link) {
+            case 'viewuri': 
+                $v_link = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_venue_list_item']['v_viewuri']);
+            break;  
+            default: 
+                $v_link = get_permalink(arlo_get_post_by_name(Shortcodes::get_rich_snippet_field($GLOBALS['arlo_venue_list_item']['v_post_name']), 'arlo_venue'));
+            break;
+        }
+
+        if (!empty($v_link)) {
+            $venue_snippet["url"] = $v_link;
+            $venue_snippet["sameAs"] = $v_link;
+        }
+
+        // Address
+        $venue_snippet["address"] = array();
+        $venue_snippet["address"]["@type"] = ["PostalAddress"];
+
+        if (!empty($GLOBALS['arlo_venue_list_item']["v_physicaladdresscity"]) 
+            || !empty($GLOBALS['arlo_venue_list_item']["v_physicaladdresspostcode"]) 
+            || !empty($GLOBALS['arlo_venue_list_item']["v_physicaladdresscountry"]) 
+            || !empty($GLOBALS['arlo_venue_list_item']["v_physicaladdressline1"])) {
+
+                if (!empty($GLOBALS['arlo_venue_list_item']["v_physicaladdressline1"])) {
+                    $address = $GLOBALS['arlo_venue_list_item']["v_physicaladdressline1"];
+
+                    $address .= ( !empty($GLOBALS['arlo_venue_list_item']["v_physicaladdressline2"]) ? ' ' . $GLOBALS['arlo_venue_list_item']["v_physicaladdressline2"] : "");
+
+                    $address .= ( !empty($GLOBALS['arlo_venue_list_item']["v_physicaladdressline3"]) ? ' ' . $GLOBALS['arlo_venue_list_item']["v_physicaladdressline3"] : "");
+
+                    $address .= ( !empty($GLOBALS['arlo_venue_list_item']["v_physicaladdressline4"]) ? ' ' . $GLOBALS['arlo_venue_list_item']["v_physicaladdressline4"] : "");
+
+                    $venue_snippet["address"]["streetAddress"] = $address;
+                }
+
+                if (!empty($GLOBALS['arlo_venue_list_item']["v_physicaladdresscity"])) {
+                    $venue_snippet["address"]["addressLocality"] = $GLOBALS['arlo_venue_list_item']["v_physicaladdresscity"];
+                }
+
+                if (!empty($GLOBALS['arlo_venue_list_item']["v_physicaladdresspostcode"])) {
+                    $venue_snippet["address"]["postalCode"] = $GLOBALS['arlo_venue_list_item']["v_physicaladdresspostcode"];
+                }
+
+                if (!empty($GLOBALS['arlo_venue_list_item']["v_physicaladdresscountry"])) {
+                    $venue_snippet["address"]["addressCountry"] = $GLOBALS['arlo_venue_list_item']["v_physicaladdresscountry"];
+                }
+        }
+
+        return Shortcodes::create_rich_snippet( json_encode($venue_snippet) ); 
+    }
+
 }

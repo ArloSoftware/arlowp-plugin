@@ -54,7 +54,7 @@ class VersionHandler {
 		}			
 		
 		arlo_add_datamodel();	
-	
+
 		if (version_compare($old_version, '2.2.1') < 0) {
 			$this->do_update('2.2.1');
 		}	
@@ -451,6 +451,27 @@ class VersionHandler {
 				$settings['regionid'] = array_map('strtoupper',$settings['regionid']);
 				$regions = array_change_key_case($regions, CASE_UPPER);
 
+				//Add rich snippet shortcodes to templates
+				$settings = $this->update_template($settings, 'event',false,"[arlo_event_template_rich_snippet]");
+				$settings = $this->update_template($settings, 'event','[/arlo_event_list_item]',"[arlo_event_rich_snippet]");
+				$settings = $this->update_template($settings, 'event','[/arlo_oa_list_item]',"[arlo_oa_rich_snippet]");
+
+				$settings = $this->update_template($settings, 'presenter',false,"[arlo_presenter_rich_snippet]");
+
+				$settings = $this->update_template($settings, 'presenters','[/arlo_presenter_list_item]',"[arlo_presenter_rich_snippet]");
+
+				$settings = $this->update_template($settings, 'venue',false,"[arlo_venue_rich_snippet]");
+
+				$settings = $this->update_template($settings, 'venues','[/arlo_venue_list_item]',"[arlo_venues_rich_snippet]");
+
+				$settings = $this->update_template($settings, 'events','[/arlo_event_template_list_item]',"[arlo_event_template_rich_snippet]");
+
+				$settings = $this->update_template($settings, 'eventsearch','[/arlo_event_template_list_item]',"[arlo_event_template_rich_snippet]");
+
+				$settings = $this->update_template($settings, 'upcoming','[/arlo_upcoming_list_item]',"[arlo_event_rich_snippet]");
+
+				$settings = $this->update_template($settings, 'oa','[/arlo_onlineactivites_list_item]',"[arlo_oa_rich_snippet]");
+
 				update_option( 'arlo_themes_settings', $theme_settings );
 				update_option( 'arlo_settings', $settings );
 				update_option('arlo_regions', $regions);
@@ -458,5 +479,20 @@ class VersionHandler {
 			break;				
 
 		}	
-	}	
+	}
+
+	private function update_template($templates, $page, $insert_before, $shortcode) {
+		if (!empty($templates['templates'][$page]['html']) && strpos($templates['templates'][$page]['html'], $shortcode) === false) {
+			$shortcode = "\n".$shortcode."\n";
+
+			if ($insert_before) {
+				$pos = strpos($templates['templates'][$page]['html'],$insert_before);
+				$templates['templates'][$page]['html'] = substr_replace($templates['templates'][$page]['html'], $shortcode, $pos, 0);
+			} else {
+				$templates['templates'][$page]['html'] = $templates['templates'][$page]['html'] . $shortcode;
+			}
+		}
+
+		return $templates;
+	}
 }

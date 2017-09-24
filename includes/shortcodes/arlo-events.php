@@ -391,13 +391,13 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         return Shortcodes::advertised_offers($GLOBALS['arlo_event_list_item']['e_id'], 'e_id', $import_id);
     }
 
-    private static function shortcode_event_presenters($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+    private static function get_event_presenters($import_id) {
         global $wpdb;
 
         $t1 = "{$wpdb->prefix}arlo_events_presenters";
         $t2 = "{$wpdb->prefix}arlo_presenters";
 
-        $items = $wpdb->get_results("
+        return $wpdb->get_results("
         SELECT 
             p.p_firstname, 
             p.p_lastname, 
@@ -421,6 +421,10 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         ORDER BY 
             exp.p_order", ARRAY_A);
 
+    }
+
+    private static function shortcode_event_presenters($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+
         // merge and extract attributes
         extract(shortcode_atts(array(
             'layout' => '',
@@ -432,6 +436,8 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         if ($layout == 'list') {
             $output .= '<ul class="arlo-list event-presenters">';
         }
+
+        $items = self::get_event_presenters($import_id);
 
         $presenters = array();
 
@@ -710,6 +716,85 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         }
         
         return $fromtext . $offer->$price_field_show;        
+    }
+
+    private static function shortcode_event_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        extract(shortcode_atts(array(
+            'link' => 'permalink'
+        ), $atts, $shortcode_name, $import_id));
+
+        $settings = get_option('arlo_settings');  
+
+        $event_snippet = array();
+        
+        // Basic
+        $event_snippet['@context'] = 'http://schema.org';
+        $event_snippet['@type'] = 'Event';
+        $event_snippet['name'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item']['e_name']);
+
+        $event_snippet['startDate'] = !empty($GLOBALS['arlo_event_list_item']['e_startdatetime']) ? date(DATE_ISO8601, strtotime($GLOBALS['arlo_event_list_item']['e_startdatetime'])) : '';
+        $event_snippet['endDate'] = !empty($GLOBALS['arlo_event_list_item']['e_startdatetime']) ? date(DATE_ISO8601, strtotime($GLOBALS['arlo_event_list_item']['e_finishdatetime'])) : '';
+
+
+        $et_link = '';
+        switch ($link) {
+            case 'viewuri': 
+                $et_link = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_eventtemplate']['et_viewuri']);
+            break;  
+            default: 
+                $et_link = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
+            break;
+        }
+
+        if (!empty($GLOBALS['arlo_event_list_item']['et_descriptionsummary'])) {
+            $event_snippet['description'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item']['et_descriptionsummary']);
+        }
+
+        $event_snippet['url'] = $et_link;
+
+        // Location
+        $event_snippet["location"] = array();
+        $event_snippet["location"]["@type"] = "Place";
+        $event_snippet["location"]["name"] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item']['e_locationname']);
+
+
+        $v_link = get_permalink(arlo_get_post_by_name(Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item']['v_post_name']), 'arlo_venue'));
+
+        if (!empty($v_link)) {
+            $event_snippet["location"]["url"] = $v_link;
+            $event_snippet["location"]["sameAs"] = $v_link;
+        }
+
+        // OFfers
+        $price_setting = (isset($settings['price_setting'])) ? $settings['price_setting'] : ARLO_PLUGIN_PREFIX . '-exclgst';
+        $price_field = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? 'o_offeramounttaxexclusive' : 'o_offeramounttaxinclusive';
+
+        $offers = Shortcodes::get_offers_snippet_data( $GLOBALS['arlo_event_list_item']['e_id'], 'e_id', $import_id, $price_field);
+
+        if (!empty($offers)) {
+            $event_snippet["offers"] = array();
+            $event_snippet["offers"]["@type"] = "AggregateOffer";
+
+            $event_snippet["offers"]["highPrice"] = $offers['high_price'];
+            $event_snippet["offers"]["lowPrice"] = $offers['low_price'];
+            
+            $event_snippet["offers"]["price"] = $offers['low_price'];
+
+            $event_snippet["offers"]["priceCurrency"] = $offers['currency'];
+
+            $event_snippet["offers"]['url'] = $et_link;
+        }
+
+
+        // Presenters
+        $performers = array();
+        foreach (self::get_event_presenters($import_id) as $i => $presenter) {
+            array_push($performers,Shortcodes::get_performer($presenter,$link));
+        }
+
+        $event_snippet["performer"] = $performers;
+
+        return Shortcodes::create_rich_snippet( json_encode($event_snippet) );
     }
 
     private static function shortcode_no_event_text($content = '', $atts = [], $shortcode_name = '', $import_id = '') {

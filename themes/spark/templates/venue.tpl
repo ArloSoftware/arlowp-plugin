@@ -19,3 +19,4 @@
 	</div>
     [arlo_powered_by]
 </div>
+[arlo_venue_rich_snippet]

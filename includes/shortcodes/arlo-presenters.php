@@ -153,7 +153,17 @@ class Presenters {
 
         return $GLOBALS['arlo_presenter_list_item']['p_interests'];
     }
-    
+
+    private static function shortcode_presenter_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        extract(shortcode_atts(array(
+            'link' => 'permalink'
+        ), $atts, $shortcode_name, $import_id));
+
+        $performer = !empty($GLOBALS['arlo_presenter_list_item']) ? Shortcodes::get_performer($GLOBALS['arlo_presenter_list_item'], $link) : "";
+
+        return Shortcodes::create_rich_snippet( json_encode($performer) ); 
+    }
+
     private static function shortcode_presenter_social_link($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         // merge and extract attributes
         extract(shortcode_atts(array(

@@ -33,6 +33,7 @@
                     [arlo_event_next_running label="<p>Next running</p>" buttonclass="button arlo-button" text="{%location%} {%date%}"]
                 </div>
             </li>
+            [arlo_event_template_rich_snippet]
 
         [/arlo_event_template_list_item]
     </ul>

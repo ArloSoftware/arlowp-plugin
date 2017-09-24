@@ -404,23 +404,7 @@ class Templates {
     }
 
     private static function shortcode_event_template_permalink($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        if(!isset($GLOBALS['arlo_eventtemplate']['et_post_name'])) return '';
-        
-        $region_link_suffix = '';
-
-        if (!empty($GLOBALS['arlo_eventtemplate']['et_region']) && is_array($regions) && count($regions)) {
-            $arlo_region = $GLOBALS['arlo_eventtemplate']['et_region'];
-        } else {
-            $arlo_region = \Arlo\Utilities::get_region_parameter();
-        }
-
-        if (!empty($arlo_region)) {
-            $region_link_suffix = 'region-' . $arlo_region . '/';
-        }
-        
-        $et_id = arlo_get_post_by_name($GLOBALS['arlo_eventtemplate']['et_post_name'], 'arlo_event');
-
-        return esc_url(get_permalink($et_id) . $region_link_suffix);
+        return Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
     }
 
     private static function shortcode_event_template_link($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -834,4 +818,40 @@ class Templates {
             throw new \Exception("Couldn't prepapre SQL statement");
         }
     }
+
+
+    private static function shortcode_event_template_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        extract(shortcode_atts(array(
+            'link' => 'permalink'
+        ), $atts, $shortcode_name, $import_id));
+
+        $event_template_snippet = array();
+
+        if (isset($GLOBALS["arlo_eventtemplate"])) {
+            $event_template_snippet['@context'] = 'http://schema.org';
+            $event_template_snippet['@type'] = 'Event';
+            $event_template_snippet['name'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_eventtemplate']['et_name']);
+
+            $et_link = '';
+            switch ($link) {
+                case 'viewuri': 
+                    $et_link = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_eventtemplate']['et_viewuri']);
+                break;  
+                default: 
+                    $et_link = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
+                break;
+            }
+
+            $event_template_snippet['url'] = $et_link;
+            $event_template_snippet['sameAs'] = $et_link;
+
+            $event_template_snippet['description'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_eventtemplate']['et_descriptionsummary']);
+
+            return Shortcodes::create_rich_snippet( json_encode($event_template_snippet) );
+        } else {
+            return '';
+        }
+
+    }
+
 }

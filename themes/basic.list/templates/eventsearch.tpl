@@ -21,6 +21,7 @@
             <td>[arlo_event_price]</td>
             <td>[arlo_event_next_running]</td>
         </tr>
+        [arlo_event_template_rich_snippet]
     [/arlo_event_template_list_item]
 </table>
 
