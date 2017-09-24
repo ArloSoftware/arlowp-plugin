@@ -25,7 +25,12 @@ class Arlo_For_Wordpress_Settings {
 		}
 				
 		// allocates the wp-options option key value pair that will store the plugin settings
-		register_setting( 'arlo_settings', 'arlo_settings' );		
+		register_setting( 'arlo_settings', 'arlo_settings', array(
+			'sanitize_callback' => function($input) {
+				$input['regionid'] = array_map('strtoupper',$input['regionid']);
+				return $input;
+			}
+		));		
 
 		$plugin = Arlo_For_Wordpress::get_instance();
 		$settings_object = get_option('arlo_settings');

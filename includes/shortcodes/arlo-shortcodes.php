@@ -182,7 +182,7 @@ class Shortcodes {
 					$value_label = get_option('arlo_filter_settings')[$group][$type][$value_label];
 				}
 
-				$selected = (strlen($selected_value) && $selected_value == $item['value']) ? ' selected="selected"' : '';
+                $selected = (strlen($selected_value) && strtolower($selected_value) == strtolower($item['value'])) ? ' selected="selected"' : '';
 				
 				$filter_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>' . esc_html($value_label) . '</option>';
 			}

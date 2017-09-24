@@ -427,6 +427,7 @@ class VersionHandler {
 			case '3.3':
 				$theme_settings = get_option( 'arlo_themes_settings', [] );
 				$settings = get_option( 'arlo_settings', [] );
+				$regions = get_option('arlo_regions');
 				$selected_theme_id = get_option( 'arlo_theme' );
 
 				foreach ($theme_settings as $theme_name => $theme_setting) {					
@@ -447,10 +448,15 @@ class VersionHandler {
 					}
 				}
 
+				$settings['regionid'] = array_map('strtoupper',$settings['regionid']);
+				$regions = array_change_key_case($regions, CASE_UPPER);
+
 				update_option( 'arlo_themes_settings', $theme_settings );
 				update_option( 'arlo_settings', $settings );
+				update_option('arlo_regions', $regions);
 
-			break;
+			break;				
+
 		}	
 	}	
 }
