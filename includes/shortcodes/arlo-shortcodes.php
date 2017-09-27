@@ -207,11 +207,13 @@ class Shortcodes {
             case 'viewuri': 
                 $p_link = Shortcodes::get_rich_snippet_field($presenter["p_viewuri"]);
             break;  
-            default: 
-                $p_link = get_permalink($presenter['post_id']);
+            default:
+            	$p_post_id = empty($presenter['post_id']) ? $presenter['p_post_id'] : $presenter['post_id'];
+                $p_link = get_permalink($p_post_id);
             break;
         }
 
+        $p_link = \Arlo\Utilities::get_absolute_url($p_link);
 
         $performer["url"] = $p_link;
 
@@ -490,8 +492,8 @@ class Shortcodes {
         
         $et_id = arlo_get_post_by_name($post_name, 'arlo_event');
 
-        return get_permalink($et_id) . $region_link_suffix;        
-
+        return get_permalink($et_id) . $region_link_suffix;
     }
+
 
 }

@@ -106,4 +106,40 @@ class Utilities {
         
         return $files;
     }
+
+    public static function get_absolute_url($rel) {
+        if (parse_url($rel, PHP_URL_SCHEME) != '' || empty($rel))
+            return ($rel);
+
+        //$base = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+        $base = "http://www.google.com/";
+
+        /* queries and anchors */
+        if ($rel[0] == '#' || $rel[0] == '?')
+            return ($base . $rel);
+
+        extract(parse_url($base));
+
+        $path = preg_replace('#/[^/]*$#', '', $path);
+
+        if ($rel[0] == '/')
+            $path = '';
+
+
+        $abs = $host;
+
+        /* port */
+        if (isset($port))
+            $abs .= ':' . $port;
+
+        $abs .= $path . '/' . $rel . (isset($query) ? '?' . $query : '');
+
+        /* replace '//' or '/./' or '/foo/../' with '/' */
+        $re = ['#(/\.?/)#', '#/(?!\.\.)[^/]+/\.\./#'];
+        for ($n = 1; $n > 0; $abs = preg_replace($re, '/', $abs, -1, $n)) {
+        }
+
+        return ($scheme . '://' . $abs);
+    }
+
 }

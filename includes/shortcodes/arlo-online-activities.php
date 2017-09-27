@@ -530,6 +530,8 @@ class OnlineActivities {
                 $oa_link = Shortcodes::get_template_permalink($GLOBALS['arlo_oa_list_item']['et_post_name'], $GLOBALS['arlo_oa_list_item']['et_region']);
             break;
         }
+        
+        $oa_link = \Arlo\Utilities::get_absolute_url($oa_link);
 
         $oa_snippet = array();
 

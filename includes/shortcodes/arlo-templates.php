@@ -876,6 +876,8 @@ class Templates {
                 break;
             }
 
+            $et_link = \Arlo\Utilities::get_absolute_url($et_link);
+
             $event_template_snippet['url'] = $et_link;
             $event_template_snippet['sameAs'] = $et_link;
 

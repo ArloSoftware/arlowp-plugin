@@ -281,6 +281,8 @@ class Venues {
                 $v_link = get_permalink(arlo_get_post_by_name(Shortcodes::get_rich_snippet_field($GLOBALS['arlo_venue_list_item']['v_post_name']), 'arlo_venue'));
             break;
         }
+        
+        $v_link = \Arlo\Utilities::get_absolute_url($v_link);
 
         if (!empty($v_link)) {
             $venue_snippet["url"] = $v_link;

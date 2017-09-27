@@ -746,6 +746,8 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
             break;
         }
 
+        $et_link = \Arlo\Utilities::get_absolute_url($et_link);
+
         if (!empty($GLOBALS['arlo_event_list_item']['et_descriptionsummary'])) {
             $event_snippet['description'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item']['et_descriptionsummary']);
         }
@@ -759,6 +761,8 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
 
 
         $v_link = get_permalink(arlo_get_post_by_name(Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item']['v_post_name']), 'arlo_venue'));
+        
+        $v_link = \Arlo\Utilities::get_absolute_url($v_link);
 
         if (!empty($v_link)) {
             $event_snippet["location"]["url"] = $v_link;
