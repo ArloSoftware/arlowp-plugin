@@ -241,6 +241,7 @@ class Arlo_For_Wordpress {
     	'webinar' => 'arlo-webinar-admin-notice',
     	'newpages' => 'arlo-newpages-admin-notice',
 		'wp_video' => 'arlo-wp-video',
+		'pagesetup' => 'arlo-page-setup-admin-notice',
     );     
     
 	/**

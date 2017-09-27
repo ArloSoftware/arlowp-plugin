@@ -177,13 +177,14 @@ class NoticeHandler {
 	
 
 	public function posttype_notice() {
-
 		$message_obj = $this->create_message_object(
 				__("Page setup required", 'arlo-for-wordpress' ),
 				'<p>' .  __('Arlo for WordPress requires you to setup the pages which will host event information.', 'arlo-for-wordpress' ) .' '. sprintf(__('<a href="%s" class="arlo-pages-setup">Setup pages</a>', 'arlo-for-wordpress' ), admin_url('admin.php?page=arlo-for-wordpress#pages/events')) . '</p><p>' . sprintf(__('<a target="_blank" href="%s">View documentation</a> for more information.', 'arlo-for-wordpress' ), 'http://developer.arlo.co/doc/wordpress/index#pages-and-post-types') . '</p>',
-				'error notice');
+				'error notice',
+				false,
+				true);
 
-		echo $this->create_notice($message_obj);
+		echo $this->create_user_notice('pagesetup', $message_obj);
 	}	
 
 	public function welcome_notice() {
