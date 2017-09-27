@@ -480,7 +480,7 @@ class Templates {
 
         $filter_html = '<form id="arlo-event-filter" class="arlo-filters" method="get" action="'. $page_link .'">';
 
-        $filter_group = 'template';
+        $filter_group = $page_type == 'schedule' ? 'schedule' : 'template';
         
         foreach(\Arlo_For_Wordpress::$available_filters[$filter_group]['filters'] as $filter_key => $filter):
 

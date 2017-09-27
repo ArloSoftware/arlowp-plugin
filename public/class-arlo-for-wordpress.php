@@ -355,7 +355,17 @@ class Arlo_For_Wordpress {
 				'location' => 'Location', 
 				'templatetag' => 'Tag'
 			)
+		),
+		'schedule' => array(
+			'name' => 'Schedule',
+			'filters' => array(
+				'category' => 'Category', 
+				'delivery' => 'Delivery', 
+				'location' => 'Location', 
+				'templatetag' => 'Tag'
+			)
 		)
+
 	);
 
 
