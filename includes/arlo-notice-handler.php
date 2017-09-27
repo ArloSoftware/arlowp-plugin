@@ -237,6 +237,7 @@ class NoticeHandler {
 		$import_id = $this->importer->get_current_import_id();
 		
 		$events = arlo_get_post_by_name('events', 'page');
+		$schedule = arlo_get_post_by_name('schedule', 'page');
 		$upcoming = arlo_get_post_by_name('upcoming', 'page');
 		$presenters = arlo_get_post_by_name('presenters', 'page');
 		$venues = arlo_get_post_by_name('venues', 'page');
@@ -342,10 +343,12 @@ class NoticeHandler {
 					echo $this->create_user_notice('newpages',
 						$this->create_message_object(
 							__('Start editing your new pages', 'arlo-for-wordpress' ),
-							'<p>'.sprintf(__('View %s <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, %s <a href="%s" target="_blank">%s</a> %s or <a href="%s" target="_blank">%s</a> pages', 'arlo-for-wordpress' ), 
+							'<p>'.sprintf(__('View %s <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, %s <a href="%s" target="_blank">%s</a> %s or <a href="%s" target="_blank">%s</a> pages', 'arlo-for-wordpress' ), 
 								$event_link,
 								$events->guid, 
 								__('Catalogue', 'arlo-for-wordpress' ), 
+								$schedule->guid,
+								__('Schedule', 'arlo-for-wordpress' ), 
 								$upcoming->guid,  
 								$upcoming->post_title,
 								$presenter_link,
