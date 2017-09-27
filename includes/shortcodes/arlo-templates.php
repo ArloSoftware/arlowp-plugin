@@ -409,7 +409,7 @@ class Templates {
                 $no_event_text .= '<br /><a href="' . esc_url($GLOBALS['arlo_eventtemplate']['et_registerinteresturi']) . '">' . __('Register your interest now', 'arlo-for-wordpress') . '</a>';
             }
             
-            $output = '<p class="arlo-no-results">' . esc_html($no_event_text) . '</p>';	
+            $output = '<p class="arlo-no-results">' . $no_event_text . '</p>';	
         }
 
         return $output;        
