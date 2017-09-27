@@ -481,7 +481,7 @@ class VersionHandler {
 
 				$settings = $this->update_template($settings, 'venue',false,"[arlo_venue_rich_snippet]");
 
-				$settings = $this->update_template($settings, 'venues','[/arlo_venue_list_item]',"[arlo_venues_rich_snippet]");
+				$settings = $this->update_template($settings, 'venues','[/arlo_venue_list_item]',"[arlo_venue_rich_snippet]");
 
 				$settings = $this->update_template($settings, 'events','[/arlo_event_template_list_item]',"[arlo_event_template_rich_snippet]");
 
