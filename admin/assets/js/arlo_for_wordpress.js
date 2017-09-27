@@ -363,14 +363,14 @@ if (typeof (Arlo) === "undefined") {
 				tabIDs = ['pages','events'];
 				me.showNavTab(tabIDs[0]);
 				me.markPageSetupError();
-				scrollTo(0,10000);
+				scrollTo(0,jQuery('#arlo-settings').offset().top)
 			});
 
 			//go to the pages section
 			$('.arlo-pages-systemrequirements').click(function() {
 				tabIDs = ['systemrequirements'];
 				me.showNavTab(tabIDs[0]);
-				scrollTo(0,10000);
+				scrollTo(0,jQuery('#arlo-settings').offset().top)
 			});				
 			
 			//remove error from the select
@@ -386,14 +386,14 @@ if (typeof (Arlo) === "undefined") {
 			$('.arlo-settings-link').click(function() {
 				var id = $(this).attr('id').split('_').pop();
 				me.showNavTab(id);	
-				scrollTo(0,10000);
+				scrollTo(0,jQuery('#arlo-settings').offset().top)
 			});
 			
 			//go to the general section
 			$('#arlo-connet-platform').click(function () {
 				tabIDs = ['general'];
 				me.showNavTab(tabIDs[0]);	
-				scrollTo(0,10000);
+				scrollTo(0,jQuery('#arlo-settings').offset().top)
 				$('#arlo_platform_name').focus().select();	
 			});
 			

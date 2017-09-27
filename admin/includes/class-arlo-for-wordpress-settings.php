@@ -53,6 +53,8 @@ class Arlo_For_Wordpress_Settings {
 		
 		if(isset($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress') {
 			add_action( 'admin_notices', array($notice_handler, "arlo_notices") );
+
+			add_action( 'admin_notices', array($notice_handler, "welcome_notice") );
 			
 			if (!empty($settings_object['platform_name'])) {
 				$show_notice = false;
@@ -131,8 +133,6 @@ class Arlo_For_Wordpress_Settings {
 				}
 				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress') );
 			}
-						
-			add_action( 'admin_notices', array($notice_handler, "welcome_notice") );
 			
 			add_action( 'admin_print_scripts', array($this, "arlo_check_current_tasks") );			
 		}
