@@ -161,6 +161,8 @@ class Shortcodes {
 			$filter_html .= '<option value="">' . esc_html($label) . '</option>';
 
 		$selected_value = \Arlo\Utilities::clean_string_url_parameter('arlo-' . $type);
+
+		$options_html = '';
 			
 		foreach($items as $key => $item) {
 			if (empty($item['string']) && empty($item['value'])) {
@@ -184,9 +186,15 @@ class Shortcodes {
 
                 $selected = (strlen($selected_value) && strtolower($selected_value) == strtolower($item['value'])) ? ' selected="selected"' : '';
 				
-				$filter_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>' . esc_html($value_label) . '</option>';
+				$options_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>' . esc_html($value_label) . '</option>';
 			}
 		}
+
+		if (strlen($options_html) == 0) {
+			return '';
+		}
+
+		$filter_html .= $options_html;
 
 		$filter_html .= '</select>';
 
