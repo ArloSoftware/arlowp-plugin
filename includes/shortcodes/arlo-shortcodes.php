@@ -147,6 +147,10 @@ class Shortcodes {
 	}
 
 	public static function create_filter($type, $items, $label=null, $group=null) {
+		if (count($items) == 0) {
+			return '';
+		}
+
 		if (!empty(get_option('arlo_filter_settings')[$group][$type][$label]) ) {
 			$label = get_option('arlo_filter_settings')[$group][$type][$label];
 		}
