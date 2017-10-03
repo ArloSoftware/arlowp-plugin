@@ -180,7 +180,6 @@ class Shortcodes {
 			if (!$is_hidden) {
 				$value_label = $item['string'];
 
-				if (!empty(get_option('arlo_filter_settings')[$group][$type][$value_label])) {
 				if (!empty(get_option('arlo_filter_settings')[$group][$type][htmlspecialchars($value_label)])) {
 					$value_label = get_option('arlo_filter_settings')[$group][$type][htmlspecialchars($value_label)];
 				}
