@@ -85,6 +85,45 @@ class UpcomingEvents {
         return do_shortcode($template);
     }
 
+    private static function shortcode_upcoming_list_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        global $post, $wpdb;
+
+        extract(shortcode_atts(array(
+            'link' => 'permalink'
+        ), $atts, $shortcode_name, $import_id));
+
+        $sql = self::generate_list_sql($atts, $import_id);
+
+        $items = $wpdb->get_results($sql, ARRAY_A);
+
+        $snippet_list_items = array();
+        
+        if (is_array($items) && count($items)) {
+            foreach($items as $key => $item) {
+                $GLOBALS['arlo_event_list_item'] = $item;
+                $GLOBALS['arlo_eventtemplate'] = $item;
+
+                $event_snippet = Events::get_rich_snippet_data($content, $atts, $shortcode_name, $import_id);
+
+                $list_item_snippet = array();
+                $list_item_snippet['@type'] = 'ListItem';
+                $list_item_snippet['position'] = $key + 1;
+                $list_item_snippet['item'] = $event_snippet;
+
+                array_push($snippet_list_items,$list_item_snippet);
+
+                unset($GLOBALS['arlo_event_list_item']);
+                unset($GLOBALS['arlo_eventtemplate']);
+            }
+        }
+
+        $item_list = array();
+        $item_list['@type'] = 'ItemList';
+        $item_list['itemListElement'] = $snippet_list_items;
+
+        return Shortcodes::create_rich_snippet( json_encode($item_list) );     
+    }
+
     private static function shortcode_upcoming_list_item($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $wpdb;
 
@@ -114,7 +153,6 @@ class UpcomingEvents {
         else :
             $previous = null;
             foreach($items as $item) {
-
                 if(is_null($previous) || date('m',strtotime($item['e_startdatetime'])) != date('m',strtotime($previous['e_startdatetime']))) {
                     $item['show_divider'] = strftime('%B', strtotime($item['e_startdatetime']));
                 }
@@ -506,8 +544,20 @@ class UpcomingEvents {
             o.o_formattedamounttaxinclusive, 
             o_offeramounttaxinclusive, 
             o.o_taxrateshortcode, 
+            v.v_name, 
             v.v_post_name, 
-            v.v_post_id   
+            v.v_post_id,
+            v.v_physicaladdressline1,
+            v.v_physicaladdressline2,
+            v.v_physicaladdressline3,
+            v.v_physicaladdressline4,
+            v.v_physicaladdresssuburb,
+            v.v_physicaladdresscity,
+            v.v_physicaladdressstate,
+            v.v_physicaladdresspostcode,
+            v.v_physicaladdresscountry,
+            v.v_geodatapointlatitude,
+            v.v_geodatapointlongitude
             ';
 
             $order = '

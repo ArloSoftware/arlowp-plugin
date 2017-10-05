@@ -214,7 +214,7 @@ class OnlineActivities {
         $items = $wpdb->get_results($sql, ARRAY_A);
 
         $output = '';
-                  
+        
         if(empty($items)) :
             $no_event_text = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No online activities to show', 'arlo-for-wordpress');
             $output = '<p class="arlo-no-results">' . esc_html($no_event_text) . '</p>';
@@ -248,7 +248,7 @@ class OnlineActivities {
                 $output .= do_shortcode($content);
 
                 unset($GLOBALS['arlo_eventtemplate']);
-                unset($GLOBALS['arlo_event_list_item']);
+                unset($GLOBALS['arlo_oa_list_item']);
                 
                 $previous = $item;
             }
@@ -514,7 +514,46 @@ class OnlineActivities {
         return $filter_html;
     }
 
+    private static function shortcode_onlineactivities_list_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        global $wpdb;
+
+        $sql = self::generate_onlineactivites_list_sql($atts, $import_id);
+        $items = $wpdb->get_results($sql, ARRAY_A);
+
+        $output = '';
+
+        $snippet_list_items = array();
+
+        foreach($items as $key => $item) {
+            $GLOBALS['arlo_eventtemplate'] = $item;
+            $GLOBALS['arlo_oa_list_item'] = $item;
+            
+            $oa_snippet = self::get_snippet_data($atts,$shortcode_name,$import_id);
+
+            $list_item_snippet = array();
+            $list_item_snippet['@type'] = 'ListItem';
+            $list_item_snippet['position'] = $key + 1;
+            $list_item_snippet['item'] = $oa_snippet;
+
+            array_push($snippet_list_items,$list_item_snippet);
+
+            unset($GLOBALS['arlo_eventtemplate']);
+            unset($GLOBALS['arlo_oa_list_item']);
+        }
+        
+        $item_list = array();
+        $item_list['@type'] = 'ItemList';
+        $item_list['itemListElement'] = $snippet_list_items;
+
+        return Shortcodes::create_rich_snippet( json_encode($item_list) );     
+    }
+
     private static function shortcode_oa_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        $oa_snippet = self::get_snippet_data($atts,$shortcode_name,$import_id);
+        return Shortcodes::create_rich_snippet( json_encode($oa_snippet) );
+    }
+
+    private static function get_snippet_data($atts,$shortcode_name,$import_id) {
         extract(shortcode_atts(array(
             'link' => 'permalink'
         ), $atts, $shortcode_name, $import_id));
@@ -524,10 +563,13 @@ class OnlineActivities {
         $oa_link = '';
         switch ($link) {
             case 'viewuri': 
-                $oa_link = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_oa_list_item']['oa_viewuri']);
+                $oa_link = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_oa_list_item'],'oa_viewuri');
             break;  
-            default: 
-                $oa_link = Shortcodes::get_template_permalink($GLOBALS['arlo_oa_list_item']['et_post_name'], $GLOBALS['arlo_oa_list_item']['et_region']);
+            default:
+                if ( array_key_exists('et_post_name',$GLOBALS['arlo_oa_list_item']) ) {
+                    $oa_link = Shortcodes::get_template_permalink($GLOBALS['arlo_oa_list_item']['et_post_name'], 
+                        $GLOBALS['arlo_oa_list_item']['et_region']);
+                }
             break;
         }
         
@@ -538,12 +580,12 @@ class OnlineActivities {
         // Basic
         $oa_snippet['@context'] = 'http://schema.org';
         $oa_snippet['@type'] = 'OnDemandEvent';
-        $oa_snippet['name'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_oa_list_item']['oa_name']);
+        $oa_snippet['name'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_oa_list_item'],'oa_name');
 
         $oa_snippet['url'] = $oa_link;
 
         if (!empty($GLOBALS['arlo_oa_list_item']['et_descriptionsummary'])) {
-            $oa_snippet['description'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_oa_list_item']['et_descriptionsummary']);
+            $oa_snippet['description'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_oa_list_item'],'et_descriptionsummary');
         }
 
 
@@ -566,7 +608,7 @@ class OnlineActivities {
             $oa_snippet["offers"]['url'] = $oa_link;
         }
 
-        return Shortcodes::create_rich_snippet( json_encode($oa_snippet) );
+        return $oa_snippet;
     }
 
 }

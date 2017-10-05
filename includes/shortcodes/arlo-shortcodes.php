@@ -217,7 +217,7 @@ class Shortcodes {
         $p_link = '';
         switch ($link) {
             case 'viewuri': 
-                $p_link = Shortcodes::get_rich_snippet_field($presenter["p_viewuri"]);
+                $p_link = self::get_rich_snippet_field($presenter,"p_viewuri");
             break;  
             default:
             	$p_post_id = empty($presenter['post_id']) ? $presenter['p_post_id'] : $presenter['post_id'];
@@ -233,7 +233,7 @@ class Shortcodes {
         	$performer["description"] = $presenter["p_profile"];
         }
 
-        $same_as = array($p_link);
+        $same_as = array();
 
         if (!empty($presenter["p_twitterid"])) {
         	array_push($same_as,"https://www.twitter.com/".$presenter["p_twitterid"]);
@@ -247,7 +247,9 @@ class Shortcodes {
         	array_push($same_as,"https://www.linkedin.com/".$presenter["p_linkedinid"]);
         }
 
-        $performer["sameAs"] = $same_as;
+        if (!empty($same_as)) {
+	        $performer["sameAs"] = $same_as;
+        }
 
         return $performer;
     }
@@ -480,8 +482,8 @@ class Shortcodes {
         return $offers;
 	}
 
-	public static function get_rich_snippet_field($field) {
-		return !empty($field) ? $field : '';
+	public static function get_rich_snippet_field($event, $field) {
+		return array_key_exists($field,$event) ? ( !empty($event[$field]) ? $event[$field] : '' ) : '';
 	}
 
     public static function get_template_permalink($post_name, $region) {

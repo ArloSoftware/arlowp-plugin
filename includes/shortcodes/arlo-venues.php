@@ -57,15 +57,29 @@ class Venues {
     }
     
     private static function shortcode_venue_list_item($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        $items = self::get_venues($atts,$import_id);
+
+        $output = '';
+
+        foreach($items as $item) {
+            $GLOBALS['arlo_venue_list_item'] = $item;
+            $output .= do_shortcode($content);
+            unset($GLOBALS['arlo_venue_list_item']);
+        }
+
+        return $output;        
+    }
+
+    private static function get_venues($atts,$import_id) {
         global $wpdb;
-	
+
         $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
         $offset = (get_query_var('paged') && intval(get_query_var('paged')) > 0) ? intval(get_query_var('paged')) * $limit - $limit: 0 ;
 
         $t1 = "{$wpdb->prefix}arlo_venues";
         $t2 = "{$wpdb->prefix}posts";
 
-        $items = $wpdb->get_results(
+        return $wpdb->get_results(
             "SELECT 
                 v.*, 
                 post.ID as post_id
@@ -85,20 +99,6 @@ class Venues {
                 v.v_name ASC
             LIMIT 
                 $offset, $limit", ARRAY_A);
-
-        $output = '';
-
-        foreach($items as $item) {
-
-            $GLOBALS['arlo_venue_list_item'] = $item;
-
-            $output .= do_shortcode($content);
-
-            unset($GLOBALS['arlo_venue_list_item']);
-
-        }
-
-        return $output;        
     }
     
     private static function shortcode_venue_name($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -260,25 +260,64 @@ class Venues {
         return $GLOBALS['arlo_venue_list_item']['v_facilityinfoparking'];        
     }
 
+    private static function shortcode_venue_list_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        extract(shortcode_atts(array(
+            'link' => 'permalink'
+        ), $atts, $shortcode_name, $import_id));
+
+        $items = self::get_venues($atts,$import_id);
+
+        $snippet_list_items = array();
+        
+        if (is_array($items) && count($items)) {
+            foreach($items as $key => $item) {
+                $GLOBALS['arlo_venue_list_item'] = $item;
+
+                $venue = self::get_venue_snippet($GLOBALS['arlo_venue_list_item'], $link);
+
+                $list_item_snippet = array();
+                $list_item_snippet['@type'] = 'ListItem';
+                $list_item_snippet['position'] = $key + 1;
+                $list_item_snippet['item'] = $venue;
+
+                array_push($snippet_list_items,$list_item_snippet);
+
+                unset($GLOBALS['arlo_venue_list_item']);
+            }
+        }
+
+        $item_list = array();
+        $item_list['@type'] = 'ItemList';
+        $item_list['itemListElement'] = $snippet_list_items;
+
+        return Shortcodes::create_rich_snippet( json_encode($item_list) ); 
+    }
+
     private static function shortcode_venue_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         extract(shortcode_atts(array(
             'link' => 'permalink'
         ), $atts, $shortcode_name, $import_id));
 
+        $venue_snippet = self::get_venue_snippet($link);
+
+        return Shortcodes::create_rich_snippet( json_encode($venue_snippet) ); 
+    }
+
+    private static function get_venue_snippet($link) {
         $venue_snippet = array();
 
         // Basic
         $venue_snippet = array();
         $venue_snippet["@type"] = "Place";
-        $venue_snippet["name"] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_venue_list_item']['v_name']);
+        $venue_snippet["name"] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_venue_list_item'],'v_name');
 
         $v_link = '';
         switch ($link) {
             case 'viewuri': 
-                $v_link = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_venue_list_item']['v_viewuri']);
+                $v_link = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_venue_list_item'],'v_viewuri');
             break;  
             default: 
-                $v_link = get_permalink(arlo_get_post_by_name(Shortcodes::get_rich_snippet_field($GLOBALS['arlo_venue_list_item']['v_post_name']), 'arlo_venue'));
+                $v_link = get_permalink(arlo_get_post_by_name(Shortcodes::get_rich_snippet_field($GLOBALS['arlo_venue_list_item'],'v_post_name'), 'arlo_venue'));
             break;
         }
         
@@ -286,7 +325,6 @@ class Venues {
 
         if (!empty($v_link)) {
             $venue_snippet["url"] = $v_link;
-            $venue_snippet["sameAs"] = $v_link;
         }
 
         // Address
@@ -307,6 +345,8 @@ class Venues {
 
                     $address .= ( !empty($GLOBALS['arlo_venue_list_item']["v_physicaladdressline4"]) ? ' ' . $GLOBALS['arlo_venue_list_item']["v_physicaladdressline4"] : "");
 
+                    $address .= ( !empty($GLOBALS['arlo_venue_list_item']["v_physicaladdresssuburb"]) ? ' ' . $GLOBALS['arlo_venue_list_item']["v_physicaladdresssuburb"] : "");
+
                     $venue_snippet["address"]["streetAddress"] = $address;
                 }
 
@@ -323,7 +363,24 @@ class Venues {
                 }
         }
 
-        return Shortcodes::create_rich_snippet( json_encode($venue_snippet) ); 
+        // Geo coordinates
+        $geolatitude = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_venue_list_item'],'v_geodatapointlatitude');
+        $geolongitude = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_venue_list_item'],'v_geodatapointlongitude');
+
+        if ( !empty($geolatitude) || !empty($geolongitude) ) {
+            $venue_snippet["location"]["geo"] = array();
+            $venue_snippet["location"]["geo"]["@type"] = "GeoCoordinates";
+        }
+
+        if ( !empty($geolatitude) ) {
+            $venue_snippet["location"]["geo"]["latitude"] = $geolatitude;
+        }
+
+        if ( !empty($geolatitude) ) {
+            $venue_snippet["location"]["geo"]["longitude"] = $geolongitude;
+        }
+
+        return $venue_snippet;
     }
 
 }
