@@ -12,5 +12,6 @@
 		</ul>
 	</li>
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_list_item" target="_blank">[/arlo_venue_list_item]</a></li>
+	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/presenterrelated#arlo_venue_list_rich_snippet" target="_blank">[arlo_venue_list_rich_snippet]</a></li>
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_list_pagination" target="_blank">[arlo_venue_list_pagination]</a></li>
 </ul>

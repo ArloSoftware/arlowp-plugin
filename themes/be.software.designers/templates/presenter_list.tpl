@@ -19,4 +19,5 @@
         [arlo_presenter_list_pagination]
     </div>
     [arlo_powered_by]
+    [arlo_presenter_list_rich_snippet]
 </div>

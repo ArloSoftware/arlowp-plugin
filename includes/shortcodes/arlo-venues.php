@@ -370,13 +370,7 @@ class Venues {
         if ( !empty($geolatitude) || !empty($geolongitude) ) {
             $venue_snippet["location"]["geo"] = array();
             $venue_snippet["location"]["geo"]["@type"] = "GeoCoordinates";
-        }
-
-        if ( !empty($geolatitude) ) {
             $venue_snippet["location"]["geo"]["latitude"] = $geolatitude;
-        }
-
-        if ( !empty($geolatitude) ) {
             $venue_snippet["location"]["geo"]["longitude"] = $geolongitude;
         }
 

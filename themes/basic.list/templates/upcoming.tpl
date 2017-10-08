@@ -41,3 +41,4 @@
 [arlo_no_event_text]
 [arlo_upcoming_list_pagination limit="50"]
 [arlo_powered_by]
+[arlo_upcoming_list_rich_snippet]

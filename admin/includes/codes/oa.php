@@ -15,4 +15,5 @@
 	</li>
 	<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivitylistrelated#arlo_onlineactivites_list_item" target="_blank">[/arlo_onlineactivites_list_item]</a>
 	<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivitylistrelated#arlo_onlineactivites_list_pagination" target="_blank">[arlo_onlineactivites_list_pagination]</a></li>
+	<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivitylistrelated#arlo_onlineactivities_list_rich_snippet" target="_blank">[arlo_onlineactivities_list_rich_snippet]</a></li>
 </ul>

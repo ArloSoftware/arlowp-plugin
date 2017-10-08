@@ -9,4 +9,5 @@
 </ul>
 
 [arlo_presenter_list_pagination]
+[arlo_presenter_list_rich_snippet]
 [arlo_powered_by]

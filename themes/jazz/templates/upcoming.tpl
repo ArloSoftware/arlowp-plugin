@@ -43,4 +43,5 @@
 	[arlo_no_event_text]
 	[arlo_upcoming_list_pagination limit="20" wrap='<div class="arlo-pagination">%s</div>']
 	[arlo_powered_by]
+	[arlo_upcoming_list_rich_snippet]
 </div>

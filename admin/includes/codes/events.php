@@ -30,6 +30,7 @@
 		</ul>
 	</li>
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_list_item" target="_blank">[/arlo_event_template_list_item]</a></li>
+	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_list_rich_snippet" target="_blank">[arlo_event_template_list_rich_snippet]</a></li>
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_no_event_text" target="_blank">[arlo_no_event_text]</a></li>
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/categoryrelated#arlo_category_footer" target="_blank">[arlo_category_footer]</a></li>
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_list_pagination" target="_blank">[arlo_event_template_list_pagination]</a></li>
