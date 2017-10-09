@@ -230,7 +230,7 @@ class Shortcodes {
         $performer["url"] = $p_link;
 
         if (!empty($presenter["p_profile"])) {
-        	$performer["description"] = $presenter["p_profile"];
+        	$performer["description"] = strip_tags( $presenter["p_profile"] );
         }
 
         $same_as = array();
@@ -358,6 +358,13 @@ class Shortcodes {
                
         $arlo_region = \Arlo\Utilities::get_region_parameter();
 
+        $cache_key = md5( serialize( array( $id => $id_field ) ) );
+        $cache_category = 'ArloOffers';
+
+        if($cached = wp_cache_get($cache_key, $cache_category)) {
+            return $cached;
+        }
+
         $sql = "
         SELECT 
             offer.*,
@@ -390,6 +397,8 @@ class Shortcodes {
 
         $offers = $wpdb->get_results($sql, ARRAY_A);
 
+        wp_cache_add( $cache_key, $offers, $cache_category, 30 );
+
         return $offers;
 	}
 
@@ -401,9 +410,17 @@ class Shortcodes {
         $currency = "";
 
         foreach ($offers_array as $offer) {
+	        $replacement_price_field = strpos('inclusive',$price_field) !== false ? "replacement_amount_taxinclusive" : "replacement_amount_taxexclusive" ;
+
         	$low_price = ( $offer[$price_field] < $low_price || $low_price == 0 ? $offer[$price_field] : $low_price );
         	$high_price = ( $offer[$price_field] > $high_price || $high_price == 0 ? $offer[$price_field] : $high_price );
-        	$currency = ( $offer['o_currencycode'] < $currency || $currency == 0 ? $offer['o_currencycode'] : $currency );
+
+        	if ( array_key_exists($replacement_price_field, $offer) ) {
+	        	$low_price = ( $offer[$replacement_price_field] < $low_price ? $offer[$replacement_price_field] : $low_price );
+	        	$high_price = ( $offer[$replacement_price_field] > $high_price ? $offer[$replacement_price_field] : $high_price );
+        	}
+
+        	$currency = $offer['o_currencycode'];
         }
 
         return array(

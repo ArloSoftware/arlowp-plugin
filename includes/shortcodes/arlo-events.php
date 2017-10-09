@@ -230,9 +230,22 @@ class Events {
         $sql = 
             "SELECT 
                 $t2.*, 
+                $t1.et_descriptionsummary,
                 $t3.v_post_name,
                 $t3.v_post_id,
-                $t3.v_viewuri 
+                $t3.v_viewuri,
+                $t3.v_physicaladdressline1,
+                $t3.v_physicaladdressline2,
+                $t3.v_physicaladdressline3,
+                $t3.v_physicaladdressline4,
+                $t3.v_physicaladdresssuburb,
+                $t3.v_physicaladdresscity,
+                $t3.v_physicaladdressstate,
+                $t3.v_physicaladdresspostcode,
+                $t3.v_physicaladdresscountry,
+                $t3.v_geodatapointlatitude,
+                $t3.v_geodatapointlongitude
+
             FROM 
                 $t2
             LEFT JOIN 
@@ -401,10 +414,17 @@ class Events {
     private static function get_event_presenters($import_id) {
         global $wpdb;
 
+        $cache_key = md5( serialize( $GLOBALS['arlo_event_list_item']['e_id'] ) );
+        $cache_category = 'ArloPresenters';
+
+        if($cached = wp_cache_get($cache_key, $cache_category)) {
+            return $cached;
+        }
+
         $t1 = "{$wpdb->prefix}arlo_events_presenters";
         $t2 = "{$wpdb->prefix}arlo_presenters";
 
-        return $wpdb->get_results("
+        $result = $wpdb->get_results("
         SELECT 
             p.p_firstname, 
             p.p_lastname, 
@@ -427,6 +447,10 @@ class Events {
             p.p_arlo_id
         ORDER BY 
             exp.p_order", ARRAY_A);
+
+        wp_cache_add( $cache_key, $result, $cache_category, 30 );
+
+        return $result;
 
     }
 
