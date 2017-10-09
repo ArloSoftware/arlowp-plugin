@@ -502,10 +502,7 @@ class VersionHandler {
 				update_option('arlo_themes_settings', $theme_settings);
 				update_option('arlo_settings', $settings);
 				update_option('arlo_regions', $regions);
-
-				Logger::log("this is a test log");
-
-			break;				
+			break;
 
 		}	
 	}
