@@ -29,4 +29,3 @@
 [arlo_no_event_text]
 [arlo_schedule_pagination limit="20"]
 [arlo_powered_by]
-[arlo_event_template_list_rich_snippet]

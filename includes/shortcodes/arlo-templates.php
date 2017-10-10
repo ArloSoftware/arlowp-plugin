@@ -278,6 +278,7 @@ class Templates {
         return arlo_pagination($num, $limit);        
     }
 
+
     private static function shortcode_event_template_list_item($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $wpdb;
 
@@ -298,8 +299,10 @@ class Templates {
             $output = $GLOBALS['no_event_text'] = '';			
             
             $previous = null;
-        
-            foreach($items as $item) {
+
+            $snippet_list_items = array();
+
+            foreach($items as $key => $item) {
                 if(isset($atts['group'])) {
                     switch($atts['group']) {
                         case 'category':
@@ -319,12 +322,28 @@ class Templates {
                 $GLOBALS['arlo_event_list_item'] = $item;
                 
                 $output .= do_shortcode($content);
+
+                $et_snippet = self::get_rich_snippet_data($content, $atts, $shortcode_name, $import_id);
+
+                $list_item_snippet = array();
+                $list_item_snippet['@type'] = 'ListItem';
+                $list_item_snippet['position'] = $key + 1;
+                $list_item_snippet['item'] = $et_snippet;
+
+                array_push($snippet_list_items,$list_item_snippet);
+
                 unset($GLOBALS['arlo_eventtemplate']);
                 unset($GLOBALS['arlo_event_list_item']);
                 
                 $previous = $item;
             }
-        
+
+            $item_list = array();
+            $item_list['@type'] = 'ItemList';
+            $item_list['itemListElement'] = $snippet_list_items;
+
+            $output .= Shortcodes::create_rich_snippet( json_encode($item_list) );
+
         endif;
 
         return $output;        
@@ -853,41 +872,7 @@ class Templates {
         }
     }
 
-    private static function shortcode_event_template_list_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        global $wpdb;
-
-        $sql = self::generate_list_sql($atts, $import_id);
-
-        $items = $wpdb->get_results($sql, ARRAY_A);
-
-        $snippet_list_items = array();
-        
-        if (is_array($items) && count($items)) {
-            foreach($items as $key => $item) {
-                $GLOBALS['arlo_eventtemplate'] = $item;
-
-                $et_snippet = self::get_rich_snippet_data($content, $atts, $shortcode_name, $import_id);
-
-                $list_item_snippet = array();
-                $list_item_snippet['@type'] = 'ListItem';
-                $list_item_snippet['position'] = $key + 1;
-                $list_item_snippet['item'] = $et_snippet;
-
-                array_push($snippet_list_items,$list_item_snippet);
-
-                unset($GLOBALS['arlo_eventtemplate']);
-            }
-        }
-
-        $item_list = array();
-        $item_list['@type'] = 'ItemList';
-        $item_list['itemListElement'] = $snippet_list_items;
-
-        return Shortcodes::create_rich_snippet( json_encode($item_list) );
-    }
-
     private static function shortcode_event_template_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-
         $et_snippet = self::get_rich_snippet_data($atts,$import_id,$shortcode_name);
         return Shortcodes::create_rich_snippet( json_encode($et_snippet) );
     }

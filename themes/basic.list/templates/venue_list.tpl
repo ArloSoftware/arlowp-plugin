@@ -26,4 +26,3 @@
 
 [arlo_venue_list_pagination]
 [arlo_powered_by]
-[arlo_venue_list_rich_snippet]

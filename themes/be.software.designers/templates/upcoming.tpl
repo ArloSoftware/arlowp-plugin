@@ -55,5 +55,5 @@
 	    [arlo_upcoming_list_pagination limit="10"]
 	</div>
 	[arlo_powered_by]
-	[arlo_upcoming_list_rich_snippet]
+	
 </div>

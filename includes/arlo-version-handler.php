@@ -491,13 +491,6 @@ class VersionHandler {
 
 				$settings = $this->update_template($settings, 'oa','[/arlo_onlineactivites_list_item]',"[arlo_oa_rich_snippet]");
 
-				$settings = $this->update_template($settings, 'oa',false,'[arlo_onlineactivities_list_rich_snippet]');
-				$settings = $this->update_template($settings, 'upcoming',false,'[arlo_upcoming_list_rich_snippet]');
-				$settings = $this->update_template($settings, 'presenters',false,'[arlo_presenter_list_rich_snippet]');
-				$settings = $this->update_template($settings, 'venues',false,'[arlo_venue_list_rich_snippet]');
-				$settings = $this->update_template($settings, 'events',false,'[arlo_event_template_list_rich_snippet]');
-				$settings = $this->update_template($settings, 'schedule',false,'[arlo_event_template_list_rich_snippet]');
-
 
 				update_option('arlo_themes_settings', $theme_settings);
 				update_option('arlo_settings', $settings);

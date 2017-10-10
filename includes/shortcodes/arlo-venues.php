@@ -57,15 +57,38 @@ class Venues {
     }
     
     private static function shortcode_venue_list_item($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        extract(shortcode_atts(array(
+            'link' => 'permalink'
+        ), $atts, $shortcode_name, $import_id));
+
         $items = self::get_venues($atts,$import_id);
 
         $output = '';
 
-        foreach($items as $item) {
+        $snippet_list_items = array();
+
+        foreach($items as $key => $item) {
             $GLOBALS['arlo_venue_list_item'] = $item;
+
+            $venue = self::get_venue_snippet($GLOBALS['arlo_venue_list_item'], $link);
+
+            $list_item_snippet = array();
+            $list_item_snippet['@type'] = 'ListItem';
+            $list_item_snippet['position'] = $key + 1;
+            $list_item_snippet['item'] = $venue;
+
+            array_push($snippet_list_items,$list_item_snippet);
+
             $output .= do_shortcode($content);
+
             unset($GLOBALS['arlo_venue_list_item']);
         }
+
+        $item_list = array();
+        $item_list['@type'] = 'ItemList';
+        $item_list['itemListElement'] = $snippet_list_items;
+
+        $output .= Shortcodes::create_rich_snippet( json_encode($item_list) );
 
         return $output;        
     }
@@ -260,38 +283,6 @@ class Venues {
         return $GLOBALS['arlo_venue_list_item']['v_facilityinfoparking'];        
     }
 
-    private static function shortcode_venue_list_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        extract(shortcode_atts(array(
-            'link' => 'permalink'
-        ), $atts, $shortcode_name, $import_id));
-
-        $items = self::get_venues($atts,$import_id);
-
-        $snippet_list_items = array();
-        
-        if (is_array($items) && count($items)) {
-            foreach($items as $key => $item) {
-                $GLOBALS['arlo_venue_list_item'] = $item;
-
-                $venue = self::get_venue_snippet($GLOBALS['arlo_venue_list_item'], $link);
-
-                $list_item_snippet = array();
-                $list_item_snippet['@type'] = 'ListItem';
-                $list_item_snippet['position'] = $key + 1;
-                $list_item_snippet['item'] = $venue;
-
-                array_push($snippet_list_items,$list_item_snippet);
-
-                unset($GLOBALS['arlo_venue_list_item']);
-            }
-        }
-
-        $item_list = array();
-        $item_list['@type'] = 'ItemList';
-        $item_list['itemListElement'] = $snippet_list_items;
-
-        return Shortcodes::create_rich_snippet( json_encode($item_list) ); 
-    }
 
     private static function shortcode_venue_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         extract(shortcode_atts(array(

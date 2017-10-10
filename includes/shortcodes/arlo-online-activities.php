@@ -204,7 +204,6 @@ class OnlineActivities {
         return arlo_pagination($num,$limit);        
     }  
 
-
     private static function shortcode_onlineactivites_list_item($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $wpdb;
         $settings = get_option('arlo_settings');
@@ -222,7 +221,9 @@ class OnlineActivities {
         else :
             $previous = null;
 
-            foreach($items as $item) {
+            $snippet_list_items = array();
+
+            foreach($items as $key => $item) {
                 if(isset($atts['group'])) {
 
                     switch($atts['group']) {
@@ -247,11 +248,26 @@ class OnlineActivities {
                 
                 $output .= do_shortcode($content);
 
+                $oa_snippet = self::get_snippet_data($atts,$shortcode_name,$import_id);
+
+                $list_item_snippet = array();
+                $list_item_snippet['@type'] = 'ListItem';
+                $list_item_snippet['position'] = $key + 1;
+                $list_item_snippet['item'] = $oa_snippet;
+
+                array_push($snippet_list_items,$list_item_snippet);
+
                 unset($GLOBALS['arlo_eventtemplate']);
                 unset($GLOBALS['arlo_oa_list_item']);
                 
                 $previous = $item;
             }
+
+            $item_list = array();
+            $item_list['@type'] = 'ItemList';
+            $item_list['itemListElement'] = $snippet_list_items;
+
+            $output .= Shortcodes::create_rich_snippet( json_encode($item_list) );     
 
         endif;
 
@@ -512,40 +528,6 @@ class OnlineActivities {
         $filter_html .= '</form>';
         
         return $filter_html;
-    }
-
-    private static function shortcode_onlineactivities_list_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        global $wpdb;
-
-        $sql = self::generate_onlineactivites_list_sql($atts, $import_id);
-        $items = $wpdb->get_results($sql, ARRAY_A);
-
-        $output = '';
-
-        $snippet_list_items = array();
-
-        foreach($items as $key => $item) {
-            $GLOBALS['arlo_eventtemplate'] = $item;
-            $GLOBALS['arlo_oa_list_item'] = $item;
-            
-            $oa_snippet = self::get_snippet_data($atts,$shortcode_name,$import_id);
-
-            $list_item_snippet = array();
-            $list_item_snippet['@type'] = 'ListItem';
-            $list_item_snippet['position'] = $key + 1;
-            $list_item_snippet['item'] = $oa_snippet;
-
-            array_push($snippet_list_items,$list_item_snippet);
-
-            unset($GLOBALS['arlo_eventtemplate']);
-            unset($GLOBALS['arlo_oa_list_item']);
-        }
-        
-        $item_list = array();
-        $item_list['@type'] = 'ItemList';
-        $item_list['itemListElement'] = $snippet_list_items;
-
-        return Shortcodes::create_rich_snippet( json_encode($item_list) );     
     }
 
     private static function shortcode_oa_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {

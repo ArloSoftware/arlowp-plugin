@@ -21,5 +21,5 @@
         [arlo_venue_list_pagination]
     </div>
     [arlo_powered_by]
-    [arlo_venue_list_rich_snippet]
+    
 </div>
