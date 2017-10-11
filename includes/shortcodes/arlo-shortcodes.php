@@ -415,7 +415,7 @@ class Shortcodes {
         	$low_price = ( $offer[$price_field] < $low_price || $low_price == 0 ? $offer[$price_field] : $low_price );
         	$high_price = ( $offer[$price_field] > $high_price || $high_price == 0 ? $offer[$price_field] : $high_price );
 
-        	if ( array_key_exists($replacement_price_field, $offer) ) {
+        	if ( array_key_exists($replacement_price_field, $offer) && !empty($offer[$replacement_price_field]) ) {
 	        	$low_price = ( $offer[$replacement_price_field] < $low_price ? $offer[$replacement_price_field] : $low_price );
 	        	$high_price = ( $offer[$replacement_price_field] > $high_price ? $offer[$replacement_price_field] : $high_price );
         	}
