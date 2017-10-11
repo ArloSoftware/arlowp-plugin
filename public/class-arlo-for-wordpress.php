@@ -1359,8 +1359,18 @@ class Arlo_For_Wordpress {
 				if ($posts[0]->post_status == 'draft') {
 					wp_publish_post($posts[0]->ID);
 				}
+
+				$posts_page = $page['name'];
+
+				if ($page['name'] == 'events') {
+					$posts_page = 'event';
+				} else if ($page['name'] == 'venues') {
+					$posts_page = 'venue';
+				} else if ($page['name'] == 'presenters') {
+					$posts_page = 'presenter';
+				}
 				
-				$settings['post_types'][$page['name']]['posts_page'] = $posts[0]->ID;
+				$settings['post_types'][$posts_page]['posts_page'] = $posts[0]->ID;
 			} else {
 				$error[] = $page['name'];
 			} 
