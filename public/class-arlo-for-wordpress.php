@@ -1333,16 +1333,16 @@ class Arlo_For_Wordpress {
 		}
 		
 		$error = [];
-		
-		foreach (self::$post_types as $id => $page) {
+
+		foreach (self::$pages as $id => $page) {
 			//try to find and publish the page
 			$args = array(
-  				'name' => $id,
+  				'name' => $page['name'],
   				'post_type' => 'page',
   				'post_status' => array('publish','draft'),
   				'numberposts' => 1
 			);
-			
+
 			$posts = get_posts($args);
 			
 			if (!(is_array($posts) && count($posts) == 1)) {
@@ -1354,13 +1354,13 @@ class Arlo_For_Wordpress {
 				
 				$posts = get_posts($args);					
 			}
-							
+
 			if (is_array($posts) && count($posts) == 1) {
 				if ($posts[0]->post_status == 'draft') {
 					wp_publish_post($posts[0]->ID);
 				}
 				
-				$settings['post_types'][$id]['posts_page'] = $posts[0]->ID;
+				$settings['post_types'][$page['name']]['posts_page'] = $posts[0]->ID;
 			} else {
 				$error[] = $page['name'];
 			} 
@@ -1679,6 +1679,7 @@ class Arlo_For_Wordpress {
 				}
 			}
 		}
+
 		return $page_ids;
 	}
 }
