@@ -248,12 +248,10 @@ class OnlineActivities {
                 
                 $output .= do_shortcode($content);
 
-                $oa_snippet = self::get_snippet_data($atts,$shortcode_name,$import_id);
-
                 $list_item_snippet = array();
                 $list_item_snippet['@type'] = 'ListItem';
                 $list_item_snippet['position'] = $key + 1;
-                $list_item_snippet['item'] = $oa_snippet;
+                $list_item_snippet['url'] = $item['et_viewuri'];
 
                 array_push($snippet_list_items,$list_item_snippet);
 

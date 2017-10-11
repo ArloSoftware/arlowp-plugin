@@ -70,12 +70,10 @@ class Venues {
         foreach($items as $key => $item) {
             $GLOBALS['arlo_venue_list_item'] = $item;
 
-            $venue = self::get_venue_snippet($GLOBALS['arlo_venue_list_item'], $link);
-
             $list_item_snippet = array();
             $list_item_snippet['@type'] = 'ListItem';
             $list_item_snippet['position'] = $key + 1;
-            $list_item_snippet['item'] = $venue;
+            $list_item_snippet['url'] = $item['v_viewuri'];
 
             array_push($snippet_list_items,$list_item_snippet);
 

@@ -72,12 +72,10 @@ class Presenters {
 
             $GLOBALS['arlo_presenter_list_item'] = $item;
 
-            $performer = Shortcodes::get_performer($GLOBALS['arlo_presenter_list_item'], $link);
-
             $list_item_snippet = array();
             $list_item_snippet['@type'] = 'ListItem';
             $list_item_snippet['position'] = $key + 1;
-            $list_item_snippet['item'] = $performer;
+            $list_item_snippet['url'] = $item['p_viewuri'];
 
             array_push($snippet_list_items,$list_item_snippet);
 
