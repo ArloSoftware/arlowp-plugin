@@ -57,17 +57,52 @@ class Presenters {
         return arlo_pagination($num,$limit);        
     }
 
+    private static function shortcode_presenter_list_item($content = '', $atts = [], $shortcode_name = '', $import_id = '') { 
+        extract(shortcode_atts(array(
+            'link' => 'permalink'
+        ), $atts, $shortcode_name, $import_id));
 
-    private static function shortcode_presenter_list_item($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        $items = self::get_presenters($atts,$import_id);
+
+        $output = '';
+
+        $snippet_list_items = array();
+
+        foreach($items as $key => $item) {
+
+            $GLOBALS['arlo_presenter_list_item'] = $item;
+
+            $list_item_snippet = array();
+            $list_item_snippet['@type'] = 'ListItem';
+            $list_item_snippet['position'] = $key + 1;
+            $list_item_snippet['url'] = $item['p_viewuri'];
+
+            array_push($snippet_list_items,$list_item_snippet);
+
+            $output .= do_shortcode($content);
+
+            unset($GLOBALS['arlo_presenter_list_item']);
+        }
+
+        $item_list = array();
+        $item_list['@type'] = 'ItemList';
+        $item_list['itemListElement'] = $snippet_list_items;
+
+        $output .= Shortcodes::create_rich_snippet( json_encode($item_list) );
+
+        return $output;        
+    }
+
+    private static function get_presenters($atts, $import_id) {
         global $wpdb;
-        
+
         $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
         $offset = (get_query_var('paged') && intval(get_query_var('paged')) > 0) ? intval(get_query_var('paged')) * $limit - $limit: 0 ;
 
         $t1 = "{$wpdb->prefix}arlo_presenters";
         $t2 = "{$wpdb->prefix}posts";
 
-        $items = $wpdb->get_results(
+        return $wpdb->get_results(
            "SELECT 
                 p_arlo_id,
                 p_id,
@@ -99,20 +134,6 @@ class Presenters {
                 BY p.p_firstname ASC, p.p_lastname ASC
             LIMIT 
                 $offset, $limit", ARRAY_A);
-
-        $output = '';
-
-        foreach($items as $item) {
-
-            $GLOBALS['arlo_presenter_list_item'] = $item;
-
-            $output .= do_shortcode($content);
-
-            unset($GLOBALS['arlo_presenter_list_item']);
-
-        }
-
-        return $output;        
     }
     
     private static function shortcode_presenter_name($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -210,7 +231,6 @@ class Presenters {
 
         // else return a tag with the link text
         } else {
-
             $link = '<a href="';
 
             switch($network) {

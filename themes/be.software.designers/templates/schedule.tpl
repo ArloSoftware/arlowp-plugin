@@ -31,6 +31,7 @@
              [arlo_event_next_running limit="3"]
           </div>
         </li>
+      [arlo_event_template_rich_snippet]
     [/arlo_event_template_list_item]
 </ul>
 
@@ -38,4 +39,5 @@
 [arlo_no_event_text]
 [arlo_schedule_pagination limit="10" wrap='<div class="arlo-pagination">%s</div>']
 [arlo_powered_by]
+
 </div>

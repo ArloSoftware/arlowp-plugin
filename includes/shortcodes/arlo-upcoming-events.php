@@ -113,14 +113,23 @@ class UpcomingEvents {
             
         else :
             $previous = null;
-            foreach($items as $item) {
 
+            $snippet_list_items = array();
+
+            foreach($items as $key => $item) {
                 if(is_null($previous) || date('m',strtotime($item['e_startdatetime'])) != date('m',strtotime($previous['e_startdatetime']))) {
                     $item['show_divider'] = strftime('%B', strtotime($item['e_startdatetime']));
                 }
 
                 $GLOBALS['arlo_event_list_item'] = $item;
                 $GLOBALS['arlo_eventtemplate'] = $item;
+
+                $list_item_snippet = array();
+                $list_item_snippet['@type'] = 'ListItem';
+                $list_item_snippet['position'] = $key + 1;
+                $list_item_snippet['url'] = $item['e_viewuri'];
+
+                array_push($snippet_list_items,$list_item_snippet);
 
                 $output .= do_shortcode($content);
 
@@ -130,6 +139,13 @@ class UpcomingEvents {
                 $previous = $item;
 
             }
+
+            $item_list = array();
+            $item_list['@type'] = 'ItemList';
+            $item_list['itemListElement'] = $snippet_list_items;
+
+            $output .= Shortcodes::create_rich_snippet( json_encode($item_list) );
+
 
         endif;
 
@@ -506,8 +522,20 @@ class UpcomingEvents {
             o.o_formattedamounttaxinclusive, 
             o_offeramounttaxinclusive, 
             o.o_taxrateshortcode, 
+            v.v_name, 
             v.v_post_name, 
-            v.v_post_id   
+            v.v_post_id,
+            v.v_physicaladdressline1,
+            v.v_physicaladdressline2,
+            v.v_physicaladdressline3,
+            v.v_physicaladdressline4,
+            v.v_physicaladdresssuburb,
+            v.v_physicaladdresscity,
+            v.v_physicaladdressstate,
+            v.v_physicaladdresspostcode,
+            v.v_physicaladdresscountry,
+            v.v_geodatapointlatitude,
+            v.v_geodatapointlongitude
             ';
 
             $order = '

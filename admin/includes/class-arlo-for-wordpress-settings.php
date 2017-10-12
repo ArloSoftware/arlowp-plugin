@@ -53,6 +53,8 @@ class Arlo_For_Wordpress_Settings {
 		
 		if(isset($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress') {
 			add_action( 'admin_notices', array($notice_handler, "arlo_notices") );
+
+			add_action( 'admin_notices', array($notice_handler, "welcome_notice") );
 			
 			if (!empty($settings_object['platform_name'])) {
 				$show_notice = false;
@@ -131,8 +133,6 @@ class Arlo_For_Wordpress_Settings {
 				}
 				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress') );
 			}
-						
-			add_action( 'admin_notices', array($notice_handler, "welcome_notice") );
 			
 			add_action( 'admin_print_scripts', array($this, "arlo_check_current_tasks") );			
 		}
@@ -778,6 +778,16 @@ class Arlo_For_Wordpress_Settings {
 	    <h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
 	    	<ul class="arlo-whatsnew-list">	  
+				<li>Support structured meta data (rich snippets) for events, online activities, templates, venues and presenters</li>
+				<li>New "Schedule" page</li>
+				<li>New "[arlo_event_notice]" shortcode</li>
+				<li>Many bug fixes</li>
+			</ul>
+		</p>		
+
+	    <h4>Version 3.2.1</h4>
+		<p>
+	    	<ul class="arlo-whatsnew-list">	  
 				<li>New online activities global shortcode <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#arlo_onlineactivites_list" target="_blank">[arlo_onlineactivites_list]</a></li>
 				<li>New options for <a href="https://developer.arlo.co/doc/wordpress/widgets#widget-upcoming-events" target="_blank">Upcoming events widget</a></li>
 				<li>New settings to customize <a href="https://developer.arlo.co/doc/wordpress/settings#filters" target="_blank">Filters</a></li>
@@ -785,9 +795,7 @@ class Arlo_For_Wordpress_Settings {
 				<li>The plugin is fully compatible with PHP 7</li>
 				<li>Many bug fixes</li>
 			</ul>
-		</p>		
-
-
+		</p>
 
 		<h4>Version 3.1.2</h4>
 		<p>
@@ -804,28 +812,8 @@ class Arlo_For_Wordpress_Settings {
 				<li>Fix timezone issues on the upcoming events widget</li>
 	    		<li>Fix timezone error if the WP hasn\'t got a named timezone</li>
 	    	</ul>
-	    </p>			    
-		<h4>Version 3.0.1</h4>
-		<p>
-	    	<ul class="arlo-whatsnew-list">	  
-				<li>Enhance time zone indicators on events</li>
-	    		<li>Fix permission issues with WPEngine hosting</li>
-				<li>Fix missing session information on a reginalized platform</li>
-				<li>Fix saving tags for multisession events</li>
-				<li>Other minor fixes and improvements</li>
-	    	</ul>
-	    </p>		
-		<h4>Version 3.0</h4>
-	    <p>
-	    	<ul class="arlo-whatsnew-list">	    
-	    		<li>New, improved, more reliable <a href="http://developer.arlo.co/doc/wordpress/import#import-snapshot" target="_blank">snapshot import</a></li>
-				<li>New <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_filters" target="_blank">[arlo_event_filters]</a> shortcode</li>
-				<li>New <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/#arlo_search_field" target="_blank">[arlo_search_field]</a> shortcode</li>
-				<li>Minor fixes and improvements</li>
-				<li>Revamp the codebase behind the plugin</li>
-				<li>New built-in theme selection</li>
-	    	</ul>
-	    </p>
+		</p>
+		<a href="https://wordpress.org/plugins/arlo-training-and-event-management-system/#developers" target="_blank">More change log</a>
 	    ';
 	}
 	
@@ -869,6 +857,7 @@ class Arlo_For_Wordpress_Settings {
 				<li><a href="https://support.arlo.co/hc/en-gb/sections/202320663-Website-Integration-Information" target="_blank">General Arlo website integration documentation</a> - General documentation on Arlo website integration including checkout and registration page options, custom URLs and the Arlo web team’s services.   </li>
 				<li><a href="https://support.arlo.co/hc/en-gb/sections/202320703-WordPress-Plugin" target="_blank">Arlo for WordPress support  documentation</a> - Documentation on Arlo for WordPress plugin including the synchronisation between Arlo and WordPress, FAQ’s and troubleshooting.  </li>
 				<li><a href="https://support.arlo.co/hc/en-gb/sections/115000452543-WordPress-Control-Themes" target="_blank">Arlo for WordPress control themes</a> - Documentation on the available Arlo for WordPress control themes and customisation options.</li>
+				<li><a href="https://support.arlo.co/hc/en-gb/articles/115004910003-Website-WordPress-test-cases" target="_blank">Arlo for WordPress test plan</a> - Important test script to run through before your site goes live
 			</ul>
 		</p>
 		';

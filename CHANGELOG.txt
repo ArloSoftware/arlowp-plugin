@@ -1,3 +1,19 @@
+== V3.3 ==
+
+Enhancement
+------------------
+Support structured meta data (rich snippets) for events, online activities, templates, venues and presenters
+New 'Schedule' page
+New '[arlo_event_notice]' shortcode
+
+
+Bugfixes
+------------------
+Template doesn't appear in multiple categories 
+Suggest template section doesn't display all templates from multiple categories
+OnlineActivity template doesn't load by default in some cases
+Internal theme files doesn't load in some cases
+
 == V3.2 ==
 
 Enhancement

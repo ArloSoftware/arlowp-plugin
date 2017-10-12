@@ -106,4 +106,13 @@ class Utilities {
         
         return $files;
     }
+
+    public static function get_absolute_url($rel) {
+        if (parse_url($rel, PHP_URL_SCHEME) != '' || empty($rel)) {
+            return ($rel);
+        }
+
+        return (get_home_url() . $rel);
+    }
+
 }

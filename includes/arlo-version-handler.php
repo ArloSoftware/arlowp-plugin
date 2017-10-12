@@ -481,7 +481,7 @@ class VersionHandler {
 
 				$settings = $this->update_template($settings, 'venue',false,"[arlo_venue_rich_snippet]");
 
-				$settings = $this->update_template($settings, 'venues','[/arlo_venue_list_item]',"[arlo_venues_rich_snippet]");
+				$settings = $this->update_template($settings, 'venues','[/arlo_venue_list_item]',"[arlo_venue_rich_snippet]");
 
 				$settings = $this->update_template($settings, 'events','[/arlo_event_template_list_item]',"[arlo_event_template_rich_snippet]");
 
@@ -491,11 +491,11 @@ class VersionHandler {
 
 				$settings = $this->update_template($settings, 'oa','[/arlo_onlineactivites_list_item]',"[arlo_oa_rich_snippet]");
 
-				update_option( 'arlo_themes_settings', $theme_settings );
-				update_option( 'arlo_settings', $settings );
-				update_option('arlo_regions', $regions);
 
-			break;				
+				update_option('arlo_themes_settings', $theme_settings);
+				update_option('arlo_settings', $settings);
+				update_option('arlo_regions', $regions);
+			break;
 
 		}	
 	}

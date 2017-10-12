@@ -9,7 +9,8 @@
 			<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivityrelated#arlo_oa_offers" target="_blank">[arlo_oa_offers]</a></li>
 			<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivityrelated#arlo_oa_registration" target="_blank">[arlo_oa_registration]</a></li>
 			<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivityrelated#arlo_oa_reference_term" target="_blank">[arlo_oa_reference_term]</a></li>
-			<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivityrelated#arlo_oa_credits" target="_blank">[arlo_oa_credits]</a></li>			
+			<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivityrelated#arlo_oa_credits" target="_blank">[arlo_oa_credits]</a></li>	
+			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivityrelated#arlo_oa_rich_snippet" target="_blank">[arlo_oa_rich_snippet]</a></li>
 		</ul>
 	</li>
 	<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivitylistrelated#arlo_onlineactivites_list_item" target="_blank">[/arlo_onlineactivites_list_item]</a>

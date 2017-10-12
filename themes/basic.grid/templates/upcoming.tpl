@@ -40,4 +40,5 @@
 	[arlo_no_event_text]
 	[arlo_upcoming_list_pagination limit="20"]
 </div>
+
 [arlo_powered_by]

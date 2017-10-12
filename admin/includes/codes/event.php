@@ -22,7 +22,6 @@
 					<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_end_date" target="_blank">[arlo_event_end_date]</a></li>
 					<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_location" target="_blank">[arlo_event_location]</a></li>
 					<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_provider" target="_blank">[arlo_event_provider]</a></li>
-					<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_notice" target="_blank">[arlo_event_notice]</a></li>
 					<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_delivery" target="_blank">[arlo_event_delivery]</a></li>
 					<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_session_description" target="_blank">[arlo_event_session_description]</a></li>
 					<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_presenters" target="_blank">[arlo_event_presenters]</a></li>
@@ -39,10 +38,11 @@
 						 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_start_date" target="_blank">[arlo_event_start_date]</a></li>
 							<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_end_date" target="_blank">[arlo_event_end_date]</a></li>
 							<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_location" target="_blank">[arlo_event_location]</a></li>
+							<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_rich_snippet" target="_blank">[arlo_event_rich_snippet]</a></li>
 						</ul>
 					</li>
 					<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_session_list_item" target="_blank">[/arlo_event_session_list_item]</a></li>					
-					<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_tags" target="_blank">[arlo_event_template_tags]</a></li>	
+					<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_tags" target="_blank">[arlo_event_template_tags]</a></li>
 				</ul>
 			</li>
 			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_list_item" target="_blank">[/arlo_event_list_item]</a></li>
@@ -62,6 +62,7 @@
 					<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivityrelated#arlo_oa_delivery_description" target="_blank">[arlo_oa_delivery_description]</a></li>
 				 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivityrelated#arlo_oa_offers" target="_blank">[arlo_oa_offers]</a></li>
 					<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivityrelated#arlo_oa_registration" target="_blank">[arlo_oa_registration]</a></li>
+					<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivityrelated#arlo_oa_rich_snippet" target="_blank">[arlo_oa_rich_snippet]</a></li>
 				</ul>
 			</li>
 			<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivityrelated#arlo_oa_list_item" target="_blank">[/arlo_oa_list_item]</a></li>
@@ -90,6 +91,6 @@
 		</ul>
 	</li>
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_suggest_templates" target="_blank">[/arlo_suggest_templates]</a></li>
-	
+	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_rich_snippet" target="_blank">[arlo_event_template_rich_snippet]</a></li>
 	
 </ul>

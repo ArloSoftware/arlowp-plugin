@@ -25,4 +25,5 @@
 </ul>
 
 [arlo_venue_list_pagination]
+
 [arlo_powered_by]

@@ -25,7 +25,7 @@ class Events {
         });         
     }
 
-private static function shortcode_event_filters($content = '', $atts = [], $shortcode_name = '', $import_id = '') {  
+    private static function shortcode_event_filters($content = '', $atts = [], $shortcode_name = '', $import_id = '') {  
         global $post, $wpdb;
 
         extract(shortcode_atts(array(
@@ -175,6 +175,33 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
 
     private static function shortcode_event_list_item($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $post, $wpdb;
+        $sql = self::generate_events_list_sql($atts, $import_id);
+
+        $items = $wpdb->get_results($sql, ARRAY_A);
+        
+        $output = '';
+        
+        if (is_array($items) && count($items)) {
+            unset($GLOBALS['no_event']);
+            foreach($items as $key => $item) {
+        
+                $GLOBALS['arlo_event_list_item'] = $item;
+                        
+                if (!empty($atts['show']) && $key == $atts['show']) {
+                    $output .= '</ul><ul class="arlo-list arlo-show-more-hidden events">';
+                }
+        
+                $output .= do_shortcode($content);
+        
+                unset($GLOBALS['arlo_event_list_item']);
+            }	
+        } 
+        
+        return $output;        
+    }
+
+    private static function generate_events_list_sql($atts, $import_id) {
+        global $post, $wpdb;
         $settings = get_option('arlo_settings');
         
         $where = '';
@@ -203,9 +230,22 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         $sql = 
             "SELECT 
                 $t2.*, 
+                $t1.et_descriptionsummary,
                 $t3.v_post_name,
                 $t3.v_post_id,
-                $t3.v_viewuri 
+                $t3.v_viewuri,
+                $t3.v_physicaladdressline1,
+                $t3.v_physicaladdressline2,
+                $t3.v_physicaladdressline3,
+                $t3.v_physicaladdressline4,
+                $t3.v_physicaladdresssuburb,
+                $t3.v_physicaladdresscity,
+                $t3.v_physicaladdressstate,
+                $t3.v_physicaladdresspostcode,
+                $t3.v_physicaladdresscountry,
+                $t3.v_geodatapointlatitude,
+                $t3.v_geodatapointlongitude
+
             FROM 
                 $t2
             LEFT JOIN 
@@ -229,33 +269,13 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
                 e_arlo_id
             ORDER BY 
                 $t2.e_startdatetime";
-           
+
         if (count($parameters)) {
-            $sql = $wpdb->prepare($sql, $parameters);
+            return $wpdb->prepare($sql, $parameters);
         }
 
-        $items = $wpdb->get_results($sql, ARRAY_A);
-        
-        $output = '';
-        
-        if (is_array($items) && count($items)) {
-            unset($GLOBALS['no_event']);
-            foreach($items as $key => $item) {
-        
-                $GLOBALS['arlo_event_list_item'] = $item;
-                        
-                if (!empty($atts['show']) && $key == $atts['show']) {
-                    $output .= '</ul><ul class="arlo-list arlo-show-more-hidden events">';
-                }
-        
-                $output .= do_shortcode($content);
-        
-                unset($GLOBALS['arlo_event_list_item']);
-            }	
-        } 
-        
-        return $output;        
-    }    
+        return $sql;
+    }
 
     private static function shortcode_event_code($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_event_list_item']['e_code'])) return '';
@@ -394,10 +414,17 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
     private static function get_event_presenters($import_id) {
         global $wpdb;
 
+        $cache_key = md5( serialize( $GLOBALS['arlo_event_list_item']['e_id'] ) );
+        $cache_category = 'ArloPresenters';
+
+        if($cached = wp_cache_get($cache_key, $cache_category)) {
+            return $cached;
+        }
+
         $t1 = "{$wpdb->prefix}arlo_events_presenters";
         $t2 = "{$wpdb->prefix}arlo_presenters";
 
-        return $wpdb->get_results("
+        $result = $wpdb->get_results("
         SELECT 
             p.p_firstname, 
             p.p_lastname, 
@@ -420,6 +447,10 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
             p.p_arlo_id
         ORDER BY 
             exp.p_order", ARRAY_A);
+
+        wp_cache_add( $cache_key, $result, $cache_category, 30 );
+
+        return $result;
 
     }
 
@@ -723,6 +754,42 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
             'link' => 'permalink'
         ), $atts, $shortcode_name, $import_id));
 
+        $event_snippet = self::get_rich_snippet_data($content, $atts, $shortcode_name, $import_id);
+        $event_snippet = Shortcodes::create_rich_snippet( json_encode($event_snippet) );
+
+        $course_snippet = array();
+        $course_snippet['@context'] = 'http://schema.org';
+        $course_snippet['@type'] = 'Course';
+        $course_snippet['name'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'e_name');
+
+        $course_snippet['description'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'et_descriptionsummary');
+
+        $et_link = \Arlo\Utilities::get_absolute_url( self::get_et_link($GLOBALS['arlo_eventtemplate'],$link) );
+
+        $course_snippet['url'] = $et_link;
+        $course_snippet = Shortcodes::create_rich_snippet( json_encode($course_snippet) );
+
+        return $event_snippet . $course_snippet;
+    }
+
+    private static function get_et_link($event_template,$link) {
+        $et_link = '';
+        switch ($link) {
+            case 'viewuri': 
+                $et_link = Shortcodes::get_rich_snippet_field($event_template,'et_viewuri');
+            break;  
+            default: 
+                $et_link = Shortcodes::get_template_permalink($event_template['et_post_name'], $event_template['et_region']);
+            break;
+        }
+        return $et_link;
+    }
+
+    public static function get_rich_snippet_data($content, $atts, $shortcode_name, $import_id) {
+        extract(shortcode_atts(array(
+            'link' => 'permalink'
+        ), $atts, $shortcode_name, $import_id));
+
         $settings = get_option('arlo_settings');  
 
         $event_snippet = array();
@@ -730,39 +797,91 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
         // Basic
         $event_snippet['@context'] = 'http://schema.org';
         $event_snippet['@type'] = 'Event';
-        $event_snippet['name'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item']['e_name']);
+        $event_snippet['name'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'e_name');
 
         $event_snippet['startDate'] = !empty($GLOBALS['arlo_event_list_item']['e_startdatetime']) ? date(DATE_ISO8601, strtotime($GLOBALS['arlo_event_list_item']['e_startdatetime'])) : '';
         $event_snippet['endDate'] = !empty($GLOBALS['arlo_event_list_item']['e_startdatetime']) ? date(DATE_ISO8601, strtotime($GLOBALS['arlo_event_list_item']['e_finishdatetime'])) : '';
 
-
-        $et_link = '';
-        switch ($link) {
-            case 'viewuri': 
-                $et_link = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_eventtemplate']['et_viewuri']);
-            break;  
-            default: 
-                $et_link = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
-            break;
-        }
+        $et_link = \Arlo\Utilities::get_absolute_url( self::get_et_link($GLOBALS['arlo_eventtemplate'],$link) );
 
         if (!empty($GLOBALS['arlo_event_list_item']['et_descriptionsummary'])) {
-            $event_snippet['description'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item']['et_descriptionsummary']);
+            $event_snippet['description'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'et_descriptionsummary');
         }
 
         $event_snippet['url'] = $et_link;
 
-        // Location
-        $event_snippet["location"] = array();
-        $event_snippet["location"]["@type"] = "Place";
-        $event_snippet["location"]["name"] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item']['e_locationname']);
+        // Venue
+        if ( array_key_exists("location",$event_snippet) ) {
+            $event_snippet["location"] = array();
+            $event_snippet["location"]["@type"] = "Place";
 
+            $v_name = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_name');
 
-        $v_link = get_permalink(arlo_get_post_by_name(Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item']['v_post_name']), 'arlo_venue'));
+            if (!empty($name)) {
+                $event_snippet["location"]["name"] = $v_name;
+            }
 
-        if (!empty($v_link)) {
-            $event_snippet["location"]["url"] = $v_link;
-            $event_snippet["location"]["sameAs"] = $v_link;
+            if ( Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'e_locationname') == "Online" ) {
+                $event_snippet["location"]["address"] = array(
+                    "@type" => "PostalAddress",
+                    "addressLocality" => "Online"
+                );
+            } else {
+                $city = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_physicaladdresscity');
+                $state = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_physicaladdressstate');
+                $post_code = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_physicaladdresspostcode');
+                $country = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_physicaladdresscountry');
+
+                $street_address = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_physicaladdressline1') . " "
+                                . Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_physicaladdressline2') . " " 
+                                . Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_physicaladdressline3') . " " 
+                                . Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_physicaladdressline4') . " " 
+                                . Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_physicaladdresssuburb');
+                
+                if ( ( !empty($street_address) && !ctype_space($street_address) ) || 
+                    ( !empty($city) && !ctype_space($city) ) || 
+                    ( !empty($state) && !ctype_space($state) ) || 
+                    ( !empty($post_code) && !ctype_space($post_code) ) || 
+                    ( !empty($country) && !ctype_space($country) ) ) {
+                    $event_snippet["location"]["address"] = array();
+                    $event_snippet["location"]["address"]["@type"] = "PostalAddress";
+                }
+
+                if (!empty($street_address) && !ctype_space($street_address)) {
+                    $event_snippet["location"]["address"]["streetAddress"] = trim($street_address);
+                }
+
+                if (!empty($city) && !ctype_space($city)) {
+                    $event_snippet["location"]["address"]["addressLocality"] = $city;
+                }
+
+                if (!empty($post_code) && !ctype_space($post_code)) {
+                    $event_snippet["location"]["address"]["postalCode"] = $post_code;
+                }
+
+                if (!empty($state) && !ctype_space($state)) {
+                    $event_snippet["location"]["address"]["addressRegion"] = $state;
+                }
+
+                // Geo coordinates
+                $geolatitude = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_geodatapointlatitude');
+                $geolongitude = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_geodatapointlongitude');
+
+                if ( !empty($geolatitude) || !empty($geolongitude) ) {
+                    $event_snippet["location"]["geo"] = array();
+                    $event_snippet["location"]["geo"]["@type"] = "GeoCoordinates";
+                    $event_snippet["location"]["geo"]["latitude"] = $geolatitude;
+                    $event_snippet["location"]["geo"]["longitude"] = $geolongitude;
+                }
+            }
+
+            $v_link = get_permalink(arlo_get_post_by_name(Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_post_name'), 'arlo_venue'));
+            
+            $v_link = \Arlo\Utilities::get_absolute_url($v_link);
+
+            if (!empty($v_link)) {
+                $event_snippet["location"]["url"] = $v_link;
+            }
         }
 
         // OFfers
@@ -783,6 +902,13 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
             $event_snippet["offers"]["priceCurrency"] = $offers['currency'];
 
             $event_snippet["offers"]['url'] = $et_link;
+
+            if ($GLOBALS['arlo_event_list_item']["e_isfull"] == "0") {
+                $event_snippet["offers"]['availability'] = "http://schema.org/InStock";
+            } else {
+                $event_snippet["offers"]['availability'] = "http://schema.org/SoldOut";
+            }
+
         }
 
 
@@ -794,7 +920,7 @@ private static function shortcode_event_filters($content = '', $atts = [], $shor
 
         $event_snippet["performer"] = $performers;
 
-        return Shortcodes::create_rich_snippet( json_encode($event_snippet) );
+        return $event_snippet;
     }
 
     private static function shortcode_no_event_text($content = '', $atts = [], $shortcode_name = '', $import_id = '') {

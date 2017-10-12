@@ -22,5 +22,5 @@
 	</ul>
 
 	[arlo_onlineactivites_list_pagination limit="10" wrap='<div class="arlo-pagination">%s</div>']
-
+	
 </div>

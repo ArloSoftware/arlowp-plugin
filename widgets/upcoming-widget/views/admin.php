@@ -33,6 +33,7 @@
 		} ?>
 	</select>
 </p>
+<p><?php _e('AND',$this->widget_slug); ?></p>
 <p>
 	<label for="<?php echo $this->get_field_id('templatetag'); ?>"><?php _e('Filter by template tag',$this->widget_slug); ?>:</label>
 	<select id="<?php echo $this->get_field_id('templatetag'); ?>" name="<?php echo $this->get_field_name('templatetag'); ?>" class="widefat">

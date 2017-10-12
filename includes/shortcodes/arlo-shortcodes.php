@@ -147,6 +147,10 @@ class Shortcodes {
 	}
 
 	public static function create_filter($type, $items, $label=null, $group=null) {
+		if (count($items) == 0) {
+			return '';
+		}
+
 		if (!empty(get_option('arlo_filter_settings')[$group][$type][$label]) ) {
 			$label = get_option('arlo_filter_settings')[$group][$type][$label];
 		}
@@ -161,6 +165,8 @@ class Shortcodes {
 			$filter_html .= '<option value="">' . esc_html($label) . '</option>';
 
 		$selected_value = \Arlo\Utilities::clean_string_url_parameter('arlo-' . $type);
+
+		$options_html = '';
 			
 		foreach($items as $key => $item) {
 			if (empty($item['string']) && empty($item['value'])) {
@@ -170,23 +176,38 @@ class Shortcodes {
 				);
 			}
 
+			$value_label = $item['string'];
+
+			$matches = array();
+			preg_match('~([&ndash;]*\s*)(.*)~',$value_label,$matches);
+
+			$value_prefix = $matches[1];
+			$value = $matches[2];
+
 			$is_hidden = false;
 			if (!empty($hidden_filters[$group][$type])) {
-				$is_hidden = in_array(esc_html($item['string']),$hidden_filters[$group][$type]);
+				$is_hidden = in_array(esc_html($value),$hidden_filters[$group][$type]);
 			}
 
 			if (!$is_hidden) {
 				$value_label = $item['string'];
 
-				if (!empty(get_option('arlo_filter_settings')[$group][$type][$value_label])) {
-					$value_label = get_option('arlo_filter_settings')[$group][$type][$value_label];
+
+				if (!empty(get_option('arlo_filter_settings')[$group][$type][htmlspecialchars($value)])) {
+					$value_label = $value_prefix . get_option('arlo_filter_settings')[$group][$type][htmlspecialchars($value)];
 				}
 
                 $selected = (strlen($selected_value) && strtolower($selected_value) == strtolower($item['value'])) ? ' selected="selected"' : '';
 				
-				$filter_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>' . esc_html($value_label) . '</option>';
+				$options_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>' . esc_html($value_label) . '</option>';
 			}
 		}
+
+		if (strlen($options_html) == 0) {
+			return '';
+		}
+
+		$filter_html .= $options_html;
 
 		$filter_html .= '</select>';
 
@@ -205,21 +226,23 @@ class Shortcodes {
         $p_link = '';
         switch ($link) {
             case 'viewuri': 
-                $p_link = Shortcodes::get_rich_snippet_field($presenter["p_viewuri"]);
+                $p_link = self::get_rich_snippet_field($presenter,"p_viewuri");
             break;  
-            default: 
-                $p_link = get_permalink($presenter['post_id']);
+            default:
+            	$p_post_id = empty($presenter['post_id']) ? $presenter['p_post_id'] : $presenter['post_id'];
+                $p_link = get_permalink($p_post_id);
             break;
         }
 
+        $p_link = \Arlo\Utilities::get_absolute_url($p_link);
 
         $performer["url"] = $p_link;
 
         if (!empty($presenter["p_profile"])) {
-        	$performer["description"] = $presenter["p_profile"];
+        	$performer["description"] = strip_tags( $presenter["p_profile"] );
         }
 
-        $same_as = array($p_link);
+        $same_as = array();
 
         if (!empty($presenter["p_twitterid"])) {
         	array_push($same_as,"https://www.twitter.com/".$presenter["p_twitterid"]);
@@ -233,7 +256,9 @@ class Shortcodes {
         	array_push($same_as,"https://www.linkedin.com/".$presenter["p_linkedinid"]);
         }
 
-        $performer["sameAs"] = $same_as;
+        if (!empty($same_as)) {
+	        $performer["sameAs"] = $same_as;
+        }
 
         return $performer;
     }
@@ -342,15 +367,24 @@ class Shortcodes {
                
         $arlo_region = \Arlo\Utilities::get_region_parameter();
 
+        $cache_key = md5( serialize( array( $id => $id_field ) ) );
+        $cache_category = 'ArloOffers';
+
+        if($cached = wp_cache_get($cache_key, $cache_category)) {
+            return $cached;
+        }
+
         $sql = "
         SELECT 
             offer.*,
             replaced_by.o_label AS replacement_label,
             replaced_by.o_isdiscountoffer AS replacement_discount,
             replaced_by.o_currencycode AS replacement_currency_code,
-            replaced_by.o_formattedamounttaxexclusive AS replacement_amount_taxexclusive,
-			replaced_by.o_formattedamounttaxinclusive AS replacement_amount_taxinclusive,
-            replaced_by.o_message AS replacement_message
+            replaced_by.o_formattedamounttaxexclusive AS replacement_formatted_amount_taxexclusive,
+			replaced_by.o_formattedamounttaxinclusive AS replacement_formatted_amount_taxinclusive,
+            replaced_by.o_message AS replacement_message,
+            replaced_by.o_offeramounttaxexclusive AS replacement_amount_taxexclusive,
+            replaced_by.o_offeramounttaxinclusive AS replacement_amount_taxinclusive
         FROM 
             {$wpdb->prefix}arlo_offers AS offer
         LEFT JOIN 
@@ -374,6 +408,8 @@ class Shortcodes {
 
         $offers = $wpdb->get_results($sql, ARRAY_A);
 
+        wp_cache_add( $cache_key, $offers, $cache_category, 30 );
+
         return $offers;
 	}
 
@@ -385,9 +421,17 @@ class Shortcodes {
         $currency = "";
 
         foreach ($offers_array as $offer) {
+	        $replacement_price_field = strpos('inclusive',$price_field) !== false ? "replacement_amount_taxinclusive" : "replacement_amount_taxexclusive" ;
+
         	$low_price = ( $offer[$price_field] < $low_price || $low_price == 0 ? $offer[$price_field] : $low_price );
         	$high_price = ( $offer[$price_field] > $high_price || $high_price == 0 ? $offer[$price_field] : $high_price );
-        	$currency = ( $offer['o_currencycode'] < $currency || $currency == 0 ? $offer['o_currencycode'] : $currency );
+
+        	if ( array_key_exists($replacement_price_field, $offer) && !empty($offer[$replacement_price_field]) ) {
+	        	$low_price = ( $offer[$replacement_price_field] < $low_price ? $offer[$replacement_price_field] : $low_price );
+	        	$high_price = ( $offer[$replacement_price_field] > $high_price ? $offer[$replacement_price_field] : $high_price );
+        	}
+
+        	$currency = $offer['o_currencycode'];
         }
 
         return array(
@@ -423,7 +467,7 @@ class Shortcodes {
             $famount = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $o_formattedamounttaxexclusive : $o_formattedamounttaxinclusive;
 
             // set to true if there is a replacement offer returned for this event offer
-            $replaced = (!empty($replacement_amount_taxexclusive) && !empty($replacement_amount_taxinclusive));
+            $replaced = (!empty($replacement_formatted_amount_taxexclusive) && !empty($replacement_formatted_amount_taxinclusive));
 
             $offers .= '<li><span';
             // if the offer is discounted
@@ -451,7 +495,7 @@ class Shortcodes {
                 
                 // display replacement offer label if there is one
                 $offers .= (!is_null($replacement_label) || $replacement_label != '') ? esc_html($replacement_label) . ' ' : '';
-                $offers .= '<span class="amount">' . ($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $replacement_amount_taxexclusive : $replacement_amount_taxinclusive) . '</span> <span class="arlo-price-tax">' . esc_html(($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode) : sprintf(__('incl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode))) . '</span>';
+                $offers .= '<span class="amount">' . ($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $replacement_formatted_amount_taxexclusive : $replacement_formatted_amount_taxinclusive) . '</span> <span class="arlo-price-tax">' . esc_html(($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode) : sprintf(__('incl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode))) . '</span>';
                 // display replacement offer message if there is one
                 $offers .= (!is_null($replacement_message) || $replacement_message != '') ? ' ' . esc_html($replacement_message) : '';
 
@@ -466,8 +510,8 @@ class Shortcodes {
         return $offers;
 	}
 
-	public static function get_rich_snippet_field($field) {
-		return !empty($field) ? $field : '';
+	public static function get_rich_snippet_field($event, $field) {
+		return array_key_exists($field,$event) ? ( !empty($event[$field]) ? $event[$field] : '' ) : '';
 	}
 
     public static function get_template_permalink($post_name, $region) {
@@ -490,8 +534,8 @@ class Shortcodes {
         
         $et_id = arlo_get_post_by_name($post_name, 'arlo_event');
 
-        return get_permalink($et_id) . $region_link_suffix;        
-
+        return get_permalink($et_id) . $region_link_suffix;
     }
+
 
 }

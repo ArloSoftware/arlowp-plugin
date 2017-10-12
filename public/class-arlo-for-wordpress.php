@@ -241,6 +241,7 @@ class Arlo_For_Wordpress {
     	'webinar' => 'arlo-webinar-admin-notice',
     	'newpages' => 'arlo-newpages-admin-notice',
 		'wp_video' => 'arlo-wp-video',
+		'pagesetup' => 'arlo-page-setup-admin-notice',
     );     
     
 	/**
@@ -355,7 +356,17 @@ class Arlo_For_Wordpress {
 				'location' => 'Location', 
 				'templatetag' => 'Tag'
 			)
+		),
+		'schedule' => array(
+			'name' => 'Schedule',
+			'filters' => array(
+				'category' => 'Category', 
+				'delivery' => 'Delivery', 
+				'location' => 'Location', 
+				'templatetag' => 'Tag'
+			)
 		)
+
 	);
 
 
@@ -1322,16 +1333,16 @@ class Arlo_For_Wordpress {
 		}
 		
 		$error = [];
-		
-		foreach (self::$post_types as $id => $page) {
+
+		foreach (self::$pages as $id => $page) {
 			//try to find and publish the page
 			$args = array(
-  				'name' => $id,
+  				'name' => $page['name'],
   				'post_type' => 'page',
   				'post_status' => array('publish','draft'),
   				'numberposts' => 1
 			);
-			
+
 			$posts = get_posts($args);
 			
 			if (!(is_array($posts) && count($posts) == 1)) {
@@ -1343,13 +1354,23 @@ class Arlo_For_Wordpress {
 				
 				$posts = get_posts($args);					
 			}
-							
+
 			if (is_array($posts) && count($posts) == 1) {
 				if ($posts[0]->post_status == 'draft') {
 					wp_publish_post($posts[0]->ID);
 				}
+
+				$posts_page = $page['name'];
+
+				if ($page['name'] == 'events') {
+					$posts_page = 'event';
+				} else if ($page['name'] == 'venues') {
+					$posts_page = 'venue';
+				} else if ($page['name'] == 'presenters') {
+					$posts_page = 'presenter';
+				}
 				
-				$settings['post_types'][$id]['posts_page'] = $posts[0]->ID;
+				$settings['post_types'][$posts_page]['posts_page'] = $posts[0]->ID;
 			} else {
 				$error[] = $page['name'];
 			} 
@@ -1668,6 +1689,7 @@ class Arlo_For_Wordpress {
 				}
 			}
 		}
+
 		return $page_ids;
 	}
 }
