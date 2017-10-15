@@ -43,6 +43,7 @@
 				</div>
 			</div>
 		</li>	
+		[arlo_event_rich_snippet]
 		[/arlo_upcoming_list_item]
 	</ul>
 
@@ -54,4 +55,5 @@
 	    [arlo_upcoming_list_pagination limit="10"]
 	</div>
 	[arlo_powered_by]
+	
 </div>

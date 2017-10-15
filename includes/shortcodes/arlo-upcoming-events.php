@@ -27,8 +27,7 @@ class UpcomingEvents {
     private static function shortcode_upcoming_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
         
-        $arlo_region = get_query_var('arlo-region', '');
-        $regions = get_option('arlo_regions');
+        $arlo_region = \Arlo\Utilities::get_region_parameter();
 
         self::$upcoming_list_item_atts = array(
             'location' => \Arlo\Utilities::clean_string_url_parameter('arlo-location'),
@@ -38,7 +37,7 @@ class UpcomingEvents {
             'eventtag' => \Arlo\Utilities::clean_string_url_parameter('arlo-eventtag'),
             'templatetag' => \Arlo\Utilities::clean_string_url_parameter('arlo-templatetag'),
             'presenter' => \Arlo\Utilities::clean_string_url_parameter('arlo-presenter'),
-            'region' => (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '')
+            'region' => $arlo_region
         );
 
         $templates = arlo_get_option('templates');
@@ -110,18 +109,27 @@ class UpcomingEvents {
         if(empty($items)) :
         
             $no_event_text = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', 'arlo-for-wordpress');
-            $output = '<p class="arlo-no-results">' . $no_event_text . '</p>';
+            $output = '<p class="arlo-no-results">' . esc_html($no_event_text) . '</p>';
             
         else :
             $previous = null;
-            foreach($items as $item) {
 
+            $snippet_list_items = array();
+
+            foreach($items as $key => $item) {
                 if(is_null($previous) || date('m',strtotime($item['e_startdatetime'])) != date('m',strtotime($previous['e_startdatetime']))) {
                     $item['show_divider'] = strftime('%B', strtotime($item['e_startdatetime']));
                 }
 
                 $GLOBALS['arlo_event_list_item'] = $item;
                 $GLOBALS['arlo_eventtemplate'] = $item;
+
+                $list_item_snippet = array();
+                $list_item_snippet['@type'] = 'ListItem';
+                $list_item_snippet['position'] = $key + 1;
+                $list_item_snippet['url'] = $item['e_viewuri'];
+
+                array_push($snippet_list_items,$list_item_snippet);
 
                 $output .= do_shortcode($content);
 
@@ -131,6 +139,13 @@ class UpcomingEvents {
                 $previous = $item;
 
             }
+
+            $item_list = array();
+            $item_list['@type'] = 'ItemList';
+            $item_list['itemListElement'] = $snippet_list_items;
+
+            $output .= Shortcodes::create_rich_snippet( json_encode($item_list) );
+
 
         endif;
 
@@ -146,9 +161,8 @@ class UpcomingEvents {
         $famount = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $GLOBALS['arlo_event_list_item']['o_formattedamounttaxexclusive'] : $GLOBALS['arlo_event_list_item']['o_formattedamounttaxinclusive'];
         $tax = $GLOBALS['arlo_event_list_item']['o_taxrateshortcode'];
 
-        $offer = ($amount > 0) ? '<span class="arlo-amount">' . $famount .'</span> <span class="arlo-price-tax">'. 
-                ($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__(' excl. %s', 'arlo-for-wordpress'), $tax) : sprintf(__(' incl. %s', 'arlo-for-wordpress'), $tax)). '</span>' 
-                : '<span class="arlo-amount">' . htmlentities($free_text, ENT_QUOTES, "UTF-8") . '</span>';
+        $offer = ($amount > 0) ? '<span class="arlo-amount">' . $famount .'</span> <span class="arlo-price-tax">'. esc_html(($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__(' excl. %s', 'arlo-for-wordpress'), $tax) : sprintf(__(' incl. %s', 'arlo-for-wordpress'), $tax))). '</span>' 
+                : '<span class="arlo-amount">' . esc_html($free_text) . '</span>';
 
         return $offer;        
     }    
@@ -352,7 +366,6 @@ class UpcomingEvents {
 
     private static function generate_list_sql($atts, $import_id, $for_pagination = false) {
         global $wpdb;
-        $regions = get_option('arlo_regions');
         $parameters = [];
 
         $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
@@ -509,8 +522,20 @@ class UpcomingEvents {
             o.o_formattedamounttaxinclusive, 
             o_offeramounttaxinclusive, 
             o.o_taxrateshortcode, 
+            v.v_name, 
             v.v_post_name, 
-            v.v_post_id   
+            v.v_post_id,
+            v.v_physicaladdressline1,
+            v.v_physicaladdressline2,
+            v.v_physicaladdressline3,
+            v.v_physicaladdressline4,
+            v.v_physicaladdresssuburb,
+            v.v_physicaladdresscity,
+            v.v_physicaladdressstate,
+            v.v_physicaladdresspostcode,
+            v.v_physicaladdresscountry,
+            v.v_geodatapointlatitude,
+            v.v_geodatapointlongitude
             ';
 
             $order = '

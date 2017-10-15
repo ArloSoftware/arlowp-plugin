@@ -83,7 +83,7 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 	
 	function column_et_code($item) {
 		$actions = array(
-            'edit' => sprintf('<a href="https://%s/management/Courses/Course.aspx?id=%d" target="_blank">Edit</a>', esc_attr($this->platform_url), $item->et_arlo_id),
+            'edit' => sprintf('<a href="%s" target="_blank">Edit</a>', esc_url(sprintf("https://%s/management/Courses/Course.aspx?id=%d", $this->platform_url, $item->et_arlo_id))),
             'view' => sprintf('<a href="%s" target="_blank">View</a>', $item->guid),
         );
         
@@ -104,7 +104,6 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 		
 	public function get_sql_query() {
 		$where = $this->get_sql_where_expression();
-		$groupby = $this->get_sql_groupby_expression();	
 	
 		return "
 		SELECT
@@ -143,10 +142,10 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists  {
 	}		
 	
 	public function get_new_link() {
-		return sprintf('https://%s/management/Console/#/events/new/', esc_attr($this->platform_url) );
+		return esc_url(sprintf('https://%s/management/Console/#/events/new/', $this->platform_url) );
 	}
 	
 	public function get_list_link() {
-		return sprintf('https://%s/management/Courses/Courses2.aspx', esc_attr($this->platform_url) );
+		return esc_url(sprintf('https://%s/management/Courses/Courses2.aspx', $this->platform_url) );
 	}				
 }

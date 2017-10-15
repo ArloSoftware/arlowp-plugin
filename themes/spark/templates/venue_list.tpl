@@ -13,6 +13,7 @@
                 [arlo_venue_permalink wrap='<div class="arlo-venue-info-link"><a href="%s">View all venue information</a></div>']
 
             </li>
+            [arlo_venue_rich_snippet]
         [/arlo_venue_list_item]
     </ul>
 
@@ -20,4 +21,5 @@
         [arlo_venue_list_pagination]
     </div>
     [arlo_powered_by]
+    
 </div>

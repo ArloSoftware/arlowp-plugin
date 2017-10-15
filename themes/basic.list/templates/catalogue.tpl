@@ -12,7 +12,7 @@
 		</th>
 		<th>Next Running</th>
 	</tr>
-    [arlo_event_template_list_item group="category" limit="1000"]
+    [arlo_event_template_list_item group="category" limit="20"]
         [arlo_group_divider wrap='<tr class="arlo-group-divider"><th colspan="4">%s</th></tr>']
         <tr>
             <td>
@@ -22,10 +22,11 @@
             <td>[arlo_event_price showfrom="false"]</td>
             <td>[arlo_event_next_running]</td>
         </tr>
+        [arlo_event_template_rich_snippet]
     [/arlo_event_template_list_item]
 </table>
 
 [arlo_category_footer]
 [arlo_no_event_text]
-[arlo_event_template_list_pagination limit="1000"]
+[arlo_event_template_list_pagination limit="20"]
 [arlo_powered_by]

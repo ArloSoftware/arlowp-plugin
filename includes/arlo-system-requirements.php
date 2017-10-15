@@ -24,7 +24,7 @@ class SystemRequirements {
 					return ini_get('max_execution_time');
 				},
 				'check' => function($current_value, $expected_value) {
-					return intval($current_value) >= intval($expected_value);
+					return intval($current_value) >= intval($expected_value) || $current_value == 0;
 				}
 			],
 			[

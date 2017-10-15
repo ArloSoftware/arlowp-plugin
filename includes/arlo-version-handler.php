@@ -5,7 +5,7 @@ namespace Arlo;
 use Arlo\Utilities;
 
 class VersionHandler {
-	const VERSION = '3.2.1';
+	const VERSION = '3.3';
 
 	private $dbl;
 	private $message_handler;
@@ -54,10 +54,10 @@ class VersionHandler {
 		}			
 		
 		arlo_add_datamodel();	
-	
+
 		if (version_compare($old_version, '2.2.1') < 0) {
 			$this->do_update('2.2.1');
-		}	
+		}
 		
 		if (version_compare($old_version, '2.3') < 0) {
 			$this->do_update('2.3');
@@ -73,18 +73,22 @@ class VersionHandler {
 
 		if (version_compare($old_version, '3.0') < 0) {
 			$this->do_update('3.0');
-		}	
+		}
 
 		if (version_compare($old_version, '3.1') < 0) {
 			$this->do_update('3.1');
-		}	
+		}
 
 		if (version_compare($old_version, '3.1.3') < 0) {
 			$this->do_update('3.1.3');
-		}	
+		}
 
 		if (version_compare($old_version, '3.2') < 0) {
 			$this->do_update('3.2');
+		}
+
+		if (version_compare($old_version, '3.3') < 0) {
+			$this->do_update('3.3');
 		}							
 	}
 	
@@ -419,7 +423,95 @@ class VersionHandler {
 				$page_name = 'oa';
 
 				$page_ids = $this->plugin->add_pages($page_name);				
-			break;				
+			break;
+			case '3.3':
+				$theme_settings = get_option( 'arlo_themes_settings', [] );
+				$settings = get_option( 'arlo_settings', [] );
+				$regions = get_option('arlo_regions');
+
+				//Add Schedule template and OA template
+				$page_name = 'schedule';
+				$page_ids = $this->plugin->add_pages($page_name);	
+
+				$selected_theme_id = get_option( 'arlo_theme' );
+
+				foreach ($theme_settings as $theme_name => $theme_setting) {					
+					if ($selected_theme_id !== 'custom') {
+						$oa_template = file_get_contents($theme_settings[$theme_name]->dir . '/templates/oa.tpl');
+						
+						if (!empty($oa_template)) {
+							if (!array_key_exists('oa',$theme_setting->templates)) {
+								$theme_settings[$theme_name]->templates['oa'] = array( 'html' => $oa_template );
+							}
+
+							if ($theme_name == $selected_theme_id) {
+								if (!array_key_exists('oa',$settings['templates'])) {
+									$settings['templates']['oa'] = array( 'html' => $oa_template );
+								}
+							}
+						}
+
+						$schedule_template = file_get_contents($theme_settings[$theme_name]->dir . '/templates/schedule.tpl');
+						
+						if (!empty($schedule_template)) {
+							if (!array_key_exists('schedule',$theme_setting->templates)) {
+								$theme_settings[$theme_name]->templates['schedule'] = array( 'html' => $schedule_template );
+							}
+
+							if ($theme_name == $selected_theme_id) {
+								if (!array_key_exists('schedule',$settings['templates'])) {
+									$settings['templates']['schedule'] = array( 'html' => $schedule_template );
+								}
+							}
+						}
+					}
+				}
+
+				$settings['regionid'] = array_map('strtoupper',$settings['regionid']);
+				$regions = array_change_key_case($regions, CASE_UPPER);
+
+				//Add rich snippet shortcodes to templates
+				$settings = $this->update_template($settings, 'event',false,"[arlo_event_template_rich_snippet]");
+				$settings = $this->update_template($settings, 'event','[/arlo_event_list_item]',"[arlo_event_rich_snippet]");
+				$settings = $this->update_template($settings, 'event','[/arlo_oa_list_item]',"[arlo_oa_rich_snippet]");
+
+				$settings = $this->update_template($settings, 'presenter',false,"[arlo_presenter_rich_snippet]");
+
+				$settings = $this->update_template($settings, 'presenters','[/arlo_presenter_list_item]',"[arlo_presenter_rich_snippet]");
+
+				$settings = $this->update_template($settings, 'venue',false,"[arlo_venue_rich_snippet]");
+
+				$settings = $this->update_template($settings, 'venues','[/arlo_venue_list_item]',"[arlo_venue_rich_snippet]");
+
+				$settings = $this->update_template($settings, 'events','[/arlo_event_template_list_item]',"[arlo_event_template_rich_snippet]");
+
+				$settings = $this->update_template($settings, 'eventsearch','[/arlo_event_template_list_item]',"[arlo_event_template_rich_snippet]");
+
+				$settings = $this->update_template($settings, 'upcoming','[/arlo_upcoming_list_item]',"[arlo_event_rich_snippet]");
+
+				$settings = $this->update_template($settings, 'oa','[/arlo_onlineactivites_list_item]',"[arlo_oa_rich_snippet]");
+
+
+				update_option('arlo_themes_settings', $theme_settings);
+				update_option('arlo_settings', $settings);
+				update_option('arlo_regions', $regions);
+			break;
+
 		}	
-	}	
+	}
+
+	private function update_template($templates, $page, $insert_before, $shortcode) {
+		if (!empty($templates['templates'][$page]['html']) && strpos($templates['templates'][$page]['html'], $shortcode) === false) {
+			$shortcode = "\n".$shortcode."\n";
+
+			if ($insert_before) {
+				$pos = strpos($templates['templates'][$page]['html'],$insert_before);
+				$templates['templates'][$page]['html'] = substr_replace($templates['templates'][$page]['html'], $shortcode, $pos, 0);
+			} else {
+				$templates['templates'][$page]['html'] = $templates['templates'][$page]['html'] . $shortcode;
+			}
+		}
+
+		return $templates;
+	}
 }

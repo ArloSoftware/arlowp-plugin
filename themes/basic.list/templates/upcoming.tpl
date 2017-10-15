@@ -34,6 +34,7 @@
 
             [arlo_event_template_summary label='<h5>Summary</h5>' wrap='<p class="arlo-clear-both">%s</p>']
         </li>
+        [arlo_event_rich_snippet]
     [/arlo_upcoming_list_item]
 </ul>
 

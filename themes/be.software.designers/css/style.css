@@ -300,7 +300,8 @@ body.arlo {
 /* Colours */
 
 .arlo#arlo .arlo-color1,
-.arlo#arlo .arlo-next-running {
+.arlo#arlo .arlo-next-running,
+.arlo#arlo .schedule .arlo-next-running a {
     color: #1DC6BC;
 }
 
@@ -309,7 +310,6 @@ body.arlo {
 .arlo#arlo .arlo-pagination .page-numbers.prev,
 .arlo#arlo .arlo-next-running a:after,
 .arlo#arlo .arlo-next-running a:hover,
-.arlo#arlo .arlo-next-running a.arlo-register,
 .arlo-widget-upcoming .arlo-cal-month,
 .arlo-categories-widget li a:hover,
 .arlo#arlo .arlo-button {
@@ -324,7 +324,9 @@ body.arlo {
 .arlo#arlo .arlo-buttons .arlo-event-registration .arlo-places-remaining,
 .arlo#arlo .event-search-list .arlo-next-running a,
 .arlo#arlo .event-search-list .arlo-next-running a:hover,
-.arlo#arlo .event-search-list .arlo-next-running a.arlo-register {
+.arlo#arlo .event-search-list .arlo-next-running a.arlo-register,
+.arlo#arlo .arlo-next-running a.arlo-register,
+.arlo#arlo .arlo-next-running a.arlo-register:hover {
     color: #ED017B;
 }
 
@@ -344,12 +346,14 @@ body.arlo {
 .arlo#arlo select,
 .arlo#arlo .arlo-category-list li a,
 .arlo#arlo .event-search-list .arlo-next-running a,
-.arlo#arlo .event-search-list .arlo-next-running a.arlo-register:hover {
+.arlo#arlo .event-search-list .arlo-next-running a.arlo-register:hover,
+.arlo#arlo .arlo-next-running a.arlo-register {
     background-color: #F1F7FB;
 }
 
 .arlo#arlo .arlo-border-color3,
-.arlo#arlo .event-search-list .arlo-next-running a {
+.arlo#arlo .event-search-list .arlo-next-running a,
+.arlo#arlo .arlo-next-running a.arlo-register {
     border-left-color: #F1F7FB;
     border-right-color: #F1F7FB;
     border-top-color: #F1F7FB;
@@ -440,7 +444,7 @@ body.arlo {
 .arlo#arlo .arlo-pagination .page-numbers.prev:hover,
 .arlo#arlo .arlo-category-list li a:hover,
 .arlo#arlo .arlo-next-running a:hover,
-.arlo#arlo .arlo-next-running a.arlo-register,
+.arlo#arlo .catalogue .arlo-next-running a.arlo-register,
 .arlo#arlo .arlo-event-registration > a:hover,
 .arlo#arlo .arlo-show-more-link:hover,
 .arlo#arlo .arlo-oa-registration > a:hover {
@@ -782,10 +786,6 @@ body.arlo {
     }
 }
 
-.arlo#arlo .arlo-event-name {
-    line-height: 1;
-}
-
 
 
 /* Catalogue */
@@ -803,7 +803,8 @@ body.arlo {
 }
 
 @media (min-width: 550px) {
-    .arlo#arlo .arlo-catalogue-filters .arlo-category-list li {
+    .arlo#arlo .arlo-catalogue-filters .arlo-category-list li,
+    .arlo#arlo .arlo-schedule-filters .arlo-category-list li {
         float: left;
         margin-right: 5px;
     }
@@ -1206,6 +1207,8 @@ body.arlo {
     color: white;
 }
 
+
+
 /* Suggest templates */
 
 .arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates,
@@ -1274,4 +1277,81 @@ body.arlo {
 
 .arlo#arlo .arlo-filters {
     margin-bottom: 1em;
+}
+
+
+
+/* Schedule */
+
+.arlo#arlo .arlo-schedule-event {
+    padding: 1em;
+    text-align: center;
+}
+
+.arlo#arlo .arlo-schedule-event:nth-child(even) {
+    background-color: rgba(0, 0, 0, .02);
+}
+
+.arlo#arlo .schedule .arlo-event-name,
+.arlo#arlo .schedule .arlo-event-duration,
+.arlo#arlo .schedule .arlo-price,
+.arlo#arlo .schedule .arlo-next-running {
+    min-height: 1px;
+}
+
+.arlo#arlo .schedule li.arlo-cf.arlo-group-divider {
+    border-bottom: 2px solid #ECECEC;
+    margin-bottom: 1em;
+}
+
+.arlo#arlo .schedule .arlo-offers {
+    font-style: italic;
+}
+
+.arlo#arlo .schedule .arlo-next-running span {
+    display: block;
+}
+
+.arlo#arlo .schedule .arlo-next-running {
+    color: transparent;
+}
+
+.arlo#arlo .schedule .arlo-next-running a,
+.arlo#arlo .schedule .arlo-next-running span {
+    display: inline-block;
+    width: auto;
+    float: none;
+}
+
+@media (min-width: 750px) {
+    .arlo#arlo .arlo-schedule-event {
+        padding: 0;
+        text-align: left;
+    }
+
+    .arlo#arlo .arlo-schedule-event:nth-child(even) {
+        background-color: transparent;
+    }
+
+    .arlo#arlo .schedule .arlo-schedule-column {
+        float: left;
+        padding: .5em 0;
+    }
+
+    .arlo#arlo .schedule .arlo-event-name {
+        width: 40%;
+    }
+
+    .arlo#arlo .schedule .arlo-event-duration {
+        width: 15%;
+    }
+
+    .arlo#arlo .schedule .arlo-price {
+        width: 15%;
+    }
+
+    .arlo#arlo .schedule .arlo-next-running {
+        width: 30%;
+        text-align: right;
+    }
 }

@@ -110,18 +110,8 @@ class NoticeHandler {
 	}
 	
 	public function connected_platform_notice() {
-		$message = new \stdClass();
-		$message->type = 'notice';
-		$message->class = 'arlo-connected-message';
-		$message->message = '<p>
-					Arlo is connected to <strong>' . $this->settings['platform_name'] . '</strong> <span class="arlo-block">Last synchronized: <span class="arlo-last-sync-date">' . $this->importer->get_last_import_date() . ' UTC</span></span> 
-					' . (get_option('arlo_import_disabled', '0') != '1' ? '<a class="arlo-block arlo-sync-button" href="?page=arlo-for-wordpress&arlo-import">Synchronize now</a>' : '') . '
-				</p>';
-
-		echo $this->create_notice($message);
-		
 		if (strtolower($this->settings['platform_name']) === \Arlo_For_Wordpress::DEFAULT_PLATFORM) {
-			
+			$message = new \stdClass();
 			$message->class = 'updated';
 			$message->title = 'Connected to demo data';
 			$message->global = true;
@@ -136,6 +126,18 @@ class NoticeHandler {
 
 			echo $this->create_notice($message);
 		}
+
+		$message = new \stdClass();
+		$message->type = 'notice';
+		$message->class = 'arlo-connected-message';
+		$message->message = '<p>
+					Arlo is connected to <strong>' . $this->settings['platform_name'] . '</strong> <span class="arlo-block">Last synchronized: <span class="arlo-last-sync-date">' . $this->importer->get_last_import_date() . ' UTC</span></span> 
+					' . (get_option('arlo_import_disabled', '0') != '1' ? '<a class="arlo-block arlo-sync-button" href="?page=arlo-for-wordpress&arlo-import">Synchronize now</a>' : '') . '
+				</p>';
+
+		echo $this->create_notice($message);
+		
+		
 	}
 
 	public function permalink_notice() {
@@ -175,13 +177,14 @@ class NoticeHandler {
 	
 
 	public function posttype_notice() {
-
 		$message_obj = $this->create_message_object(
-				__("Page setup required.", 'arlo-for-wordpress' ),
+				__("Page setup required", 'arlo-for-wordpress' ),
 				'<p>' .  __('Arlo for WordPress requires you to setup the pages which will host event information.', 'arlo-for-wordpress' ) .' '. sprintf(__('<a href="%s" class="arlo-pages-setup">Setup pages</a>', 'arlo-for-wordpress' ), admin_url('admin.php?page=arlo-for-wordpress#pages/events')) . '</p><p>' . sprintf(__('<a target="_blank" href="%s">View documentation</a> for more information.', 'arlo-for-wordpress' ), 'http://developer.arlo.co/doc/wordpress/index#pages-and-post-types') . '</p>',
-				'error notice');
+				'error notice',
+				false,
+				true);
 
-		echo $this->create_notice($message_obj);
+		echo $this->create_user_notice('pagesetup', $message_obj);
 	}	
 
 	public function welcome_notice() {
@@ -237,6 +240,7 @@ class NoticeHandler {
 		$import_id = $this->importer->get_current_import_id();
 		
 		$events = arlo_get_post_by_name('events', 'page');
+		$schedule = arlo_get_post_by_name('schedule', 'page');
 		$upcoming = arlo_get_post_by_name('upcoming', 'page');
 		$presenters = arlo_get_post_by_name('presenters', 'page');
 		$venues = arlo_get_post_by_name('venues', 'page');
@@ -342,10 +346,12 @@ class NoticeHandler {
 					echo $this->create_user_notice('newpages',
 						$this->create_message_object(
 							__('Start editing your new pages', 'arlo-for-wordpress' ),
-							'<p>'.sprintf(__('View %s <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, %s <a href="%s" target="_blank">%s</a> %s or <a href="%s" target="_blank">%s</a> pages', 'arlo-for-wordpress' ), 
+							'<p>'.sprintf(__('View %s <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, <a href="%s" target="_blank">%s</a>, %s <a href="%s" target="_blank">%s</a> %s or <a href="%s" target="_blank">%s</a> pages', 'arlo-for-wordpress' ), 
 								$event_link,
 								$events->guid, 
 								__('Catalogue', 'arlo-for-wordpress' ), 
+								$schedule->guid,
+								__('Schedule', 'arlo-for-wordpress' ), 
 								$upcoming->guid,  
 								$upcoming->post_title,
 								$presenter_link,

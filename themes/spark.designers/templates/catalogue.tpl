@@ -33,6 +33,7 @@
                     [arlo_event_next_running label="<p>Next running</p>" buttonclass="button arlo-button" text="{%location%} {%date%}"]
                 </div>
             </li>
+            [arlo_event_template_rich_snippet]
 
         [/arlo_event_template_list_item]
     </ul>
@@ -45,4 +46,5 @@
 
     [arlo_category_footer wrap="<div class='arlo-category-footer-wrapper'><div class='arlo-category-footer'>%s</div></div>"]
     [arlo_powered_by]
+    
 </div>

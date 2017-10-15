@@ -49,7 +49,7 @@ class Arlo_For_Wordpress {
 	 *
 	 * @var     string
 	 */
-	const MIN_PHP_VERSION = '5.4.0';
+	const MIN_PHP_VERSION = '5.5.0';
 
 	/**
 	 * The default loaded theme
@@ -148,6 +148,12 @@ class Arlo_For_Wordpress {
 			'singular_name' => 'Event search',
 			'regionalized' => true
 		),
+		'schedule' => array(
+			'slug' => 'schedule',
+			'name' => 'Schedule',
+			'singular_name' => 'Schedule',
+			'regionalized' => true
+		),
 		'oa' => array(
 			'slug' => 'onlineactivities',
 			'name' => 'Online activities',
@@ -201,6 +207,12 @@ class Arlo_For_Wordpress {
 				'content' 			=> '[arlo_onlineactivites_list]',
 				'child_post_type'	=> 'event'
 			),
+			array(
+				'name'				=> 'schedule',
+				'title'				=> 'Schedule',
+				'content' 			=> '[arlo_schedule]',
+				'child_post_type'	=> 'event'
+			),
 		);  
 
     
@@ -229,6 +241,7 @@ class Arlo_For_Wordpress {
     	'webinar' => 'arlo-webinar-admin-notice',
     	'newpages' => 'arlo-newpages-admin-notice',
 		'wp_video' => 'arlo-wp-video',
+		'pagesetup' => 'arlo-page-setup-admin-notice',
     );     
     
 	/**
@@ -259,6 +272,11 @@ class Arlo_For_Wordpress {
 			'id' => 'events',
 			'shortcode' => '[arlo_event_template_list]',
 			'name' => 'Catalogue'
+		),
+		'schedule' => array(
+			'id' => 'schedule',
+			'shortcode' => '[arlo_schedule]',
+			'name' => 'Schedule',
 		),
 		'eventsearch' => array(
 			'id' => 'eventsearch',
@@ -338,7 +356,17 @@ class Arlo_For_Wordpress {
 				'location' => 'Location', 
 				'templatetag' => 'Tag'
 			)
+		),
+		'schedule' => array(
+			'name' => 'Schedule',
+			'filters' => array(
+				'category' => 'Category', 
+				'delivery' => 'Delivery', 
+				'location' => 'Location', 
+				'templatetag' => 'Tag'
+			)
 		)
+
 	);
 
 
@@ -683,7 +711,7 @@ class Arlo_For_Wordpress {
                 }
                 $plugin->get_importer()->set_import_id(date("Y", strtotime($last_import)));
             }
-                        
+
 			if ($plugin_version != VersionHandler::VERSION) {
 				$plugin->get_version_handler()->run_update($plugin_version);
 				
@@ -847,7 +875,7 @@ class Arlo_For_Wordpress {
 	public function enqueue_styles() {
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css?20170424', __FILE__ ), array(), VersionHandler::VERSION );
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-darktooltip', plugins_url( 'assets/css/libs/darktooltip.min.css', __FILE__ ), array(), VersionHandler::VERSION );
-		wp_enqueue_style( $this->plugin_slug .'-arlo-icons8', plugins_url( '../admin/assets/fonts/arlo-icons8/Arlo-WP.css', __FILE__ ), array(), VersionHandler::VERSION );
+		wp_enqueue_style( $this->plugin_slug .'-arlo-icons8', plugins_url( '../admin/assets/fonts/icons8/Arlo-WP.css', __FILE__ ), array(), VersionHandler::VERSION );
 
 		//enqueue theme related styles
 		$stored_themes_settings = get_option( 'arlo_themes_settings', [] );
@@ -1305,16 +1333,16 @@ class Arlo_For_Wordpress {
 		}
 		
 		$error = [];
-		
-		foreach (self::$post_types as $id => $page) {
+
+		foreach (self::$pages as $id => $page) {
 			//try to find and publish the page
 			$args = array(
-  				'name' => $id,
+  				'name' => $page['name'],
   				'post_type' => 'page',
   				'post_status' => array('publish','draft'),
   				'numberposts' => 1
 			);
-			
+
 			$posts = get_posts($args);
 			
 			if (!(is_array($posts) && count($posts) == 1)) {
@@ -1326,13 +1354,23 @@ class Arlo_For_Wordpress {
 				
 				$posts = get_posts($args);					
 			}
-							
+
 			if (is_array($posts) && count($posts) == 1) {
 				if ($posts[0]->post_status == 'draft') {
 					wp_publish_post($posts[0]->ID);
 				}
+
+				$posts_page = $page['name'];
+
+				if ($page['name'] == 'events') {
+					$posts_page = 'event';
+				} else if ($page['name'] == 'venues') {
+					$posts_page = 'venue';
+				} else if ($page['name'] == 'presenters') {
+					$posts_page = 'presenter';
+				}
 				
-				$settings['post_types'][$id]['posts_page'] = $posts[0]->ID;
+				$settings['post_types'][$posts_page]['posts_page'] = $posts[0]->ID;
 			} else {
 				$error[] = $page['name'];
 			} 
@@ -1427,7 +1465,7 @@ class Arlo_For_Wordpress {
 		switch($_GET['object_post_type']) {
 			case 'event':
 				//check if it's a private event				
-				if (!empty($_GET['e']) || !empty($_GET['t']) && !empty($settings['platform_name'])) {
+				if ((!empty($_GET['e']) || !empty($_GET['t'])) && !empty($settings['platform_name'])) {
 					$platform_url = strpos($settings['platform_name'], '.') !== false ? $settings['platform_name'] : $settings['platform_name'] . '.arlo.co';
 
 					$url = 'http://' . $platform_url . '/events/' . intval($_GET['arlo_id']) . '-fake-redirect-url?';
@@ -1559,7 +1597,7 @@ class Arlo_For_Wordpress {
 			$this->get_notice_handler()->dismiss_user_notice($_POST['id']);
 		}		
 		
-		echo $_POST['id'];
+		echo 0;
 		wp_die();
 	}	
 
@@ -1651,6 +1689,7 @@ class Arlo_For_Wordpress {
 				}
 			}
 		}
+
 		return $page_ids;
 	}
 }

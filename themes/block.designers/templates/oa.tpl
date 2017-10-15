@@ -14,9 +14,10 @@
 			    [arlo_oa_offers]
 			    [arlo_oa_registration]
 		</li>
+		[arlo_oa_rich_snippet]
 		[/arlo_onlineactivites_list_item]
 	</ul>
 
 	[arlo_onlineactivites_list_pagination limit="10" wrap='<div class="arlo-pagination">%s</div>']
-
+	
 </div>

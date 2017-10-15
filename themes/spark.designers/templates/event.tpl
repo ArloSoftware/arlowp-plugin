@@ -37,6 +37,7 @@
                 </div>
             </div>
         </li>
+        [arlo_event_rich_snippet]
         [/arlo_event_list_item]
     [/arlo_event_list]
 </ul>
@@ -59,6 +60,7 @@
             [arlo_oa_registration]
         </div>
     </li>
+    [arlo_oa_rich_snippet]
     [/arlo_oa_list_item]
 [/arlo_oa_list]
 </ul>

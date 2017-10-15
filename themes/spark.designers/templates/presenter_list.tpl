@@ -13,6 +13,7 @@
                 [arlo_presenter_social_link wrap='<div class="arlo-presenter-content"><h4>Social Network</h4>%s</div>']
                 [arlo_presenter_interests wrap='<div class="arlo-presenter-content"><h4>Interests</h4>%s</div>']
             </li>
+            [arlo_presenter_rich_snippet]
         [/arlo_presenter_list_item]
     </ul>
 
@@ -20,4 +21,5 @@
         [arlo_presenter_list_pagination]
     </div>
     [arlo_powered_by]
+    
 </div>

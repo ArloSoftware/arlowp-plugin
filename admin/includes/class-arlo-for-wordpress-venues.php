@@ -92,7 +92,7 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 	
 	public function column_v_name($item) {
 		$actions = array(
-            'edit' => sprintf('<a href="https://%s/management/Venues/Venue.aspx?id=%d" target="_blank">Edit</a>', esc_attr($this->platform_url), $item->v_arlo_id),
+            'edit' => sprintf(sprintf(esc_url('<a href="https://%s/management/Venues/Venue.aspx?id=%d" target="_blank">Edit</a>', $this->platform_url, $item->v_arlo_id))),
             'view' => sprintf('<a href="%s" target="_blank">View</a>', $item->guid),
         );
 
@@ -162,11 +162,11 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 	}	
 	
 	public function get_new_link() {
-		return sprintf('https://%s/management/Venues/Venue.aspx?i=1', esc_attr($this->platform_url) );
+		return esc_url(sprintf('https://%s/management/Venues/Venue.aspx?i=1', $this->platform_url) );
 	}
 	
 	public function get_list_link() {
-		return sprintf('https://%s/management/Venues/Venues.aspx', esc_attr($this->platform_url) );
+		return esc_url(sprintf('https://%s/management/Venues/Venues.aspx', $this->platform_url) );
 	}
 		
 }

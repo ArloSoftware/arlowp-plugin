@@ -29,19 +29,17 @@ class OnlineActivities {
     private static function shortcode_oa_list_item($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $post, $wpdb;
         $settings = get_option('arlo_settings');
-        $regions = get_option('arlo_regions');
 
         $where = '';
                
-        $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
-        
+        $arlo_region = \Arlo\Utilities::get_region_parameter();
+
         $t1 = "{$wpdb->prefix}arlo_eventtemplates";
         $t2 = "{$wpdb->prefix}arlo_onlineactivities";
         $t6 = "{$wpdb->prefix}arlo_offers";
         
         if (!empty($arlo_region)) {
-            $where .= ' AND ' . $t1 . '.et_region = "' . $arlo_region . '" AND ' . $t2 . '.oa_region = "' . $arlo_region . '"';
+            $where .= ' AND ' . $t1 . '.et_region = "' . esc_sql($arlo_region) . '" AND ' . $t2 . '.oa_region = "' . esc_sql($arlo_region) . '"';
         }					
         
         $sql = 
@@ -169,7 +167,7 @@ class OnlineActivities {
         $registration = '<div class="arlo-oa-registration">';
         // test if there is a register uri string, if so display the button
         if(!is_null($registeruri) && $registeruri != '') {
-            $registration .= '<a class="' . $class . ' arlo-register" href="'. esc_attr($registeruri) . '" target="_blank">' . __($registermessage, 'arlo-for-wordpress') . '</a>';
+            $registration .= '<a class="' . $class . ' arlo-register" href="'. esc_url($registeruri) . '" target="_blank">' . __($registermessage, 'arlo-for-wordpress') . '</a>';
         } else {
             $registration .= $registermessage;
         }
@@ -206,7 +204,6 @@ class OnlineActivities {
         return arlo_pagination($num,$limit);        
     }  
 
-
     private static function shortcode_onlineactivites_list_item($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $wpdb;
         $settings = get_option('arlo_settings');
@@ -216,15 +213,17 @@ class OnlineActivities {
         $items = $wpdb->get_results($sql, ARRAY_A);
 
         $output = '';
-                  
+        
         if(empty($items)) :
             $no_event_text = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No online activities to show', 'arlo-for-wordpress');
-            $output = '<p class="arlo-no-results">' . $no_event_text . '</p>';
+            $output = '<p class="arlo-no-results">' . esc_html($no_event_text) . '</p>';
             
         else :
             $previous = null;
 
-            foreach($items as $item) {
+            $snippet_list_items = array();
+
+            foreach($items as $key => $item) {
                 if(isset($atts['group'])) {
 
                     switch($atts['group']) {
@@ -249,11 +248,24 @@ class OnlineActivities {
                 
                 $output .= do_shortcode($content);
 
+                $list_item_snippet = array();
+                $list_item_snippet['@type'] = 'ListItem';
+                $list_item_snippet['position'] = $key + 1;
+                $list_item_snippet['url'] = $item['et_viewuri'];
+
+                array_push($snippet_list_items,$list_item_snippet);
+
                 unset($GLOBALS['arlo_eventtemplate']);
-                unset($GLOBALS['arlo_event_list_item']);
+                unset($GLOBALS['arlo_oa_list_item']);
                 
                 $previous = $item;
             }
+
+            $item_list = array();
+            $item_list['@type'] = 'ItemList';
+            $item_list['itemListElement'] = $snippet_list_items;
+
+            $output .= Shortcodes::create_rich_snippet( json_encode($item_list) );     
 
         endif;
 
@@ -264,10 +276,8 @@ class OnlineActivities {
     private static function generate_onlineactivites_list_sql($atts, $import_id, $for_pagination = false) {
         global $wpdb;
 
-        $regions = get_option('arlo_regions');
-        $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : ''); 
-
+        $arlo_region = \Arlo\Utilities::get_region_parameter();
+        
         $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
         $page = !empty($_GET['paged']) ? intval($_GET['paged']) : intval(get_query_var('paged'));
 
@@ -518,6 +528,67 @@ class OnlineActivities {
         return $filter_html;
     }
 
+    private static function shortcode_oa_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        $oa_snippet = self::get_snippet_data($atts,$shortcode_name,$import_id);
+        return Shortcodes::create_rich_snippet( json_encode($oa_snippet) );
+    }
 
+    private static function get_snippet_data($atts,$shortcode_name,$import_id) {
+        extract(shortcode_atts(array(
+            'link' => 'permalink'
+        ), $atts, $shortcode_name, $import_id));
+        
+        $settings = get_option('arlo_settings');  
+
+        $oa_link = '';
+        switch ($link) {
+            case 'viewuri': 
+                $oa_link = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_oa_list_item'],'oa_viewuri');
+            break;  
+            default:
+                if ( array_key_exists('et_post_name',$GLOBALS['arlo_oa_list_item']) ) {
+                    $oa_link = Shortcodes::get_template_permalink($GLOBALS['arlo_oa_list_item']['et_post_name'], 
+                        $GLOBALS['arlo_oa_list_item']['et_region']);
+                }
+            break;
+        }
+        
+        $oa_link = \Arlo\Utilities::get_absolute_url($oa_link);
+
+        $oa_snippet = array();
+
+        // Basic
+        $oa_snippet['@context'] = 'http://schema.org';
+        $oa_snippet['@type'] = 'OnDemandEvent';
+        $oa_snippet['name'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_oa_list_item'],'oa_name');
+
+        $oa_snippet['url'] = $oa_link;
+
+        if (!empty($GLOBALS['arlo_oa_list_item']['et_descriptionsummary'])) {
+            $oa_snippet['description'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_oa_list_item'],'et_descriptionsummary');
+        }
+
+
+        // OFfers
+        $price_setting = (isset($settings['price_setting'])) ? $settings['price_setting'] : ARLO_PLUGIN_PREFIX . '-exclgst';
+        $price_field = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? 'o_offeramounttaxexclusive' : 'o_offeramounttaxinclusive';
+        $offers = Shortcodes::get_offers_snippet_data($GLOBALS['arlo_oa_list_item']['oa_id'], 'oa_id', $import_id, $price_field);
+
+        if (!empty($offers)) {
+            $oa_snippet["offers"] = array();
+            $oa_snippet["offers"]["@type"] = "AggregateOffer";
+
+            $oa_snippet["offers"]["highPrice"] = $offers['high_price'];
+            $oa_snippet["offers"]["lowPrice"] = $offers['low_price'];
+
+            $oa_snippet["offers"]["price"] = $offers['low_price'];
+
+            $oa_snippet["offers"]["priceCurrency"] = $offers['currency'];
+
+            $oa_snippet["offers"]['url'] = $oa_link;
+        }
+
+        return $oa_snippet;
+    }
 
 }

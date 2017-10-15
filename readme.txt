@@ -2,8 +2,8 @@
 Contributors: ArloSoftware, adamfentosi
 Tags: online registration, event registration, training management,  event management, event plugin, training company software, training calendar, training administration, training management software, training provider, solution, events calendar, wordpress events, event ticketing, wordpress lms, class registration, conference registration,  ticket, registration, event manager, training, booking, ticketing
 Requires at least: 4.4
-Tested up to: 4.8
-Stable tag: 3.2.1
+Tested up to: 4.8.2
+Stable tag: 3.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -33,7 +33,7 @@ Arlo is a cloud-based training and event management system for managing, marketi
 * [Customer relationship management](https://www.arlo.co/features/customer-relationship-management?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) - Manage information about existing clients, and easily run campaigns to target potential customers. Arlo is a fully featured customer relationship management tool. 
 
 = Requirements =
-* PHP Version - WordPress PHP version must be 5.4 or higher.
+* PHP Version - WordPress PHP version must be 5.5 or higher.
 * Shared Server Hosting - Slow shared server hosting can cause issues with the data import. If you have shared server hosting please ensure you [set up a Cron Job](http://developer.arlo.co/doc/wordpress/import#import-cron-job?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing).
 * WordPress version - Your WordPress should be kept updated to the latest version available. 
 * Cache plugins - Caching plugins can interfere with the Arlo WordPress plugin. Once changes have been made to the Arlo plugin, ensure you clear or reset your caching plugins if you have them. 
@@ -111,7 +111,7 @@ Sign-up for a [free Arlo trial](https://www.arlo.co/register?utm_source=wordpres
 
 = Developers Guide =
 
-For more information about the shortcodes please visit the [Arlo developer site](https://developer.arlo.co/doc/wordpres/index?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
+For more information about the shortcodes please visit the [Arlo developer site](https://developer.arlo.co/doc/wordpress/index?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
 
 == Frequently Asked Questions ==
 
@@ -133,7 +133,7 @@ The plugin's documentation can be found in our [Arlo developer site](https://dev
 
 = Can I use the plugin with PHP 5.3? =
 
-The minimum requirement PHP version for the plugin is PHP 5.4.
+The minimum requirement PHP version for the plugin is PHP 5.5.
 
 = Can I log a bug? =
 
@@ -158,6 +158,16 @@ The Arlo - Training and Event Management, and online registration plugin is only
 11. Theme Jazz - Upcoming events
 
 == Changelog ==
+
+= 3.3 =
+
+Support structured meta data (rich snippets) for events, online activities, templates, venues and presenters
+New 'Schedule' page
+New '[arlo_event_notice]' shortcode
+Template doesn't appear in multiple categories 
+Suggest template section doesn't display all templates from multiple categories
+OnlineActivity template doesn't load by default in some cases
+Internal theme files doesn't load in some cases
 
 = 3.2.1 =
 

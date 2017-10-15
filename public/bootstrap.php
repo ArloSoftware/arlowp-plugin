@@ -111,7 +111,7 @@ function set_title($title, $id = null, $meta = false){
 	if (!empty($cat_slug))
 		$cat = \Arlo\Entities\Categories::get(array('slug' => $cat_slug), null, $import_id);		
 		
-	if ($id === null || !in_array($id, $pages) || $id != $post->ID || (!in_the_loop() && !$meta) || is_nav_menu_item($id)) return ['title' => $title];
+	if ($id === null || !in_array($id, $pages) || ($post && $id != $post->ID) || (!in_the_loop() && !$meta) || is_nav_menu_item($id)) return ['title' => $title];
 	
 	if(!$cat && empty($arlo_location) && empty($arlo_search)) return ['title' => $title];
 	
@@ -179,6 +179,7 @@ function arlo_register_custom_post_types() {
 		);
 		
 		// let's try some custom rewrite rules
+
 		if($page_id) {
 			switch($id) {
 				case 'upcoming':
@@ -195,6 +196,9 @@ function arlo_register_custom_post_types() {
 				case 'eventsearch':
 					add_rewrite_rule('^' . $slug . '/?(region-([^/]*))?/search/([^/]*)?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-search=$matches[3]&paged=$matches[5]','top');
 					add_rewrite_rule('^' . $slug . '/?(region-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&paged=$matches[4]','top');
+				break;
+				case 'schedule':
+					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(templatetag-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-delivery=$matches[10]&arlo-templatetag=$matches[12]&paged=$matches[14]','top');
 				break;
 				case 'presenter':
 					add_rewrite_rule('^' . $slug . '/page/([^/]*)/?','index.php?page_id=' . $page_id . '&paged=$matches[1]','top');
@@ -269,7 +273,10 @@ function arlo_register_custom_post_types() {
 	}
 			
 	foreach(Arlo_For_Wordpress::$post_types as $id => $arlo_post) {
-		if (isset($arlo_post['regionalized']) && is_bool($arlo_post['regionalized']) && $arlo_post['regionalized'] && !empty($settings['post_types'][$id]['posts_page'])) {
+		if (isset($arlo_post['regionalized']) 
+			&& is_bool($arlo_post['regionalized']) 
+			&& $arlo_post['regionalized'] 
+			&& !empty($settings['post_types'][$id]['posts_page'])) {
 			$arlo_page_ids[intval($settings['post_types'][$id]['posts_page'])] = $id;
 		}
 	}
@@ -293,7 +300,7 @@ function arlo_register_custom_post_types() {
 			
 			$location = str_replace($slug, $slug.'/region-' . $selected_region , $_SERVER['REQUEST_URI']);			
 			
-			wp_redirect($location);
+			wp_redirect(esc_url($location));
 			exit();				
 		} else {
 			setcookie("arlo-region", $selected_region, time()+60*60*24*30, '/');	
@@ -338,11 +345,8 @@ function arlo_the_content_event($content) {
 	
 	$templates = arlo_get_option('templates');
 	$content = $templates['event']['html'];
-	$regions = get_option('arlo_regions');	
-	
-	$arlo_region = get_query_var('arlo-region', '');
-	$arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
-	
+    $arlo_region = \Arlo\Utilities::get_region_parameter();	
+
 	$t1 = "{$wpdb->prefix}arlo_eventtemplates";
 	$t2 = "{$wpdb->prefix}posts";	
 	
@@ -360,7 +364,7 @@ function arlo_the_content_event($content) {
 		post.post_type = 'arlo_event' 
 	AND 
 		post.ID = $post->ID
-	" . (!empty($arlo_region) ? " AND et.et_region = '" . $arlo_region . "'" : "") . "
+	" . (!empty($arlo_region) ? " AND et.et_region = '" . esc_sql($arlo_region) . "'" : "") . "
 	ORDER 
 		BY et.et_name ASC
 	";

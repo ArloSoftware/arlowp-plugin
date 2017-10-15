@@ -32,7 +32,7 @@
                     </div>
                 </div>
             </li>
-
+            [arlo_event_template_rich_snippet]
         [/arlo_event_template_list_item]
     </ul>
 
@@ -44,4 +44,5 @@
 
     [arlo_category_footer wrap="<div class='arlo-category-footer-wrapper'><div class='arlo-category-footer'>%s</div></div>"]
     [arlo_powered_by]
+    
 </div>

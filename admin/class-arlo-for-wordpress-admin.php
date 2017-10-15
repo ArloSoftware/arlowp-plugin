@@ -646,7 +646,7 @@ class Arlo_For_Wordpress_Admin {
 		// need to check for posts-page change here
 		// loop through each post type and check if the posts-page has changed
 		foreach($new['post_types'] as $id => $post_type) {
-			if($old['post_types'][$id]['posts_page'] != $new['post_types'][$id]['posts_page']) {
+			if(isset($old['post_types'][$id]['posts_page']) && $old['post_types'][$id]['posts_page'] != $new['post_types'][$id]['posts_page']) {
 				$posts = get_posts(array(
 					'posts_per_page'	=> -1,
 					'post_type'			=> 'arlo_' . $id,

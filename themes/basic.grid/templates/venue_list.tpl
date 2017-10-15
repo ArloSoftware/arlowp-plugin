@@ -20,8 +20,10 @@
                 [arlo_venue_map height="200" width="250"]
             </div>
         </li>
+        [arlo_venue_rich_snippet]
     [/arlo_venue_list_item]
 </ul>
 
 [arlo_venue_list_pagination]
+
 [arlo_powered_by]
