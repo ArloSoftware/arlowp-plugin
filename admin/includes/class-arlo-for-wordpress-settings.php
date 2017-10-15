@@ -775,16 +775,9 @@ class Arlo_For_Wordpress_Settings {
 	    echo '
 	    <h3>What\'s new in this release</h3>
 		<p><strong>If you are experiencing problems after an update, please deactivate and re-activate the plugin and re-synchronize the data.</strong></p>
-	    <h4>Version ' .  VersionHandler::VERSION . '</h4>
+		<h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
-	    	<ul class="arlo-whatsnew-list">	  
-<<<<<<< HEAD
-				<li>Fix long running import issue, which can timeout the request</li>
-			</ul>
-		</p>
-
-		<h4>Version 3.2</h4>
-=======
+			<ul class="arlo-whatsnew-list">	  		
 				<li>Support structured meta data (rich snippets) for events, online activities, templates, venues and presenters</li>
 				<li>New "Schedule" page</li>
 				<li>New "[arlo_event_notice]" shortcode</li>
@@ -792,8 +785,15 @@ class Arlo_For_Wordpress_Settings {
 			</ul>
 		</p>		
 
+
+		<h4>Version 3.2</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">	  
+				<li>Fix long running import issue, which can timeout the request</li>
+			</ul>
+		</p>		
+
 	    <h4>Version 3.2.1</h4>
->>>>>>> release-3.3
 		<p>
 	    	<ul class="arlo-whatsnew-list">	  
 				<li>New online activities global shortcode <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#arlo_onlineactivites_list" target="_blank">[arlo_onlineactivites_list]</a></li>
@@ -803,11 +803,7 @@ class Arlo_For_Wordpress_Settings {
 				<li>The plugin is fully compatible with PHP 7</li>
 				<li>Many bug fixes</li>
 			</ul>
-<<<<<<< HEAD
-		</p>		
-=======
 		</p>
->>>>>>> release-3.3
 
 		<h4>Version 3.1.2</h4>
 		<p>
