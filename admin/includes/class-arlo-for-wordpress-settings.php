@@ -777,10 +777,15 @@ class Arlo_For_Wordpress_Settings {
 		<p><strong>If you are experiencing problems after an update, please deactivate and re-activate the plugin and re-synchronize the data.</strong></p>
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
-			<ul class="arlo-whatsnew-list">	  		
-				<li>Support structured meta data (rich snippets) for events, online activities, templates, venues and presenters</li>
-				<li>New "Schedule" page</li>
-				<li>New "[arlo_event_notice]" shortcode</li>
+	    	<ul class="arlo-whatsnew-list">	  
+				<li>Support structured meta data (rich snippets) for 
+					<a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_rich_snippet" target="_blank">events</a>, 
+					<a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivityrelated#arlo_oa_rich_snippet" target="_blank">online activities</a>, 
+					<a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_rich_snippet" target="_blank">templates</a>, 
+					<a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_rich_snippet" target="_blank">venues</a> and 
+					<a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/presenterrelated#arlo_presenter_rich_snippet" target="_blank">presenters</a></li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#arlo_schedule" target="_blank">Schedule</a> page</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_notice" target="_blank">[arlo_event_notice]</a> shortcode</li>
 				<li>Many bug fixes</li>
 			</ul>
 		</p>		
