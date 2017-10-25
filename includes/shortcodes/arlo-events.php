@@ -231,6 +231,7 @@ class Events {
             "SELECT 
                 $t2.*, 
                 $t1.et_descriptionsummary,
+                $t3.v_name,
                 $t3.v_post_name,
                 $t3.v_post_id,
                 $t3.v_viewuri,
@@ -817,6 +818,8 @@ class Events {
 
         $v_name = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_name');
         if (!empty($v_name)) {
+            $event_snippet["location"]["name"] = $v_name;
+        } else if ($v_name = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'e_locationname')) {
             $event_snippet["location"]["name"] = $v_name;
         }
 
