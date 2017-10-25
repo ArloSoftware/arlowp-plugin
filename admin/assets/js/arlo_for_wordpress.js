@@ -150,7 +150,6 @@ if (typeof (Arlo) === "undefined") {
 				parent.append(newElement);
 			}
 		},
-
 		createTaskPlaceholder: function(taskID) {
 			var me = this,
 				header = $('.arlo-wrap > h2'),
@@ -286,6 +285,27 @@ if (typeof (Arlo) === "undefined") {
 				me.arloReloadTemplate();
 			} 
 		},
+		deleteCustomShortcodeConfirm: function(e) {
+			var me = this,
+				message = "Do you really want to delete this custom shortcode?";
+
+			e.preventDefault();
+
+			if (confirm(message)) {
+				me.deleteCustomShortcode();
+			}
+		},
+		deleteCustomShortcode: function() {
+			var me = this,
+				template = $('.arlo-field-wrap:visible').attr('id'),
+				navLink = 'arlo-for-wordpress-pages-'+template.replace('arlo-', '');
+
+				$('.'+template+', '+'.'+navLink).remove();
+				window.location.hash = "#pages";
+				$('.arlo-event').show();
+				$('.arlo-for-wordpress-pages-event').addClass('nav-tab-active');
+
+		},
 		markPageSetupError: function() {
 			$('.arlo-page-select > select').each(function() {
 				if ($(this).val() == '' || $(this).val() == '0') {
@@ -420,6 +440,10 @@ if (typeof (Arlo) === "undefined") {
 			// show confirm message to reload the template from the theme		
 			$('.arlo-reload-template').on('click', function() {
 				me.arloReloadTemplateConfirm();
+			});
+
+			$('.arlo-delete-button').on('click', function(e) {
+				me.deleteCustomShortcodeConfirm(e);
 			});
 			
 			//check numeric field

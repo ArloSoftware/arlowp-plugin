@@ -20,8 +20,15 @@ class UpcomingEvents {
                 $method_name = 'shortcode_' . str_replace('arlo_', '', $shortcode_name);
                 return self::$method_name($content, $atts, $shortcode_name, $import_id);
             });
-        } 
-            
+        }
+
+        $custom_shortcodes = Shortcodes::get_custom_shortcodes('upcoming');
+
+        foreach ($custom_shortcodes as $shortcode_name => $shortcode) {
+            Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
+                return self::shortcode_upcoming_list($content = '', $atts, $shortcode_name, $import_id);
+            });
+        }
     }
 
     private static function shortcode_upcoming_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -40,8 +47,11 @@ class UpcomingEvents {
             'region' => $arlo_region
         );
 
+        $template_name = Shortcodes::get_template_name($shortcode_name,'upcoming_list','upcoming');
+
         $templates = arlo_get_option('templates');
-        $content = $templates['upcoming']['html'];
+        $content = $templates[$template_name]['html'];
+
         return do_shortcode($content);        
     }   
 
@@ -179,9 +189,11 @@ class UpcomingEvents {
         $filters_array = explode(',',$filters);
         
         $settings = get_option('arlo_settings');
+        
+        $page_type = \Arlo\Utilities::get_current_page_arlo_type();
 
         if (!empty($settings['post_types']['upcoming']['posts_page'])) {
-            $page_link = get_permalink(get_post($settings['post_types']['upcoming']['posts_page']));
+            $page_link = get_permalink(get_post($settings['post_types'][$page_type]['posts_page']));
         } else {
             $page_link = get_permalink(get_post($post));
         }

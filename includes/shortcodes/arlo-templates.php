@@ -19,6 +19,29 @@ class Templates {
                 return self::$method_name($content, $atts, $shortcode_name, $import_id);
             });
         } 
+
+
+        $custom_shortcodes = Shortcodes::get_custom_shortcodes(array('events','schedule','eventsearch'));
+
+        foreach ($custom_shortcodes as $shortcode_name => $shortcode) {
+            switch($shortcode["type"]) {
+                case 'schedule':
+                    Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
+                        return self::shortcode_schedule($content = '', $atts, $shortcode_name, $import_id);
+                    });
+                    break;
+                case 'eventsearch':
+                    Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
+                        return self::shortcode_event_template_search_list($content = '', $atts, $shortcode_name, $import_id);
+                    });
+                    break;
+                default:
+                    Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
+                        return self::shortcode_event_template_list($content = '', $atts, $shortcode_name, $import_id);
+                    });
+                    break;            
+            }
+        }
     }
     
     private static function shortcode_suggest_templates($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -230,18 +253,22 @@ class Templates {
 
     private static function shortcode_event_template_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
-        
+
+        $template_name = Shortcodes::get_template_name($shortcode_name,'event_template_list','events');
+
         $templates = arlo_get_option('templates');
-        $content = $templates['events']['html'];
+        $content = $templates[$template_name]['html'];
 
 	    return $content;
     }
 
     private static function shortcode_schedule($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
-        
+
+        $template_name = Shortcodes::get_template_name($shortcode_name,'schedule','schedule');
+
         $templates = arlo_get_option('templates');
-        $content = $templates['schedule']['html'];
+        $content = $templates[$template_name]['html'];
 
         return $content;
     }
@@ -831,7 +858,7 @@ class Templates {
         }	
         
         // grouping
-        $group = (isset($GLOBALS['arlo_group_template_by_id']) && $GLOBALS['arlo_group_template_by_id']) ? 'GROUP BY et.et_arlo_id' : '';	
+        $group = (isset($GLOBALS['arlo_group_template_by_id']) && $GLOBALS['arlo_group_template_by_id']) ? 'GROUP BY et.et_arlo_id' : '';
         $order = $limit_field = '';
         $field_list = 'et.et_id';
 
@@ -864,7 +891,7 @@ class Templates {
         LEFT JOIN $t3 etc
             ON etc.et_arlo_id = et.et_arlo_id AND etc.import_id = et.import_id
         LEFT JOIN $t4 c
-            ON c.c_arlo_id = etc.c_arlo_id AND c.import_id = etc.import_id            
+            ON c.c_arlo_id = etc.c_arlo_id AND c.import_id = etc.import_id
         $where 
         $group 
         $order

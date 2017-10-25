@@ -251,7 +251,7 @@ class Arlo_For_Wordpress_Settings {
 		// loop though slug array and create each required slug field
 	    foreach(Arlo_For_Wordpress::$templates as $id => $template) {
 	    	$name = __($template['name'], 'arlo-for-wordpress' );
-			add_settings_field( $id, '<label for="'.$id.'">'.$name.'</label>', array($this, 'arlo_template_callback'), $this->plugin_slug, 'arlo_pages_section', array('id'=>$id,'label_for'=>$id) );
+			add_settings_field( $id, '<label for="'.$id.'">'.$name.'</label>', array($this, 'arlo_template_callback'), $this->plugin_slug, 'arlo_pages_section', array('id'=>$id,'label_for'=>$id, 'type'=> isset($template["type"]) ? $template["type"] : null) );
 		}
 		
 		/*
@@ -603,15 +603,32 @@ class Arlo_For_Wordpress_Settings {
 
 	function arlo_template_callback($args) {
 		$id = $args['id'];
+		$type = isset($args['type']) ? $args['type'] : $args['id'];
 		$settings_object = get_option('arlo_settings');
-		
-		echo '<h3>' . sprintf(__('%s page', 'arlo-for-wordpress' ), Arlo_For_Wordpress::$templates[$id]['name']) . '</h3>';
-		
+		$is_new_shortcode_page = $id == 'new_custom';
+		$is_custom_shortcode = isset( $args['type'] );
+
+		echo '<h3>';
+		if ($is_new_shortcode_page) {
+			echo 'New custom shortcode';
+		} else {
+			echo sprintf(__('%s page', 'arlo-for-wordpress' ), Arlo_For_Wordpress::$templates[$id]['name']);
+
+			if ($is_custom_shortcode) {
+				echo '<a href="" class="red arlo-delete-button"><i class="arlo-icons8 arlo-icons8-cancel size-16"></i> Delete</a>';
+			}
+		}
+		echo '</h3>';
+
+    	if ($is_custom_shortcode) {
+    		echo '<h4 class="arlo-gray arlo-subhead">'.ucfirst($type).' '.__('page', 'arlo-for-wordpress' ).'</h4>';
+    	}
+
 		/*
 		HACK because the keys in the $post_types arrays are bad, couldn't change because backward comp.
 		*/
 		
-		if (in_array($id, array('eventsearch', 'upcoming', 'events', 'presenters', 'venues', 'oa', 'schedule'))) {
+		if (!in_array($id, array('event', 'presenter', 'venue'))) {
 			$post_type_id = in_array($id, array('events','presenters', 'venues')) ? substr($id, 0, strlen($id)-1) : $id;
 		}
 
@@ -635,26 +652,53 @@ class Arlo_For_Wordpress_Settings {
 				<span class="arlo-gray arlo-inlineblock">' . sprintf(__('Page must contain the %s shortcode', 'arlo-for-wordpress' ), Arlo_For_Wordpress::$templates[$id]['shortcode']) . '</span>
 			</div>';
     	}
-	    
+
+    	if ($is_new_shortcode_page) {
+			echo '
+			<div class="arlo-label"><label>' .  __("Shortcode name", 'arlo-for-wordpress' ) . '</label></div>
+			<div class="arlo-field arlo-gray">
+				<span class="arlo-new-custom-shortcode-name"> [arlo_<input type="text" name="arlo_settings[new_custom_shortcode]" class="arlo-inline-input" maxlength="15">] </span>
+			</div>';
+
+			echo '
+			<div class="arlo-label"><label>' .  __("Shortcode type", 'arlo-for-wordpress' ) . '</label></div>
+			<div class="arlo-field">
+				<select name="arlo_settings[new_custom_shortcode_type]">';
+				foreach (Arlo_For_Wordpress::$shortcode_types as $shortcode_type => $shortcode_type_name) {
+					echo '<option value="'.$shortcode_type.'">'.$shortcode_type_name.'</option>';
+				}
+			echo '</select>
+			</div>';
+
+    	}
+
 	    $val = isset($settings_object['templates'][$id]['html']) ? $settings_object['templates'][$id]['html'] : '';
-	    
-	    
+	   
 	    $this->arlo_reload_template($id);
-	    
-	    echo '<div class="arlo-label arlo-full-width">
-	    		<label>
-	    		' . sprintf(__('%s page', 'arlo-for-wordpress' ), Arlo_For_Wordpress::$templates[$id]['name']) . '
-	    		' . (!empty(Arlo_For_Wordpress::$templates[$id]['shortcode']) ? 'shortcode <span class="arlo-gray">' . Arlo_For_Wordpress::$templates[$id]['shortcode'] . '</span>' : '') . ' content
+
+    	if ($is_custom_shortcode) {
+    		echo '<input type="checkbox" class="hidden" name="arlo_settings[keep_custom_shortcodes]['.$id.']" checked="checked"/>';
+    	}
+
+	    if ( isset(Arlo_For_Wordpress::$templates[$id]['shortcode']) ) {
+		    echo '<div class="arlo-label arlo-full-width">
+	    		<label>'
+	    		. sprintf(__('%s page ', 'arlo-for-wordpress' ), Arlo_For_Wordpress::$templates[$id]['name'])
+	    		. 'shortcode <span class="arlo-gray">' . Arlo_For_Wordpress::$templates[$id]['shortcode'] . '</span>'
+	    		. ' content
 	    		</label>
 	    	</div>';
-	    	
-	    wp_editor($val, $id, array('textarea_name'=>'arlo_settings[templates]['.$id.'][html]','textarea_rows'=>'20'));
+	    }
+
+	    if (!$is_new_shortcode_page) {
+	    	wp_editor($val, $id, array('textarea_name'=>'arlo_settings[templates]['.$id.'][html]','textarea_rows'=>'20'));
+	    }
 	}
 	
 	function arlo_reload_template($template) {
 		$selected_theme_id = get_option('arlo_theme', Arlo_For_Wordpress::DEFAULT_THEME);
 
-		if ($selected_theme_id != 'custom') {
+		if ($selected_theme_id != 'custom' && $template != 'new_custom') {
 			echo '
 				<div class="arlo-label">
 					<label>'. __('Template', 'arlo-for-wordpress' ) . '</label>
@@ -676,9 +720,11 @@ class Arlo_For_Wordpress_Settings {
 		$templates = [];
 		
 		foreach (Arlo_For_Wordpress::$templates as $key => $val) {
-			$templates[ARLO_PLUGIN_PREFIX . '-' . $key] = $theme_templates[$key]['html'];
+			if ($key == 'new_custom') { continue; }
+			$template_type = array_key_exists( 'type', $val ) ? $val['type'] : $key;
+			$templates[ARLO_PLUGIN_PREFIX . '-' . $key] = $theme_templates[$template_type]['html'];
 		}
-		
+
 		return $templates;
 	}
 	
@@ -775,7 +821,7 @@ class Arlo_For_Wordpress_Settings {
 	    echo '
 	    <h3>What\'s new in this release</h3>
 		<p><strong>If you are experiencing problems after an update, please deactivate and re-activate the plugin and re-synchronize the data.</strong></p>
-		<h4>Version ' .  VersionHandler::VERSION . '</h4>
+	    <h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">	  
 				<li>Bugfix, when rich snippet for event doesn\'t return Location</li>
@@ -797,7 +843,6 @@ class Arlo_For_Wordpress_Settings {
 				<li>Many bug fixes</li>
 			</ul>
 		</p>		
-
 	    <h4>Version 3.2.1</h4>
 		<p>
 	    	<ul class="arlo-whatsnew-list">	  
@@ -809,7 +854,6 @@ class Arlo_For_Wordpress_Settings {
 				<li>Many bug fixes</li>
 			</ul>
 		</p>
-
 		<h4>Version 3.1.2</h4>
 		<p>
 	    	<ul class="arlo-whatsnew-list">	  

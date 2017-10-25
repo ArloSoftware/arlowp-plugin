@@ -141,7 +141,7 @@ class Arlo_For_Wordpress {
 			'slug' => 'presenter',
 			'name' => 'Presenters',
 			'singular_name' => 'Presenter list'
-		),		
+		),
 		'eventsearch' => array(
 			'slug' => 'eventsearch',
 			'name' => 'Event search',
@@ -310,7 +310,30 @@ class Arlo_For_Wordpress {
 			'id' => 'venues',
 			'shortcode' => '[arlo_venue_list]',
 			'name' => 'Venue list'
+		),
+		'new_custom' => array(
+			'id' => 'new_custom',
+			'name' => 'New'
 		)
+    );
+
+
+
+	/**
+	 * $shortcoes_types: defines the available types of global shortcodes for the plugin
+	 *
+	 * @since    1.0.0
+	 *
+	 * @var      array
+	 */
+    public static $shortcode_types = array(
+		'events' => 'Catalogue', 
+		'schedule' => 'Schedule', 
+		'eventsearch' => 'Event Search', 
+		'upcoming' => 'Upcoming', 
+		'oa' => 'Online Activities', 
+		'presenters' => 'Presenters', 
+		'venues' => 'Venues'
     );
 
 	/**

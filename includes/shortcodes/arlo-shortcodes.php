@@ -5,6 +5,9 @@ class Shortcodes {
 	public static function init() {
 		//TODO: Autoloader
 
+		// Add custom shortcodes to list of shortcodes
+		arlo_add_custom_shortcodes();
+
 		Categories::init();
 		OnlineActivities::init();
 		Templates::init();
@@ -96,7 +99,7 @@ class Shortcodes {
 			'strip_html'	=> 'false',
 			'decode_quotes_in_shortcodes' => 'false',
 		), $atts, $shortcode_name));
-	
+
 		// need to decide ordering - currently makes sense to process the specific filter first
 		$content = apply_filters('arlo_shortcode_content_'.$shortcode_name, $content, $atts, $shortcode_name);
 		$content = apply_filters('arlo_shortcode_content', $content, $atts, $shortcode_name);
@@ -129,7 +132,7 @@ class Shortcodes {
 			// wrap content			
 			$content = sprintf($wrap, $content);                        
 		}
-		
+
 		return do_shortcode($content);
     }
 
@@ -538,4 +541,25 @@ class Shortcodes {
     }
 
 
+    public static function get_custom_shortcodes($type) {
+    	$shortcodes = array();
+
+    	foreach(\Arlo_For_Wordpress::$templates as $shortcode_name => $shortcode) {
+    		if ( isset($shortcode["type"]) ) {
+    			if (is_string($type) && $shortcode["type"] == $type ) {
+    				$shortcodes[$shortcode_name] = $shortcode;
+    			} else if (is_array($type) && in_array($shortcode["type"], $type)) {
+    				$shortcodes[$shortcode_name] = $shortcode;
+    			}
+    		}
+    	}
+
+    	return $shortcodes;
+    }
+
+
+    public static function get_template_name($shortcode_name,$default_shortcode_name,$default_template_name) {
+        $shortcode_name_root = str_replace('arlo_', '', $shortcode_name);
+        return $shortcode_name_root != $default_shortcode_name ? $shortcode_name_root : $default_template_name;
+    }
 }

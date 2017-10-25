@@ -143,8 +143,10 @@ function arlo_register_custom_post_types() {
 	$settings = get_option('arlo_settings');
 
 	foreach(Arlo_For_Wordpress::$post_types as $id => $type) {
+		$custom_type = isset( Arlo_For_Wordpress::$templates[$id]['type'] ) ? Arlo_For_Wordpress::$templates[$id]['type'] : $id;
+		$custom_type = in_array($custom_type,array('events','presenters','venues')) ? substr( $custom_type, 0, strlen($custom_type)-1 ) : $custom_type;
+
 		// default slug
-		
 		$slug = str_replace('_', '-', strtolower(trim(preg_replace('/[^A-Za-z]+/', '', $type['name']))));
 		$slug = 'arlo/' . $slug;
 		
@@ -154,7 +156,7 @@ function arlo_register_custom_post_types() {
 			$page_id = $settings['post_types'][$id]['posts_page'];
 			$slug = substr(substr(str_replace(get_home_url(), '', get_permalink($settings['post_types'][$id]['posts_page'])), 0, -1), 1);
 		}
-                
+
 		$args = array(
 			'labels' => array(
                 'name' => __( $type['name'], 'arlo-for-wordpress'),
@@ -177,20 +179,21 @@ function arlo_register_custom_post_types() {
 				'comments' => false
 			)
 		);
-		
+
 		// let's try some custom rewrite rules
 
 		if($page_id) {
-			switch($id) {
+			switch($custom_type) {
 				case 'upcoming':
 					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(eventtag-([^/]*))?/?(presenter-([^/]*))?/?(templatetag-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-delivery=$matches[10]&arlo-eventtag=$matches[12]&arlo-presenter=$matches[14]&arlo-templatetag=$matches[16]&paged=$matches[18]','top');
 				break;
 				case 'oa':
 					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(oatag-([^/]*))?/?(page/([^/]*))?/?(templatetag-([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-oatag=$matches[6]&paged=$matches[8]&arlo-templatetag=$matches[10]','top');
 				break;			
-				case 'event':					
+				case 'event':
 					add_rewrite_rule('^' . $slug . '/(\d+-[^/]*)+/?(region-([^/]*))?/?$','index.php?arlo_event=$matches[1]&arlo-region=$matches[3]','top');
 					add_rewrite_rule('^' . $slug . '/(\d+-[^/]*)+/?(region-([^/]*))?/?(location-([^/]*))?/?$','index.php?arlo_event=$matches[1]&arlo-region=$matches[3]&arlo-location=$matches[5]','top');
+
 					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(templatetag-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-delivery=$matches[10]&arlo-templatetag=$matches[12]&paged=$matches[14]','top');
 				break;
 				case 'eventsearch':
@@ -208,7 +211,7 @@ function arlo_register_custom_post_types() {
 				break;
 			}
 		}
-	
+
 		register_post_type('arlo_' . $id, $args);
 	}
 	
@@ -229,6 +232,57 @@ function arlo_register_custom_post_types() {
 	// flush cached rewrite rules if we've just updated the arlo settings
 	if(isset($_GET['settings-updated'])) flush_rewrite_rules();
 }
+
+
+/**
+ * Adds any custom shortcodes to the list of templates
+ *
+ * @since    3.4.0
+ *
+ */
+function arlo_add_custom_shortcodes() {
+	$settings = get_option('arlo_settings');
+
+	if ( isset($settings['custom_shortcodes']) ) {
+		array_walk($settings['custom_shortcodes'], function (&$type,$shortcode) {
+			$type = array(
+				'id' => $shortcode,
+				'name' => ucfirst( str_replace("_"," ",$shortcode) ),
+				'shortcode' => '[arlo_'.$shortcode.']',
+				'type' => $type
+			);
+		});
+
+		$first_elements = array_slice( Arlo_For_Wordpress::$templates, 0, count(Arlo_For_Wordpress::$templates)-1 );
+
+		$last_element = array_slice( Arlo_For_Wordpress::$templates, count(Arlo_For_Wordpress::$templates)-1, 1 );
+
+		Arlo_For_Wordpress::$templates = array_merge( $first_elements, $settings['custom_shortcodes'], $last_element );
+
+		
+
+		$custom_post_types = array();
+
+		foreach ($settings['custom_shortcodes'] as $shortcode_id => $shortcode) {
+			$shortcode_name = $shortcode['name'];
+			$regionalized = $shortcode['type'] != 'venue' && $shortcode['type'] != 'presenter';
+			$shortcode_id = $shortcode['id']; // Wordpress has a character limit on post names
+
+			$custom_post_types[$shortcode_id] = array(
+				'slug' => $shortcode_id,
+				'name' => $shortcode_name,
+				'singular_name' => $shortcode_name,
+				'regionalized' => $regionalized
+			);
+
+		}
+
+		Arlo_For_Wordpress::$post_types = array_merge(Arlo_For_Wordpress::$post_types, $custom_post_types);
+	}
+}
+
+
+
 
 /**
  * If there is a search term for arlo-search, we need to redirect to a friendlier url.

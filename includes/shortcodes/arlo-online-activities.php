@@ -24,6 +24,16 @@ class OnlineActivities {
         Shortcodes::add('oa_list', function($content = '', $atts, $shortcode_name, $import_id){
             return $content;
         });
+
+
+        $custom_shortcodes = Shortcodes::get_custom_shortcodes('oa');
+
+        foreach ($custom_shortcodes as $shortcode_name => $shortcode) {
+            Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
+                return self::shortcode_onlineactivites_list($content = '', $atts, $shortcode_name, $import_id);
+            });
+        }
+
     }
 
     private static function shortcode_oa_list_item($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -184,9 +194,11 @@ class OnlineActivities {
 
     private static function shortcode_onlineactivites_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
-        
+
+        $template_name = Shortcodes::get_template_name($shortcode_name,'onlineactivites_list','oa');
+
         $templates = arlo_get_option('templates');
-        $content = $templates['oa']['html'];
+        $content = $templates[$template_name]['html'];
         return do_shortcode($content);        
     }
 
@@ -424,9 +436,11 @@ class OnlineActivities {
         $filters_array = explode(',',$filters);
         
         $settings = get_option('arlo_settings');
+        
+        $page_type = \Arlo\Utilities::get_current_page_arlo_type();
 
         if (!empty($settings['post_types']['oa']['posts_page'])) {
-            $page_link = get_permalink(get_post($settings['post_types']['oa']['posts_page']));
+            $page_link = get_permalink(get_post($settings['post_types'][$page_type]['posts_page']));
         } else {
             $page_link = get_permalink(get_post($post));
         }        
