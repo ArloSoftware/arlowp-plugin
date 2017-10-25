@@ -777,6 +777,14 @@ class Arlo_For_Wordpress_Settings {
 		<p><strong>If you are experiencing problems after an update, please deactivate and re-activate the plugin and re-synchronize the data.</strong></p>
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
+			<ul class="arlo-whatsnew-list">	  
+				<li>Bugfix, when rich snippet for event doesn\'t return Location</li>
+				<li>Bugfix, when the event search returns the template multiple times</li>
+			</ul>
+		</p>		
+	
+	    <h4>Version 3.3</h4>
+		<p>
 	    	<ul class="arlo-whatsnew-list">	  
 				<li>Support structured meta data (rich snippets) for 
 					<a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_rich_snippet" target="_blank">events</a>, 

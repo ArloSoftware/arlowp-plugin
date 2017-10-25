@@ -1,3 +1,10 @@
+== V3.3.1 ==
+
+Bugfixes
+------------------
+Fix, when rich snippet for event doesn't return Location
+Fix, when the event search returns the template multiple times
+
 == V3.3 ==
 
 Enhancement
