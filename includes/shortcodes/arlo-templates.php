@@ -284,6 +284,13 @@ class Templates {
 
         $settings = get_option('arlo_settings');  
 
+        //we need to determine, if it's group by "category" and has a divider, if not, and if we are on the search page, we need to group the templates
+        //see bug 68492
+        
+        if (!((isset($GLOBALS['arlo_search_page']) && $GLOBALS['arlo_search_page'] && isset($atts['group']) && strpos($content, "arlo_group_divider") !== false) || !isset($GLOBALS['arlo_search_page']))) {
+            $GLOBALS['arlo_group_template_by_id'] = true; //it's a global, because the paging should know about it, which is a separate shortcode
+        }
+
         $output = '';
 
         $sql = self::generate_list_sql($atts, $import_id);
@@ -670,6 +677,7 @@ class Templates {
         
         $templates = arlo_get_option('templates');
         $content = $templates['eventsearch']['html'];
+        $GLOBALS['arlo_search_page'] = true;
 
         return $content;
     }
@@ -823,7 +831,7 @@ class Templates {
         }	
         
         // grouping
-        $group = "";	
+        $group = (isset($GLOBALS['arlo_group_template_by_id']) && $GLOBALS['arlo_group_template_by_id']) ? 'GROUP BY et.et_arlo_id' : '';	
         $order = $limit_field = '';
         $field_list = 'et.et_id';
 
@@ -832,7 +840,7 @@ class Templates {
             $order = "ORDER BY et.et_name ASC";
             
             // if grouping is set...
-            if(isset($atts['group'])) {
+            if(isset($atts['group']) && !isset($GLOBALS['arlo_group_template_by_id'])) {
                 switch($atts['group']) {
                     case 'category':
                         $order = "ORDER BY c.c_order ASC, etc.et_order ASC, c.c_name ASC, et.et_name ASC";
@@ -856,7 +864,7 @@ class Templates {
         LEFT JOIN $t3 etc
             ON etc.et_arlo_id = et.et_arlo_id AND etc.import_id = et.import_id
         LEFT JOIN $t4 c
-            ON c.c_arlo_id = etc.c_arlo_id AND c.import_id = etc.import_id
+            ON c.c_arlo_id = etc.c_arlo_id AND c.import_id = etc.import_id            
         $where 
         $group 
         $order

@@ -5,7 +5,7 @@
 [arlo_search_field placeholder="Search events" buttonclass="arlo-button" showbutton="true"]
 
     <ul class="arlo-list event-search">
-        [arlo_event_template_list_item group="category" limit="10"]
+        [arlo_event_template_list_item limit="10"]
               <li class='arlo-cf arlo-catalogue-event'>
                   [arlo_event_template_permalink wrap='
                   <a href="%s" class="arlo-template-name">
