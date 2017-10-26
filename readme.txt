@@ -1,6 +1,7 @@
 === Arlo training and event management system ===
 Contributors: ArloSoftware, adamfentosi
-Tags: online registration, event registration, training management,  event management, event plugin, training company software, training calendar, training administration, training management software, training provider, solution, events calendar, wordpress events, event ticketing, wordpress lms, class registration, conference registration,  ticket, registration, event manager, training, booking, ticketing
+Tags: online registration, event registration, training management,  event management, event plugin, training company software, training calendar, training administration, training management software, training provider, solution, events calendar, wordpress events, event ticketing, wordpress lms, class registration, conference registration,  ticket, registration, event manager, training, booking, ticketing, courses, events, training, calendar, course management
+
 Requires at least: 4.4
 Tested up to: 4.8.2
 Stable tag: 3.3.1
