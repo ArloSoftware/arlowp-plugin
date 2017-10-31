@@ -49,7 +49,7 @@ class Templates {
         if (empty($GLOBALS['arlo_eventtemplate']['et_arlo_id'])) return '';
 
         $settings = get_option('arlo_settings');  
-        $arlo_region = \Arlo\Utilities::get_region_parameter();
+        $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
 
         extract(shortcode_atts(array(
             'limit'	=> 5,
@@ -189,7 +189,7 @@ class Templates {
     private static function shortcode_content_field_item($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $post, $wpdb;
         
-        $arlo_region = \Arlo\Utilities::get_region_parameter();
+        $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
 
         extract(shortcode_atts(array(
             'fields'	=> 'all',
@@ -521,7 +521,7 @@ class Templates {
         
         $settings = get_option('arlo_settings');
 
-        $page_type = \Arlo\Utilities::get_current_page_arlo_type();
+        $page_type = \Arlo_For_Wordpress::get_current_page_arlo_type();
 
         if (!empty($settings['post_types'][$page_type]['posts_page'])) {
             $page_link = get_permalink(get_post($settings['post_types'][$page_type]['posts_page']));
@@ -746,7 +746,7 @@ class Templates {
         $arlo_delivery = \Arlo\Utilities::clean_int_url_parameter('arlo-delivery');
         $arlo_templatetag = \Arlo\Utilities::clean_string_url_parameter('arlo-templatetag');
         $arlo_search = \Arlo\Utilities::clean_string_url_parameter('arlo-search');
-        $arlo_region = \Arlo\Utilities::get_region_parameter();
+        $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
 
         if(!empty($arlo_location) || (isset($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) ) :
 

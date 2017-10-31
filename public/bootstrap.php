@@ -234,55 +234,6 @@ function arlo_register_custom_post_types() {
 }
 
 
-/**
- * Adds any custom shortcodes to the list of templates
- *
- * @since    3.4.0
- *
- */
-function arlo_add_custom_shortcodes() {
-	$settings = get_option('arlo_settings');
-
-	if ( isset($settings['custom_shortcodes']) ) {
-		array_walk($settings['custom_shortcodes'], function (&$type,$shortcode) {
-			$type = array(
-				'id' => $shortcode,
-				'name' => ucfirst( str_replace("_"," ",$shortcode) ),
-				'shortcode' => '[arlo_'.$shortcode.']',
-				'type' => $type
-			);
-		});
-
-		$first_elements = array_slice( Arlo_For_Wordpress::$templates, 0, count(Arlo_For_Wordpress::$templates)-1 );
-
-		$last_element = array_slice( Arlo_For_Wordpress::$templates, count(Arlo_For_Wordpress::$templates)-1, 1 );
-
-		Arlo_For_Wordpress::$templates = array_merge( $first_elements, $settings['custom_shortcodes'], $last_element );
-
-		
-
-		$custom_post_types = array();
-
-		foreach ($settings['custom_shortcodes'] as $shortcode_id => $shortcode) {
-			$shortcode_name = $shortcode['name'];
-			$regionalized = $shortcode['type'] != 'venue' && $shortcode['type'] != 'presenter';
-			$shortcode_id = $shortcode['id']; // Wordpress has a character limit on post names
-
-			$custom_post_types[$shortcode_id] = array(
-				'slug' => $shortcode_id,
-				'name' => $shortcode_name,
-				'singular_name' => $shortcode_name,
-				'regionalized' => $regionalized
-			);
-
-		}
-
-		Arlo_For_Wordpress::$post_types = array_merge(Arlo_For_Wordpress::$post_types, $custom_post_types);
-	}
-}
-
-
-
 
 /**
  * If there is a search term for arlo-search, we need to redirect to a friendlier url.
@@ -399,7 +350,7 @@ function arlo_the_content_event($content) {
 	
 	$templates = arlo_get_option('templates');
 	$content = $templates['event']['html'];
-    $arlo_region = \Arlo\Utilities::get_region_parameter();	
+    $arlo_region = \Arlo_For_Wordpress::get_region_parameter();	
 
 	$t1 = "{$wpdb->prefix}arlo_eventtemplates";
 	$t2 = "{$wpdb->prefix}posts";	

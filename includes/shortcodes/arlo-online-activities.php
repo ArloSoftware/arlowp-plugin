@@ -42,7 +42,7 @@ class OnlineActivities {
 
         $where = '';
                
-        $arlo_region = \Arlo\Utilities::get_region_parameter();
+        $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
 
         $t1 = "{$wpdb->prefix}arlo_eventtemplates";
         $t2 = "{$wpdb->prefix}arlo_onlineactivities";
@@ -288,7 +288,7 @@ class OnlineActivities {
     private static function generate_onlineactivites_list_sql($atts, $import_id, $for_pagination = false) {
         global $wpdb;
 
-        $arlo_region = \Arlo\Utilities::get_region_parameter();
+        $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
         
         $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
         $page = !empty($_GET['paged']) ? intval($_GET['paged']) : intval(get_query_var('paged'));
@@ -437,7 +437,7 @@ class OnlineActivities {
         
         $settings = get_option('arlo_settings');
         
-        $page_type = \Arlo\Utilities::get_current_page_arlo_type();
+        $page_type = \Arlo_For_Wordpress::get_current_page_arlo_type();
 
         if (!empty($settings['post_types']['oa']['posts_page'])) {
             $page_link = get_permalink(get_post($settings['post_types'][$page_type]['posts_page']));

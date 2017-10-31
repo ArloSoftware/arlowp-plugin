@@ -99,7 +99,7 @@
 	margin: 2px 10px 2px 0;
 }
 
-input[type=checkbox].hidden {
+.arlo-field input[type=checkbox].arlo-check.hidden {
 	display: none;
 }
 

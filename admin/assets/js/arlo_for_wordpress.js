@@ -1,5 +1,3 @@
-
-
 if (typeof (Arlo) === "undefined") {
 	Arlo = {};
 }
@@ -285,27 +283,6 @@ if (typeof (Arlo) === "undefined") {
 				me.arloReloadTemplate();
 			} 
 		},
-		deleteCustomShortcodeConfirm: function(e) {
-			var me = this,
-				message = "Do you really want to delete this custom shortcode?";
-
-			e.preventDefault();
-
-			if (confirm(message)) {
-				me.deleteCustomShortcode();
-			}
-		},
-		deleteCustomShortcode: function() {
-			var me = this,
-				template = $('.arlo-field-wrap:visible').attr('id'),
-				navLink = 'arlo-for-wordpress-pages-'+template.replace('arlo-', '');
-
-				$('.'+template+', '+'.'+navLink).remove();
-				window.location.hash = "#pages";
-				$('.arlo-event').show();
-				$('.arlo-for-wordpress-pages-event').addClass('nav-tab-active');
-
-		},
 		markPageSetupError: function() {
 			$('.arlo-page-select > select').each(function() {
 				if ($(this).val() == '' || $(this).val() == '0') {
@@ -442,10 +419,6 @@ if (typeof (Arlo) === "undefined") {
 				me.arloReloadTemplateConfirm();
 			});
 
-			$('.arlo-delete-button').on('click', function(e) {
-				me.deleteCustomShortcodeConfirm(e);
-			});
-			
 			//check numeric field
 			$(".arlo-only-numeric").keypress(function(event) {
 				// Backspace, tab, enter, end, home, left, right
@@ -464,7 +437,44 @@ if (typeof (Arlo) === "undefined") {
 					event.preventDefault();
 				}
 			});
-			
+
+			$('#arlo-settings').on('submit', function() {
+				var customShortcodeType = $('.arlo-new-custom-shortcode-type'),
+					customShortcodeName = $('.arlo-new-custom-shortcode-name'),
+					errors = false,
+					requiredFieldError = 'Field is required';
+
+				if (customShortcodeName.find('input').val() == '' && customShortcodeType.val() == '') {
+					return true;
+				}
+
+				if (customShortcodeName.find('input').val() == '') {
+					errors = true;
+					showValidationError(customShortcodeName, requiredFieldError);
+				}
+
+				if (customShortcodeType.val() == '') {
+					errors = true;
+					showValidationError(customShortcodeType, requiredFieldError);
+				}
+
+				if ( arlo_shortcodes.indexOf( customShortcodeName.find('input').val() ) !== -1 ) {
+					errors = true;
+					showValidationError(customShortcodeName, 'A shortcode with that name already exists');
+				}
+
+				function showValidationError(field, message) {
+					$('.arlo-new-custom-shortcode-error').remove();
+					field.after('<span class="arlo-new-custom-shortcode-error red">' + message + '</span>');
+				}
+
+				if (errors) {
+					return false;
+				}
+
+				return true;
+			});
+
 			//dismissible message
 			$('.toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-dismiss').click(function() {
 				var id = $(this).parent().attr('id').split('-').pop();

@@ -549,28 +549,16 @@ class Arlo_For_Wordpress_Admin {
 			$new['sleep_between_import_tasks'] = \Arlo\Scheduler::MAX_SLEEP_BETWEEN_TASKS;
 		}
 
-		// Custom shortcodes
-		if ( isset($new['templates']['new_custom']['html']) ) {
-			$new_custom_shortcode_template = $new['templates']['new_custom']['html'];
-			unset($new['templates']['new_custom']);
-
-			if ( isset($new["new_custom_shortcode"]) ) {
-				$new['templates'][ $new["new_custom_shortcode"] ]['html'] = $new_custom_shortcode_template;
-			}
-		}
-
 		if (!empty($old["custom_shortcodes"])) {
 			$new["custom_shortcodes"] = $old["custom_shortcodes"];
 		} else {
 			$new["custom_shortcodes"] = array();
 		}
 
-		// Remove deleted custom shortcodes
-		$deleted = array_diff_key($new["custom_shortcodes"], $new["keep_custom_shortcodes"]);
-		$new['custom_shortcodes'] = array_diff_key($new["custom_shortcodes"], $deleted);
+		// Custom shortcodes
+		if (!empty($new["new_custom_shortcode"]) && !empty($new["new_custom_shortcode_type"])) {
 
-		if (!empty($new["new_custom_shortcode"])) {
-			$shortcode_name = substr( sanitize_text_field(strtolower( str_replace( array("&","/","<",">","[","]","="),'',str_replace(' ','_',$new["new_custom_shortcode"]) ) )), 0, 15 );
+			$shortcode_name = substr( sanitize_text_field(strtolower( str_replace( array("&","/","<",">","[","]","="),'',str_replace(' ','_',$new["new_custom_shortcode"]) ) )), 0, 15 ); // WP limits post name lengths
 			$shortcode_type = $new["new_custom_shortcode_type"];
 
 			if (empty($new['custom_shortcodes'])) {
@@ -578,11 +566,21 @@ class Arlo_For_Wordpress_Admin {
 			}
 
 			$new['custom_shortcodes'][$shortcode_name] = $shortcode_type;
+
+			$default_template = \Arlo_For_Wordpress::arlo_template_source()[ 'arlo-' . $new["new_custom_shortcode_type"] ];
+
+			if ( !empty($default_template) ) {
+				$new['templates'][ $new["new_custom_shortcode"] ]['html'] = $default_template;
+			}
+		}
+
+		if (!empty($new["delete_shortcode"])) {
+			unset( $new['custom_shortcodes'][$new["delete_shortcode"]] );
 		}
 
 		unset($new["new_custom_shortcode"]);
 		unset($new["new_custom_shortcode_type"]);
-
+		unset($new["delete_shortcode"]);
 
 		return $new;
 	}
@@ -700,4 +698,5 @@ class Arlo_For_Wordpress_Admin {
 			}
 		}
 	}
+
 }

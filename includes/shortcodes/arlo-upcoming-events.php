@@ -34,7 +34,7 @@ class UpcomingEvents {
     private static function shortcode_upcoming_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
         
-        $arlo_region = \Arlo\Utilities::get_region_parameter();
+        $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
 
         self::$upcoming_list_item_atts = array(
             'location' => \Arlo\Utilities::clean_string_url_parameter('arlo-location'),
@@ -190,7 +190,7 @@ class UpcomingEvents {
         
         $settings = get_option('arlo_settings');
         
-        $page_type = \Arlo\Utilities::get_current_page_arlo_type();
+        $page_type = \Arlo_For_Wordpress::get_current_page_arlo_type();
 
         if (!empty($settings['post_types']['upcoming']['posts_page'])) {
             $page_link = get_permalink(get_post($settings['post_types'][$page_type]['posts_page']));

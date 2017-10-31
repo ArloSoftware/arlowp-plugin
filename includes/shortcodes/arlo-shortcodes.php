@@ -6,8 +6,6 @@ class Shortcodes {
 		//TODO: Autoloader
 
 		// Add custom shortcodes to list of shortcodes
-		arlo_add_custom_shortcodes();
-
 		Categories::init();
 		OnlineActivities::init();
 		Templates::init();
@@ -368,7 +366,7 @@ class Shortcodes {
 	public static function get_advertised_offers($id, $id_field, $import_id) {
 		global $wpdb;
                
-        $arlo_region = \Arlo\Utilities::get_region_parameter();
+        $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
 
         $cache_key = md5( serialize( array( $id => $id_field ) ) );
         $cache_category = 'ArloOffers';

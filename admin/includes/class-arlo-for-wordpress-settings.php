@@ -133,7 +133,13 @@ class Arlo_For_Wordpress_Settings {
 				}
 				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress') );
 			}
-			
+
+			if (!empty($_GET['delete-shortcode']) && isset($_GET['_wpnonce']) && wp_verify_nonce($_GET['_wpnonce'], 'arlo-delete-shortcode-nonce')) {
+				$settings_object["delete_shortcode"] = $_GET['delete-shortcode'];
+				update_option('arlo_settings', $settings_object);
+				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages') );
+			}
+
 			add_action( 'admin_print_scripts', array($this, "arlo_check_current_tasks") );			
 		}
 		                 
@@ -388,8 +394,9 @@ class Arlo_For_Wordpress_Settings {
 	function arlo_pages_section_callback() {
 		echo '
 	    		<script type="text/javascript"> 
-	    			var arlo_templates = ' . json_encode($this->arlo_template_source()) . ';
-	    		</script>		
+	    			var arlo_templates = ' . json_encode(\Arlo_For_Wordpress::arlo_template_source()) . ';' . '
+	    			var arlo_shortcodes = ' . json_encode(array_keys(Arlo_For_Wordpress::$templates)) . ';' .
+	    		'</script>		
 		';
 	}
 	
@@ -615,13 +622,18 @@ class Arlo_For_Wordpress_Settings {
 			echo sprintf(__('%s page', 'arlo-for-wordpress' ), Arlo_For_Wordpress::$templates[$id]['name']);
 
 			if ($is_custom_shortcode) {
-				echo '<a href="" class="red arlo-delete-button"><i class="arlo-icons8 arlo-icons8-cancel size-16"></i> Delete</a>';
+				echo '<a href="' . wp_nonce_url(admin_url('admin.php?page=arlo-for-wordpress&delete-shortcode=' . urlencode($id)), 'arlo-delete-shortcode-nonce') . '"
+				class="red arlo-delete-button"><i class="arlo-icons8 arlo-icons8-cancel size-16"></i> Delete</a>';
 			}
 		}
 		echo '</h3>';
 
     	if ($is_custom_shortcode) {
-    		echo '<h4 class="arlo-gray arlo-subhead">'.ucfirst($type).' '.__('page', 'arlo-for-wordpress' ).'</h4>';
+			echo '
+			<div class="arlo-label"><label>' .  __("Shortcode type", 'arlo-for-wordpress' ) . '</label></div>
+			<div class="arlo-field">
+				<span>'.ucfirst($type).' '.__('page', 'arlo-for-wordpress' ).'</span>
+			</div><br><br>';
     	}
 
 		/*
@@ -654,31 +666,13 @@ class Arlo_For_Wordpress_Settings {
     	}
 
     	if ($is_new_shortcode_page) {
-			echo '
-			<div class="arlo-label"><label>' .  __("Shortcode name", 'arlo-for-wordpress' ) . '</label></div>
-			<div class="arlo-field arlo-gray">
-				<span class="arlo-new-custom-shortcode-name"> [arlo_<input type="text" name="arlo_settings[new_custom_shortcode]" class="arlo-inline-input" maxlength="15">] </span>
-			</div>';
-
-			echo '
-			<div class="arlo-label"><label>' .  __("Shortcode type", 'arlo-for-wordpress' ) . '</label></div>
-			<div class="arlo-field">
-				<select name="arlo_settings[new_custom_shortcode_type]">';
-				foreach (Arlo_For_Wordpress::$shortcode_types as $shortcode_type => $shortcode_type_name) {
-					echo '<option value="'.$shortcode_type.'">'.$shortcode_type_name.'</option>';
-				}
-			echo '</select>
-			</div>';
-
+    		$this->arlo_output_new_shortcode_page();
+    		return;
     	}
 
 	    $val = isset($settings_object['templates'][$id]['html']) ? $settings_object['templates'][$id]['html'] : '';
 	   
 	    $this->arlo_reload_template($id);
-
-    	if ($is_custom_shortcode) {
-    		echo '<input type="checkbox" class="hidden" name="arlo_settings[keep_custom_shortcodes]['.$id.']" checked="checked"/>';
-    	}
 
 	    if ( isset(Arlo_For_Wordpress::$templates[$id]['shortcode']) ) {
 		    echo '<div class="arlo-label arlo-full-width">
@@ -690,15 +684,37 @@ class Arlo_For_Wordpress_Settings {
 	    	</div>';
 	    }
 
-	    if (!$is_new_shortcode_page) {
-	    	wp_editor($val, $id, array('textarea_name'=>'arlo_settings[templates]['.$id.'][html]','textarea_rows'=>'20'));
-	    }
+    	wp_editor($val, $id, array('textarea_name'=>'arlo_settings[templates]['.$id.'][html]','textarea_rows'=>'20'));
+	}
+
+	function arlo_output_new_shortcode_page() {
+		echo '
+		<div class="arlo-label"><label>' .  __("Shortcode name", 'arlo-for-wordpress' ) . '</label></div>
+		<div class="arlo-field">
+			<span class="arlo-new-custom-shortcode-name arlo-gray"> [arlo_<input type="text" name="arlo_settings[new_custom_shortcode]" class="arlo-inline-input" maxlength="15">] </span>
+		</div><br><br>';
+
+		echo '
+		<div class="arlo-label"><label>' .  __("Shortcode type", 'arlo-for-wordpress' ) . '</label></div>
+		<div class="arlo-field">
+			<select name="arlo_settings[new_custom_shortcode_type]" class="arlo-new-custom-shortcode-type">';
+			echo '<option value=""></option>';
+			foreach (Arlo_For_Wordpress::$shortcode_types as $shortcode_type => $shortcode_type_name) {
+				echo '<option value="'.$shortcode_type.'">'.$shortcode_type_name.'</option>';
+			}
+		echo '</select>
+		</div><br><br>';
+		echo '
+		<div class="arlo-label"><br></div>
+		<div class="arlo-field">
+			<input type="submit" name="submit" id="submit" class="button button-primary" value="Save Changes">
+		</div>';
 	}
 	
 	function arlo_reload_template($template) {
 		$selected_theme_id = get_option('arlo_theme', Arlo_For_Wordpress::DEFAULT_THEME);
 
-		if ($selected_theme_id != 'custom' && $template != 'new_custom') {
+		if ($selected_theme_id != 'custom') {
 			echo '
 				<div class="arlo-label">
 					<label>'. __('Template', 'arlo-for-wordpress' ) . '</label>
@@ -708,24 +724,6 @@ class Arlo_For_Wordpress_Settings {
 				</div>
 				<div class="cf"></div>';
 		}
-	}
-	
-	function arlo_template_source() {
-		$plugin = Arlo_For_Wordpress::get_instance();
-		$theme_manager = $plugin->get_theme_manager();
-
-		$selected_theme_id = get_option('arlo_theme', Arlo_For_Wordpress::DEFAULT_THEME);
-		$theme_templates = $theme_manager->load_default_templates($selected_theme_id);
-		
-		$templates = [];
-		
-		foreach (Arlo_For_Wordpress::$templates as $key => $val) {
-			if ($key == 'new_custom') { continue; }
-			$template_type = array_key_exists( 'type', $val ) ? $val['type'] : $key;
-			$templates[ARLO_PLUGIN_PREFIX . '-' . $key] = $theme_templates[$template_type]['html'];
-		}
-
-		return $templates;
 	}
 	
 	function arlo_check_current_tasks() {
