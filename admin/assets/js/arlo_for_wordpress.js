@@ -438,6 +438,14 @@ if (typeof (Arlo) === "undefined") {
 				}
 			});
 
+			$('.arlo-delete-button').click(function(e){
+				e.preventDefault();
+
+				if (confirm("Are you sure you want to delete this custom shortcode?")) {
+					document.location = $(e.target).attr('href');
+				} 				
+			});
+
 			$('#arlo-settings').on('submit', function() {
 				var customShortcodeType = $('.arlo-new-custom-shortcode-type'),
 					customShortcodeName = $('.arlo-new-custom-shortcode-name'),

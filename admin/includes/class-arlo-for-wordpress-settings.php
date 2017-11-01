@@ -140,6 +140,12 @@ class Arlo_For_Wordpress_Settings {
 				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages') );
 			}
 
+			if ( array_key_exists('arlo-new-custom-shortcode', $_COOKIE) ) {
+				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages/' . $_COOKIE['arlo-new-custom-shortcode']) );
+				unset( $_COOKIE['arlo-new-custom-shortcode'] );
+				setcookie('arlo-new-custom-shortcode', null, -1, '/');
+			}
+
 			add_action( 'admin_print_scripts', array($this, "arlo_check_current_tasks") );			
 		}
 		                 
@@ -667,9 +673,12 @@ class Arlo_For_Wordpress_Settings {
 
     	if ($is_new_shortcode_page) {
     		$this->arlo_output_new_shortcode_page();
-    		return;
+    	} else {
+    		$this->arlo_output_template_page($settings_object, $id);
     	}
+	}
 
+	function arlo_output_template_page($settings_object, $id) {
 	    $val = isset($settings_object['templates'][$id]['html']) ? $settings_object['templates'][$id]['html'] : '';
 	   
 	    $this->arlo_reload_template($id);
