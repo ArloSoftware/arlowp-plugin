@@ -1647,8 +1647,8 @@ class Arlo_For_Wordpress {
 
 			$settings = get_option('arlo_settings');
 			if (!empty($settings['disable_ssl_verification']) && $settings['disable_ssl_verification'] == 1) {
-				curl_setopt($c, CURLOPT_SSL_VERIFYHOST,false);
-				curl_setopt($c, CURLOPT_SSL_VERIFYPEER,false);
+				curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,false);
+				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,false);
 			}
 			
 			curl_exec($ch);
