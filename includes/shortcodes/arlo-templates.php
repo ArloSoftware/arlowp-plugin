@@ -710,6 +710,7 @@ class Templates {
         $t7 = "{$wpdb->prefix}arlo_tags";
             
         $where = "WHERE post.post_type = 'arlo_event' AND et.import_id = %d";
+        $group = (isset($GLOBALS['arlo_group_template_by_id']) && $GLOBALS['arlo_group_template_by_id']) ? 'GROUP BY et.et_arlo_id' : '';	
         $parameters[] = $import_id;
 
         $join = "";
@@ -739,7 +740,9 @@ class Templates {
             if (!empty($arlo_region)) {
                 $where .= ' AND e.e_region = %s';
                 $parameters[] = $arlo_region;
-            }								
+            }
+
+            $group = 'GROUP BY et.et_arlo_id';
             
         endif;	
         
@@ -830,8 +833,6 @@ class Templates {
             $parameters[] = $import_id;
         }	
         
-        // grouping
-        $group = (isset($GLOBALS['arlo_group_template_by_id']) && $GLOBALS['arlo_group_template_by_id']) ? 'GROUP BY et.et_arlo_id' : '';	
         $order = $limit_field = '';
         $field_list = 'et.et_id';
 
