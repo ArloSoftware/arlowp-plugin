@@ -512,7 +512,7 @@ class Arlo_For_Wordpress_Settings {
 							$is_hidden = false;
 					    	$existing_filter_setting_id = rand();
 
-							if ($filter_settings["arlohiddenfilters"][$filter_group][$filter_key]) {
+							if (isset($filter_settings["arlohiddenfilters"]) && $filter_settings["arlohiddenfilters"][$filter_group][$filter_key]) {
 								$is_hidden = in_array($old_value,$filter_settings["arlohiddenfilters"][$filter_group][$filter_key]);
 							}
 
