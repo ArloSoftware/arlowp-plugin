@@ -397,11 +397,14 @@ if (typeof (Arlo) === "undefined") {
 			//nav-bar
 			$('.nav-tab-wrapper.main-tab .nav-tab').click(function() {
 				var tabID = $(this).attr('id').split('-').pop();
+				$.removeCookie("arlo-vertical-tab");
+				$.cookie("arlo-nav-tab", tabID, { path: '/' });
 				me.showNavTab(tabID);
 			});		
 			
 			$('.arlo_pages_section .nav-tab').click(function() {
 				var tabID = $(this).attr('id').split('-').pop();
+				$.cookie("arlo-vertical-tab", tabID, { path: '/' });
 				me.showVerticalNavTab(tabID);
 			});
 		},

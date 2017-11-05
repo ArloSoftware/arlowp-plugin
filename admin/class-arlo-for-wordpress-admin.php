@@ -197,6 +197,7 @@ class Arlo_For_Wordpress_Admin {
 		}
 		
 		wp_enqueue_script( $this->plugin_slug . '-admin-global-script', plugins_url( 'assets/js/admin_public.js?20170424', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, true );
+		wp_enqueue_script( $this->plugin_slug . '-plugin-script-cookie', plugins_url( '../public/assets/js/libs/jquery.cookie.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, true );
 
 		$screen = get_current_screen();
 		if ( $this->plugin_screen_hook_suffix == $screen->id ) {
@@ -557,7 +558,7 @@ class Arlo_For_Wordpress_Admin {
 		}
 
 		// Custom shortcodes
-		if (!empty($new["new_custom_shortcode"]) && !empty($new["new_custom_shortcode_type"]) && !array_key_exists( $new["new_custom_shortcode"], $old['custom_shortcodes'] )) {
+		if (!empty($new["new_custom_shortcode"]) && !empty($new["new_custom_shortcode_type"]) && !array_key_exists( $new["new_custom_shortcode"], $old['custom_shortcodes'] ) && !shortcode_exists("arlo_" . $new["new_custom_shortcode"] . "") ) {
 
 			$shortcode_name = substr( sanitize_text_field(strtolower( str_replace( array("&","/","<",">","[","]","="),'',str_replace(' ','_',$new["new_custom_shortcode"]) ) )), 0, 15 ); // WP limits post name lengths
 

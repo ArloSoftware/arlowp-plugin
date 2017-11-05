@@ -146,6 +146,20 @@ class Arlo_For_Wordpress_Settings {
 				setcookie('arlo-new-custom-shortcode', null, -1, '/');
 			}
 
+			if ( array_key_exists('arlo-nav-tab', $_COOKIE) ) {
+				$nav_tab = $_COOKIE['arlo-nav-tab'];
+				unset( $_COOKIE['arlo-nav-tab'] );
+				setcookie('arlo-nav-tab', null, -1, '/');
+				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#' . $nav_tab) );
+			}
+
+			if ( array_key_exists('arlo-vertical-tab', $_COOKIE) ) {
+				$page = $_COOKIE['arlo-vertical-tab'];
+				unset( $_COOKIE['arlo-vertical-tab'] );
+				setcookie('arlo-vertical-tab', null, -1, '/');
+				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages/' . $page) );
+			}
+
 			add_action( 'admin_print_scripts', array($this, "arlo_check_current_tasks") );			
 		}
 		                 
