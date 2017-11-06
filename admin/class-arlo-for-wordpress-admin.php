@@ -197,7 +197,6 @@ class Arlo_For_Wordpress_Admin {
 		}
 		
 		wp_enqueue_script( $this->plugin_slug . '-admin-global-script', plugins_url( 'assets/js/admin_public.js?20170424', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, true );
-		wp_enqueue_script( $this->plugin_slug . '-plugin-script-cookie', plugins_url( '../public/assets/js/libs/jquery.cookie.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, true );
 
 		$screen = get_current_screen();
 		if ( $this->plugin_screen_hook_suffix == $screen->id ) {

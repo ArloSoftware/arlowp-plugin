@@ -404,7 +404,9 @@ if (typeof (Arlo) === "undefined") {
 			
 			$('.arlo_pages_section .nav-tab').click(function() {
 				var tabID = $(this).attr('id').split('-').pop();
-				$.cookie("arlo-vertical-tab", tabID, { path: '/' });
+				if (tabID !== 'new_custom') {
+					$.cookie("arlo-vertical-tab", tabID, { path: '/' });
+				}
 				me.showVerticalNavTab(tabID);
 			});
 		},
@@ -444,7 +446,7 @@ if (typeof (Arlo) === "undefined") {
 			$('.arlo-delete-button').click(function(e){
 				e.preventDefault();
 
-				if (confirm("Are you sure you want to delete this custom shortcode?")) {
+				if (confirm("Are you sure you want to delete this custom shortcode across all the themes?")) {
 					document.location = $(e.target).attr('href');
 				} 				
 			});

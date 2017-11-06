@@ -5,7 +5,6 @@ class Shortcodes {
 	public static function init() {
 		//TODO: Autoloader
 
-		// Add custom shortcodes to list of shortcodes
 		Categories::init();
 		OnlineActivities::init();
 		Templates::init();
@@ -81,9 +80,8 @@ class Shortcodes {
 	    
 	    // assign the passed function to a filter
 	    // all shortcodes are run through filters to allow external manipulation if required, however we also need a means of running the passed function
-	    add_filter('arlo_shortcode_content_' . $shortcode_name, function($content='', $atts, $shortcode_name, $import_id = '') use($closure) {
+	    add_filter('arlo_shortcode_content_' . $shortcode_name, function($content='', $atts, $shortcode_name, $import_id='') use($closure) {
 			global $arlo_plugin;
-
 		    return $closure->invokeArgs(array($content, $atts, $shortcode_name, $arlo_plugin->get_importer()->get_current_import_id(), ''));
 	    }, 10, 3);
 		
@@ -147,7 +145,7 @@ class Shortcodes {
 		return self::create_filter('region', $regions);
 	}
 
-	public static function create_filter($type, $items, $label=null, $group=null) {
+	public static function create_filter($type, $items, $label=null, $group=null, $att_default=null) {
 		if (count($items) == 0) {
 			return '';
 		}
@@ -165,7 +163,9 @@ class Shortcodes {
 		if (!is_null($label))
 			$filter_html .= '<option value="">' . esc_html($label) . '</option>';
 
-		$selected_value = \Arlo\Utilities::clean_string_url_parameter('arlo-' . $type);
+		$urlParameter = \Arlo\Utilities::clean_string_url_parameter('arlo-' . $type);
+
+		$selected_value = !empty($urlParameter) || $urlParameter == "0" ? $urlParameter : (!empty($att_default) || $att_default == "0" ? $att_default : '');
 
 		$options_html = '';
 			
@@ -199,7 +199,7 @@ class Shortcodes {
 				}
 
                 $selected = (strlen($selected_value) && strtolower($selected_value) == strtolower($item['value'])) ? ' selected="selected"' : '';
-				
+
 				$options_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>' . esc_html($value_label) . '</option>';
 			}
 		}

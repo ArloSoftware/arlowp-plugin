@@ -23,9 +23,9 @@ class Categories {
 
     private static function shortcode_categories($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         $return = '';
-        
-        $arlo_category = \Arlo\Utilities::clean_string_url_parameter('arlo-category');
-        
+
+        $arlo_category = self::get_selected_category();
+
         // calculate depth
         $depth = (isset($atts['depth'])) ? (int)$atts['depth'] : 1;
 
@@ -76,7 +76,7 @@ class Categories {
     }
 
     private static function shortcode_category_title($content = '', $atts, $shortcode_name, $import_id = '') {
-        $arlo_category = \Arlo\Utilities::clean_string_url_parameter('arlo-category');
+        $arlo_category = self::get_selected_category();
         
         if (!empty($arlo_category)) {
             $category = CategoriesEntity::get(array('id' => current(explode('-', $arlo_category))), 1, $import_id);
@@ -90,7 +90,7 @@ class Categories {
     }
 
     private static function shortcode_category_header($content = '', $atts, $shortcode_name, $import_id = '') {
-        $arlo_category = \Arlo\Utilities::clean_string_url_parameter('arlo-category');
+        $arlo_category = self::get_selected_category();
         
         if (!empty($arlo_category)) {
             $category = CategoriesEntity::get(array('id' => current(explode('-', $arlo_category))), 1, $import_id);
@@ -104,7 +104,7 @@ class Categories {
     } 
 
     private static function shortcode_category_footer ($content = '', $atts, $shortcode_name, $import_id = ''){
-        $arlo_category = \Arlo\Utilities::clean_string_url_parameter('arlo-category');
+        $arlo_category = self::get_selected_category();
         
         if (!empty($arlo_category)) {
             $category = CategoriesEntity::get(array('id' => current(explode('-', $arlo_category))), 1, $import_id);
@@ -115,6 +115,17 @@ class Categories {
         if(!$category) return;
         
         return $category->c_footer;
+    }
+
+    private static function get_selected_category() {
+        $category_atts = !empty(\Arlo\Shortcodes\Templates::$event_template_atts) ? \Arlo\Shortcodes\Templates::$event_template_atts : 
+        (!empty(\Arlo\Shortcodes\UpcomingEvents::$upcoming_list_item_atts) ? \Arlo\Shortcodes\UpcomingEvents::$upcoming_list_item_atts :
+        (!empty(\Arlo\Shortcodes\OnlineActivities::$oa_list_atts) ? \Arlo\Shortcodes\OnlineActivities::$oa_list_atts :
+        null));
+
+
+        return \Arlo\Utilities::get_att_string('category', $category_atts);
+
     }
 
     // category list

@@ -135,6 +135,8 @@ class Arlo_For_Wordpress_Settings {
 			}
 
 			if (!empty($_GET['delete-shortcode']) && isset($_GET['_wpnonce']) && wp_verify_nonce($_GET['_wpnonce'], 'arlo-delete-shortcode-nonce')) {
+				unset( $_COOKIE['arlo-vertical-tab'] );
+				setcookie('arlo-vertical-tab', null, -1, '/');
 				$settings_object["delete_shortcode"] = $_GET['delete-shortcode'];
 				update_option('arlo_settings', $settings_object);
 				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages') );

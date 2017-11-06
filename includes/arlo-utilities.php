@@ -29,6 +29,14 @@ class Utilities {
         return !empty($_GET[$parameter_name]) ? wp_unslash($_GET[$parameter_name]) : wp_unslash(urldecode(get_query_var($parameter_name)));
     }
 
+    public static function get_att_string($name, $atts) {
+        return self::clean_string_url_parameter('arlo-'.$name) !== NULL && self::clean_string_url_parameter('arlo-'.$name) !== "" ? self::clean_string_url_parameter('arlo-'.$name) : ( is_array($atts) && array_key_exists($name, $atts) ? $atts[$name] : '' );
+    }
+
+    public static function get_att_int($name, $atts) {
+        return self::clean_int_url_parameter('arlo-'.$name) !== NULL && self::clean_int_url_parameter('arlo-'.$name) !== "" ? self::clean_int_url_parameter('arlo-'.$name) : ( is_array($atts) && array_key_exists($name, $atts) ? intval($atts[$name]) : '' );
+    }
+
     public static function clean_int_url_parameter($parameter_name) {
         if (isset($_GET[$parameter_name])) {
             return intval($_GET[$parameter_name]);

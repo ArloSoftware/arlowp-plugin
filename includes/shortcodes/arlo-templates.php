@@ -4,6 +4,8 @@ namespace Arlo\Shortcodes;
 use Arlo\Entities\Categories as CategoriesEntity;
 
 class Templates {
+    public static $event_template_atts = [];
+
     public static function init() {
         $class = new \ReflectionClass(__CLASS__);
 
@@ -255,22 +257,45 @@ class Templates {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
 
         $template_name = Shortcodes::get_template_name($shortcode_name,'event_template_list','events');
-
         $templates = arlo_get_option('templates');
         $content = $templates[$template_name]['html'];
+
+        self::$event_template_atts = self::get_event_template_atts($atts);
 
 	    return $content;
     }
 
     private static function shortcode_schedule($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
-
         $template_name = Shortcodes::get_template_name($shortcode_name,'schedule','schedule');
-
         $templates = arlo_get_option('templates');
         $content = $templates[$template_name]['html'];
 
+        self::$event_template_atts = self::get_event_template_atts($atts);
         return $content;
+    }
+
+    private static function shortcode_event_template_search_list ($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if (get_option('arlo_plugin_disabled', '0') == '1') return;
+        
+        $templates = arlo_get_option('templates');
+        $content = $templates['eventsearch']['html'];
+        $GLOBALS['arlo_search_page'] = true;
+
+        self::$event_template_atts = self::get_event_template_atts($atts);
+
+        return $content;
+    }
+
+    private static function get_event_template_atts($atts) {
+        return array(
+            'location' => \Arlo\Utilities::get_att_string('location', $atts),
+            'category' => \Arlo\Utilities::get_att_string('category', $atts),
+            'delivery' => \Arlo\Utilities::get_att_int('delivery', $atts),
+            'templatetag' => \Arlo\Utilities::get_att_int('templatetag', $atts),
+            'search' => \Arlo\Utilities::get_att_string('search', $atts),
+            'region' => $arlo_region
+        );
     }
 
     private static function shortcode_event_template_list_pagination($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -278,15 +303,17 @@ class Templates {
 
         if (isset($GLOBALS['show_only_at_bottom']) && $GLOBALS['show_only_at_bottom']) return;
 
-        $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
-        
+        $atts['limit'] = intval(isset(self::$event_template_atts['limit']) ? self::$event_template_atts['limit'] : isset($atts['limit']) && is_numeric($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
+
+        $atts = array_merge($atts,self::$event_template_atts);
+
         $sql = self::generate_list_sql($atts, $import_id, true);
 
         $items = $wpdb->get_results($sql, ARRAY_A);
 
         $num = $wpdb->num_rows;
 
-        return arlo_pagination($num, $limit);        
+        return arlo_pagination($num, $atts['limit']);        
     }
 
     private static function shortcode_schedule_pagination($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -294,7 +321,9 @@ class Templates {
 
         if (isset($GLOBALS['show_only_at_bottom']) && $GLOBALS['show_only_at_bottom']) return;
 
-        $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
+        $atts['limit'] = intval(isset(self::$event_template_atts['limit']) ? self::$event_template_atts['limit'] : isset($atts['limit']) && is_numeric($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
+        
+        $atts = array_merge($atts, self::$event_template_atts);
         
         $sql = self::generate_list_sql($atts, $import_id, true);
 
@@ -302,12 +331,16 @@ class Templates {
 
         $num = $wpdb->num_rows;
 
-        return arlo_pagination($num, $limit);        
+        return arlo_pagination($num, $atts['limit']);        
     }
 
 
     private static function shortcode_event_template_list_item($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $wpdb;
+
+        if (!empty($atts['limit'])) {
+            self::$event_template_atts['limit'] = $atts['limit'];
+        }
 
         $settings = get_option('arlo_settings');  
 
@@ -319,6 +352,12 @@ class Templates {
         }
 
         $output = '';
+
+        if (empty($atts)) {
+            $atts = [];
+        }
+
+        $atts = array_merge($atts, self::$event_template_atts);
 
         $sql = self::generate_list_sql($atts, $import_id);
 
@@ -532,8 +571,15 @@ class Templates {
         $filter_html = '<form id="arlo-event-filter" class="arlo-filters" method="get" action="'. $page_link .'">';
 
         $filter_group = $page_type == 'schedule' ? 'schedule' : 'template';
-        
+
+        $atts = is_array($atts) ? $atts : [];
+
+        $atts = array_merge($atts, self::$event_template_atts);
+
+
         foreach(\Arlo_For_Wordpress::$available_filters[$filter_group]['filters'] as $filter_key => $filter):
+
+            $att = strval(self::$event_template_atts[$filter_key]);
 
             if (!in_array($filter_key, $filters_array))
                 continue;
@@ -549,7 +595,7 @@ class Templates {
                     }
                     
                     if (is_array($cats)) {
-                        $filter_html .= Shortcodes::create_filter($filter_key, CategoriesEntity::child_categories($cats), __('All categories', 'arlo-for-wordpress'),$filter_group);
+                        $filter_html .= Shortcodes::create_filter($filter_key, CategoriesEntity::child_categories($cats), __('All categories', 'arlo-for-wordpress'),$filter_group,$att);
                     }
                     
                     break;
@@ -558,7 +604,7 @@ class Templates {
 
                     // delivery select
 
-                    $filter_html .= Shortcodes::create_filter($filter_key, \Arlo_For_Wordpress::$delivery_labels, __('All delivery options', 'arlo-for-wordpress'),$filter_group);
+                    $filter_html .= Shortcodes::create_filter($filter_key, \Arlo_For_Wordpress::$delivery_labels, __('All delivery options', 'arlo-for-wordpress'),$filter_group,$att);
 
                     break;              
 
@@ -591,7 +637,7 @@ class Templates {
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter_key, $locations, __('All locations', 'arlo-for-wordpress'),$filter_group);
+                    $filter_html .= Shortcodes::create_filter($filter_key, $locations, __('All locations', 'arlo-for-wordpress'),$filter_group,$att);
 
                     break;
                     
@@ -623,7 +669,7 @@ class Templates {
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter_key, $tags, __('Select tag', 'arlo-for-wordpress'),$filter_group);                
+                    $filter_html .= Shortcodes::create_filter($filter_key, $tags, __('Select tag', 'arlo-for-wordpress'),$filter_group,$att);                
                     
                     break;
 
@@ -699,16 +745,6 @@ class Templates {
         return Shortcodes::create_region_selector("event");
     }
 
-    private static function shortcode_event_template_search_list ($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        if (get_option('arlo_plugin_disabled', '0') == '1') return;
-        
-        $templates = arlo_get_option('templates');
-        $content = $templates['eventsearch']['html'];
-        $GLOBALS['arlo_search_page'] = true;
-
-        return $content;
-    }
-
     private static function shortcode_template_search_region_selector ($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         return Shortcodes::create_region_selector("eventsearch");
     }        
@@ -741,12 +777,12 @@ class Templates {
 
         $join = "";
 
-        $arlo_location = \Arlo\Utilities::clean_string_url_parameter('arlo-location');
-        $arlo_category = \Arlo\Utilities::clean_string_url_parameter('arlo-category');
-        $arlo_delivery = \Arlo\Utilities::clean_int_url_parameter('arlo-delivery');
-        $arlo_templatetag = \Arlo\Utilities::clean_string_url_parameter('arlo-templatetag');
-        $arlo_search = \Arlo\Utilities::clean_string_url_parameter('arlo-search');
-        $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
+        $arlo_location = !empty($atts['location']) ? $atts['location'] : null;
+        $arlo_category = !empty($atts['category']) ? $atts['category'] : null;
+        $arlo_delivery = isset($atts['delivery']) ? $atts['delivery'] : null;
+        $arlo_templatetag = !empty($atts['templatetag']) ? $atts['templatetag'] : null;
+        $arlo_search = !empty($atts['search']) ? $atts['search'] : null;
+        $arlo_region = !empty($atts['region']) ? $atts['region'] : null;
 
         if(!empty($arlo_location) || (isset($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) ) :
 
