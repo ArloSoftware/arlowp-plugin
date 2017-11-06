@@ -76,6 +76,11 @@
 	width: 100%;
 }
 
+.arlo-field [type='text'].arlo-inline-input {
+	width: auto;
+	display: inline-block;
+}
+
 .arlo-field .arlo_platform {
 	display: inline-block;
 	color: #aaa;
@@ -92,6 +97,10 @@
 
 .arlo-check input {
 	margin: 2px 10px 2px 0;
+}
+
+.arlo-field input[type=checkbox].arlo-check.hidden {
+	display: none;
 }
 
 .arlo-check + .arlo-label {
@@ -332,6 +341,10 @@ table.arlo-welcome td.logo {
 	padding-right: 0;
 }
 
+.arlo-new_custom .arlo-template-table td {
+	vertical-align: top;
+}
+
 .arlo-block {
 	display: inline-block;
 }
@@ -379,6 +392,25 @@ table.arlo-welcome td.logo {
 	border-right: 1px solid #f1f1f1;
 	margin-right: -1px;
 	margin-bottom: 3px;
+}
+
+.nav-tab.vertical-nav-tab.arlo-for-wordpress-pages-new_custom {
+	background-color: #d2d2d2;
+	margin-top: .5em;
+}
+
+.nav-tab.vertical-nav-tab.arlo-for-wordpress-pages-new_custom:hover {
+	background-color: white;
+}
+
+.nav-tab.vertical-nav-tab.arlo-for-wordpress-pages-new_custom.nav-tab-active {
+	background-color: #f1f1f1;
+}
+
+.nav-tab.vertical-nav-tab.arlo-for-wordpress-pages-new_custom::before {
+    content: '+';
+    display: inline-block;
+    margin-right: 5px;
 }
 
 .arlo-template-table .arlo-label + .arlo-field.arlo-template-field,
@@ -449,6 +481,13 @@ table.arlo-welcome td.logo {
 
 .hidden {
 	display: none;
+}
+
+.arlo-delete-button {
+    text-decoration: none;
+    font-size: 14px;
+    display: inline-block;
+    margin-left: 1em;	
 }
 
 #arlo-themes-for-designers a:focus,

@@ -36,7 +36,7 @@ class Events {
         
         $filters_array = explode(',',$filters);
 
-        $arlo_region = \Arlo\Utilities::get_region_parameter();
+        $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
         
         $settings = get_option('arlo_settings');  
 
@@ -207,7 +207,7 @@ class Events {
         $where = '';
         $parameters = [];
         
-        $arlo_region = \Arlo\Utilities::get_region_parameter();
+        $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
         $arlo_location = \Arlo\Utilities::clean_string_url_parameter('arlo-location');
         
         $t1 = "{$wpdb->prefix}arlo_eventtemplates";
@@ -528,7 +528,7 @@ class Events {
         if(!isset($GLOBALS['arlo_event_list_item']['e_arlo_id'])) return '';
         global $post, $wpdb;
         
-        $arlo_region = \Arlo\Utilities::get_region_parameter();
+        $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
         $output = $where = '';
         
         extract(shortcode_atts(array(
@@ -584,7 +584,7 @@ class Events {
     private static function shortcode_event_duration($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_event_list_item']) || empty($GLOBALS['arlo_event_list_item']['et_arlo_id'])) return;
 
-        $arlo_region = \Arlo\Utilities::get_region_parameter();
+        $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
 
         $conditions = array(
             'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id'],
@@ -672,7 +672,7 @@ class Events {
         
         $offer;
         
-        $arlo_region = \Arlo\Utilities::get_region_parameter();
+        $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
 
         // attempt to find event template offer
         $conditions = array(
@@ -956,7 +956,7 @@ class Events {
         if (!empty($GLOBALS['arlo_eventtemplate']['et_region'])) {
             $arlo_region = $GLOBALS['arlo_eventtemplate']['et_region'];
         } else {
-            $arlo_region = \Arlo\Utilities::get_region_parameter();
+            $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
         }
 
         // merge and extract attributes

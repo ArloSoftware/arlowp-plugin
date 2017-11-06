@@ -80,9 +80,8 @@ class Shortcodes {
 	    
 	    // assign the passed function to a filter
 	    // all shortcodes are run through filters to allow external manipulation if required, however we also need a means of running the passed function
-	    add_filter('arlo_shortcode_content_' . $shortcode_name, function($content='', $atts, $shortcode_name, $import_id = '') use($closure) {
+	    add_filter('arlo_shortcode_content_' . $shortcode_name, function($content='', $atts, $shortcode_name, $import_id='') use($closure) {
 			global $arlo_plugin;
-
 		    return $closure->invokeArgs(array($content, $atts, $shortcode_name, $arlo_plugin->get_importer()->get_current_import_id(), ''));
 	    }, 10, 3);
 		
@@ -96,7 +95,7 @@ class Shortcodes {
 			'strip_html'	=> 'false',
 			'decode_quotes_in_shortcodes' => 'false',
 		), $atts, $shortcode_name));
-	
+
 		// need to decide ordering - currently makes sense to process the specific filter first
 		$content = apply_filters('arlo_shortcode_content_'.$shortcode_name, $content, $atts, $shortcode_name);
 		$content = apply_filters('arlo_shortcode_content', $content, $atts, $shortcode_name);
@@ -129,7 +128,7 @@ class Shortcodes {
 			// wrap content			
 			$content = sprintf($wrap, $content);                        
 		}
-		
+
 		return do_shortcode($content);
     }
 
@@ -146,7 +145,7 @@ class Shortcodes {
 		return self::create_filter('region', $regions);
 	}
 
-	public static function create_filter($type, $items, $label=null, $group=null) {
+	public static function create_filter($type, $items, $label=null, $group=null, $att_default=null) {
 		if (count($items) == 0) {
 			return '';
 		}
@@ -164,7 +163,9 @@ class Shortcodes {
 		if (!is_null($label))
 			$filter_html .= '<option value="">' . esc_html($label) . '</option>';
 
-		$selected_value = \Arlo\Utilities::clean_string_url_parameter('arlo-' . $type);
+		$urlParameter = \Arlo\Utilities::clean_string_url_parameter('arlo-' . $type);
+
+		$selected_value = !empty($urlParameter) || $urlParameter == "0" ? $urlParameter : (!empty($att_default) || $att_default == "0" ? $att_default : '');
 
 		$options_html = '';
 			
@@ -198,7 +199,7 @@ class Shortcodes {
 				}
 
                 $selected = (strlen($selected_value) && strtolower($selected_value) == strtolower($item['value'])) ? ' selected="selected"' : '';
-				
+
 				$options_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>' . esc_html($value_label) . '</option>';
 			}
 		}
@@ -365,7 +366,7 @@ class Shortcodes {
 	public static function get_advertised_offers($id, $id_field, $import_id) {
 		global $wpdb;
                
-        $arlo_region = \Arlo\Utilities::get_region_parameter();
+        $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
 
         $cache_key = md5( serialize( array( $id => $id_field ) ) );
         $cache_category = 'ArloOffers';
@@ -538,4 +539,25 @@ class Shortcodes {
     }
 
 
+    public static function get_custom_shortcodes($type) {
+    	$shortcodes = array();
+
+    	foreach(\Arlo_For_Wordpress::$templates as $shortcode_name => $shortcode) {
+    		if ( isset($shortcode["type"]) ) {
+    			if (is_string($type) && $shortcode["type"] == $type ) {
+    				$shortcodes[$shortcode_name] = $shortcode;
+    			} else if (is_array($type) && in_array($shortcode["type"], $type)) {
+    				$shortcodes[$shortcode_name] = $shortcode;
+    			}
+    		}
+    	}
+
+    	return $shortcodes;
+    }
+
+
+    public static function get_template_name($shortcode_name,$default_shortcode_name,$default_template_name) {
+        $shortcode_name_root = str_replace('arlo_', '', $shortcode_name);
+        return $shortcode_name_root != $default_shortcode_name ? $shortcode_name_root : $default_template_name;
+    }
 }
