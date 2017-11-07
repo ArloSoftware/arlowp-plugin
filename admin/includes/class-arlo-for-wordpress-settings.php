@@ -678,12 +678,14 @@ class Arlo_For_Wordpress_Settings {
 			    'show_option_none'	=> '-- Select --',
 			    'option_none_value'	=> 0
 			));
-	
+
+			$shortcode_documentation_url = "https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#" . str_replace( "]", "", str_replace( "[", "", Arlo_For_Wordpress::$templates[$type]['shortcode'] ) );
+
 			echo '
 			<div class="arlo-label"><label>' .  __("Host page", 'arlo-for-wordpress' ) . '</label></div>
 			<div class="arlo-field">
 				<span class="arlo-page-select">' . $select . '</span>
-				<span class="arlo-gray arlo-inlineblock">' . sprintf(__('Page must contain the %s shortcode', 'arlo-for-wordpress' ), Arlo_For_Wordpress::$templates[$id]['shortcode']) . '</span>
+				<span class="arlo-gray arlo-inlineblock">' . sprintf(__('Page must contain the %s shortcode. <a href="%s" target="_blank">Shortcode customisation options.</a>', 'arlo-for-wordpress' ), Arlo_For_Wordpress::$templates[$id]['shortcode'], $shortcode_documentation_url) . '</span>
 			</div>';
     	}
 
