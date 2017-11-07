@@ -30,11 +30,13 @@ class Utilities {
     }
 
     public static function get_att_string($name, $atts) {
-        return self::clean_string_url_parameter('arlo-'.$name) !== NULL && self::clean_string_url_parameter('arlo-'.$name) !== "" ? self::clean_string_url_parameter('arlo-'.$name) : ( is_array($atts) && array_key_exists($name, $atts) ? $atts[$name] : '' );
+        $string_parameter = self::clean_string_url_parameter('arlo-'.$name);
+        return !empty($string_parameter) || $string_parameter == "0" ? $string_parameter : ( is_array($atts) && array_key_exists($name, $atts) ? $atts[$name] : '' );
     }
 
     public static function get_att_int($name, $atts) {
-        return self::clean_int_url_parameter('arlo-'.$name) !== NULL && self::clean_int_url_parameter('arlo-'.$name) !== "" ? self::clean_int_url_parameter('arlo-'.$name) : ( is_array($atts) && array_key_exists($name, $atts) ? intval($atts[$name]) : '' );
+        $int_parameter = self::clean_int_url_parameter('arlo-'.$name);
+        return !empty($int_parameter) || $int_parameter == "0" ? $int_parameter : ( is_array($atts) && array_key_exists($name, $atts) ? intval($atts[$name]) : '' );
     }
 
     public static function clean_int_url_parameter($parameter_name) {
