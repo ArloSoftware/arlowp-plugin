@@ -34,6 +34,9 @@ class Categories {
         
         // show counts
         $counts = (isset($atts['counts'])) ? $atts['counts'] : null;
+
+        //from widget
+        $widget = (isset($atts['widget'])) ? $atts['widget'] == "true" : false;
                     
         // start at
         $start_at = (isset($atts['parent'])) ? (int)$atts['parent'] : 0;
@@ -68,7 +71,7 @@ class Categories {
             $GLOBALS['arlo_categories_count'] = count($tree);		
                     
             if(!empty($tree)) {		
-                $return .= self::generate_category_ul($tree, $counts);	
+                $return .= self::generate_category_ul($tree, $counts, $widget);	
             }	
         }
         
@@ -129,9 +132,17 @@ class Categories {
     }
 
     // category list
-    private static function generate_category_ul($items, $counts) {
+    private static function generate_category_ul($items, $counts, $widget = false) {
         $post_types = arlo_get_option('post_types');
         $page_type = \Arlo_For_Wordpress::get_current_page_arlo_type();
+
+        if (empty($page_type) || $widget) {
+            $page_type = 'event';
+        }
+
+        if (empty($post_types[$page_type]['posts_page'])) 
+            return null;
+
         $events_url = get_page_link($post_types[$page_type]['posts_page']);
         
         if(!is_array($items) || empty($items)) return '';
@@ -143,7 +154,7 @@ class Categories {
         foreach($items as $cat) {
             $href = $events_url . (!empty($arlo_region) ? 'region-' . $arlo_region . '/' : '') . ($cat->c_parent_id != 0 ? 'cat-' . esc_attr($cat->c_slug) : '');
             $cat_name = $cat->c_name . ( !is_null($counts) ?  sprintf($counts, $cat->c_template_num) : '' );
-            $child_li = (isset($cat->children) ? self::generate_category_ul($cat->children, $counts) : '');
+            $child_li = (isset($cat->children) ? self::generate_category_ul($cat->children, $counts, $widget) : '');
 
             $html .= sprintf('<li><a href="%s">%s</a>%s</li>', esc_url($href), esc_html($cat_name), $child_li);
         }
