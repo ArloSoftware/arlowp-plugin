@@ -816,6 +816,7 @@ class Events {
         $event_snippet["location"] = array();
         $event_snippet["location"]["@type"] = "Place";
 
+
         $v_name = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_name');
         if (!empty($v_name)) {
             $event_snippet["location"]["name"] = $v_name;
@@ -897,7 +898,7 @@ class Events {
         
         $v_link = \Arlo\Utilities::get_absolute_url($v_link);
 
-        if (!empty($v_link)) {
+        if (!empty($v_link) && !$v_is_hidden && Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'e_locationname') !== "Online") {
             $event_snippet["location"]["url"] = $v_link;
         }
 
