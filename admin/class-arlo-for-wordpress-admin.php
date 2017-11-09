@@ -557,7 +557,7 @@ class Arlo_For_Wordpress_Admin {
 		}
 
 		// Custom shortcodes
-		if (!empty($new["new_custom_shortcode"]) && !empty($new["new_custom_shortcode_type"]) && !array_key_exists( $new["new_custom_shortcode"], $old['custom_shortcodes'] ) && !shortcode_exists("arlo_" . $new["new_custom_shortcode"] . "") ) {
+		if (!empty($new["new_custom_shortcode"]) && !empty($new["new_custom_shortcode_type"]) && !array_key_exists( $new["new_custom_shortcode"], $old['custom_shortcodes'] ) && !shortcode_exists("arlo_" . $new["new_custom_shortcode"] . "") && preg_match('/^[\w]+$/',$new["new_custom_shortcode"]) === 1 ) {
 
 			$shortcode_name = substr( sanitize_text_field(strtolower( str_replace( array("&","/","<",">","[","]","="),'',str_replace(' ','_',$new["new_custom_shortcode"]) ) )), 0, 15 ); // WP limits post name lengths
 
