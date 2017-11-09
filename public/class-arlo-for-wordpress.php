@@ -329,7 +329,6 @@ class Arlo_For_Wordpress {
     public static $shortcode_types = array(
 		'events' => 'Catalogue', 
 		'schedule' => 'Schedule', 
-		'eventsearch' => 'Event Search', 
 		'upcoming' => 'Upcoming', 
 		'oa' => 'Online Activities', 
 		'presenters' => 'Presenters', 

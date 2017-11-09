@@ -455,7 +455,9 @@ if (typeof (Arlo) === "undefined") {
 				var customShortcodeType = $('.arlo-new-custom-shortcode-type'),
 					customShortcodeName = $('.arlo-new-custom-shortcode-name'),
 					errors = false,
-					requiredFieldError = 'Field is required';
+					requiredFieldError = 'Field is required',
+					re = new RegExp(/^\w+$/),
+					input = customShortcodeName.find('input').val();
 
 				if (customShortcodeName.find('input').val() == '' && customShortcodeType.val() == '') {
 					return true;
@@ -471,9 +473,14 @@ if (typeof (Arlo) === "undefined") {
 					showValidationError(customShortcodeType, requiredFieldError);
 				}
 
-				if ( arlo_shortcodes.indexOf( customShortcodeName.find('input').val() ) !== -1 ) {
+				if ( arlo_shortcodes.indexOf( input ) !== -1 ) {
 					errors = true;
 					showValidationError(customShortcodeName, 'A shortcode with that name already exists');
+				}
+
+				if ( !re.test(input) ) {
+					errors = true;
+					showValidationError(customShortcodeName, 'Shortcode names must only contain letters, numbers and underscores');
 				}
 
 				function showValidationError(field, message) {
