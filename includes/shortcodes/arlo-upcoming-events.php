@@ -55,7 +55,7 @@ class UpcomingEvents {
             'templatetag' => \Arlo\Utilities::get_att_string('templatetag', $atts),
             'presenter' => \Arlo\Utilities::get_att_string('presenter', $atts),
             'month' => \Arlo\Utilities::get_att_string('month', $atts),
-            'region' => $arlo_region
+            'region' => \Arlo_For_Wordpress::get_region_parameter()
         );
     }
 
