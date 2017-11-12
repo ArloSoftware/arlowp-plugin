@@ -30,7 +30,8 @@ class Venues {
     private static function shortcode_venue_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
 
-        $template_name = Shortcodes::get_template_name($shortcode_name,'venues_list','venues');
+        $template_name = Shortcodes::get_template_name($shortcode_name,'venue_list','venues');
+
 
         $templates = arlo_get_option('templates');
         $content = $templates[$template_name]['html'];
@@ -164,9 +165,9 @@ class Venues {
         
         // merge and extract attributes
         extract(shortcode_atts(array(
-            'height'	=> 400,
-            'width'  	=> 400,
-            'zoom'		=> 16,
+            'height'    => 400,
+            'width'     => 400,
+            'zoom'      => 16,
             'type'      => 'dynamic'
         ), $atts, $shortcode_name, $import_id));
 

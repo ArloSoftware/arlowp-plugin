@@ -294,7 +294,7 @@ class Templates {
             'delivery' => \Arlo\Utilities::get_att_int('delivery', $atts),
             'templatetag' => \Arlo\Utilities::get_att_int('templatetag', $atts),
             'search' => \Arlo\Utilities::get_att_string('search', $atts),
-            'region' => $arlo_region
+            'region' => \Arlo_For_Wordpress::get_region_parameter()
         );
     }
 

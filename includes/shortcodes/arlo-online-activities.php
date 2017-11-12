@@ -198,7 +198,7 @@ class OnlineActivities {
             'category' => \Arlo\Utilities::get_att_string('category', $atts),
             'oatag' => \Arlo\Utilities::get_att_string('oatag', $atts),
             'templatetag' => \Arlo\Utilities::get_att_string('templatetag', $atts),
-            'region' => $arlo_region
+            'region' => \Arlo_For_Wordpress::get_region_parameter()
         );
     }
 

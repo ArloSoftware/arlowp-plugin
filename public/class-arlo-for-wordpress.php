@@ -1496,12 +1496,11 @@ class Arlo_For_Wordpress {
 			Arlo_For_Wordpress::$templates = array_merge( $first_elements, $settings['custom_shortcodes'], $last_element );
 
 			
-
 			$custom_post_types = array();
 
 			foreach ($settings['custom_shortcodes'] as $shortcode_id => $shortcode) {
 				$shortcode_name = $shortcode['name'];
-				$regionalized = !in_array($shortcode['type'],['venue','presenter']);
+				$regionalized = !in_array($shortcode['type'],['venue','presenter','venues','presenters']);
 				$shortcode_id = $shortcode['id'];
 
 				$custom_post_types[$shortcode_id] = array(

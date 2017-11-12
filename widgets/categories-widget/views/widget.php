@@ -15,7 +15,7 @@
 
 	$parent = ($instance['parent']) ? '' : ' parent="0"';
 
-	$shortcode = '[arlo_categories' . $parent . ' depth="' . $depth . '"]';
+	$shortcode = '[arlo_categories' . $parent . ' depth="' . $depth . '" widget="true"]';
 
 	$output = do_shortcode($shortcode);
 

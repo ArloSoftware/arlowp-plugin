@@ -846,7 +846,19 @@ class Arlo_For_Wordpress_Settings {
 	    echo '
 	    <h3>What\'s new in this release</h3>
 		<p><strong>If you are experiencing problems after an update, please deactivate and re-activate the plugin and re-synchronize the data.</strong></p>
-	    <h4>Version ' .  VersionHandler::VERSION . '</h4>
+		
+		<h4>Version ' .  VersionHandler::VERSION . '</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">	  
+				<li>Resuable shortcodes</li>
+				<li>New "category", "location", "delivery" and "templatetag" attributes for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#arlo_event_template_list" target="_blank">[arlo_event_template_list]</a> global shortcode </li>
+				<li>New "category", "location", "delivery" and "templatetag" attributes for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#arlo_schedule" target="_blank">[arlo_schedule]</a> global shortcode </li>
+				<li>New "category", "location", "delivery", "eventtag", "templatetag", "presenter" and "month" attributes for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#arlo_upcoming_list" target="_blank">[arlo_upcoming_list]</a> global shortcode </li>
+				<li>New "category" attribute for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#arlo_onlineactivites_list" target="_blank">[arlo_onlineactivites_list]</a> global shortcode </li>	
+			</ul>
+		</p>		
+	
+		<h4>Version 3.3.1</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">	  
 				<li>Bugfix, when rich snippet for event doesn\'t return Location</li>
@@ -867,33 +879,6 @@ class Arlo_For_Wordpress_Settings {
 				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_notice" target="_blank">[arlo_event_notice]</a> shortcode</li>
 				<li>Many bug fixes</li>
 			</ul>
-		</p>		
-	    <h4>Version 3.2.1</h4>
-		<p>
-	    	<ul class="arlo-whatsnew-list">	  
-				<li>New online activities global shortcode <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#arlo_onlineactivites_list" target="_blank">[arlo_onlineactivites_list]</a></li>
-				<li>New options for <a href="https://developer.arlo.co/doc/wordpress/widgets#widget-upcoming-events" target="_blank">Upcoming events widget</a></li>
-				<li>New settings to customize <a href="https://developer.arlo.co/doc/wordpress/settings#filters" target="_blank">Filters</a></li>
-				<li>New settings for the <a href="https://developer.arlo.co/doc/wordpress/settings#misc" target="_blank">Import</a></li>
-				<li>The plugin is fully compatible with PHP 7</li>
-				<li>Many bug fixes</li>
-			</ul>
-		</p>
-		<h4>Version 3.1.2</h4>
-		<p>
-	    	<ul class="arlo-whatsnew-list">	  
-				<li>Improve error logging and reliability for data synchronization</li>
-			</ul>
-		</p>
-		<h4>Version 3.1</h4>
-		<p>
-	    	<ul class="arlo-whatsnew-list">	  
-				<li>New \'link\' attribute for <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_location" target="_blank">[arlo_event_location]</a> and <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_presenters" target="_blank">[arlo_event_presenters]</a> shortcodes</li>
-				<li>New <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_link" target="_blank">[arlo_venue_link]</a> shortcode</li>
-				<li>New <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/presenterrelated#arlo_presenter_link" target="_blank">[arlo_presenter_link]</a> shortcode</li>
-				<li>Fix timezone issues on the upcoming events widget</li>
-	    		<li>Fix timezone error if the WP hasn\'t got a named timezone</li>
-	    	</ul>
 		</p>
 		<a href="https://wordpress.org/plugins/arlo-training-and-event-management-system/#developers" target="_blank">More change log</a>
 	    ';
