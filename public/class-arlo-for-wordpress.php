@@ -141,7 +141,7 @@ class Arlo_For_Wordpress {
 			'slug' => 'presenter',
 			'name' => 'Presenters',
 			'singular_name' => 'Presenter list'
-		),		
+		),
 		'eventsearch' => array(
 			'slug' => 'eventsearch',
 			'name' => 'Event search',
@@ -310,7 +310,29 @@ class Arlo_For_Wordpress {
 			'id' => 'venues',
 			'shortcode' => '[arlo_venue_list]',
 			'name' => 'Venue list'
+		),
+		'new_custom' => array(
+			'id' => 'new_custom',
+			'name' => 'New'
 		)
+    );
+
+
+
+	/**
+	 * $shortcoes_types: defines the available types of global shortcodes for the plugin
+	 *
+	 * @since    1.0.0
+	 *
+	 * @var      array
+	 */
+    public static $shortcode_types = array(
+		'events' => 'Catalogue', 
+		'schedule' => 'Schedule', 
+		'upcoming' => 'Upcoming', 
+		'oa' => 'Online Activities', 
+		'presenters' => 'Presenters', 
+		'venues' => 'Venues'
     );
 
 	/**
@@ -382,6 +404,8 @@ class Arlo_For_Wordpress {
 
 		// Load plugin text domain
 		add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
+
+		self::arlo_add_custom_shortcodes();
 
 		// Register custom post types
 		add_action( 'init', 'arlo_register_custom_post_types');
@@ -1433,7 +1457,65 @@ class Arlo_For_Wordpress {
 			}
 		}
 	}
+
+	public static function arlo_template_source() {
+		$plugin = Arlo_For_Wordpress::get_instance();
+		$theme_manager = $plugin->get_theme_manager();
+
+		$selected_theme_id = get_option('arlo_theme', Arlo_For_Wordpress::DEFAULT_THEME);
+		$theme_templates = $theme_manager->load_default_templates($selected_theme_id);
+		
+		$templates = [];
+		
+		foreach (Arlo_For_Wordpress::$templates as $key => $val) {
+			if ($key == 'new_custom') { continue; }
+			$template_type = array_key_exists( 'type', $val ) ? $val['type'] : $key;
+			$templates[ARLO_PLUGIN_PREFIX . '-' . $key] = $theme_templates[$template_type]['html'];
+		}
+
+		return $templates;
+	}
 	
+	public static function arlo_add_custom_shortcodes() {
+		$settings = get_option('arlo_settings');
+
+		if ( isset($settings['custom_shortcodes']) ) {
+			array_walk($settings['custom_shortcodes'], function (&$type,$shortcode) {
+				$type = array(
+					'id' => $shortcode,
+					'name' => ucfirst( str_replace("_"," ",$shortcode) ),
+					'shortcode' => '[arlo_'.$shortcode.']',
+					'type' => $type
+				);
+			});
+
+			$first_elements = array_slice( Arlo_For_Wordpress::$templates, 0, count(Arlo_For_Wordpress::$templates)-1 );
+
+			$last_element = array_slice( Arlo_For_Wordpress::$templates, count(Arlo_For_Wordpress::$templates)-1, 1 );
+
+			Arlo_For_Wordpress::$templates = array_merge( $first_elements, $settings['custom_shortcodes'], $last_element );
+
+			
+			$custom_post_types = array();
+
+			foreach ($settings['custom_shortcodes'] as $shortcode_id => $shortcode) {
+				$shortcode_name = $shortcode['name'];
+				$regionalized = !in_array($shortcode['type'],['venue','presenter','venues','presenters']);
+				$shortcode_id = $shortcode['id'];
+
+				$custom_post_types[$shortcode_id] = array(
+					'slug' => $shortcode_id,
+					'name' => $shortcode_name,
+					'singular_name' => $shortcode_name,
+					'regionalized' => $regionalized
+				);
+
+			}
+
+			Arlo_For_Wordpress::$post_types = array_merge(Arlo_For_Wordpress::$post_types, $custom_post_types);
+		}
+	}
+
 	public function add_cron_schedules($schedules) {
 		$schedules = [
 			'minutes_5' => [
@@ -1608,8 +1690,25 @@ class Arlo_For_Wordpress {
 
 		update_option('arlo_settings', $settings);
 	}
-	
-	public function get_tag_by_id($tag_id) {
+
+    public static function get_current_page_arlo_type() {
+        global $post;
+
+        $settings = get_option('arlo_settings');
+        foreach ($settings['post_types'] as $key => $post_type) {
+            if ($post_type["posts_page"] == $post->ID) {
+                return $key;
+            }
+        }
+    }
+
+    public static function get_region_parameter() {
+        $regions = get_option('arlo_regions');
+        $arlo_region = strtoupper(get_query_var('arlo-region', ''));
+        return (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+    }
+    
+   	public function get_tag_by_id($tag_id) {
 		global $wpdb;		
 		
 		$tag = $wpdb->get_row($wpdb->prepare(
@@ -1647,8 +1746,8 @@ class Arlo_For_Wordpress {
 
 			$settings = get_option('arlo_settings');
 			if (!empty($settings['disable_ssl_verification']) && $settings['disable_ssl_verification'] == 1) {
-				curl_setopt($c, CURLOPT_SSL_VERIFYHOST,false);
-				curl_setopt($c, CURLOPT_SSL_VERIFYPEER,false);
+				curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,false);
+				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,false);
 			}
 			
 			curl_exec($ch);

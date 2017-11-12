@@ -29,6 +29,16 @@ class Utilities {
         return !empty($_GET[$parameter_name]) ? wp_unslash($_GET[$parameter_name]) : wp_unslash(urldecode(get_query_var($parameter_name)));
     }
 
+    public static function get_att_string($name, $atts) {
+        $string_parameter = self::clean_string_url_parameter('arlo-'.$name);
+        return !empty($string_parameter) || $string_parameter == "0" ? $string_parameter : ( is_array($atts) && array_key_exists($name, $atts) ? $atts[$name] : '' );
+    }
+
+    public static function get_att_int($name, $atts) {
+        $int_parameter = self::clean_int_url_parameter('arlo-'.$name);
+        return !empty($int_parameter) || $int_parameter == "0" ? $int_parameter : ( is_array($atts) && array_key_exists($name, $atts) ? intval($atts[$name]) : '' );
+    }
+
     public static function clean_int_url_parameter($parameter_name) {
         if (isset($_GET[$parameter_name])) {
             return intval($_GET[$parameter_name]);
@@ -46,23 +56,6 @@ class Utilities {
         $url = parse_url($url);
         unset($url['scheme']);
         return '//'.implode($url);
-    }
-
-    public static function get_region_parameter() {
-        $regions = get_option('arlo_regions');
-        $arlo_region = strtoupper(get_query_var('arlo-region', ''));
-        return (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
-    }
-
-    public static function get_current_page_arlo_type() {
-        global $post;
-
-        $settings = get_option('arlo_settings');
-        foreach ($settings['post_types'] as $key => $post_type) {
-            if ($post_type["posts_page"] == $post->ID) {
-                return $key;
-            }
-        }
     }
 
 	public static function GUIDv4 ($trim = true, $remove_hyphens = false) {

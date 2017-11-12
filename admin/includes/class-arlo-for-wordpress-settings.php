@@ -133,7 +133,35 @@ class Arlo_For_Wordpress_Settings {
 				}
 				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress') );
 			}
-			
+
+			if (!empty($_GET['delete-shortcode']) && isset($_GET['_wpnonce']) && wp_verify_nonce($_GET['_wpnonce'], 'arlo-delete-shortcode-nonce')) {
+				unset( $_COOKIE['arlo-vertical-tab'] );
+				setcookie('arlo-vertical-tab', null, -1, '/');
+				$settings_object["delete_shortcode"] = $_GET['delete-shortcode'];
+				update_option('arlo_settings', $settings_object);
+				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages') );
+			}
+
+			if ( array_key_exists('arlo-new-custom-shortcode', $_COOKIE) ) {
+				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages/' . $_COOKIE['arlo-new-custom-shortcode']) );
+				unset( $_COOKIE['arlo-new-custom-shortcode'] );
+				setcookie('arlo-new-custom-shortcode', null, -1, '/');
+			}
+
+			if ( array_key_exists('arlo-nav-tab', $_COOKIE) ) {
+				$nav_tab = $_COOKIE['arlo-nav-tab'];
+				unset( $_COOKIE['arlo-nav-tab'] );
+				setcookie('arlo-nav-tab', null, -1, '/');
+				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#' . $nav_tab) );
+			}
+
+			if ( array_key_exists('arlo-vertical-tab', $_COOKIE) ) {
+				$page = $_COOKIE['arlo-vertical-tab'];
+				unset( $_COOKIE['arlo-vertical-tab'] );
+				setcookie('arlo-vertical-tab', null, -1, '/');
+				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages/' . $page) );
+			}
+
 			add_action( 'admin_print_scripts', array($this, "arlo_check_current_tasks") );			
 		}
 		                 
@@ -251,7 +279,7 @@ class Arlo_For_Wordpress_Settings {
 		// loop though slug array and create each required slug field
 	    foreach(Arlo_For_Wordpress::$templates as $id => $template) {
 	    	$name = __($template['name'], 'arlo-for-wordpress' );
-			add_settings_field( $id, '<label for="'.$id.'">'.$name.'</label>', array($this, 'arlo_template_callback'), $this->plugin_slug, 'arlo_pages_section', array('id'=>$id,'label_for'=>$id) );
+			add_settings_field( $id, '<label for="'.$id.'">'.$name.'</label>', array($this, 'arlo_template_callback'), $this->plugin_slug, 'arlo_pages_section', array('id'=>$id,'label_for'=>$id, 'type'=> isset($template["type"]) ? $template["type"] : null) );
 		}
 		
 		/*
@@ -388,8 +416,9 @@ class Arlo_For_Wordpress_Settings {
 	function arlo_pages_section_callback() {
 		echo '
 	    		<script type="text/javascript"> 
-	    			var arlo_templates = ' . json_encode($this->arlo_template_source()) . ';
-	    		</script>		
+	    			var arlo_templates = ' . json_encode(\Arlo_For_Wordpress::arlo_template_source()) . ';' . '
+	    			var arlo_shortcodes = ' . json_encode(array_keys(Arlo_For_Wordpress::$templates)) . ';' .
+	    		'</script>		
 		';
 	}
 	
@@ -499,7 +528,7 @@ class Arlo_For_Wordpress_Settings {
 							$is_hidden = false;
 					    	$existing_filter_setting_id = rand();
 
-							if ($filter_settings["arlohiddenfilters"][$filter_group][$filter_key]) {
+							if (isset($filter_settings["arlohiddenfilters"]) && $filter_settings["arlohiddenfilters"][$filter_group][$filter_key]) {
 								$is_hidden = in_array($old_value,$filter_settings["arlohiddenfilters"][$filter_group][$filter_key]);
 							}
 
@@ -603,15 +632,37 @@ class Arlo_For_Wordpress_Settings {
 
 	function arlo_template_callback($args) {
 		$id = $args['id'];
+		$type = isset($args['type']) ? $args['type'] : $args['id'];
 		$settings_object = get_option('arlo_settings');
-		
-		echo '<h3>' . sprintf(__('%s page', 'arlo-for-wordpress' ), Arlo_For_Wordpress::$templates[$id]['name']) . '</h3>';
-		
+		$is_new_shortcode_page = $id == 'new_custom';
+		$is_custom_shortcode = isset( $args['type'] );
+
+		echo '<h3>';
+		if ($is_new_shortcode_page) {
+			echo 'New custom shortcode';
+		} else {
+			echo sprintf(__('%s page', 'arlo-for-wordpress' ), Arlo_For_Wordpress::$templates[$id]['name']);
+
+			if ($is_custom_shortcode) {
+				echo '<a href="' . wp_nonce_url(admin_url('admin.php?page=arlo-for-wordpress&delete-shortcode=' . urlencode($id)), 'arlo-delete-shortcode-nonce') . '"
+				class="red arlo-delete-button"><i class="arlo-icons8 arlo-icons8-cancel size-16"></i> Delete</a>';
+			}
+		}
+		echo '</h3>';
+
+    	if ($is_custom_shortcode) {
+			echo '
+			<div class="arlo-label"><label>' .  __("Shortcode type", 'arlo-for-wordpress' ) . '</label></div>
+			<div class="arlo-field">
+				<span>'.ucfirst($type).' '.__('page', 'arlo-for-wordpress' ).'</span>
+			</div><br><br>';
+    	}
+
 		/*
 		HACK because the keys in the $post_types arrays are bad, couldn't change because backward comp.
 		*/
 		
-		if (in_array($id, array('eventsearch', 'upcoming', 'events', 'presenters', 'venues', 'oa', 'schedule'))) {
+		if (!in_array($id, array('event', 'presenter', 'venue'))) {
 			$post_type_id = in_array($id, array('events','presenters', 'venues')) ? substr($id, 0, strlen($id)-1) : $id;
 		}
 
@@ -627,28 +678,64 @@ class Arlo_For_Wordpress_Settings {
 			    'show_option_none'	=> '-- Select --',
 			    'option_none_value'	=> 0
 			));
-	
+
+			$shortcode_documentation_url = "https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#" . str_replace( "]", "", str_replace( "[", "", Arlo_For_Wordpress::$templates[$type]['shortcode'] ) );
+
 			echo '
 			<div class="arlo-label"><label>' .  __("Host page", 'arlo-for-wordpress' ) . '</label></div>
 			<div class="arlo-field">
 				<span class="arlo-page-select">' . $select . '</span>
-				<span class="arlo-gray arlo-inlineblock">' . sprintf(__('Page must contain the %s shortcode', 'arlo-for-wordpress' ), Arlo_For_Wordpress::$templates[$id]['shortcode']) . '</span>
+				<span class="arlo-gray arlo-inlineblock">' . sprintf(__('Page must contain the %s shortcode. <a href="%s" target="_blank">Shortcode customisation options.</a>', 'arlo-for-wordpress' ), Arlo_For_Wordpress::$templates[$id]['shortcode'], $shortcode_documentation_url) . '</span>
 			</div>';
     	}
-	    
+
+    	if ($is_new_shortcode_page) {
+    		$this->arlo_output_new_shortcode_page();
+    	} else {
+    		$this->arlo_output_template_page($settings_object, $id);
+    	}
+	}
+
+	function arlo_output_template_page($settings_object, $id) {
 	    $val = isset($settings_object['templates'][$id]['html']) ? $settings_object['templates'][$id]['html'] : '';
-	    
-	    
+	   
 	    $this->arlo_reload_template($id);
-	    
-	    echo '<div class="arlo-label arlo-full-width">
-	    		<label>
-	    		' . sprintf(__('%s page', 'arlo-for-wordpress' ), Arlo_For_Wordpress::$templates[$id]['name']) . '
-	    		' . (!empty(Arlo_For_Wordpress::$templates[$id]['shortcode']) ? 'shortcode <span class="arlo-gray">' . Arlo_For_Wordpress::$templates[$id]['shortcode'] . '</span>' : '') . ' content
+
+	    if ( isset(Arlo_For_Wordpress::$templates[$id]['shortcode']) ) {
+		    echo '<div class="arlo-label arlo-full-width">
+	    		<label>'
+	    		. sprintf(__('%s page ', 'arlo-for-wordpress' ), Arlo_For_Wordpress::$templates[$id]['name'])
+	    		. 'shortcode <span class="arlo-gray">' . Arlo_For_Wordpress::$templates[$id]['shortcode'] . '</span>'
+	    		. ' content
 	    		</label>
 	    	</div>';
-	    	
-	    wp_editor($val, $id, array('textarea_name'=>'arlo_settings[templates]['.$id.'][html]','textarea_rows'=>'20'));
+	    }
+
+    	wp_editor($val, $id, array('textarea_name'=>'arlo_settings[templates]['.$id.'][html]','textarea_rows'=>'20'));
+	}
+
+	function arlo_output_new_shortcode_page() {
+		echo '
+		<div class="arlo-label"><label>' .  __("Shortcode name", 'arlo-for-wordpress' ) . '</label></div>
+		<div class="arlo-field">
+			<span class="arlo-new-custom-shortcode-name arlo-gray"> [arlo_<input type="text" name="arlo_settings[new_custom_shortcode]" class="arlo-inline-input" maxlength="15">] </span>
+		</div><br><br>';
+
+		echo '
+		<div class="arlo-label"><label>' .  __("Shortcode type", 'arlo-for-wordpress' ) . '</label></div>
+		<div class="arlo-field">
+			<select name="arlo_settings[new_custom_shortcode_type]" class="arlo-new-custom-shortcode-type">';
+			echo '<option value=""></option>';
+			foreach (Arlo_For_Wordpress::$shortcode_types as $shortcode_type => $shortcode_type_name) {
+				echo '<option value="'.$shortcode_type.'">'.$shortcode_type_name.'</option>';
+			}
+		echo '</select>
+		</div><br><br>';
+		echo '
+		<div class="arlo-label"><br></div>
+		<div class="arlo-field">
+			<input type="submit" name="submit" id="submit" class="button button-primary" value="Save Changes">
+		</div>';
 	}
 	
 	function arlo_reload_template($template) {
@@ -664,22 +751,6 @@ class Arlo_For_Wordpress_Settings {
 				</div>
 				<div class="cf"></div>';
 		}
-	}
-	
-	function arlo_template_source() {
-		$plugin = Arlo_For_Wordpress::get_instance();
-		$theme_manager = $plugin->get_theme_manager();
-
-		$selected_theme_id = get_option('arlo_theme', Arlo_For_Wordpress::DEFAULT_THEME);
-		$theme_templates = $theme_manager->load_default_templates($selected_theme_id);
-		
-		$templates = [];
-		
-		foreach (Arlo_For_Wordpress::$templates as $key => $val) {
-			$templates[ARLO_PLUGIN_PREFIX . '-' . $key] = $theme_templates[$key]['html'];
-		}
-		
-		return $templates;
 	}
 	
 	function arlo_check_current_tasks() {
@@ -775,7 +846,19 @@ class Arlo_For_Wordpress_Settings {
 	    echo '
 	    <h3>What\'s new in this release</h3>
 		<p><strong>If you are experiencing problems after an update, please deactivate and re-activate the plugin and re-synchronize the data.</strong></p>
+		
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">	  
+				<li>Resuable shortcodes</li>
+				<li>New "category", "location", "delivery" and "templatetag" attributes for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#arlo_event_template_list" target="_blank">[arlo_event_template_list]</a> global shortcode </li>
+				<li>New "category", "location", "delivery" and "templatetag" attributes for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#arlo_schedule" target="_blank">[arlo_schedule]</a> global shortcode </li>
+				<li>New "category", "location", "delivery", "eventtag", "templatetag", "presenter" and "month" attributes for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#arlo_upcoming_list" target="_blank">[arlo_upcoming_list]</a> global shortcode </li>
+				<li>New "category" attribute for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#arlo_onlineactivites_list" target="_blank">[arlo_onlineactivites_list]</a> global shortcode </li>	
+			</ul>
+		</p>		
+	
+		<h4>Version 3.3.1</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">	  
 				<li>Bugfix, when rich snippet for event doesn\'t return Location</li>
@@ -796,43 +879,6 @@ class Arlo_For_Wordpress_Settings {
 				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_notice" target="_blank">[arlo_event_notice]</a> shortcode</li>
 				<li>Many bug fixes</li>
 			</ul>
-		</p>		
-
-
-		<h4>Version 3.2</h4>
-		<p>
-			<ul class="arlo-whatsnew-list">	  
-				<li>Fix long running import issue, which can timeout the request</li>
-			</ul>
-		</p>		
-
-	    <h4>Version 3.2.1</h4>
-		<p>
-	    	<ul class="arlo-whatsnew-list">	  
-				<li>New online activities global shortcode <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#arlo_onlineactivites_list" target="_blank">[arlo_onlineactivites_list]</a></li>
-				<li>New options for <a href="https://developer.arlo.co/doc/wordpress/widgets#widget-upcoming-events" target="_blank">Upcoming events widget</a></li>
-				<li>New settings to customize <a href="https://developer.arlo.co/doc/wordpress/settings#filters" target="_blank">Filters</a></li>
-				<li>New settings for the <a href="https://developer.arlo.co/doc/wordpress/settings#misc" target="_blank">Import</a></li>
-				<li>The plugin is fully compatible with PHP 7</li>
-				<li>Many bug fixes</li>
-			</ul>
-		</p>
-
-		<h4>Version 3.1.2</h4>
-		<p>
-	    	<ul class="arlo-whatsnew-list">	  
-				<li>Improve error logging and reliability for data synchronization</li>
-			</ul>
-		</p>
-		<h4>Version 3.1</h4>
-		<p>
-	    	<ul class="arlo-whatsnew-list">	  
-				<li>New \'link\' attribute for <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_location" target="_blank">[arlo_event_location]</a> and <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_presenters" target="_blank">[arlo_event_presenters]</a> shortcodes</li>
-				<li>New <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_link" target="_blank">[arlo_venue_link]</a> shortcode</li>
-				<li>New <a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/presenterrelated#arlo_presenter_link" target="_blank">[arlo_presenter_link]</a> shortcode</li>
-				<li>Fix timezone issues on the upcoming events widget</li>
-	    		<li>Fix timezone error if the WP hasn\'t got a named timezone</li>
-	    	</ul>
 		</p>
 		<a href="https://wordpress.org/plugins/arlo-training-and-event-management-system/#developers" target="_blank">More change log</a>
 	    ';

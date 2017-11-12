@@ -23,9 +23,9 @@ class Categories {
 
     private static function shortcode_categories($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         $return = '';
-        
-        $arlo_category = \Arlo\Utilities::clean_string_url_parameter('arlo-category');
-        
+
+        $arlo_category = self::get_selected_category();
+
         // calculate depth
         $depth = (isset($atts['depth'])) ? (int)$atts['depth'] : 1;
 
@@ -34,6 +34,9 @@ class Categories {
         
         // show counts
         $counts = (isset($atts['counts'])) ? $atts['counts'] : null;
+
+        //from widget
+        $widget = (isset($atts['widget'])) ? $atts['widget'] == "true" : false;
                     
         // start at
         $start_at = (isset($atts['parent'])) ? (int)$atts['parent'] : 0;
@@ -68,7 +71,7 @@ class Categories {
             $GLOBALS['arlo_categories_count'] = count($tree);		
                     
             if(!empty($tree)) {		
-                $return .= self::generate_category_ul($tree, $counts);	
+                $return .= self::generate_category_ul($tree, $counts, $widget);	
             }	
         }
         
@@ -76,7 +79,7 @@ class Categories {
     }
 
     private static function shortcode_category_title($content = '', $atts, $shortcode_name, $import_id = '') {
-        $arlo_category = \Arlo\Utilities::clean_string_url_parameter('arlo-category');
+        $arlo_category = self::get_selected_category();
         
         if (!empty($arlo_category)) {
             $category = CategoriesEntity::get(array('id' => current(explode('-', $arlo_category))), 1, $import_id);
@@ -90,7 +93,7 @@ class Categories {
     }
 
     private static function shortcode_category_header($content = '', $atts, $shortcode_name, $import_id = '') {
-        $arlo_category = \Arlo\Utilities::clean_string_url_parameter('arlo-category');
+        $arlo_category = self::get_selected_category();
         
         if (!empty($arlo_category)) {
             $category = CategoriesEntity::get(array('id' => current(explode('-', $arlo_category))), 1, $import_id);
@@ -104,7 +107,7 @@ class Categories {
     } 
 
     private static function shortcode_category_footer ($content = '', $atts, $shortcode_name, $import_id = ''){
-        $arlo_category = \Arlo\Utilities::clean_string_url_parameter('arlo-category');
+        $arlo_category = self::get_selected_category();
         
         if (!empty($arlo_category)) {
             $category = CategoriesEntity::get(array('id' => current(explode('-', $arlo_category))), 1, $import_id);
@@ -117,22 +120,41 @@ class Categories {
         return $category->c_footer;
     }
 
+    private static function get_selected_category() {
+        $category_atts = !empty(\Arlo\Shortcodes\Templates::$event_template_atts) ? \Arlo\Shortcodes\Templates::$event_template_atts : 
+        (!empty(\Arlo\Shortcodes\UpcomingEvents::$upcoming_list_item_atts) ? \Arlo\Shortcodes\UpcomingEvents::$upcoming_list_item_atts :
+        (!empty(\Arlo\Shortcodes\OnlineActivities::$oa_list_atts) ? \Arlo\Shortcodes\OnlineActivities::$oa_list_atts :
+        null));
+
+
+        return \Arlo\Utilities::get_att_string('category', $category_atts);
+
+    }
+
     // category list
-    private static function generate_category_ul($items, $counts) {
+    private static function generate_category_ul($items, $counts, $widget = false) {
         $post_types = arlo_get_option('post_types');
-        $page_type = \Arlo\Utilities::get_current_page_arlo_type();
+        $page_type = \Arlo_For_Wordpress::get_current_page_arlo_type();
+
+        if (empty($page_type) || $widget) {
+            $page_type = 'event';
+        }
+
+        if (empty($post_types[$page_type]['posts_page'])) 
+            return null;
+
         $events_url = get_page_link($post_types[$page_type]['posts_page']);
         
         if(!is_array($items) || empty($items)) return '';
         
-        $arlo_region = \Arlo\Utilities::get_region_parameter();
+        $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
         
         $html = '<ul class="arlo-category-list">';
 
         foreach($items as $cat) {
             $href = $events_url . (!empty($arlo_region) ? 'region-' . $arlo_region . '/' : '') . ($cat->c_parent_id != 0 ? 'cat-' . esc_attr($cat->c_slug) : '');
             $cat_name = $cat->c_name . ( !is_null($counts) ?  sprintf($counts, $cat->c_template_num) : '' );
-            $child_li = (isset($cat->children) ? self::generate_category_ul($cat->children, $counts) : '');
+            $child_li = (isset($cat->children) ? self::generate_category_ul($cat->children, $counts, $widget) : '');
 
             $html .= sprintf('<li><a href="%s">%s</a>%s</li>', esc_url($href), esc_html($cat_name), $child_li);
         }

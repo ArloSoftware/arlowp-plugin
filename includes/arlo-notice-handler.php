@@ -260,7 +260,7 @@ class NoticeHandler {
 			$meta = get_user_meta($user->ID, $notice_id, true);
 
 			if ($meta !== '0') {			
-				if (!empty($this->settings['platform_name']) && $events !== false && $upcoming !== false && $presenters !== false && $venues !== false && !empty($import_id)) {		
+				if (!empty($this->settings['platform_name']) && $events !== false && $schedule !== false && $upcoming !== false && $presenters !== false && $venues !== false && !empty($import_id)) {		
 					//Get the first event template wich has event
 					$sql = "
 					SELECT 
@@ -312,7 +312,7 @@ class NoticeHandler {
 					";
 					$presenter = $this->dbl->get_results($sql, ARRAY_A);		
 					$presenter_link = '';
-					if (count($event)) {
+					if (count($event) && count($presenter)) {
 						$presenter_link = sprintf('<a href="%s" target="_blank">%s</a>,',
 						get_post_permalink($presenter[0]['ID']),
 						__('Presenter profile', 'arlo-for-wordpress' ));

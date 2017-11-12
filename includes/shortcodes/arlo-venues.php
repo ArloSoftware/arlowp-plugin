@@ -17,14 +17,25 @@ class Venues {
                 return self::$method_name($content, $atts, $shortcode_name, $import_id);
             });
         } 
+
+        $custom_shortcodes = Shortcodes::get_custom_shortcodes('venues');
+
+        foreach ($custom_shortcodes as $shortcode_name => $shortcode) {
+            Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
+                return self::shortcode_venue_list($content = '', $atts, $shortcode_name, $import_id);
+            });
+        }
     }
 
     private static function shortcode_venue_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
-        
+
+        $template_name = Shortcodes::get_template_name($shortcode_name,'venue_list','venues');
+
+
         $templates = arlo_get_option('templates');
-        $content = $templates['venues']['html'];
-        return do_shortcode($content);        
+        $content = $templates[$template_name]['html'];
+        return do_shortcode($content);    
     }
     
     private static function shortcode_venue_list_pagination($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -154,9 +165,9 @@ class Venues {
         
         // merge and extract attributes
         extract(shortcode_atts(array(
-            'height'	=> 400,
-            'width'  	=> 400,
-            'zoom'		=> 16,
+            'height'    => 400,
+            'width'     => 400,
+            'zoom'      => 16,
             'type'      => 'dynamic'
         ), $atts, $shortcode_name, $import_id));
 

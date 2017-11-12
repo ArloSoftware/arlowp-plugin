@@ -207,6 +207,7 @@ class Arlo_For_Wordpress_Admin {
 			wp_enqueue_script( $this->plugin_slug . '-arlo-for-wordpress-script', plugins_url( 'assets/js/arlo_for_wordpress.js?20170424', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, true );
 			wp_enqueue_script( $this->plugin_slug . '-admin-script', plugins_url( 'assets/js/admin.js?20170424', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, true );					
 			wp_enqueue_script( $this->plugin_slug . '-fancybox', 'https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.0.47/jquery.fancybox.min.js', array('jquery'), '3.3.7', true );
+			wp_enqueue_script( $this->plugin_slug . '-plugin-script-cookie', plugins_url( '../public/assets/js/libs/jquery.cookie.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION );
 		}
 	}
 
@@ -480,15 +481,17 @@ class Arlo_For_Wordpress_Admin {
 								    foreach(Arlo_For_Wordpress::$templates as $id => $template) {
 								    	$name = __($template['name'], 'arlo-for-wordpress' );
 										echo '<a href="#pages/'.$id.'" class="nav-tab vertical-nav-tab ' . $this->plugin_slug . '-pages-' . $id . '" id="' . $this->plugin_slug . '-pages-' . $id . '">'.$name.'</a>';
-								    }				
-								echo '</h2>							
+								    }
+								echo '</h2>
 							</td>
 							
 							<td>
 								<div class="' . ARLO_PLUGIN_PREFIX . '-field ' . ARLO_PLUGIN_PREFIX . '-template-field">';
 									call_user_func($field['callback'], $field['args']);
-								
-									$path = ARLO_PLUGIN_DIR . 'admin/includes/codes/' . $field['id'] . '.php';
+
+									$type = isset($field["args"]["type"]) ? $field["args"]["type"] : $field["id"];
+
+									$path = ARLO_PLUGIN_DIR . 'admin/includes/codes/' . $type . '.php';
 									if(file_exists($path)) {
 										echo '<div class="' . ARLO_PLUGIN_PREFIX . '-shortcodes">
 											<h3>' . __( 'Recommended shortcodes', 'arlo-for-wordpress' ) . '</h3>
@@ -498,12 +501,11 @@ class Arlo_For_Wordpress_Admin {
 										echo '</div>';
 									}
 									
-								echo '</div>									
+								echo '</div>
 							</td>
 						</tr>
 					</table>
 				';
-							  
 			} else {
 				echo '
 					<div class="' . ARLO_PLUGIN_PREFIX . '-label"><label>' . $field['title'] . '</label></div>
@@ -548,6 +550,42 @@ class Arlo_For_Wordpress_Admin {
 			$new['sleep_between_import_tasks'] = \Arlo\Scheduler::MAX_SLEEP_BETWEEN_TASKS;
 		}
 
+		if (!empty($old["custom_shortcodes"])) {
+			$new["custom_shortcodes"] = $old["custom_shortcodes"];
+		} else {
+			$new["custom_shortcodes"] = array();
+		}
+
+		// Custom shortcodes
+		if (!empty($new["new_custom_shortcode"]) && !empty($new["new_custom_shortcode_type"]) && !array_key_exists( $new["new_custom_shortcode"], $old['custom_shortcodes'] ) && !shortcode_exists("arlo_" . $new["new_custom_shortcode"] . "") && preg_match('/^[\w]+$/',$new["new_custom_shortcode"]) === 1 ) {
+
+			$shortcode_name = substr( sanitize_text_field(strtolower( str_replace( array("&","/","<",">","[","]","="),'',str_replace(' ','_',$new["new_custom_shortcode"]) ) )), 0, 15 ); // WP limits post name lengths
+
+			setcookie("arlo-new-custom-shortcode", $shortcode_name, time()+60*60*24*30, '/');	
+
+			$shortcode_type = $new["new_custom_shortcode_type"];
+
+			if (empty($new['custom_shortcodes'])) {
+				$new['custom_shortcodes'] = array();
+			}
+
+			$new['custom_shortcodes'][$shortcode_name] = $shortcode_type;
+
+			$default_template = \Arlo_For_Wordpress::arlo_template_source()[ 'arlo-' . $new["new_custom_shortcode_type"] ];
+
+			if ( !empty($default_template) ) {
+				$new['templates'][ $new["new_custom_shortcode"] ]['html'] = $default_template;
+			}
+		}
+
+		if (!empty($new["delete_shortcode"])) {
+			unset( $new['custom_shortcodes'][$new["delete_shortcode"]] );
+		}
+
+		unset($new["new_custom_shortcode"]);
+		unset($new["new_custom_shortcode_type"]);
+		unset($new["delete_shortcode"]);
+
 		return $new;
 	}
 		
@@ -562,7 +600,6 @@ class Arlo_For_Wordpress_Admin {
 		update_option('arlo_themes_settings', $stored_themes_settings, 1);
 			
 		if($old['platform_name'] != $new['platform_name'] && !empty($new['platform_name'])) {
-			
 			$plugin = Arlo_For_Wordpress::get_instance();
 			$plugin->determine_url_structure($new['platform_name']);
 			
@@ -665,4 +702,5 @@ class Arlo_For_Wordpress_Admin {
 			}
 		}
 	}
+
 }

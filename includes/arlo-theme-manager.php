@@ -85,13 +85,21 @@ class ThemeManager {
 			$templates = [];
 
 			$template_files = glob($theme_settings[$theme_id]->dir . '/templates/*.tpl');
+
 			if (is_array($template_files) && count($template_files)) {
 				foreach ($template_files as $template_file) {
-					$template_name = str_replace('.tpl', '', basename($template_file));
+					$file_name = str_replace('.tpl', '', basename($template_file));
+					$template_name = array_key_exists($file_name, self::$template_names_subs) ? self::$template_names_subs[$file_name] : $file_name;
 
-					$templates[str_replace(array_keys(self::$template_names_subs), array_values(self::$template_names_subs), $template_name)]['html'] = file_get_contents($template_file);
+					$templates[$template_name]['html'] = file_get_contents($template_file);
+
+					foreach(\Arlo_For_Wordpress::$templates as $template_key => $template_info) {
+						if((array_key_exists('type', $template_info) && $template_info['type'] == $template_name)) {
+							$templates[$template_key]['html'] = file_get_contents($template_file);
+						}
+					}
+
 				}
-
 				return $templates;
 			}
 		}

@@ -4,7 +4,7 @@ namespace Arlo\Shortcodes;
 use Arlo\Entities\Categories as CategoriesEntity;
 
 class UpcomingEvents {
-    private static $upcoming_list_item_atts = [];
+    public static $upcoming_list_item_atts = [];
 
     public static function init() {
         $class = new \ReflectionClass(__CLASS__);
@@ -20,30 +20,44 @@ class UpcomingEvents {
                 $method_name = 'shortcode_' . str_replace('arlo_', '', $shortcode_name);
                 return self::$method_name($content, $atts, $shortcode_name, $import_id);
             });
-        } 
-            
+        }
+
+        $custom_shortcodes = Shortcodes::get_custom_shortcodes('upcoming');
+
+        foreach ($custom_shortcodes as $shortcode_name => $shortcode) {
+            Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
+                return self::shortcode_upcoming_list($content = '', $atts, $shortcode_name, $import_id);
+            });
+        }
     }
 
     private static function shortcode_upcoming_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
         
-        $arlo_region = \Arlo\Utilities::get_region_parameter();
+        $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
 
-        self::$upcoming_list_item_atts = array(
-            'location' => \Arlo\Utilities::clean_string_url_parameter('arlo-location'),
-            'category' => \Arlo\Utilities::clean_string_url_parameter('arlo-category'),
-            'delivery' => \Arlo\Utilities::clean_int_url_parameter('arlo-delivery'),
-            'month' => \Arlo\Utilities::clean_string_url_parameter('arlo-month'),
-            'eventtag' => \Arlo\Utilities::clean_string_url_parameter('arlo-eventtag'),
-            'templatetag' => \Arlo\Utilities::clean_string_url_parameter('arlo-templatetag'),
-            'presenter' => \Arlo\Utilities::clean_string_url_parameter('arlo-presenter'),
-            'region' => $arlo_region
-        );
+        self::$upcoming_list_item_atts = self::get_upcoming_atts($atts);
+
+        $template_name = Shortcodes::get_template_name($shortcode_name,'upcoming_list','upcoming');
 
         $templates = arlo_get_option('templates');
-        $content = $templates['upcoming']['html'];
+        $content = $templates[$template_name]['html'];
+
         return do_shortcode($content);        
-    }   
+    }
+
+    private static function get_upcoming_atts($atts) {
+        return array(
+            'location' => \Arlo\Utilities::get_att_string('location', $atts),
+            'category' => \Arlo\Utilities::get_att_string('category', $atts),
+            'delivery' => \Arlo\Utilities::get_att_int('delivery', $atts),
+            'eventtag' => \Arlo\Utilities::get_att_string('eventtag', $atts),
+            'templatetag' => \Arlo\Utilities::get_att_string('templatetag', $atts),
+            'presenter' => \Arlo\Utilities::get_att_string('presenter', $atts),
+            'month' => \Arlo\Utilities::get_att_string('month', $atts),
+            'region' => \Arlo_For_Wordpress::get_region_parameter()
+        );
+    }
 
     private static function shortcode_upcoming_list_pagination($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $wpdb;
@@ -179,9 +193,11 @@ class UpcomingEvents {
         $filters_array = explode(',',$filters);
         
         $settings = get_option('arlo_settings');
+        
+        $page_type = \Arlo_For_Wordpress::get_current_page_arlo_type();
 
         if (!empty($settings['post_types']['upcoming']['posts_page'])) {
-            $page_link = get_permalink(get_post($settings['post_types']['upcoming']['posts_page']));
+            $page_link = get_permalink(get_post($settings['post_types'][$page_type]['posts_page']));
         } else {
             $page_link = get_permalink(get_post($post));
         }
@@ -191,6 +207,8 @@ class UpcomingEvents {
         $filter_group = "upcoming";
             
         foreach(\Arlo_For_Wordpress::$available_filters[$filter_group]['filters'] as $filter_key => $filter):
+
+            $att = strval(self::$upcoming_list_item_atts[$filter_key]);
 
             if (!in_array($filter_key, $filters_array))
                 continue;
@@ -205,12 +223,12 @@ class UpcomingEvents {
                     }
 
                     if (is_array($cats)) {
-                        $filter_html .= Shortcodes::create_filter($filter_key, CategoriesEntity::child_categories($cats), __('All categories', 'arlo-for-wordpress'),$filter_group);                    
+                        $filter_html .= Shortcodes::create_filter($filter_key, CategoriesEntity::child_categories($cats), __('All categories', 'arlo-for-wordpress'),$filter_group,$att);                    
                     }
 
                     break;
                 case 'delivery' :
-                    $filter_html .= Shortcodes::create_filter($filter_key, \Arlo_For_Wordpress::$delivery_labels, __('All delivery options', 'arlo-for-wordpress'),$filter_group);
+                    $filter_html .= Shortcodes::create_filter($filter_key, \Arlo_For_Wordpress::$delivery_labels, __('All delivery options', 'arlo-for-wordpress'),$filter_group,$att);
 
                     break;                                    
                 case 'month' :
@@ -225,7 +243,7 @@ class UpcomingEvents {
 
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter_key, $months, __('All months', 'arlo-for-wordpress'),$filter_group);
+                    $filter_html .= Shortcodes::create_filter($filter_key, $months, __('All months', 'arlo-for-wordpress'),$filter_group,$att);
 
                     break;
                 case 'location' :
@@ -254,7 +272,7 @@ class UpcomingEvents {
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter_key, $locations, __('All locations', 'arlo-for-wordpress'),$filter_group);
+                    $filter_html .= Shortcodes::create_filter($filter_key, $locations, __('All locations', 'arlo-for-wordpress'),$filter_group,$att);
 
                     break;          
                 case 'eventtag' :
@@ -283,7 +301,7 @@ class UpcomingEvents {
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter_key, $tags, __('Select tag', 'arlo-for-wordpress'),$filter_group);                
+                    $filter_html .= Shortcodes::create_filter($filter_key, $tags, __('Select tag', 'arlo-for-wordpress'),$filter_group,$att);                
                     
                     break;
 
@@ -313,7 +331,7 @@ class UpcomingEvents {
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter_key, $tags, __('Select tag', 'arlo-for-wordpress'),$filter_group);                
+                    $filter_html .= Shortcodes::create_filter($filter_key, $tags, __('Select tag', 'arlo-for-wordpress'),$filter_group,$att);                
                     
                     break;
 
@@ -344,7 +362,7 @@ class UpcomingEvents {
                         }
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter_key, $presenters, __('All presenters', 'arlo-for-wordpress'),$filter_group);
+                    $filter_html .= Shortcodes::create_filter($filter_key, $presenters, __('All presenters', 'arlo-for-wordpress'),$filter_group,$att);
                     
                     break;  
 
