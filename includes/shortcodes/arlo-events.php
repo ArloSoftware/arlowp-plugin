@@ -91,6 +91,38 @@ class Events {
 
                     break;
 
+                case 'state' :
+                    $items = $wpdb->get_results(
+                        "SELECT DISTINCT
+                            v.v_physicaladdressstate
+                        FROM 
+                            {$wpdb->prefix}arlo_venues AS v
+                        LEFT JOIN 
+                            {$wpdb->prefix}arlo_events AS e
+                        ON
+                            v.v_arlo_id = e.v_id
+                        AND
+                            v.import_id = e.import_id
+                        WHERE 
+                            e.import_id = $import_id
+                        ORDER BY v_name", ARRAY_A);
+
+
+                    $states = array();
+
+                    foreach ($items as $item) {
+                        if (!empty($item['v_physicaladdressstate']) || in_array($item['v_physicaladdressstate'],[0,"0"], true) ) {
+                            $states[] = array(
+                                'string' => $item['v_physicaladdressstate'],
+                                'value' => $item['v_physicaladdressstate'],
+                            );
+                        }
+                    }
+
+                    $filter_html .= Shortcodes::create_filter($filter_key, $states, __('Select state', 'arlo-for-wordpress'),$filter_group);                
+                    
+                    break;
+
             endswitch;
 
         endforeach; 
@@ -209,6 +241,7 @@ class Events {
         
         $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
         $arlo_location = \Arlo\Utilities::clean_string_url_parameter('arlo-location');
+        $arlo_state = \Arlo\Utilities::clean_string_url_parameter('arlo-state');
         
         $t1 = "{$wpdb->prefix}arlo_eventtemplates";
         $t2 = "{$wpdb->prefix}arlo_events";
@@ -225,8 +258,13 @@ class Events {
         if (!empty($arlo_location)) {
             $where .= ' AND ' . $t2 .'.e_locationname = %s';
             $parameters[] = $arlo_location;
-        };        
+        };
         
+        if (!empty($arlo_state)) {
+            $where .= ' AND ' . $t3 .'.v_physicaladdressstate = %s';
+            $parameters[] = $arlo_state;
+        };        
+
         $sql = 
             "SELECT 
                 $t2.*, 
@@ -974,7 +1012,7 @@ class Events {
         if (strpos($format, '%') === false) {
             $format = DateFormatter::date_format_to_strftime_format($format);
         }
-            
+
         $removeyear = ($removeyear == "false" || $removeyear == "0" ? false : true);
         
         $conditions = array(

@@ -290,6 +290,7 @@ class Templates {
     private static function get_event_template_atts($atts) {
         return array(
             'location' => \Arlo\Utilities::get_att_string('location', $atts),
+            'state' => \Arlo\Utilities::get_att_string('state', $atts),
             'category' => \Arlo\Utilities::get_att_string('category', $atts),
             'delivery' => \Arlo\Utilities::get_att_int('delivery', $atts),
             'templatetag' => \Arlo\Utilities::get_att_int('templatetag', $atts),
@@ -640,7 +641,39 @@ class Templates {
                     $filter_html .= Shortcodes::create_filter($filter_key, $locations, __('All locations', 'arlo-for-wordpress'),$filter_group,$att);
 
                     break;
+
+                case 'state' :
+                    $items = $wpdb->get_results(
+                        "SELECT DISTINCT
+                            v.v_physicaladdressstate
+                        FROM 
+                            {$wpdb->prefix}arlo_venues AS v
+                        LEFT JOIN 
+                            {$wpdb->prefix}arlo_events AS e
+                        ON
+                            v.v_arlo_id = e.v_id
+                        AND
+                            v.import_id = e.import_id
+                        WHERE 
+                            e.import_id = $import_id
+                        ORDER BY v_name", ARRAY_A);
+
+
+                    $states = array();
+
+                    foreach ($items as $item) {
+                        if (!empty($item['v_physicaladdressstate']) || in_array($item['v_physicaladdressstate'],[0,"0"], true) ) {
+                            $states[] = array(
+                                'string' => $item['v_physicaladdressstate'],
+                                'value' => $item['v_physicaladdressstate'],
+                            );
+                        }
+                    }
+
+                    $filter_html .= Shortcodes::create_filter($filter_key, $states, __('Select state', 'arlo-for-wordpress'),$filter_group,$att);                
                     
+                    break;
+
                 case 'templatetag' :
                     //template tag select
                     
@@ -771,6 +804,7 @@ class Templates {
         $t5 = "{$wpdb->prefix}arlo_events";
         $t6 = "{$wpdb->prefix}arlo_eventtemplates_tags";
         $t7 = "{$wpdb->prefix}arlo_tags";
+        $t8 = "{$wpdb->prefix}arlo_venues";
             
         $where = "WHERE post.post_type = 'arlo_event' AND et.import_id = %d";
         $group = (isset($GLOBALS['arlo_group_template_by_id']) && $GLOBALS['arlo_group_template_by_id']) ? 'GROUP BY et.et_arlo_id' : '';	
@@ -779,13 +813,14 @@ class Templates {
         $join = "";
 
         $arlo_location = !empty($atts['location']) ? $atts['location'] : null;
+        $arlo_state = !empty($atts['state']) ? $atts['state'] : null;
         $arlo_category = !empty($atts['category']) ? $atts['category'] : null;
         $arlo_delivery = isset($atts['delivery']) ? $atts['delivery'] : null;
         $arlo_templatetag = !empty($atts['templatetag']) ? $atts['templatetag'] : null;
         $arlo_search = !empty($atts['search']) ? $atts['search'] : null;
         $arlo_region = !empty($atts['region']) ? $atts['region'] : null;
 
-        if(!empty($arlo_location) || (isset($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) ) :
+        if(!empty($arlo_location) || (isset($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) || !empty($arlo_state) ) :
 
             $join .= " LEFT JOIN $t5 e ON e.et_arlo_id = et.et_arlo_id AND e.import_id = et.import_id";
             $where .= " AND e.e_parent_arlo_id = 0";
@@ -805,6 +840,13 @@ class Templates {
                 $parameters[] = $arlo_region;
             }
 
+            if(!empty($arlo_state)) :
+                $join .= " LEFT JOIN $t8 v ON e.v_id = v.v_arlo_id AND e.import_id = v.import_id";
+                
+                $where .= ' AND v.v_physicaladdressstate = %s';
+                $parameters[] = $arlo_state;
+            endif;
+
             $group = 'GROUP BY et.et_arlo_id';
             
         endif;	
@@ -822,8 +864,7 @@ class Templates {
                 $parameters[] = intval($arlo_templatetag);
             }
         endif;
-        
-        
+
         if (!empty($arlo_search)) {
             $where .= '
             AND (
