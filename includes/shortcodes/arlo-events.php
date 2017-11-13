@@ -968,13 +968,14 @@ class Events {
             'layout' => '',
             'limit' => 1,
             'removeyear' => "true",
-            'text' => '{%date%}'
+            'text' => '{%date%}',
+            'template_link' => 'permalink'
         ), $atts, $shortcode_name, $import_id));
         
         if (strpos($format, '%') === false) {
             $format = DateFormatter::date_format_to_strftime_format($format);
         }
-            
+
         $removeyear = ($removeyear == "false" || $removeyear == "0" ? false : true);
         
         $conditions = array(
@@ -1031,7 +1032,8 @@ class Events {
                     if ($event->e_registeruri && !$event->e_isfull) {
                         $return_links[] = ($layout == 'list' ? "<li>" : "") . '<a href="' . esc_attr($event->e_registeruri) . '" class="' . esc_attr($buttonclass) . ' arlo-register">' . $display_text  . '</a>' . ($layout == 'list' ? "</li>" : "");
                     } else {
-                        $return_links[] = ($layout == 'list' ? "<li>" : "") . '<span class="' . esc_attr($dateclass) . '">' . $display_text . '</span>' . ($layout == 'list' ? "</li>" : "");
+                        $et_link = self::get_et_link($GLOBALS['arlo_eventtemplate'],$template_link);
+                        $return_links[] = ($layout == 'list' ? "<li>" : "") . '<a href="' . esc_attr($et_link) . '" class="' . esc_attr($buttonclass) . ' arlo-event-full">' . $display_text  . '</a>' . ($layout == 'list' ? "</li>" : "");
                     }
                 }   
             }   
