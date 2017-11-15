@@ -42,7 +42,7 @@ class Events {
 
         $page_link = get_permalink(get_post($post));
 
-        $filter_html = '<form id="arlo-event-filter" class="arlo-filters" method="get" action="' . $page_link . '">';
+        $filter_html = '';
         
         $filter_group = 'event';
 
@@ -95,16 +95,15 @@ class Events {
 
         endforeach; 
             
-        // category select
-
-
-        $filter_html .= '<div class="arlo-filters-buttons"><input type="hidden" id="arlo-page" value="' .  $page_link . '">';
-            
-        $filter_html .= '<a href="' . $page_link . '" class="' . esc_attr($buttonclass) . '">' . htmlentities($resettext, ENT_QUOTES, "UTF-8") . '</a></div>';
-
-        $filter_html .= '</form>';
-        
-        return $filter_html;        
+        if (!empty($filter_html)) {
+            return '
+            <form id="arlo-event-filter" class="arlo-filters" method="get" action="' . $page_link . '">
+                ' . $filter_html . '
+                <div class="arlo-filters-buttons"><input type="hidden" id="arlo-page" value="' .  $page_link . '">
+                    <a href="' . $page_link . '" class="' . esc_attr($buttonclass) . '">' . htmlentities($resettext, ENT_QUOTES, "UTF-8") . '</a>
+                </div>
+            </form>';
+        }
     }    
 
     private static function shortcode_event_tags($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
