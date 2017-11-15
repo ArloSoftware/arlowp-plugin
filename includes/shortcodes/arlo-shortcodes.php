@@ -135,14 +135,14 @@ class Shortcodes {
 	public static function create_region_selector($page_name) {
 		global $post;
 		
-		$valid_page_names = ['upcoming', 'event', 'eventsearch'];
+		$valid_page_names = ['upcoming', 'event', 'eventsearch', 'widget'];
 		
 		$settings = get_option('arlo_settings');  
 		$regions = get_option('arlo_regions');  
 		
 		if (!in_array($page_name, $valid_page_names) || !(is_array($regions) && count($regions))) return "";
 			
-		return self::create_filter('region', $regions);
+		return self::create_filter('region', $regions, null, null, \Arlo_For_Wordpress::get_region_parameter());
 	}
 
 	public static function create_filter($type, $items, $label=null, $group=null, $att_default=null) {
@@ -158,7 +158,7 @@ class Shortcodes {
 			$hidden_filters = get_option('arlo_filter_settings')['arlohiddenfilters'];
 		}
 
-		$filter_html = '<select id="arlo-filter-' . esc_attr($type) . '" name="arlo-' . esc_attr($type) . '">';
+		$filter_html = '<select id="arlo-filter-' . esc_attr($type) . '" class="arlo-filter-' . esc_attr($type) . '" name="arlo-' . esc_attr($type) . '">';
 
 		if (!is_null($label))
 			$filter_html .= '<option value="">' . esc_html($label) . '</option>';

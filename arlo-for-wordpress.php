@@ -153,6 +153,8 @@ require_once( plugin_dir_path( __FILE__ ) . '/widgets/categories-widget/class-ar
 add_action( 'plugins_loaded', array( 'Arlo_For_Wordpress_Categories_Widget', 'get_instance' ) );
 require_once( plugin_dir_path( __FILE__ ) . '/widgets/search-widget/class-arlo-for-wordpress-search-widget.php' );
 add_action( 'plugins_loaded', array( 'arlo_for_wordpress_search_widget', 'get_instance' ) );
+require_once( plugin_dir_path( __FILE__ ) . '/widgets/region-selector/class-arlo-for-wordpress-region-selector.php' );
+add_action( 'plugins_loaded', array( 'arlo_for_wordpress_region_selector', 'get_instance' ) );
 
 
 /*----------------------------------------------------------------------------*
