@@ -969,7 +969,7 @@ class Events {
             'limit' => 1,
             'removeyear' => "true",
             'text' => '{%date%}',
-            'template_link' => 'permalink'
+            'template_link' => 'registerlink'
         ), $atts, $shortcode_name, $import_id));
         
         if (strpos($format, '%') === false) {
@@ -1028,20 +1028,44 @@ class Events {
                     $date = self::event_date_formatter(['format' => $format], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
 
                     $display_text = str_replace(['{%date%}', '{%location%}'], [esc_html($date), esc_html($location)], $text);
-                    
-                    if ($event->e_registeruri && !$event->e_isfull) {
-                        $return_links[] = ($layout == 'list' ? "<li>" : "") . '<a href="' . esc_attr($event->e_registeruri) . '" class="' . esc_attr($buttonclass) . ' arlo-register">' . $display_text  . '</a>' . ($layout == 'list' ? "</li>" : "");
-                    } else {
-                        $et_link = self::get_et_link($GLOBALS['arlo_eventtemplate'],$template_link);
-                        $return_links[] = ($layout == 'list' ? "<li>" : "") . '<a href="' . esc_attr($et_link) . '" class="' . esc_attr($buttonclass) . ' arlo-event-full">' . $display_text  . '</a>' . ($layout == 'list' ? "</li>" : "");
+
+                    $link = ($layout == 'list' ? "<li>" : "");
+
+                    $buttonclass = $event->e_isfull ? $buttonclass . ' arlo-event-full' : $buttonclass . ' arlo-register' ;
+
+                    switch ($template_link) {
+                        case "permalink":
+                            $url = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
+
+                            $link .= self::get_event_date_link($url, $buttonclass, $display_text);
+                            break;
+                        case "none":
+                            $link .= '<span class="' . esc_attr($dateclass) . '">' . $display_text . '</span>';
+                            break;
+                        case "viewuri":
+                            $url = $GLOBALS['arlo_eventtemplate']['et_viewuri'];
+                            $link .= self::get_event_date_link($url,$buttonclass,$display_text);
+                            break;
+                        case "registerlink":
+                            if ($event->e_registeruri && !$event->e_isfull) {
+                                $url = $event->e_registeruri;
+                            } else {
+                                $url = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
+                            }
+                            $link .= self::get_event_date_link($url,$buttonclass,$display_text);
+                            break;
                     }
+
+                    $link .= ($layout == 'list' ? "</li>" : "");
+
+                    $return_links[] = $link;
                 }   
             }   
             
             $return .= implode(($layout == 'list' ? "" : ", "), $return_links);
         } else if (count($oa)) {
             $reference_terms = json_decode($oa->oa_reference_terms, true);
-            
+
             if (is_array($reference_terms) && isset($reference_terms['Plural']))
                 $return .= '<a href="' . $oa->oa_registeruri . '" class="' . esc_attr($buttonclass) . ' arlo-register">' . $reference_terms['Plural'] . '</a>';
         }
@@ -1050,7 +1074,12 @@ class Events {
             $return .= '</ul>';
         }
             
-        return $return;        
+        return $return;
+    }
+
+
+    private static function get_event_date_link($url, $buttonclass, $display_text) {
+        return sprintf('<a href="%s" class="%s">%s</a>', esc_attr($url), esc_attr($buttonclass), $display_text);
     }
     
 
