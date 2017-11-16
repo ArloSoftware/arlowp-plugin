@@ -268,9 +268,25 @@ class Venues {
             }
         }
 
-        $address_link = !$link || $link !== 'map' ? $link : "https://www.google.com/maps/search/?api=1&query=".self::get_map_query();
+        $address_link = null;
+        switch($link) {
+            case 'permalink':
+                $address_link = self::shortcode_venue_permalink();
+                break;
+            case 'viewuri':
+                $address_link = self::shortcode_venue_link();
+                break;
+            case 'map':
+                $address_link = "https://www.google.com/maps/search/?api=1&query=".self::get_map_query();
+                break;
+            default:
+                if ($link) {
+                    $address_link = $link;
+                }
+                break;
+        }
 
-        $content = $address_link ? '<a href="'.$address_link.'" target="_blank">' . $content : $content;
+        $content = $address_link ? sprintf('<a href="%s" target="_blank">',esc_attr($address_link)) . $content : $content;
         
         switch($layout) {
             case 'list':
