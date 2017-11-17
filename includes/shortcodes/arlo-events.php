@@ -237,6 +237,7 @@ class Events {
         $settings = get_option('arlo_settings');
         
         $where = '';
+        $join = '';
         $parameters = [];
         
         $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
@@ -248,7 +249,7 @@ class Events {
         $t3 = "{$wpdb->prefix}arlo_venues";
         $t5 = "{$wpdb->prefix}arlo_presenters";
         $t6 = "{$wpdb->prefix}arlo_offers";
-        
+
         if (!empty($arlo_region)) {
             $where .= ' AND ' . $t1 . '.et_region = %s AND ' . $t2 . '.e_region = %s';
             $parameters[] = $arlo_region;
@@ -261,8 +262,19 @@ class Events {
         };
         
         if (!empty($arlo_state)) {
-            $where .= ' AND ' . $t3 .'.v_physicaladdressstate = %s';
-            $parameters[] = $arlo_state;
+            $join .= "
+                LEFT JOIN $t2 ce ON $t2.e_arlo_id = ce.e_parent_arlo_id AND $t2.import_id = ce.import_id
+            ";
+
+            $venues_query = $wpdb->prepare("SELECT v.v_arlo_id FROM $t3 v WHERE v.v_physicaladdressstate = %s", $arlo_state);
+            $venues = implode(', ', array_map(function ($venue) {
+              return $venue['v_arlo_id'];
+            }, $wpdb->get_results( $venues_query, ARRAY_A)));
+
+            $where .= " AND (ce.v_id IN (%s) OR $t3.v_arlo_id IN (%s))";
+
+            $parameters[] = $venues;
+            $parameters[] = $venues;
         };        
 
         $sql = 
@@ -273,6 +285,7 @@ class Events {
                 $t3.v_post_name,
                 $t3.v_post_id,
                 $t3.v_viewuri,
+                $t3.v_id,
                 $t3.v_physicaladdressline1,
                 $t3.v_physicaladdressline2,
                 $t3.v_physicaladdressline3,
@@ -284,7 +297,6 @@ class Events {
                 $t3.v_physicaladdresscountry,
                 $t3.v_geodatapointlatitude,
                 $t3.v_geodatapointlongitude
-
             FROM 
                 $t2
             LEFT JOIN 
@@ -297,6 +309,7 @@ class Events {
                 $t2.et_arlo_id = $t1.et_arlo_id
             AND
                 $t1.import_id = $t2.import_id
+            $join
             WHERE 
                 $t1.import_id = $import_id
             AND
@@ -312,6 +325,7 @@ class Events {
         if (count($parameters)) {
             return $wpdb->prepare($sql, $parameters);
         }
+
 
         return $sql;
     }
@@ -991,7 +1005,8 @@ class Events {
 
         $arlo_location = \Arlo\Utilities::clean_string_url_parameter('arlo-location');
         $arlo_delivery = \Arlo\Utilities::clean_int_url_parameter('arlo-delivery');
-        
+        $arlo_state = \Arlo\Utilities::clean_string_url_parameter('arlo-state');
+
         if (!empty($GLOBALS['arlo_eventtemplate']['et_region'])) {
             $arlo_region = $GLOBALS['arlo_eventtemplate']['et_region'];
         } else {
@@ -1036,6 +1051,10 @@ class Events {
 
         if(isset($arlo_delivery) && is_numeric($arlo_delivery)) {
             $conditions['e.e_isonline = %d'] = $arlo_delivery;
+        }
+
+        if (isset($arlo_state) && isset($GLOBALS['state_filter_venues'])) {
+            $conditions['state'] = $GLOBALS['state_filter_venues'];
         }
         
         $events = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), $limit, $import_id);

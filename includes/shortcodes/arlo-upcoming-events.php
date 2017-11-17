@@ -488,14 +488,18 @@ class UpcomingEvents {
             
         if(!empty($arlo_state)) :
             $join .= "
-                LEFT JOIN $t1 ce ON e.e_arlo_id = ce.e_parent_arlo_id
-                LEFT JOIN $t3 cev ON ce.v_id = cev.v_arlo_id
+                LEFT JOIN $t1 ce ON e.e_arlo_id = ce.e_parent_arlo_id AND e.import_id = ce.import_id
             ";
 
-            $where .= " AND (cev.v_physicaladdressstate = %s OR v.v_physicaladdressstate = %s)";
+            $venues_query = $wpdb->prepare("SELECT v.v_arlo_id FROM $t3 v WHERE v.v_physicaladdressstate = %s", $arlo_state);
+            $venues = implode(', ', array_map(function ($venue) {
+              return $venue['v_arlo_id'];
+            }, $wpdb->get_results( $venues_query, ARRAY_A)));
 
-            $parameters[] = $arlo_state;
-            $parameters[] = $arlo_state;
+            $where .= " AND (ce.v_id IN (%s) OR v.v_arlo_id IN (%s))";
+
+            $parameters[] = $venues;
+            $parameters[] = $venues;
         endif;
 
         if(!empty($arlo_eventtag)) :

@@ -166,7 +166,6 @@ class Templates {
         if(!empty($items)) :
             foreach($items as $item) {
                 $GLOBALS['arlo_eventtemplate'] = $item;
-                
                 $output .= do_shortcode($content);
                 unset($GLOBALS['arlo_eventtemplate']);
             }
@@ -394,7 +393,7 @@ class Templates {
                 
                 $GLOBALS['arlo_eventtemplate'] = $item;
                 $GLOBALS['arlo_event_list_item'] = $item;
-                
+
                 $output .= do_shortcode($content);
 
                 $list_item_snippet = array();
@@ -406,7 +405,7 @@ class Templates {
 
                 unset($GLOBALS['arlo_eventtemplate']);
                 unset($GLOBALS['arlo_event_list_item']);
-                
+
                 $previous = $item;
             }
 
@@ -796,6 +795,7 @@ class Templates {
         $offset = ($page > 0) ? $page * $limit - $limit: 0 ;
 
         $parameters = [];
+        $additional_fields = [];
 
         $t1 = "{$wpdb->prefix}arlo_eventtemplates";
         $t2 = "{$wpdb->prefix}posts";
@@ -811,6 +811,7 @@ class Templates {
         $parameters[] = $import_id;
 
         $join = "";
+        $field_list = "";
 
         $arlo_location = !empty($atts['location']) ? $atts['location'] : null;
         $arlo_state = !empty($atts['state']) ? $atts['state'] : null;
@@ -840,11 +841,26 @@ class Templates {
                 $parameters[] = $arlo_region;
             }
 
-            if(!empty($arlo_state)) :
-                $join .= " LEFT JOIN $t8 v ON e.v_id = v.v_arlo_id AND e.import_id = v.import_id";
-                
-                $where .= ' AND v.v_physicaladdressstate = %s';
-                $parameters[] = $arlo_state;
+            if(!empty($arlo_state)) :                
+                $join .= "
+                    LEFT JOIN $t8 v ON e.v_id = v.v_arlo_id AND e.import_id = v.import_id
+                    LEFT JOIN $t5 ce ON e.e_arlo_id = ce.e_parent_arlo_id AND e.import_id = ce.import_id
+                ";
+
+                $additional_fields[] = 'v.v_arlo_id';
+
+                $venues_query = $wpdb->prepare("SELECT v.v_arlo_id FROM $t8 v WHERE v.v_physicaladdressstate = %s", $arlo_state);
+                $venues = implode(', ', array_map(function ($venue) {
+                  return $venue['v_arlo_id'];
+                }, $wpdb->get_results( $venues_query, ARRAY_A)));
+
+                $GLOBALS['state_filter_venues'] = $venues;
+
+                $where .= " AND (ce.v_id IN (%s) OR v.v_arlo_id IN (%s))";
+
+                $parameters[] = $venues;
+                $parameters[] = $venues;
+
             endif;
 
             $group = 'GROUP BY et.et_arlo_id';
@@ -938,7 +954,7 @@ class Templates {
         }	
         
         $order = $limit_field = '';
-        $field_list = 'et.et_id';
+        $field_list .= 'et.et_id';
 
         if (!$for_pagination) {
             //ordering
@@ -955,7 +971,7 @@ class Templates {
 
             $limit_field = " LIMIT $offset,$limit ";
 
-            $field_list = "et.*, post.ID as post_id, etc.c_arlo_id, c.*";
+            $field_list = "et.*, post.ID as post_id, etc.c_arlo_id, c.*" . ($additional_fields ? ' ,' . implode(' ,', $additional_fields) : '');
         }
         
         $sql = "
@@ -976,6 +992,7 @@ class Templates {
         $limit_field";
 
         $query = $wpdb->prepare($sql, $parameters);
+
         if ($query) {
             return $query;
         } else {
