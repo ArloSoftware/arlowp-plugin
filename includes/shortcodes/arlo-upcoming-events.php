@@ -435,7 +435,7 @@ class UpcomingEvents {
         $t11 = "{$wpdb->prefix}arlo_eventtemplates_tags";
 
         $join = '';
-        $where = 'WHERE CURDATE() < DATE(e.e_startdatetime)  AND e_parent_arlo_id = 0 AND e.import_id = %d';
+        $where = 'WHERE CURDATE() < DATE(e.e_startdatetime)  AND e.e_parent_arlo_id = 0 AND e.import_id = %d';
         $parameters[] = $import_id;
 
         $arlo_location = !empty($atts['location']) ? $atts['location'] : null;
@@ -487,7 +487,14 @@ class UpcomingEvents {
         endif;  
             
         if(!empty($arlo_state)) :
-            $where .= ' AND v.v_physicaladdressstate = %s';
+            $join .= "
+                LEFT JOIN $t1 ce ON e.e_arlo_id = ce.e_parent_arlo_id
+                LEFT JOIN $t3 cev ON ce.v_id = cev.v_arlo_id
+            ";
+
+            $where .= " AND (cev.v_physicaladdressstate = %s OR v.v_physicaladdressstate = %s)";
+
+            $parameters[] = $arlo_state;
             $parameters[] = $arlo_state;
         endif;
 
@@ -638,6 +645,7 @@ class UpcomingEvents {
             et.et_arlo_id, e.e_id
         $order
         $limit_field";
+
 
         $query = $wpdb->prepare($sql, $parameters);
 
