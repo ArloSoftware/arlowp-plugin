@@ -80,6 +80,8 @@ class UpcomingEvents {
             'limit' => ''
         ), $atts, $shortcode_name, $import_id);
 
+        self::$upcoming_list_item_atts = self::get_upcoming_atts($atts);
+
         if (isset($atts['limit']) && is_numeric($atts['limit'])) {
             self::$upcoming_list_item_atts['limit'] = $atts['limit'];
         }

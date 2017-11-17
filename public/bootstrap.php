@@ -285,30 +285,39 @@ function arlo_register_custom_post_types() {
 			$arlo_page_ids[intval($settings['post_types'][$id]['posts_page'])] = $id;
 		}
 	}
-	
-	if (((array_key_exists($page_id, $arlo_page_ids) && !empty($settings['post_types'][$arlo_page_ids[$page_id]]['posts_page'])) || $page_type == 'arlo_event') && is_array($regions) && count($regions)) {
-		if (empty($selected_region)) {
-			//try to read the region from a cookie
-			if (!empty($_COOKIE['arlo-region']) && in_array($_COOKIE['arlo-region'], array_keys($regions))) {
-				$selected_region = $_COOKIE['arlo-region'];
+
+
+	if (is_array($regions) && count($regions)) {
+
+		if (((array_key_exists($page_id, $arlo_page_ids) && !empty($settings['post_types'][$arlo_page_ids[$page_id]]['posts_page'])) || $page_type == 'arlo_event')) {
+			if (empty($selected_region)) {
+				//try to read the region from a cookie
+				if (!empty($_COOKIE['arlo-region']) && in_array($_COOKIE['arlo-region'], array_keys($regions))) {
+					$selected_region = $_COOKIE['arlo-region'];
+				} else {
+					$selected_region = reset(array_keys($regions));
+				}
+				
+				setcookie("arlo-region", $selected_region, time()+60*60*24*30, '/');	
+				
+				if ($page_type == 'arlo_event') {
+					$slug = substr(substr(str_replace(get_home_url(), '', get_post_permalink($page_id)), 0, -1), 1);	
+				} else {
+					$slug = substr(substr(str_replace(get_home_url(), '', get_permalink($settings['post_types'][$arlo_page_ids[$page_id]]['posts_page'])), 0, -1), 1);	
+				}
+				
+				$location = str_replace($slug, $slug.'/region-' . $selected_region , $_SERVER['REQUEST_URI']);			
+				
+				wp_redirect(esc_url($location));
+				exit();				
 			} else {
-				$selected_region = reset(array_keys($regions));
+				setcookie("arlo-region", $selected_region, time()+60*60*24*30, '/');	
 			}
-			
-			setcookie("arlo-region", $selected_region, time()+60*60*24*30, '/');	
-			
-			if ($page_type == 'arlo_event') {
-				$slug = substr(substr(str_replace(get_home_url(), '', get_post_permalink($page_id)), 0, -1), 1);	
-			} else {
-				$slug = substr(substr(str_replace(get_home_url(), '', get_permalink($settings['post_types'][$arlo_page_ids[$page_id]]['posts_page'])), 0, -1), 1);	
-			}
-			
-			$location = str_replace($slug, $slug.'/region-' . $selected_region , $_SERVER['REQUEST_URI']);			
-			
-			wp_redirect(esc_url($location));
-			exit();				
 		} else {
-			setcookie("arlo-region", $selected_region, time()+60*60*24*30, '/');	
+			if (empty($_COOKIE['arlo-region'])) {
+				setcookie("arlo-region", reset(array_keys($regions)), time()+60*60*24*30, '/');
+				wp_redirect($_SERVER['REQUEST_URI']);
+			}
 		}
 	}
 }
