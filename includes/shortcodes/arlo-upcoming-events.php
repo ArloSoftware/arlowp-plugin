@@ -47,16 +47,20 @@ class UpcomingEvents {
     }
 
     private static function get_upcoming_atts($atts) {
-        return array(
-            'location' => \Arlo\Utilities::get_att_string('location', $atts),
-            'category' => \Arlo\Utilities::get_att_string('category', $atts),
-            'delivery' => \Arlo\Utilities::get_att_int('delivery', $atts),
-            'eventtag' => \Arlo\Utilities::get_att_string('eventtag', $atts),
-            'templatetag' => \Arlo\Utilities::get_att_string('templatetag', $atts),
-            'presenter' => \Arlo\Utilities::get_att_string('presenter', $atts),
-            'month' => \Arlo\Utilities::get_att_string('month', $atts),
-            'region' => \Arlo_For_Wordpress::get_region_parameter()
-        );
+        $new_atts = [];
+        
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'location', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'category', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'search', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_int', 'delivery', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'templatetag', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'eventtag', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'presenter', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'month', $atts);
+        
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo_For_Wordpress::get_region_parameter', 'region');
+
+        return $new_atts;
     }
 
     private static function shortcode_upcoming_list_pagination($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
