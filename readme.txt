@@ -3,8 +3,8 @@ Contributors: ArloSoftware, adamfentosi
 Tags: online registration, event registration, training management,  event management, event plugin, training company software, training calendar, training administration, training management software, training provider, solution, events calendar, wordpress events, event ticketing, wordpress lms, class registration, conference registration,  ticket, registration, event manager, training, booking, ticketing, courses, events, training, calendar, course management
 
 Requires at least: 4.4
-Tested up to: 4.8.2
-Stable tag: 3.4
+Tested up to: 4.9
+Stable tag: 3.4.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -173,7 +173,11 @@ The Arlo - Training and Event Management, and online registration plugin is only
 
 == Changelog ==
 
-== V3.4 ==
+= 3.4.1 =
+
+Fix, global level shortcodes don't respect attribute settings
+
+= 3.4 =
 
 Resuable shortcodes
 New "category", "location", "delivery" and "templatetag" attributes for [arlo_event_template_list] global shortcode
@@ -195,6 +199,10 @@ Template doesn't appear in multiple categories
 Suggest template section doesn't display all templates from multiple categories
 OnlineActivity template doesn't load by default in some cases
 Internal theme files doesn't load in some cases
+
+= 3.2.1 =
+
+Fix long running import issue, which can timeout the request
 
 = 3.2 =
 
