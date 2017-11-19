@@ -1,3 +1,10 @@
+== V3.4.1 ==
+
+Bugfixes
+------------------
+Fix, global level shortcodes don't respect attribute settings
+
+
 == V3.4 ==
 
 Enhancement

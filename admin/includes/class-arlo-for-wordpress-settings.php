@@ -850,6 +850,12 @@ class Arlo_For_Wordpress_Settings {
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">	  
+				<li>Fix, global level shortcodes don\'t respect attribute settings</li>
+			</ul>
+		</p>	
+		<h4>Version 3.4</h4>		
+		<p>
+			<ul class="arlo-whatsnew-list">	  
 				<li>Resuable shortcodes</li>
 				<li>New "category", "location", "delivery" and "templatetag" attributes for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#arlo_event_template_list" target="_blank">[arlo_event_template_list]</a> global shortcode </li>
 				<li>New "category", "location", "delivery" and "templatetag" attributes for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#arlo_schedule" target="_blank">[arlo_schedule]</a> global shortcode </li>
