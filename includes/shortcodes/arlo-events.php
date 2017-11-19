@@ -1044,7 +1044,7 @@ class Events {
                             break;
                         case "viewuri":
                             $url = $GLOBALS['arlo_eventtemplate']['et_viewuri'];
-                            $link .= self::get_event_date_link($url,$buttonclass,$display_text);
+                            $link .= self::get_event_date_link($url, $buttonclass, $display_text);
                             break;
                         case "registerlink":
                             if ($event->e_registeruri && !$event->e_isfull) {
@@ -1052,7 +1052,7 @@ class Events {
                             } else {
                                 $url = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
                             }
-                            $link .= self::get_event_date_link($url,$buttonclass,$display_text);
+                            $link .= self::get_event_date_link($url, $buttonclass, $display_text);
                             break;
                     }
 
@@ -1065,9 +1065,33 @@ class Events {
             $return .= implode(($layout == 'list' ? "" : ", "), $return_links);
         } else if (count($oa)) {
             $reference_terms = json_decode($oa->oa_reference_terms, true);
+            $buttonclass = 'arlo-register';
 
-            if (is_array($reference_terms) && isset($reference_terms['Plural']))
-                $return .= '<a href="' . $oa->oa_registeruri . '" class="' . esc_attr($buttonclass) . ' arlo-register">' . $reference_terms['Plural'] . '</a>';
+            if (is_array($reference_terms) && isset($reference_terms['Plural'])) {
+                $tag = 'a';
+                $class = esc_attr($buttonclass);
+                $href = '';
+                switch ($template_link) {
+                    case "permalink":
+                        $url = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
+                        $href = 'href="' . esc_url($url) . '"';
+                        break;
+                    case "none":
+                        $tag = 'span';
+                        $class = esc_attr($dateclass);        
+                        break;
+                    case "viewuri":
+                        $url = $GLOBALS['arlo_eventtemplate']['et_viewuri'];
+                        $href = 'href="' . esc_url($url) . '"';
+                        break;
+                    case "registerlink":
+                        $url = $oa->oa_registeruri;
+                        $href = 'href="' . esc_url($url) . '"';
+                        break;
+                }
+
+                $return .= sprintf('<%s %s class="%s">%s</%s>', $tag, $href, $class, $reference_terms['Plural'], $tag);
+            }
         }
         
         if ($layout == "list") {
