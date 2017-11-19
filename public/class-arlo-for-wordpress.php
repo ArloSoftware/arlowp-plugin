@@ -1704,7 +1704,7 @@ class Arlo_For_Wordpress {
 
     public static function get_region_parameter() {
         $regions = get_option('arlo_regions');
-        $arlo_region = strtoupper(get_query_var('arlo-region', ''));
+        $arlo_region = get_query_var('arlo-region', '') ? strtoupper(get_query_var('arlo-region', '')) : $_COOKIE['arlo-region'];
         return (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
     }
     

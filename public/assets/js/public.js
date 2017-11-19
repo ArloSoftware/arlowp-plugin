@@ -131,11 +131,9 @@
 	function initRegionChanger() {
 		uriRegion = getUriRegion();
 		
-		if (uriRegion != null) {
-			$("#arlo-filter-region").bind("change", function () {
-				changeRegion(uriRegion, jQuery("#arlo-filter-region").val());
-			});		
-		}
+		$(".arlo-filter-region").bind("change", function () {
+			changeRegion(uriRegion, $(this).val());
+		});		
 	}        
     
     function changeRegion(uriRegion, newRegion) {
@@ -143,7 +141,11 @@
 	    //Manually set cookie
     	$.cookie("arlo-region", newRegion, { path: "/" });
 
-	    window.location.href = window.location.href.replace("/region-" + uriRegion + "/", "/region-" + newRegion + "/").replace(/location-\w+(%\d+)?\w*/g,"");
+    	if (uriRegion) {
+		    window.location.href = window.location.href.replace("/region-" + uriRegion + "/", "/region-" + newRegion + "/").replace(/location-\w+(%\d+)?\w*/g,"");
+    	} else {
+    		window.location.reload();
+    	}
 	}	
 	
 	$(document).ready(function() {

@@ -34,8 +34,6 @@ class UpcomingEvents {
     private static function shortcode_upcoming_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
         
-        $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
-
         self::$upcoming_list_item_atts = self::get_upcoming_atts($atts);
 
         $template_name = Shortcodes::get_template_name($shortcode_name,'upcoming_list','upcoming');
@@ -85,6 +83,8 @@ class UpcomingEvents {
             'templatetag' => '',
             'limit' => ''
         ), $atts, $shortcode_name, $import_id);
+
+        self::$upcoming_list_item_atts = self::get_upcoming_atts($atts);
 
         if (isset($atts['limit']) && is_numeric($atts['limit'])) {
             self::$upcoming_list_item_atts['limit'] = $atts['limit'];
