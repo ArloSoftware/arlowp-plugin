@@ -194,12 +194,14 @@ class OnlineActivities {
     }
 
     private static function get_oa_atts($atts) {
-        return array(
-            'category' => \Arlo\Utilities::get_att_string('category', $atts),
-            'oatag' => \Arlo\Utilities::get_att_string('oatag', $atts),
-            'templatetag' => \Arlo\Utilities::get_att_string('templatetag', $atts),
-            'region' => \Arlo_For_Wordpress::get_region_parameter()
-        );
+        $new_atts = [];
+        
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'category', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'oatag', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'templatetag', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo_For_Wordpress::get_region_parameter', 'region');
+
+        return $new_atts;
     }
 
     private static function shortcode_onlineactivites_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {

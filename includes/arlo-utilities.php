@@ -51,6 +51,16 @@ class Utilities {
 
         return null;
     }
+
+    public function process_att($new_atts_array, $callback, $att_name = '', $atts = []) {
+        $value = call_user_func($callback, $att_name, $atts);
+        
+		if (!is_null($value) && (!empty($value) || is_numeric($value))) {
+			$new_atts_array[$att_name] = $value;
+        }
+        
+		return $new_atts_array;
+	}
     
     public static function remove_url_protocol($url) {
         $url = parse_url($url);
