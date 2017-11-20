@@ -51,6 +51,7 @@ class UpcomingEvents {
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'category', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'search', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_int', 'delivery', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_int', 'templateid', $atts);       
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'templatetag', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'eventtag', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'presenter', $atts);
@@ -451,6 +452,7 @@ class UpcomingEvents {
         $arlo_templatetag = !empty($atts['templatetag']) ? $atts['templatetag'] : null;
         $arlo_presenter = !empty($atts['presenter']) ? $atts['presenter'] : null;
         $arlo_region = !empty($atts['region']) ? $atts['region'] : null;
+        $arlo_templateid = !empty($atts['templateid']) ? $atts['templateid'] : null;
 
         if(!empty($arlo_month)) :
             $dates = explode(':',urldecode($arlo_month));
@@ -462,6 +464,11 @@ class UpcomingEvents {
         if(!empty($arlo_location)) :
             $where .= ' AND e.e_locationname = %s';
             $parameters[] = $arlo_location;
+        endif;
+
+        if(!empty($arlo_templateid)) :
+            $where .= ' AND e.et_arlo_id = %d';
+            $parameters[] = $arlo_templateid;
         endif;
 
         if(!empty($arlo_category)) :
