@@ -1,3 +1,14 @@
+== V3.5 ==
+Enhancement
+------------------
+New "template_link" attribute for [arlo_event_next_running]
+Enhance the output of [arlo_venue_address] and new "link" attribute
+New "Region selector" widget
+New "State" filter for [arlo_event_filters], [arlo_upcoming_event_filters], [arlo_event_template_filters] and [arlo_schedule_filters]
+New "templateid" attribute for [arlo_upcoming_list] global shortcode
+Filter settings available for custom shortcodes
+
+
 == V3.4.1 ==
 
 Bugfixes
