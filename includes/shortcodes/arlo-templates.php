@@ -804,7 +804,6 @@ class Templates {
         $t5 = "{$wpdb->prefix}arlo_events";
         $t6 = "{$wpdb->prefix}arlo_eventtemplates_tags";
         $t7 = "{$wpdb->prefix}arlo_tags";
-        $t8 = "{$wpdb->prefix}arlo_venues";
             
         $where = "WHERE post.post_type = 'arlo_event' AND et.import_id = %d";
         $group = (isset($GLOBALS['arlo_group_template_by_id']) && $GLOBALS['arlo_group_template_by_id']) ? 'GROUP BY et.et_arlo_id' : '';	
@@ -843,23 +842,30 @@ class Templates {
 
             if(!empty($arlo_state)) :                
                 $join .= "
-                    LEFT JOIN $t8 v ON e.v_id = v.v_arlo_id AND e.import_id = v.import_id
                     LEFT JOIN $t5 ce ON e.e_arlo_id = ce.e_parent_arlo_id AND e.import_id = ce.import_id
                 ";
 
-                $additional_fields[] = 'v.v_arlo_id';
-
-                $venues_query = $wpdb->prepare("SELECT v.v_arlo_id FROM $t8 v WHERE v.v_physicaladdressstate = %s", $arlo_state);
-                $venues = implode(', ', array_map(function ($venue) {
+                $venues_query = $wpdb->prepare("SELECT v.v_arlo_id FROM {$wpdb->prefix}arlo_venues v WHERE v.v_physicaladdressstate = %s", $arlo_state);
+                $venues = array_map(function ($venue) {
                   return $venue['v_arlo_id'];
-                }, $wpdb->get_results( $venues_query, ARRAY_A)));
+                }, $wpdb->get_results( $venues_query, ARRAY_A));
 
                 $GLOBALS['state_filter_venues'] = $venues;
 
-                $where .= " AND (ce.v_id IN (%s) OR v.v_arlo_id IN (%s))";
+                if(is_array($venues) && count($venues) > 1) {
+                    $ids_string = implode(',', array_map(function() {return "%d";}, $venues));
+                    $where .= " AND (ce.v_id IN (" . $ids_string . ") OR e.v_id IN (" . $ids_string . "))";
+                    $parameters = array_merge($parameters, $venues);
+                    $parameters = array_merge($parameters, $venues);
+                } else {
+                    if (is_array($venues)) {
+                        $venues = array_shift($venues);
+                    }
 
-                $parameters[] = $venues;
-                $parameters[] = $venues;
+                    $where .= " AND (ce.v_id = %d OR e.v_id = %d)";
+                    $parameters[] = $venues;
+                    $parameters[] = $venues;	
+                }                
 
             endif;
 
