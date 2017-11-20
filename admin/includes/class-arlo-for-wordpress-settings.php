@@ -482,8 +482,18 @@ class Arlo_For_Wordpress_Settings {
 
 		$filters_settings_html = '';
 
-		foreach(Arlo_For_Wordpress::$available_filters as $filter_group => $filter_group_values) {
-		    $output .= '<option value="'.$filter_group.'" >'.$filter_group_values['name'].'</option>';
+		foreach(Arlo_For_Wordpress::$templates as $filter_group => $arlo_template) {
+			$filter_type = (!empty($arlo_template['type']) ? $arlo_template['type'] : $arlo_template['id']);
+
+			//hack, because the key in the templates are not the same as in the filters
+			$filter_type = ($filter_type == 'events' ? 'template' : $filter_type);
+
+			if (!array_key_exists($filter_type, Arlo_For_Wordpress::$available_filters))
+				continue;
+
+			$filter_group_values = Arlo_For_Wordpress::$available_filters[$filter_type];
+			
+		    $output .= '<option value="' . $filter_group . '" >' . $arlo_template['name'] . '</option>';
 
 		    $filters_settings_html .= '<div id="arlo-' . $filter_group . '-filters" class="arlo-filter-group">';
 

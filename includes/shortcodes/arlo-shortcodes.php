@@ -150,12 +150,14 @@ class Shortcodes {
 			return '';
 		}
 
-		if (!empty(get_option('arlo_filter_settings')[$group][$type][$label]) ) {
-			$label = get_option('arlo_filter_settings')[$group][$type][$label];
+		$filter_settings = get_option('arlo_filter_settings');
+
+		if (!empty($filter_settings[$group][$type][$label]) ) {
+			$label = $filter_settings[$group][$type][$label];
 		}
 
-		if (!empty(get_option('arlo_filter_settings')['arlohiddenfilters'])) {
-			$hidden_filters = get_option('arlo_filter_settings')['arlohiddenfilters'];
+		if (!empty($filter_settings['arlohiddenfilters'])) {
+			$hidden_filters = $filter_settings['arlohiddenfilters'];
 		}
 
 		$filter_html = '<select id="arlo-filter-' . esc_attr($type) . '" class="arlo-filter-' . esc_attr($type) . '" name="arlo-' . esc_attr($type) . '">';

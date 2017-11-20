@@ -562,7 +562,7 @@ class Templates {
         
         $settings = get_option('arlo_settings');
 
-        $page_type = \Arlo_For_Wordpress::get_current_page_arlo_type();
+        $page_type = \Arlo_For_Wordpress::get_current_page_arlo_type();        
 
         if (!empty($settings['post_types'][$page_type]['posts_page'])) {
             $page_link = get_permalink(get_post($settings['post_types'][$page_type]['posts_page']));
@@ -572,14 +572,13 @@ class Templates {
 
         $filter_html = '';
 
-        $filter_group = $page_type == 'schedule' ? 'schedule' : 'template';
+        $filter_group = $page_type == 'event' ? 'events' : $page_type;        
 
         $atts = is_array($atts) ? $atts : [];
 
         $atts = array_merge($atts, self::$event_template_atts);
 
-
-        foreach(\Arlo_For_Wordpress::$available_filters[$filter_group]['filters'] as $filter_key => $filter):
+        foreach(\Arlo_For_Wordpress::$available_filters[$page_type == 'schedule' ? 'schedule' : 'template']['filters'] as $filter_key => $filter):
 
             $att = strval(self::$event_template_atts[$filter_key]);
 
@@ -597,7 +596,7 @@ class Templates {
                     }
                     
                     if (is_array($cats)) {
-                        $filter_html .= Shortcodes::create_filter($filter_key, CategoriesEntity::child_categories($cats), __('All categories', 'arlo-for-wordpress'),$filter_group,$att);
+                        $filter_html .= Shortcodes::create_filter($filter_key, CategoriesEntity::child_categories($cats), __('All categories', 'arlo-for-wordpress'), $filter_group, $att);
                     }
                     
                     break;
@@ -606,7 +605,7 @@ class Templates {
 
                     // delivery select
 
-                    $filter_html .= Shortcodes::create_filter($filter_key, \Arlo_For_Wordpress::$delivery_labels, __('All delivery options', 'arlo-for-wordpress'),$filter_group,$att);
+                    $filter_html .= Shortcodes::create_filter($filter_key, \Arlo_For_Wordpress::$delivery_labels, __('All delivery options', 'arlo-for-wordpress'), $filter_group, $att);
 
                     break;              
 
@@ -639,7 +638,7 @@ class Templates {
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter_key, $locations, __('All locations', 'arlo-for-wordpress'),$filter_group,$att);
+                    $filter_html .= Shortcodes::create_filter($filter_key, $locations, __('All locations', 'arlo-for-wordpress'), $filter_group, $att);
 
                     break;
 
@@ -671,7 +670,7 @@ class Templates {
                         }
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter_key, $states, __('Select state', 'arlo-for-wordpress'),$filter_group,$att);                
+                    $filter_html .= Shortcodes::create_filter($filter_key, $states, __('Select state', 'arlo-for-wordpress'), $filter_group, $att);                
                     
                     break;
 
@@ -703,7 +702,7 @@ class Templates {
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter_key, $tags, __('Select tag', 'arlo-for-wordpress'),$filter_group,$att);                
+                    $filter_html .= Shortcodes::create_filter($filter_key, $tags, __('Select tag', 'arlo-for-wordpress'), $filter_group, $att);                
                     
                     break;
 
