@@ -89,7 +89,11 @@ class VersionHandler {
 
 		if (version_compare($old_version, '3.3') < 0) {
 			$this->do_update('3.3');
-		}							
+		}
+		
+		if (version_compare($old_version, '3.5') < 0) {
+			$this->do_update('3.5');
+		}
 	}
 	
 	private function run_pre_data_update($version) {
@@ -497,6 +501,22 @@ class VersionHandler {
 				update_option('arlo_regions', $regions);
 			break;
 
+			case '3.5':
+				//update filter settings, if there is
+				$filter_settings = get_option('arlo_filter_settings', []);
+
+				if (isset($filter_settings['template'])) {
+					$filter_settings['events'] = $filter_settings['template'];
+					unset($filter_settings['template']);					
+				}
+
+				if (isset($filter_settings['arlohiddenfilters']) && isset($filter_settings['arlohiddenfilters']['template'])) {
+					$filter_settings['arlohiddenfilters']['events'] = $filter_settings['arlohiddenfilters']['template'];
+					unset($filter_settings['arlohiddenfilters']['template']);					
+				}
+
+				update_option('arlo_filter_settings', $filter_settings);
+			break;
 		}	
 	}
 
