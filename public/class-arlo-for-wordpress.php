@@ -347,7 +347,8 @@ class Arlo_For_Wordpress {
 		'event' => array(
 			'name' => 'Event',
 			'filters' => array(
-				'location' => 'Location'
+				'location' => 'Location',
+				'state' => 'State'
 			)
 		),
 		'upcoming' => array(
@@ -359,7 +360,8 @@ class Arlo_For_Wordpress {
 				'delivery' => 'Delivery', 
 				'eventtag' => 'Event tag', 
 				'templatetag' => 'Template tag', 
-				'presenter' => 'Presenter'
+				'presenter' => 'Presenter',
+				'state' => 'State'
 			)
 		),
 		'oa' => array(
@@ -376,7 +378,8 @@ class Arlo_For_Wordpress {
 				'category' => 'Category', 
 				'delivery' => 'Delivery', 
 				'location' => 'Location', 
-				'templatetag' => 'Tag'
+				'templatetag' => 'Tag',
+				'state' => 'State'
 			)
 		),
 		'schedule' => array(
@@ -385,7 +388,8 @@ class Arlo_For_Wordpress {
 				'category' => 'Category', 
 				'delivery' => 'Delivery', 
 				'location' => 'Location', 
-				'templatetag' => 'Tag'
+				'templatetag' => 'Tag',
+				'state' => 'State'
 			)
 		)
 

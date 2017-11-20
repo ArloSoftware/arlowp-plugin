@@ -55,6 +55,7 @@ class UpcomingEvents {
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'eventtag', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'presenter', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'month', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'state', $atts);
         
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo_For_Wordpress::get_region_parameter', 'region');
 
@@ -278,7 +279,38 @@ class UpcomingEvents {
 
                     $filter_html .= Shortcodes::create_filter($filter_key, $locations, __('All locations', 'arlo-for-wordpress'),$filter_group,$att);
 
-                    break;          
+                    break;
+                case 'state' :
+                    $items = $wpdb->get_results(
+                        "SELECT DISTINCT
+                            v.v_physicaladdressstate
+                        FROM 
+                            {$wpdb->prefix}arlo_venues AS v
+                        LEFT JOIN 
+                            {$wpdb->prefix}arlo_events AS e
+                        ON
+                            v.v_arlo_id = e.v_id
+                        AND
+                            v.import_id = e.import_id
+                        WHERE 
+                            e.import_id = $import_id
+                        ORDER BY v_name", ARRAY_A);
+
+
+                    $states = array();
+
+                    foreach ($items as $item) {
+                        if (!empty($item['v_physicaladdressstate']) || in_array($item['v_physicaladdressstate'],[0,"0"], true) ) {
+                            $states[] = array(
+                                'string' => $item['v_physicaladdressstate'],
+                                'value' => $item['v_physicaladdressstate'],
+                            );
+                        }
+                    }
+
+                    $filter_html .= Shortcodes::create_filter($filter_key, $states, __('Select state', 'arlo-for-wordpress'),$filter_group,$att);                
+                    
+                    break;
                 case 'eventtag' :
                     $items = $wpdb->get_results(
                         "SELECT DISTINCT
@@ -407,10 +439,11 @@ class UpcomingEvents {
         $t11 = "{$wpdb->prefix}arlo_eventtemplates_tags";
 
         $join = '';
-        $where = 'WHERE CURDATE() < DATE(e.e_startdatetime)  AND e_parent_arlo_id = 0 AND e.import_id = %d';
+        $where = 'WHERE CURDATE() < DATE(e.e_startdatetime)  AND e.e_parent_arlo_id = 0 AND e.import_id = %d';
         $parameters[] = $import_id;
 
         $arlo_location = !empty($atts['location']) ? $atts['location'] : null;
+        $arlo_state = !empty($atts['state']) ? $atts['state'] : null;
         $arlo_category = !empty($atts['category']) ? $atts['category'] : null;
         $arlo_delivery = isset($atts['delivery']) ? $atts['delivery'] : null;
         $arlo_month = !empty($atts['month']) ? $atts['month'] : null;
@@ -457,6 +490,22 @@ class UpcomingEvents {
             $parameters[] = intval($arlo_delivery);
         endif;  
             
+        if(!empty($arlo_state)) :
+            $join .= "
+                LEFT JOIN $t1 ce ON e.e_arlo_id = ce.e_parent_arlo_id AND e.import_id = ce.import_id
+            ";
+
+            $venues_query = $wpdb->prepare("SELECT v.v_arlo_id FROM $t3 v WHERE v.v_physicaladdressstate = %s", $arlo_state);
+            $venues = implode(', ', array_map(function ($venue) {
+              return $venue['v_arlo_id'];
+            }, $wpdb->get_results( $venues_query, ARRAY_A)));
+
+            $where .= " AND (ce.v_id IN (%s) OR v.v_arlo_id IN (%s))";
+
+            $parameters[] = $venues;
+            $parameters[] = $venues;
+        endif;
+
         if(!empty($arlo_eventtag)) :
             $join .= " LEFT JOIN $t7 etag ON etag.e_id = e.e_id AND etag.import_id = e.import_id";
 
@@ -604,6 +653,7 @@ class UpcomingEvents {
             et.et_arlo_id, e.e_id
         $order
         $limit_field";
+
 
         $query = $wpdb->prepare($sql, $parameters);
 

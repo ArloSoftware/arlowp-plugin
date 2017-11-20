@@ -58,7 +58,8 @@
         		'eventtag-': 'arlo-filter-eventtag',
         		'templatetag-': 'arlo-filter-templatetag',
 	    		'oatag-': 'arlo-filter-oatag',
-        		'presenter-': 'arlo-filter-presenter'
+        		'presenter-': 'arlo-filter-presenter',
+        		'state-': 'arlo-filter-state'
         	};
         	
         	var page = $('#arlo-page').val();
