@@ -367,7 +367,7 @@ class Arlo_For_Wordpress {
 		'oa' => array(
 			'name' => 'Online activities',
 			'filters' => array(
-				'oatag' => 'Online activity tag', 
+				//'oatag' => 'Online activity tag',  //OA cannot be tagged currently
 				'templatetag' => 'Template tag',
 				'category' => 'Category'
 			)
