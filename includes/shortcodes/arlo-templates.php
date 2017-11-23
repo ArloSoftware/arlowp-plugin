@@ -911,36 +911,28 @@ class Templates {
             $parameters[] = $arlo_region;
         }		
                 
-        if(!empty($arlo_category) || !empty($atts['category'])) {
+        if(!empty($arlo_category)) {
+            $cat_ids = array_filter(
+                array_map(function($cat) {
+                    return intval($cat);
+                }, explode(',', $arlo_category)), 
+                function($cat_id) {
+                    return $cat_id > 0;
+                });
 
-            $cat_id = 0;
-
-            $cat_slug = (!empty($arlo_category) ? $arlo_category : $atts['category']);
-
-            $where .= " AND ( c.c_slug = %s";
-            $parameters[] = $cat_slug;
+            $where .= " AND ( c.c_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $cat_ids)) . ")";                
+            $parameters = array_merge($parameters, $cat_ids);
             
-            $cat_id = $wpdb->get_var($wpdb->prepare("
-            SELECT
-                c_arlo_id
-            FROM 
-                {$wpdb->prefix}arlo_categories
-            WHERE 
-                c_slug = %s
-            AND
-                import_id = %d
-            ", [$cat_slug, $import_id]));
-            
-            if (is_null($cat_id)) {
-                $cat_id = 0;
-            } 
-            
-            if (isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true") {
+            if (isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true" || $GLOBALS['show_child_elements']) {
                 $GLOBALS['show_child_elements'] = true;
-            
-                $cats = CategoriesEntity::getTree($cat_id, null, 0, $import_id);
+                $cats = [];
 
-                $categories_tree = CategoriesEntity::child_categories($cats);
+                foreach ($cat_ids as $cat_id) {
+                    $cat_tree = CategoriesEntity::getTree($cat_id, 100, 0, $import_id, true);
+                    $cats = array_merge($cats, (is_array($cat_tree) ? $cat_tree : []));
+                }
+
+                $categories_tree = CategoriesEntity::child_categories($cats);              
 
                 if (is_array($categories_tree)) {
                     $ids = array_map(function($item) {
@@ -959,6 +951,7 @@ class Templates {
         } else if (!(isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true")) {
             $where .= ' AND (c.c_parent_id = (SELECT c_arlo_id FROM ' . $t4 . ' WHERE c_parent_id = 0 AND import_id = %d) OR c.c_parent_id IS NULL)';
             $parameters[] = $import_id;
+            $GLOBALS['show_child_elements'] = false;
         }	
         
         $order = $limit_field = '';

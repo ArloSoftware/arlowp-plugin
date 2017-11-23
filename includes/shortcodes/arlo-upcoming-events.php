@@ -472,8 +472,16 @@ class UpcomingEvents {
         endif;
 
         if(!empty($arlo_category)) :
-            $where .= ' AND c.c_arlo_id = %d';
-            $parameters[] = intval(current(explode('-', $arlo_category)));
+            $arlo_category = array_filter(
+                array_map(function($cat) {
+                    return intval($cat);
+                }, explode(',', $arlo_category)), 
+                function($cat_id) {
+                    return $cat_id > 0;
+                });
+
+            $where .= " AND c.c_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $arlo_category)) . ")";                
+            $parameters = array_merge($parameters, $arlo_category);
 
             $join .= "LEFT JOIN 
                     $t5 etc
