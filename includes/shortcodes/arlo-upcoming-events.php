@@ -210,9 +210,9 @@ class UpcomingEvents {
             
         $filter_html = '<form class="arlo-filters" method="get" action="' . $page_link . '">';
 
-        $filter_group = "upcoming";
+        $filter_group = \Arlo_For_Wordpress::get_current_page_arlo_type();
             
-        foreach(\Arlo_For_Wordpress::$available_filters[$filter_group]['filters'] as $filter_key => $filter):
+        foreach(\Arlo_For_Wordpress::$available_filters['upcoming']['filters'] as $filter_key => $filter):
 
             $att = (isset(self::$upcoming_list_item_atts[$filter_key]) ? strval(self::$upcoming_list_item_atts[$filter_key]) : '');
 

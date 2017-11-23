@@ -480,13 +480,13 @@ class OnlineActivities {
 
         $filter_html = '';
 
-        $filter_group = 'oa';
+        $filter_group = \Arlo_For_Wordpress::get_current_page_arlo_type();
 
         foreach($filters_array as $filter_key):
 
             $att = strval(self::$oa_list_atts[$filter_key]);
 
-            if (!array_key_exists($filter_key, \Arlo_For_Wordpress::$available_filters[$filter_group]['filters']))
+            if (!array_key_exists($filter_key, \Arlo_For_Wordpress::$available_filters['oa']['filters']))
                 continue;
 
             switch($filter_key) :
