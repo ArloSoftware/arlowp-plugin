@@ -214,7 +214,7 @@ class UpcomingEvents {
             
         foreach(\Arlo_For_Wordpress::$available_filters[$filter_group]['filters'] as $filter_key => $filter):
 
-            $att = strval(self::$upcoming_list_item_atts[$filter_key]);
+            $att = (isset(self::$upcoming_list_item_atts[$filter_key]) ? strval(self::$upcoming_list_item_atts[$filter_key]) : '');
 
             if (!in_array($filter_key, $filters_array))
                 continue;

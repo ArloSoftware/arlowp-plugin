@@ -1707,9 +1707,13 @@ class Arlo_For_Wordpress {
     }
 
     public static function get_region_parameter() {
-        $regions = get_option('arlo_regions');
-        $arlo_region = get_query_var('arlo-region', '') ? strtoupper(get_query_var('arlo-region', '')) : $_COOKIE['arlo-region'];
-        return (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+		$regions = get_option('arlo_regions');
+
+		$arlo_region = get_query_var('arlo-region', '') 
+			? strtoupper(get_query_var('arlo-region', ''))
+			: (!empty($_COOKIE['arlo-region']) ? $_COOKIE['arlo-region'] : '');
+
+		return (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
     }
     
    	public function get_tag_by_id($tag_id) {
