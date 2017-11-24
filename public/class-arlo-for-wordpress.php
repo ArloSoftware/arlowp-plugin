@@ -253,7 +253,8 @@ class Arlo_For_Wordpress {
 	 */
     public static $delivery_labels = array(
         0 => 'Workshop',
-        1 => 'Online',
+		1 => 'Online',
+		99 => 'Online Activity'
     );
     
 	/**
