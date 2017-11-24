@@ -38,8 +38,12 @@
 		[arlo_event_rich_snippet]
 		[/arlo_event_list_item]
 	[/arlo_event_list]
+</ul>
 
+[arlo_event_template_register_interest]
+[arlo_suggest_datelocation wrap="<div class='arlo-suggest'>%s</div>"]
 
+<ul class="arlo-list arlo-show-more template-online-activities" data-show="3" data-show-text="Show more">
 	[arlo_oa_list]
 		[arlo_oa_list_item]
 		<li class="arlo-cf arlo-onlineactivity">
@@ -62,8 +66,6 @@
 	[/arlo_oa_list]
 </ul>
 
-[arlo_event_template_register_interest]
-[arlo_suggest_datelocation wrap="<div class='arlo-suggest'>%s</div>"]
 
 [arlo_content_field_item]
 	[arlo_content_field_name wrap='<h5>%s</h5>']

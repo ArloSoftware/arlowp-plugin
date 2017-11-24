@@ -710,20 +710,20 @@ body.arlo {
     border: none;
 }
 
-.arlo#arlo .arlo-list.events .arlo-online-activity,
+.arlo#arlo .arlo-list.template-online-activities .arlo-online-activity,
 .arlo#arlo .arlo-list.events .arlo-event {
     -webkit-transition: all .2s ease-in-out;
     transition: all .2s ease-in-out;
 }
 
 .arlo#arlo .arlo-list.events .arlo-event:hover,
-.arlo#arlo .arlo-list.events .arlo-online-activity:hover {
+.arlo#arlo .arlo-list.template-online-activities .arlo-online-activity:hover {
     -webkit-transform: translateY(-5px);
     transform: translateY(-5px);
     box-shadow: 0 20px 40px rgba(0,0,0,0.2);
 }
 
-.arlo#arlo .arlo-list.events .arlo-online-activity {
+.arlo#arlo .arlo-list.template-online-activities .arlo-online-activity {
     clear: both;
     width: 100%;
     padding: 1.5em 1.8em;
@@ -731,8 +731,9 @@ body.arlo {
     margin: .5em 0;
 }
 
-.arlo#arlo .arlo-list.events .arlo-online-activity h3 {
+.arlo#arlo .arlo-list.template-online-activities .arlo-online-activity h3 {
     margin-top: 0;
+    padding-top: 0;
     margin-bottom: .3em;
     line-height: 1;
 }
@@ -1124,11 +1125,11 @@ body.arlo {
 
 /* Online activities list */
 
-.arlo#arlo .arlo-online-activity {
+.arlo#arlo .arlo-online-activities .arlo-online-activity {
     margin-bottom: 3em;
 }
 
-.arlo#arlo .arlo-online-activity .arlo-reference-term {
+.arlo#arlo .arlo-online-activities .arlo-online-activity .arlo-reference-term {
     border-left-width: 2px;
     border-left-style: solid;
     display:inline-block;
@@ -1136,7 +1137,7 @@ body.arlo {
     margin-bottom: .5em;
 }
 
-.arlo#arlo .arlo-online-activity .arlo-event-offers {
+.arlo#arlo .arlo-online-activities .arlo-online-activity .arlo-event-offers {
     margin-bottom: 1em;
 }
 

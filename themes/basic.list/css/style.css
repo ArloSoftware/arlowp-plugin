@@ -15,6 +15,7 @@
 }
 
 .arlo .arlo-list.events > li,
+.arlo .arlo-list.template-online-activities > li,
 .arlo .arlo-list.upcoming > li,
 .arlo .arlo-list.arlo-online-activities > li {
 	border: 1px solid #ccc;
@@ -24,12 +25,17 @@
 }
 
 .arlo .arlo-list.events > li:last-child, 
+.arlo .arlo-list.template-online-activities > li:last-child,
 .arlo .arlo-list.upcoming > li:last-child {
 	margin-bottom: 0;
 }
 
 .arlo .arlo-list.venues > li, 
 .arlo .arlo-list.presenters > li {
+	margin-bottom: 1em;
+}
+
+.arlo .arlo-suggest {
 	margin-bottom: 1em;
 }
 
