@@ -81,13 +81,13 @@ class Categories {
 
 	}
 	
-	static function getTree($start_id = 0, $depth = 1, $level = 0, $import_id = null) {
+	static function getTree($start_id = 0, $depth = 1, $level = 0, $import_id = null, $insert_self = false) {
 		$result = null;
 		$depth = intval($depth);
 		$level = intval($level);
-		$conditions = array('parent_id' => intval($start_id));
-		
-		$categories = self::get($conditions, null, $import_id);
+		$start_id = intval($start_id);
+
+		$categories = self::get(['parent_id' => $start_id], null, $import_id);
 
 		foreach($categories as $item) {		
 			$item->depth_level = $level;	
@@ -97,6 +97,13 @@ class Categories {
 				unset($item->children);
 			}
 			$result[] = $item;
+		}
+		
+		if ($insert_self) {
+			$category = self::get(['id' => $start_id], null, $import_id);
+			$category->children = $result;
+
+			return [$category];
 		}
 		
 		return $result;
@@ -122,4 +129,29 @@ class Categories {
 
 		return $output;
 	} 
+
+	static function get_flattened_category_list_for_filter($base_category, $import_id) {
+        $cache_key = md5(serialize($base_category));
+                            
+        if(!($categories_flatten_list = wp_cache_get($cache_key, 'ArloFilterCategoryList'))) {
+            if (is_array($base_category)) {                    
+                $cats = [];
+            
+                foreach ($base_category as $cat_id) {
+                    $cat_tree = self::getTree($cat_id, 100, 0, $import_id, true);
+                    $cats = array_merge($cats, (is_array($cat_tree) ? $cat_tree : []));
+                }
+            } else {
+                $cats = self::getTree($base_category, 1, 0, $import_id);
+                if (!empty($cats)) {
+                    $cats = self::getTree($cats[0]->c_arlo_id, 100, 0, $import_id);
+                }
+            }
+
+            $categories_flatten_list = self::child_categories($cats);
+            wp_cache_add( $cache_key, $categories_flatten_list, 'ArloFilterCategoryList', 30 );
+        }
+
+        return $categories_flatten_list;
+    }
 }

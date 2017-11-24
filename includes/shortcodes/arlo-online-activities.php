@@ -211,6 +211,10 @@ class OnlineActivities {
 
         self::$oa_list_atts = self::get_oa_atts($atts);
 
+        if (!empty($atts["category"])) {
+            $GLOBALS['arlo_filter_base']['category'] = \Arlo\Utilities::convert_string_array_to_int_array($atts["category"]);
+        }
+
         $templates = arlo_get_option('templates');
         $content = $templates[$template_name]['html'];
         return do_shortcode($content);        
@@ -500,14 +504,13 @@ class OnlineActivities {
             switch($filter_key) :
 
                 case 'category' :
-                    $cats = CategoriesEntity::getTree(0, 1, 0, $import_id);
-                    
-                    if (!empty($cats)) {
-                        $cats = CategoriesEntity::getTree($cats[0]->c_arlo_id, 100, 0, $import_id);
-                    }
+                    //root category select
+                    $base_category = ((isset($GLOBALS['arlo_filter_base']['category']) && is_array($GLOBALS['arlo_filter_base']['category'])) ? $GLOBALS['arlo_filter_base']['category'] : 0);
 
-                    if (is_array($cats)) {
-                        $filter_html .= Shortcodes::create_filter($filter_key, CategoriesEntity::child_categories($cats), __('All categories', 'arlo-for-wordpress'),$filter_group,$att);                  
+                    $categories_flatten_list = CategoriesEntity::get_flattened_category_list_for_filter($base_category, $import_id);
+
+                    if (is_array($categories_flatten_list)) {
+                        $filter_html .= Shortcodes::create_filter($filter_key, $categories_flatten_list, __('All categories', 'arlo-for-wordpress'),$filter_group,$att);                  
                     }
 
                     break;

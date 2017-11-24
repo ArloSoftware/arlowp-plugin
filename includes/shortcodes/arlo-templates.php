@@ -261,6 +261,10 @@ class Templates {
 
         self::$event_template_atts = self::get_event_template_atts($atts);
 
+        if (!empty($atts["category"])) {
+            $GLOBALS['arlo_filter_base']['category'] = \Arlo\Utilities::convert_string_array_to_int_array($atts["category"]);
+        }
+
 	    return $content;
     }
 
@@ -590,13 +594,12 @@ class Templates {
                 case 'category' :
 
                     //root category select
-                    $cats = CategoriesEntity::getTree(0, 1, 0, $import_id); 
-                    if (!empty($cats)) {
-                        $cats = CategoriesEntity::getTree($cats[0]->c_arlo_id, 100, 0, $import_id);
-                    }
+                    $base_category = ((isset($GLOBALS['arlo_filter_base']['category']) && is_array($GLOBALS['arlo_filter_base']['category'])) ? $GLOBALS['arlo_filter_base']['category'] : 0);
                     
-                    if (is_array($cats)) {
-                        $filter_html .= Shortcodes::create_filter($filter_key, CategoriesEntity::child_categories($cats), __('All categories', 'arlo-for-wordpress'), $filter_group, $att);
+                    $categories_flatten_list = CategoriesEntity::get_flattened_category_list_for_filter($base_category, $import_id);
+                   
+                    if (is_array($categories_flatten_list)) {
+                        $filter_html .= Shortcodes::create_filter($filter_key, $categories_flatten_list, __('All categories', 'arlo-for-wordpress'), $filter_group, $att);
                     }
                     
                     break;
@@ -610,20 +613,48 @@ class Templates {
                     break;              
 
                 case 'location' :
-
-                    // location select
-
                     $t1 = "{$wpdb->prefix}arlo_events";
+                    $join = [];
+                    $where = [
+                            " e_locationname != '' ",
+                            " e.import_id = $import_id "
+                    ];
+
+                    $base_category = ((isset($GLOBALS['arlo_filter_base']['category']) && is_array($GLOBALS['arlo_filter_base']['category'])) ? $GLOBALS['arlo_filter_base']['category'] : 0);
+
+                    if (is_array($base_category)) {
+
+                        $categories_flatten_list = CategoriesEntity::get_flattened_category_list_for_filter($base_category, $import_id);        
+                        
+                        $join[] = "
+                        LEFT JOIN 
+                            {$wpdb->prefix}arlo_eventtemplates AS et
+                        ON
+                            et.et_arlo_id = e.et_arlo_id
+                        AND
+                            et.import_id = e.import_id
+                        ";
+
+                        $join[] = "
+                        LEFT JOIN 
+                            {$wpdb->prefix}arlo_eventtemplates_categories AS etc
+                        ON
+                            etc.et_arlo_id = et.et_arlo_id
+                        AND
+                            etc.import_id = et.import_id
+                        ";
+
+                        $where[] = " c_arlo_id IN (" . implode(", ", array_map(function($cat) { return $cat['id']; }, $categories_flatten_list)) . ") ";
+                    }
 
                     $items = $wpdb->get_results(
                         "SELECT 
-                            DISTINCT(e.e_locationname)
+                            DISTINCT e.e_locationname
                         FROM 
                             $t1 e 
+                        " . implode("\n", $join) . "
                         WHERE 
-                            e_locationname != ''
-                        AND
-                            e.import_id = " . $import_id . "
+                        " . implode(" AND ", $where) . "
                         GROUP BY 
                             e.e_locationname 
                         ORDER BY 
@@ -638,24 +669,62 @@ class Templates {
                         );
                     }
 
-                    $filter_html .= Shortcodes::create_filter($filter_key, $locations, __('All locations', 'arlo-for-wordpress'), $filter_group, $att);
+                    $filter_html .= Shortcodes::create_filter($filter_key, $locations, __('All locations', 'arlo-for-wordpress'),$filter_group,$att);
 
                     break;
 
-                case 'state' :
-                    $items = $wpdb->get_results(
-                        "SELECT DISTINCT
-                            v.v_physicaladdressstate
-                        FROM 
-                            {$wpdb->prefix}arlo_venues AS v
+                    case 'state' :
+                    $join = [
+                        "
                         LEFT JOIN 
                             {$wpdb->prefix}arlo_events AS e
                         ON
                             v.v_arlo_id = e.v_id
                         AND
-                            v.import_id = e.import_id
+                            v.import_id = e.import_id                    
+                        "
+                    ];
+
+                    $where = [
+                        " e.import_id = $import_id "
+                    ];
+
+                    $base_category = ((isset($GLOBALS['arlo_filter_base']['category']) && is_array($GLOBALS['arlo_filter_base']['category'])) ? $GLOBALS['arlo_filter_base']['category'] : 0);
+
+                    if (is_array($base_category)) {
+
+                        $categories_flatten_list = CategoriesEntity::get_flattened_category_list_for_filter($base_category, $import_id);        
+                        
+                        $join[] = "
+                        LEFT JOIN 
+                            {$wpdb->prefix}arlo_eventtemplates AS et
+                        ON
+                            et.et_arlo_id = e.et_arlo_id
+                        AND
+                            et.import_id = e.import_id
+                        ";
+
+                        $join[] = "
+                        LEFT JOIN 
+                            {$wpdb->prefix}arlo_eventtemplates_categories AS etc
+                        ON
+                            etc.et_arlo_id = et.et_arlo_id
+                        AND
+                            etc.import_id = et.import_id
+                        ";
+
+                        $where[] = " c_arlo_id IN (" . implode(", ", array_map(function($cat) { return $cat['id']; }, $categories_flatten_list)) . ") ";
+                    }
+
+
+                    $items = $wpdb->get_results(
+                        "SELECT DISTINCT
+                            v.v_physicaladdressstate
+                        FROM 
+                            {$wpdb->prefix}arlo_venues AS v
+                        " . implode("\n", $join) . "
                         WHERE 
-                            e.import_id = $import_id
+                        " . implode(" AND ", $where) . "                           
                         ORDER BY v_name", ARRAY_A);
 
 
