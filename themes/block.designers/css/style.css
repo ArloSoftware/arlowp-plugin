@@ -568,6 +568,11 @@ body.arlo {
     border: none;
 }
 
+.arlo#arlo .arlo-next-running > a,
+.arlo#arlo .arlo-next-running > span  {
+    margin-left: 0.5em;
+}
+
 
 
 

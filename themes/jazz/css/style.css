@@ -859,6 +859,11 @@ body.arlo {
     margin-top: 1em;
 }
 
+.arlo#arlo .arlo-next-running > a,
+.arlo#arlo .arlo-next-running > span  {
+    margin-left: 0.5em;
+}
+
 .arlo#arlo .event-search .arlo-next-running a,
 .arlo#arlo .event-search .arlo-next-running span,
 .arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a {
@@ -1245,6 +1250,7 @@ body.arlo {
     border-right-color: #f97070;
     border-top-color: #f97070;
     border-bottom-color: #f97070;
+    overflow: hidden;
 }
 
 .arlo#arlo .arlo-color2 {
