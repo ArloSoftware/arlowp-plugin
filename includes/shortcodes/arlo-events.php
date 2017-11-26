@@ -460,13 +460,16 @@ class Events {
     }
 
     private static function shortcode_event_offers($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        return Shortcodes::advertised_offers($GLOBALS['arlo_event_list_item']['e_id'], 'e_id', $import_id);
+        $id = isset($GLOBALS['arlo_event_session_list_item']['e_id']) ? $GLOBALS['arlo_event_session_list_item']['e_id'] : $GLOBALS['arlo_event_list_item']['e_id'];
+        return Shortcodes::advertised_offers($id, 'e_id', $import_id);
     }
 
     private static function get_event_presenters($import_id) {
         global $wpdb;
 
-        $cache_key = md5( serialize( $GLOBALS['arlo_event_list_item']['e_id'] ) );
+        $id = isset($GLOBALS['arlo_event_session_list_item']['e_id']) ? $GLOBALS['arlo_event_session_list_item']['e_id'] : $GLOBALS['arlo_event_list_item']['e_id'];
+
+        $cache_key = md5( serialize( $id ) );
         $cache_category = 'ArloPresenters';
 
         if($cached = wp_cache_get($cache_key, $cache_category)) {
@@ -492,7 +495,7 @@ class Events {
         AND 
             exp.import_id = p.import_id
         WHERE 
-            exp.e_id = {$GLOBALS['arlo_event_list_item']['e_id']}
+            exp.e_id = {$id}
         AND 
             p.import_id = $import_id
         GROUP BY 
@@ -594,6 +597,7 @@ class Events {
         $sql = "
             SELECT 
                 e_name, 
+                e_id,
                 e_locationname,
                 e_locationvisible,
                 e_startdatetime,
@@ -601,6 +605,7 @@ class Events {
                 e_datetimeoffset,
                 e_isonline,
                 e_timezone_id,
+                e_sessiondescription,
                 0 AS v_id
             FROM
                 {$wpdb->prefix}arlo_events
@@ -620,7 +625,7 @@ class Events {
             foreach($items as $key => $item) {
         
                 $GLOBALS['arlo_event_session_list_item'] = $item;
-                
+
                 $output .= do_shortcode($content);
                 
                 unset($GLOBALS['arlo_event_session_list_item']);
