@@ -181,23 +181,16 @@ class Shortcodes {
 
 			$value_label = $item['string'];
 
-			$matches = array();
-			preg_match('~([&ndash;]*\s*)(.*)~',$value_label,$matches);
-
-			$value_prefix = $matches[1];
-			$value = $matches[2];
-
 			$is_hidden = false;
 			if (!empty($hidden_filters[$group][$type])) {
-				$is_hidden = in_array(esc_html($value),$hidden_filters[$group][$type]);
+				$is_hidden = in_array(esc_html($value_label),$hidden_filters[$group][$type]);
 			}
 
 			if (!$is_hidden) {
 				$value_label = $item['string'];
 
-
-				if (!empty(get_option('arlo_filter_settings')[$group][$type][htmlspecialchars($value)])) {
-					$value_label = $value_prefix . get_option('arlo_filter_settings')[$group][$type][htmlspecialchars($value)];
+				if (!empty(get_option('arlo_filter_settings')[$group][$type][html_entity_decode($value_label)])) {
+					$value_label = get_option('arlo_filter_settings')[$group][$type][html_entity_decode($value_label)];
 				}
 
                 $selected = (strlen($selected_value) && strtolower($selected_value) == strtolower($item['value'])) ? ' selected="selected"' : '';

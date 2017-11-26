@@ -185,7 +185,185 @@ class UpcomingEvents {
                 : '<span class="arlo-amount">' . esc_html($free_text) . '</span>';
 
         return $offer;        
-    }    
+    }
+
+    public static function get_upcoming_filter_options($filter, $import_id) {
+        global $post, $wpdb;
+
+        switch ($filter) {
+            case 'location':
+                $locations = array();
+
+                $t1 = "{$wpdb->prefix}arlo_events";
+
+                $items = $wpdb->get_results(
+                    "SELECT 
+                        DISTINCT e.e_locationname
+                    FROM 
+                        $t1 e 
+                    WHERE 
+                        e_locationname != ''
+                    AND
+                        import_id = $import_id
+                    GROUP BY 
+                        e.e_locationname 
+                    ORDER BY 
+                        e.e_locationname", ARRAY_A);
+
+                foreach ($items as $item) {
+                    $locations[] = array(
+                        'string' => $item['e_locationname'],
+                        'value' => $item['e_locationname'],
+                    );
+                }
+
+                return $locations;
+
+            case 'month':
+                $months = array();
+
+                $currentMonth = (int)date('m');
+
+                for ($x = $currentMonth; $x < $currentMonth + 12; $x++) {
+                    $date = mktime(0, 0, 0, $x, 1);
+                    $months[$x]['string'] = strftime('%B', $date);
+                    $months[$x]['value'] = date('Ym01', $date) . ':' . date('Ymt', $date);
+
+                }
+
+                return $months;
+
+            case 'state':
+                $items = $wpdb->get_results(
+                    "SELECT DISTINCT
+                        v.v_physicaladdressstate
+                    FROM 
+                        {$wpdb->prefix}arlo_venues AS v
+                    LEFT JOIN 
+                        {$wpdb->prefix}arlo_events AS e
+                    ON
+                        v.v_arlo_id = e.v_id
+                    AND
+                        v.import_id = e.import_id
+                    WHERE 
+                        e.import_id = $import_id
+                    ORDER BY v_name", ARRAY_A);
+
+
+                $states = array();
+
+                foreach ($items as $item) {
+                    if (!empty($item['v_physicaladdressstate']) || in_array($item['v_physicaladdressstate'],[0,"0"], true) ) {
+                        $states[] = array(
+                            'string' => $item['v_physicaladdressstate'],
+                            'value' => $item['v_physicaladdressstate'],
+                        );
+                    }
+                }
+
+                return $states;
+
+            case 'delivery':
+                return \Arlo_For_Wordpress::$delivery_labels;
+
+            case 'category':
+                //root category select
+                $cats = CategoriesEntity::getTree(0, 1, 0, $import_id);
+
+                if (!empty($cats)) {
+                    $cats = CategoriesEntity::getTree($cats[0]->c_arlo_id, 100, 0, $import_id);
+                }
+
+                if (is_array($cats)) {
+                    return CategoriesEntity::child_categories($cats);
+                }
+
+            case 'eventtag':
+                $items = $wpdb->get_results(
+                    "SELECT DISTINCT
+                        t.id,
+                        t.tag
+                    FROM 
+                        {$wpdb->prefix}arlo_events_tags AS etag
+                    LEFT JOIN 
+                        {$wpdb->prefix}arlo_tags AS t
+                    ON
+                        t.id = etag.tag_id
+                    AND
+                        t.import_id = etag.import_id
+                    WHERE 
+                        etag.import_id = $import_id
+                    ORDER BY tag", ARRAY_A);
+
+                $tags = array();
+
+                foreach ($items as $item) {
+                    $tags[] = array(
+                        'string' => $item['tag'],
+                        'value' => $item['tag'],
+                    );
+                }
+
+                return $tags;
+
+            case 'templatetag':
+                $items = $wpdb->get_results(
+                    "SELECT DISTINCT
+                        t.id,
+                        t.tag
+                    FROM 
+                        {$wpdb->prefix}arlo_eventtemplates_tags AS ettag
+                    LEFT JOIN 
+                        {$wpdb->prefix}arlo_tags AS t
+                    ON
+                        t.id = ettag.tag_id
+                    AND
+                        t.import_id = ettag.import_id
+                    WHERE 
+                        ettag.import_id = $import_id
+                    ORDER BY tag", ARRAY_A);
+
+                $tags = array();
+
+                foreach ($items as $item) {
+                    $tags[] = array(
+                        'string' => $item['tag'],
+                        'value' => $item['tag'],
+                    );
+                }
+
+                return $tags;
+
+            case 'presenter':
+                $items = $wpdb->get_results(
+                    "SELECT DISTINCT
+                        p.p_arlo_id,
+                        p.p_firstname,
+                        p.p_lastname
+                    FROM 
+                        {$wpdb->prefix}arlo_events_presenters AS epresenter
+                    LEFT JOIN 
+                        {$wpdb->prefix}arlo_presenters AS p
+                    ON
+                        p.p_arlo_id = epresenter.p_arlo_id
+                    WHERE 
+                        epresenter.import_id = $import_id
+                    ORDER BY p_firstname", ARRAY_A);
+
+                $presenters = array();
+
+                foreach ($items as $item) {
+                    if (!is_null($item['p_firstname']) && !is_null($item['p_firstname'])) {
+                        $presenters[] = array(
+                            'string' => $item['p_firstname'] . " " . $item['p_lastname'],
+                            'value' => $item['p_arlo_id'] . "-" . $item['p_firstname'] . "-" . $item['p_lastname'],
+                        );
+                    }
+                }
+
+                return $presenters;
+        }
+    }
 
     private static function shortcode_upcoming_event_filters($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $post, $wpdb;
@@ -211,6 +389,17 @@ class UpcomingEvents {
         $filter_html = '<form class="arlo-filters" method="get" action="' . $page_link . '">';
 
         $filter_group = "upcoming";
+
+        $filter_labels = array(
+            'category' => 'All categories',
+            'delivery' => 'All delivery options',
+            'month' => 'All months',
+            'location' => 'All locations',
+            'state' => 'Select state',
+            'eventtag' => 'Select tag',
+            'templatetag' => 'Select tag',
+            'presenter' => 'All presenters'
+        );
             
         foreach(\Arlo_For_Wordpress::$available_filters[$filter_group]['filters'] as $filter_key => $filter):
 
@@ -220,190 +409,21 @@ class UpcomingEvents {
                 continue;
 
             switch($filter_key) :
-
                 case 'category' :
-                    //root category select
-                    $cats = CategoriesEntity::getTree(0, 1, 0, $import_id); 
-                    if (!empty($cats)) {
-                        $cats = CategoriesEntity::getTree($cats[0]->c_arlo_id, 100, 0, $import_id);
-                    }
+                    $cats = self::get_upcoming_filter_options($filter_key, $import_id);
 
                     if (is_array($cats)) {
-                        $filter_html .= Shortcodes::create_filter($filter_key, CategoriesEntity::child_categories($cats), __('All categories', 'arlo-for-wordpress'),$filter_group,$att);                    
+                        $filter_html .= Shortcodes::create_filter($filter_key, $cats, __('All categories', 'arlo-for-wordpress'),$filter_group,$att);                    
                     }
 
                     break;
-                case 'delivery' :
-                    $filter_html .= Shortcodes::create_filter($filter_key, \Arlo_For_Wordpress::$delivery_labels, __('All delivery options', 'arlo-for-wordpress'),$filter_group,$att);
 
-                    break;                                    
-                case 'month' :
-                    $months = array();
+                default:
+                    $items = self::get_upcoming_filter_options($filter_key, $import_id);
 
-                    $currentMonth = (int)date('m');
-
-                    for ($x = $currentMonth; $x < $currentMonth + 12; $x++) {
-                        $date = mktime(0, 0, 0, $x, 1);
-                        $months[$x]['string'] = strftime('%B', $date);
-                        $months[$x]['value'] = date('Ym01', $date) . ':' . date('Ymt', $date);
-
-                    }
-
-                    $filter_html .= Shortcodes::create_filter($filter_key, $months, __('All months', 'arlo-for-wordpress'),$filter_group,$att);
+                    $filter_html .= Shortcodes::create_filter($filter_key, $items, __($filter_labels[$filter_key], 'arlo-for-wordpress'),$filter_group,$att);
 
                     break;
-                case 'location' :
-                    $t1 = "{$wpdb->prefix}arlo_events";
-
-                    $items = $wpdb->get_results(
-                        "SELECT 
-                            DISTINCT e.e_locationname
-                        FROM 
-                            $t1 e 
-                        WHERE 
-                            e_locationname != ''
-                        AND
-                            import_id = $import_id
-                        GROUP BY 
-                            e.e_locationname 
-                        ORDER BY 
-                            e.e_locationname", ARRAY_A);
-
-                    $locations = array();
-
-                    foreach ($items as $item) {
-                        $locations[] = array(
-                            'string' => $item['e_locationname'],
-                            'value' => $item['e_locationname'],
-                        );
-                    }
-
-                    $filter_html .= Shortcodes::create_filter($filter_key, $locations, __('All locations', 'arlo-for-wordpress'),$filter_group,$att);
-
-                    break;
-                case 'state' :
-                    $items = $wpdb->get_results(
-                        "SELECT DISTINCT
-                            v.v_physicaladdressstate
-                        FROM 
-                            {$wpdb->prefix}arlo_venues AS v
-                        LEFT JOIN 
-                            {$wpdb->prefix}arlo_events AS e
-                        ON
-                            v.v_arlo_id = e.v_id
-                        AND
-                            v.import_id = e.import_id
-                        WHERE 
-                            e.import_id = $import_id
-                        ORDER BY v_name", ARRAY_A);
-
-
-                    $states = array();
-
-                    foreach ($items as $item) {
-                        if (!empty($item['v_physicaladdressstate']) || in_array($item['v_physicaladdressstate'],[0,"0"], true) ) {
-                            $states[] = array(
-                                'string' => $item['v_physicaladdressstate'],
-                                'value' => $item['v_physicaladdressstate'],
-                            );
-                        }
-                    }
-
-                    $filter_html .= Shortcodes::create_filter($filter_key, $states, __('Select state', 'arlo-for-wordpress'),$filter_group,$att);                
-                    
-                    break;
-                case 'eventtag' :
-                    $items = $wpdb->get_results(
-                        "SELECT DISTINCT
-                            t.id,
-                            t.tag
-                        FROM 
-                            {$wpdb->prefix}arlo_events_tags AS etag
-                        LEFT JOIN 
-                            {$wpdb->prefix}arlo_tags AS t
-                        ON
-                            t.id = etag.tag_id
-                        AND
-                            t.import_id = etag.import_id
-                        WHERE 
-                            etag.import_id = $import_id
-                        ORDER BY tag", ARRAY_A);
-
-                    $tags = array();
-
-                    foreach ($items as $item) {
-                        $tags[] = array(
-                            'string' => $item['tag'],
-                            'value' => $item['tag'],
-                        );
-                    }
-
-                    $filter_html .= Shortcodes::create_filter($filter_key, $tags, __('Select tag', 'arlo-for-wordpress'),$filter_group,$att);                
-                    
-                    break;
-
-                case 'templatetag' :
-                    $items = $wpdb->get_results(
-                        "SELECT DISTINCT
-                            t.id,
-                            t.tag
-                        FROM 
-                            {$wpdb->prefix}arlo_eventtemplates_tags AS ettag
-                        LEFT JOIN 
-                            {$wpdb->prefix}arlo_tags AS t
-                        ON
-                            t.id = ettag.tag_id
-                        AND
-                            t.import_id = ettag.import_id
-                        WHERE 
-                            ettag.import_id = $import_id
-                        ORDER BY tag", ARRAY_A);
-
-                    $tags = array();
-
-                    foreach ($items as $item) {
-                        $tags[] = array(
-                            'string' => $item['tag'],
-                            'value' => $item['tag'],
-                        );
-                    }
-
-                    $filter_html .= Shortcodes::create_filter($filter_key, $tags, __('Select tag', 'arlo-for-wordpress'),$filter_group,$att);                
-                    
-                    break;
-
-                case 'presenter' :
-                    $items = $wpdb->get_results(
-                        "SELECT DISTINCT
-                            p.p_arlo_id,
-                            p.p_firstname,
-                            p.p_lastname
-                        FROM 
-                            {$wpdb->prefix}arlo_events_presenters AS epresenter
-                        LEFT JOIN 
-                            {$wpdb->prefix}arlo_presenters AS p
-                        ON
-                            p.p_arlo_id = epresenter.p_arlo_id
-                        WHERE 
-                            epresenter.import_id = $import_id
-                        ORDER BY p_firstname", ARRAY_A);
-
-                    $presenters = array();
-
-                    foreach ($items as $item) {
-                        if (!is_null($item['p_firstname']) && !is_null($item['p_firstname'])) {
-                            $presenters[] = array(
-                                'string' => $item['p_firstname'] . " " . $item['p_lastname'],
-                                'value' => $item['p_arlo_id'] . "-" . $item['p_firstname'] . "-" . $item['p_lastname'],
-                            );
-                        }
-                    }
-
-                    $filter_html .= Shortcodes::create_filter($filter_key, $presenters, __('All presenters', 'arlo-for-wordpress'),$filter_group,$att);
-                    
-                    break;  
-
-
             endswitch;
         endforeach;
 
