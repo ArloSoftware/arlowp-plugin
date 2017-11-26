@@ -234,7 +234,8 @@ class UpcomingEvents {
 
                     break;
                 case 'delivery' :
-                    $filter_html .= Shortcodes::create_filter($filter_key, \Arlo_For_Wordpress::$delivery_labels, __('All delivery options', 'arlo-for-wordpress'),$filter_group,$att);
+
+                    $filter_html .= Shortcodes::create_filter($filter_key, array_diff_key(\Arlo_For_Wordpress::$delivery_labels, [99 => null]), __('All delivery options', 'arlo-for-wordpress'),$filter_group,$att);
 
                     break;                                    
                 case 'month' :

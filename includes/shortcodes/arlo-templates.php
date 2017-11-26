@@ -806,6 +806,7 @@ class Templates {
         $t5 = "{$wpdb->prefix}arlo_events";
         $t6 = "{$wpdb->prefix}arlo_eventtemplates_tags";
         $t7 = "{$wpdb->prefix}arlo_tags";
+        $t8 = "{$wpdb->prefix}arlo_onlineactivities";
             
         $where = "WHERE post.post_type = 'arlo_event' AND et.import_id = %d";
         $group = (isset($GLOBALS['arlo_group_template_by_id']) && $GLOBALS['arlo_group_template_by_id']) ? 'GROUP BY et.et_arlo_id' : '';	
@@ -825,7 +826,6 @@ class Templates {
         if(!empty($arlo_location) || (isset($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) || !empty($arlo_state) ) :
 
             $join .= " LEFT JOIN $t5 e ON e.et_arlo_id = et.et_arlo_id AND e.import_id = et.import_id";
-            $where .= " AND e.e_parent_arlo_id = 0";
             
             if(!empty($arlo_location)) :
                 $where .= " AND e.e_locationname = %s ";
@@ -833,8 +833,20 @@ class Templates {
             endif;	
             
             if(isset($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) :
-                $where .= " AND e.e_isonline = %d ";
-                $parameters[] = $arlo_delivery;
+                switch ($arlo_delivery) {
+                    case 1:
+                    case 2: 
+                        $where .= " AND e.e_isonline = %d ";
+                        $parameters[] = $arlo_delivery;    
+                        $where .= " AND e.e_parent_arlo_id = 0 ";
+                    break;
+                    case 99: 
+                        $join .= " LEFT JOIN $t8 oa ON oa.oat_arlo_id = et.et_arlo_id AND oa.import_id = et.import_id";
+                        $where .= ' AND oa_id IS NOT NULL ';
+                    break;
+                }
+            else :
+                $where .= " AND e.e_parent_arlo_id = 0 ";
             endif;	
             
             if (!empty($arlo_region)) {

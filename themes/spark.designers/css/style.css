@@ -1072,6 +1072,11 @@ body.arlo {
 }
 
 
+.arlo#arlo .arlo-next-running > a,
+.arlo#arlo .arlo-next-running > span  {
+    margin-left: 0.5em;
+}
+
 .arlo#arlo .arlo-next-running span {
     cursor: inherit;
     background-image: none;

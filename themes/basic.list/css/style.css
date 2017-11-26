@@ -351,6 +351,10 @@
     text-align: center;
 }
 
+.arlo .arlo-register {
+	margin-right: 0.5em;
+}
+
 .arlo .arlo-boxed .arlo-show-more-link-container {
     border: none !important;
     border-bottom: 2px solid #f4f4f4 !important;
