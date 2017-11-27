@@ -389,17 +389,6 @@ class UpcomingEvents {
         $filter_html = '<form class="arlo-filters" method="get" action="' . $page_link . '">';
 
         $filter_group = "upcoming";
-
-        $filter_labels = array(
-            'category' => 'All categories',
-            'delivery' => 'All delivery options',
-            'month' => 'All months',
-            'location' => 'All locations',
-            'state' => 'Select state',
-            'eventtag' => 'Select tag',
-            'templatetag' => 'Select tag',
-            'presenter' => 'All presenters'
-        );
             
         foreach(\Arlo_For_Wordpress::$available_filters[$filter_group]['filters'] as $filter_key => $filter):
 
@@ -408,23 +397,8 @@ class UpcomingEvents {
             if (!in_array($filter_key, $filters_array))
                 continue;
 
-            switch($filter_key) :
-                case 'category' :
-                    $cats = self::get_upcoming_filter_options($filter_key, $import_id);
-
-                    if (is_array($cats)) {
-                        $filter_html .= Shortcodes::create_filter($filter_key, $cats, __('All categories', 'arlo-for-wordpress'),$filter_group,$att);                    
-                    }
-
-                    break;
-
-                default:
-                    $items = self::get_upcoming_filter_options($filter_key, $import_id);
-
-                    $filter_html .= Shortcodes::create_filter($filter_key, $items, __($filter_labels[$filter_key], 'arlo-for-wordpress'),$filter_group,$att);
-
-                    break;
-            endswitch;
+            $items = self::get_upcoming_filter_options($filter_key, $import_id);
+            $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'),$filter_group,$att);
         endforeach;
 
         $filter_html .= '<div class="arlo-filters-buttons"><input type="hidden" id="arlo-page" value="' .  $page_link . '"> ';    

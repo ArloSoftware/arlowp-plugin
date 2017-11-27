@@ -555,37 +555,15 @@ class OnlineActivities {
 
         $filter_group = 'oa';
 
-        $filter_labels = array(
-            'category' => 'All categories',
-            'templatetag' => 'All tags',
-            'templatetag' => 'All tags'
-        );
-
         foreach($filters_array as $filter_key):
             $att = strval(self::$oa_list_atts[$filter_key]);
 
             if (!array_key_exists($filter_key, \Arlo_For_Wordpress::$available_filters[$filter_group]['filters']))
                 continue;
 
-            switch($filter_key) :
-
-                case 'category' :
-                    $cats = self::get_oa_filter_options($filter_key, $import_id);
-
-                    if (is_array($cats)) {
-                        $filter_html .= Shortcodes::create_filter($filter_key, $cats, __('All categories', 'arlo-for-wordpress'),$filter_group,$att);                  
-                    }
-
-                    break;
-
-                default:
-                    $items = self::get_oa_filter_options($filter_key, $import_id);
-                    
-                    $filter_html .= Shortcodes::create_filter($filter_key, $items, __($filter_labels[$filter_key], 'arlo-for-wordpress'),$filter_group,$att);
-
-                    break;
-
-            endswitch;
+            $items = self::get_oa_filter_options($filter_key, $import_id);
+            
+            $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'),$filter_group,$att);
         endforeach;
 
         if (!empty($filter_html)) {

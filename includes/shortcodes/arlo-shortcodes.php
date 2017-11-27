@@ -146,7 +146,7 @@ class Shortcodes {
 	}
 
 	public static function create_filter($type, $items, $label=null, $group=null, $att_default=null) {
-		if (count($items) == 0) {
+		if (count($items) == 0 || !is_array($items)) {
 			return '';
 		}
 
