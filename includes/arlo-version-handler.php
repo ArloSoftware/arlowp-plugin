@@ -5,7 +5,7 @@ namespace Arlo;
 use Arlo\Utilities;
 
 class VersionHandler {
-	const VERSION = '3.4.1';
+	const VERSION = '3.5';
 
 	private $dbl;
 	private $message_handler;
@@ -516,6 +516,8 @@ class VersionHandler {
 				}
 
 				update_option('arlo_filter_settings', $filter_settings);
+
+				$this->plugin->set_review_notice_date('now');
 			break;
 		}	
 	}
