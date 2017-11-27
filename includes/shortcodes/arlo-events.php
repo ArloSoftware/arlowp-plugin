@@ -139,8 +139,10 @@ class Events {
     }    
 
     private static function shortcode_event_tags($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        if(!isset($GLOBALS['arlo_event_list_item']['e_id'])) return '';
-        
+        if(!isset($GLOBALS['arlo_event_list_item']['e_id']) && !isset($GLOBALS['arlo_event_session_list_item']['e_id'])) return '';
+
+        $id = isset($GLOBALS['arlo_event_session_list_item']['e_id']) ? $GLOBALS['arlo_event_session_list_item']['e_id'] : $GLOBALS['arlo_event_list_item']['e_id'];
+         
         global $wpdb;
         $output = '';
         $tags = [];
@@ -161,7 +163,7 @@ class Events {
             ON
                 tag_id = id
             WHERE
-                et.e_id = {$GLOBALS['arlo_event_list_item']['e_id']}
+                et.e_id = {$id}
             AND 
                 t.import_id = " . $import_id . "
             AND
@@ -171,7 +173,7 @@ class Events {
         foreach ($items as $t) {
             $tags[] = $t['tag'];
         }
-        
+
         if (count($tags)) {
             switch($layout) {
                 case 'list':
