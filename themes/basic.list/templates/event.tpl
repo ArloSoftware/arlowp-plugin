@@ -43,13 +43,12 @@
 [arlo_event_template_register_interest]
 [arlo_suggest_datelocation wrap="<div class='arlo-suggest'>%s</div>"]
 
-<ul class="arlo-list arlo-show-more template-online-activities" data-show="3" data-show-text="Show more">
+<ul class="arlo-list arlo-show-more template-online-activities">
 	[arlo_oa_list]
 		[arlo_oa_list_item]
-		<li class="arlo-cf arlo-onlineactivity">
-			<div class="arlo-left arlo-cal">[arlo_oa_reference_term]</div>
-			
+		<li class="arlo-cf arlo-onlineactivity">			
 			<div class="arlo-left">
+				<h4>[arlo_oa_reference_term]</h4>
 				[arlo_oa_name]
 				[arlo_oa_credits]
 				

@@ -44,7 +44,7 @@
     [arlo_event_template_register_interest wrap='<div class="arlo-background-color2">%s</div>']
     [arlo_suggest_datelocation wrap="<div class='arlo-suggest arlo-background-color2'>%s</div>"]
 
-    <ul class="arlo-list arlo-show-more template-online-activities" data-show="3" data-show-text="Show more">
+    <ul class="arlo-list arlo-show-more template-online-activities">
         [arlo_oa_list]
             [arlo_oa_list_item]
             <li class="arlo-cf arlo-online-activity arlo-background-color2">
