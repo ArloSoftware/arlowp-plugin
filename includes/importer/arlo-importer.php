@@ -97,6 +97,48 @@ class Importer {
 		$this->last_import_date = $timestamp;
 	}	
 
+	public function set_tax_excempt_events($import_id) {
+		$settings = get_option('arlo_settings');
+
+		if (!empty($settings['taxexcempt_tag'])) {
+			$sql = $this->dbl->prepare("
+			UPDATE 
+				wp_arlo_events AS e, 
+				wp_arlo_events_tags AS et, 
+				wp_arlo_tags AS t 
+			SET 
+				e_is_taxexcempt = 1
+			WHERE 
+				t.tag = %s
+			AND 
+				t.id = et.tag_id
+			AND
+				et.e_id = e.e_id
+			AND 
+				et.import_id = %d
+			AND 
+				t.import_id = %d
+			AND
+				e.import_id = %d
+			", [trim($settings['taxexcempt_tag']), $import_id, $import_id, $import_id]);			
+		} else {
+			$sql = $this->dbl->prepare("
+			UPDATE 
+				wp_arlo_events AS e
+			SET 
+				e_is_taxexcempt = 0
+			WHERE 
+				e.import_id = %d
+			", [$import_id]);
+		}
+		
+		$this->dbl->query($sql);
+
+		if ($query === false) {					
+			throw new \Exception('SQL error at set_tax_excempt_events: ' . $this->dbl->last_error);
+		}	
+	}
+
 	public function get_last_import_date() {
 		if(!is_null($this->last_import_date)) {
 			return $this->last_import_date;

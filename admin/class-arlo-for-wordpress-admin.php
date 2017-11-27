@@ -591,7 +591,9 @@ class Arlo_For_Wordpress_Admin {
 		
 	public function settings_saved($old) {
 		$new = get_option('arlo_settings', array());
+		$import_id = get_option('arlo_import_id');
 		$old_regions = get_option('arlo_regions', array());
+		$plugin = Arlo_For_Wordpress::get_instance();
 
 		//save theme changes
 		$theme_id = get_option('arlo_theme', Arlo_For_Wordpress::DEFAULT_THEME);
@@ -600,7 +602,6 @@ class Arlo_For_Wordpress_Admin {
 		update_option('arlo_themes_settings', $stored_themes_settings, 1);
 			
 		if($old['platform_name'] != $new['platform_name'] && !empty($new['platform_name'])) {
-			$plugin = Arlo_For_Wordpress::get_instance();
 			$plugin->determine_url_structure($new['platform_name']);
 			
 			$scheduler = $plugin->get_scheduler();
@@ -630,6 +631,10 @@ class Arlo_For_Wordpress_Admin {
 			}	
 		}
 
+		//check if the tax excempt tag has changed
+		if (!empty($import_id) && $new['taxexcempt_tag'] != $old['taxexcempt_tag']) {
+			$plugin->get_importer()->set_tax_excempt_events($import_id);
+		}
 
 		//normalize regions
 		$regions = array();
