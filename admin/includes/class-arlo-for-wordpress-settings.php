@@ -499,7 +499,8 @@ class Arlo_For_Wordpress_Settings {
 		    $filters_settings_html .= '<div id="arlo-' . $filter_group . '-filters" class="arlo-filter-group">';
 
 		    foreach($filter_group_values['filters'] as $filter_key => $filter) {
-				$filter_options = self::get_filter_options($filter_key, $filter_type);
+				$import_id = Arlo_For_Wordpress::get_instance()->get_importer()->get_current_import_id();
+				$filter_options = \Arlo\Shortcodes\Filters::get_filter_options($filter_key, $import_id);
 
 				$default_filter_options = $filter_options;
 
@@ -684,24 +685,6 @@ class Arlo_For_Wordpress_Settings {
 		$selected = $item["string"] == htmlentities($selected_value) ? ' selected="selected" ' : '';
 
 		$item = "<option value='" . $item["string"] . "' " . $selected . ">" . $item["string"] . "</option>";
-	}
-
-	function get_filter_options($filter_key, $filter_type) {
-		$import_id = Arlo_For_Wordpress::get_instance()->get_importer()->get_current_import_id();
-
-		switch ($filter_type) {
-			case 'upcoming':
-			case 'event':
-				return \Arlo\Shortcodes\UpcomingEvents::get_upcoming_filter_options($filter_key, $import_id);
-			case 'template':
-			case 'schedule':
-				return \Arlo\Shortcodes\Templates::get_template_filter_options($filter_key, $import_id);
-			case 'oa':
-				return \Arlo\Shortcodes\OnlineActivities::get_oa_filter_options($filter_key, $import_id);
-			default:
-				return array();
-		}
-
 	}
 
 	function arlo_checkbox_callback($args) {

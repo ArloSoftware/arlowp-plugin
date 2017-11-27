@@ -82,6 +82,7 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-timezone-manager.php'
 	
 //include shortcodes
 require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-shortcodes.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-filters.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-categories.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-online-activities.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-templates.php');

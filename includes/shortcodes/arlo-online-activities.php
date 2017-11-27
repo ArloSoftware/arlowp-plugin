@@ -3,7 +3,7 @@ namespace Arlo\Shortcodes;
 
 use Arlo\Entities\Categories as CategoriesEntity;
 
-class OnlineActivities {
+class OnlineActivities extends Filters {
     public static $oa_list_atts = [];
 
     public static function init() {
@@ -366,7 +366,7 @@ class OnlineActivities {
             $parameters[] = $arlo_oatag;
         endif;
 
-        if(!empty($arlo_templatetag)) :
+        if(!empty($arlo_templatetag)) :            
             $join .= " LEFT JOIN $t6 ett ON ett.et_id = et.et_id AND ett.import_id = et.import_id";
 
             $where .= " AND ett.tag_id = %d";
@@ -451,84 +451,9 @@ class OnlineActivities {
             $order
             $limit_field
             ";
-        
 
         return $wpdb->prepare($sql, $parameters);
     }  
-
-    public static function get_oa_filter_options($filter, $import_id) {
-        global $post, $wpdb;
-
-        switch ($filter) {
-            case 'category':
-                //root category select
-                $cats = CategoriesEntity::getTree(0, 1, 0, $import_id);
-
-                if (!empty($cats)) {
-                    $cats = CategoriesEntity::getTree($cats[0]->c_arlo_id, 100, 0, $import_id);
-                }
-
-                if (is_array($cats)) {
-                    return CategoriesEntity::child_categories($cats);
-                }
-
-            case 'oatag':
-                $items = $wpdb->get_results(
-                    "SELECT DISTINCT
-                        t.id,
-                        t.tag
-                    FROM 
-                        {$wpdb->prefix}arlo_onlineactivities_tags AS oatag
-                    LEFT JOIN 
-                        {$wpdb->prefix}arlo_tags AS t
-                    ON
-                        t.id = oatag.tag_id
-                    AND
-                        t.import_id = oatag.import_id
-                    WHERE 
-                        oatag.import_id = $import_id
-                    ORDER BY tag", ARRAY_A);
-
-                $tags = array();
-
-                foreach ($items as $item) {
-                    $tags[] = array(
-                        'string' => $item['tag'],
-                        'value' => $item['id'] . '-' . $item['tag'],
-                    );
-                }
-
-                return $tags;
-
-            case 'templatetag':
-                $items = $wpdb->get_results(
-                    "SELECT DISTINCT
-                        t.id,
-                        t.tag
-                    FROM 
-                        {$wpdb->prefix}arlo_eventtemplates_tags AS ett
-                    LEFT JOIN 
-                        {$wpdb->prefix}arlo_tags AS t
-                    ON
-                        t.id = ett.tag_id
-                    AND
-                        t.import_id = ett.import_id
-                    WHERE 
-                        ett.import_id = $import_id
-                    ORDER BY tag", ARRAY_A);
-
-                $tags = array();
-                
-                foreach ($items as $item) {
-                    $tags[] = array(
-                        'string' => $item['tag'],
-                        'value' => $item['id'] . '-' . $item['tag'],
-                    );
-                }
-
-                return $tags;
-        }
-    }
 
     private static function shortcode_onlineactivites_filters($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $post, $wpdb;
@@ -561,7 +486,7 @@ class OnlineActivities {
             if (!array_key_exists($filter_key, \Arlo_For_Wordpress::$available_filters[$filter_group]['filters']))
                 continue;
 
-            $items = self::get_oa_filter_options($filter_key, $import_id);
+            $items = self::get_filter_options($filter_key, $import_id);
             
             $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'),$filter_group,$att);
         endforeach;

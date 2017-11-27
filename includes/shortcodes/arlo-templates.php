@@ -3,7 +3,7 @@ namespace Arlo\Shortcodes;
 
 use Arlo\Entities\Categories as CategoriesEntity;
 
-class Templates {
+class Templates extends Filters {
     public static $event_template_atts = [];
 
     public static function init() {
@@ -549,118 +549,6 @@ class Templates {
         return self::generate_template_filters_form($atts,$shortcode_name,$import_id);
     }
 
-    public static function get_template_filter_options($filter, $import_id) {
-        global $post, $wpdb;
-
-        switch ($filter) {
-            case 'category':
-                //root category select
-                $cats = CategoriesEntity::getTree(0, 1, 0, $import_id);
-
-                if (!empty($cats)) {
-                    $cats = CategoriesEntity::getTree($cats[0]->c_arlo_id, 100, 0, $import_id);
-                }
-
-                if (is_array($cats)) {
-                    return CategoriesEntity::child_categories($cats);
-                }
-
-            case 'state':
-                $items = $wpdb->get_results(
-                    "SELECT DISTINCT
-                        v.v_physicaladdressstate
-                    FROM 
-                        {$wpdb->prefix}arlo_venues AS v
-                    LEFT JOIN 
-                        {$wpdb->prefix}arlo_events AS e
-                    ON
-                        v.v_arlo_id = e.v_id
-                    AND
-                        v.import_id = e.import_id
-                    WHERE 
-                        e.import_id = $import_id
-                    ORDER BY v_name", ARRAY_A);
-
-
-                $states = array();
-
-                foreach ($items as $item) {
-                    if (!empty($item['v_physicaladdressstate']) || in_array($item['v_physicaladdressstate'],[0,"0"], true) ) {
-                        $states[] = array(
-                            'string' => $item['v_physicaladdressstate'],
-                            'value' => $item['v_physicaladdressstate'],
-                        );
-                    }
-                }
-
-                return $states;
-
-            case 'location':
-                // location select
-
-                $t1 = "{$wpdb->prefix}arlo_events";
-
-                $items = $wpdb->get_results(
-                    "SELECT 
-                        DISTINCT(e.e_locationname)
-                    FROM 
-                        $t1 e 
-                    WHERE 
-                        e_locationname != ''
-                    AND
-                        e.import_id = " . $import_id . "
-                    GROUP BY 
-                        e.e_locationname 
-                    ORDER BY 
-                        e.e_locationname", ARRAY_A);
-
-                $locations = array();
-
-                foreach ($items as $item) {
-                    $locations[] = array(
-                        'string' => $item['e_locationname'],
-                        'value' => $item['e_locationname'],
-                    );
-                }
-
-                return $locations;
-
-            case 'templatetag':
-                //template tag select
-                
-                $items = $wpdb->get_results(
-                    "SELECT DISTINCT
-                        t.id,
-                        t.tag
-                    FROM 
-                        {$wpdb->prefix}arlo_eventtemplates_tags AS ett
-                    LEFT JOIN 
-                        {$wpdb->prefix}arlo_tags AS t
-                    ON
-                        t.id = ett.tag_id
-                    AND
-                        t.import_id = ett.import_id
-                    WHERE 
-                        ett.import_id = $import_id
-                    ORDER BY tag", ARRAY_A);
-
-                $tags = array();
-                
-                foreach ($items as $item) {
-                    $tags[] = array(
-                        'string' => $item['tag'],
-                        'value' => $item['tag'],
-                    );
-                }
-
-
-            case 'delivery' :
-                return \Arlo_For_Wordpress::$delivery_labels;
-
-        }
-
-    }
-
     private static function generate_template_filters_form($atts, $shortcode_name, $import_id) {
         global $post, $wpdb;
 
@@ -697,7 +585,7 @@ class Templates {
             if (!in_array($filter_key, $filters_array))
                 continue;
 
-            $items = self::get_template_filter_options($filter_key, $import_id);
+            $items = self::get_filter_options($filter_key, $import_id);
 
             $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'),$filter_group,$att);
 
@@ -871,15 +759,8 @@ class Templates {
         if(!empty($arlo_templatetag)) :
             $join .= " LEFT JOIN $t6 ett ON et.et_id = ett.et_id AND ett.import_id = et.import_id";
             
-            
-            if (!is_numeric($arlo_templatetag)) {
-                $where .= " AND tag.tag = %s ";
-                $parameters[] = $arlo_templatetag;
-                $join .= " LEFT JOIN $t7 tag ON tag.id = ett.tag_id AND ett.import_id = tag.import_id";
-            } else {
-                $where .= " AND ett.tag_id = %d ";
-                $parameters[] = intval($arlo_templatetag);
-            }
+            $where .= " AND ett.tag_id = %d ";
+            $parameters[] = intval($arlo_templatetag);
         endif;
 
         if (!empty($arlo_search)) {
