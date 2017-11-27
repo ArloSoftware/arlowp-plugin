@@ -482,8 +482,18 @@ class Arlo_For_Wordpress_Settings {
 
 		$filters_settings_html = '';
 
-		foreach(Arlo_For_Wordpress::$available_filters as $filter_group => $filter_group_values) {
-		    $output .= '<option value="'.$filter_group.'" >'.$filter_group_values['name'].'</option>';
+		foreach(Arlo_For_Wordpress::$templates as $filter_group => $arlo_template) {
+			$filter_type = (!empty($arlo_template['type']) ? $arlo_template['type'] : $arlo_template['id']);
+
+			//hack, because the key in the templates are not the same as in the filters
+			$filter_type = ($filter_type == 'events' ? 'template' : $filter_type);
+
+			if (!array_key_exists($filter_type, Arlo_For_Wordpress::$available_filters))
+				continue;
+
+			$filter_group_values = Arlo_For_Wordpress::$available_filters[$filter_type];
+			
+		    $output .= '<option value="' . $filter_group . '" >' . $arlo_template['name'] . '</option>';
 
 		    $filters_settings_html .= '<div id="arlo-' . $filter_group . '-filters" class="arlo-filter-group">';
 
@@ -850,6 +860,18 @@ class Arlo_For_Wordpress_Settings {
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">	  
+				<li>New "template_link" attribute for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_next_running" target="_blank">[arlo_event_next_running]</a></li>
+				<li>Enhance the output of <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_address" target="_blank">[arlo_venue_address]</a> and new "link" attribute</li>
+				<li>New "Region selector" widget</li>
+				<li>New "State" filter for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_filters" target="_blank">[arlo_event_filters]</a>, <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/upcomingeventrelated#arlo_upcoming_event_filters" target="_blank">[arlo_upcoming_event_filters]</a>, <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_filters" target="_blank">[arlo_event_template_filters]</a> and <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_schedule_filters" target="_blank">[arlo_schedule_filters]</a></li>
+				<li>New "templateid" attribute for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#arlo_upcoming_list" target="_blank">[arlo_upcoming_list]</a> global shortcode</li>
+				<li>Filter settings available for custom shortcodes</li>
+			</ul>
+		</p>	
+
+		<h4>Version 3.4.1</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">	  
 				<li>Fix, global level shortcodes don\'t respect attribute settings</li>
 			</ul>
 		</p>	
@@ -863,29 +885,6 @@ class Arlo_For_Wordpress_Settings {
 				<li>New "category" attribute for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#arlo_onlineactivites_list" target="_blank">[arlo_onlineactivites_list]</a> global shortcode </li>	
 			</ul>
 		</p>		
-	
-		<h4>Version 3.3.1</h4>
-		<p>
-			<ul class="arlo-whatsnew-list">	  
-				<li>Bugfix, when rich snippet for event doesn\'t return Location</li>
-				<li>Bugfix, when the event search returns the template multiple times</li>
-			</ul>
-		</p>		
-	
-	    <h4>Version 3.3</h4>
-		<p>
-	    	<ul class="arlo-whatsnew-list">	  
-				<li>Support structured meta data (rich snippets) for 
-					<a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_rich_snippet" target="_blank">events</a>, 
-					<a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivityrelated#arlo_oa_rich_snippet" target="_blank">online activities</a>, 
-					<a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_rich_snippet" target="_blank">templates</a>, 
-					<a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_rich_snippet" target="_blank">venues</a> and 
-					<a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/presenterrelated#arlo_presenter_rich_snippet" target="_blank">presenters</a></li>
-				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#arlo_schedule" target="_blank">Schedule</a> page</li>
-				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_notice" target="_blank">[arlo_event_notice]</a> shortcode</li>
-				<li>Many bug fixes</li>
-			</ul>
-		</p>
 		<a href="https://wordpress.org/plugins/arlo-training-and-event-management-system/#developers" target="_blank">More change log</a>
 	    ';
 	}

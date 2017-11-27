@@ -150,6 +150,29 @@ class Venues {
 
         return get_permalink($GLOBALS['arlo_venue_list_item']['post_id']);        
     }
+
+    private static function get_map_query() {
+        $array_fields = [
+            'v_physicaladdressline1',
+            'v_physicaladdressline2',
+            'v_physicaladdressline3',
+            'v_physicaladdressline4',
+            'v_physicaladdresssuburb',
+            'v_physicaladdresscity',
+            'v_physicaladdressstate',
+            'v_physicaladdresspostcode',
+            'v_physicaladdresscountry'
+        ];
+
+        $query = [];
+
+        foreach($array_fields as $field) {
+            if (!empty($GLOBALS['arlo_venue_list_item'][$field])) {
+                $query[] = urlencode($GLOBALS['arlo_venue_list_item'][$field]);
+            }
+        }
+        return implode(',', $query);
+    }
     
     private static function shortcode_venue_map($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         $settings = get_option('arlo_settings');
@@ -175,24 +198,7 @@ class Venues {
         $lat = $GLOBALS['arlo_venue_list_item']['v_geodatapointlatitude'];
         $long = $GLOBALS['arlo_venue_list_item']['v_geodatapointlongitude'];
 
-        $array_fields = [
-            'v_physicaladdressline1',
-            'v_physicaladdressline2',
-            'v_physicaladdressline3',
-            'v_physicaladdressline4',
-            'v_physicaladdresssuburb',
-            'v_physicaladdresscity',
-            'v_physicaladdressstate',
-            'v_physicaladdresspostcode',
-            'v_physicaladdresscountry'
-        ];
-
-        $query = [];
-        foreach($array_fields as $field) {
-            if (!empty($GLOBALS['arlo_venue_list_item'][$field])) {
-                $query[] = urlencode($GLOBALS['arlo_venue_list_item'][$field]);
-            }
-        }
+        $query = self::get_map_query();
 
         if($lat != 0 || $long != 0) {
             if(intval($height) <= 0) $height = 400;
@@ -213,7 +219,7 @@ class Venues {
 
                 default: 
                     $map = '<iframe src="https://www.google.com/maps/embed/v1/place?q=' ;
-                    $map .= implode(',', $query);
+                    $map .= $query;
                     $map .= '&zoom=' . $zoom;
                     $map .= '&key=' . $api_key ;
                     $map .= '"';
@@ -234,7 +240,8 @@ class Venues {
         // merge and extract attributes
         extract(shortcode_atts(array(
             'layout' => 'list',
-            'items' => 'line1,line2,line3,line4,suburb,city,state,post_code,country'
+            'items' => 'line1,line2,line3,line4,suburb,city,state,post_code,country',
+            'link' => null
         ), $atts, $shortcode_name, $import_id));
         
         $items = str_replace(' ', '', $items);
@@ -260,10 +267,30 @@ class Venues {
                 unset($address[$key]);
             }
         }
+
+        $address_link = null;
+        switch($link) {
+            case 'permalink':
+                $address_link = self::shortcode_venue_permalink();
+                break;
+            case 'viewuri':
+                $address_link = self::shortcode_venue_link();
+                break;
+            case 'map':
+                $address_link = "https://www.google.com/maps/search/?api=1&query=".self::get_map_query();
+                break;
+            default:
+                if ($link) {
+                    $address_link = $link;
+                }
+                break;
+        }
+
+        $content = $address_link ? sprintf('<a href="%s" target="_blank">',esc_attr($address_link)) . $content : $content;
         
         switch($layout) {
             case 'list':
-                $content = '<ul class="arlo-address-list">';
+                $content .= '<ul class="arlo-address-list">';
                 
                 foreach($address as $line) {
                     $content .= '<li>' . $line . '</li>';
@@ -273,10 +300,48 @@ class Venues {
             break;
         
             default:
-                $content = implode(', ', $address);
+                $locale = (array_key_exists('suburb',$address) ? $address['suburb'] . ', ' : '') .
+                            (array_key_exists('city',$address) ? $address['city'] . ' ' : '') .
+                            (array_key_exists('state',$address) ? $address['state'] . ' ' : '') .
+                            (array_key_exists('post_code',$address) ? $address['post_code'] . ' ' : '');
+
+                $country = array_key_exists('country',$address) ? $address['country'] : '';
+
+                if (isset($address['suburb'])) {
+                    unset($address['suburb']);
+                }
+
+                if (isset($address['city'])) {
+                    unset($address['city']);
+                }
+
+                if (isset($address['state'])) {
+                    unset($address['state']);
+                }
+
+                if (isset($address['post_code'])) {
+                    unset($address['post_code']);
+                }
+
+                if (isset($address['country'])) {
+                    unset($address['country']);
+                }
+
+
+                if (!empty($locale)) {
+                    $address['locale'] = $locale;
+                }
+
+                if (!empty($country)) {
+                    $address['country'] = $country;
+                }
+
+                $content .= count($address) > 1 ? implode('<br> ', $address) : implode('', $address);
             break;
         }
-        
+
+        $content = $address_link ? $content . '</a>' : $content;
+
         return $content;        
     }
     

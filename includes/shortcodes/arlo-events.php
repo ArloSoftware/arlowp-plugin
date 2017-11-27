@@ -42,7 +42,7 @@ class Events {
 
         $page_link = get_permalink(get_post($post));
 
-        $filter_html = '<form id="arlo-event-filter" class="arlo-filters" method="get" action="' . $page_link . '">';
+        $filter_html = '';
         
         $filter_group = 'event';
 
@@ -91,20 +91,51 @@ class Events {
 
                     break;
 
+                case 'state' :
+                    $items = $wpdb->get_results(
+                        "SELECT DISTINCT
+                            v.v_physicaladdressstate
+                        FROM 
+                            {$wpdb->prefix}arlo_venues AS v
+                        LEFT JOIN 
+                            {$wpdb->prefix}arlo_events AS e
+                        ON
+                            v.v_arlo_id = e.v_id
+                        AND
+                            v.import_id = e.import_id
+                        WHERE 
+                            e.import_id = $import_id
+                        ORDER BY v_name", ARRAY_A);
+
+
+                    $states = array();
+
+                    foreach ($items as $item) {
+                        if (!empty($item['v_physicaladdressstate']) || in_array($item['v_physicaladdressstate'],[0,"0"], true) ) {
+                            $states[] = array(
+                                'string' => $item['v_physicaladdressstate'],
+                                'value' => $item['v_physicaladdressstate'],
+                            );
+                        }
+                    }
+
+                    $filter_html .= Shortcodes::create_filter($filter_key, $states, __('Select state', 'arlo-for-wordpress'),$filter_group);                
+                    
+                    break;
+
             endswitch;
 
         endforeach; 
             
-        // category select
-
-
-        $filter_html .= '<div class="arlo-filters-buttons"><input type="hidden" id="arlo-page" value="' .  $page_link . '">';
-            
-        $filter_html .= '<a href="' . $page_link . '" class="' . esc_attr($buttonclass) . '">' . htmlentities($resettext, ENT_QUOTES, "UTF-8") . '</a></div>';
-
-        $filter_html .= '</form>';
-        
-        return $filter_html;        
+        if (!empty($filter_html)) {
+            return '
+            <form id="arlo-event-filter" class="arlo-filters" method="get" action="' . $page_link . '">
+                ' . $filter_html . '
+                <div class="arlo-filters-buttons"><input type="hidden" id="arlo-page" value="' .  $page_link . '">
+                    <a href="' . $page_link . '" class="' . esc_attr($buttonclass) . '">' . htmlentities($resettext, ENT_QUOTES, "UTF-8") . '</a>
+                </div>
+            </form>';
+        }
     }    
 
     private static function shortcode_event_tags($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -205,17 +236,19 @@ class Events {
         $settings = get_option('arlo_settings');
         
         $where = '';
+        $join = '';
         $parameters = [];
         
         $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
         $arlo_location = \Arlo\Utilities::clean_string_url_parameter('arlo-location');
+        $arlo_state = \Arlo\Utilities::clean_string_url_parameter('arlo-state');
         
         $t1 = "{$wpdb->prefix}arlo_eventtemplates";
         $t2 = "{$wpdb->prefix}arlo_events";
         $t3 = "{$wpdb->prefix}arlo_venues";
         $t5 = "{$wpdb->prefix}arlo_presenters";
         $t6 = "{$wpdb->prefix}arlo_offers";
-        
+
         if (!empty($arlo_region)) {
             $where .= ' AND ' . $t1 . '.et_region = %s AND ' . $t2 . '.e_region = %s';
             $parameters[] = $arlo_region;
@@ -225,8 +258,24 @@ class Events {
         if (!empty($arlo_location)) {
             $where .= ' AND ' . $t2 .'.e_locationname = %s';
             $parameters[] = $arlo_location;
-        };        
+        };
         
+        if (!empty($arlo_state)) {
+            $join .= "
+                LEFT JOIN $t2 ce ON $t2.e_arlo_id = ce.e_parent_arlo_id AND $t2.import_id = ce.import_id
+            ";
+
+            $venues_query = $wpdb->prepare("SELECT v.v_arlo_id FROM $t3 v WHERE v.v_physicaladdressstate = %s", $arlo_state);
+            $venues = implode(', ', array_map(function ($venue) {
+              return $venue['v_arlo_id'];
+            }, $wpdb->get_results( $venues_query, ARRAY_A)));
+
+            $where .= " AND (ce.v_id IN (%s) OR $t3.v_arlo_id IN (%s))";
+
+            $parameters[] = $venues;
+            $parameters[] = $venues;
+        };        
+
         $sql = 
             "SELECT 
                 $t2.*, 
@@ -235,6 +284,7 @@ class Events {
                 $t3.v_post_name,
                 $t3.v_post_id,
                 $t3.v_viewuri,
+                $t3.v_id,
                 $t3.v_physicaladdressline1,
                 $t3.v_physicaladdressline2,
                 $t3.v_physicaladdressline3,
@@ -246,7 +296,6 @@ class Events {
                 $t3.v_physicaladdresscountry,
                 $t3.v_geodatapointlatitude,
                 $t3.v_geodatapointlongitude
-
             FROM 
                 $t2
             LEFT JOIN 
@@ -259,6 +308,7 @@ class Events {
                 $t2.et_arlo_id = $t1.et_arlo_id
             AND
                 $t1.import_id = $t2.import_id
+            $join
             WHERE 
                 $t1.import_id = $import_id
             AND
@@ -274,6 +324,7 @@ class Events {
         if (count($parameters)) {
             return $wpdb->prepare($sql, $parameters);
         }
+
 
         return $sql;
     }
@@ -953,7 +1004,8 @@ class Events {
 
         $arlo_location = \Arlo\Utilities::clean_string_url_parameter('arlo-location');
         $arlo_delivery = \Arlo\Utilities::clean_int_url_parameter('arlo-delivery');
-        
+        $arlo_state = \Arlo\Utilities::clean_string_url_parameter('arlo-state');
+
         if (!empty($GLOBALS['arlo_eventtemplate']['et_region'])) {
             $arlo_region = $GLOBALS['arlo_eventtemplate']['et_region'];
         } else {
@@ -968,13 +1020,14 @@ class Events {
             'layout' => '',
             'limit' => 1,
             'removeyear' => "true",
-            'text' => '{%date%}'
+            'text' => '{%date%}',
+            'template_link' => 'registerlink'
         ), $atts, $shortcode_name, $import_id));
         
         if (strpos($format, '%') === false) {
             $format = DateFormatter::date_format_to_strftime_format($format);
         }
-            
+
         $removeyear = ($removeyear == "false" || $removeyear == "0" ? false : true);
         
         $conditions = array(
@@ -998,6 +1051,10 @@ class Events {
 
         if(isset($arlo_delivery) && is_numeric($arlo_delivery)) {
             $conditions['e.e_isonline = %d'] = $arlo_delivery;
+        }
+
+        if (isset($arlo_state) && isset($GLOBALS['state_filter_venues'])) {
+            $conditions['state'] = $GLOBALS['state_filter_venues'];
         }
         
         $events = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), $limit, $import_id);
@@ -1027,28 +1084,82 @@ class Events {
                     $date = self::event_date_formatter(['format' => $format], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
 
                     $display_text = str_replace(['{%date%}', '{%location%}'], [esc_html($date), esc_html($location)], $text);
-                    
-                    if ($event->e_registeruri && !$event->e_isfull) {
-                        $return_links[] = ($layout == 'list' ? "<li>" : "") . '<a href="' . esc_attr($event->e_registeruri) . '" class="' . esc_attr($buttonclass) . ' arlo-register">' . $display_text  . '</a>' . ($layout == 'list' ? "</li>" : "");
-                    } else {
-                        $return_links[] = ($layout == 'list' ? "<li>" : "") . '<span class="' . esc_attr($dateclass) . '">' . $display_text . '</span>' . ($layout == 'list' ? "</li>" : "");
+
+                    $link = ($layout == 'list' ? "<li>" : "");
+
+                    $buttonclass = $event->e_isfull ? $buttonclass . ' arlo-event-full' : $buttonclass . ' arlo-register' ;
+
+                    switch ($template_link) {
+                        case "permalink":
+                            $url = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
+
+                            $link .= self::get_event_date_link($url, $buttonclass, $display_text);
+                            break;
+                        case "none":
+                            $link .= '<span class="' . esc_attr($dateclass) . '">' . $display_text . '</span>';
+                            break;
+                        case "viewuri":
+                            $url = $GLOBALS['arlo_eventtemplate']['et_viewuri'];
+                            $link .= self::get_event_date_link($url, $buttonclass, $display_text);
+                            break;
+                        case "registerlink":
+                            if ($event->e_registeruri && !$event->e_isfull) {
+                                $url = $event->e_registeruri;
+                            } else {
+                                $url = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
+                            }
+                            $link .= self::get_event_date_link($url, $buttonclass, $display_text);
+                            break;
                     }
+
+                    $link .= ($layout == 'list' ? "</li>" : "");
+
+                    $return_links[] = $link;
                 }   
             }   
             
             $return .= implode(($layout == 'list' ? "" : ", "), $return_links);
         } else if (count($oa)) {
             $reference_terms = json_decode($oa->oa_reference_terms, true);
-            
-            if (is_array($reference_terms) && isset($reference_terms['Plural']))
-                $return .= '<a href="' . $oa->oa_registeruri . '" class="' . esc_attr($buttonclass) . ' arlo-register">' . $reference_terms['Plural'] . '</a>';
+            $buttonclass = 'arlo-register';
+
+            if (is_array($reference_terms) && isset($reference_terms['Plural'])) {
+                $tag = 'a';
+                $class = esc_attr($buttonclass);
+                $href = '';
+                switch ($template_link) {
+                    case "permalink":
+                        $url = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
+                        $href = 'href="' . esc_url($url) . '"';
+                        break;
+                    case "none":
+                        $tag = 'span';
+                        $class = esc_attr($dateclass);        
+                        break;
+                    case "viewuri":
+                        $url = $GLOBALS['arlo_eventtemplate']['et_viewuri'];
+                        $href = 'href="' . esc_url($url) . '"';
+                        break;
+                    case "registerlink":
+                        $url = $oa->oa_registeruri;
+                        $href = 'href="' . esc_url($url) . '"';
+                        break;
+                }
+
+                $return .= sprintf('<%s %s class="%s">%s</%s>', $tag, $href, $class, $reference_terms['Plural'], $tag);
+            }
         }
         
         if ($layout == "list") {
             $return .= '</ul>';
         }
             
-        return $return;        
+        return $return;
+    }
+
+
+    private static function get_event_date_link($url, $buttonclass, $display_text) {
+        return sprintf('<a href="%s" class="%s">%s</a>', esc_attr($url), esc_attr($buttonclass), $display_text);
     }
     
 

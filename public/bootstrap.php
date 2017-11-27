@@ -185,23 +185,23 @@ function arlo_register_custom_post_types() {
 		if($page_id) {
 			switch($custom_type) {
 				case 'upcoming':
-					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(eventtag-([^/]*))?/?(presenter-([^/]*))?/?(templatetag-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-delivery=$matches[10]&arlo-eventtag=$matches[12]&arlo-presenter=$matches[14]&arlo-templatetag=$matches[16]&paged=$matches[18]','top');
+					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(eventtag-([^/]*))?/?(presenter-([^/]*))?/?(templatetag-([^/]*))?/?(state-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-delivery=$matches[10]&arlo-eventtag=$matches[12]&arlo-presenter=$matches[14]&arlo-templatetag=$matches[16]&arlo-state=$matches[18]&paged=$matches[20]','top');
 				break;
 				case 'oa':
 					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(oatag-([^/]*))?/?(page/([^/]*))?/?(templatetag-([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-oatag=$matches[6]&paged=$matches[8]&arlo-templatetag=$matches[10]','top');
 				break;			
 				case 'event':
 					add_rewrite_rule('^' . $slug . '/(\d+-[^/]*)+/?(region-([^/]*))?/?$','index.php?arlo_event=$matches[1]&arlo-region=$matches[3]','top');
-					add_rewrite_rule('^' . $slug . '/(\d+-[^/]*)+/?(region-([^/]*))?/?(location-([^/]*))?/?$','index.php?arlo_event=$matches[1]&arlo-region=$matches[3]&arlo-location=$matches[5]','top');
+					add_rewrite_rule('^' . $slug . '/(\d+-[^/]*)+/?(region-([^/]*))?/?(location-([^/]*))?/?(state-([^/]*))?/?$','index.php?arlo_event=$matches[1]&arlo-region=$matches[3]&arlo-location=$matches[5]&arlo-state=$matches[7]','top');
 
-					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(templatetag-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-delivery=$matches[10]&arlo-templatetag=$matches[12]&paged=$matches[14]','top');
+					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(templatetag-([^/]*))?/?(state-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-delivery=$matches[10]&arlo-templatetag=$matches[12]&arlo-state=$matches[14]&paged=$matches[16]','top');
 				break;
 				case 'eventsearch':
 					add_rewrite_rule('^' . $slug . '/?(region-([^/]*))?/search/([^/]*)?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-search=$matches[3]&paged=$matches[5]','top');
 					add_rewrite_rule('^' . $slug . '/?(region-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&paged=$matches[4]','top');
 				break;
 				case 'schedule':
-					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(templatetag-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-delivery=$matches[10]&arlo-templatetag=$matches[12]&paged=$matches[14]','top');
+					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(templatetag-([^/]*))?/?(state-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-delivery=$matches[10]&arlo-templatetag=$matches[12]&arlo-state=$matches[14]&paged=$matches[16]','top');
 				break;
 				case 'presenter':
 					add_rewrite_rule('^' . $slug . '/page/([^/]*)/?','index.php?page_id=' . $page_id . '&paged=$matches[1]','top');
@@ -221,6 +221,7 @@ function arlo_register_custom_post_types() {
 	add_rewrite_tag('%arlo-category%', '([^&]+)');
 	add_rewrite_tag('%arlo-month%', '([^&]+)');
 	add_rewrite_tag('%arlo-location%', '([^&]+)');
+	add_rewrite_tag('%arlo-state%', '([^&]+)');
 	add_rewrite_tag('%arlo-delivery%', '([^&]+)');
 	add_rewrite_tag('%arlo-eventtag%', '([^&]+)');
 	add_rewrite_tag('%arlo-oatag%', '([^&]+)');
@@ -285,30 +286,39 @@ function arlo_register_custom_post_types() {
 			$arlo_page_ids[intval($settings['post_types'][$id]['posts_page'])] = $id;
 		}
 	}
-	
-	if (((array_key_exists($page_id, $arlo_page_ids) && !empty($settings['post_types'][$arlo_page_ids[$page_id]]['posts_page'])) || $page_type == 'arlo_event') && is_array($regions) && count($regions)) {
-		if (empty($selected_region)) {
-			//try to read the region from a cookie
-			if (!empty($_COOKIE['arlo-region']) && in_array($_COOKIE['arlo-region'], array_keys($regions))) {
-				$selected_region = $_COOKIE['arlo-region'];
+
+
+	if (is_array($regions) && count($regions)) {
+
+		if (((array_key_exists($page_id, $arlo_page_ids) && !empty($settings['post_types'][$arlo_page_ids[$page_id]]['posts_page'])) || $page_type == 'arlo_event')) {
+			if (empty($selected_region)) {
+				//try to read the region from a cookie
+				if (!empty($_COOKIE['arlo-region']) && in_array($_COOKIE['arlo-region'], array_keys($regions))) {
+					$selected_region = $_COOKIE['arlo-region'];
+				} else {
+					$selected_region = reset(array_keys($regions));
+				}
+				
+				setcookie("arlo-region", $selected_region, time()+60*60*24*30, '/');	
+				
+				if ($page_type == 'arlo_event') {
+					$slug = substr(substr(str_replace(get_home_url(), '', get_post_permalink($page_id)), 0, -1), 1);	
+				} else {
+					$slug = substr(substr(str_replace(get_home_url(), '', get_permalink($settings['post_types'][$arlo_page_ids[$page_id]]['posts_page'])), 0, -1), 1);	
+				}
+				
+				$location = str_replace($slug, $slug.'/region-' . $selected_region , $_SERVER['REQUEST_URI']);			
+				
+				wp_redirect(esc_url($location));
+				exit();				
 			} else {
-				$selected_region = reset(array_keys($regions));
+				setcookie("arlo-region", $selected_region, time()+60*60*24*30, '/');	
 			}
-			
-			setcookie("arlo-region", $selected_region, time()+60*60*24*30, '/');	
-			
-			if ($page_type == 'arlo_event') {
-				$slug = substr(substr(str_replace(get_home_url(), '', get_post_permalink($page_id)), 0, -1), 1);	
-			} else {
-				$slug = substr(substr(str_replace(get_home_url(), '', get_permalink($settings['post_types'][$arlo_page_ids[$page_id]]['posts_page'])), 0, -1), 1);	
-			}
-			
-			$location = str_replace($slug, $slug.'/region-' . $selected_region , $_SERVER['REQUEST_URI']);			
-			
-			wp_redirect(esc_url($location));
-			exit();				
 		} else {
-			setcookie("arlo-region", $selected_region, time()+60*60*24*30, '/');	
+			if (empty($_COOKIE['arlo-region'])) {
+				setcookie("arlo-region", reset(array_keys($regions)), time()+60*60*24*30, '/');
+				wp_redirect($_SERVER['REQUEST_URI']);
+			}
 		}
 	}
 }

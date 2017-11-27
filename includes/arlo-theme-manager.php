@@ -91,10 +91,8 @@ class ThemeManager {
 					$file_name = str_replace('.tpl', '', basename($template_file));
 					$template_name = array_key_exists($file_name, self::$template_names_subs) ? self::$template_names_subs[$file_name] : $file_name;
 
-					$templates[$template_name]['html'] = file_get_contents($template_file);
-
 					foreach(\Arlo_For_Wordpress::$templates as $template_key => $template_info) {
-						if((array_key_exists('type', $template_info) && $template_info['type'] == $template_name)) {
+						if($template_info['id'] == $template_name || (array_key_exists('type', $template_info) && $template_info['type'] == $template_name)) {
 							$templates[$template_key]['html'] = file_get_contents($template_file);
 						}
 					}
