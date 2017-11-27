@@ -140,7 +140,7 @@
     function changeRegion(uriRegion, newRegion) {
 
 	    //Manually set cookie
-    	$.cookie("arlo-region", newRegion, { path: "/" });
+    	Cookies.set("arlo-region", newRegion, { path: "/" });
 
     	if (uriRegion) {
 		    window.location.href = window.location.href.replace("/region-" + uriRegion + "/", "/region-" + newRegion + "/").replace(/location-\w+(%\d+)?\w*/g,"");

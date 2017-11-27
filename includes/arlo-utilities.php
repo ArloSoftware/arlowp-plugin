@@ -52,7 +52,7 @@ class Utilities {
         return null;
     }
 
-    public function process_att($new_atts_array, $callback, $att_name = '', $atts = []) {
+    public static function process_att($new_atts_array, $callback, $att_name = '', $atts = []) {
         $value = call_user_func($callback, $att_name, $atts);
         
 		if (!is_null($value) && (!empty($value) || is_numeric($value))) {

@@ -1068,7 +1068,7 @@ class Arlo_For_Wordpress {
 	public function enqueue_scripts() {
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script', plugins_url( 'assets/js/public.js?20170424', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION );
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script-darktooltip', plugins_url( 'assets/js/libs/jquery.darktooltip.min.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION );
-		wp_enqueue_script( $this->plugin_slug . '-plugin-script-cookie', plugins_url( 'assets/js/libs/jquery.cookie.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION );
+		wp_enqueue_script( $this->plugin_slug . '-plugin-script-cookie', plugins_url( 'assets/js/libs/js.cookie.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION );
 		wp_localize_script( $this->plugin_slug . '-plugin-script', 'objectL10n', array(
 			'showmoredates' => __( 'Show me more dates', 'arlo-for-wordpress' ),
 		) );
@@ -1708,9 +1708,13 @@ class Arlo_For_Wordpress {
     }
 
     public static function get_region_parameter() {
-        $regions = get_option('arlo_regions');
-        $arlo_region = get_query_var('arlo-region', '') ? strtoupper(get_query_var('arlo-region', '')) : $_COOKIE['arlo-region'];
-        return (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+		$regions = get_option('arlo_regions');
+
+		$arlo_region = get_query_var('arlo-region', '') 
+			? strtoupper(get_query_var('arlo-region', ''))
+			: (!empty($_COOKIE['arlo-region']) ? $_COOKIE['arlo-region'] : '');
+
+		return (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
     }
     
    	public function get_tag_by_id($tag_id) {

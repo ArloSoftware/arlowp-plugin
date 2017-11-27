@@ -4,7 +4,7 @@ Tags: online registration, event registration, training management,  event manag
 
 Requires at least: 4.4
 Tested up to: 4.9
-Stable tag: 3.4.1
+Stable tag: 3.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -172,6 +172,15 @@ The Arlo - Training and Event Management, and online registration plugin is only
 11. Theme Jazz - Upcoming events
 
 == Changelog ==
+
+= 3.5 =
+
+New "template_link" attribute for [arlo_event_next_running]
+Enhance the output of [arlo_venue_address] and new "link" attribute
+New "Region selector" widget
+New "State" filter for [arlo_event_filters], [arlo_upcoming_event_filters], [arlo_event_template_filters] and [arlo_schedule_filters]
+New "templateid" attribute for [arlo_upcoming_list] global shortcode
+Filter settings available for custom shortcodes
 
 = 3.4.1 =
 
