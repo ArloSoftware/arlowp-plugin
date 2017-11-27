@@ -947,9 +947,9 @@ class Templates {
                 $cat_id = 0;
             } 
             
-            if (isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true") {
+            if ((isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true") || (isset($GLOBALS['show_child_elements']) && $GLOBALS['show_child_elements'])) {
                 $GLOBALS['show_child_elements'] = true;
-            
+
                 $cats = CategoriesEntity::getTree($cat_id, null, 0, $import_id);
 
                 $categories_tree = CategoriesEntity::child_categories($cats);
