@@ -185,10 +185,14 @@
 	padding: 0.3em 0;
 }
 
-#arlo-regions li > div,
-.arlo-filter-group li > div {
+#arlo-regions li > div {
 	float: left;
 	margin-left: 1em;
+}
+
+.arlo-filter-group li > div {
+	float: left;
+	margin-right: 1em;
 }
 
 #arlo-regions li {
@@ -215,9 +219,12 @@
 	vertical-align: middle;
 }
 
-.arlo-region-id, .arlo-region-name,
-.arlo-filter-old-value, .arlo-filter-new-value {
+.arlo-region-id, .arlo-region-name {
 	width: 170px;
+}
+
+.arlo-filter-old-value, .arlo-filter-new-value {
+	width: 160px;
 }
 
 .arlo-region-controls,
@@ -246,6 +253,18 @@
 
 #arlo-region-empty,
 #arlo-filter-empty {
+	display: none;
+}
+
+.arlo-filter-new-value {
+	display: none;
+}
+
+.arlo-filter-old-value select {
+	width: 160px;
+}
+
+.arlo-available-filters {
 	display: none;
 }
 
@@ -407,10 +426,19 @@ table.arlo-welcome td.logo {
 	background-color: #f1f1f1;
 }
 
-.nav-tab.vertical-nav-tab.arlo-for-wordpress-pages-new_custom::before {
+.nav-tab.vertical-nav-tab.arlo-for-wordpress-pages-new_custom::before,
+.arlo-filter-section-toggle h2:before {
     content: '+';
     display: inline-block;
     margin-right: 5px;
+}
+
+.arlo-filter-section-toggle h2:before {
+	width: 10px;
+}
+
+.filter-section-expanded .arlo-filter-section-toggle h2:before {
+    content: '-';
 }
 
 .arlo-template-table .arlo-label + .arlo-field.arlo-template-field,
@@ -712,6 +740,27 @@ a .arlo-icons8 {
 	display: block;
 }
 
+a.arlo-filter-section-toggle {
+    border: 1px solid #ccc;
+    display: block;
+    width: 300px;
+    cursor: pointer;
+    padding: 1em;
+    margin-bottom: .5em;
+    background-color: #e5e5e5;
+}
+
+a.arlo-filter-section-toggle h2 {
+    margin: 0;
+}
+
+.arlo-filter-settings {
+	margin-bottom: 1em;
+}
+
+.arlo-select-page {
+	margin-bottom: 1em;
+}
 
 /* media queries, these match the wordpress admin breakpoints as of WP 3.9 */
 

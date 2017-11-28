@@ -378,7 +378,7 @@ class OnlineActivities {
             $parameters[] = $arlo_oatag;
         endif;
 
-        if(!empty($arlo_templatetag)) :
+        if(!empty($arlo_templatetag)) :            
             $join .= " LEFT JOIN $t6 ett ON ett.et_id = et.et_id AND ett.import_id = et.import_id";
 
             $where .= " AND ett.tag_id = %d";
@@ -463,7 +463,7 @@ class OnlineActivities {
             $order
             $limit_field
             ";
-        
+
 
         return $wpdb->prepare($sql, $parameters);
     }  
@@ -479,7 +479,7 @@ class OnlineActivities {
         ), $atts, $shortcode_name, $import_id));
 
         $filters_array = explode(',',$filters);
-        
+
         $settings = get_option('arlo_settings');
         
         $page_type = \Arlo_For_Wordpress::get_current_page_arlo_type();
@@ -495,89 +495,15 @@ class OnlineActivities {
         $filter_group = 'oa';
 
         foreach($filters_array as $filter_key):
-
+            
             $att = strval(self::$oa_list_atts[$filter_key]);
 
             if (!array_key_exists($filter_key, \Arlo_For_Wordpress::$available_filters[$filter_group]['filters']))
                 continue;
 
-            switch($filter_key) :
-
-                case 'category' :
-                    //root category select
-                    $base_category = ((isset($GLOBALS['arlo_filter_base']['category']) && is_array($GLOBALS['arlo_filter_base']['category'])) ? $GLOBALS['arlo_filter_base']['category'] : 0);
-
-                    $categories_flatten_list = CategoriesEntity::get_flattened_category_list_for_filter($base_category, $import_id);
-
-                    if (is_array($categories_flatten_list)) {
-                        $filter_html .= Shortcodes::create_filter($filter_key, $categories_flatten_list, __('All categories', 'arlo-for-wordpress'),$filter_group,$att);                  
-                    }
-
-                    break;
-
-                case 'oatag' :
-                    $items = $wpdb->get_results(
-                        "SELECT DISTINCT
-                            t.id,
-                            t.tag
-                        FROM 
-                            {$wpdb->prefix}arlo_onlineactivities_tags AS oatag
-                        LEFT JOIN 
-                            {$wpdb->prefix}arlo_tags AS t
-                        ON
-                            t.id = oatag.tag_id
-                        AND
-                            t.import_id = oatag.import_id
-                        WHERE 
-                            oatag.import_id = $import_id
-                        ORDER BY tag", ARRAY_A);
-
-                    $tags = array();
-
-                    foreach ($items as $item) {
-                        $tags[] = array(
-                            'string' => $item['tag'],
-                            'value' => $item['id'] . '-' . $item['tag'],
-                        );
-                    }
-
-                    $filter_html .= Shortcodes::create_filter($filter_key, $tags, __('Select tag', 'arlo-for-wordpress'),$filter_group,$att);              
-
-                    break;
-
-                case 'templatetag' :
-                    //template tag select
-                    
-                    $items = $wpdb->get_results(
-                        "SELECT DISTINCT
-                            t.id,
-                            t.tag
-                        FROM 
-                            {$wpdb->prefix}arlo_eventtemplates_tags AS ett
-                        LEFT JOIN 
-                            {$wpdb->prefix}arlo_tags AS t
-                        ON
-                            t.id = ett.tag_id
-                        AND
-                            t.import_id = ett.import_id
-                        WHERE 
-                            ett.import_id = $import_id
-                        ORDER BY tag", ARRAY_A);
-
-                    $tags = array();
-                    
-                    foreach ($items as $item) {
-                        $tags[] = array(
-                            'string' => $item['tag'],
-                            'value' => $item['id'] . '-' . $item['tag'],
-                        );
-                    }
-
-                    $filter_html .= Shortcodes::create_filter($filter_key, $tags, __('Select tag', 'arlo-for-wordpress'),$filter_group,$att);               
-                    
-                    break;
-
-            endswitch;
+            $items = Filters::get_filter_options($filter_key, $import_id);
+            
+            $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'),$filter_group,$att);
         endforeach;
 
         if (!empty($filter_html)) {

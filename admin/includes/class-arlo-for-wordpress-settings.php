@@ -474,11 +474,12 @@ class Arlo_For_Wordpress_Settings {
 		
 		$output = '<div id="'.ARLO_PLUGIN_PREFIX.'-filter-select" class="cf">';
 
-		$output .= '<h3>Filter Settings</h3>';
+		$output .= '<h3>Filter options</h3>';
 
-		$output .= '<label>Select page: </label>';
-
-		$output .= '<select name="arlo_settings['.$setting_id.']" id="arlo-filter-settings">';
+		$output .= '<div class="arlo-select-page">
+		<label>Select page: </label>
+		<select name="arlo_settings['.$setting_id.']" id="arlo-filter-settings">
+		';
 
 		$filters_settings_html = '';
 
@@ -492,109 +493,199 @@ class Arlo_For_Wordpress_Settings {
 				continue;
 
 			$filter_group_values = Arlo_For_Wordpress::$available_filters[$filter_type];
-			
+
 		    $output .= '<option value="' . $filter_group . '" >' . $arlo_template['name'] . '</option>';
 
 		    $filters_settings_html .= '<div id="arlo-' . $filter_group . '-filters" class="arlo-filter-group">';
 
 		    foreach($filter_group_values['filters'] as $filter_key => $filter) {
+				$import_id = Arlo_For_Wordpress::get_instance()->get_importer()->get_current_import_id();
+				$filter_options = \Arlo\Shortcodes\Filters::get_filter_options($filter_key, $import_id);
+
+				$default_filter_options = $filter_options;
+
+				array_walk($default_filter_options, 'self::get_select_filter_options');
+
 		    	$filters_settings_html .= '<div class="arlo-filter-settings">';
 
-		    	$filters_settings_html .= '<h4>' . __($filter,'arlo-for-wordpress') . '</h4>';
-
-			    $filters_settings_html .= '
-				    <div id="arlo-filters-header">
-						<div class="arlo-filter-old-value">Option text</div>
-						<div class="arlo-filter-new-value">Replacement text</div>
-						<div class="arlo-filter-toggle">Hide this option?</div>
-				    </div>
-			    ';
+		    	$filters_settings_html .= '<a class="arlo-filter-section-toggle"><h2>' . __($filter,'arlo-for-wordpress') . '</h2></a>';
 
 			    $filters_settings_html .= '
 				    <div id="arlo-filter-empty">
 						<ul>
+
 							<li>
-								<div class="arlo-filter-old-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][setting_id][filteroldvalue]" tabindex="1"></div>
-								<div class="arlo-filter-controls">
-									<i class="arlo-icons8-minus arlo-icons8 size-21"></i>
-									<i class="arlo-icons8-plus arlo-icons8 size-21"></i>
+								<div class="arlo-filter-action">
+							  	<select name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][setting_id][filteraction]">
+							  		<option>Select an action</option>
+							  		<option value="rename">Rename</option>
+							  		<option value="exclude">Exclude</option>
+							  	</select>
 								</div>
-								<div class="arlo-filter-toggle">
-									<input type="checkbox" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][setting_id][filterhideoption]" value="hidden" tabindex="3">
+
+							<div class="arlo-filter-controls">
+								<i class="arlo-icons8-minus arlo-icons8 size-21"></i>
+								<i class="arlo-icons8-plus arlo-icons8 size-21"></i>
+							</div>
+
+								<div class="arlo-filter-old-value">
+							  	<select id="filteroldvalue" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][setting_id][filteroldvalue]">
+							  		<option>Select an option</option>' .
+								  		implode($default_filter_options, '')
+							  	. '</select>
 								</div>
-								<div class="arlo-filter-new-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][setting_id][filternewvalue]" tabindex="2"></div>
+
+							<div class="arlo-filter-new-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][setting_id][filternewvalue]" tabindex="2"></div>
+
 							</li>
+
 						</ul>
 				    </div>
 				    ';
 
 				$filters_settings_html .= '<ul class="arlo-available-filters">';
 
+
 				if (is_array($filter_settings)) {
 
 					if (!empty($filter_settings[$filter_group][$filter_key]) && count($filter_settings[$filter_group][$filter_key])) {
 
 						foreach($filter_settings[$filter_group][$filter_key] as $old_value => $new_value) {
-							$is_hidden = false;
 					    	$existing_filter_setting_id = rand();
 
-							if (isset($filter_settings["arlohiddenfilters"]) && $filter_settings["arlohiddenfilters"][$filter_group][$filter_key]) {
-								$is_hidden = in_array($old_value,$filter_settings["arlohiddenfilters"][$filter_group][$filter_key]);
-							}
+							$filter_rename_setting_options = $filter_options;
 
-							$checked = $is_hidden ? ' checked="checked"' : '';
+							array_walk($filter_rename_setting_options, 'self::get_select_filter_options', $old_value);
 
-							$filters_settings_html .=  '<li>
-								<div class="arlo-filter-old-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$existing_filter_setting_id.'][filteroldvalue]" value="'.$old_value.'" tabindex="1"></div>
+							$filters_settings_html .= '
+							  <li>
+							  	<div class="arlo-filter-action">
+								  	<select name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$existing_filter_setting_id.'][filteraction]">
+								  		<option>Select an action</option>
+								  		<option selected="selected" value="rename">Rename</option>
+								  		<option value="exclude">Exclude</option>
+								  	</select>
+							  	</div>
+
 								<div class="arlo-filter-controls">
 									<i class="arlo-icons8-minus arlo-icons8 size-21"></i>
 									<i class="arlo-icons8-plus arlo-icons8 size-21"></i>
 								</div>
-								<div class="arlo-filter-toggle">
-									<input type="checkbox" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$existing_filter_setting_id.'][filterhideoption]" value="hidden" ' . $checked . ' tabindex="3">
-								</div>
-								<div class="arlo-filter-new-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$existing_filter_setting_id.'][filternewvalue]" value="' . $new_value . '" tabindex="2"></div>
-							  </li>
-							 ';
-						}
 
+							  	<div class="arlo-filter-old-value">
+								  	<select id="filteroldvalue" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$existing_filter_setting_id.'][filteroldvalue]">
+								  		<option>Select an option</option>' .
+									  		implode($filter_rename_setting_options, '')
+								  	. '</select>
+							  	</div>
+
+								<div class="arlo-filter-new-value" style="display: block"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$existing_filter_setting_id.'][filternewvalue]" tabindex="2" value="'.$new_value.'"></div>
+
+							  </li>
+							';
+						}
+					}
+
+
+					if (!empty($filter_settings["arlohiddenfilters"][$filter_group][$filter_key])) {
+
+						foreach($filter_settings["arlohiddenfilters"][$filter_group][$filter_key] as $old_value) {
+					    	$existing_filter_setting_id = rand();
+
+							$filter_hidden_setting_options = $filter_options;
+
+							array_walk($filter_hidden_setting_options, 'self::get_select_filter_options', $old_value);
+
+							$filters_settings_html .= '
+							  <li>
+							  	<div class="arlo-filter-action">
+								  	<select name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$existing_filter_setting_id.'][filteraction]">
+								  		<option>Select an action</option>
+								  		<option value="rename">Rename</option>
+								  		<option selected="selected" value="exclude">Exclude</option>
+								  	</select>
+							  	</div>
+
+								<div class="arlo-filter-controls">
+									<i class="arlo-icons8-minus arlo-icons8 size-21"></i>
+									<i class="arlo-icons8-plus arlo-icons8 size-21"></i>
+								</div>
+
+							  	<div class="arlo-filter-old-value">
+								  	<select id="filteroldvalue" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$existing_filter_setting_id.'][filteroldvalue]">
+								  		<option>Select an option</option>' .
+									  		implode($filter_hidden_setting_options, '')
+								  	. '</select>
+							  	</div>
+
+								<div class="arlo-filter-new-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$existing_filter_setting_id.'][filternewvalue]" tabindex="2"></div>
+
+							  </li>
+							';
+
+						}
 					}
 
 				}
 
 				$new_filter_setting_id = rand();
-		
-				$filters_settings_html .= '<li>
-						<div class="arlo-filter-old-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$new_filter_setting_id.'][filteroldvalue]" tabindex="1"></div>
-						<div class="arlo-filter-controls">
-							<i class="arlo-icons8-minus arlo-icons8 size-21"></i>
-							<i class="arlo-icons8-plus arlo-icons8 size-21"></i>
-						</div>
-						<div class="arlo-filter-toggle">
-							<input type="checkbox" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$new_filter_setting_id.'][filterhideoption]" value="hidden" tabindex="3">
-						</div>
-						<div class="arlo-filter-new-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$new_filter_setting_id.'][filternewvalue]" tabindex="2"></div>
+
+				array_walk($filter_options, 'self::get_select_filter_options');
+
+				$filters_settings_html .= '
+				  <li>
+				  	<div class="arlo-filter-action">
+					  	<select name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$new_filter_setting_id.'][filteraction]">
+					  		<option>Select an action</option>
+					  		<option value="rename">Rename</option>
+					  		<option value="exclude">Exclude</option>
+					  	</select>
+				  	</div>
+
+					<div class="arlo-filter-controls">
+						<i class="arlo-icons8-minus arlo-icons8 size-21"></i>
+						<i class="arlo-icons8-plus arlo-icons8 size-21"></i>
+					</div>
+
+				  	<div class="arlo-filter-old-value">
+					  	<select name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$new_filter_setting_id.'][filteroldvalue]">
+					  		<option>Select an option</option>' .
+						  		implode($filter_options, '')
+					  	. '</select>
+				  	</div>
+
+					<div class="arlo-filter-new-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$new_filter_setting_id.'][filternewvalue]" tabindex="2"></div>
+
 				  </li>
 				</ul>';
 
-				$filters_settings_html .= '</div><hr>';
+				$filters_settings_html .= '</div>';
 		    }
 
-
-
 		    $filters_settings_html .= '</div>';
-
 		}
 				
-		$output .= '</select>';
+		$output .= '</select></div>';
 
 		$output .= $filters_settings_html;
 
 		$output .= '</div>';
 
 		echo $output;
-	}	
+	}
 
+	function get_select_filter_options(&$item, $key, $selected_value = NULL) {
+		if (empty($item['string']) && empty($item['value'])) {
+			$item = array(
+				'string' => $item,
+				'value' => $key
+			);
+		}
+
+		$selected = $item["string"] == htmlentities($selected_value) ? ' selected="selected" ' : '';
+
+		$item = "<option value='" . $item["string"] . "' " . $selected . ">" . $item["string"] . "</option>";
+	}
 
 	function arlo_checkbox_callback($args) {
 		if (empty($args['option_name'])) return;
