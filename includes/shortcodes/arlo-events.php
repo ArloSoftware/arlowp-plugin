@@ -1021,7 +1021,8 @@ class Events {
             'limit' => 1,
             'removeyear' => "true",
             'text' => '{%date%}',
-            'template_link' => 'registerlink'
+            'template_link' => 'registerlink',
+            'separator' => ', '
         ), $atts, $shortcode_name, $import_id));
         
         if (strpos($format, '%') === false) {
@@ -1120,7 +1121,7 @@ class Events {
                     }   
                 }   
                 
-                $return .= implode(($layout == 'list' ? "" : ", "), $return_links);
+                $return .= implode(($layout == 'list' ? "" : esc_html($separator)), $return_links);
             } 
             
             //show only, if there is no events or delivery filter set to "OA"
