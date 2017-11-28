@@ -227,6 +227,7 @@ class Filters {
                     $tags[] = array(
                         'string' => $item['tag'],
                         'value' => $item['id'] . '-' . $item['tag'],
+                        'id' => $item['id']
                     );
                 }
 
