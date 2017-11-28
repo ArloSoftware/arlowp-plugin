@@ -160,48 +160,49 @@ class Shortcodes {
 			$hidden_filters = $filter_settings['arlohiddenfilters'];
 		}
 
-		$filter_html = '<select id="arlo-filter-' . esc_attr($type) . '" class="arlo-filter-' . esc_attr($type) . '" name="arlo-' . esc_attr($type) . '">';
-
-		if (!is_null($label))
-			$filter_html .= '<option value="">' . esc_html($label) . '</option>';
-
 		$urlParameter = \Arlo\Utilities::clean_string_url_parameter('arlo-' . $type);
 
 		$selected_value = !empty($urlParameter) || $urlParameter == "0" ? $urlParameter : (!empty($att_default) || $att_default == "0" ? $att_default : '');
 
 		$options_html = '';
-			
+
 		foreach($items as $key => $item) {
 			if (empty($item['string']) && empty($item['value'])) {
 				$item = array(
 					'string' => $item,
-					'value' => $key
+					'value' => $key,
+					'id' => $key
 				);
 			}
+			
+			if (!isset($item['id'])) {
+				$item['id'] = $item['value'];
+			}
 
-			$value_label = $item['string'];
+			$option_label = get_option('arlo_filter_settings')[$group][$type][$item['id']];
 
 			$is_hidden = false;
 			if (!empty($hidden_filters[$group][$type])) {
-				$is_hidden = in_array(esc_html($value_label),$hidden_filters[$group][$type]);
+				$is_hidden = in_array($item['id'], $hidden_filters[$group][$type]);
 			}
 
 			if (!$is_hidden) {
-				$value_label = $item['string'];
-
-				if (!empty(get_option('arlo_filter_settings')[$group][$type][html_entity_decode($value_label)])) {
-					$value_label = get_option('arlo_filter_settings')[$group][$type][html_entity_decode($value_label)];
-				}
+				$option_label = !empty($option_label) ? $option_label : $item['string'];
 
                 $selected = (strlen($selected_value) && strtolower($selected_value) == strtolower($item['value'])) ? ' selected="selected"' : '';
 
-				$options_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>' . esc_html($value_label) . '</option>';
+				$options_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>' . esc_html($option_label) . '</option>';
 			}
 		}
 
 		if (strlen($options_html) == 0) {
 			return '';
 		}
+
+		$filter_html = '<select id="arlo-filter-' . esc_attr($type) . '" class="arlo-filter-' . esc_attr($type) . '" name="arlo-' . esc_attr($type) . '">';
+		
+		if (!is_null($label))
+			$filter_html .= '<option value="">' . esc_html($label) . '</option>';
 
 		$filter_html .= $options_html;
 

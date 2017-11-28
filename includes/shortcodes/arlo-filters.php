@@ -32,7 +32,7 @@ class Filters {
                     $where[] = " AND e.e_region = '" . esc_sql($arlo_region) . "'";
                 }
 
-                $base_category = ((isset($GLOBALS['arlo_filter_base']['category']) && is_array($GLOBALS['arlo_filter_base']['category'])) ? $GLOBALS['arlo_filter_base']['category'] : 0);
+                $base_category = ((isset($GLOBALS['arlo_filter_base']['category']) && is_array($GLOBALS['arlo_filter_base']['category']) && count($GLOBALS['arlo_filter_base']['category'])) ? $GLOBALS['arlo_filter_base']['category'] : 0);
 
                 if (is_array($base_category)) {
 
@@ -115,7 +115,7 @@ class Filters {
                     $where[] = " AND e.e_region = '" . esc_sql($arlo_region) . "'";
                 }
 
-                $base_category = ((isset($GLOBALS['arlo_filter_base']['category']) && is_array($GLOBALS['arlo_filter_base']['category'])) ? $GLOBALS['arlo_filter_base']['category'] : 0);
+                $base_category = ((isset($GLOBALS['arlo_filter_base']['category']) && is_array($GLOBALS['arlo_filter_base']['category']) && count($GLOBALS['arlo_filter_base']['category'])) ? $GLOBALS['arlo_filter_base']['category'] : 0);
 
                 if (is_array($base_category)) {
 
@@ -172,7 +172,7 @@ class Filters {
 
             case 'category':
                 //root category select
-                $base_category = ((isset($GLOBALS['arlo_filter_base']['category']) && is_array($GLOBALS['arlo_filter_base']['category'])) ? $GLOBALS['arlo_filter_base']['category'] : 0);
+                $base_category = ((isset($GLOBALS['arlo_filter_base']['category']) && is_array($GLOBALS['arlo_filter_base']['category']) && count($GLOBALS['arlo_filter_base']['category'])) ? $GLOBALS['arlo_filter_base']['category'] : 0);
 
                 return CategoriesEntity::get_flattened_category_list_for_filter($base_category, $import_id);
 

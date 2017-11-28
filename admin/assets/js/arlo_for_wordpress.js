@@ -101,7 +101,7 @@ if (typeof (Arlo) === "undefined") {
 			});
 		},
 		showFilterGroupSettings: function(val) {
-			$('.arlo-filter-group').hide();
+			$('.arlo-filter-group:not(.arlo-always-visible)').hide();
 			$("#arlo-" + val + "-filters").show();
 		},
 		checkTasks: function() {

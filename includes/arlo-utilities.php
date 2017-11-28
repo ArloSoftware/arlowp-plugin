@@ -131,6 +131,6 @@ class Utilities {
                 });
         }
 
-        return null;
+        return [];
     }
 }

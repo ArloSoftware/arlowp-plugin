@@ -90,8 +90,6 @@ class UpcomingEvents {
             'limit' => ''
         ), $atts, $shortcode_name, $import_id);
 
-        self::$upcoming_list_item_atts = self::get_upcoming_atts($atts);
-
         if (isset($atts['limit']) && is_numeric($atts['limit'])) {
             self::$upcoming_list_item_atts['limit'] = $atts['limit'];
         }
@@ -124,7 +122,7 @@ class UpcomingEvents {
             $atts = [];
         }
 
-        $atts = array_merge($atts, self::$upcoming_list_item_atts);
+        $atts = array_merge($atts, self::$upcoming_list_item_atts);      
 
         $sql = self::generate_list_sql($atts, $import_id);
 

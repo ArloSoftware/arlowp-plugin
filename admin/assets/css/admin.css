@@ -455,6 +455,10 @@ table.arlo-welcome td.logo {
 	width: 68%;
 }
 
+.arlo-template-table .arlo-template-field .wp-editor-wrap .wp-editor-wrap {
+	width: 100%;
+}
+
 .arlo-template-table .arlo-template-field .arlo-shortcodes {
 	float: right;
 	width: 28%;

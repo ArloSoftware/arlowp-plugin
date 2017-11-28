@@ -588,6 +588,51 @@ class Arlo_For_Wordpress_Admin {
 
 		return $new;
 	}
+
+	private function normalize_filter_options($settings_name, $setting_array) {
+		//normalize filters options
+		$filters = array();
+
+		if (is_array($setting_array[$settings_name]) && count($setting_array[$settings_name])) {
+			foreach($setting_array[$settings_name] as $filter_group_name => $filter_group) {
+				foreach ($filter_group as $filter_name => $filter_settings) {
+					foreach ($filter_settings as $filter_setting_id => $filter_setting) {
+						$old_value = esc_html($filter_setting['filteroldvalue']);
+						$new_value = esc_html($filter_setting['filternewvalue']);
+
+						if (isset($filter_setting["filteraction"]) && $filter_setting["filteraction"] == "rename" && isset($old_value) && !empty($new_value)) {
+							$filters[$filter_group_name][$filter_name][$old_value] = $new_value;
+						}
+
+						if (isset($filter_setting["filteraction"]) && $filter_setting["filteraction"] == "exclude") {
+							if (!isset($filters['arlohiddenfilters'][$filter_group_name][$filter_name])) {
+								$filters['arlohiddenfilters'][$filter_group_name][$filter_name] = array();
+							}
+
+							array_push($filters['arlohiddenfilters'][$filter_group_name][$filter_name], $old_value);
+						} else if (isset($filter_setting["filteraction"]) && $filter_setting["filteraction"] == "showonly") {
+							if (!isset($filters['showonlyfilters'][$filter_group_name][$filter_name])) {
+								$filters['showonlyfilters'][$filter_group_name][$filter_name] = array();
+							}
+
+							array_push($filters['showonlyfilters'][$filter_group_name][$filter_name], $old_value);
+						}
+						else {
+							if (!empty($filters['arlohiddenfilters'][$filter_group_name][$filter_name])) {
+								$old_value_index = array_search($old_value, $filters['arlohiddenfilters'][$filter_group_name][$filter_name]);
+
+								if ($old_value_index) {
+									unset( $filters['arlohiddenfilters'][$filter_group_name][$filter_name][$old_value_index] );
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		update_option($settings_name, $filters);
+	}
 		
 	public function settings_saved($old) {
 		$new = get_option('arlo_settings', array());
@@ -640,45 +685,11 @@ class Arlo_For_Wordpress_Admin {
 				}
 			}
 		}
-		
 		update_option('arlo_regions', $regions);
 
-
-		//normalize filters options
-		$filters = array();
-		if (is_array($new['arlo_filter_settings']) && count($new['arlo_filter_settings'])) {
-			foreach($new['arlo_filter_settings'] as $filter_group_name => $filter_group) {
-				foreach ($filter_group as $filter_name => $filter_settings) {
-					foreach ($filter_settings as $filter_setting_id => $filter_setting) {
-						$old_value = esc_html($filter_setting['filteroldvalue']);
-						$new_value = esc_html($filter_setting['filternewvalue']);
-
-						if (isset($filter_setting["filteraction"]) && $filter_setting["filteraction"] == "rename" && !empty($old_value) && !empty($new_value)) {
-							$filters[$filter_group_name][$filter_name][$old_value] = $new_value;
-						}
-
-						if (isset($filter_setting["filteraction"]) && $filter_setting["filteraction"] == "exclude") {
-							if (!isset($filters['arlohiddenfilters'][$filter_group_name][$filter_name])) {
-							    $filters['arlohiddenfilters'][$filter_group_name][$filter_name] = array();
-							}
-
-							array_push($filters['arlohiddenfilters'][$filter_group_name][$filter_name], $old_value);
-						} else {
-							if (!empty($filters['arlohiddenfilters'][$filter_group_name][$filter_name])) {
-								$old_value_index = array_search($old_value, $filters['arlohiddenfilters'][$filter_group_name][$filter_name]);
-
-								if ($old_value_index) {
-									unset( $filters['arlohiddenfilters'][$filter_group_name][$filter_name][$old_value_index] );
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		update_option('arlo_filter_settings', $filters);
-
+		//normalize filter options and save them
+		$this->normalize_filter_options('arlo_filter_settings', $new);
+		$this->normalize_filter_options('page_filter_settings', $new);
 
 		// need to check for posts-page change here
 		// loop through each post type and check if the posts-page has changed
