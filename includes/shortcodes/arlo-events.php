@@ -46,24 +46,12 @@ class Events extends Filters {
         
         $filter_group = 'event';
 
-        $join = '';
-        $where = '';
-
         foreach($filters_array as $filter_key):
 
             if (!array_key_exists($filter_key, \Arlo_For_Wordpress::$available_filters[$filter_group]['filters']))
                 continue;
 
-            $join = "LEFT JOIN 
-                        {$wpdb->prefix}arlo_eventtemplates AS et
-                    ON 
-                        et.et_arlo_id = e.et_arlo_id
-                        " . (!empty($arlo_region) ? 'AND et.et_region = "' . esc_sql($arlo_region) . '"' : '' );
-
-            $where = 'AND 
-                et_post_id = ' . $post->ID;
-
-            $items = self::get_filter_options($filter_key, $import_id, $join, $where);
+            $items = self::get_filter_options($filter_key, $import_id, $post->ID);
 
             $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'),$filter_group);
 

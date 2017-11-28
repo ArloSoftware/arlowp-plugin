@@ -4,10 +4,23 @@ namespace Arlo\Shortcodes;
 use Arlo\Entities\Categories as CategoriesEntity;
 
 class Filters {
-    public static function get_filter_options($filter, $import_id, $join = '', $where = '') {
+    public static function get_filter_options($filter, $import_id, $post_id = NULL) {
         global $post, $wpdb;
         
         $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
+        $join = '';
+        $where = '';
+
+        if (!empty($post_id) || $post_id === 0) {
+            $join = "LEFT JOIN 
+                        {$wpdb->prefix}arlo_eventtemplates AS et
+                    ON 
+                        et.et_arlo_id = e.et_arlo_id
+                        " . (!empty($arlo_region) ? 'AND et.et_region = "' . esc_sql($arlo_region) . '"' : '' );
+
+            $where = 'AND 
+                et_post_id = ' . $post_id;
+        }
 
         switch ($filter) {
             case 'location':
