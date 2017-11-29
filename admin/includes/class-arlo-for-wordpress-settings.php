@@ -712,15 +712,16 @@ class Arlo_For_Wordpress_Settings {
 		//hack, because the key in the templates are not the same as in the filters
 		$filter_type = ($filter_type == 'events' ? 'template' : $filter_type);
 
-		if (!array_key_exists($filter_type, Arlo_For_Wordpress::$available_filters))
-			return;
-
 		$filter_group_values = Arlo_For_Wordpress::$available_filters[$filter_type];
-		$available_filters_key = array_filter(array_keys($filter_group_values['filters']), 
-				function($filter_key) use ($include_only) {
-					return !(count($include_only) && !in_array($filter_key, $include_only));
-				});
-		$available_filters = array_intersect_key($filter_group_values['filters'], array_flip($available_filters_key));
+
+		$available_filters = [];
+		if (isset($filter_group_values['filters']) && is_array($filter_group_values['filters'])) {
+			$available_filters_key = array_filter(array_keys($filter_group_values['filters']), 
+			function($filter_key) use ($include_only) {
+				return !(count($include_only) && !in_array($filter_key, $include_only));
+			});
+			$available_filters = array_intersect_key($filter_group_values['filters'], array_flip($available_filters_key));
+		}
 		
 		$filters_settings_html .= '<div id="arlo-' . (!empty($id_prefix) ? $id_prefix . '-' : '') . $filter_group . '-filters" class="arlo-filter-group ' . $class . '">';
 
