@@ -49,81 +49,11 @@ class Events {
         foreach($filters_array as $filter_key):
 
             if (!array_key_exists($filter_key, \Arlo_For_Wordpress::$available_filters[$filter_group]['filters']))
-                continue;            
-            switch($filter_key) :
+                continue;
 
-                case 'location' :
+            $items = \Arlo\Shortcodes\Filters::get_filter_options($filter_key, $import_id, $post->ID);
 
-                    // location select
-
-                    $items = $wpdb->get_results(
-                        'SELECT 
-                            DISTINCT(e.e_locationname)
-                        FROM 
-                            ' . $wpdb->prefix . 'arlo_events AS e
-                        LEFT JOIN 
-                            ' . $wpdb->prefix . 'arlo_eventtemplates AS et
-                        ON 
-                            et.et_arlo_id = e.et_arlo_id
-                            ' . (!empty($arlo_region) ? 'AND et.et_region = "' . esc_sql($arlo_region) . '"' : '' ) . '
-                        WHERE 
-                            e_locationname != ""
-                        AND
-                            e.import_id = ' . $import_id . '
-                        AND 
-                            et_post_id = ' . $post->ID . '
-                        ' . (!empty($arlo_region) ? 'AND e.e_region = "' . esc_sql($arlo_region) . '"' : '' ) . '
-                        GROUP BY 
-                            e.e_locationname 
-                        ORDER BY 
-                            e.e_locationname', ARRAY_A);
-
-                    $locations = array();
-
-                    foreach ($items as $item) {
-                        $locations[] = array(
-                            'string' => $item['e_locationname'],
-                            'value' => $item['e_locationname'],
-                        );
-                    }
-
-                    $filter_html .= Shortcodes::create_filter($filter_key, $locations, __('All locations', 'arlo-for-wordpress'), $filter_group);
-
-                    break;
-
-                case 'state' :
-                    $items = $wpdb->get_results(
-                        "SELECT DISTINCT
-                            v.v_physicaladdressstate
-                        FROM 
-                            {$wpdb->prefix}arlo_venues AS v
-                        LEFT JOIN 
-                            {$wpdb->prefix}arlo_events AS e
-                        ON
-                            v.v_arlo_id = e.v_id
-                        AND
-                            v.import_id = e.import_id
-                        WHERE 
-                            e.import_id = $import_id
-                        ORDER BY v_name", ARRAY_A);
-
-
-                    $states = array();
-
-                    foreach ($items as $item) {
-                        if (!empty($item['v_physicaladdressstate']) || in_array($item['v_physicaladdressstate'],[0,"0"], true) ) {
-                            $states[] = array(
-                                'string' => $item['v_physicaladdressstate'],
-                                'value' => $item['v_physicaladdressstate'],
-                            );
-                        }
-                    }
-
-                    $filter_html .= Shortcodes::create_filter($filter_key, $states, __('Select state', 'arlo-for-wordpress'),$filter_group);                
-                    
-                    break;
-
-            endswitch;
+            $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'),$filter_group);
 
         endforeach; 
             

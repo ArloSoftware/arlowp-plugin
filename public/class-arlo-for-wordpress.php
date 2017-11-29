@@ -398,6 +398,27 @@ class Arlo_For_Wordpress {
 
 
 	/**
+	 * $filter_labels: maps filter name to their labels
+	 *
+	 * @since    3.5.0
+	 *
+	 * @var      array
+	 */
+
+    public static $filter_labels = array(
+        'category' => 'All categories',
+        'delivery' => 'All delivery options',
+        'month' => 'All months',
+        'location' => 'All locations',
+        'state' => 'Select state',
+        'eventtag' => 'Select tag',
+        'templatetag' => 'Select tag',
+        'presenter' => 'All presenters',
+        'oatag' => 'All tags'
+    );
+
+
+	/**
 	 * Initialize the plugin by setting localization and loading public scripts
 	 * and styles.
 	 *

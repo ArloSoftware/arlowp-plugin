@@ -91,8 +91,17 @@ if (typeof (Arlo) === "undefined") {
 				me.addFilter(parent);
 			});
 		},
+		toggleNewValueField: function() {
+			$('.arlo-filter-action select').change(function() {
+				if ($(this).val() == 'rename') {
+					$(this).closest('li').find('.arlo-filter-new-value').show();
+				} else {
+					$(this).closest('li').find('.arlo-filter-new-value').hide();
+				}
+			});
+		},
 		showFilterGroupSettings: function(val) {
-			$('.arlo-filter-group').hide();
+			$('.arlo-filter-group:not(.arlo-always-visible)').hide();
 			$("#arlo-" + val + "-filters").show();
 		},
 		checkTasks: function() {
@@ -146,6 +155,7 @@ if (typeof (Arlo) === "undefined") {
 
 			if (newElement.length == 1) {
 				parent.append(newElement);
+				this.toggleNewValueField();
 			}
 		},
 		createTaskPlaceholder: function(taskID) {
@@ -552,7 +562,15 @@ if (typeof (Arlo) === "undefined") {
 				if (confirm(message)) {
 					document.location = target.attr('href');
 				} 				
-			})
+			});
+
+			this.toggleNewValueField();
+
+			$('.arlo-filter-section-toggle').click(function() {
+				$(this).closest('.arlo-filter-settings').find('.arlo-available-filters').slideToggle();
+				$(this).closest('.arlo-filter-settings').toggleClass('filter-section-expanded');
+			});
+
 		},
 		getEventsForWebinar: function() {
 			var me = this,

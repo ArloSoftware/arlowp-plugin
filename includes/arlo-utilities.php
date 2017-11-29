@@ -2,6 +2,8 @@
 
 namespace Arlo;
 
+use Arlo\Entities\Categories as CategoriesEntity;
+
 class Utilities {
 
 	public static function array_ikey_exists($key,$arr) { 
@@ -118,4 +120,17 @@ class Utilities {
         return (get_home_url() . $rel);
     }
 
+    public static function convert_string_array_to_int_array($string_array) {
+        if (!empty($string_array)) {
+            return array_filter(
+                array_map(function($int) {
+                    return intval($int);
+                }, explode(',', $string_array)), 
+                function($int) {
+                    return $int > 0;
+                });
+        }
+
+        return [];
+    }
 }
