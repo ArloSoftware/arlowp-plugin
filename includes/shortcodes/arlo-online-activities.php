@@ -207,16 +207,24 @@ class OnlineActivities {
     private static function shortcode_onlineactivites_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
 
+        $filter_settings = get_option('page_filter_settings', []);                       
+
         $template_name = Shortcodes::get_template_name($shortcode_name,'onlineactivites_list','oa');
-
-        self::$oa_list_atts = self::get_oa_atts($atts);
-
-        if (!empty($atts["category"])) {
-            $GLOBALS['arlo_filter_base']['category'] = \Arlo\Utilities::convert_string_array_to_int_array($atts["category"]);
-        }
-
         $templates = arlo_get_option('templates');
         $content = $templates[$template_name]['html'];
+
+        self::$oa_list_atts = self::get_oa_atts($atts);
+        $category_parameter = \Arlo\Utilities::clean_string_url_parameter('arlo-category');
+        
+        if (!empty($atts["category"])) {
+            $GLOBALS['arlo_filter_base']['category'] = \Arlo\Utilities::convert_string_array_to_int_array($atts["category"]);
+        } else if (isset($filter_settings['showonlyfilters']) && isset($filter_settings['showonlyfilters'][$template_name]) && isset($filter_settings['showonlyfilters'][$template_name]['category'])) {
+            $GLOBALS['arlo_filter_base']['category'] = array_values($filter_settings['showonlyfilters'][$template_name]['category']);
+            if (empty($category_parameter))
+                self::$oa_list_atts['category'] = implode(',',$GLOBALS['arlo_filter_base']['category']);
+        }
+
+ 
         return do_shortcode($content);        
     }
 
