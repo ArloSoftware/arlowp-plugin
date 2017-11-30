@@ -80,9 +80,11 @@ if (typeof (Arlo) === "undefined") {
 			$( ".arlo-filter-group" ).disableSelection();	
 			
 			$('.arlo-filter-group').on('click', 'li .arlo-icons8-minus', function () {
+				var parent = $(this).closest('.arlo-available-filters');
 				$(this).parentsUntil("li").parent().remove();
-				if ($('.arlo-available-filters-section > li').length === 0) {
-					me.addFilter();
+				
+				if (parent.find('li').length === 0) {
+					me.addFilter(parent);
 				}
 			});
 			
