@@ -539,7 +539,7 @@ if (typeof (Arlo) === "undefined") {
 
 			$('.toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-ask-later').click(function() {
 				var data = {
-					action: 'arlo_review_notice_date'
+					action: 'arlo_increment_review_notice_date'
 				}
 				
 				$.post(me.ajaxUrl, data);

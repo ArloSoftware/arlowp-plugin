@@ -450,7 +450,7 @@ class Arlo_For_Wordpress {
 	
 		add_action( 'wp_ajax_arlo_dismissible_notice', array($this, 'dismissible_notice_callback'));
 
-		add_action( 'wp_ajax_arlo_review_notice_date', array($this, 'increment_review_notice_date'));
+		add_action( 'wp_ajax_arlo_increment_review_notice_date', array($this, 'increment_review_notice_date'));
 
 		add_action( 'wp_ajax_arlo_turn_off_send_data', array($this, 'turn_off_send_data_callback'));
 		
