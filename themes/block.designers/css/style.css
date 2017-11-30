@@ -655,6 +655,10 @@ body.arlo {
     display: none;
 }
 
+.arlo#arlo .upcoming .arlo-event-notice {
+    margin-bottom: .5em;
+}
+
 .arlo#arlo .upcoming .arlo-template-summary {
     margin-bottom: .5em;
 }

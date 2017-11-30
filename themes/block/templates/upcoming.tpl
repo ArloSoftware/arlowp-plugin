@@ -28,6 +28,7 @@
 				   </div>
 				</div>
 				<div class="arlo-event-time">[arlo_event_duration], [arlo_event_start_date format="%I:%M %p"] - [arlo_event_end_date format="%I:%M %p"]</div>
+				<div class="arlo-event-notice">[arlo_event_notice]</div>
 				<div class="arlo-template-summary">
 					[arlo_event_template_summary]
 				</div>

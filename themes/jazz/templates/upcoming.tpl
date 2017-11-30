@@ -29,6 +29,9 @@
 					[/arlo_event_session_list_item]
 				   </div>
 				</div>
+				<div class="arlo-event-notice">
+					[arlo_event_notice]
+				</div>
 				<div class="arlo-template-summary">
 					[arlo_event_template_summary]
 				</div>
