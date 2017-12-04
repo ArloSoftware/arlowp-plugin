@@ -30,7 +30,7 @@
 			<div class="arlo-template-summary">
 				[arlo_event_template_summary]
 			</div>
-			[arlo_event_notice label="Notice: " wrap='<div class="arlo-event-notice">%s</div>']
+			[arlo_event_notice label="Special note: " wrap='<div class="arlo-event-notice">%s</div>']
             [arlo_event_offers wrap='<div class="arlo-event-offers">%s</div>']
 			[arlo_event_registration]
 		</li>	

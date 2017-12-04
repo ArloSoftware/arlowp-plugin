@@ -20,7 +20,7 @@
                 [arlo_event_template_advertised_duration label="Duration: "]
                 [arlo_event_session_description wrap='<span class="arlo-event-session-description">%s</span>']
                 [arlo_event_offers wrap='<div class="arlo-event-offers">%s</div>']
-                [arlo_event_notice label="Notice: " wrap='<div class="arlo-event-notice">%s</div>']
+                [arlo_event_notice label="Special note: " wrap='<div class="arlo-event-notice">%s</div>']
                 [arlo_event_session_list_item]
                    <div class="arlo_session">
                        <h6>[arlo_event_name]</h6>

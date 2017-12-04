@@ -351,7 +351,6 @@ body.arlo {
 .arlo#arlo .arlo-event-name a:hover,
 .arlo#arlo .arlo-event-provider a:hover,
 .arlo#arlo .arlo-event-location a:hover,
-.arlo#arlo .arlo-event-notice a:hover,
 .arlo#arlo .arlo-list.catalogue .arlo-template-name a:hover,
 .arlo#arlo ul.arlo-list.venues .arlo-venue-name a:hover,
 .arlo#arlo .arlo-event-presenters a:hover,
@@ -436,7 +435,6 @@ body.arlo {
 .arlo#arlo .arlo-event-provider a,
 .arlo#arlo .arlo-event-location a,
 .arlo#arlo .arlo-event-presenters a,
-.arlo#arlo .arlo-event-notice a,
 .arlo#arlo .arlo-places-remaining,
 .arlo#arlo .arlo-event-full,
 .arlo#arlo .arlo-presenter-details a {

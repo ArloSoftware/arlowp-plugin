@@ -22,7 +22,7 @@
 				[arlo_event_presenters label="Presenters: "]
 				[arlo_event_credits]
 				[arlo_event_offers]
-				[arlo_event_notice label="Notice: " wrap='<div class="arlo-event-notice">%s</div>']
+				[arlo_event_notice label="Special note: " wrap='<div class="arlo-event-notice">%s</div>']
 			</div>
 			<div class="arlo-right">
 				[arlo_event_registration]
