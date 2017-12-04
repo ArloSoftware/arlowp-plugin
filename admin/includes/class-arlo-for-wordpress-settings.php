@@ -517,7 +517,9 @@ class Arlo_For_Wordpress_Settings {
 
 		$value = (isset($value_field) && isset($item[$value_field]) ? $item[$value_field] : $item["string"]); 
 		
-		$selected = $value == htmlentities($selected_value) ? ' selected="selected" ' : '';
+		$html_selected_value = (isset($selected_value) ? htmlentities($selected_value) : '');
+
+		$selected = ($value == $html_selected_value) ? ' selected="selected" ' : '';
 
 		$item = "<option value='" . $value . "' " . $selected . ">" . $item["string"] . "</option>";
 	}
