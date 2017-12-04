@@ -179,7 +179,9 @@ class Shortcodes {
 				$item['id'] = $item['value'];
 			}
 
-			$option_label = get_option('arlo_filter_settings')[$group][$type][$item['id']];
+			if (isset($filter_settings[$group])) {
+				$option_label = $filter_settings[$group][$type][$item['id']];
+			}
 
 			$is_hidden = false;
 			if (!empty($hidden_filters[$group][$type])) {
