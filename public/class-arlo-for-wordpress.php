@@ -1046,10 +1046,21 @@ class Arlo_For_Wordpress {
 		$obj = get_queried_object();
 		
 		$page_id = (empty($obj->ID) ? $page_id : $obj->ID);
-		
+
+		$category = \Arlo\Utilities::get_att_string('category');
+
 		if (!empty($obj->post_type) && $obj->post_type == 'arlo_event' && !empty($obj->post_content)) {
-			$ellipsis = '';
 			$desc = strip_tags($obj->post_content);
+		} else if (!empty($category)) {
+			$import_id = $this->get_importer()->get_current_import_id();
+			$category_data = \Arlo\Entities\Categories::get([ 'id' => intval($category)], 1, $import_id);
+			if (!empty($category_data) && !empty($category_data->c_header)) {
+				$desc = strip_tags($category_data->c_header);
+			}
+		}
+
+		if (!empty($desc)) {
+			$ellipsis = '';
 			if (strlen($desc) >= 150) {
 				$end_pos = strpos($desc, " ", 140);
 				$ellipsis = '...';
