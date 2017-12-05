@@ -1069,7 +1069,7 @@ class Arlo_For_Wordpress {
 			}
 			$desc = substr($desc, 0, $end_pos) . $ellipsis;
 			
-			echo '<meta description="' . htmlspecialchars($desc, ENT_COMPAT, 'UTF-8') . '">';
+			echo '<meta name="description" content="' . htmlspecialchars($desc, ENT_COMPAT, 'UTF-8') . '">';
 		}
 	}	
 	
