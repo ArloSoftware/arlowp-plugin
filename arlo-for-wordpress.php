@@ -99,6 +99,7 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/entities/arlo-categories.p
 require_once( plugin_dir_path( __FILE__ ) . 'includes/entities/arlo-offers.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/entities/arlo-venues.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/entities/arlo-presenters.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/entities/arlo-tags.php');
 
 //include importer
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-importer.php');

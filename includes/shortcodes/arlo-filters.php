@@ -222,7 +222,7 @@ class Filters {
                 foreach ($items as $item) {
                     $tags[] = array(
                         'string' => $item['tag'],
-                        'value' => $item['id'] . '-' . $item['tag']
+                        'value' => $item['tag']
                     );
                 }
 

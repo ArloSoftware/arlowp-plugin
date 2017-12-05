@@ -417,8 +417,8 @@ class Arlo_For_Wordpress {
 		'oa' => array(
 			'name' => 'Online activities',
 			'filters' => array(
+				'category' => 'Category',
 				'templatetag' => 'Template tag',
-				'category' => 'Category'
 			)
 		),
 		'template' => array(
@@ -427,7 +427,7 @@ class Arlo_For_Wordpress {
 				'category' => 'Category', 
 				'delivery' => 'Delivery', 
 				'location' => 'Location', 
-				'templatetag' => 'Tag',
+				'templatetag' => 'Template tag',
 			)
 		),
 		'schedule' => array(
@@ -436,7 +436,7 @@ class Arlo_For_Wordpress {
 				'category' => 'Category', 
 				'delivery' => 'Delivery', 
 				'location' => 'Location', 
-				'templatetag' => 'Tag',
+				'templatetag' => 'Template tag',
 			)
 		)
 	);	

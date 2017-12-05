@@ -54,8 +54,9 @@ class Utilities {
         return null;
     }
 
-    public static function process_att($new_atts_array, $callback, $att_name = '', $atts = []) {
-        $value = call_user_func($callback, $att_name, $atts);
+    public static function process_att($new_atts_array, $callback, $att_name = '', $atts = [], $value = null) {
+        if (!empty($callback))
+            $value = call_user_func($callback, $att_name, $atts);
         
 		if (!is_null($value) && (!empty($value) || is_numeric($value))) {
 			$new_atts_array[$att_name] = $value;
