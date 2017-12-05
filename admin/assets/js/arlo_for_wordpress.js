@@ -93,11 +93,16 @@ if (typeof (Arlo) === "undefined") {
 				me.addFilter(parent);
 			});
 		},
-		toggleNewValueField: function() {
+		filterActionChange: function() {
 			$('.arlo-filter-action select').change(function() {
-				if ($(this).val() == 'rename') {
+				var val = $(this).val()
+				if (val == 'rename') {
 					$(this).closest('li').find('.arlo-filter-new-value').show();
 				} else {
+					if (val == 'exclude' || val == 'showonly') {
+						$(this).closest('.arlo-available-filters').find('.arlo-filter-action select').val(val);
+					}
+					
 					$(this).closest('li').find('.arlo-filter-new-value').hide();
 				}
 			});
@@ -156,8 +161,9 @@ if (typeof (Arlo) === "undefined") {
 			});
 
 			if (newElement.length == 1) {
+				newElement.find('.arlo-filter-action select').val(parent.find('.arlo-filter-action select').val());
 				parent.append(newElement);
-				this.toggleNewValueField();
+				this.filterActionChange();
 			}
 		},
 		createTaskPlaceholder: function(taskID) {
@@ -566,7 +572,7 @@ if (typeof (Arlo) === "undefined") {
 				} 				
 			});
 
-			this.toggleNewValueField();
+			this.filterActionChange();
 
 			$('.arlo-filter-section-toggle').click(function() {
 				$(this).closest('.arlo-filter-settings').find('.arlo-available-filters').slideToggle();

@@ -197,6 +197,7 @@ class OnlineActivities {
         $new_atts = [];
         
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'category', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'categoryhidden', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'oatag', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'templatetag', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo_For_Wordpress::get_region_parameter', 'region');
@@ -216,6 +217,7 @@ class OnlineActivities {
         self::$oa_list_atts = self::get_oa_atts($atts);
         $category_parameter = \Arlo\Utilities::clean_string_url_parameter('arlo-category');
         
+        //category
         if (!empty($atts["category"])) {
             $GLOBALS['arlo_filter_base']['category'] = \Arlo\Utilities::convert_string_array_to_int_array($atts["category"]);
         } else if (isset($filter_settings['showonlyfilters']) && isset($filter_settings['showonlyfilters'][$template_name]) && isset($filter_settings['showonlyfilters'][$template_name]['category'])) {
@@ -224,7 +226,14 @@ class OnlineActivities {
                 self::$oa_list_atts['category'] = implode(',',$GLOBALS['arlo_filter_base']['category']);
         }
 
- 
+        //categoryhidden
+        if (!empty($atts["categoryhidden"])) {
+            $GLOBALS['arlo_filter_base']['categoryhidden'] = \Arlo\Utilities::convert_string_array_to_int_array($atts["categoryhidden"]);
+        } else if (isset($filter_settings['hiddenfilters']) && isset($filter_settings['hiddenfilters'][$template_name]) && isset($filter_settings['hiddenfilters'][$template_name]['category'])) {
+            $GLOBALS['arlo_filter_base']['categoryhidden'] = array_values($filter_settings['hiddenfilters'][$template_name]['category']);
+            self::$oa_list_atts['categoryhidden'] = implode(',',$GLOBALS['arlo_filter_base']['categoryhidden']);
+        }
+
         return do_shortcode($content);        
     }
 
@@ -363,20 +372,28 @@ class OnlineActivities {
         }       
 
         $arlo_category = !empty($atts['category']) ? $atts['category'] : null;
+        $arlo_categoryhidden = !empty($atts['categoryhidden']) ? $atts['categoryhidden'] : null;               
         $arlo_oatag = !empty($atts['oatag']) ? $atts['oatag'] : null;
         $arlo_templatetag = isset($atts['templatetag']) ? $atts['templatetag'] : null;
 
-        if(!empty($arlo_category)) :
-            $arlo_category = array_filter(
-                array_map(function($cat) {
-                    return intval($cat);
-                }, explode(',', $arlo_category)), 
-                function($cat_id) {
-                    return $cat_id > 0;
-                });
+        if(!empty($arlo_category) || !empty($arlo_categoryhidden)) :
 
-            $where .= " AND etc.c_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $arlo_category)) . ")";                
-            $parameters = array_merge($parameters, $arlo_category);
+            $arlo_category = \Arlo\Utilities::convert_string_array_to_int_array($arlo_category);
+            $arlo_categoryhidden = \Arlo\Utilities::convert_string_array_to_int_array($arlo_categoryhidden);
+
+            if (!empty($arlo_category)) {
+                $where .= " AND etc.c_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $arlo_category)) . ")";       
+            
+                $parameters = array_merge($parameters, $arlo_category);    
+            }
+
+            if (!empty($arlo_categoryhidden)) {
+                //need to exclude all the child categories
+                $categoriesnot_flatten_list = CategoriesEntity::get_flattened_category_list_for_filter($arlo_categoryhidden, [], $import_id);
+                
+                $where .= " AND  (etc.c_arlo_id NOT IN (" . implode(',', array_map(function() {return "%d";}, $categoriesnot_flatten_list)) . ") OR etc.c_arlo_id IS NULL)";
+                $parameters = array_merge($parameters, array_map(function($cat) { return $cat['id']; }, $categoriesnot_flatten_list));
+            }
         endif;
 
         if(!empty($arlo_oatag)) :

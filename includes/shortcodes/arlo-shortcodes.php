@@ -156,8 +156,8 @@ class Shortcodes {
 			$label = $filter_settings[$group][$type][$label];
 		}
 
-		if (!empty($filter_settings['arlohiddenfilters'])) {
-			$hidden_filters = $filter_settings['arlohiddenfilters'];
+		if (!empty($filter_settings['hiddenfilters'])) {
+			$hidden_filters = $filter_settings['hiddenfilters'];
 		}
 
 		$urlParameter = \Arlo\Utilities::clean_string_url_parameter('arlo-' . $type);

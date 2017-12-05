@@ -393,8 +393,66 @@ class Arlo_For_Wordpress {
 				'state' => 'State'
 			)
 		)
-
 	);
+
+	/**
+	 * $available_page_filters: defines the available filters for the plugin
+	 *
+	 * @since    3.6.0
+	 *
+	 * @var      array
+	 */
+
+	public static  $available_page_filters = array(
+		'upcoming' => array(
+			'name' => 'Upcoming',
+			'filters' => array(
+				'category' => 'Category', 
+				'location' => 'Location', 
+				'delivery' => 'Delivery', 
+				'eventtag' => 'Event tag', 
+				'templatetag' => 'Template tag', 
+			)
+		),
+		'oa' => array(
+			'name' => 'Online activities',
+			'filters' => array(
+				'templatetag' => 'Template tag',
+				'category' => 'Category'
+			)
+		),
+		'template' => array(
+			'name' => 'Catalogue',
+			'filters' => array(
+				'category' => 'Category', 
+				'delivery' => 'Delivery', 
+				'location' => 'Location', 
+				'templatetag' => 'Tag',
+			)
+		),
+		'schedule' => array(
+			'name' => 'Schedule',
+			'filters' => array(
+				'category' => 'Category', 
+				'delivery' => 'Delivery', 
+				'location' => 'Location', 
+				'templatetag' => 'Tag',
+			)
+		)
+	);	
+
+	/**
+	 * $page_filter_options: behaviour selector for page filters
+	 *
+	 * @since    3.6.0
+	 *
+	 * @var      array
+	 */
+
+    public static $page_filter_options = array(
+		'showonly' => 'Hide all except',
+        'exclude' => 'Show all except',
+    );	
 
 
 	/**

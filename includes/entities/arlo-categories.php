@@ -130,28 +130,56 @@ class Categories {
 		return $output;
 	} 
 
-	static function get_flattened_category_list_for_filter($base_category, $import_id) {
-        $cache_key = md5(serialize($base_category));
-                            
+	static function get_flattened_category_list_for_filter($base_category, $exclude_category, $import_id) {
+		$cache_key = md5(serialize(func_get_args()));
+		
         if(!($categories_flatten_list = wp_cache_get($cache_key, 'ArloFilterCategoryList'))) {
-            if (is_array($base_category)) {                    
+			
+			$cats = self::get_merged_tree($base_category, $import_id);
+			$categories_flatten_list = self::child_categories($cats);
+
+			if (!is_array($exclude_category)) {
+				$exclude_category = [$exclude_category];
+			}
+			$exclude_category = array_filter($exclude_category, function($val) {
+				return intval($val) > 0;
+			});
+			if (count($exclude_category)) {
+				$cats_not = self::get_merged_tree($exclude_category, $import_id);
+				$categoriesnot_flatten_list = self::child_categories($cats_not);
+
+				$categories_flatten_list = array_udiff($categories_flatten_list, $categoriesnot_flatten_list, function($a, $b) {
+					return ($a['id'] - $b['id']);
+				});
+			}
+			
+            wp_cache_add( $cache_key, $categories_flatten_list, 'ArloFilterCategoryList', 30 );
+        }
+
+        return $categories_flatten_list;
+	}
+	
+	static function get_merged_tree($categories = [], $import_id) {
+		$cache_key = md5(serialize(func_get_args()));
+                            
+        if(!($cats = wp_cache_get($cache_key, 'ArloMergedCategoryList'))) {
+			if (is_array($categories)) {                    
                 $cats = [];
             
-                foreach ($base_category as $cat_id) {
+                foreach ($categories as $cat_id) {
                     $cat_tree = self::getTree($cat_id, 100, 0, $import_id, true);
                     $cats = array_merge($cats, (is_array($cat_tree) ? $cat_tree : []));
                 }
             } else {
-                $cats = self::getTree($base_category, 1, 0, $import_id);
+                $cats = self::getTree($categories, 1, 0, $import_id);
                 if (!empty($cats)) {
                     $cats = self::getTree($cats[0]->c_arlo_id, 100, 0, $import_id);
                 }
             }
 
-            $categories_flatten_list = self::child_categories($cats);
-            wp_cache_add( $cache_key, $categories_flatten_list, 'ArloFilterCategoryList', 30 );
+            wp_cache_add( $cache_key, $cats, 'ArloMergedCategoryList', 30 );
         }
 
-        return $categories_flatten_list;
-    }
+        return $cats;
+	}
 }
