@@ -5,7 +5,7 @@ namespace Arlo;
 use Arlo\Utilities;
 
 class VersionHandler {
-	const VERSION = '3.6';
+	const VERSION = '3.5';
 
 	private $dbl;
 	private $message_handler;
@@ -527,119 +527,9 @@ class VersionHandler {
 				$filter_settings = get_option('arlo_filter_settings', []);
 				$import_id = get_option('arlo_import_id','');
 
-				$new_settings_array = [];
-				foreach ($filter_settings as $page => $filter_options) {
-					if ($page == 'arlohiddenfilters') {
-						continue;
-					}
-		
-					if (!isset($new_settings_array[$page])) {
-						$new_settings_array[$page] = [];
-					}
-		
-					foreach ($filter_options as $group => $filters) {
-						if (!isset($new_settings_array[$page][$group])) {
-							$new_settings_array[$page][$group] = [];
-						}
-		
-						switch ($group) {
-							case 'category':
-								foreach ($filters as $old_value => $new_value) {
-									if (!empty($new_value)) {
-										$sql = '
-										SELECT
-											c_id
-										FROM
-											' . $this->dbl->prefix . 'arlo_categories
-										WHERE
-											c_name = "' . html_entity_decode($old_value) . '"
-										AND
-											import_id = ' . $import_id . '
-										';
-		
-										$items = $this->dbl->get_results($sql);
-										if (is_array($items) && count($items)) {
-											foreach($items as $key => $item) {
-												$new_settings_array[$page][$group][$item->c_id] = $new_value;
-											}
-										}
-									}
-								}
-							break;
-		
-							case 'delivery':
-								foreach ($filters as $old_value => $new_value) {
-									$delivery_key = array_search($old_value, \Arlo_For_Wordpress::$delivery_labels);
-									if ($delivery_key !== false && !empty($new_value))
-										$new_settings_array[$page][$group][$delivery_key] = $new_value;
-								}
-							break;
-							default: 
-								foreach ($filters as $old_value => $new_value) {
-									if (!empty($new_value))
-										$new_settings_array[$page][$group][$old_value] = $new_value;
-									
-								}
-							break;
-						}
-					}
-				}
+				error_log("fake 3.6 upgrade");
 
-				foreach ($filter_settings['arlohiddenfilters'] as $page => $filter_options) {		
-					if (!isset($new_settings_array['hiddenfilters'][$page])) {
-						$new_settings_array['hiddenfilters'][$page] = [];
-					}
-		
-					foreach ($filter_options as $group => $filters) {
-						if (!isset($new_settings_array['hiddenfilters'][$page][$group])) {
-							$new_settings_array['hiddenfilters'][$page][$group] = [];
-						}
-		
-						switch ($group) {
-							case 'category':
-								foreach ($filters as $filter) {
-									$sql = '
-									SELECT
-										c_arlo_id
-									FROM
-										' . $this->dbl->prefix . 'arlo_categories
-									WHERE
-										c_name = "' . html_entity_decode($filter) . '"
-									AND
-										import_id = ' . $import_id . '
-									';
-	
-									$items = $this->dbl->get_results($sql);
-									if (is_array($items) && count($items)) {
-										foreach($items as $key => $item) {
-											$new_settings_array['hiddenfilters'][$page][$group][] = $item->c_arlo_id;
-										}
-									}
-									
-								}
-							break;
-		
-							case 'delivery':
-								foreach ($filters as $filter) {
-									$delivery_key = array_search($filter, \Arlo_For_Wordpress::$delivery_labels);
-									if ($delivery_key !== false)
-										$new_settings_array['hiddenfilters'][$page][$group][] = $delivery_key;
-								}
-							break;
-							default: 
-								foreach ($filters as $filter) {
-									if (!empty($filter))
-										$new_settings_array['hiddenfilters'][$page][$group][] = $filter;
-									
-								}
-							break;
-						}
-					}
-				}
-
-				update_option('arlo_filter_settings', $new_settings_array);
-
-				break;
+			break;
 		}	
 	}
 
