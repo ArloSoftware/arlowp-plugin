@@ -266,8 +266,8 @@ class Templates {
         \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$event_template_atts);
         \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$event_template_atts, true);
 
-        \Arlo\Utilities::set_base_filter($template_name, 'template', $filter_settings, $atts, self::$event_template_atts);
-        \Arlo\Utilities::set_base_filter($template_name, 'template', $filter_settings, $atts, self::$event_template_atts, true);
+        \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$event_template_atts);
+        \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$event_template_atts, true);
 
 	    return $content;
     }
@@ -286,8 +286,8 @@ class Templates {
         \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$event_template_atts);
         \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$event_template_atts, true);
 
-        \Arlo\Utilities::set_base_filter($template_name, 'template', $filter_settings, $atts, self::$event_template_atts);
-        \Arlo\Utilities::set_base_filter($template_name, 'template', $filter_settings, $atts, self::$event_template_atts, true);
+        \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$event_template_atts);
+        \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$event_template_atts, true);
 
 
         return $content;

@@ -221,8 +221,8 @@ class OnlineActivities {
         \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$oa_list_atts);
         \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$oa_list_atts, true);
 
-        \Arlo\Utilities::set_base_filter($template_name, 'template', $filter_settings, $atts, self::$oa_list_atts);
-        \Arlo\Utilities::set_base_filter($template_name, 'template', $filter_settings, $atts, self::$oa_list_atts, true);
+        \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$oa_list_atts);
+        \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$oa_list_atts, true);
 
         return do_shortcode($content);        
     }
