@@ -525,47 +525,47 @@ class VersionHandler {
 			case '3.6':
 				//update filter settings, if there is			
 				$filter_settings = get_option('arlo_filter_settings', []);
-				$import_id = get_option('arlo_import_id','');
-
 				$is_notice_required = false;
-				$delivery_filter = null;
-				$showonly_filters = null;
-				$hidden_filters = null;
 
+				//create new generic section
 				foreach ($filter_settings as $page => $filter_options) {
-					if ($page == 'showonlyfilters') {
-						$showonly_filters = $filter_options;
-						continue;
+					if (!in_array($page, ['showonlyfilters', 'hiddenfilters', 'generic'])) {
+						foreach ($filter_options as $group => $filters) {
+							//copy first delivery filters
+							if ($group == 'delivery' && empty($filter_settings['generic'])) {
+								$filter_settings['generic'] = array('delivery' => $filters);
+								break;
+							}
+						}
 					}
-					if ($page == 'hiddenfilters') {
-						$hidden_filters = $filter_options;
-						continue;
-					}
-					foreach ($filter_options as $group => $filters) {
-						// if delivery - first only
-						if ($group == 'delivery' && empty($delivery_filter)) {
-							$delivery_filter = $filters;
-						} else {
-							$is_notice_required = true;
+				}
+
+				//remove obsolete filter settings
+				foreach ($filter_settings as $page => $filter_options) {
+					if (!in_array($page, ['showonlyfilters', 'hiddenfilters', 'generic'])) {
+						//remove the whole page
+						unset($filter_settings[$page]);
+						$is_notice_required = true;
+					} else {
+						foreach ($filter_options as $group => $filters) {
+							//remove all non-delivery groups
+							if ($group != 'delivery') {
+								unset($filter_settings[$page][$group]);
+							}
 						}
 					}
 				}
 
 				if ($is_notice_required) {
-					// TODO
+					$message = [
+						'<p>'. __('The Filters tab has been removed. All per-page filter settings are now lost. They can still be configured from the Arlo management platform instead. Only the delivery filter is configurable now and it is common to all pages. This can be done in the General Settings.', 'arlo-for-wordpress' ) . '</p>'
+					];
+					if (!$this->message_handler->set_message('import_error', __('Filter settings deleted', 'arlo-for-wordpress' ), implode('', $message), true)) {
+						Logger::log("Couldn't create Arlo 3.6 filters settings lost notice message");
+					}
 				}
 
-				$new_settings = array();
-				if (!empty($delivery_filter)) {
-					$new_settings['delivery'] = $delivery_filter;
-				}
-				if (!empty($showonly_filters)) {
-					$new_settings['showonlyfilters'] = $showonly_filters;
-				}
-				if (!empty($hidden_filters)) {
-					$new_settings['hiddenfilters'] = $hidden_filters;
-				}
-				update_option('arlo_filter_settings', $new_settings);
+				update_option('arlo_filter_settings', $filter_settings);
 			break;
 		}	
 	}

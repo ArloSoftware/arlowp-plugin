@@ -528,7 +528,7 @@ class OnlineActivities {
 
             $items = Filters::get_filter_options($filter_key, $import_id);
             
-            $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'),$filter_group,$att);
+            $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'), 'generic', $att);
         endforeach;
 
         if (!empty($filter_html)) {

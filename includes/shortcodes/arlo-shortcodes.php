@@ -145,7 +145,7 @@ class Shortcodes {
 		return self::create_filter('region', $regions, null, null, \Arlo_For_Wordpress::get_region_parameter());
 	}
 
-	public static function create_filter($type, $items, $label=null, $group=null, $att_default=null) {
+	public static function create_filter($type, $items, $label, $group, $att_default=null) {
 		if (count($items) == 0 || !is_array($items)) {
 			return '';
 		}
@@ -179,11 +179,12 @@ class Shortcodes {
 				$item['id'] = $item['value'];
 			}
 
-			if (!empty($filter_settings[$type])) {
-				$option_label = $filter_settings[$type][$item['id']];
-				if (empty($option_label)) {
-					$option_label = $filter_settings[$type][$item['string']];
-				}
+			$option_label = '';
+			if (!empty($filter_settings[$group][$type][$item['id']])) {
+				$option_label = $filter_settings[$group][$type][$item['id']];
+			}
+			else if (!empty($filter_settings[$group][$type][$item['string']])) {
+				$option_label = $filter_settings[$group][$type][$item['string']];
 			}
 
 			$is_hidden = false;
