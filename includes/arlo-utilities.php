@@ -55,7 +55,7 @@ class Utilities {
     }
 
     public static function process_att($new_atts_array, $callback, $att_name = '', $atts = [], $value = null) {
-        if (!empty($callback))
+        if (!empty($callback) && is_callable($callback))
             $value = call_user_func($callback, $att_name, $atts);
         
 		if (!is_null($value) && (!empty($value) || is_numeric($value))) {
@@ -139,7 +139,7 @@ class Utilities {
         return [];
     }
 
-    public static function set_base_filter($template_name, $filter_name = '', $filter_settings = [], $atts = [], &$stored_atts = [], $is_hidden = false ) {
+    public static function set_base_filter($template_name, $filter_name = '', $filter_settings = [], $atts = [], &$stored_atts = [], $callback = '', $callback_parameters = [], $is_hidden = false ) {
         $parameter = \Arlo\Utilities::clean_string_url_parameter('arlo-' . $filter_name);
         $filter_setting_section = ($is_hidden ? 'hiddenfilters' : 'showonlyfilters');
         $filter_setting_name = $filter_name;
@@ -148,7 +148,14 @@ class Utilities {
         if (is_array($atts) && count($atts) && !empty($atts[$filter_name])) {
             $GLOBALS['arlo_filter_base'][$filter_name] = \Arlo\Utilities::convert_string_array_to_int_array($atts[$filter_name]);
         } else if (isset($filter_settings[$filter_setting_section]) && isset($filter_settings[$filter_setting_section][$template_name]) && isset($filter_settings[$filter_setting_section][$template_name][$filter_setting_name])) {
-            $GLOBALS['arlo_filter_base'][$filter_name] = array_values($filter_settings[$filter_setting_section][$template_name][$filter_setting_name]);
+            $value = array_values($filter_settings[$filter_setting_section][$template_name][$filter_setting_name]);
+
+            if (!empty($callback) && is_callable($callback)) {
+                $value = call_user_func_array($callback, array_merge([$value], $callback_parameters));
+            }
+
+            $GLOBALS['arlo_filter_base'][$filter_name] = $value;
+            
             if (empty($parameter) || $is_hidden) {
                 $stored_atts[$filter_name] = $GLOBALS['arlo_filter_base'][$filter_name];
             }
