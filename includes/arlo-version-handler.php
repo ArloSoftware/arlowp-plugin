@@ -35,7 +35,7 @@ class VersionHandler {
 
 	public function run_update($from_version) {
 		$this->update(self::VERSION, $from_version);
-		$this->set_installed_version();
+		//$this->set_installed_version();
 	}
 
 	private function update($new_version, $old_version) {
@@ -527,8 +527,32 @@ class VersionHandler {
 				$filter_settings = get_option('arlo_filter_settings', []);
 				$import_id = get_option('arlo_import_id','');
 
-				error_log("fake 3.6 upgrade");
+				$is_notice_required = false;
+				$delivery_filter = null;
 
+				foreach ($filter_settings as $type => $filters) {
+					foreach ($filters as $group => $content) {
+						// if delivery - first only
+						if ($group == 'delivery' && empty($delivery_filter)) {
+							$delivery_filter = array('delivery' => $content);
+						} else {
+							$is_notice_required = true;
+						}
+					}
+				}
+
+				if ($is_notice_required) {
+					// TODO
+				}
+
+				error_log("Current:");
+				$all = print_r($filter_settings, true);
+				error_log($all);
+				error_log("New:");
+				$all = print_r($delivery_filter, true);
+				error_log($all);
+
+				//update_option('arlo_filter_settings', $delivery_filter);
 			break;
 		}	
 	}
