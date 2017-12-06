@@ -17,7 +17,7 @@
 
             <div class="arlo-event-details">
                 <div class="arlo-event-info">
-                   <div class="arlo-event-time"><i class="icons8-clock"></i>[arlo_event_start_date format="D g:i A"] - [arlo_event_end_date format="D g:i A"]</div>
+                   <div class="arlo-event-time"><i class="icons8-clock"></i>[arlo_event_duration_description format="D g:i A"]</div>
 
                     [arlo_event_location wrap='<div class="arlo-event-location"><i class="icons8-marker"></i>%s</div>']
                     [arlo_event_presenters wrap='<div class="arlo-event-presenters"><i class="icons8-gender-neutral-user"></i>%s</div>']
@@ -29,7 +29,6 @@
                             [arlo_event_location]
                         </div>
                     [/arlo_event_session_list_item]
-                    [arlo_event_session_description wrap='<div class="arlo-event-session-description">%s</div>']
                     [arlo_event_offers wrap='<div>%s</div>']
                 </div>
                 <div class="arlo-registration">

@@ -10,9 +10,8 @@
 				[arlo_event_start_date format="%a %d %b" wrap='<div class="arlo-date">%s</div>']
 			</div>
 			<div class="arlo-event-details">
-				<span class="arlo-event-time">[arlo_event_duration], [arlo_event_start_date format="%I:%M %p"] - [arlo_event_end_date format="%I:%M %p"]</span>
+				<span class="arlo-event-time">[arlo_event_duration_description format="%I:%M %p"]</span>
 				[arlo_event_location label="" wrap="<div class='arlo-event-location'>%s</div>"]
-				[arlo_event_session_description wrap='<div class="arlo-event-session-description">%s</div>']
 				[arlo_event_presenters label="Presenters: " wrap='<div class="arlo-event-presenters">%s</div>']
 				[arlo_event_provider label="Provider: " wrap='<div class="arlo-event-provider">Provided by %s</div>']
 				[arlo_event_template_advertised_duration label="Duration: " wrap='<div class="arlo-event-duration">%s</div>']
