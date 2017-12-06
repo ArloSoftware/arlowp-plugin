@@ -80,8 +80,8 @@ class Tags {
 	}
 
 	public static function look_up_tags_by_tag($tags, $import_id) {
-		if (!isset($tags)) return [];
-
+		if (!isset($tags) || empty($tags)) return [];
+		
 		$condition = [
 			'tag' => $tags
 		];
@@ -96,7 +96,7 @@ class Tags {
 	}
 
 	public static function get_tag_ids_by_tag($tags, $import_id) {
-		if (!isset($tags)) return [];
+		if (!isset($tags) || empty($tags)) return [];
 
 		$tags = self::look_up_tags_by_tag($tags, $import_id);
 

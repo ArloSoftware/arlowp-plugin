@@ -217,42 +217,12 @@ class OnlineActivities {
         $content = $templates[$template_name]['html'];
 
         self::$oa_list_atts = self::get_oa_atts($atts, $import_id);
-        $category_parameter = \Arlo\Utilities::clean_string_url_parameter('arlo-category');
-        $templatetag_parameter = \Arlo\Utilities::clean_string_url_parameter('arlo-templatetag');
-        
-        //category
-        if (!empty($atts["category"])) {
-            $GLOBALS['arlo_filter_base']['category'] = \Arlo\Utilities::convert_string_array_to_int_array($atts["category"]);
-        } else if (isset($filter_settings['showonlyfilters']) && isset($filter_settings['showonlyfilters'][$template_name]) && isset($filter_settings['showonlyfilters'][$template_name]['category'])) {
-            $GLOBALS['arlo_filter_base']['category'] = array_values($filter_settings['showonlyfilters'][$template_name]['category']);
-            if (empty($category_parameter))
-                self::$oa_list_atts['category'] = implode(',',$GLOBALS['arlo_filter_base']['category']);
-        }
 
-        //categoryhidden
-        if (!empty($atts["categoryhidden"])) {
-            $GLOBALS['arlo_filter_base']['categoryhidden'] = \Arlo\Utilities::convert_string_array_to_int_array($atts["categoryhidden"]);
-        } else if (isset($filter_settings['hiddenfilters']) && isset($filter_settings['hiddenfilters'][$template_name]) && isset($filter_settings['hiddenfilters'][$template_name]['category'])) {
-            $GLOBALS['arlo_filter_base']['categoryhidden'] = array_values($filter_settings['hiddenfilters'][$template_name]['category']);
-            self::$oa_list_atts['categoryhidden'] = implode(',',$GLOBALS['arlo_filter_base']['categoryhidden']);
-        }
+        \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$oa_list_atts);
+        \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$oa_list_atts, true);
 
-        //templatetag
-        if (!empty($atts["templatetag"])) {
-            $GLOBALS['arlo_filter_base']['templatetag'] = \Arlo\Entities\Tags::get_tag_ids_by_tag($atts["templatetag"], $import_id);
-        } else if (isset($filter_settings['showonlyfilters']) && isset($filter_settings['showonlyfilters'][$template_name]) && isset($filter_settings['showonlyfilters'][$template_name]['templatetag'])) {
-            $GLOBALS['arlo_filter_base']['templatetag'] = \Arlo\Entities\Tags::get_tag_ids_by_tag($filter_settings['showonlyfilters'][$template_name]['templatetag'], $import_id);
-            if (empty($templatetag_parameter))
-                self::$oa_list_atts['templatetag'] = $GLOBALS['arlo_filter_base']['templatetag'];
-        }
-
-        //templatetag hidden
-        if (!empty($atts["templatetaghidden"])) {
-            $GLOBALS['arlo_filter_base']['templatetaghidden'] = \Arlo\Entities\Tags::get_tag_ids_by_tag($atts["templatetaghidden"], $import_id);
-        } else if (isset($filter_settings['hiddenfilters']) && isset($filter_settings['hiddenfilters'][$template_name]) && isset($filter_settings['hiddenfilters'][$template_name]['templatetag'])) {
-            $GLOBALS['arlo_filter_base']['templatetaghidden'] = \Arlo\Entities\Tags::get_tag_ids_by_tag($filter_settings['hiddenfilters'][$template_name]['templatetag'], $import_id);
-            self::$oa_list_atts['templatetaghidden'] = $GLOBALS['arlo_filter_base']['templatetaghidden'];
-        }
+        \Arlo\Utilities::set_base_filter($template_name, 'template', $filter_settings, $atts, self::$oa_list_atts);
+        \Arlo\Utilities::set_base_filter($template_name, 'template', $filter_settings, $atts, self::$oa_list_atts, true);
 
         return do_shortcode($content);        
     }

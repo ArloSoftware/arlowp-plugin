@@ -122,16 +122,36 @@ class Utilities {
     }
 
     public static function convert_string_array_to_int_array($string_array) {
+        if (is_string($string_array)) {
+            $string_array = explode(',', $string_array);
+        }
+
         if (!empty($string_array)) {
             return array_filter(
                 array_map(function($int) {
                     return intval($int);
-                }, explode(',', $string_array)), 
+                }, $string_array), 
                 function($int) {
                     return $int > 0;
                 });
         }
 
         return [];
+    }
+
+    public static function set_base_filter($template_name, $filter_name = '', $filter_settings = [], $atts = [], &$stored_atts = [], $is_hidden = false ) {
+        $parameter = \Arlo\Utilities::clean_string_url_parameter('arlo-' . $filter_name);
+        $filter_setting_section = ($is_hidden ? 'hiddenfilters' : 'showonlyfilters');
+        $filter_setting_name = $filter_name;
+        $filter_name = ($is_hidden ? $filter_name . 'hidden' : $filter_setting_name);
+
+        if (is_array($atts) && count($atts) && !empty($atts[$filter_name])) {
+            $GLOBALS['arlo_filter_base'][$filter_name] = \Arlo\Utilities::convert_string_array_to_int_array($atts[$filter_name]);
+        } else if (isset($filter_settings[$filter_setting_section]) && isset($filter_settings[$filter_setting_section][$template_name]) && isset($filter_settings[$filter_setting_section][$template_name][$filter_setting_name])) {
+            $GLOBALS['arlo_filter_base'][$filter_name] = array_values($filter_settings[$filter_setting_section][$template_name][$filter_setting_name]);
+            if (empty($parameter) || $is_hidden) {
+                $stored_atts[$filter_name] = $GLOBALS['arlo_filter_base'][$filter_name];
+            }
+        }
     }
 }
