@@ -51,6 +51,8 @@ class UpcomingEvents {
         \Arlo\Utilities::set_base_filter($template_name, 'eventtag', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id]);
         \Arlo\Utilities::set_base_filter($template_name, 'eventtag', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id], true);
 
+        \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$upcoming_list_item_atts);
+        \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$upcoming_list_item_atts, null, null, true);
 
         return do_shortcode($content);        
     }
@@ -66,6 +68,7 @@ class UpcomingEvents {
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'categoryhidden', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'search', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_int', 'delivery', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_int', 'deliveryhidden', $atts);        
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_int', 'templateid', $atts);       
         $new_atts = \Arlo\Utilities::process_att($new_atts, null, 'templatetag', $atts, $templatetag);
         $new_atts = \Arlo\Utilities::process_att($new_atts, null, 'eventtag', $atts, $eventtag);
@@ -278,6 +281,7 @@ class UpcomingEvents {
         $arlo_category = !empty($atts['category']) ? $atts['category'] : null;
         $arlo_categoryhidden = !empty($atts['categoryhidden']) ? $atts['categoryhidden'] : null;
         $arlo_delivery = isset($atts['delivery']) ? $atts['delivery'] : null;
+        $arlo_deliveryhidden = isset($atts['deliveryhidden']) ? $atts['deliveryhidden'] : null;
         $arlo_month = !empty($atts['month']) ? $atts['month'] : null;
         $arlo_eventtag = !empty($atts['eventtag']) ? $atts['eventtag'] : null;
         $arlo_eventtaghidden = !empty($atts['eventtaghidden']) ? $atts['eventtaghidden'] : null;
@@ -338,9 +342,22 @@ class UpcomingEvents {
 
         endif;
 
-        if(isset($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) :
-            $where .= ' AND e.e_isonline = %d';
-            $parameters[] = intval($arlo_delivery);
+        if(isset($arlo_delivery) || isset($arlo_deliveryhidden)) :
+            if (!empty($arlo_delivery)) {
+                if (!is_array($arlo_delivery)) 
+                    $arlo_delivery = [$arlo_delivery];
+                
+                $where .= " AND e.e_isonline IN (" . implode(',', array_map(function() {return "%d";}, $arlo_delivery)) . ")";                
+                $parameters = array_merge($parameters, $arlo_delivery);    
+            }
+
+            if (!empty($arlo_deliveryhidden)) {    
+                if (!is_array($arlo_deliveryhidden)) 
+                    $arlo_deliveryhidden = [$arlo_deliveryhidden];        
+
+                $where .= " AND e.e_isonline NOT IN (" . implode(',', array_map(function() {return "%d";}, $arlo_deliveryhidden)) . ")";                
+                $parameters = array_merge($parameters, $arlo_deliveryhidden);    
+            }
         endif;  
             
         if(!empty($arlo_state)) :
@@ -358,8 +375,6 @@ class UpcomingEvents {
             $parameters[] = $venues;
             $parameters[] = $venues;
         endif;
-
-        var_dump($arlo_eventtag);
 
         if(!empty($arlo_eventtag) || !empty($arlo_eventtaghidden)) :
             $join .= " LEFT JOIN $t7 etag ON etag.e_id = e.e_id AND etag.import_id = e.import_id";

@@ -253,31 +253,24 @@ class Templates {
     }
 
     private static function shortcode_event_template_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        if (get_option('arlo_plugin_disabled', '0') == '1') return;
         
-        $filter_settings = get_option('page_filter_settings', []);
-
         $template_name = Shortcodes::get_template_name($shortcode_name,'event_template_list','events');
-        $templates = arlo_get_option('templates');
-        $content = $templates[$template_name]['html'];
 
-        self::$event_template_atts = self::get_event_template_atts($atts, $import_id);
-
-        \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$event_template_atts);
-        \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$event_template_atts, null, null, true);
-
-        \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id]);
-        \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id], true);
-
-	    return $content;
+	    return self::template_list_initializer($content, $atts, $shortcode_name, $import_id, $template_name);
     }
 
     private static function shortcode_schedule($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+
+        $template_name = Shortcodes::get_template_name($shortcode_name,'schedule','schedule');
+
+        return self::template_list_initializer($content, $atts, $shortcode_name, $import_id, $template_name);
+    }
+
+    private static function template_list_initializer($content = '', $atts = [], $shortcode_name = '', $import_id = '', $template_name) {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
 
         $filter_settings = get_option('page_filter_settings', []);        
-
-        $template_name = Shortcodes::get_template_name($shortcode_name,'schedule','schedule');
+        
         $templates = arlo_get_option('templates');
         $content = $templates[$template_name]['html'];
 
@@ -289,7 +282,10 @@ class Templates {
         \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id]);
         \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id], true);
 
-        return $content;
+        \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$event_template_atts);
+        \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$event_template_atts, null, null, true);
+        
+        return $content;        
     }
 
     private static function shortcode_event_template_search_list ($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -314,6 +310,7 @@ class Templates {
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'categoryhidden', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'search', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_int', 'delivery', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_int', 'deliveryhidden', $atts);        
         $new_atts = \Arlo\Utilities::process_att($new_atts, null, 'templatetag', $atts, $templatetag);        
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'state', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo_For_Wordpress::get_region_parameter', 'region');
@@ -722,12 +719,21 @@ class Templates {
         $arlo_category = !empty($atts['category']) ? $atts['category'] : null;
         $arlo_categoryhidden = !empty($atts['categoryhidden']) ? $atts['categoryhidden'] : null;        
         $arlo_delivery = isset($atts['delivery']) ? $atts['delivery'] : null;
+        $arlo_deliveryhidden = isset($atts['deliveryhidden']) ? $atts['deliveryhidden'] : null;        
         $arlo_templatetag = !empty($atts['templatetag']) ? $atts['templatetag'] : null;
         $arlo_templatetaghidden = isset($atts['templatetaghidden']) ? $atts['templatetaghidden'] : null;        
         $arlo_search = !empty($atts['search']) ? $atts['search'] : null;
         $arlo_region = !empty($atts['region']) ? $atts['region'] : null;
 
-        if(!empty($arlo_location) || (isset($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) || !empty($arlo_state) ) :
+        if (isset($arlo_delivery) && !is_array($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) {
+            $arlo_delivery = [$arlo_delivery];
+        }
+
+        if (isset($arlo_deliveryhidden) && !is_array($arlo_deliveryhidden) && strlen($arlo_deliveryhidden) && is_numeric($arlo_deliveryhidden)) {
+            $arlo_deliveryhidden = [$arlo_deliveryhidden];
+        }
+
+        if(!empty($arlo_location) || isset($arlo_delivery) || isset($arlo_deliveryhidden) || !empty($arlo_state) ) :
 
             $join .= " LEFT JOIN $t5 e ON e.et_arlo_id = et.et_arlo_id AND e.import_id = et.import_id";
             
@@ -735,23 +741,44 @@ class Templates {
                 $where .= " AND e.e_locationname = %s ";
                 $parameters[] = $arlo_location;
             endif;	
-            
-            if(isset($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) :
-                switch ($arlo_delivery) {
-                    case 1:
-                    case 2: 
-                        $where .= " AND e.e_isonline = %d ";
-                        $parameters[] = $arlo_delivery;    
-                        $where .= " AND e.e_parent_arlo_id = 0 ";
-                    break;
-                    case 99: 
-                        $join .= " LEFT JOIN $t8 oa ON oa.oat_arlo_id = et.et_arlo_id AND oa.import_id = et.import_id";
-                        $where .= ' AND oa_id IS NOT NULL ';
-                    break;
+
+            if(isset($arlo_delivery) || isset($arlo_deliveryhidden)) {
+                if (!empty($arlo_delivery)) {
+                    foreach ($arlo_delivery as $delivery) {
+                        switch ($delivery) {
+                            case 0:
+                            case 1: 
+                                $where .= " AND e.e_isonline = %d ";
+                                $parameters[] = $delivery;    
+                                $where .= " AND e.e_parent_arlo_id = 0 ";
+                            break;
+                            case 99: 
+                                $join .= " LEFT JOIN $t8 oa ON oa.oat_arlo_id = et.et_arlo_id AND oa.import_id = et.import_id";
+                                $where .= ' AND oa_id IS NOT NULL ';
+                            break;        
+                        } 
+                    }
                 }
-            else :
+    
+                if (!empty($arlo_deliveryhidden)) {            
+                    $join .= " LEFT JOIN $t8 oa ON oa.oat_arlo_id = et.et_arlo_id AND oa.import_id = et.import_id";
+                    foreach ($arlo_deliveryhidden as $delivery) {
+                        switch ($delivery) {
+                            case 0:
+                            case 1: 
+                                $where .= " AND ( (e.e_parent_arlo_id = 0 AND e.e_isonline != %d ) OR oa_id IS NOT NULL )";
+                                $parameters[] = $delivery;
+                            break;
+                            case 99: 
+                                $where .= " AND e.e_parent_arlo_id = 0 ";
+                                $where .= ' AND oa_id IS NULL ';
+                            break;        
+                        } 
+                    }
+                }
+            } else {
                 $where .= " AND e.e_parent_arlo_id = 0 ";
-            endif;	
+            }
             
             if (!empty($arlo_region)) {
                 $where .= ' AND e.e_region = %s';
