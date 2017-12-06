@@ -285,6 +285,9 @@ class Templates {
         \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$event_template_atts);
         \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$event_template_atts, null, null, true);
         
+        \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$event_template_atts);
+        \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$event_template_atts, null, null, true);
+
         return $content;        
     }
 
@@ -715,6 +718,7 @@ class Templates {
         $field_list = "";
 
         $arlo_location = !empty($atts['location']) ? $atts['location'] : null;
+        $arlo_locationhidden = !empty($atts['locationhidden']) ? $atts['locationhidden'] : null;
         $arlo_state = !empty($atts['state']) ? $atts['state'] : null;
         $arlo_category = !empty($atts['category']) ? $atts['category'] : null;
         $arlo_categoryhidden = !empty($atts['categoryhidden']) ? $atts['categoryhidden'] : null;        
@@ -733,14 +737,27 @@ class Templates {
             $arlo_deliveryhidden = [$arlo_deliveryhidden];
         }
 
-        if(!empty($arlo_location) || isset($arlo_delivery) || isset($arlo_deliveryhidden) || !empty($arlo_state) ) :
+        if (!empty($arlo_location) && !is_array($arlo_location)) {
+            $arlo_location = [$arlo_location];
+        }
+
+        if (!empty($arlo_locationhidden) && !is_array($arlo_locationhidden)) {
+            $arlo_locationhidden = [$arlo_locationhidden];
+        }        
+
+        if(isset($arlo_location) || isset($arlo_locationhidden) || isset($arlo_delivery) || isset($arlo_deliveryhidden) || !empty($arlo_state) ) :
 
             $join .= " LEFT JOIN $t5 e ON e.et_arlo_id = et.et_arlo_id AND e.import_id = et.import_id";
             
-            if(!empty($arlo_location)) :
-                $where .= " AND e.e_locationname = %s ";
-                $parameters[] = $arlo_location;
-            endif;	
+            if (!empty($arlo_location)) {
+                $where .= " AND e.e_locationname IN (" . implode(',', array_map(function() {return "%s";}, $arlo_location)) . ")";                
+                $parameters = array_merge($parameters, $arlo_location);    
+            }
+
+            if (!empty($arlo_locationhidden)) {    
+                $where .= " AND e.e_locationname NOT IN (" . implode(',', array_map(function() {return "%s";}, $arlo_locationhidden)) . ")";                
+                $parameters = array_merge($parameters, $arlo_locationhidden);    
+            }
 
             if(isset($arlo_delivery) || isset($arlo_deliveryhidden)) {
                 if (!empty($arlo_delivery)) {

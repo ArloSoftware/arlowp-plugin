@@ -518,7 +518,7 @@ class Arlo_For_Wordpress_Settings {
 		
 		$selected = $value == htmlentities($selected_value) ? ' selected="selected" ' : '';
 
-		$item = "<option value='" . $value . "' " . $selected . ">" . $item["string"] . "</option>";
+		$item = "<option value='" . esc_attr($value) . "' " . $selected . ">" . esc_html($item["string"]) . "</option>";
 	}
 
 	function arlo_checkbox_callback($args) {
@@ -799,7 +799,7 @@ class Arlo_For_Wordpress_Settings {
 				
 			foreach ($actions as $value => $text) {
 				$selected = ($value == $selected_action ? 'selected="selected"' : '');
-				$option_html .= sprintf('<option value="%s" %s>%s</option>', $value, $selected, $text);
+				$option_html .= sprintf('<option value="%s" %s>%s</option>', esc_attr($value), $selected, esc_html($text));
 			}
 						
 			$option_html .= '

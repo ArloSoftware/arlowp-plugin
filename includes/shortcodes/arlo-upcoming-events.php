@@ -54,6 +54,9 @@ class UpcomingEvents {
         \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$upcoming_list_item_atts);
         \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$upcoming_list_item_atts, null, null, true);
 
+        \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$upcoming_list_item_atts);
+        \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$upcoming_list_item_atts, null, null, true);
+
         return do_shortcode($content);        
     }
 
@@ -64,6 +67,7 @@ class UpcomingEvents {
         $eventtag = \Arlo\Entities\Tags::get_tag_ids_by_tag(\Arlo\Utilities::get_att_string('eventtag', $atts), $import_id);
 
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'location', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'locationhidden', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'category', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'categoryhidden', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'search', $atts);
@@ -277,6 +281,7 @@ class UpcomingEvents {
         $parameters[] = $import_id;
 
         $arlo_location = !empty($atts['location']) ? $atts['location'] : null;
+        $arlo_locationhidden = !empty($atts['locationhidden']) ? $atts['locationhidden'] : null;
         $arlo_state = !empty($atts['state']) ? $atts['state'] : null;
         $arlo_category = !empty($atts['category']) ? $atts['category'] : null;
         $arlo_categoryhidden = !empty($atts['categoryhidden']) ? $atts['categoryhidden'] : null;
@@ -298,10 +303,22 @@ class UpcomingEvents {
             $parameters[] = $dates[1];
         endif;
 
-        if(!empty($arlo_location)) :
-            $where .= ' AND e.e_locationname = %s';
-            $parameters[] = $arlo_location;
-        endif;
+        if(isset($arlo_location) || isset($arlo_locationhidden)) :
+            if (!empty($arlo_location)) {
+                if (!is_array($arlo_location)) 
+                    $arlo_location = [$arlo_location];
+                
+                $where .= " AND e.e_locationname IN (" . implode(',', array_map(function() {return "%s";}, $arlo_location)) . ")";                
+                $parameters = array_merge($parameters, $arlo_location);    
+            }
+
+            if (!empty($arlo_locationhidden)) {    
+                if (!is_array($arlo_locationhidden)) 
+                    $arlo_locationhidden = [$arlo_locationhidden];        
+                $where .= " AND e.e_locationname NOT IN (" . implode(',', array_map(function() {return "%s";}, $arlo_locationhidden)) . ")";                
+                $parameters = array_merge($parameters, $arlo_locationhidden);    
+            }
+        endif;         
 
         if(!empty($arlo_templateid)) :
             $where .= ' AND e.et_arlo_id = %d';

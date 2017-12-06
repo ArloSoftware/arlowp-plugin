@@ -609,13 +609,13 @@ class Arlo_For_Wordpress_Admin {
 								$filters['hiddenfilters'][$filter_group_name][$filter_name] = array();
 							}
 
-							array_push($filters['hiddenfilters'][$filter_group_name][$filter_name], $old_value);
+							array_push($filters['hiddenfilters'][$filter_group_name][$filter_name], htmlspecialchars_decode($old_value, ENT_QUOTES));
 						} else if (isset($filter_setting["filteraction"]) && $filter_setting["filteraction"] == "showonly"  && isset($old_value) && $old_value != '') {
 							if (!isset($filters['showonlyfilters'][$filter_group_name][$filter_name])) {
 								$filters['showonlyfilters'][$filter_group_name][$filter_name] = array();
 							}
 
-							array_push($filters['showonlyfilters'][$filter_group_name][$filter_name], $old_value);
+							array_push($filters['showonlyfilters'][$filter_group_name][$filter_name], htmlspecialchars_decode($old_value, ENT_QUOTES));
 						}
 						else {
 							if (!empty($filters['hiddenfilters'][$filter_group_name][$filter_name])) {
