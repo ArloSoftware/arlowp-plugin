@@ -5,7 +5,7 @@ namespace Arlo;
 use Arlo\Utilities;
 
 class VersionHandler {
-	const VERSION = '3.5';
+	const VERSION = '3.6';
 
 	private $dbl;
 	private $message_handler;
@@ -35,7 +35,7 @@ class VersionHandler {
 
 	public function run_update($from_version) {
 		$this->update(self::VERSION, $from_version);
-		//$this->set_installed_version();
+		$this->set_installed_version();
 	}
 
 	private function update($new_version, $old_version) {
@@ -529,12 +529,22 @@ class VersionHandler {
 
 				$is_notice_required = false;
 				$delivery_filter = null;
+				$showonly_filters = null;
+				$hidden_filters = null;
 
-				foreach ($filter_settings as $type => $filters) {
-					foreach ($filters as $group => $content) {
+				foreach ($filter_settings as $page => $filter_options) {
+					if ($page == 'showonlyfilters') {
+						$showonly_filters = $filter_options;
+						continue;
+					}
+					if ($page == 'hiddenfilters') {
+						$hidden_filters = $filter_options;
+						continue;
+					}
+					foreach ($filter_options as $group => $filters) {
 						// if delivery - first only
 						if ($group == 'delivery' && empty($delivery_filter)) {
-							$delivery_filter = array('delivery' => $content);
+							$delivery_filter = $filters;
 						} else {
 							$is_notice_required = true;
 						}
@@ -545,14 +555,17 @@ class VersionHandler {
 					// TODO
 				}
 
-				error_log("Current:");
-				$all = print_r($filter_settings, true);
-				error_log($all);
-				error_log("New:");
-				$all = print_r($delivery_filter, true);
-				error_log($all);
-
-				//update_option('arlo_filter_settings', $delivery_filter);
+				$new_settings = array();
+				if (!empty($delivery_filter)) {
+					$new_settings['delivery'] = $delivery_filter;
+				}
+				if (!empty($showonly_filters)) {
+					$new_settings['showonlyfilters'] = $showonly_filters;
+				}
+				if (!empty($hidden_filters)) {
+					$new_settings['hiddenfilters'] = $hidden_filters;
+				}
+				update_option('arlo_filter_settings', $new_settings);
 			break;
 		}	
 	}

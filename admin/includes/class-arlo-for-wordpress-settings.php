@@ -720,11 +720,11 @@ class Arlo_For_Wordpress_Settings {
 								
 									<ul class="arlo-available-filters" style="display: ' . ($expand_filter ? 'block' : 'none') . '">
 									';
+
+									if (is_array($filter_settings)) {
 					
-				if (is_array($filter_settings)) {
-					
-					if (!empty($filter_settings[$filter_group][$filter_key]) && count($filter_settings[$filter_group][$filter_key])) {
-						foreach($filter_settings[$filter_group][$filter_key] as $old_value => $new_value) {
+					if (!empty($filter_settings[$filter_key]) && count($filter_settings[$filter_key])) {
+						foreach($filter_settings[$filter_key] as $old_value => $new_value) {
 							/* rename entries */								
 							$filter_rename_setting_options = $filter_options;
 							array_walk($filter_rename_setting_options, 'self::get_select_filter_options', ['selected_value' => $old_value, 'value_field' => 'id']);
