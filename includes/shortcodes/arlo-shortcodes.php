@@ -444,7 +444,7 @@ class Shortcodes {
         );
 	}
 
-	public static function advertised_offers($id, $id_field, $import_id, $is_tax_excempt = false) {
+	public static function advertised_offers($id, $id_field, $import_id, $is_tax_exempt = false) {
 		global $wpdb;
                
         $regions = get_option('arlo_regions');	
@@ -459,7 +459,7 @@ class Shortcodes {
 		$offers = '<ul class="arlo-list arlo-event-offers">';
 		
         $settings = get_option('arlo_settings');  
-        $price_setting = (isset($settings['price_setting']) && $is_tax_excempt != true ? esc_attr($settings['price_setting']) : ARLO_PLUGIN_PREFIX . '-exclgst');
+        $price_setting = (isset($settings['price_setting']) && $is_tax_exempt != true ? esc_attr($settings['price_setting']) : ARLO_PLUGIN_PREFIX . '-exclgst');
 		$free_text = (isset($settings['free_text']) ? esc_attr($settings['free_text']) : __('Free', 'arlo-for-wordpress'));
 		
         foreach($offers_array as $offer) {
@@ -485,8 +485,8 @@ class Shortcodes {
             $offers .= (!is_null($o_label) || $o_label != '') ? $o_label.' ':'';
             if($amount > 0) {
                 $offers .= '<span class="amount">' . esc_html($famount) . '</span> ';
-                // only include the excl. tax if the offer is not replaced and not tax excempt
-                $offers .= $replaced ? '' : (!$is_tax_excempt ? '<span class="arlo-price-tax">' . esc_html(($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode) : sprintf(__('incl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode))) . '</span>'  : '');
+                // only include the excl. tax if the offer is not replaced and not tax exempt
+                $offers .= $replaced ? '' : (!$is_tax_exempt ? '<span class="arlo-price-tax">' . esc_html(($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode) : sprintf(__('incl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode))) . '</span>'  : '');
             } else {
                 $offers .= '<span class="amount free">' . esc_html($free_text) . '</span> ';
             }
@@ -500,7 +500,7 @@ class Shortcodes {
                 $offers .= (!is_null($replacement_label) || $replacement_label != '') ? esc_html($replacement_label) . ' ' : '';
 				$offers .= '<span class="amount">' . ($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $replacement_formatted_amount_taxexclusive : $replacement_formatted_amount_taxinclusive) . '</span>';
 				
-				if (!$is_tax_excempt) {
+				if (!$is_tax_exempt) {
 					$offers.= '<span class="arlo-price-tax">' . esc_html(($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode) : sprintf(__('incl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode))) . '</span>';
 				}
 

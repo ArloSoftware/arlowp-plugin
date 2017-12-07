@@ -212,7 +212,7 @@ class SchemaManager {
 			e_isonline tinyint(1) NOT NULL DEFAULT FALSE,
 			e_parent_arlo_id int(11) NOT NULL,
 			e_region varchar(5) NOT NULL,	
-			e_is_taxexcempt tinyint(1) NOT NULL DEFAULT FALSE,
+			e_is_taxexempt tinyint(1) NOT NULL DEFAULT FALSE,
 			import_id int(10) unsigned DEFAULT NULL,
 			PRIMARY KEY  (e_id),
 			KEY et_arlo_id (et_arlo_id),

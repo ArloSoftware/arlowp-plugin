@@ -22,7 +22,7 @@ class Finish extends BaseImporter {
 	        
 			$this->importer->set_last_import_date();
 			
-			$this->importer->set_tax_excempt_events($this->import_id);
+			$this->importer->set_tax_exempt_events($this->import_id);
 	        
 	        $this->message_handler->dismiss_by_type('import_error');
 

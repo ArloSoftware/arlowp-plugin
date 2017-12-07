@@ -631,9 +631,9 @@ class Arlo_For_Wordpress_Admin {
 			}	
 		}
 
-		//check if the tax excempt tag has changed
-		if (!empty($import_id) && $new['taxexcempt_tag'] != $old['taxexcempt_tag']) {
-			$plugin->get_importer()->set_tax_excempt_events($import_id);
+		//check if the tax exempt tag has changed
+		if (!empty($import_id) && $new['taxexempt_tag'] != $old['taxexempt_tag']) {
+			$plugin->get_importer()->set_tax_exempt_events($import_id);
 		}
 
 		//normalize regions

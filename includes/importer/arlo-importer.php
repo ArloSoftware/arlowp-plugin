@@ -97,17 +97,17 @@ class Importer {
 		$this->last_import_date = $timestamp;
 	}	
 
-	public function set_tax_excempt_events($import_id) {
+	public function set_tax_exempt_events($import_id) {
 		$settings = get_option('arlo_settings');
 
-		if (!empty($settings['taxexcempt_tag'])) {
+		if (!empty($settings['taxexempt_tag'])) {
 			$sql = $this->dbl->prepare("
 			UPDATE 
 				{$this->dbl->prefix}_arlo_events AS e, 
 				{$this->dbl->prefix}_arlo_events_tags AS et, 
 				{$this->dbl->prefix}_arlo_tags AS t 
 			SET 
-				e_is_taxexcempt = 1
+				e_is_taxexempt = 1
 			WHERE 
 				t.tag = %s
 			AND 
@@ -120,13 +120,13 @@ class Importer {
 				t.import_id = %d
 			AND
 				e.import_id = %d
-			", [trim($settings['taxexcempt_tag']), $import_id, $import_id, $import_id]);			
+			", [trim($settings['taxexempt_tag']), $import_id, $import_id, $import_id]);			
 		} else {
 			$sql = $this->dbl->prepare("
 			UPDATE 
 				{$this->dbl->prefix}_arlo_events AS e
 			SET 
-				e_is_taxexcempt = 0
+				e_is_taxexempt = 0
 			WHERE 
 				e.import_id = %d
 			", [$import_id]);
@@ -135,7 +135,7 @@ class Importer {
 		$this->dbl->query($sql);
 
 		if ($query === false) {					
-			throw new \Exception('SQL error at set_tax_excempt_events: ' . $this->dbl->last_error);
+			throw new \Exception('SQL error at set_tax_exempt_events: ' . $this->dbl->last_error);
 		}	
 	}
 
