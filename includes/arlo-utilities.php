@@ -57,7 +57,7 @@ class Utilities {
     public static function process_att($new_atts_array, $callback, $att_name = '', $atts = [], $value = null) {
         if (!empty($callback) && is_callable($callback))
             $value = call_user_func($callback, $att_name, $atts);
-        
+       
 		if (!is_null($value) && (!empty($value) || is_numeric($value))) {
 			$new_atts_array[$att_name] = $value;
         }
@@ -121,18 +121,36 @@ class Utilities {
         return (get_home_url() . $rel);
     }
 
-    public static function convert_string_array_to_int_array($string_array) {
-        if (is_string($string_array)) {
-            $string_array = explode(',', $string_array);
+    public static function convert_string_to_int_array($string) {
+        if (is_string($string)) {
+            $string = explode(',', $string);
         }
 
-        if (!empty($string_array)) {
+        if (!empty($string)) {
             return array_filter(
                 array_map(function($int) {
                     return intval($int);
-                }, $string_array), 
+                }, $string), 
                 function($int) {
-                    return $int > 0;
+                    return $int >= 0;
+                });
+        }
+
+        return [];
+    }
+
+    public static function convert_string_to_string_array($string) {
+        if (is_string($string)) {
+            $string = explode(',', $string);
+        }
+
+        if (!empty($string)) {
+            return array_filter(
+                array_map(function($s) {
+                    return trim($s);
+                }, $string), 
+                function($s) {
+                    return !empty($s);
                 });
         }
 
@@ -146,13 +164,22 @@ class Utilities {
         $filter_name = ($is_hidden ? $filter_name . 'hidden' : $filter_setting_name);
 
         if (is_array($atts) && count($atts) && !empty($atts[$filter_name])) {
-            $GLOBALS['arlo_filter_base'][$filter_name] = \Arlo\Utilities::convert_string_array_to_int_array($atts[$filter_name]);
+            
+            $value = $atts[$filter_name];
+            
+            $value = self::call_user_func_with_callback($value, $callback, $callback_parameters);
+
+            $GLOBALS['arlo_filter_base'][$filter_name] = $value;              
+
+            if (!isset($stored_atts[$filter_name])) {
+                $stored_atts[$filter_name] = $GLOBALS['arlo_filter_base'][$filter_name];
+            }
+
         } else if (isset($filter_settings[$filter_setting_section]) && isset($filter_settings[$filter_setting_section][$template_name]) && isset($filter_settings[$filter_setting_section][$template_name][$filter_setting_name])) {
+            //this is always an array, coming from the admin UI
             $value = array_values($filter_settings[$filter_setting_section][$template_name][$filter_setting_name]);
 
-            if (!empty($callback) && is_callable($callback)) {
-                $value = call_user_func_array($callback, array_merge([$value], $callback_parameters));
-            }
+            $value = self::call_user_func_with_callback($value, $callback, $callback_parameters);
 
             $GLOBALS['arlo_filter_base'][$filter_name] = $value;
             
@@ -160,5 +187,21 @@ class Utilities {
                 $stored_atts[$filter_name] = $GLOBALS['arlo_filter_base'][$filter_name];
             }
         }
+    }
+
+    public static function call_user_func_with_callback($value, $callback = '', $callback_parameters = []) {
+        $parameters = [$value];
+
+        if (is_array($callback_parameters)) {
+            $parameters = array_merge($parameters, $callback_parameters);
+        } else if (!empty($callback_parameters)) {
+            $parameters[] = $callback_parameters;
+        }
+
+        if (!empty($callback) && is_callable($callback)) {
+            $value = call_user_func_array($callback, $parameters);
+        }
+
+        return $value;
     }
 }

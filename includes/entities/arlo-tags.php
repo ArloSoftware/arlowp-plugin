@@ -69,7 +69,7 @@ class Tags {
 
 		if ($query) {
 			$result = ($limit != 1) ? $wpdb->get_results($query) : $wpdb->get_row($query);
-			
+
 			wp_cache_add( $cache_key, $result, $cache_category, 30 );
 
 			return $result;
@@ -88,7 +88,7 @@ class Tags {
 
 		$tags = self::get($condition, 2, $import_id);
 
-		if (!is_array($tags)) {
+		if (!is_array($tags) && !is_null($tags)) {
 			$tags = [$tags];
 		}
 
@@ -100,8 +100,12 @@ class Tags {
 
 		$tags = self::look_up_tags_by_tag($tags, $import_id);
 
-		return array_map(function($tag) {
-			return $tag->id;
-		}, $tags);
+		if (!is_null($tags)) {
+			return array_map(function($tag) {
+				return $tag->id;
+			}, $tags);
+		}
+
+		return null;
 	}
 }

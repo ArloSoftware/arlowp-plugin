@@ -276,17 +276,17 @@ class Templates {
 
         self::$event_template_atts = self::get_event_template_atts($atts, $import_id);
 
-        \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$event_template_atts);
-        \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$event_template_atts, null, null, true);
+        \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Utilities::convert_string_to_int_array');
+        \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Utilities::convert_string_to_int_array', null, true);
         
         \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id]);
         \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id], true);
 
-        \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$event_template_atts);
-        \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$event_template_atts, null, null, true);
-        
-        \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$event_template_atts);
-        \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$event_template_atts, null, null, true);
+        \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Utilities::convert_string_to_int_array');
+        \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Utilities::convert_string_to_int_array', null, true);
+
+        \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Utilities::convert_string_to_string_array');
+        \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Utilities::convert_string_to_string_array', null, true);        
 
         return $content;        
     }
@@ -309,6 +309,7 @@ class Templates {
         $templatetag = \Arlo\Entities\Tags::get_tag_ids_by_tag(\Arlo\Utilities::get_att_string('templatetag', $atts), $import_id);        
 
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'location', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'locationhidden', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'category', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'categoryhidden', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'search', $atts);
@@ -761,20 +762,23 @@ class Templates {
 
             if(isset($arlo_delivery) || isset($arlo_deliveryhidden)) {
                 if (!empty($arlo_delivery)) {
+                    $where .= ' AND ( 1 ';
                     foreach ($arlo_delivery as $delivery) {
                         switch ($delivery) {
                             case 0:
                             case 1: 
-                                $where .= " AND e.e_isonline = %d ";
+                                $where .=  " AND e.e_isonline = %d ";
                                 $parameters[] = $delivery;    
                                 $where .= " AND e.e_parent_arlo_id = 0 ";
                             break;
                             case 99: 
                                 $join .= " LEFT JOIN $t8 oa ON oa.oat_arlo_id = et.et_arlo_id AND oa.import_id = et.import_id";
-                                $where .= ' AND oa_id IS NOT NULL ';
+                                $where .= (count($arlo_delivery) > 1 ? ' OR ' : ' AND ') . ' oa_id IS NOT NULL ';
                             break;        
                         } 
                     }
+                    $where .= ' ) ';
+                    
                 }
     
                 if (!empty($arlo_deliveryhidden)) {            
@@ -831,7 +835,7 @@ class Templates {
 
             endif;
 
-            $group = 'GROUP BY et.et_arlo_id';
+            $group = 'GROUP BY c.c_arlo_id, et.et_arlo_id';
             
         endif;	
 
@@ -872,8 +876,8 @@ class Templates {
         }		
                 
         if(!empty($arlo_category) || !empty($arlo_categoryhidden)) {
-            $arlo_category = \Arlo\Utilities::convert_string_array_to_int_array($arlo_category);
-            $arlo_categoryhidden = \Arlo\Utilities::convert_string_array_to_int_array($arlo_categoryhidden);
+            $arlo_category = \Arlo\Utilities::convert_string_to_int_array($arlo_category);
+            $arlo_categoryhidden = \Arlo\Utilities::convert_string_to_int_array($arlo_categoryhidden);
 
             $where .= ' AND (';
 

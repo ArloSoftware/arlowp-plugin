@@ -218,8 +218,8 @@ class OnlineActivities {
 
         self::$oa_list_atts = self::get_oa_atts($atts, $import_id);
 
-        \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$oa_list_atts);
-        \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$oa_list_atts, null, null, true);
+        \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$oa_list_atts, '\Arlo\Utilities::convert_string_to_int_array');
+        \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$oa_list_atts, '\Arlo\Utilities::convert_string_to_int_array', null, true);       
 
         \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$oa_list_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id]);
         \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$oa_list_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id], true);
@@ -369,8 +369,8 @@ class OnlineActivities {
 
         if(!empty($arlo_category) || !empty($arlo_categoryhidden)) :
 
-            $arlo_category = \Arlo\Utilities::convert_string_array_to_int_array($arlo_category);
-            $arlo_categoryhidden = \Arlo\Utilities::convert_string_array_to_int_array($arlo_categoryhidden);
+            $arlo_category = \Arlo\Utilities::convert_string_to_int_array($arlo_category);
+            $arlo_categoryhidden = \Arlo\Utilities::convert_string_to_int_array($arlo_categoryhidden);
 
             if (!empty($arlo_category)) {
                 $where .= " AND etc.c_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $arlo_category)) . ")";       
@@ -409,7 +409,7 @@ class OnlineActivities {
         endif;
 
         $field_list = '
-            DISTINCT oa.oa_id
+            oa.oa_id
         ';
 
         $limit_field = $order = '';
