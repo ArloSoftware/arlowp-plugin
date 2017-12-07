@@ -565,11 +565,6 @@ class Events {
     private static function shortcode_event_duration($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_event_list_item']) || empty($GLOBALS['arlo_event_list_item']['et_arlo_id'])) return;
 
-        return self::get_event_duration($import_id);
-    }
-
-    private static function get_event_duration($import_id) {
-    
         $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
 
         $conditions = array(
@@ -646,19 +641,14 @@ class Events {
 
         if(empty($GLOBALS['arlo_event_list_item']['e_sessiondescription'])) {
             // basic event
-            if(empty($GLOBALS['arlo_event_list_item']['et_arlo_id'])) return;
-            if(empty($GLOBALS['arlo_event_list_item']['e_startdatetime'])) return;
+            $duration = self::shortcode_event_duration('', [], '', $import_id);
+            $start = self::shortcode_event_start_date('', $atts);
+            $end = self::shortcode_event_end_date('', $atts);
 
-            $duration = self::get_event_duration($import_id);
-
-            $event =  $GLOBALS['arlo_event_list_item'];
-            $start = self::event_date_formatter($atts, $event['e_startdatetime'], $event['e_datetimeoffset'], $event['e_isonline'], $event['e_timezone_id']);
-            $end = self::event_date_formatter($atts, $event['e_finishdatetime'], $event['e_datetimeoffset'], $event['e_isonline'], $event['e_timezone_id']);
-
-            return esc_html($duration . ', ' . $start . ' - ' . $end);
+            return $duration . esc_html(', ') . $start . esc_html(' - ') . $end;
         } else {
             // multi-session event
-            return esc_html($GLOBALS['arlo_event_list_item']['e_sessiondescription']);
+            return self::shortcode_event_session_description();
         }
     }
 
