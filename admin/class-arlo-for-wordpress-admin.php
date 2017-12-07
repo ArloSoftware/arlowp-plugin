@@ -604,25 +604,25 @@ class Arlo_For_Wordpress_Admin {
 							$filters[$filter_group_name][$filter_name][$old_value] = $new_value;
 						}
 
-						if (isset($filter_setting["filteraction"]) && $filter_setting["filteraction"] == "exclude") {
-							if (!isset($filters['arlohiddenfilters'][$filter_group_name][$filter_name])) {
-								$filters['arlohiddenfilters'][$filter_group_name][$filter_name] = array();
+						if (isset($filter_setting["filteraction"]) && $filter_setting["filteraction"] == "exclude" && isset($old_value) && $old_value != '') {
+							if (!isset($filters['hiddenfilters'][$filter_group_name][$filter_name])) {
+								$filters['hiddenfilters'][$filter_group_name][$filter_name] = array();
 							}
 
-							array_push($filters['arlohiddenfilters'][$filter_group_name][$filter_name], $old_value);
-						} else if (isset($filter_setting["filteraction"]) && $filter_setting["filteraction"] == "showonly") {
+							array_push($filters['hiddenfilters'][$filter_group_name][$filter_name], htmlspecialchars_decode($old_value, ENT_QUOTES));
+						} else if (isset($filter_setting["filteraction"]) && $filter_setting["filteraction"] == "showonly"  && isset($old_value) && $old_value != '') {
 							if (!isset($filters['showonlyfilters'][$filter_group_name][$filter_name])) {
 								$filters['showonlyfilters'][$filter_group_name][$filter_name] = array();
 							}
 
-							array_push($filters['showonlyfilters'][$filter_group_name][$filter_name], $old_value);
+							array_push($filters['showonlyfilters'][$filter_group_name][$filter_name], htmlspecialchars_decode($old_value, ENT_QUOTES));
 						}
 						else {
-							if (!empty($filters['arlohiddenfilters'][$filter_group_name][$filter_name])) {
-								$old_value_index = array_search($old_value, $filters['arlohiddenfilters'][$filter_group_name][$filter_name]);
+							if (!empty($filters['hiddenfilters'][$filter_group_name][$filter_name])) {
+								$old_value_index = array_search($old_value, $filters['hiddenfilters'][$filter_group_name][$filter_name]);
 
 								if ($old_value_index) {
-									unset( $filters['arlohiddenfilters'][$filter_group_name][$filter_name][$old_value_index] );
+									unset( $filters['hiddenfilters'][$filter_group_name][$filter_name][$old_value_index] );
 								}
 							}
 						}

@@ -136,7 +136,7 @@ class Categories {
         (!empty(\Arlo\Shortcodes\OnlineActivities::$oa_list_atts) ? \Arlo\Shortcodes\OnlineActivities::$oa_list_atts :
         null));
      
-        return \Arlo\Utilities::convert_string_array_to_int_array(\Arlo\Utilities::get_att_string('category', $category_atts));
+        return \Arlo\Utilities::convert_string_to_int_array(\Arlo\Utilities::get_att_string('category', $category_atts));
     }
 
     // category list

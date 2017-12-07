@@ -40,30 +40,45 @@ class UpcomingEvents {
         $templates = arlo_get_option('templates');
         $content = $templates[$template_name]['html'];
         
-        self::$upcoming_list_item_atts = self::get_upcoming_atts($atts);
-        $category_parameter = \Arlo\Utilities::clean_string_url_parameter('arlo-category');
+        self::$upcoming_list_item_atts = self::get_upcoming_atts($atts, $import_id);
 
-        if (!empty($atts["category"])) {
-            $GLOBALS['arlo_filter_base']['category'] = \Arlo\Utilities::convert_string_array_to_int_array($atts["category"]);
-        } else if (isset($filter_settings['showonlyfilters']) && isset($filter_settings['showonlyfilters'][$template_name]) && isset($filter_settings['showonlyfilters'][$template_name]['category'])) {
-            $GLOBALS['arlo_filter_base']['category'] = array_values($filter_settings['showonlyfilters'][$template_name]['category']);
-            if (empty($category_parameter))
-                self::$upcoming_list_item_atts['category'] = implode(',',$GLOBALS['arlo_filter_base']['category']);
-        }
+
+        \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Utilities::convert_string_to_int_array');
+        \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Utilities::convert_string_to_int_array', null, true);
+
+        \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id]);
+        \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id], true);
+
+        \Arlo\Utilities::set_base_filter($template_name, 'eventtag', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id]);
+        \Arlo\Utilities::set_base_filter($template_name, 'eventtag', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id], true);
+
+        \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Utilities::convert_string_to_int_array');
+        \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Utilities::convert_string_to_int_array', null, true);
+
+        \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Utilities::convert_string_to_string_array');
+        \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Utilities::convert_string_to_string_array', null, true);
+
+        var_dump(self::$upcoming_list_item_atts);
 
         return do_shortcode($content);        
     }
 
-    private static function get_upcoming_atts($atts) {
+    private static function get_upcoming_atts($atts, $import_id) {
         $new_atts = [];
-        
+
+        $templatetag = \Arlo\Entities\Tags::get_tag_ids_by_tag(\Arlo\Utilities::get_att_string('templatetag', $atts), $import_id);
+        $eventtag = \Arlo\Entities\Tags::get_tag_ids_by_tag(\Arlo\Utilities::get_att_string('eventtag', $atts), $import_id);
+
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'location', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'locationhidden', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'category', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'categoryhidden', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'search', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_int', 'delivery', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_int', 'deliveryhidden', $atts);        
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_int', 'templateid', $atts);       
-        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'templatetag', $atts);
-        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'eventtag', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, null, 'templatetag', $atts, $templatetag);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, null, 'eventtag', $atts, $eventtag);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'presenter', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'month', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'state', $atts);
@@ -269,12 +284,17 @@ class UpcomingEvents {
         $parameters[] = $import_id;
 
         $arlo_location = !empty($atts['location']) ? $atts['location'] : null;
+        $arlo_locationhidden = !empty($atts['locationhidden']) ? $atts['locationhidden'] : null;
         $arlo_state = !empty($atts['state']) ? $atts['state'] : null;
         $arlo_category = !empty($atts['category']) ? $atts['category'] : null;
+        $arlo_categoryhidden = !empty($atts['categoryhidden']) ? $atts['categoryhidden'] : null;
         $arlo_delivery = isset($atts['delivery']) ? $atts['delivery'] : null;
+        $arlo_deliveryhidden = isset($atts['deliveryhidden']) ? $atts['deliveryhidden'] : null;
         $arlo_month = !empty($atts['month']) ? $atts['month'] : null;
         $arlo_eventtag = !empty($atts['eventtag']) ? $atts['eventtag'] : null;
+        $arlo_eventtaghidden = !empty($atts['eventtaghidden']) ? $atts['eventtaghidden'] : null;
         $arlo_templatetag = !empty($atts['templatetag']) ? $atts['templatetag'] : null;
+        $arlo_templatetaghidden = isset($atts['templatetaghidden']) ? $atts['templatetaghidden'] : null;
         $arlo_presenter = !empty($atts['presenter']) ? $atts['presenter'] : null;
         $arlo_region = !empty($atts['region']) ? $atts['region'] : null;
         $arlo_templateid = !empty($atts['templateid']) ? $atts['templateid'] : null;
@@ -286,27 +306,44 @@ class UpcomingEvents {
             $parameters[] = $dates[1];
         endif;
 
-        if(!empty($arlo_location)) :
-            $where .= ' AND e.e_locationname = %s';
-            $parameters[] = $arlo_location;
-        endif;
+        if(isset($arlo_location) || isset($arlo_locationhidden)) :
+            if (!empty($arlo_location)) {
+                if (!is_array($arlo_location)) 
+                    $arlo_location = [$arlo_location];
+                
+                $where .= " AND e.e_locationname IN (" . implode(',', array_map(function() {return "%s";}, $arlo_location)) . ")";                
+                $parameters = array_merge($parameters, $arlo_location);    
+            }
+
+            if (!empty($arlo_locationhidden)) {    
+                if (!is_array($arlo_locationhidden)) 
+                    $arlo_locationhidden = [$arlo_locationhidden];        
+                $where .= " AND e.e_locationname NOT IN (" . implode(',', array_map(function() {return "%s";}, $arlo_locationhidden)) . ")";                
+                $parameters = array_merge($parameters, $arlo_locationhidden);    
+            }
+        endif;         
 
         if(!empty($arlo_templateid)) :
             $where .= ' AND e.et_arlo_id = %d';
             $parameters[] = $arlo_templateid;
         endif;
 
-        if(!empty($arlo_category)) :
-            $arlo_category = array_filter(
-                array_map(function($cat) {
-                    return intval($cat);
-                }, explode(',', $arlo_category)), 
-                function($cat_id) {
-                    return $cat_id > 0;
-                });
+        if(!empty($arlo_category) || !empty($arlo_categoryhidden)) :
+            $arlo_category = \Arlo\Utilities::convert_string_to_int_array($arlo_category);
+            $arlo_categoryhidden = \Arlo\Utilities::convert_string_to_int_array($arlo_categoryhidden);
 
-            $where .= " AND c.c_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $arlo_category)) . ")";                
-            $parameters = array_merge($parameters, $arlo_category);
+            if (!empty($arlo_category)) {
+                $where .= " AND c.c_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $arlo_category)) . ")";                
+                $parameters = array_merge($parameters, $arlo_category);    
+            }
+
+            if (!empty($arlo_categoryhidden)) {
+                //need to exclude all the child categories
+                $categoriesnot_flatten_list = CategoriesEntity::get_flattened_category_list_for_filter($arlo_categoryhidden, [], $import_id);
+                
+                $where .= " AND (c.c_arlo_id NOT IN (" . implode(',', array_map(function() {return "%d";}, $categoriesnot_flatten_list)) . ") OR c.c_arlo_id IS NULL)";
+                $parameters = array_merge($parameters, array_map(function($cat) { return $cat['id']; }, $categoriesnot_flatten_list));
+            }
 
             $join .= "LEFT JOIN 
                     $t5 etc
@@ -325,9 +362,22 @@ class UpcomingEvents {
 
         endif;
 
-        if(isset($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) :
-            $where .= ' AND e.e_isonline = %d';
-            $parameters[] = intval($arlo_delivery);
+        if(isset($arlo_delivery) || isset($arlo_deliveryhidden)) :
+            if (!empty($arlo_delivery)) {
+                if (!is_array($arlo_delivery)) 
+                    $arlo_delivery = [$arlo_delivery];
+                
+                $where .= " AND e.e_isonline IN (" . implode(',', array_map(function() {return "%d";}, $arlo_delivery)) . ")";                
+                $parameters = array_merge($parameters, $arlo_delivery);    
+            }
+
+            if (!empty($arlo_deliveryhidden)) {    
+                if (!is_array($arlo_deliveryhidden)) 
+                    $arlo_deliveryhidden = [$arlo_deliveryhidden];        
+
+                $where .= " AND e.e_isonline NOT IN (" . implode(',', array_map(function() {return "%d";}, $arlo_deliveryhidden)) . ")";                
+                $parameters = array_merge($parameters, $arlo_deliveryhidden);    
+            }
         endif;  
             
         if(!empty($arlo_state)) :
@@ -346,29 +396,31 @@ class UpcomingEvents {
             $parameters[] = $venues;
         endif;
 
-        if(!empty($arlo_eventtag)) :
+        if(!empty($arlo_eventtag) || !empty($arlo_eventtaghidden)) :
             $join .= " LEFT JOIN $t7 etag ON etag.e_id = e.e_id AND etag.import_id = e.import_id";
-
-            if (!is_numeric($arlo_eventtag)) {
-                $where .= ' AND tag.tag = %s';
-                $parameters[] = $arlo_eventtag;
-                $join .= " LEFT JOIN $t8 AS tag ON tag.id = etag.tag_id AND tag.import_id = etag.import_id";
-            } else {
-                $where .= " AND etag.tag_id = %d";
-                $parameters[] = intval($arlo_eventtag);
+            
+            if (!empty($arlo_eventtag)) {
+                $where .= " AND etag.tag_id IN (" . implode(',', array_map(function() {return "%d";}, $arlo_eventtag)) . ")";
+                $parameters = array_merge($parameters, $arlo_eventtag);    
+            }
+            
+            if (!empty($arlo_eventtaghidden)) {
+                $where .= " AND (etag.tag_id NOT IN (" . implode(',', array_map(function() {return "%d";}, $arlo_eventtaghidden)) . ") OR etag.tag_id IS NULL)";
+                $parameters = array_merge($parameters, $arlo_eventtaghidden);    
             }
         endif;
-        
-        if(!empty($arlo_templatetag)) :
+
+        if(!empty($arlo_templatetag) || !empty($arlo_templatetaghidden)) :
             $join .= " LEFT JOIN $t11 ettag ON ettag.et_id = et.et_id AND ettag.import_id = et.import_id";
 
-            if (!is_numeric($arlo_templatetag)) {
-                $where .= ' AND ttag.tag = %s';
-                $parameters[] = $arlo_templatetag;
-                $join .= " LEFT JOIN $t8 AS ttag ON ttag.id = ettag.tag_id AND ttag.import_id = ettag.import_id";
-            } else {
-                $where .= " AND ettag.tag_id = %d";
-                $parameters[] = intval($arlo_templatetag);
+            if (!empty($arlo_templatetag)) {
+                $where .= " AND ettag.tag_id IN (" . implode(',', array_map(function() {return "%d";}, $arlo_templatetag)) . ")";
+                $parameters = array_merge($parameters, $arlo_templatetag);    
+            }
+            
+            if (!empty($arlo_templatetaghidden)) {
+                $where .= " AND (ettag.tag_id NOT IN (" . implode(',', array_map(function() {return "%d";}, $arlo_templatetaghidden)) . ") OR ettag.tag_id IS NULL)";
+                $parameters = array_merge($parameters, $arlo_templatetaghidden);    
             }
         endif;
 
