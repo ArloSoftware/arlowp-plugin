@@ -173,7 +173,7 @@ class Arlo_For_Wordpress_Settings {
 
 		// create a section for the API Endpoint
 		add_settings_section( 'arlo_general_section', __('General Settings', 'arlo-for-wordpress' ), null, 'arlo-for-wordpress' );
-
+		
 		// create API Endpoint field                
 		add_settings_field(
                         'arlo_platform_name', 
@@ -267,6 +267,8 @@ class Arlo_For_Wordpress_Settings {
                             )
                 );
 
+		add_settings_field('arlo_filters', null, array($this, 'arlo_filter_settings_callback'), $this->plugin_slug, 'arlo_general_section',  array('id'=>'filters'));    
+				
 
 		/*
 		 *
@@ -300,17 +302,6 @@ class Arlo_For_Wordpress_Settings {
 		 
 		add_settings_section('arlo_customcss_section', null, null, $this->plugin_slug );				
 		add_settings_field( 'arlo_customcss', null, array($this, 'arlo_simple_textarea_callback'), $this->plugin_slug, 'arlo_customcss_section', array('id'=>'customcss', 'after_html' => '<p>Learn how to <a href="https://support.arlo.co/hc/en-gb/articles/115001714006" target="_blank">override existing styles</a> by adding <a href="#" class="arlo-settings-link" id="theme_customcss">Custom CSS</a></p>') );
-
-
-		/*
-		 *
-		 * Filters Section Settings
-		 *
-		 */ 
-		 
-		add_settings_section('arlo_filters_section', null, null, $this->plugin_slug );	
-
-		add_settings_field('arlo_filters', null, array($this, 'arlo_filter_settings_callback'), $this->plugin_slug, 'arlo_filters_section',  array('id'=>'filters'));    
 
 		
 		/*
@@ -468,35 +459,25 @@ class Arlo_For_Wordpress_Settings {
 	}
 	
 	function arlo_filter_settings_callback() {
-		$settings_object = get_option('arlo_settings');
 		$filter_actions = [
-			'rename' => __('Rename', 'arlo-for-wordpress')
+			'rename' => __('Rename', 'arlo-for-wordpress'),
+			'exclude' => __('Exclude', 'arlo-for-wordpress')
 		];
 		
-		$setting_id = 'filter_settings';
-		
-		$output = '<div id="'.ARLO_PLUGIN_PREFIX.'-filter-select" class="cf">';
+		$output = '<div id="'.ARLO_PLUGIN_PREFIX.'-filter-terminology" class="cf">';
 
-		$output .= '<h3>Filter options</h3>';
+		$output .= '<h3>Filter terminology</h3>';
 
-		$output .= '<div class="arlo-select-page">
-		<label>Select page: </label>
-		<select name="arlo_settings['.$setting_id.']" id="arlo-filter-settings">
-		';
-
-		$filters_settings_html = '';
-
-		foreach(Arlo_For_Wordpress::$templates as $filter_group => $arlo_template) {
-			$filter_type = (!empty($arlo_template['type']) ? $arlo_template['type'] : $arlo_template['id']);
-
-			$output .= '<option value="' . $filter_group . '" >' . $arlo_template['name'] . '</option>';
-
-			$filters_settings_html .= $this->arlo_output_filter_editor('arlo_filter_settings', $filter_type, $filter_group, $filter_actions);
-		}
+		$available_page_filters = array(
+			'generic' => array(
+				'name' => 'Generic',
+				'filters' => array(
+					'delivery' => 'Delivery', 
+				)
+			)
+		);
 				
-		$output .= '</select></div>';
-
-		$output .= $filters_settings_html;
+		$output .= $this->arlo_output_filter_editor('arlo_filter_settings', $available_page_filters, 'generic', 'generic', $filter_actions, '', 'arlo-always-visible');
 
 		$output .= '</div>';
 
@@ -516,9 +497,7 @@ class Arlo_For_Wordpress_Settings {
 
 		$value = (isset($value_field) && isset($item[$value_field]) ? $item[$value_field] : $item["string"]); 
 		
-		$html_selected_value = (isset($selected_value) ? htmlentities($selected_value) : '');
-
-		$selected = ($value == $html_selected_value) ? ' selected="selected" ' : '';
+		$selected = (isset($selected_value) && $value == htmlentities($selected_value) ? ' selected="selected" ' : '');
 
 		$item = "<option value='" . esc_attr($value) . "' " . $selected . ">" . esc_html($item["string"]) . "</option>";
 	}
@@ -657,7 +636,7 @@ class Arlo_For_Wordpress_Settings {
 		echo '
 		<div class="cf"></div>
 		<h2>' . __('Page filtered by ', 'arlo-for-wordpress' ) . '</h2>
-			' . $this->arlo_output_filter_editor('page_filter_settings', $type, $id, Arlo_For_Wordpress::$page_filter_options, 'page', 'arlo-always-visible') . '
+			' . $this->arlo_output_filter_editor('page_filter_settings', Arlo_For_Wordpress::$available_page_filters, $type, $id, Arlo_For_Wordpress::$page_filter_options, 'page', 'arlo-always-visible') . '
 		</div>';
 
 		
@@ -703,14 +682,14 @@ class Arlo_For_Wordpress_Settings {
 		}
 	}
 
-	function arlo_output_filter_editor($setting_name, $filter_type, $filter_group, $actions = [], $id_prefix = '', $class = '') {
+	function arlo_output_filter_editor($setting_name, $available_page_filters, $filter_type, $filter_group, $actions = [], $id_prefix = '', $class = '') {
 		$filters_settings_html = '';
 		$filter_settings = get_option($setting_name, array());
 
 		//hack, because the key in the templates are not the same as in the filters
 		$filter_type = ($filter_type == 'events' ? 'template' : $filter_type);
 
-		$filter_group_values = Arlo_For_Wordpress::$available_page_filters[$filter_type];
+		$filter_group_values = $available_page_filters[$filter_type];
 
 		$available_filters = [];
 		if (isset($filter_group_values['filters']) && is_array($filter_group_values['filters'])) {;
@@ -720,10 +699,9 @@ class Arlo_For_Wordpress_Settings {
 		$filters_settings_html .= '<div id="arlo-' . (!empty($id_prefix) ? $id_prefix . '-' : '') . $filter_group . '-filters" class="arlo-filter-group ' . $class . '">';
 
 		if (count($available_filters)) {
+			$import_id = Arlo_For_Wordpress::get_instance()->get_importer()->get_current_import_id();
 			foreach($available_filters as $filter_key => $filter) {
-				$import_id = Arlo_For_Wordpress::get_instance()->get_importer()->get_current_import_id();
 				$filter_options = \Arlo\Shortcodes\Filters::get_filter_options($filter_key, $import_id);
-	
 				$default_filter_options = $filter_options;
 				array_walk($default_filter_options, 'self::get_select_filter_options', ['value_field' => 'id']);
 
@@ -742,9 +720,9 @@ class Arlo_For_Wordpress_Settings {
 								
 									<ul class="arlo-available-filters" style="display: ' . ($expand_filter ? 'block' : 'none') . '">
 									';
-					
-								if (is_array($filter_settings)) {
-					
+
+				if (is_array($filter_settings)) {
+
 					if (!empty($filter_settings[$filter_group][$filter_key]) && count($filter_settings[$filter_group][$filter_key])) {
 						foreach($filter_settings[$filter_group][$filter_key] as $old_value => $new_value) {
 							/* rename entries */								
