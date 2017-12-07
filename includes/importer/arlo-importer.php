@@ -103,9 +103,9 @@ class Importer {
 		if (!empty($settings['taxexcempt_tag'])) {
 			$sql = $this->dbl->prepare("
 			UPDATE 
-				wp_arlo_events AS e, 
-				wp_arlo_events_tags AS et, 
-				wp_arlo_tags AS t 
+				{$this->dbl->prefix}_arlo_events AS e, 
+				{$this->dbl->prefix}_arlo_events_tags AS et, 
+				{$this->dbl->prefix}_arlo_tags AS t 
 			SET 
 				e_is_taxexcempt = 1
 			WHERE 
@@ -124,7 +124,7 @@ class Importer {
 		} else {
 			$sql = $this->dbl->prepare("
 			UPDATE 
-				wp_arlo_events AS e
+				{$this->dbl->prefix}_arlo_events AS e
 			SET 
 				e_is_taxexcempt = 0
 			WHERE 
