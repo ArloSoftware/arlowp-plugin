@@ -526,10 +526,11 @@ class VersionHandler {
 				//update filter settings, if there is			
 				$filter_settings = get_option('arlo_filter_settings', []);
 				$is_notice_required = false;
+				$filter_parts = ['showonlyfilters', 'hiddenfilters', 'generic'];
 
 				//create new generic section
 				foreach ($filter_settings as $page => $filter_options) {
-					if (!in_array($page, ['showonlyfilters', 'hiddenfilters', 'generic'])) {
+					if (!in_array($page, $filter_parts)) {
 						foreach ($filter_options as $group => $filters) {
 							//copy first delivery filters
 							if ($group == 'delivery' && empty($filter_settings['generic'])) {
@@ -542,7 +543,7 @@ class VersionHandler {
 
 				//remove obsolete filter settings
 				foreach ($filter_settings as $page => $filter_options) {
-					if (!in_array($page, ['showonlyfilters', 'hiddenfilters', 'generic'])) {
+					if (!in_array($page, $filter_parts)) {
 						//remove the whole page
 						unset($filter_settings[$page]);
 						$is_notice_required = true;

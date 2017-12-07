@@ -698,10 +698,9 @@ class Arlo_For_Wordpress_Settings {
 		$filters_settings_html .= '<div id="arlo-' . (!empty($id_prefix) ? $id_prefix . '-' : '') . $filter_group . '-filters" class="arlo-filter-group ' . $class . '">';
 
 		if (count($available_filters)) {
+			$import_id = Arlo_For_Wordpress::get_instance()->get_importer()->get_current_import_id();
 			foreach($available_filters as $filter_key => $filter) {
-				$import_id = Arlo_For_Wordpress::get_instance()->get_importer()->get_current_import_id();
 				$filter_options = \Arlo\Shortcodes\Filters::get_filter_options($filter_key, $import_id);
-	
 				$default_filter_options = $filter_options;
 				array_walk($default_filter_options, 'self::get_select_filter_options', ['value_field' => 'id']);
 
