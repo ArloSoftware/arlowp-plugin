@@ -460,7 +460,8 @@ class Arlo_For_Wordpress_Settings {
 	
 	function arlo_filter_settings_callback() {
 		$filter_actions = [
-			'rename' => __('Rename', 'arlo-for-wordpress')
+			'rename' => __('Rename', 'arlo-for-wordpress'),
+			'exclude' => __('Exclude', 'arlo-for-wordpress')
 		];
 		
 		$output = '<div id="'.ARLO_PLUGIN_PREFIX.'-filter-terminology" class="cf">';
