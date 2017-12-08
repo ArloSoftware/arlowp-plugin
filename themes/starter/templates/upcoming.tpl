@@ -70,7 +70,7 @@
 
 			  <div class="card-back bg-primary text-white">
 			    <p class="date no-margin">[arlo_event_start_date format="%a %e %b %G"]</p>
-			    <p class="time normal-text muted truncate-1">[arlo_event_start_date format="%I:%M %p"] - [arlo_event_end_date format="%I:%M %p"] [arlo_event_start_date format="%Z"] ([arlo_event_duration])</p>
+			    <p class="time normal-text muted truncate-1">[arlo_event_start_date format="%I:%M %p"] - [arlo_event_end_date format="%I:%M %p"] ([arlo_event_duration])</p>
 			    <p class="normal-text summary m-b-5 truncate-4">[arlo_event_template_summary]</p>
 			    [arlo_event_registration][arlo_event_template_permalink wrap='<a class="btn btn-cons btn-bordered" href="%s">More Information</a>']
 			    [arlo_event_provider wrap='<p class="small-text text-left muted text-white m-b-0 m-t-5">Provided by %s</p>']
