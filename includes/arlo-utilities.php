@@ -31,12 +31,12 @@ class Utilities {
         return !empty($_GET[$parameter_name]) ? wp_unslash($_GET[$parameter_name]) : wp_unslash(urldecode(get_query_var($parameter_name)));
     }
 
-    public static function get_att_string($name, $atts) {
+    public static function get_att_string($name, $atts = []) {
         $string_parameter = self::clean_string_url_parameter('arlo-'.$name);
         return !empty($string_parameter) || $string_parameter == "0" ? $string_parameter : ( is_array($atts) && array_key_exists($name, $atts) ? $atts[$name] : '' );
     }
 
-    public static function get_att_int($name, $atts) {
+    public static function get_att_int($name, $atts = []) {
         $int_parameter = self::clean_int_url_parameter('arlo-'.$name);
         return !empty($int_parameter) || $int_parameter == "0" ? $int_parameter : ( is_array($atts) && array_key_exists($name, $atts) ? intval($atts[$name]) : '' );
     }
