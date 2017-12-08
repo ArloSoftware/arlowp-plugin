@@ -602,7 +602,7 @@ class Templates {
 
         foreach(\Arlo_For_Wordpress::$available_filters[$page_type == 'schedule' ? 'schedule' : 'template']['filters'] as $filter_key => $filter):
 
-            $att = (isset(self::$event_template_atts[$filter_key]) ? strval(self::$event_template_atts[$filter_key]) : '');
+            $att = (isset(self::$event_template_atts[$filter_key]) && is_string(self::$event_template_atts[$filter_key]) ? self::$event_template_atts[$filter_key] : '');
 
             if (!in_array($filter_key, $filters_array))
                 continue;

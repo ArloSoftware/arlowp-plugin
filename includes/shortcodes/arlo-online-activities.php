@@ -518,8 +518,8 @@ class OnlineActivities {
 
         foreach($filters_array as $filter_key):
             
-            $att = strval(self::$oa_list_atts[$filter_key]);
-
+            $att = (isset(self::$oa_list_atts[$filter_key]) && is_string(self::$oa_list_atts[$filter_key]) ? self::$oa_list_atts[$filter_key] : '');
+            
             if (!array_key_exists($filter_key, \Arlo_For_Wordpress::$available_filters['oa']['filters']))
                 continue;
 
