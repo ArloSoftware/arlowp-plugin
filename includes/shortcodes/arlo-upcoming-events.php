@@ -58,8 +58,6 @@ class UpcomingEvents {
         \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Utilities::convert_string_to_string_array');
         \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Utilities::convert_string_to_string_array', null, true);
 
-        var_dump(self::$upcoming_list_item_atts);
-
         return do_shortcode($content);        
     }
 
