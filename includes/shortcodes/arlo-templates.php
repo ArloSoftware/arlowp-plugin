@@ -602,7 +602,7 @@ class Templates {
 
         foreach(\Arlo_For_Wordpress::$available_filters[$page_type == 'schedule' ? 'schedule' : 'template']['filters'] as $filter_key => $filter):
 
-            $att = strval(self::$event_template_atts[$filter_key]);
+            $att = (isset(self::$event_template_atts[$filter_key]) ? strval(self::$event_template_atts[$filter_key]) : '');
 
             if (!in_array($filter_key, $filters_array))
                 continue;
@@ -874,7 +874,8 @@ class Templates {
             $where .= ' AND et.et_region = %s';
             $parameters[] = $arlo_region;
         }		
-                
+        
+        $GLOBALS['show_child_elements'] = false;
         if(!empty($arlo_category) || !empty($arlo_categoryhidden)) {
             $arlo_category = \Arlo\Utilities::convert_string_to_int_array($arlo_category);
             $arlo_categoryhidden = \Arlo\Utilities::convert_string_to_int_array($arlo_categoryhidden);
@@ -912,7 +913,6 @@ class Templates {
         } else if (!(isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true")) {
             $where .= ' AND (c.c_parent_id = (SELECT c_arlo_id FROM ' . $t4 . ' WHERE c_parent_id = 0 AND import_id = %d) OR c.c_parent_id IS NULL)';
             $parameters[] = $import_id;
-            $GLOBALS['show_child_elements'] = false;
         }	
         
         $order = $limit_field = '';

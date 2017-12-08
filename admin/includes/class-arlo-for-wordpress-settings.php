@@ -701,7 +701,7 @@ class Arlo_For_Wordpress_Settings {
 		//hack, because the key in the templates are not the same as in the filters
 		$filter_type = ($filter_type == 'events' ? 'template' : $filter_type);
 
-		$filter_group_values = $available_page_filters[$filter_type];
+		$filter_group_values = (isset($available_page_filters[$filter_type]) ? $available_page_filters[$filter_type] : []);
 
 		$available_filters = [];
 		if (isset($filter_group_values['filters']) && is_array($filter_group_values['filters'])) {;
