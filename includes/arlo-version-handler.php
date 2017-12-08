@@ -53,6 +53,10 @@ class VersionHandler {
 			$this->run_pre_data_update('3.0');
 		}			
 		
+		if (version_compare($old_version, '3.6') < 0) {
+			$this->run_pre_data_update('3.6');
+		}			
+		
 		arlo_add_datamodel();	
 
 		if (version_compare($old_version, '2.2.1') < 0) {
@@ -135,7 +139,7 @@ class VersionHandler {
 				if (!is_null($exists)) {
 					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events_presenters CHANGE  e_arlo_id  e_id int( 11 ) NOT NULL DEFAULT  '0'");
 						
-				}				
+				}
 
 				$exists = $this->dbl->get_var("SHOW KEYS FROM " . $this->dbl->prefix . "arlo_categories WHERE key_name = 'c_arlo_id'", 0, 0);
 				if (!is_null($exists)) {
@@ -176,6 +180,14 @@ class VersionHandler {
 			case '3.0':
 				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events DROP e_summary;");
 				$this->dbl->query("DROP TABLE " . $this->dbl->prefix . "arlo_timezones_olson;");
+			break;	
+
+			case '3.6':
+			$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_events LIKE 'e_is_taxexempt'", 0, 0);
+			if (is_null($exists)) {
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events ADD e_is_taxexempt TINYINT(1) NOT NULL DEFAULT '0' AFTER e_isonline");
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events ADD INDEX (e_is_taxexempt(1))");
+			}
 			break;					
 		}
 	}	

@@ -1,4 +1,21 @@
+== V3.6 ==
+
+Deprecated features
+------------------
+Remove the ability to rename and exclude filter options
+
+Enhancement
+------------------
+[arlo_event_next_running] should have a "separator" attribute, if it's not used as a list layout
+Use category header as meta description if category is selected as a filter
+Ability to filter global level shortcodes by mutliple categories/location/templatetag/eventtag
+Delivery filter for on demand events (online activities)
+Support tax exempt tags
+
+
+
 == V3.5 ==
+
 Enhancement
 ------------------
 New "template_link" attribute for [arlo_event_next_running]
