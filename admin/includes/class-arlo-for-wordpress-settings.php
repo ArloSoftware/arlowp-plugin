@@ -265,7 +265,19 @@ class Arlo_For_Wordpress_Settings {
                             'id' => 'import_callback_host',
                             'label_for' => 'import_callback_host',
                             )
-                );
+				);
+				
+				add_settings_field(
+					'arlo_taxexempt_tag', 
+					'<label for="arlo_taxexempt_tag">'.__('Tax exempt tag', 'arlo-for-wordpress' ).' <a href="https://support.arlo.co/hc/en-gb/articles/115001999286-Set-an-event-as-tax-free" target="_blank"><i class="arlo-icons8 arlo-icons8-help-filled size-16"></i></a></label>', 
+					array($this, 'arlo_simple_input_callback'), 
+					$this->plugin_slug, 'arlo_general_section', 
+					array(
+						'id' => 'taxexempt_tag',
+						'label_for' => 'taxexempt_tag',
+						)
+			);
+			
 
 		add_settings_field('arlo_filters', null, array($this, 'arlo_filter_settings_callback'), $this->plugin_slug, 'arlo_general_section',  array('id'=>'filters'));    
 				

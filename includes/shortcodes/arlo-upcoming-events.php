@@ -471,6 +471,7 @@ class UpcomingEvents {
             e.e_parent_arlo_id,
             e.e_region,
             e.e_credits,
+            e.e_is_taxexempt,
             et.et_id,
             et.et_name, 
             et.et_post_name, 

@@ -6,8 +6,8 @@ use Arlo\Logger;
 
 class SchemaManager {
 
-	const DB_SCHEMA_HASH = '48ea9f90faccf74546d647038566f6e3b6c20dc0';
-	const DB_SCHEMA_VERSION = '3.0.0';
+	const DB_SCHEMA_HASH = 'c1fc5873b2c060df777000e7e19066dd4389d8cd';
+	const DB_SCHEMA_VERSION = '3.1.0';
 
 	/* database layer */
 	private $dbl;
@@ -212,6 +212,7 @@ class SchemaManager {
 			e_isonline tinyint(1) NOT NULL DEFAULT FALSE,
 			e_parent_arlo_id int(11) NOT NULL,
 			e_region varchar(5) NOT NULL,	
+			e_is_taxexempt tinyint(1) NOT NULL DEFAULT FALSE,
 			import_id int(10) unsigned DEFAULT NULL,
 			PRIMARY KEY  (e_id),
 			KEY et_arlo_id (et_arlo_id),
