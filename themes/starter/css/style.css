@@ -1177,6 +1177,7 @@
     transform: rotateY(0deg);
     z-index: 2;
     text-align: center;
+    height: 100%;
   }
   .arlo#arlo:not(.arlo-sm) .event-card .card-front .date {
     position: absolute;
@@ -13917,4 +13918,10 @@
 .arlo#arlo:not(.arlo-xs) .arlo-online-activity .offers {
   font-size: 18px;
   line-height: 18px;
+}
+
+
+.arlo#arlo .arlo-event-registration p {
+  font-size: 16px;
+  text-align: left;
 }

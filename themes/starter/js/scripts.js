@@ -121,6 +121,10 @@ jQuery(function($){
 
         calculateEventHeights();
 
+        $('.arlo-show-more-link').click(function() {
+            setTimeout(calculateEventHeights,0);
+        });
+
         // collapsable elements
         if ( !$('.arlo#arlo').hasClass('arlo-xs') ) {
              $('.arlo#arlo .event .event-container').on({
