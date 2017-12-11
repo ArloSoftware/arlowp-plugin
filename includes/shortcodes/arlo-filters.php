@@ -39,6 +39,10 @@ class Filters {
                 if (is_array($base_category) || is_array($exclude_category)) {
 
                     $categories_flatten_list = CategoriesEntity::get_flattened_category_list_for_filter($base_category, $exclude_category, $import_id);
+
+                    if (!is_array($categories_flatten_list) || !count($categories_flatten_list)) {
+                        $categories_flatten_list = [ ['id' => 0, 'value' => 'none', 'string' => 'none']];
+                    }
                     
                     if (empty($post_id)) {
                         $join[] = "
@@ -131,7 +135,11 @@ class Filters {
 
                 if (is_array($base_category) || is_array($exclude_category)) {
 
-                    $categories_flatten_list = CategoriesEntity::get_flattened_category_list_for_filter($base_category, $exclude_category, $import_id);        
+                    $categories_flatten_list = CategoriesEntity::get_flattened_category_list_for_filter($base_category, $exclude_category, $import_id);   
+                    
+                    if (!is_array($categories_flatten_list) || !count($categories_flatten_list)) {
+                        $categories_flatten_list = [ ['id' => 0, 'value' => 'none', 'string' => 'none']];
+                    }
                     
                     if (empty($post_id)) {
                         $join[] = "
