@@ -210,7 +210,7 @@ class OnlineActivities {
     private static function shortcode_onlineactivites_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
 
-        $filter_settings = get_option('page_filter_settings', []);                       
+        $filter_settings = get_option('arlo_page_filter_settings', []);                       
 
         $template_name = Shortcodes::get_template_name($shortcode_name,'onlineactivites_list','oa');
         $templates = arlo_get_option('templates');
@@ -525,7 +525,7 @@ class OnlineActivities {
 
             $items = Filters::get_filter_options($filter_key, $import_id);
             
-            $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'), 'generic', $att);
+            $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'), 'generic', $att, 'oa');
         endforeach;
 
         if (!empty($filter_html)) {

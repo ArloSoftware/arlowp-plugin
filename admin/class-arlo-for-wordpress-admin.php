@@ -694,7 +694,7 @@ class Arlo_For_Wordpress_Admin {
 
 		//normalize filter options and save them
 		$this->normalize_filter_options('arlo_filter_settings', $new);
-		$this->normalize_filter_options('page_filter_settings', $new);
+		$this->normalize_filter_options('arlo_page_filter_settings', $new);
 
 		// need to check for posts-page change here
 		// loop through each post type and check if the posts-page has changed

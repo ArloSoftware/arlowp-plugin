@@ -44,16 +44,14 @@ class Events {
 
         $filter_html = '';
         
-        $filter_group = 'event';
-
         foreach($filters_array as $filter_key):
 
-            if (!array_key_exists($filter_key, \Arlo_For_Wordpress::$available_filters[$filter_group]['filters']))
+            if (!array_key_exists($filter_key, \Arlo_For_Wordpress::$available_filters['event']['filters']))
                 continue;
 
             $items = \Arlo\Shortcodes\Filters::get_filter_options($filter_key, $import_id, $post->ID);
 
-            $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'), 'generic');
+            $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'), 'generic', null, 'event');
 
         endforeach; 
             

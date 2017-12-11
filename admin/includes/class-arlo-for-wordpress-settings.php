@@ -648,7 +648,7 @@ class Arlo_For_Wordpress_Settings {
 		echo '
 		<div class="cf"></div>
 		<h2>' . __('Page filtered by ', 'arlo-for-wordpress' ) . '</h2>
-			' . $this->arlo_output_filter_editor('page_filter_settings', Arlo_For_Wordpress::$available_page_filters, $type, $id, Arlo_For_Wordpress::$page_filter_options, 'page', 'arlo-always-visible') . '
+			' . $this->arlo_output_filter_editor('arlo_page_filter_settings', Arlo_For_Wordpress::$available_page_filters, $type, $id, Arlo_For_Wordpress::$page_filter_options, 'page', 'arlo-always-visible') . '
 		</div>';
 
 		

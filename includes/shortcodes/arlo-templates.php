@@ -269,7 +269,7 @@ class Templates {
     private static function template_list_initializer($content = '', $atts = [], $shortcode_name = '', $import_id = '', $template_name) {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
 
-        $filter_settings = get_option('page_filter_settings', []);        
+        $filter_settings = get_option('arlo_page_filter_settings', []);        
         
         $templates = arlo_get_option('templates');
         $content = $templates[$template_name]['html'];
@@ -609,7 +609,7 @@ class Templates {
 
             $items = Filters::get_filter_options($filter_key, $import_id);
 
-            $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'), 'generic', $att);
+            $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'), 'generic', $att, $filter_group);
 
         endforeach; 
             

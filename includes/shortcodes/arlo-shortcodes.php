@@ -148,19 +148,16 @@ class Shortcodes {
 		return self::create_filter('region', $regions, null, null, \Arlo_For_Wordpress::get_region_parameter());
 	}
 
-	public static function create_filter($type, $items, $label, $group, $att_default=null) {
+	public static function create_filter($type, $items, $label, $group, $att_default=null, $page = '') {
 		if (count($items) == 0 || !is_array($items)) {
 			return '';
 		}
 
-		$filter_settings = get_option('arlo_filter_settings');
+		$filter_settings = get_option('arlo_filter_settings', []);
+		$page_filter_settings = get_option('arlo_page_filter_settings', []);
 
 		if (!empty($filter_settings[$group][$type][$label]) ) {
 			$label = $filter_settings[$group][$type][$label];
-		}
-
-		if (!empty($filter_settings['hiddenfilters'])) {
-			$hidden_filters = $filter_settings['hiddenfilters'];
 		}
 
 		$urlParameter = \Arlo\Utilities::clean_string_url_parameter('arlo-' . $type);
@@ -191,11 +188,20 @@ class Shortcodes {
 			}
 
 			$is_hidden = false;
-			if (!empty($hidden_filters[$group][$type])) {
-				$is_hidden = in_array($item['id'], $hidden_filters[$group][$type]);
+			if (!empty($filter_settings['hiddenfilters'][$group][$type])) {
+				$is_hidden = in_array($item['id'], $filter_settings['hiddenfilters'][$group][$type]);
 			}
 
-			if (!$is_hidden) {
+			if (!empty($page_filter_settings['hiddenfilters'][$page][$type])) {
+				$is_hidden = in_array($item['id'], $page_filter_settings['hiddenfilters'][$page][$type]);
+			}
+
+			$show_only = true;
+			if (!empty($page_filter_settings['showonlyfilters'][$page][$type])) {
+				$show_only = in_array($item['id'], $page_filter_settings['showonlyfilters'][$page][$type]);
+			}			
+
+			if (!$is_hidden && $show_only) {
 				$option_label = !empty($option_label) ? $option_label : $item['string'];
 
                 $selected = (strlen($selected_value) && strtolower($selected_value) == strtolower($item['value'])) ? ' selected="selected"' : '';
