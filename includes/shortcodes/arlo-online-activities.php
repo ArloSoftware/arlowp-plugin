@@ -341,7 +341,7 @@ class OnlineActivities {
 
         $output = '';
 
-        $join = '';
+        $join = [];
         $where = '';
         $parameters = array();
 
@@ -388,14 +388,14 @@ class OnlineActivities {
         endif;
 
         if(!empty($arlo_oatag)) :
-            $join .= " LEFT JOIN $t4 oa_tag ON oa_tag.oa_id = oa.oa_id AND oa_tag.import_id = oa.import_id";
+            $join['oa_tag'] = " LEFT JOIN $t4 AS oa_tag ON oa_tag.oa_id = oa.oa_id AND oa_tag.import_id = oa.import_id";
 
             $where .= " AND oa_tag.tag_id = %d";
             $parameters[] = $arlo_oatag;
         endif;
 
         if(!empty($arlo_templatetag) || !empty($arlo_templatetaghidden)) :    
-            $join .= " LEFT JOIN $t6 ett ON ett.et_id = et.et_id AND ett.import_id = et.import_id";
+            $join['ett'] = " LEFT JOIN $t6 AS ett ON ett.et_id = et.et_id AND ett.import_id = et.import_id";
 
             if (!empty($arlo_templatetag)) {
                 $where .= " AND ett.tag_id IN (" . implode(',', array_map(function() {return "%d";}, $arlo_templatetag)) . ")";
@@ -479,7 +479,7 @@ class OnlineActivities {
                 c.c_arlo_id = etc.c_arlo_id
             AND
                 c.import_id = etc.import_id
-            $join
+            " . implode("\n", $join) ."
             WHERE
             $where
             $order

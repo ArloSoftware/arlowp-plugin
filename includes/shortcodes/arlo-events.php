@@ -164,7 +164,7 @@ class Events {
         $settings = get_option('arlo_settings');
         
         $where = '';
-        $join = '';
+        $join = [];
         $parameters = [];
         
         $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
@@ -189,9 +189,7 @@ class Events {
         };
         
         if (!empty($arlo_state)) {
-            $join .= "
-                LEFT JOIN $t2 ce ON $t2.e_arlo_id = ce.e_parent_arlo_id AND $t2.import_id = ce.import_id
-            ";
+            $join['ce'] = " LEFT JOIN $t2 AS ce ON $t2.e_arlo_id = ce.e_parent_arlo_id AND $t2.import_id = ce.import_id ";
 
             $venues_query = $wpdb->prepare("SELECT v.v_arlo_id FROM $t3 v WHERE v.v_physicaladdressstate = %s", $arlo_state);
             $venues =  $wpdb->get_results( $venues_query, ARRAY_A);
@@ -239,7 +237,7 @@ class Events {
                 $t2.et_arlo_id = $t1.et_arlo_id
             AND
                 $t1.import_id = $t2.import_id
-            $join
+            " . implode("\n", $join) ."
             WHERE 
                 $t1.import_id = $import_id
             AND

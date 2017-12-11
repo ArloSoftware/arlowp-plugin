@@ -14,8 +14,6 @@ class Filters {
         $base_category = ((isset($GLOBALS['arlo_filter_base']['category']) && is_array($GLOBALS['arlo_filter_base']['category']) && count($GLOBALS['arlo_filter_base']['category'])) ? $GLOBALS['arlo_filter_base']['category'] : 0);
         $exclude_category = ((isset($GLOBALS['arlo_filter_base']['categoryhidden']) && is_array($GLOBALS['arlo_filter_base']['categoryhidden']) && count($GLOBALS['arlo_filter_base']['categoryhidden'])) ? $GLOBALS['arlo_filter_base']['categoryhidden'] : 0);
 
-
-
         switch ($filter) {
             case 'location':
                 $t1 = "{$wpdb->prefix}arlo_events";
@@ -27,10 +25,12 @@ class Filters {
                 }
 
                 if (!empty($post_id) || $post_id === 0) {
-                    $join[] = "LEFT JOIN 
+                    $join['et'] = " LEFT JOIN 
                                 {$wpdb->prefix}arlo_eventtemplates AS et
                             ON 
                                 et.et_arlo_id = e.et_arlo_id
+                            AND
+                                et.import_id = e.import_id
                                 " . (!empty($arlo_region) ? 'AND et.et_region = "' . esc_sql($arlo_region) . '"' : '' );
         
                     $where[] = ' et_post_id = ' . $post_id;
@@ -45,17 +45,17 @@ class Filters {
                     }
                     
                     if (empty($post_id)) {
-                        $join[] = "
+                        $join['et'] = "
                         LEFT JOIN 
                             {$wpdb->prefix}arlo_eventtemplates AS et
-                        ON
+                        ON 
                             et.et_arlo_id = e.et_arlo_id
                         AND
                             et.import_id = e.import_id
-                        ";    
+                        " . (!empty($arlo_region) ? 'AND et.et_region = "' . esc_sql($arlo_region) . '"' : '' );
                     }
 
-                    $join[] = "
+                    $join['etc'] = "
                     LEFT JOIN 
                         {$wpdb->prefix}arlo_eventtemplates_categories AS etc
                     ON
@@ -107,7 +107,7 @@ class Filters {
 
             case 'state':
 
-                $join[] =
+                $join['e'] =
                     "
                     LEFT JOIN 
                         {$wpdb->prefix}arlo_events AS e
@@ -118,12 +118,14 @@ class Filters {
                     ";
 
                 if (!empty($post_id) || $post_id === 0) {
-                    $join[] = "LEFT JOIN 
-                                {$wpdb->prefix}arlo_eventtemplates AS et
-                            ON 
-                                et.et_arlo_id = e.et_arlo_id
-                                " . (!empty($arlo_region) ? 'AND et.et_region = "' . esc_sql($arlo_region) . '"' : '' );
-        
+                    $join['et'] = "
+                    LEFT JOIN 
+                        {$wpdb->prefix}arlo_eventtemplates AS et
+                    ON 
+                        et.et_arlo_id = e.et_arlo_id
+                    AND
+                        et.import_id = e.import_id
+                    " . (!empty($arlo_region) ? 'AND et.et_region = "' . esc_sql($arlo_region) . '"' : '' );
                     $where[] = ' et_post_id = ' . $post_id;
                 }                      
 
@@ -142,18 +144,18 @@ class Filters {
                     }
                     
                     if (empty($post_id)) {
-                        $join[] = "
+                        $join['et'] = "
                         LEFT JOIN 
                             {$wpdb->prefix}arlo_eventtemplates AS et
-                        ON
+                        ON 
                             et.et_arlo_id = e.et_arlo_id
                         AND
                             et.import_id = e.import_id
-                        ";
+                        " . (!empty($arlo_region) ? 'AND et.et_region = "' . esc_sql($arlo_region) . '"' : '' );
                     }
 
 
-                    $join[] = "
+                    $join['etc'] = "
                     LEFT JOIN 
                         {$wpdb->prefix}arlo_eventtemplates_categories AS etc
                     ON
