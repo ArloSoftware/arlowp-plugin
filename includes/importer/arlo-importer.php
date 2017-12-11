@@ -132,7 +132,7 @@ class Importer {
 			", [$import_id]);
 		}
 		
-		$this->dbl->query($sql);
+		$query = $this->dbl->query($sql);
 
 		if ($query === false) {					
 			throw new \Exception('SQL error at set_tax_exempt_events: ' . $this->dbl->last_error);
