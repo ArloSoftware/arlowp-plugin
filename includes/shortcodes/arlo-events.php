@@ -196,14 +196,17 @@ class Events {
             ";
 
             $venues_query = $wpdb->prepare("SELECT v.v_arlo_id FROM $t3 v WHERE v.v_physicaladdressstate = %s", $arlo_state);
-            $venues = implode(', ', array_map(function ($venue) {
-              return $venue['v_arlo_id'];
-            }, $wpdb->get_results( $venues_query, ARRAY_A)));
+            $venues =  $wpdb->get_results( $venues_query, ARRAY_A);
 
-            $where .= " AND (ce.v_id IN (%s) OR $t3.v_arlo_id IN (%s))";
-
-            $parameters[] = $venues;
-            $parameters[] = $venues;
+            if (count($venues)) {
+                $venues = array_map(function ($venue) {
+                    return $venue['v_arlo_id'];
+                }, $venues);
+                
+                $where .= " AND (ce.v_id IN (" . implode(',', array_map(function() {return "%d";}, $venues)) . ") OR $t3.v_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $venues)) . "))";
+                $parameters = array_merge($parameters, $venues);
+                $parameters = array_merge($parameters, $venues);
+            }
         };        
 
         $sql = 
