@@ -508,10 +508,14 @@ class Events {
     private static function shortcode_event_session_list_item($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_event_list_item']['e_arlo_id'])) return '';
         global $post, $wpdb;
-        
+
+        extract(shortcode_atts(array(
+            'layout' => 'tooltip'
+        ), $atts, $shortcode_name, $import_id));
+
         $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
         $output = $where = '';
-        
+
         extract(shortcode_atts(array(
             'label' => __('Session information', 'arlo-for-wordpress'),
             'header' => __('Sessions', 'arlo-for-wordpress'),
@@ -519,7 +523,7 @@ class Events {
         
         if (!empty($arlo_region)) {
             $where = ' AND e_region = "' . esc_sql($arlo_region) . '"';
-        }       
+        }
         
         $sql = "
             SELECT 
@@ -544,19 +548,68 @@ class Events {
                         
         $items = $wpdb->get_results($sql, ARRAY_A);
         if (is_array($items) && count($items)) {
-            $output .= '<div data-tooltip="#' . ARLO_PLUGIN_PREFIX . '_session_tooltip_' . $GLOBALS['arlo_event_list_item']['e_arlo_id'] . '" class="' . ARLO_PLUGIN_PREFIX . '-tooltip-button">' . htmlentities($label, ENT_QUOTES, "UTF-8") . '</div>
+            $open = '';
+            $close = '';
+            $item_tag = '%s';
+
+            if ($layout == 'tooltip') {
+                $open = '<div data-tooltip="#' . ARLO_PLUGIN_PREFIX . '_session_tooltip_' . $GLOBALS['arlo_event_list_item']['e_arlo_id'] . '" class="' . ARLO_PLUGIN_PREFIX . '-tooltip-button">' . htmlentities($label, ENT_QUOTES, "UTF-8") . '</div>
             <div class="' . ARLO_PLUGIN_PREFIX . '-tooltip-html" id="' . ARLO_PLUGIN_PREFIX . '_session_tooltip_' . $GLOBALS['arlo_event_list_item']['e_arlo_id'] . '"><h5>' . htmlentities($header, ENT_QUOTES, "UTF-8") . '</h5>';
+
+                $close = '</div>';
+            } else if ($layout == 'popup') {
+                $modal_id = ARLO_PLUGIN_PREFIX . '_session_modal_' . $GLOBALS['arlo_event_list_item']['e_arlo_id'];
+
+                $open = '
+                <div class="arlo-bootstrap-modal">
+
+                    <a href="#" data-toggle="modal" data-target="#' . $modal_id . '">
+                      ' .  htmlentities($label, ENT_QUOTES, "UTF-8") . '
+                    </a>
+
+                    <div class="modal fade" id="' . $modal_id . '" tabindex="-1" role="dialog" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title">' . htmlentities($header, ENT_QUOTES, "UTF-8") . '</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                ';
+
+                $close = '
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                </div>
+                ';
+            } else {
+                $open = '<ul class="arlo-sessions">';
+                $close = '</ul>';
+                $item_tag = '<li class="arlo-session">%s</li>';
+            }
+
+
+            $output .= $open;
             
             foreach($items as $key => $item) {
         
                 $GLOBALS['arlo_event_session_list_item'] = $item;
                 
-                $output .= do_shortcode($content);
+                $output .= sprintf($item_tag, do_shortcode($content));
                 
                 unset($GLOBALS['arlo_event_session_list_item']);
             }
             
-            $output .= '</div>';    
+            $output .= $close;    
         }
         
         return $output;        
