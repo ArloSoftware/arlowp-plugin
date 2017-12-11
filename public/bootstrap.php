@@ -296,7 +296,8 @@ function arlo_register_custom_post_types() {
 				if (!empty($_COOKIE['arlo-region']) && in_array($_COOKIE['arlo-region'], array_keys($regions))) {
 					$selected_region = $_COOKIE['arlo-region'];
 				} else {
-					$selected_region = reset(array_keys($regions));
+					$regions_keys = array_keys($regions);
+					$selected_region = reset($regions_keys);
 				}
 				
 				setcookie("arlo-region", $selected_region, time()+60*60*24*30, '/');	
