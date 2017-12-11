@@ -82,7 +82,10 @@ class Shortcodes {
 	    // all shortcodes are run through filters to allow external manipulation if required, however we also need a means of running the passed function
 	    add_filter('arlo_shortcode_content_' . $shortcode_name, function($content='', $atts, $shortcode_name, $import_id='') use($closure) {
 			global $arlo_plugin;
-		    return $closure->invokeArgs(array($content, $atts, $shortcode_name, $arlo_plugin->get_importer()->get_current_import_id(), ''));
+			$import_id = $arlo_plugin->get_importer()->get_current_import_id();
+
+			if (!empty($import_id))
+		    	return $closure->invokeArgs(array($content, $atts, $shortcode_name, $import_id, ''));
 	    }, 10, 3);
 		
     }
