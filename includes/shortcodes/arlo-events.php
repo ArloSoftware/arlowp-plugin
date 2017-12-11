@@ -53,7 +53,7 @@ class Events {
 
             $items = \Arlo\Shortcodes\Filters::get_filter_options($filter_key, $import_id, $post->ID);
 
-            $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'), 'generic');
+            $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'),$filter_group);
 
         endforeach; 
             
@@ -330,6 +330,28 @@ class Events {
         return esc_html(self::event_date_formatter($atts, $event['e_finishdatetime'], $event['e_datetimeoffset'], $event['e_isonline'], $event['e_timezone_id']));
     }
 
+    private static function shortcode_event_dates($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if(!isset($GLOBALS['arlo_event_list_item']['e_finishdatetime']) && !isset($GLOBALS['arlo_event_session_list_item']['e_finishdatetime'])) return '';
+
+        $formatted_end_date = '';
+        
+        $event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
+
+        $start_date = $event['e_startdatetime'];
+        $end_date = $event['e_finishdatetime'];
+        $offset = $event['e_datetimeoffset'];
+        $is_online = $event['e_isonline'];
+        $timezone_id = $event['e_timezone_id'];
+
+        $formatted_start_date = esc_html(self::event_date_formatter($atts, $start_date, $offset, $is_online, $timezone_id));
+
+        if ((new \DateTime($end_date))->format('Y-m-d') !== (new \DateTime($start_date))->format('Y-m-d')) {
+            $formatted_end_date = '<span class="arlo-end-date">' . esc_html(self::event_date_formatter($atts, $end_date, $offset, $is_online, $timezone_id)) . '</span>';
+        }
+
+        return $formatted_start_date . $formatted_end_date;
+    }
+
     private static function shortcode_event_session_description($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_event_list_item']['e_sessiondescription'])) return '';
 
@@ -390,7 +412,7 @@ class Events {
     }
 
     private static function shortcode_event_offers($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        return Shortcodes::advertised_offers($GLOBALS['arlo_event_list_item']['e_id'], 'e_id', $import_id, $GLOBALS['arlo_event_list_item']['e_is_taxexempt']);
+        return Shortcodes::advertised_offers($GLOBALS['arlo_event_list_item']['e_id'], 'e_id', $import_id);
     }
 
     private static function get_event_presenters($import_id) {
@@ -951,8 +973,7 @@ class Events {
             'limit' => 1,
             'removeyear' => "true",
             'text' => '{%date%}',
-            'template_link' => 'registerlink',
-            'separator' => ', '
+            'template_link' => 'registerlink'
         ), $atts, $shortcode_name, $import_id));
         
         if (strpos($format, '%') === false) {
@@ -1051,7 +1072,7 @@ class Events {
                     }   
                 }   
                 
-                $return .= implode(($layout == 'list' ? "" : esc_html($separator)), $return_links);
+                $return .= implode(($layout == 'list' ? "" : ", "), $return_links);
             } 
             
             //show only, if there is no events or delivery filter set to "OA"
@@ -1100,10 +1121,11 @@ class Events {
     }
     
 
-    public static function event_date_formatter($atts, $date, $offset, $is_online = false, $timezoneid = null) {
+    public static function event_date_formatter($atts, $date, $offset, $is_online = false, $timezoneid = null, $end_date = null) {
         global $arlo_plugin;
         $timezone = $wp_timezone = $selected_timezone = null;
         $original_timezone = date_default_timezone_get();
+        $formatted_end_date = '';
         
         $timewithtz = str_replace(' ', 'T', $date) . $offset;
 
@@ -1180,6 +1202,6 @@ class Events {
 
         date_default_timezone_set($original_timezone);
 
-        return $date;
+        return $date . $formatted_end_date;
     }  
 }
