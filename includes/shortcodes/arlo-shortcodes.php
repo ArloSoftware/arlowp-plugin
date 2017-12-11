@@ -519,7 +519,9 @@ class Shortcodes {
 	}
 
 	public static function get_rich_snippet_field($event, $field) {
-		return array_key_exists($field,$event) ? ( !empty($event[$field]) ? $event[$field] : '' ) : '';
+		if (!empty($event)) {
+			return array_key_exists($field, $event) ? ( !empty($event[$field]) ? $event[$field] : '' ) : '';
+		}
 	}
 
     public static function get_template_permalink($post_name, $region) {
