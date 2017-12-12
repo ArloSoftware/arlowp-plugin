@@ -21,7 +21,7 @@ class Filters {
                 $where[] = " e.import_id = $import_id ";
 
                 if (!empty($arlo_region)) {
-                    $where[] = " AND e.e_region = '" . esc_sql($arlo_region) . "'";
+                    $where[] = " e.e_region = '" . esc_sql($arlo_region) . "'";
                 }
 
                 if (!empty($post_id) || $post_id === 0) {
