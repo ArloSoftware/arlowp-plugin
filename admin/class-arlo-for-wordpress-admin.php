@@ -597,9 +597,9 @@ class Arlo_For_Wordpress_Admin {
 			foreach($setting_array[$settings_name] as $filter_group_name => $filter_group) {
 				foreach ($filter_group as $filter_name => $filter_settings) {
 					foreach ($filter_settings as $filter_setting_id => $filter_setting) {
-						$old_value = esc_html($filter_setting['filteroldvalue']);
-						$new_value = esc_html($filter_setting['filternewvalue']);
-
+						$old_value = (isset($filter_setting['filteroldvalue']) ? esc_html($filter_setting['filteroldvalue']) : '');
+						$new_value = (isset($filter_setting['filternewvalue']) ? esc_html($filter_setting['filternewvalue']) : '');
+						
 						if (isset($filter_setting["filteraction"]) && $filter_setting["filteraction"] == "rename" && isset($old_value) && !empty($new_value)) {
 							$filters[$filter_group_name][$filter_name][$old_value] = $new_value;
 						}
