@@ -5,7 +5,7 @@ namespace Arlo;
 use Arlo\Utilities;
 
 class VersionHandler {
-	const VERSION = '3.5';
+	const VERSION = '3.5.1';
 
 	private $dbl;
 	private $message_handler;

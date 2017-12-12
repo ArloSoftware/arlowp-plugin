@@ -134,31 +134,34 @@ class Arlo_For_Wordpress_Settings {
 				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress') );
 			}
 
+			$urlparts = parse_url(site_url());
+			$domain = $urlparts['host'];
+
 			if (!empty($_GET['delete-shortcode']) && isset($_GET['_wpnonce']) && wp_verify_nonce($_GET['_wpnonce'], 'arlo-delete-shortcode-nonce')) {
 				unset( $_COOKIE['arlo-vertical-tab'] );
-				setcookie('arlo-vertical-tab', null, -1, '/');
+				setcookie('arlo-vertical-tab', null, -1, '/', $domain);
 				$settings_object["delete_shortcode"] = $_GET['delete-shortcode'];
 				update_option('arlo_settings', $settings_object);
 				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages') );
 			}
 
 			if ( array_key_exists('arlo-new-custom-shortcode', $_COOKIE) ) {
-				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages/' . $_COOKIE['arlo-new-custom-shortcode']) );
 				unset( $_COOKIE['arlo-new-custom-shortcode'] );
-				setcookie('arlo-new-custom-shortcode', null, -1, '/');
+				setcookie('arlo-new-custom-shortcode', null, -1, '/', $domain);
+				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages/' . $_COOKIE['arlo-new-custom-shortcode']) );
 			}
 
 			if ( array_key_exists('arlo-nav-tab', $_COOKIE) ) {
 				$nav_tab = $_COOKIE['arlo-nav-tab'];
 				unset( $_COOKIE['arlo-nav-tab'] );
-				setcookie('arlo-nav-tab', null, -1, '/');
+				setcookie('arlo-nav-tab', null, -1, '/', $domain);
 				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#' . $nav_tab) );
 			}
 
 			if ( array_key_exists('arlo-vertical-tab', $_COOKIE) ) {
 				$page = $_COOKIE['arlo-vertical-tab'];
 				unset( $_COOKIE['arlo-vertical-tab'] );
-				setcookie('arlo-vertical-tab', null, -1, '/');
+				setcookie('arlo-vertical-tab', null, -1, '/', $domain);
 				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages/' . $page) );
 			}
 
@@ -858,6 +861,14 @@ class Arlo_For_Wordpress_Settings {
 		<p><strong>If you are experiencing problems after an update, please deactivate and re-activate the plugin and re-synchronize the data.</strong></p>
 		
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">	  
+				<li>Admin page gets into a redirect loop on some webservers</li>
+				<li>Wrong filter URL if a global level shortcode is used on a home page</li>
+			</ul>
+		</p>
+
+		<h4>Version 3.5</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">	  
 				<li>New "template_link" attribute for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_next_running" target="_blank">[arlo_event_next_running]</a></li>

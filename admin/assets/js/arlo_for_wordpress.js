@@ -51,6 +51,10 @@ if (typeof (Arlo) === "undefined") {
 			$('#arlo-filter-settings').change(function() {
 				me.showFilterGroupSettings($(this).val());
 			});
+
+			//clear cookies
+			Cookies.remove("arlo-vertical-tab", { path: '/' });
+			Cookies.remove("arlo-nav-tab", { path: '/' });
 		},
 		initRegionFields: function() {
 			var me = this;

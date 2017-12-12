@@ -4,7 +4,7 @@ Tags: online registration, event registration, training management,  event manag
 
 Requires at least: 4.4
 Tested up to: 4.9
-Stable tag: 3.5
+Stable tag: 3.5.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -172,6 +172,11 @@ The Arlo - Training and Event Management, and online registration plugin is only
 11. Theme Jazz - Upcoming events
 
 == Changelog ==
+
+= 3.5.1 =
+
+Admin page gets into a redirect loop on some webservers
+Wrong filter URL if a global level shortcode is used on a home page
 
 = 3.5 =
 

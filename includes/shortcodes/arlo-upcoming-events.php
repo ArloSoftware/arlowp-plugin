@@ -200,18 +200,16 @@ class UpcomingEvents {
         
         $settings = get_option('arlo_settings');
         
-        $page_type = \Arlo_For_Wordpress::get_current_page_arlo_type();
+        $page_type = $filter_group = \Arlo_For_Wordpress::get_current_page_arlo_type('upcoming');
 
-        if (!empty($settings['post_types']['upcoming']['posts_page'])) {
+        if (!empty($settings['post_types'][$page_type]['posts_page'])) {
             $page_link = get_permalink(get_post($settings['post_types'][$page_type]['posts_page']));
         } else {
             $page_link = get_permalink(get_post($post));
         }
-            
+
         $filter_html = '<form class="arlo-filters" method="get" action="' . $page_link . '">';
 
-        $filter_group = \Arlo_For_Wordpress::get_current_page_arlo_type();
-            
         foreach(\Arlo_For_Wordpress::$available_filters['upcoming']['filters'] as $filter_key => $filter):
 
             $att = (isset(self::$upcoming_list_item_atts[$filter_key]) ? strval(self::$upcoming_list_item_atts[$filter_key]) : '');
