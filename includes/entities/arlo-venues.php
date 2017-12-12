@@ -25,10 +25,10 @@ class Venues {
 			switch($key) {
 				case 'id':
 					if(is_array($value)) {
-						$where[] = "v.v_arlo_id IN (%s)";
+						$where[] = "v.v_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $value)) . ")";
 						$parameters[] = implode(',', $value);
 					} else {
-						$where[] = "v.v_arlo_id = %s";
+						$where[] = "v.v_arlo_id = %d";
 						$parameters[] = $value;
 						$limit = 1;
 					}

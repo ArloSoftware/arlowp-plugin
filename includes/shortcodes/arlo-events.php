@@ -161,7 +161,6 @@ class Events {
                 $output .= do_shortcode($content);
 
                 unset($GLOBALS['arlo_venue_list_item']);
-                unset($GLOBALS['arlo_event_list_item']);
             }   
         } 
         
@@ -283,11 +282,10 @@ class Events {
             'id' => $event['v_id']
         );
 
-        $venue = \Arlo\Entities\Venues::get($conditions, null, null, $import_id);
-
         switch ($link) {
             case 'permalink': 
                 if(!($event['e_isonline'] || $event['v_id'] == 0 || $event['e_locationvisible'] == 0)) {
+                    $venue = \Arlo\Entities\Venues::get($conditions, null, null, $import_id);
                     $permalink = get_permalink(arlo_get_post_by_name($venue['v_post_name'], 'arlo_venue'));
                 }                   
             break;
