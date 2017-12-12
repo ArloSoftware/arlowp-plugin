@@ -600,6 +600,7 @@ class Events {
             SELECT 
                 e_name, 
                 e_id,
+                e_arlo_id,
                 e_locationname,
                 e_locationvisible,
                 e_startdatetime,
@@ -728,21 +729,49 @@ class Events {
         $price_field_show = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? 'o_formattedamounttaxexclusive' : 'o_formattedamounttaxinclusive';
         $free_text = (isset($settings['free_text'])) ? $settings['free_text'] : __('Free', 'arlo-for-wordpress');
         
-        $offer;
+        $offer = '';
         
         $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
 
-        // attempt to find event template offer
-        $conditions = array(
-            'event_template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id'],
-            'parent_id' => 0
-        );
-        
-        if (!empty($arlo_region)) {
-            $conditions['region'] = $arlo_region; 
+        // attempt to find session offer
+        if (isset($GLOBALS['arlo_event_session_list_item'])) {
+            $conditions = array(
+                'id' => $GLOBALS['arlo_event_session_list_item']['e_arlo_id']
+            );
+
+            if (!empty($arlo_region)) {
+                $conditions['region'] = $arlo_region; 
+            }               
+
+            $event = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), 1, $import_id);
+
+            if(empty($event)) return;
+            
+            $conditions = array(
+                'event_id' => $event->e_id,
+                'discounts' => false
+            );
+            
+            if (!empty($arlo_region)) {
+                $conditions['region'] = $arlo_region; 
+            }       
+            
+            $offer = \Arlo\Entities\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $import_id);
         }
 
-        $offer = \Arlo\Entities\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $import_id);
+        // if none, try the event template offer
+        if(!$offer) {
+            $conditions = array(
+                'event_template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id'],
+                'parent_id' => 0
+            );
+            
+            if (!empty($arlo_region)) {
+                $conditions['region'] = $arlo_region; 
+            }
+
+            $offer = \Arlo\Entities\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $import_id);
+        }
 
         // if none, try the associated events
         if(!$offer) {
