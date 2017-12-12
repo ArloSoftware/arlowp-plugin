@@ -1007,12 +1007,10 @@ class Events {
 
                 $href = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
 
-                $return .= sprintf('<a href="%s">%s</a>', $href, $display_text);
+                $return .= sprintf('<a href="%s">%s</a>', esc_html($href), esc_html($display_text));
 
                 $return .= ($layout == 'list' ? "</li>" : "");
-            } 
-
-            else if (count($events)) {
+            } else if (count($events)) {
                 $return_links = [];
                 
                 if (!is_array($events)) {
