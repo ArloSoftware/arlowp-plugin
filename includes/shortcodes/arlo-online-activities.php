@@ -504,7 +504,7 @@ class OnlineActivities {
 
         $settings = get_option('arlo_settings');
         
-        $page_type = \Arlo_For_Wordpress::get_current_page_arlo_type();
+        $page_type = $filter_group = \Arlo_For_Wordpress::get_current_page_arlo_type('oa');
 
         if (!empty($settings['post_types']['oa']['posts_page'])) {
             $page_link = get_permalink(get_post($settings['post_types'][$page_type]['posts_page']));
@@ -513,8 +513,6 @@ class OnlineActivities {
         }        
 
         $filter_html = '';
-
-        $filter_group = \Arlo_For_Wordpress::get_current_page_arlo_type();
 
         foreach($filters_array as $filter_key):
             

@@ -95,9 +95,13 @@ class VersionHandler {
 			$this->do_update('3.5');
 		}
 
+		if (version_compare($old_version, '3.5.1') < 0) {
+			$this->do_update('3.5.1');
+		}
+
 		if (version_compare($old_version, '3.6') < 0) {
 			$this->do_update('3.6');
-		}
+		
 	}
 	
 	private function run_pre_data_update($version) {
@@ -522,6 +526,19 @@ class VersionHandler {
 				update_option('arlo_filter_settings', $filter_settings);
 			break;
 
+			case '3.5.1':
+				//delete cookies
+				$urlparts = parse_url(site_url());
+				$domain = $urlparts['host'];
+
+				unset( $_COOKIE['arlo-nav-tab'] );
+				setcookie('arlo-nav-tab', null, -1, '/', $domain);
+
+				unset( $_COOKIE['arlo-vertical-tab'] );
+				setcookie('arlo-vertical-tab', null, -1, '/', $domain);
+				
+			break;			
+
 			case '3.6':
 				//update filter settings, if there is			
 				$filter_settings = get_option('arlo_filter_settings', []);
@@ -567,7 +584,7 @@ class VersionHandler {
 				}
 
 				update_option('arlo_filter_settings', $filter_settings);
-			break;
+
 		}	
 	}
 

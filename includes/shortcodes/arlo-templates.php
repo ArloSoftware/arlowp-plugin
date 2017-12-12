@@ -564,14 +564,14 @@ class Templates {
     }
 
     private static function shortcode_event_template_filters($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        return self::generate_template_filters_form($atts,$shortcode_name,$import_id);
+        return self::generate_template_filters_form($atts, $shortcode_name, $import_id, 'event');
     }
 
     private static function shortcode_schedule_filters($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        return self::generate_template_filters_form($atts,$shortcode_name,$import_id);
+        return self::generate_template_filters_form($atts, $shortcode_name, $import_id, 'schedule');
     }
 
-    private static function generate_template_filters_form($atts, $shortcode_name, $import_id) {
+    private static function generate_template_filters_form($atts, $shortcode_name, $import_id, $default_page = 'event') {
         global $post, $wpdb;
 
         extract(shortcode_atts(array(
@@ -584,7 +584,8 @@ class Templates {
         
         $settings = get_option('arlo_settings');
 
-        $page_type = \Arlo_For_Wordpress::get_current_page_arlo_type();        
+        $page_type = \Arlo_For_Wordpress::get_current_page_arlo_type($default_page);        
+        $filter_group = $page_type == 'event' ? 'events' : $page_type;
 
         if (!empty($settings['post_types'][$page_type]['posts_page'])) {
             $page_link = get_permalink(get_post($settings['post_types'][$page_type]['posts_page']));
@@ -593,11 +594,8 @@ class Templates {
         }
 
         $filter_html = '';
-
-        $filter_group = $page_type == 'event' ? 'events' : $page_type;        
-
+        
         $atts = is_array($atts) ? $atts : [];
-
         $atts = array_merge($atts, self::$event_template_atts);
 
         foreach(\Arlo_For_Wordpress::$available_filters[$page_type == 'schedule' ? 'schedule' : 'template']['filters'] as $filter_key => $filter):

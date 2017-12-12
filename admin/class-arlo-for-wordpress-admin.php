@@ -538,6 +538,9 @@ class Arlo_For_Wordpress_Admin {
 	}
 
 	public function settings_pre_saved($new, $old) {
+		$urlparts = parse_url(site_url());
+		$domain = $urlparts['host'];
+
 		if (empty($new['import_fragment_size']) || !is_numeric($new['import_fragment_size'])) {
 			$new['import_fragment_size'] = ImportRequest::FRAGMENT_DEFAULT_BYTE_SIZE;
 		} else if ($new['import_fragment_size'] > ImportRequest::FRAGMENT_MAX_BYTE_SIZE) {
@@ -561,7 +564,7 @@ class Arlo_For_Wordpress_Admin {
 
 			$shortcode_name = substr( sanitize_text_field(strtolower( str_replace( array("&","/","<",">","[","]","="),'',str_replace(' ','_',$new["new_custom_shortcode"]) ) )), 0, 15 ); // WP limits post name lengths
 
-			setcookie("arlo-new-custom-shortcode", $shortcode_name, time()+60*60*24*30, '/');	
+			setcookie("arlo-new-custom-shortcode", $shortcode_name, time()+60*60*24*30, '/', $domain);	
 
 			$shortcode_type = $new["new_custom_shortcode_type"];
 
