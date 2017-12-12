@@ -101,7 +101,7 @@ class VersionHandler {
 
 		if (version_compare($old_version, '3.6') < 0) {
 			$this->do_update('3.6');
-		
+		}
 	}
 	
 	private function run_pre_data_update($version) {
@@ -584,6 +584,8 @@ class VersionHandler {
 				}
 
 				update_option('arlo_filter_settings', $filter_settings);
+
+			break;
 
 		}	
 	}
