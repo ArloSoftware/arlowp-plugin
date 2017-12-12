@@ -289,6 +289,8 @@ function arlo_register_custom_post_types() {
 
 
 	if (is_array($regions) && count($regions)) {
+		$urlparts = parse_url(site_url());
+		$domain = $urlparts['host'];
 
 		if (((array_key_exists($page_id, $arlo_page_ids) && !empty($settings['post_types'][$arlo_page_ids[$page_id]]['posts_page'])) || $page_type == 'arlo_event')) {
 			if (empty($selected_region)) {
@@ -299,7 +301,7 @@ function arlo_register_custom_post_types() {
 					$selected_region = reset(array_keys($regions));
 				}
 				
-				setcookie("arlo-region", $selected_region, time()+60*60*24*30, '/');	
+				setcookie("arlo-region", $selected_region, time()+60*60*24*30, '/', $domain);	
 				
 				if ($page_type == 'arlo_event') {
 					$slug = substr(substr(str_replace(get_home_url(), '', get_post_permalink($page_id)), 0, -1), 1);	
@@ -312,11 +314,11 @@ function arlo_register_custom_post_types() {
 				wp_redirect(esc_url($location));
 				exit();				
 			} else {
-				setcookie("arlo-region", $selected_region, time()+60*60*24*30, '/');	
+				setcookie("arlo-region", $selected_region, time()+60*60*24*30, '/', $domain);	
 			}
 		} else {
 			if (empty($_COOKIE['arlo-region'])) {
-				setcookie("arlo-region", reset(array_keys($regions)), time()+60*60*24*30, '/');
+				setcookie("arlo-region", reset(array_keys($regions)), time()+60*60*24*30, '/', $domain);
 				wp_redirect($_SERVER['REQUEST_URI']);
 			}
 		}
