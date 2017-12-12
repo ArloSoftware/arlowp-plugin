@@ -863,6 +863,14 @@ class Arlo_For_Wordpress_Settings {
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">	  
+				<li>Admin page gets into a redirect loop on some webservers</li>
+				<li>Wrong filter URL if a global level shortcode is used on a home page</li>
+			</ul>
+		</p>
+
+		<h4>Version 3.5</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">	  
 				<li>New "template_link" attribute for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_next_running" target="_blank">[arlo_event_next_running]</a></li>
 				<li>Enhance the output of <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_address" target="_blank">[arlo_venue_address]</a> and new "link" attribute</li>
 				<li>New "Region selector" widget</li>
