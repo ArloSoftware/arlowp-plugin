@@ -94,6 +94,12 @@ if (typeof (Arlo) === "undefined") {
 			});
 		},
 		filterActionChange: function() {
+			$('.arlo-filter-action select').each(function() {
+				var val = $(this).val();
+				if (val == 'rename') {
+					$(this).closest('li').find('.arlo-filter-new-value').show();
+				}
+			});
 			$('.arlo-filter-action select').change(function() {
 				var val = $(this).val()
 				if (val == 'rename') {
