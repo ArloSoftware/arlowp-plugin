@@ -935,7 +935,7 @@ class Events {
             'output' => 'Event full'
         ), $atts, $shortcode_name, $import_id));
 
-        if ($GLOBALS['arlo_event_list_item']["e_isfull"] == "1") {
+        if ($GLOBALS['arlo_event_list_item']["e_isfull"] == 1) {
             return $output;
         }
     }
