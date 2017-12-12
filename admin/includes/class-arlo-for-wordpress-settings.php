@@ -146,23 +146,45 @@ class Arlo_For_Wordpress_Settings {
 			}
 
 			if ( array_key_exists('arlo-new-custom-shortcode', $_COOKIE) ) {
+				$custom_shortcode = $_COOKIE['arlo-new-custom-shortcode'];
 				unset( $_COOKIE['arlo-new-custom-shortcode'] );
 				setcookie('arlo-new-custom-shortcode', null, -1, '/', $domain);
-				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages/' . $_COOKIE['arlo-new-custom-shortcode']) );
+
+				//some shared hosting doesn't delete the cookie properly
+				if (!isset($_SESSION['arlo-new-custom-shortcode'])) {
+					$_SESSION['arlo-new-custom-shortcode'] = true;
+					wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages/' . $custom_shortcode) );
+				} else {
+					unset($_SESSION['arlo-new-custom-shortcode']);
+				}
 			}
 
 			if ( array_key_exists('arlo-nav-tab', $_COOKIE) ) {
 				$nav_tab = $_COOKIE['arlo-nav-tab'];
 				unset( $_COOKIE['arlo-nav-tab'] );
 				setcookie('arlo-nav-tab', null, -1, '/', $domain);
-				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#' . $nav_tab) );
+
+				//some shared hosting doesn't delete the cookie properly
+				if (!isset($_SESSION['arlo-nav-tab'])) {
+					$_SESSION['arlo-nav-tab'] = true;
+					wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#' . $nav_tab) );
+				} else {
+					unset($_SESSION['arlo-nav-tab']);
+				}
 			}
 
 			if ( array_key_exists('arlo-vertical-tab', $_COOKIE) ) {
 				$page = $_COOKIE['arlo-vertical-tab'];
 				unset( $_COOKIE['arlo-vertical-tab'] );
 				setcookie('arlo-vertical-tab', null, -1, '/', $domain);
-				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages/' . $page) );
+
+				//some shared hosting doesn't delete the cookie properly
+				if (!isset($_SESSION['arlo-vertical-tab'])) {
+					$_SESSION['arlo-vertical-tab'] = true;
+					wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages/' . $page) );
+				} else {
+					unset($_SESSION['arlo-vertical-tab']);
+				}
 			}
 
 			add_action( 'admin_print_scripts', array($this, "arlo_check_current_tasks") );			
