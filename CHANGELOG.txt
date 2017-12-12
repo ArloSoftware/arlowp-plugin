@@ -12,6 +12,12 @@ Ability to filter global level shortcodes by mutliple categories/location/templa
 Delivery filter for on demand events (online activities)
 Support tax exempt tags
 
+== V3.5.1 ==
+
+Bugfixes
+------------------
+Admin page gets into a redirect loop on some webservers
+Wrong filter URL if a global level shortcode is used on a home page
 
 
 == V3.5 ==

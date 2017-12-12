@@ -3,7 +3,11 @@ Contributors: ArloSoftware, adamfentosi
 Tags: online registration, event registration, training management,  event management, event plugin, training company software, training calendar, training administration, training management software, training provider, solution, events calendar, wordpress events, event ticketing, wordpress lms, class registration, conference registration,  ticket, registration, event manager, training, booking, ticketing, courses, events, training, calendar, course management
 Requires at least: 4.4
 Tested up to: 4.9
+<<<<<<< HEAD
 Stable tag: 3.6
+=======
+Stable tag: 3.5.1
+>>>>>>> hotfix-adminredirectandfilterissue
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -181,6 +185,10 @@ Use category header as meta description if category is selected as a filter
 Ability to filter global level shortcodes by mutliple categories/location/templatetag/eventtag
 Delivery filter for on demand events (online activities)
 Support tax exempt tags
+= 3.5.1 =
+
+Admin page gets into a redirect loop on some webservers
+Wrong filter URL if a global level shortcode is used on a home page
 
 = 3.5 =
 

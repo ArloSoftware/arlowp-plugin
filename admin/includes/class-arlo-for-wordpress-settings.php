@@ -134,32 +134,57 @@ class Arlo_For_Wordpress_Settings {
 				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress') );
 			}
 
+			$urlparts = parse_url(site_url());
+			$domain = $urlparts['host'];
+
 			if (!empty($_GET['delete-shortcode']) && isset($_GET['_wpnonce']) && wp_verify_nonce($_GET['_wpnonce'], 'arlo-delete-shortcode-nonce')) {
 				unset( $_COOKIE['arlo-vertical-tab'] );
-				setcookie('arlo-vertical-tab', null, -1, '/');
+				setcookie('arlo-vertical-tab', null, -1, '/', $domain);
 				$settings_object["delete_shortcode"] = $_GET['delete-shortcode'];
 				update_option('arlo_settings', $settings_object);
 				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages') );
 			}
 
 			if ( array_key_exists('arlo-new-custom-shortcode', $_COOKIE) ) {
-				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages/' . $_COOKIE['arlo-new-custom-shortcode']) );
+				$custom_shortcode = $_COOKIE['arlo-new-custom-shortcode'];
 				unset( $_COOKIE['arlo-new-custom-shortcode'] );
-				setcookie('arlo-new-custom-shortcode', null, -1, '/');
+				setcookie('arlo-new-custom-shortcode', null, -1, '/', $domain);
+
+				//some shared hosting doesn't delete the cookie properly
+				if (!isset($_SESSION['arlo-new-custom-shortcode'])) {
+					$_SESSION['arlo-new-custom-shortcode'] = true;
+					wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages/' . $custom_shortcode) );
+				} else {
+					unset($_SESSION['arlo-new-custom-shortcode']);
+				}
 			}
 
 			if ( array_key_exists('arlo-nav-tab', $_COOKIE) ) {
 				$nav_tab = $_COOKIE['arlo-nav-tab'];
 				unset( $_COOKIE['arlo-nav-tab'] );
-				setcookie('arlo-nav-tab', null, -1, '/');
-				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#' . $nav_tab) );
+				setcookie('arlo-nav-tab', null, -1, '/', $domain);
+
+				//some shared hosting doesn't delete the cookie properly
+				if (!isset($_SESSION['arlo-nav-tab'])) {
+					$_SESSION['arlo-nav-tab'] = true;
+					wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#' . $nav_tab) );
+				} else {
+					unset($_SESSION['arlo-nav-tab']);
+				}
 			}
 
 			if ( array_key_exists('arlo-vertical-tab', $_COOKIE) ) {
 				$page = $_COOKIE['arlo-vertical-tab'];
 				unset( $_COOKIE['arlo-vertical-tab'] );
-				setcookie('arlo-vertical-tab', null, -1, '/');
-				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages/' . $page) );
+				setcookie('arlo-vertical-tab', null, -1, '/', $domain);
+
+				//some shared hosting doesn't delete the cookie properly
+				if (!isset($_SESSION['arlo-vertical-tab'])) {
+					$_SESSION['arlo-vertical-tab'] = true;
+					wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages/' . $page) );
+				} else {
+					unset($_SESSION['arlo-vertical-tab']);
+				}
 			}
 
 			add_action( 'admin_print_scripts', array($this, "arlo_check_current_tasks") );			
@@ -924,6 +949,14 @@ class Arlo_For_Wordpress_Settings {
 				<li>Support tax exempt tags</li>
 			</ul>
 		</p>	
+
+		<h4>Version 3.5</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">	  
+				<li>Admin page gets into a redirect loop on some webservers</li>
+				<li>Wrong filter URL if a global level shortcode is used on a home page</li>
+			</ul>
+		</p>
 
 		<h4>Version 3.5</h4>
 		<p>

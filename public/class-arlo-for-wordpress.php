@@ -1812,7 +1812,7 @@ class Arlo_For_Wordpress {
 		update_option('arlo_settings', $settings);
 	}
 
-    public static function get_current_page_arlo_type() {
+    public static function get_current_page_arlo_type($default_page = null) {
         global $post;
 
         $settings = get_option('arlo_settings');
@@ -1820,7 +1820,9 @@ class Arlo_For_Wordpress {
             if ($post_type["posts_page"] == $post->ID) {
                 return $key;
             }
-        }
+		}
+		
+		return $default_page; 
     }
 
     public static function get_region_parameter() {
