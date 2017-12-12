@@ -54,7 +54,6 @@ class Events {
             $items = \Arlo\Shortcodes\Filters::get_filter_options($filter_key, $import_id, $post->ID);
 
             $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'),$filter_group);
-
         endforeach; 
             
         if (!empty($filter_html)) {
@@ -343,10 +342,10 @@ class Events {
         $is_online = $event['e_isonline'];
         $timezone_id = $event['e_timezone_id'];
 
-        $formatted_start_date = esc_html(self::event_date_formatter($atts, $start_date, $offset, $is_online, $timezone_id));
+        $formatted_start_date = '<span class="arlo-start-date">' . esc_html( call_user_func_array('self::shortcode_event_start_date', func_get_args()) ) . '</span>';
 
         if ((new \DateTime($end_date))->format('Y-m-d') !== (new \DateTime($start_date))->format('Y-m-d')) {
-            $formatted_end_date = '<span class="arlo-end-date">' . esc_html(self::event_date_formatter($atts, $end_date, $offset, $is_online, $timezone_id)) . '</span>';
+            $formatted_end_date = '<span class="arlo-end-date">' . esc_html( call_user_func_array('self::shortcode_event_end_date', func_get_args()) ) . '</span>';
         }
 
         return $formatted_start_date . $formatted_end_date;
@@ -1121,7 +1120,7 @@ class Events {
     }
     
 
-    public static function event_date_formatter($atts, $date, $offset, $is_online = false, $timezoneid = null, $end_date = null) {
+    public static function event_date_formatter($atts, $date, $offset, $is_online = false, $timezoneid = null) {
         global $arlo_plugin;
         $timezone = $wp_timezone = $selected_timezone = null;
         $original_timezone = date_default_timezone_get();
