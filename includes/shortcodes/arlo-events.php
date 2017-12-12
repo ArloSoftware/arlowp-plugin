@@ -509,10 +509,6 @@ class Events {
         if(!isset($GLOBALS['arlo_event_list_item']['e_arlo_id'])) return '';
         global $post, $wpdb;
 
-        extract(shortcode_atts(array(
-            'layout' => 'tooltip'
-        ), $atts, $shortcode_name, $import_id));
-
         $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
         $output = $where = '';
 
@@ -552,51 +548,54 @@ class Events {
             $close = '';
             $item_tag = '%s';
 
-            if ($layout == 'tooltip') {
-                $open = '<div data-tooltip="#' . ARLO_PLUGIN_PREFIX . '_session_tooltip_' . $GLOBALS['arlo_event_list_item']['e_arlo_id'] . '" class="' . ARLO_PLUGIN_PREFIX . '-tooltip-button">' . htmlentities($label, ENT_QUOTES, "UTF-8") . '</div>
-            <div class="' . ARLO_PLUGIN_PREFIX . '-tooltip-html" id="' . ARLO_PLUGIN_PREFIX . '_session_tooltip_' . $GLOBALS['arlo_event_list_item']['e_arlo_id'] . '"><h5>' . htmlentities($header, ENT_QUOTES, "UTF-8") . '</h5>';
+            switch($layout) {
+                case 'tooltip':
+                    $open = '<div data-tooltip="#' . ARLO_PLUGIN_PREFIX . '_session_tooltip_' . $GLOBALS['arlo_event_list_item']['e_arlo_id'] . '" class="' . ARLO_PLUGIN_PREFIX . '-tooltip-button">' . htmlentities($label, ENT_QUOTES, "UTF-8") . '</div>
+                <div class="' . ARLO_PLUGIN_PREFIX . '-tooltip-html" id="' . ARLO_PLUGIN_PREFIX . '_session_tooltip_' . $GLOBALS['arlo_event_list_item']['e_arlo_id'] . '"><h5>' . htmlentities($header, ENT_QUOTES, "UTF-8") . '</h5>';
 
-                $close = '</div>';
-            } else if ($layout == 'popup') {
-                $modal_id = ARLO_PLUGIN_PREFIX . '_session_modal_' . $GLOBALS['arlo_event_list_item']['e_arlo_id'];
+                    $close = '</div>';
+                    break;
+                case 'popup':
+                    $modal_id = ARLO_PLUGIN_PREFIX . '_session_modal_' . $GLOBALS['arlo_event_list_item']['e_arlo_id'];
 
-                $open = '
-                <div class="arlo-bootstrap-modal">
+                    $open = '
+                    <div class="arlo-bootstrap-modal">
 
-                    <a href="#" data-toggle="modal" data-target="#' . $modal_id . '">
-                      ' .  htmlentities($label, ENT_QUOTES, "UTF-8") . '
-                    </a>
+                        <a href="#" data-toggle="modal" data-target="#' . $modal_id . '">
+                          ' .  htmlentities($label, ENT_QUOTES, "UTF-8") . '
+                        </a>
 
-                    <div class="modal fade" id="' . $modal_id . '" tabindex="-1" role="dialog" aria-hidden="true">
-                      <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h5 class="modal-title">' . htmlentities($header, ENT_QUOTES, "UTF-8") . '</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                              <span aria-hidden="true">&times;</span>
-                            </button>
-                          </div>
-                          <div class="modal-body">
-                ';
+                        <div class="modal fade" id="' . $modal_id . '" tabindex="-1" role="dialog" aria-hidden="true">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title">' . htmlentities($header, ENT_QUOTES, "UTF-8") . '</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body">
+                    ';
 
-                $close = '
-                          </div>
-                          <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary">Save changes</button>
+                    $close = '
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary">Save changes</button>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      </div>
+
                     </div>
-
-                </div>
-                ';
-            } else {
-                $open = '<ul class="arlo-sessions">';
-                $close = '</ul>';
-                $item_tag = '<li class="arlo-session">%s</li>';
+                    ';
+                    break;
+                default:
+                    $open = '<ul class="arlo-sessions">';
+                    $close = '</ul>';
+                    $item_tag = '<li class="arlo-session">%s</li>';
+                    break;
             }
-
 
             $output .= $open;
             
