@@ -1832,7 +1832,7 @@ class Arlo_For_Wordpress {
 			? strtoupper(get_query_var('arlo-region', ''))
 			: (!empty($_COOKIE['arlo-region']) ? $_COOKIE['arlo-region'] : '');
 
-		return (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+		return (!empty($arlo_region) && is_array($regions) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
     }
     
    	public function get_tag_by_id($tag_id) {
