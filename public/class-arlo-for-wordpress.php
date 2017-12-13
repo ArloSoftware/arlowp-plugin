@@ -1132,6 +1132,8 @@ class Arlo_For_Wordpress {
 		$filter_settings = get_option('arlo_page_filter_settings', []);
 
 		$page = get_post($page_id);
+		if (!$page) return;
+		
 		$template_name = $page->post_name;
 
 		//too early to call get_selected_categories()
