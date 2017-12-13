@@ -109,7 +109,7 @@ class Arlo_For_Wordpress_Settings {
 					$stored_themes_settings = get_option( 'arlo_themes_settings', [] );
 
 					//check if there is already a stored settings for the theme, or need to be reset
-					if ($_GET['reset'] == 1 || empty($stored_themes_settings[$theme_id])) {
+					if ((!empty($_GET['reset']) && $_GET['reset'] == 1) || empty($stored_themes_settings[$theme_id])) {
 						$stored_themes_settings[$theme_id] = $theme_settings[$theme_id];
 						$stored_themes_settings[$theme_id]->templates = $theme_manager->load_default_templates($theme_id);
 					}
