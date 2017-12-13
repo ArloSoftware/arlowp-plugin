@@ -761,7 +761,7 @@ class Templates {
             }
 
             if(isset($arlo_delivery) || isset($arlo_deliveryhidden)) {
-                if (!empty($arlo_delivery)) {
+                if (isset($arlo_delivery)) {
                     $where .= ' AND ( 1 ';
                     foreach ($arlo_delivery as $delivery) {
                         switch ($delivery) {
@@ -781,7 +781,7 @@ class Templates {
                     
                 }
     
-                if (!empty($arlo_deliveryhidden)) {            
+                if (isset($arlo_deliveryhidden)) {            
                     $join['oa'] = " LEFT JOIN $t8 AS oa ON oa.oat_arlo_id = et.et_arlo_id AND oa.import_id = et.import_id ";
                     foreach ($arlo_deliveryhidden as $delivery) {
                         switch ($delivery) {

@@ -360,7 +360,7 @@ class UpcomingEvents {
         endif;
 
         if(isset($arlo_delivery) || isset($arlo_deliveryhidden)) :
-            if (!empty($arlo_delivery)) {
+            if (isset($arlo_delivery)) {
                 if (!is_array($arlo_delivery)) 
                     $arlo_delivery = [$arlo_delivery];
                 
@@ -368,7 +368,7 @@ class UpcomingEvents {
                 $parameters = array_merge($parameters, $arlo_delivery);    
             }
 
-            if (!empty($arlo_deliveryhidden)) {    
+            if (isset($arlo_deliveryhidden)) {    
                 if (!is_array($arlo_deliveryhidden)) 
                     $arlo_deliveryhidden = [$arlo_deliveryhidden];        
 
@@ -548,6 +548,8 @@ class UpcomingEvents {
 
 
         $query = $wpdb->prepare($sql, $parameters);
+
+        echo "<pre>$query</pre>";
 
         if ($query) {
             return $query;
