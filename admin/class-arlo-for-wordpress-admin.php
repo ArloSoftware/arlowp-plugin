@@ -596,7 +596,7 @@ class Arlo_For_Wordpress_Admin {
 		//normalize filters options
 		$filters = array();
 
-		if (is_array($setting_array[$settings_name]) && count($setting_array[$settings_name])) {
+		if (isset($setting_array[$settings_name]) && is_array($setting_array[$settings_name]) && count($setting_array[$settings_name])) {
 			foreach($setting_array[$settings_name] as $filter_group_name => $filter_group) {
 				foreach ($filter_group as $filter_name => $filter_settings) {
 					foreach ($filter_settings as $filter_setting_id => $filter_setting) {
@@ -680,7 +680,10 @@ class Arlo_For_Wordpress_Admin {
 		}
 
 		//check if the tax exempt tag has changed
-		if (!empty($import_id) && $new['taxexempt_tag'] != $old['taxexempt_tag']) {
+		if (!empty($import_id) && (
+			(isset($new['taxexempt_tag']) && isset($old['taxexempt_tag']) && $new['taxexempt_tag'] != $old['taxexempt_tag']) ||
+			!isset($new['taxexempt_tag']) || !isset($old['taxexempt_tag'])
+			)) {
 			$plugin->get_importer()->set_tax_exempt_events($import_id);
 		}
 
