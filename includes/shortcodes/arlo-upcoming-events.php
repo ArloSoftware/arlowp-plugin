@@ -549,8 +549,6 @@ class UpcomingEvents {
 
         $query = $wpdb->prepare($sql, $parameters);
 
-        echo "<pre>$query</pre>";
-
         if ($query) {
             return $query;
         } else {
