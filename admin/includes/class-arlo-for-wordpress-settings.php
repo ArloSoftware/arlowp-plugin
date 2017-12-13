@@ -604,10 +604,11 @@ class Arlo_For_Wordpress_Settings {
 		echo '</h3>';
 
     	if ($is_custom_shortcode) {
+			$type_name = ($type == 'events' ? 'catalogue' : $type);
 			echo '
 			<div class="arlo-label"><label>' .  __("Shortcode type", 'arlo-for-wordpress' ) . '</label></div>
 			<div class="arlo-field">
-				<span>'.ucfirst($type).' '.__('page', 'arlo-for-wordpress' ).'</span>
+				<span>'.ucfirst($type_name).' '.__('page', 'arlo-for-wordpress' ).'</span>
 			</div><br><br>';
     	}
 
