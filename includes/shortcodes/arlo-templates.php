@@ -388,7 +388,7 @@ class Templates {
         $sql = self::generate_list_sql($atts, $import_id);
 
         $items = $wpdb->get_results($sql, ARRAY_A);
-            
+        
         if(empty($items)) :
             if (!(isset($atts['show_only_at_bottom']) && $atts['show_only_at_bottom'] == "true" && isset($GLOBALS['arlo_categories_count']) && $GLOBALS['arlo_categories_count'])) :
                 $GLOBALS['no_event_text'] = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', 'arlo-for-wordpress');
@@ -838,16 +838,18 @@ class Templates {
         endif;	
 
         if(!empty($arlo_templatetag) || !empty($arlo_templatetaghidden)) :
-            $join['ett'] = " LEFT JOIN $t6 AS ett ON et.et_id = ett.et_id AND ett.import_id = et.import_id ";
 
             if (!empty($arlo_templatetag)) {
+                $join['ett'] = " LEFT JOIN $t6 AS ett ON et.et_id = ett.et_id AND ett.import_id = et.import_id ";
+
                 $where .= " AND ett.tag_id IN (" . implode(',', array_map(function() {return "%d";}, $arlo_templatetag)) . ")";
                 $parameters = array_merge($parameters, $arlo_templatetag);    
             }
             
             if (!empty($arlo_templatetaghidden)) {
-                $where .= " AND (ett.tag_id NOT IN (" . implode(',', array_map(function() {return "%d";}, $arlo_templatetaghidden)) . ") OR ett.tag_id IS NULL)";
-                $parameters = array_merge($parameters, $arlo_templatetaghidden);    
+                $tag_id_substitutes = implode(', ', array_map(function() {return "%d";}, $arlo_templatetaghidden));
+                $where .= " AND NOT EXISTS( SELECT tag_id FROM $t6 WHERE tag_id IN ($tag_id_substitutes) AND et.et_id = et_id AND import_id = et.import_id )";
+                $parameters = array_merge($parameters, $arlo_templatetaghidden);
             }
         endif;
 
