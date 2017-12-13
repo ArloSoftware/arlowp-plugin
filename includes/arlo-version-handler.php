@@ -592,37 +592,40 @@ class VersionHandler {
 						}
 					}
 				}
-				foreach ($filter_settings['arlohiddenfilters'] as $page => $filter_options) {		
-					if (!isset($new_settings_array['hiddenfilters'][$page])) {
-						$new_settings_array['hiddenfilters'][$page] = [];
-					}
-		
-					foreach ($filter_options as $group => $filters) {
-						if (!isset($new_settings_array['hiddenfilters'][$page][$group])) {
-							$new_settings_array['hiddenfilters'][$page][$group] = [];
+				if (isset($filter_settings['arlohiddenfilters']) && is_array($filter_settings['arlohiddenfilters'])) {
+					foreach ($filter_settings['arlohiddenfilters'] as $page => $filter_options) {		
+						if (!isset($new_settings_array['hiddenfilters'][$page])) {
+							$new_settings_array['hiddenfilters'][$page] = [];
 						}
-		
-						switch ($group) {
-							case 'category':
-							break;
-		
-							case 'delivery':
-								foreach ($filters as $filter) {
-									$delivery_key = array_search($filter, \Arlo_For_Wordpress::$delivery_labels);
-									if ($delivery_key !== false)
-										$new_settings_array['hiddenfilters'][$page][$group][] = $delivery_key;
-								}
-							break;
-							default: 
-								foreach ($filters as $filter) {
-									if (!empty($filter))
-										$new_settings_array['hiddenfilters'][$page][$group][] = $filter;
-									
-								}
-							break;
+			
+						foreach ($filter_options as $group => $filters) {
+							if (!isset($new_settings_array['hiddenfilters'][$page][$group])) {
+								$new_settings_array['hiddenfilters'][$page][$group] = [];
+							}
+			
+							switch ($group) {
+								case 'category':
+								break;
+			
+								case 'delivery':
+									foreach ($filters as $filter) {
+										$delivery_key = array_search($filter, \Arlo_For_Wordpress::$delivery_labels);
+										if ($delivery_key !== false)
+											$new_settings_array['hiddenfilters'][$page][$group][] = $delivery_key;
+									}
+								break;
+								default: 
+									foreach ($filters as $filter) {
+										if (!empty($filter))
+											$new_settings_array['hiddenfilters'][$page][$group][] = $filter;
+										
+									}
+								break;
+							}
 						}
 					}
 				}
+				
 
 				//now remove by-page filters and only keep hidden and delivery
 				$filter_settings = $new_settings_array;
