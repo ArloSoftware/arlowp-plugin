@@ -253,8 +253,8 @@ class Arlo_For_Wordpress {
 	 */
     public static $delivery_labels = array(
         0 => 'Workshop',
-		1 => 'Online',
-		99 => 'Online Activity'
+        1 => 'Online',
+        99 => 'Online Activity'
     );
     
 	/**
@@ -494,6 +494,9 @@ class Arlo_For_Wordpress {
 		// Register custom post types
 		add_action( 'init', 'arlo_register_custom_post_types');
 
+		// Add review notice
+		add_action( 'init', array( $this, 'arlo_add_review_message' ) );
+
 		// Load public-facing style sheet and JavaScript.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -525,6 +528,8 @@ class Arlo_For_Wordpress {
 	
 	
 		add_action( 'wp_ajax_arlo_dismissible_notice', array($this, 'dismissible_notice_callback'));
+
+		add_action( 'wp_ajax_arlo_increment_review_notice_date', array($this, 'increment_review_notice_date'));
 
 		add_action( 'wp_ajax_arlo_turn_off_send_data', array($this, 'turn_off_send_data_callback'));
 		
@@ -864,6 +869,9 @@ class Arlo_For_Wordpress {
 		// run import every 15 minutes
 		Logger::log("Plugin activated");
 
+		// set date to show review notice
+		self::set_review_notice_date("+7 day");
+
 		// now add pages
 		self::add_pages();
 
@@ -882,6 +890,54 @@ class Arlo_For_Wordpress {
 			do_action('arlo_scheduler');
 		}
 	}
+
+
+	/**
+	 * Set the date to show the review notice
+	 *
+	 * @since    3.7.0
+	 *
+	 */	
+	public function set_review_notice_date($increment) {
+		$date = \DateTime::createFromFormat('U', strtotime($increment, time()))->format("Y-m-d H:i:s");
+		update_option('arlo_review_notice_date',$date);
+	}
+
+
+	/**
+	 * Increment the date to show the review notice
+	 *
+	 * @since    3.7.0
+	 *
+	 */	
+	public function increment_review_notice_date() {
+		self::set_review_notice_date("+1 month");
+		$this->get_message_handler()->delete_messages('review');
+	}
+
+
+	/**
+	 * Add a review message
+	 *
+	 * @since    3.7.0
+	 *
+	 */	
+	public function arlo_add_review_message() {
+		$review_notice_date = get_option('arlo_review_notice_date');
+
+		if (time() >= strtotime($review_notice_date) && $this->get_message_handler()->get_message_by_type_count('review', true) == 0) {
+			$message = "<p>
+				It's great to see that you've been using the <strong>Arlo for WordPress</strong> plugin for a while now. Hopefully you're happy with it! If so, would you consider leaving a positive review? It really helps to support the plugin and helps others to discover it too!
+			</p>
+			<p>
+				<a href='https://wordpress.org/support/plugin/arlo-training-and-event-management-system/reviews/' target='_blank' class='arlo-review-option'>Sure, I'd love to!</a> &#8226; <a href='#' target='_blank' class='arlo-review-option notice-dismiss-custom'>No thanks</a> &#8226; <a href='https://support.arlo.co/hc/en-gb/requests/new' target='_blank' class='arlo-review-option'>I actually need some help</a> &#8226; <a href='#' target='_blank' class='arlo-review-option notice-ask-later'>Ask me later</a>
+			</p>
+			";
+
+			$this->get_message_handler()->set_message('review', '', $message, true);
+		}
+	}
+
 
 	/**
 	 * Set the default theme

@@ -24,7 +24,7 @@ class NoticeHandler {
 	}
 
 	public function global_notices() {
-		$messages = array_merge($this->message_handler->get_messages('import_error', true), $this->message_handler->get_messages('error', true));
+		$messages = array_merge($this->message_handler->get_messages('import_error', true), $this->message_handler->get_messages('error', true), $this->message_handler->get_messages('review', true));
 		
 		foreach ($messages as $message) {
 			echo $this->create_notice($message);
@@ -46,7 +46,7 @@ class NoticeHandler {
 		$global_message = '';
 		if (!empty($message->global)) {
 			$global_message = '<td class="logo" valign="top" style="width: 60px; padding-top: 1em;">
-						<a href="http://www.arlo.co" target="_blank"><i class="arlo-icons8 size-48 arlo-yellow arlo-icons8-arlo-logo-for-font arlo-middle"></i></a>
+						<a href="http://www.arlo.co" target="_blank" class="arlo-logo"></a>
 					</td>';
 		}
 

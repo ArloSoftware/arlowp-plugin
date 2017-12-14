@@ -528,8 +528,8 @@ if (typeof (Arlo) === "undefined") {
 			});
 
 			//dismissible message
-			$('.toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-dismiss').click(function() {
-				var id = $(this).parent().attr('id').split('-').pop();
+			$('.toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-dismiss, .toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-dismiss-custom').click(function() {
+				var id = $(this).closest('.notice.is-dismissible.arlo-message').attr('id');
 				if (id != null) {
 					var data = {
 						action: 'arlo_dismiss_message',
@@ -538,8 +538,14 @@ if (typeof (Arlo) === "undefined") {
 					
 					$.post(me.ajaxUrl, data);
 				}
-			})		
-			
+			})
+
+			$('.toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-dismiss-custom, .toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-ask-later').click(function(e) {
+				e.preventDefault();
+				$(this).closest('.arlo-message').fadeOut(function() {
+					$(this).closest('.arlo-message').remove();
+				});
+			});
 			
 			//dismissible admin notices
 			$('.toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-user-dismissable-message .notice-dismiss').click(function() {
@@ -552,7 +558,15 @@ if (typeof (Arlo) === "undefined") {
 					
 					$.post(me.ajaxUrl, data);
 				}
-			})	
+			});
+
+			$('.toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-ask-later').click(function() {
+				var data = {
+					action: 'arlo_increment_review_notice_date'
+				}
+				
+				$.post(me.ajaxUrl, data);
+			});
 
 			//turn off arlo_send_data
 			$('#arlo_turn_off_send_data').click(function() {

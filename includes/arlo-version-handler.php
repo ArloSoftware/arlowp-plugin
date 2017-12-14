@@ -536,6 +536,8 @@ class VersionHandler {
 				}
 
 				update_option('arlo_filter_settings', $filter_settings);
+
+				$this->plugin->set_review_notice_date('now');
 			break;
 
 			case '3.5.1':
