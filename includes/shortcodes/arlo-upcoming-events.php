@@ -389,8 +389,7 @@ class UpcomingEvents {
         if(!empty($arlo_state)) :
             $join['ce'] = " LEFT JOIN $t1 AS ce ON e.e_arlo_id = ce.e_parent_arlo_id AND e.import_id = ce.import_id ";
 
-            $venues_query = $wpdb->prepare("SELECT v.v_arlo_id FROM $t3 v WHERE v.v_physicaladdressstate = %s", $arlo_state);
-            $venues =  $wpdb->get_results( $venues_query, ARRAY_A);
+            $venues = \Arlo\Entities\Venues::get(['state' => $arlo_state], null, null, $import_id);
 
             if (count($venues)) {
                 $join['cev'] = " LEFT JOIN $t3 v ON e.v_id = v.v_arlo_id AND v.import_id = e.import_id ";

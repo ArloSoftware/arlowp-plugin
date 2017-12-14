@@ -33,6 +33,15 @@ class Venues {
 						$limit = 1;
 					}
 				break;
+				case 'state':
+					if(is_array($value)) {
+						$where[] = "v.v_physicaladdressstate IN (" . implode(',', array_map(function() {return "%s";}, $value)) . ")";
+						$parameters = array_merge($parameters, $value);
+					} else {
+						$where[] = "v.v_physicaladdressstate = %s";
+						$parameters[] = $value;
+					}
+				break;				
 			}
 		}
 

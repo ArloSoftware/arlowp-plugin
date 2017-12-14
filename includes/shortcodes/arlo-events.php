@@ -172,7 +172,7 @@ class Events {
     private static function generate_events_list_sql($atts, $import_id) {
         global $post, $wpdb;
         $settings = get_option('arlo_settings');
-        
+
         $where = '';
         $join = [];
         $parameters = [];
@@ -197,21 +197,19 @@ class Events {
             $where .= ' AND ' . $t2 .'.e_locationname = %s';
             $parameters[] = $arlo_location;
         };
-        
-        if (!empty($arlo_state)) {
-            $join['ce'] = " LEFT JOIN $t2 AS ce ON $t2.e_arlo_id = ce.e_parent_arlo_id AND $t2.import_id = ce.import_id ";
 
-            $venues_query = $wpdb->prepare("SELECT v.v_arlo_id FROM $t3 v WHERE v.v_physicaladdressstate = %s", $arlo_state);
-            $venues =  $wpdb->get_results( $venues_query, ARRAY_A);
+        if (!empty($arlo_state)) {
+
+            $venues = \Arlo\Entities\Venues::get(['state' => $arlo_state], null, null, $import_id, ['v_arlo_id']);
 
             if (count($venues)) {
-                $join['cev'] = " LEFT JOIN $t3 v ON $t2.v_id = $t3.v_arlo_id AND $t3.import_id = v.import_id ";
-                
+                $join['ce'] = " LEFT JOIN $t2 AS ce ON $t2.e_arlo_id = ce.e_parent_arlo_id AND $t2.import_id = ce.import_id ";
+
                 $venues = array_map(function ($venue) {
                     return $venue['v_arlo_id'];
                 }, $venues);
                 
-                $where .= " AND (ce.v_id IN (" . implode(',', array_map(function() {return "%d";}, $venues)) . ") OR $t3.v_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $venues)) . "))";
+                $where .= " AND (ce.v_id IN (" . implode(',', array_map(function() {return "%d";}, $venues)) . ") OR $t2.v_id IN (" . implode(',', array_map(function() {return "%d";}, $venues)) . "))";
                 $parameters = array_merge($parameters, $venues);
                 $parameters = array_merge($parameters, $venues);
             }
