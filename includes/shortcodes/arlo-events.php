@@ -329,6 +329,34 @@ class Events {
         return esc_html(self::event_date_formatter($atts, $event['e_finishdatetime'], $event['e_datetimeoffset'], $event['e_isonline'], $event['e_timezone_id']));
     }
 
+    private static function shortcode_event_dates($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if(!isset($GLOBALS['arlo_event_list_item']['e_finishdatetime']) && !isset($GLOBALS['arlo_event_session_list_item']['e_finishdatetime'])) return '';
+
+        $event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
+
+        $args = func_get_args();
+
+        // merge and extract attributes
+        extract(shortcode_atts(array(
+            'startdateformat' => '%e %b',
+            'enddateformat' => '%e %b',
+        ), $atts, $shortcode_name, $import_id));
+
+        $start_date = new \DateTime($event['e_startdatetime']);
+        $end_date = new \DateTime($event['e_finishdatetime']);
+
+        $args[1]['format'] = $startdateformat;
+        $formatted_start_date = '<span class="arlo-start-date">' . esc_html( call_user_func_array('self::shortcode_event_start_date', $args) ) . '</span>';
+
+        $formatted_end_date = '';
+        if ($start_date->format('Y-m-d') !== $end_date ->format('Y-m-d')) {
+            $args[1] = $enddateformat;
+            $formatted_end_date = '<span class="arlo-end-date">' . esc_html( call_user_func_array('self::shortcode_event_end_date', $args) ) . '</span>';
+        }
+
+        return $formatted_start_date . $formatted_end_date;
+    }
+
     private static function shortcode_event_session_description($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_event_list_item']['e_sessiondescription'])) return '';
 
@@ -389,7 +417,7 @@ class Events {
     }
 
     private static function shortcode_event_offers($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        return Shortcodes::advertised_offers($GLOBALS['arlo_event_list_item']['e_id'], 'e_id', $import_id, $GLOBALS['arlo_event_list_item']['e_is_taxexempt']);
+        return Shortcodes::advertised_offers($GLOBALS['arlo_event_list_item']['e_id'], 'e_id', $import_id);
     }
 
     private static function get_event_presenters($import_id) {
@@ -976,8 +1004,7 @@ class Events {
             'limit' => 1,
             'removeyear' => "true",
             'text' => '{%date%}',
-            'template_link' => 'registerlink',
-            'separator' => ', '
+            'template_link' => 'registerlink'
         ), $atts, $shortcode_name, $import_id));
         
         if (strpos($format, '%') === false) {
@@ -1076,7 +1103,7 @@ class Events {
                     }   
                 }   
                 
-                $return .= implode(($layout == 'list' ? "" : esc_html($separator)), $return_links);
+                $return .= implode(($layout == 'list' ? "" : ", "), $return_links);
             } 
             
             //show only, if there is no events or delivery filter set to "OA"
@@ -1129,6 +1156,7 @@ class Events {
         global $arlo_plugin;
         $timezone = $wp_timezone = $selected_timezone = null;
         $original_timezone = date_default_timezone_get();
+        $formatted_end_date = '';
         
         $timewithtz = str_replace(' ', 'T', $date) . $offset;
 
@@ -1205,6 +1233,6 @@ class Events {
 
         date_default_timezone_set($original_timezone);
 
-        return $date;
+        return $date . $formatted_end_date;
     }  
 }
