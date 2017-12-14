@@ -904,8 +904,6 @@ class Templates {
             if ((isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true") || (isset($GLOBALS['show_child_elements']) && $GLOBALS['show_child_elements'])) {
                 $GLOBALS['show_child_elements'] = true;
 
-                $cats = CategoriesEntity::getTree($cat_id, null, 0, $import_id);
-
                 $categories_flatten_list = CategoriesEntity::get_flattened_category_list_for_filter($arlo_category, $arlo_categoryhidden, $import_id);
                     
                 if (is_array($categories_flatten_list) && count($categories_flatten_list)) {
