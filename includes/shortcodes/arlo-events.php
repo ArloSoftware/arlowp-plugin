@@ -735,27 +735,17 @@ class Events {
 
         // attempt to find session offer
         if (isset($GLOBALS['arlo_event_session_list_item'])) {
-            $conditions = array(
-                'id' => $GLOBALS['arlo_event_session_list_item']['e_arlo_id']
-            );
-
-            if (!empty($arlo_region)) {
-                $conditions['region'] = $arlo_region; 
-            }               
-
-            $event = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), 1, $import_id);
-
-            if(empty($event)) return;
+            $showfrom = false;
             
             $conditions = array(
-                'event_id' => $event->e_id,
+                'event_id' => $GLOBALS['arlo_event_session_list_item']['e_id'],
                 'discounts' => false
             );
             
             if (!empty($arlo_region)) {
                 $conditions['region'] = $arlo_region; 
-            }       
-            
+            }
+
             $offer = \Arlo\Entities\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $import_id);
         }
 
@@ -833,7 +823,7 @@ class Events {
         if (strtolower($showfrom) === "true") {
             $fromtext = '<span class="arlo-from-text">' . __('From', 'arlo-for-wordpress') . '</span> ';
         }
-        
+
         return $fromtext . $offer->$price_field_show;        
     }
 
