@@ -1067,7 +1067,9 @@ class Events {
         
         $events = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), $limit, $import_id);
         $oa = \Arlo\Entities\OnlineActivities::get($oaconditions, null, 1, $import_id);
-        
+
+        $display_count = (strpos($text, '{%count%}') !== false) ? true : false;
+
         if ($layout == "list") {
             $return = '<ul class="arlo-event-next-running">';
         }
@@ -1075,8 +1077,17 @@ class Events {
         if(count($events) == 0 && count($oa) == 0 && !empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) {
             $return = '<a href="' . esc_url($GLOBALS['arlo_eventtemplate']['et_registerinteresturi']) . '" title="' . __('Register interest', 'arlo-for-wordpress') . '" class="' . esc_attr($buttonclass) . '">' . __('Register interest', 'arlo-for-wordpress') . '</a>';
         } else {
+            if ($display_count && count($events)) {
+                $return .= ($layout == 'list' ? "<li>" : "");
 
-            if (count($events)) {
+                $display_text = str_replace('{%count%}', count($oa) + count($events), $text);
+
+                $href = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
+
+                $return .= sprintf('<a href="%s">%s</a>', esc_html($href), esc_html($display_text));
+
+                $return .= ($layout == 'list' ? "</li>" : "");
+            } else if (count($events)) {
                 $return_links = [];
                 
                 if (!is_array($events)) {
