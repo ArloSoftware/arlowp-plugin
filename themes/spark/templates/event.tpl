@@ -30,6 +30,7 @@
                         </div>
                     [/arlo_event_session_list_item]
                     [arlo_event_session_description wrap='<div class="arlo-event-session-description">%s</div>']
+                    [arlo_event_notice wrap='<div class="arlo-event-notice">%s</div>']
                     [arlo_event_offers wrap='<div>%s</div>']
                 </div>
                 <div class="arlo-registration">

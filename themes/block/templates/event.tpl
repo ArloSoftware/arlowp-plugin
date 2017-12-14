@@ -31,6 +31,7 @@
             </div>
             [arlo_event_location label="" wrap="<div class='arlo-event-location'><i class='icons8-marker-filled'></i> %s</div>"]
             [arlo_event_presenters wrap='<div class="arlo-event-presenters">%s</div>']
+            [arlo_event_notice wrap='<div class="arlo-event-notice">%s</div>']
             [arlo_event_credits wrap='<div class="arlo-event-credits">%s</div>']
             [arlo_event_offers]
             [arlo_event_tags layout="list"]

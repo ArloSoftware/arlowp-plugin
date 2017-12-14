@@ -22,6 +22,8 @@
 						<i class="icons8-clock"></i>[arlo_event_duration], [arlo_event_start_date format="%I:%M %p"] - [arlo_event_end_date format="%I:%M %p"]
 					</div>
 
+					[arlo_event_notice wrap='<div class="arlo-event-notice">%s</div>']
+
 					[arlo_event_template_summary wrap='<div class="arlo-template-summary">%s</div>']
 
 					[arlo_event_session_list_item]

@@ -21,6 +21,7 @@
             [arlo_event_session_description wrap='<div class="arlo-event-session-description">%s</div>']
             [arlo_event_location wrap="<div class='arlo-event-location'>%s</div>"]
             <div class="arlo-presenters">[arlo_event_presenters wrap="Presented by %s"]</div>
+            [arlo_event_notice wrap='<div class="arlo-event-notice">%s</div>']
             [arlo_event_offers wrap='<div class="arlo-color1">%s</div>']
             [arlo_event_registration]
         </li>

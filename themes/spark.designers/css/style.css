@@ -823,6 +823,10 @@ body.arlo {
     overflow: visible;
 }
 
+.arlo#arlo.arlo-xs .arlo-event-details .arlo-event-notice {
+    clear: both;
+}
+
 .arlo#arlo.arlo-xs .arlo-event-details .arlo-template-summary {
     clear: both;
 }
@@ -861,6 +865,10 @@ body.arlo {
 
 .arlo#arlo .arlo-event-offers .replaced {
     margin-right: .5em;
+}
+
+.arlo#arlo .arlo-event-notice {
+    margin: .5em 0;
 }
 
 .arlo#arlo .arlo-template-summary {
