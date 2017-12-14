@@ -515,6 +515,7 @@ class Events {
         extract(shortcode_atts(array(
             'label' => __('Session information', 'arlo-for-wordpress'),
             'header' => __('Sessions', 'arlo-for-wordpress'),
+            'layout' => 'tooltip'
         ), $atts, $shortcode_name, $import_id));
         
         if (!empty($arlo_region)) {
@@ -549,12 +550,6 @@ class Events {
             $item_tag = '%s';
 
             switch($layout) {
-                case 'tooltip':
-                    $open = '<div data-tooltip="#' . ARLO_PLUGIN_PREFIX . '_session_tooltip_' . $GLOBALS['arlo_event_list_item']['e_arlo_id'] . '" class="' . ARLO_PLUGIN_PREFIX . '-tooltip-button">' . htmlentities($label, ENT_QUOTES, "UTF-8") . '</div>
-                <div class="' . ARLO_PLUGIN_PREFIX . '-tooltip-html" id="' . ARLO_PLUGIN_PREFIX . '_session_tooltip_' . $GLOBALS['arlo_event_list_item']['e_arlo_id'] . '"><h5>' . htmlentities($header, ENT_QUOTES, "UTF-8") . '</h5>';
-
-                    $close = '</div>';
-                    break;
                 case 'popup':
                     $modal_id = ARLO_PLUGIN_PREFIX . '_session_modal_' . $GLOBALS['arlo_event_list_item']['e_arlo_id'];
 
@@ -590,10 +585,18 @@ class Events {
                     </div>
                     ';
                     break;
-                default:
+
+                case 'none':
                     $open = '<ul class="arlo-sessions">';
                     $close = '</ul>';
                     $item_tag = '<li class="arlo-session">%s</li>';
+                    break;
+
+                default:
+                    $open = '<div data-tooltip="#' . ARLO_PLUGIN_PREFIX . '_session_tooltip_' . $GLOBALS['arlo_event_list_item']['e_arlo_id'] . '" class="' . ARLO_PLUGIN_PREFIX . '-tooltip-button">' . htmlentities($label, ENT_QUOTES, "UTF-8") . '</div>
+                <div class="' . ARLO_PLUGIN_PREFIX . '-tooltip-html" id="' . ARLO_PLUGIN_PREFIX . '_session_tooltip_' . $GLOBALS['arlo_event_list_item']['e_arlo_id'] . '"><h5>' . htmlentities($header, ENT_QUOTES, "UTF-8") . '</h5>';
+
+                    $close = '</div>';
                     break;
             }
 
