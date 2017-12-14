@@ -165,6 +165,14 @@ class UpcomingEvents {
                 $GLOBALS['arlo_event_list_item'] = $item;
                 $GLOBALS['arlo_eventtemplate'] = $item;
 
+                if (strpos($content, '[arlo_venue_') !== false) {
+                    $conditions = array(
+                        'id' => $item['v_id']
+                    );
+    
+                    $GLOBALS['arlo_venue_list_item'] = \Arlo\Entities\Venues::get($conditions, null, null, $import_id);    
+                }
+
                 $list_item_snippet = array();
                 $list_item_snippet['@type'] = 'ListItem';
                 $list_item_snippet['position'] = $key + 1;
@@ -174,6 +182,7 @@ class UpcomingEvents {
 
                 $output .= do_shortcode($content);
 
+                unset($GLOBALS['arlo_venue_list_item']);
                 unset($GLOBALS['arlo_event_list_item']);
                 unset($GLOBALS['arlo_eventtemplate']);
 
@@ -384,6 +393,8 @@ class UpcomingEvents {
             $venues =  $wpdb->get_results( $venues_query, ARRAY_A);
 
             if (count($venues)) {
+                $join['cev'] = " LEFT JOIN $t3 v ON e.v_id = v.v_arlo_id AND v.import_id = e.import_id ";
+            
                 $venues = array_map(function ($venue) {
                     return $venue['v_arlo_id'];
                 }, $venues);
@@ -471,7 +482,6 @@ class UpcomingEvents {
             e.e_parent_arlo_id,
             e.e_region,
             e.e_credits,
-            e.e_is_taxexempt,
             et.et_id,
             et.et_name, 
             et.et_post_name, 
@@ -485,21 +495,7 @@ class UpcomingEvents {
             o_offeramounttaxexclusive, 
             o.o_formattedamounttaxinclusive, 
             o_offeramounttaxinclusive, 
-            o.o_taxrateshortcode, 
-            v.v_name, 
-            v.v_post_name, 
-            v.v_post_id,
-            v.v_physicaladdressline1,
-            v.v_physicaladdressline2,
-            v.v_physicaladdressline3,
-            v.v_physicaladdressline4,
-            v.v_physicaladdresssuburb,
-            v.v_physicaladdresscity,
-            v.v_physicaladdressstate,
-            v.v_physicaladdresspostcode,
-            v.v_physicaladdresscountry,
-            v.v_geodatapointlatitude,
-            v.v_geodatapointlongitude
+            o.o_taxrateshortcode
             ';
 
             $order = '
@@ -522,12 +518,6 @@ class UpcomingEvents {
             e.et_arlo_id = et.et_arlo_id 
         AND
             et.import_id = e.import_id
-        LEFT JOIN 
-            $t3 v
-        ON
-            e.v_id = v.v_arlo_id
-        AND
-            v.import_id = e.import_id
         INNER JOIN 
             (SELECT 
                 * 

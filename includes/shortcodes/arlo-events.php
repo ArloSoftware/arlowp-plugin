@@ -147,14 +147,22 @@ class Events {
             foreach($items as $key => $item) {
         
                 $GLOBALS['arlo_event_list_item'] = $item;
-                        
+
+                if (strpos($content, '[arlo_venue_') !== false) {
+                    $conditions = array(
+                        'id' => $item['v_id']
+                    );
+    
+                    $GLOBALS['arlo_venue_list_item'] = \Arlo\Entities\Venues::get($conditions, null, null, $import_id);    
+                }
+
                 if (!empty($atts['show']) && $key == $atts['show']) {
                     $output .= '</ul><ul class="arlo-list arlo-show-more-hidden events">';
                 }
         
                 $output .= do_shortcode($content);
-        
-                unset($GLOBALS['arlo_event_list_item']);
+
+                unset($GLOBALS['arlo_venue_list_item']);
             }   
         } 
         
@@ -197,6 +205,8 @@ class Events {
             $venues =  $wpdb->get_results( $venues_query, ARRAY_A);
 
             if (count($venues)) {
+                $join['cev'] = " LEFT JOIN $t3 v ON $t2.v_id = $t3.v_arlo_id AND $t3.import_id = v.import_id ";
+                
                 $venues = array_map(function ($venue) {
                     return $venue['v_arlo_id'];
                 }, $venues);
@@ -210,29 +220,9 @@ class Events {
         $sql = 
             "SELECT 
                 $t2.*, 
-                $t1.et_descriptionsummary,
-                $t3.v_name,
-                $t3.v_post_name,
-                $t3.v_post_id,
-                $t3.v_viewuri,
-                $t3.v_id,
-                $t3.v_physicaladdressline1,
-                $t3.v_physicaladdressline2,
-                $t3.v_physicaladdressline3,
-                $t3.v_physicaladdressline4,
-                $t3.v_physicaladdresssuburb,
-                $t3.v_physicaladdresscity,
-                $t3.v_physicaladdressstate,
-                $t3.v_physicaladdresspostcode,
-                $t3.v_physicaladdresscountry,
-                $t3.v_geodatapointlatitude,
-                $t3.v_geodatapointlongitude
+                $t1.et_descriptionsummary
             FROM 
                 $t2
-            LEFT JOIN 
-                $t3
-            ON 
-                $t2.v_id = $t3.v_arlo_id
             LEFT JOIN 
                 $t1
             ON 
@@ -292,10 +282,15 @@ class Events {
 
         $location = htmlentities($event['e_locationname'], ENT_QUOTES, "UTF-8");
 
+        $conditions = array(
+            'id' => $event['v_id']
+        );
+
         switch ($link) {
             case 'permalink': 
                 if(!($event['e_isonline'] || $event['v_id'] == 0 || $event['e_locationvisible'] == 0)) {
-                    $permalink = get_permalink(arlo_get_post_by_name($event['v_post_name'], 'arlo_venue'));
+                    $venue = \Arlo\Entities\Venues::get($conditions, null, null, $import_id);
+                    $permalink = get_permalink(arlo_get_post_by_name($venue['v_post_name'], 'arlo_venue'));
                 }                   
             break;
             case 'viewuri': 
@@ -587,7 +582,7 @@ class Events {
                 $GLOBALS['arlo_event_session_list_item'] = $item;
 
                 $output .= do_shortcode($content);
-                
+
                 unset($GLOBALS['arlo_event_session_list_item']);
             }
             
@@ -850,8 +845,14 @@ class Events {
         $event_snippet["location"] = array();
         $event_snippet["location"]["@type"] = "Place";
 
+        $conditions = array(
+            'id' => $GLOBALS['arlo_event_list_item']['v_id']
+        );
 
-        $v_name = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_name');
+        $venue = \Arlo\Entities\Venues::get($conditions, null, null, $import_id);
+
+        $v_name = Shortcodes::get_rich_snippet_field($venue,'v_name');
+
         if (!empty($v_name)) {
             $event_snippet["location"]["name"] = $v_name;
         } else if ($v_name = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'e_locationname')) {
@@ -880,16 +881,16 @@ class Events {
                 "addressLocality" => $GLOBALS['arlo_event_list_item']['e_locationname']
             );
         } else {
-            $city = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_physicaladdresscity');
-            $state = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_physicaladdressstate');
-            $post_code = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_physicaladdresspostcode');
-            $country = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_physicaladdresscountry');
+            $city = Shortcodes::get_rich_snippet_field($venue,'v_physicaladdresscity');
+            $state = Shortcodes::get_rich_snippet_field($venue,'v_physicaladdressstate');
+            $post_code = Shortcodes::get_rich_snippet_field($venue,'v_physicaladdresspostcode');
+            $country = Shortcodes::get_rich_snippet_field($venue,'v_physicaladdresscountry');
 
-            $street_address = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_physicaladdressline1') . " "
-                            . Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_physicaladdressline2') . " " 
-                            . Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_physicaladdressline3') . " " 
-                            . Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_physicaladdressline4') . " " 
-                            . Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_physicaladdresssuburb');
+            $street_address = Shortcodes::get_rich_snippet_field($venue,'v_physicaladdressline1') . " "
+                            . Shortcodes::get_rich_snippet_field($venue,'v_physicaladdressline2') . " " 
+                            . Shortcodes::get_rich_snippet_field($venue,'v_physicaladdressline3') . " " 
+                            . Shortcodes::get_rich_snippet_field($venue,'v_physicaladdressline4') . " " 
+                            . Shortcodes::get_rich_snippet_field($venue,'v_physicaladdresssuburb');
             
             if ( ( !empty($street_address) && !ctype_space($street_address) ) || 
                 ( !empty($city) && !ctype_space($city) ) || 
@@ -917,8 +918,8 @@ class Events {
             }
 
             // Geo coordinates
-            $geolatitude = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_geodatapointlatitude');
-            $geolongitude = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_geodatapointlongitude');
+            $geolatitude = Shortcodes::get_rich_snippet_field($venue,'v_geodatapointlatitude');
+            $geolongitude = Shortcodes::get_rich_snippet_field($venue,'v_geodatapointlongitude');
 
             if ( !empty($geolatitude) || !empty($geolongitude) ) {
                 $event_snippet["location"]["geo"] = array();
@@ -928,8 +929,8 @@ class Events {
             }
         }
 
-        $v_link = get_permalink(arlo_get_post_by_name(Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'v_post_name'), 'arlo_venue'));
-        
+        $v_link = get_permalink(arlo_get_post_by_name(Shortcodes::get_rich_snippet_field($venue,'v_post_name'), 'arlo_venue'));
+
         $v_link = \Arlo\Utilities::get_absolute_url($v_link);
 
         if (!empty($v_link) && !$v_is_hidden && Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'e_locationname') !== "Online") {
