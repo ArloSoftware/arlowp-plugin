@@ -26,7 +26,7 @@ class Venues {
 				case 'id':
 					if(is_array($value)) {
 						$where[] = "v.v_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $value)) . ")";
-						$parameters[] = implode(',', $value);
+						$parameters = array_merge($parameters, $value);
 					} else {
 						$where[] = "v.v_arlo_id = %d";
 						$parameters[] = $value;
