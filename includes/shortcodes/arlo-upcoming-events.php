@@ -165,11 +165,13 @@ class UpcomingEvents {
                 $GLOBALS['arlo_event_list_item'] = $item;
                 $GLOBALS['arlo_eventtemplate'] = $item;
 
-                $conditions = array(
-                    'id' => $item['v_id']
-                );
-
-                $GLOBALS['arlo_venue_list_item'] = \Arlo\Entities\Venues::get($conditions, null, null, $import_id);
+                if (strpos($content, '[arlo_venue_') !== false) {
+                    $conditions = array(
+                        'id' => $item['v_id']
+                    );
+    
+                    $GLOBALS['arlo_venue_list_item'] = \Arlo\Entities\Venues::get($conditions, null, null, $import_id);    
+                }
 
                 $list_item_snippet = array();
                 $list_item_snippet['@type'] = 'ListItem';

@@ -148,11 +148,13 @@ class Events {
         
                 $GLOBALS['arlo_event_list_item'] = $item;
 
-                $conditions = array(
-                    'id' => $item['v_id']
-                );
-
-                $GLOBALS['arlo_venue_list_item'] = \Arlo\Entities\Venues::get($conditions, null, null, $import_id);
+                if (strpos($content, '[arlo_venue_') !== false) {
+                    $conditions = array(
+                        'id' => $item['v_id']
+                    );
+    
+                    $GLOBALS['arlo_venue_list_item'] = \Arlo\Entities\Venues::get($conditions, null, null, $import_id);    
+                }
 
                 if (!empty($atts['show']) && $key == $atts['show']) {
                     $output .= '</ul><ul class="arlo-list arlo-show-more-hidden events">';
@@ -382,7 +384,7 @@ class Events {
     }
 
     private static function shortcode_event_offers($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        return Shortcodes::advertised_offers($GLOBALS['arlo_event_list_item']['e_id'], 'e_id', $import_id, $GLOBALS['arlo_event_list_item']['e_is_taxexempt']);
+        return Shortcodes::advertised_offers($GLOBALS['arlo_event_list_item']['e_id'], 'e_id', $import_id, $GLOBAL$GLOBALS['arlo_event_list_item']['e_is_taxexempt']);
     }
 
     private static function get_event_presenters($import_id) {
