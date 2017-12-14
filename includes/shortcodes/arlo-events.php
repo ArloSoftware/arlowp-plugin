@@ -332,20 +332,26 @@ class Events {
     private static function shortcode_event_dates($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_event_list_item']['e_finishdatetime']) && !isset($GLOBALS['arlo_event_session_list_item']['e_finishdatetime'])) return '';
 
-        $formatted_end_date = '';
-        
         $event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
 
-        $start_date = $event['e_startdatetime'];
-        $end_date = $event['e_finishdatetime'];
-        $offset = $event['e_datetimeoffset'];
-        $is_online = $event['e_isonline'];
-        $timezone_id = $event['e_timezone_id'];
+        $args = func_get_args();
 
-        $formatted_start_date = '<span class="arlo-start-date">' . esc_html( call_user_func_array('self::shortcode_event_start_date', func_get_args()) ) . '</span>';
+        // merge and extract attributes
+        extract(shortcode_atts(array(
+            'startdateformat' => '%e %b',
+            'enddateformat' => '%e %b',
+        ), $atts, $shortcode_name, $import_id));
 
-        if ((new \DateTime($end_date))->format('Y-m-d') !== (new \DateTime($start_date))->format('Y-m-d')) {
-            $formatted_end_date = '<span class="arlo-end-date">' . esc_html( call_user_func_array('self::shortcode_event_end_date', func_get_args()) ) . '</span>';
+        $start_date = new \DateTime($event['e_startdatetime']);
+        $end_date = new \DateTime($event['e_finishdatetime']);
+
+        $args[1]['format'] = $startdateformat;
+        $formatted_start_date = '<span class="arlo-start-date">' . esc_html( call_user_func_array('self::shortcode_event_start_date', $args) ) . '</span>';
+
+        $formatted_end_date = '';
+        if ($start_date->format('Y-m-d') !== $end_date ->format('Y-m-d')) {
+            $args[1] = $enddateformat;
+            $formatted_end_date = '<span class="arlo-end-date">' . esc_html( call_user_func_array('self::shortcode_event_end_date', $args) ) . '</span>';
         }
 
         return $formatted_start_date . $formatted_end_date;
