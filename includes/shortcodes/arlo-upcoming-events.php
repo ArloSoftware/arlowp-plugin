@@ -366,6 +366,27 @@ class UpcomingEvents {
                             c.import_id = etc.import_id
                 ";
 
+                if ((isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true") || (isset($GLOBALS['show_child_elements']) && $GLOBALS['show_child_elements'])) {
+                    $GLOBALS['show_child_elements'] = true;
+                
+                    $cats = CategoriesEntity::getTree($cat_id, 100, 0, $import_id);
+
+                    $categories_tree = CategoriesEntity::child_categories($cats);
+    
+                    if (is_array($categories_tree)) {
+                        $ids = array_map(function($item) {
+                            return $item['id'];
+                        }, $categories_tree);
+                        
+                        if (is_array($ids) && count($ids)) {
+                            $where .= " OR c.c_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $ids)) . ")";
+                            $parameters = array_merge($parameters, $ids);
+                        }
+                    }
+                }
+
+                $where .= ')';
+
         endif;
 
         if(isset($arlo_delivery) || isset($arlo_deliveryhidden)) :
