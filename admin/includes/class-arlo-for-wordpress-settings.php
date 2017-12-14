@@ -27,7 +27,8 @@ class Arlo_For_Wordpress_Settings {
 		// allocates the wp-options option key value pair that will store the plugin settings
 		register_setting( 'arlo_settings', 'arlo_settings', array(
 			'sanitize_callback' => function($input) {
-				$input['regionid'] = array_map('strtoupper',$input['regionid']);
+				$region_id = (is_array($input['regionid']) ? $input['regionid'] : []);
+				$input['regionid'] = array_map('strtoupper', $region_id);
 				return $input;
 			}
 		));		
@@ -122,7 +123,9 @@ class Arlo_For_Wordpress_Settings {
 					if ($stored_themes_settings[$theme_id]->templates !== false) {
 						//update the main setting with the stored theme
 						foreach ($settings_object['templates'] as $page => $template) {
-							$settings_object['templates'][$page]['html'] = $stored_themes_settings[$theme_id]->templates[$page]['html'];
+							if (isset($stored_themes_settings[$theme_id]->templates[$page]['html'])) {
+								$settings_object['templates'][$page]['html'] = $stored_themes_settings[$theme_id]->templates[$page]['html'];
+							}
 						}
 						update_option('arlo_settings', $settings_object, 1);
 						update_option('arlo_themes_settings', $stored_themes_settings, 1);
