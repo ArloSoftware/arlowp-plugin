@@ -132,7 +132,7 @@ class Filters {
                 $where[] = " e.import_id = $import_id ";
 
                 if (!empty($arlo_region)) {
-                    $where[] = " AND e.e_region = '" . esc_sql($arlo_region) . "'";
+                    $where[] = " e.e_region = '" . esc_sql($arlo_region) . "'";
                 }
 
                 if (is_array($base_category) || is_array($exclude_category)) {
