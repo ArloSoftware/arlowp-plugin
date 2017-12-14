@@ -337,16 +337,21 @@ class UpcomingEvents {
             $arlo_category = \Arlo\Utilities::convert_string_to_int_array($arlo_category);
             $arlo_categoryhidden = \Arlo\Utilities::convert_string_to_int_array($arlo_categoryhidden);
 
+            $where .= ' AND (';
+
             if (!empty($arlo_category)) {
-                $where .= " AND c.c_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $arlo_category)) . ")";                
+                $where .= " c.c_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $arlo_category)) . ")";                
                 $parameters = array_merge($parameters, $arlo_category);    
             }
 
             if (!empty($arlo_categoryhidden)) {
+                if (!empty($arlo_category))
+                    $where .= " AND "; 
+
                 //need to exclude all the child categories
                 $categoriesnot_flatten_list = CategoriesEntity::get_flattened_category_list_for_filter($arlo_categoryhidden, [], $import_id);
                 
-                $where .= " AND (c.c_arlo_id NOT IN (" . implode(',', array_map(function() {return "%d";}, $categoriesnot_flatten_list)) . ") OR c.c_arlo_id IS NULL)";
+                $where .= " (c.c_arlo_id NOT IN (" . implode(',', array_map(function() {return "%d";}, $categoriesnot_flatten_list)) . ") OR c.c_arlo_id IS NULL)";
                 $parameters = array_merge($parameters, array_map(function($cat) { return $cat['id']; }, $categoriesnot_flatten_list));
             }
 
@@ -368,20 +373,12 @@ class UpcomingEvents {
 
                 if ((isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true") || (isset($GLOBALS['show_child_elements']) && $GLOBALS['show_child_elements'])) {
                     $GLOBALS['show_child_elements'] = true;
-                
-                    $cats = CategoriesEntity::getTree($cat_id, 100, 0, $import_id);
 
-                    $categories_tree = CategoriesEntity::child_categories($cats);
-    
-                    if (is_array($categories_tree)) {
-                        $ids = array_map(function($item) {
-                            return $item['id'];
-                        }, $categories_tree);
-                        
-                        if (is_array($ids) && count($ids)) {
-                            $where .= " OR c.c_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $ids)) . ")";
-                            $parameters = array_merge($parameters, $ids);
-                        }
+                    $categories_flatten_list = CategoriesEntity::get_flattened_category_list_for_filter($arlo_category, $arlo_categoryhidden, $import_id);
+                    
+                    if (is_array($categories_flatten_list) && count($categories_flatten_list)) {
+                        $where .= " OR c.c_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $categories_flatten_list)) . ")";
+                        $parameters = array_merge($parameters, array_map(function($cat) { return $cat['id']; }, $categories_flatten_list));
                     }
                 }
 
