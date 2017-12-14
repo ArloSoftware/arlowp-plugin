@@ -671,10 +671,6 @@ class VersionHandler {
 				}
 
 				update_option('arlo_filter_settings', $filter_settings);
-<<<<<<< HEAD
-
-=======
->>>>>>> release-3.6
 			break;
 
 		}	
