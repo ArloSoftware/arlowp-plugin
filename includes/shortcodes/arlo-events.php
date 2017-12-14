@@ -67,8 +67,10 @@ class Events {
     }    
 
     private static function shortcode_event_tags($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        if(!isset($GLOBALS['arlo_event_list_item']['e_id'])) return '';
-        
+        if(!isset($GLOBALS['arlo_event_list_item']['e_id']) && !isset($GLOBALS['arlo_event_session_list_item']['e_id'])) return '';
+
+        $id = isset($GLOBALS['arlo_event_session_list_item']['e_id']) ? $GLOBALS['arlo_event_session_list_item']['e_id'] : $GLOBALS['arlo_event_list_item']['e_id'];
+         
         global $wpdb;
         $output = '';
         $tags = [];
@@ -89,7 +91,7 @@ class Events {
             ON
                 tag_id = id
             WHERE
-                et.e_id = {$GLOBALS['arlo_event_list_item']['e_id']}
+                et.e_id = {$id}
             AND 
                 t.import_id = " . $import_id . "
             AND
@@ -99,7 +101,7 @@ class Events {
         foreach ($items as $t) {
             $tags[] = $t['tag'];
         }
-        
+
         if (count($tags)) {
             switch($layout) {
                 case 'list':
@@ -417,13 +419,16 @@ class Events {
     }
 
     private static function shortcode_event_offers($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        return Shortcodes::advertised_offers($GLOBALS['arlo_event_list_item']['e_id'], 'e_id', $import_id);
+        $id = isset($GLOBALS['arlo_event_session_list_item']['e_id']) ? $GLOBALS['arlo_event_session_list_item']['e_id'] : $GLOBALS['arlo_event_list_item']['e_id'];
+        return Shortcodes::advertised_offers($id, 'e_id', $import_id);
     }
 
     private static function get_event_presenters($import_id) {
         global $wpdb;
 
-        $cache_key = md5( serialize( $GLOBALS['arlo_event_list_item']['e_id'] ) );
+        $id = isset($GLOBALS['arlo_event_session_list_item']['e_id']) ? $GLOBALS['arlo_event_session_list_item']['e_id'] : $GLOBALS['arlo_event_list_item']['e_id'];
+
+        $cache_key = md5( serialize( $id ) );
         $cache_category = 'ArloPresenters';
 
         if($cached = wp_cache_get($cache_key, $cache_category)) {
@@ -449,7 +454,7 @@ class Events {
         AND 
             exp.import_id = p.import_id
         WHERE 
-            exp.e_id = {$GLOBALS['arlo_event_list_item']['e_id']}
+            exp.e_id = {$id}
         AND 
             p.import_id = $import_id
         GROUP BY 
@@ -551,6 +556,8 @@ class Events {
         $sql = "
             SELECT 
                 e_name, 
+                e_id,
+                e_arlo_id,
                 e_locationname,
                 e_locationvisible,
                 e_startdatetime,
@@ -558,6 +565,7 @@ class Events {
                 e_datetimeoffset,
                 e_isonline,
                 e_timezone_id,
+                e_sessiondescription,
                 0 AS v_id
             FROM
                 {$wpdb->prefix}arlo_events
@@ -577,7 +585,7 @@ class Events {
             foreach($items as $key => $item) {
         
                 $GLOBALS['arlo_event_session_list_item'] = $item;
-                
+
                 $output .= do_shortcode($content);
                 
                 unset($GLOBALS['arlo_event_session_list_item']);
@@ -678,21 +686,39 @@ class Events {
         $price_field_show = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? 'o_formattedamounttaxexclusive' : 'o_formattedamounttaxinclusive';
         $free_text = (isset($settings['free_text'])) ? $settings['free_text'] : __('Free', 'arlo-for-wordpress');
         
-        $offer;
+        $offer = '';
         
         $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
 
-        // attempt to find event template offer
-        $conditions = array(
-            'event_template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id'],
-            'parent_id' => 0
-        );
-        
-        if (!empty($arlo_region)) {
-            $conditions['region'] = $arlo_region; 
+        // attempt to find session offer
+        if (isset($GLOBALS['arlo_event_session_list_item'])) {
+            $showfrom = false;
+            
+            $conditions = array(
+                'event_id' => $GLOBALS['arlo_event_session_list_item']['e_id'],
+                'discounts' => false
+            );
+            
+            if (!empty($arlo_region)) {
+                $conditions['region'] = $arlo_region; 
+            }
+
+            $offer = \Arlo\Entities\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $import_id);
         }
 
-        $offer = \Arlo\Entities\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $import_id);
+        // if none, try the event template offer
+        if(!$offer) {
+            $conditions = array(
+                'event_template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id'],
+                'parent_id' => 0
+            );
+            
+            if (!empty($arlo_region)) {
+                $conditions['region'] = $arlo_region; 
+            }
+
+            $offer = \Arlo\Entities\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $import_id);
+        }
 
         // if none, try the associated events
         if(!$offer) {
@@ -754,7 +780,7 @@ class Events {
         if (strtolower($showfrom) === "true") {
             $fromtext = '<span class="arlo-from-text">' . __('From', 'arlo-for-wordpress') . '</span> ';
         }
-        
+
         return $fromtext . $offer->$price_field_show;        
     }
 
