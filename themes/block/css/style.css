@@ -784,7 +784,7 @@ body.arlo {
     overflow: hidden;
 }
 
-.arlo#arlo .arlo-list.events .arlo-online-activity,
+.arlo#arlo .arlo-list.template-online-activities .arlo-online-activity,
 .arlo#arlo .arlo-list.events .arlo-event {
     -webkit-transition: all .2s ease-in-out;
     transition: all .2s ease-in-out;
@@ -792,13 +792,13 @@ body.arlo {
 }
 
 .arlo#arlo .arlo-list.events .arlo-event:hover,
-.arlo#arlo .arlo-list.events .arlo-online-activity:hover {
+.arlo#arlo .arlo-list.template-online-activities .arlo-online-activity:hover {
     -webkit-transform: translateY(-5px);
     transform: translateY(-5px);
     box-shadow: 0 20px 40px rgba(0,0,0,0.2);
 }
 
-.arlo#arlo .arlo-list.events .arlo-online-activity {
+.arlo#arlo .arlo-list.template-online-activities .arlo-online-activity {
     clear: both;
     width: 100%;
     padding: 1.5em 1.8em;
@@ -807,7 +807,7 @@ body.arlo {
     margin-bottom: 1em;
 }
 
-.arlo#arlo .arlo-list.events .arlo-online-activity h3 {
+.arlo#arlo .arlo-list.template-online-activities .arlo-online-activity h3 {
     margin-top: 0;
     margin-bottom: .3em;
     line-height: 1;
@@ -847,6 +847,7 @@ body.arlo {
     text-align: center;
     padding: .5em 1em;
     background-color: rgba(0, 0, 0, 0.04);
+    margin-bottom: 1.5em;
 }
 
 .arlo#arlo .arlo-content-field {

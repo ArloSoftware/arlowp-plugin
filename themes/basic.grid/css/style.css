@@ -15,6 +15,7 @@
 }
 
 .arlo .arlo-list.events > li,
+.arlo .arlo-list.template-online-activities > li,
 .arlo .arlo-list.upcoming > li.arlo-event,
 .arlo .arlo-list.arlo-online-activities > li {
 	border: 1px solid #ccc;
@@ -24,6 +25,7 @@
 }
 
 .arlo .arlo-list.events > li:last-child, 
+.arlo .arlo-list.template-online-activities > li:last-child, 
 .arlo .arlo-list.upcoming > li:last-child {
 	margin-bottom: 0;
 }
@@ -269,6 +271,7 @@
     margin-left: 0px;
 }
 
+.arlo .arlo-boxed .arlo-list.template-online-activities .arlo-cf,
 .arlo .arlo-boxed .arlo-list.events .arlo-cf,
 .arlo .arlo-boxed .arlo-list.upcoming .arlo-cf,
 .arlo .arlo-boxed .arlo-list.arlo-online-activities .arlo-cf  {
@@ -279,6 +282,7 @@
 }
 
 @media (min-width: 550px) {
+	.arlo .arlo-boxed .arlo-list.template-online-activities .arlo-cf,
 	.arlo .arlo-boxed .arlo-list.events .arlo-cf,
 	.arlo .arlo-boxed .arlo-list.upcoming .arlo-cf,
 	.arlo .arlo-boxed .arlo-list.arlo-online-activities .arlo-cf {
