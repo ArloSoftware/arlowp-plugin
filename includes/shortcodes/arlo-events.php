@@ -718,6 +718,22 @@ class Events {
         
         return;        
     }
+    
+    private static function shortcode_event_duration_description($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if(!isset($GLOBALS['arlo_event_list_item'])) return;
+
+        if(empty($GLOBALS['arlo_event_list_item']['e_sessiondescription'])) {
+            // basic event
+            $duration = self::shortcode_event_duration('', [], '', $import_id);
+            $start = self::shortcode_event_start_date('', $atts);
+            $end = self::shortcode_event_end_date('', $atts);
+
+            return $duration . esc_html(', ') . $start . esc_html(' - ') . $end;
+        } else {
+            // multi-session event
+            return self::shortcode_event_session_description();
+        }
+    }
 
     private static function shortcode_event_price($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_event_list_item']) || empty($GLOBALS['arlo_event_list_item']['et_arlo_id'])) return;

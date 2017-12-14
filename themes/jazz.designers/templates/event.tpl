@@ -15,12 +15,11 @@
                     <div class="arlo-date">
                         [arlo_event_start_date format="%d %B"]
                     </div>
-                    <div class="arlo-event-time">[arlo_event_duration], [arlo_event_start_date format="%I:%M %p"] - [arlo_event_end_date format="%I:%M %p"]</div>
+                    <div class="arlo-event-time">[arlo_event_duration_description format="%I:%M %p"]</div>
                 </div>
 
                 <div class="arlo-event-body">
                    [arlo_event_location label="" wrap="<div class='arlo-event-location'>%s</div>"]
-                   [arlo_event_session_description wrap='<div class="arlo-event-session-description">%s</div>']
                    [arlo_event_session_list_item]
                        <div class="arlo_session">
                            <h6>[arlo_event_name]</h6>

@@ -10,7 +10,7 @@
         [arlo_event_list_item show="4"]
         <li class="arlo-cf">
             [arlo_event_start_date format="D j M" wrap='<h4 class="arlo-item-header">%s</h4>']
-            <div class="arlo-event-time">[arlo_event_start_date format="D g:i A"] - [arlo_event_end_date format="D g:i A"]</div>
+            <div class="arlo-event-time">[arlo_event_duration_description format="D g:i A"]</div>
             [arlo_event_session_list_item]
                 <div class="arlo_session">
                     <h6>[arlo_event_name]</h6>
@@ -18,7 +18,6 @@
                     [arlo_event_location]
                 </div>
             [/arlo_event_session_list_item]
-            [arlo_event_session_description wrap='<div class="arlo-event-session-description">%s</div>']
             [arlo_event_location wrap="<div class='arlo-event-location'>%s</div>"]
             <div class="arlo-presenters">[arlo_event_presenters wrap="Presented by %s"]</div>
             [arlo_event_notice wrap='<div class="arlo-event-notice">%s</div>']

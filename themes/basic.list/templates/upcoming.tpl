@@ -11,14 +11,13 @@
                 <div>[arlo_event_start_date format="%d %b %Y"]</div>
                 
                 [arlo_label wrap="<span class='arlo-event-time'>%s</span>"]
-                    [arlo_event_start_date format="%a %I:%M %p"][arlo_event_end_date format="%a %I:%M %p" wrap=" - %s"]
+                    [arlo_event_duration_description format="%a %I:%M %p"]
                 [/arlo_label]
 
                 [arlo_event_location label="Location: " wrap="<div class='arlo-event-location'>%s</div>"]
                 [arlo_event_provider label="Provider: " wrap="<div class='arlo-event-provider'>Provided by %s</div>"]
                 [arlo_event_delivery label="Delivery: " wrap="<div class='arlo-event-delivery'>%s</div>"]
                 [arlo_event_template_advertised_duration label="Duration: "]
-                [arlo_event_session_description wrap='<span class="arlo-event-session-description">%s</span>']
                 [arlo_event_offers wrap='<div class="arlo-event-offers">%s</div>']
                 [arlo_event_notice label="Special note: " wrap='<div class="arlo-event-notice">%s</div>']
                 [arlo_event_session_list_item]

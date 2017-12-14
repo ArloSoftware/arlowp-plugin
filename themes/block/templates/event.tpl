@@ -14,11 +14,9 @@
           <div class="arlo-date arlo-font2 arlo-background-color1 arlo-contrast-color">
                 [arlo_event_start_date format="j F"]
           </div>
-          <div class="arlo-event-duration arlo-background-color2 arlo-contrast-color">[arlo_event_duration]</div>
+          <div class="arlo-event-duration arlo-background-color2 arlo-contrast-color">[arlo_event_duration_description format="%I:%M %p"]</div>
           <div class="arlo-event-details">
             <div class="arlo-event-time">
-                [arlo_event_start_date format="%I:%M %p"] - [arlo_event_end_date format="%I:%M %p"]
-                [arlo_event_session_description wrap='<div class="arlo-event-session-description">%s</div>']
                 <div class="arlo-sessions-wrapper">
                 [arlo_event_session_list_item wrap='<i class="icons8-clock"></i> %s']
                     <div class="arlo_session">
