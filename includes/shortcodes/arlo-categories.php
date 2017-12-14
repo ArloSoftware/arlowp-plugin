@@ -89,7 +89,8 @@ class Categories {
     }
 
     private static function shortcode_category_title($content = '', $atts, $shortcode_name, $import_id = '') {
-        $arlo_category = array_shift(self::get_selected_categories());
+        $selected_categories = self::get_selected_categories();
+        $arlo_category = array_shift($selected_categories);
         
         if (!empty($arlo_category)) {
             $category = CategoriesEntity::get(array('id' => current(explode('-', $arlo_category))), 1, $import_id);

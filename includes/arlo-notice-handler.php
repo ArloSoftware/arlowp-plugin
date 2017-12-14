@@ -51,7 +51,7 @@ class NoticeHandler {
 		}
 
 		return '
-		<div class="notice ' . $notice_type . ' ' . (!empty($message->class) ? $message->class : '' ) . ' arlo-message ' . (isset($message->is_dismissable) && $message->is_dismissable ? 'is-dismissible' : '' ) . ' arlo-' . $message->type .  '" ' . 
+		<div class="notice ' . $notice_type . ' ' . (!empty($message->class) ? $message->class : '' ) . ' arlo-message ' . (isset($message->is_dismissable) && $message->is_dismissable ? 'is-dismissible' : '' ) . (!empty($message->type) ? ' arlo-' . $message->type : '' ) .  '" ' . 
 		(!empty($message->id) ? 'id="' . $message->id . '"' : '' ) . '>
 			<table>
 				<tr>
@@ -112,6 +112,7 @@ class NoticeHandler {
 	public function connected_platform_notice() {
 		if (strtolower($this->settings['platform_name']) === \Arlo_For_Wordpress::DEFAULT_PLATFORM) {
 			$message = new \stdClass();
+			$message->type = 'notice';
 			$message->class = 'updated';
 			$message->title = 'Connected to demo data';
 			$message->global = true;

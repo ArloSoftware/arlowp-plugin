@@ -109,7 +109,7 @@ class Arlo_For_Wordpress_Settings {
 					$stored_themes_settings = get_option( 'arlo_themes_settings', [] );
 
 					//check if there is already a stored settings for the theme, or need to be reset
-					if ($_GET['reset'] == 1 || empty($stored_themes_settings[$theme_id])) {
+					if ((!empty($_GET['reset']) && $_GET['reset'] == 1) || empty($stored_themes_settings[$theme_id])) {
 						$stored_themes_settings[$theme_id] = $theme_settings[$theme_id];
 						$stored_themes_settings[$theme_id]->templates = $theme_manager->load_default_templates($theme_id);
 					}
@@ -604,10 +604,11 @@ class Arlo_For_Wordpress_Settings {
 		echo '</h3>';
 
     	if ($is_custom_shortcode) {
+			$type_name = ($type == 'events' ? 'catalogue' : $type);
 			echo '
 			<div class="arlo-label"><label>' .  __("Shortcode type", 'arlo-for-wordpress' ) . '</label></div>
 			<div class="arlo-field">
-				<span>'.ucfirst($type).' '.__('page', 'arlo-for-wordpress' ).'</span>
+				<span>'.ucfirst($type_name).' '.__('page', 'arlo-for-wordpress' ).'</span>
 			</div><br><br>';
     	}
 
@@ -673,7 +674,7 @@ class Arlo_For_Wordpress_Settings {
 		echo '
 		<div class="cf"></div>
 		<h2>' . __('Page filtered by ', 'arlo-for-wordpress' ) . '</h2>
-			' . $this->arlo_output_filter_editor('page_filter_settings', Arlo_For_Wordpress::$available_page_filters, $type, $id, Arlo_For_Wordpress::$page_filter_options, 'page', 'arlo-always-visible') . '
+			' . $this->arlo_output_filter_editor('arlo_page_filter_settings', Arlo_For_Wordpress::$available_page_filters, $type, $id, Arlo_For_Wordpress::$page_filter_options, 'page', 'arlo-always-visible') . '
 		</div>';
 
 		
@@ -734,9 +735,10 @@ class Arlo_For_Wordpress_Settings {
 		}
 		
 		$filters_settings_html .= '<div id="arlo-' . (!empty($id_prefix) ? $id_prefix . '-' : '') . $filter_group . '-filters" class="arlo-filter-group ' . $class . '">';
+		$import_id = Arlo_For_Wordpress::get_instance()->get_importer()->get_current_import_id();
 
-		if (count($available_filters)) {
-			$import_id = Arlo_For_Wordpress::get_instance()->get_importer()->get_current_import_id();
+		if (count($available_filters) && !empty($import_id)) {
+			
 			foreach($available_filters as $filter_key => $filter) {
 				$filter_options = \Arlo\Shortcodes\Filters::get_filter_options($filter_key, $import_id);
 				$default_filter_options = $filter_options;
@@ -938,6 +940,18 @@ class Arlo_For_Wordpress_Settings {
 		<p><strong>If you are experiencing problems after an update, please deactivate and re-activate the plugin and re-synchronize the data.</strong></p>
 		
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">
+				<li>Remove the ability to rename and exclude filter options</li>
+				<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_next_running" target="_blank">[arlo_event_next_running]</a> has a "separator" attribute, if it\'s not used as a list layout</li>
+				<li>Use category header as meta description if category is selected as a filter</li>
+				<li>Ability to filter <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes" target="_blank">global level shortcodes</a> by mutliple categories/location/templatetag/eventtag</li>
+				<li>Delivery filter for on demand events (online activities)</li>
+				<li>Support tax exempt tags</li>
+			</ul>
+		</p>	
+
+		<h4>Version 3.5</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">	  
 				<li>Admin page gets into a redirect loop on some webservers</li>

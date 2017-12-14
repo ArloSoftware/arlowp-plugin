@@ -98,6 +98,12 @@ if (typeof (Arlo) === "undefined") {
 			});
 		},
 		filterActionChange: function() {
+			$('.arlo-filter-action select').each(function() {
+				var val = $(this).val();
+				if (val == 'rename') {
+					$(this).closest('li').find('.arlo-filter-new-value').show();
+				}
+			});
 			$('.arlo-filter-action select').change(function() {
 				var val = $(this).val()
 				if (val == 'rename') {
@@ -161,7 +167,7 @@ if (typeof (Arlo) === "undefined") {
 
 			var setting_id = Math.floor(Math.random() * 1000000);
 
-			newElement.find('input').each( function(index,element) {
+			newElement.find('input, select').each( function(index, element) {
 				var name = $(element).attr('name').replace('setting_id',setting_id);
 				$(element).attr('name',name);
 			});

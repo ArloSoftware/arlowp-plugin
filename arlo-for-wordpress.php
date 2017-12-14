@@ -9,12 +9,12 @@
  * @author    Arlo <info@arlo.co>
  * @license   GPL-2.0+
  * @link      http://arlo.co
- * @copyright 2015 Arlo
+ * @copyright 2017 Arlo
  *
  * @wordpress-plugin
  * Plugin Name:       Arlo
  * Description:       Connect your WordPress to Arlo
- * Version:           3.5.1
+ * Version:           3.6
  * Author:            Arlo
  * Author URI:       http://arlo.co
  * Text Domain:       arlo-for-wordpress

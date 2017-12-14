@@ -34,7 +34,7 @@ class UpcomingEvents {
     private static function shortcode_upcoming_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
 
-        $filter_settings = get_option('page_filter_settings', []);               
+        $filter_settings = get_option('arlo_page_filter_settings', []);               
 
         $template_name = Shortcodes::get_template_name($shortcode_name,'upcoming_list','upcoming');
         $templates = arlo_get_option('templates');
@@ -240,7 +240,7 @@ class UpcomingEvents {
 
             $items = Filters::get_filter_options($filter_key, $import_id);
 
-            $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'), 'generic', $att);
+            $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'), 'generic', $att, 'upcoming');
         endforeach;
 
         $filter_html .= '<div class="arlo-filters-buttons"><input type="hidden" id="arlo-page" value="' .  $page_link . '"> ';    
@@ -275,7 +275,7 @@ class UpcomingEvents {
         $t10 = "{$wpdb->prefix}arlo_presenters";
         $t11 = "{$wpdb->prefix}arlo_eventtemplates_tags";
 
-        $join = '';
+        $join = [];
         $where = 'WHERE CURDATE() < DATE(e.e_startdatetime)  AND e.e_parent_arlo_id = 0 AND e.import_id = %d';
         $parameters[] = $import_id;
 
@@ -341,15 +341,16 @@ class UpcomingEvents {
                 $parameters = array_merge($parameters, array_map(function($cat) { return $cat['id']; }, $categoriesnot_flatten_list));
             }
 
-            $join .= "LEFT JOIN 
-                    $t5 etc
+            $join['etc'] = " LEFT JOIN 
+                    $t5 AS etc
                         ON 
                             etc.et_arlo_id = et.et_arlo_id 
                         AND 
                             etc.import_id = et.import_id
-
+                        ";
+            $join['c'] = "
                     LEFT JOIN 
-                    $t6 c
+                    $t6 AS c
                         ON 
                             c.c_arlo_id = etc.c_arlo_id
                         AND
@@ -359,7 +360,7 @@ class UpcomingEvents {
         endif;
 
         if(isset($arlo_delivery) || isset($arlo_deliveryhidden)) :
-            if (!empty($arlo_delivery)) {
+            if (isset($arlo_delivery)) {
                 if (!is_array($arlo_delivery)) 
                     $arlo_delivery = [$arlo_delivery];
                 
@@ -367,7 +368,7 @@ class UpcomingEvents {
                 $parameters = array_merge($parameters, $arlo_delivery);    
             }
 
-            if (!empty($arlo_deliveryhidden)) {    
+            if (isset($arlo_deliveryhidden)) {    
                 if (!is_array($arlo_deliveryhidden)) 
                     $arlo_deliveryhidden = [$arlo_deliveryhidden];        
 
@@ -377,23 +378,25 @@ class UpcomingEvents {
         endif;  
             
         if(!empty($arlo_state)) :
-            $join .= "
-                LEFT JOIN $t1 ce ON e.e_arlo_id = ce.e_parent_arlo_id AND e.import_id = ce.import_id
-            ";
+            $join['ce'] = " LEFT JOIN $t1 AS ce ON e.e_arlo_id = ce.e_parent_arlo_id AND e.import_id = ce.import_id ";
 
             $venues_query = $wpdb->prepare("SELECT v.v_arlo_id FROM $t3 v WHERE v.v_physicaladdressstate = %s", $arlo_state);
-            $venues = implode(', ', array_map(function ($venue) {
-              return $venue['v_arlo_id'];
-            }, $wpdb->get_results( $venues_query, ARRAY_A)));
+            $venues =  $wpdb->get_results( $venues_query, ARRAY_A);
 
-            $where .= " AND (ce.v_id IN (%s) OR v.v_arlo_id IN (%s))";
+            if (count($venues)) {
+                $venues = array_map(function ($venue) {
+                    return $venue['v_arlo_id'];
+                }, $venues);
+                
+                $where .= " AND (ce.v_id IN (" . implode(',', array_map(function() {return "%d";}, $venues)) . ") OR v.v_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $venues)) . "))";
+                $parameters = array_merge($parameters, $venues);
+                $parameters = array_merge($parameters, $venues);
+            }
 
-            $parameters[] = $venues;
-            $parameters[] = $venues;
         endif;
 
         if(!empty($arlo_eventtag) || !empty($arlo_eventtaghidden)) :
-            $join .= " LEFT JOIN $t7 etag ON etag.e_id = e.e_id AND etag.import_id = e.import_id";
+            $join['etag'] = " LEFT JOIN $t7 AS etag ON etag.e_id = e.e_id AND etag.import_id = e.import_id";
             
             if (!empty($arlo_eventtag)) {
                 $where .= " AND etag.tag_id IN (" . implode(',', array_map(function() {return "%d";}, $arlo_eventtag)) . ")";
@@ -407,21 +410,22 @@ class UpcomingEvents {
         endif;
 
         if(!empty($arlo_templatetag) || !empty($arlo_templatetaghidden)) :
-            $join .= " LEFT JOIN $t11 ettag ON ettag.et_id = et.et_id AND ettag.import_id = et.import_id";
-
             if (!empty($arlo_templatetag)) {
+                $join['ettag'] = " LEFT JOIN $t11 AS ettag ON ettag.et_id = et.et_id AND ettag.import_id = et.import_id";
+
                 $where .= " AND ettag.tag_id IN (" . implode(',', array_map(function() {return "%d";}, $arlo_templatetag)) . ")";
                 $parameters = array_merge($parameters, $arlo_templatetag);    
             }
             
             if (!empty($arlo_templatetaghidden)) {
-                $where .= " AND (ettag.tag_id NOT IN (" . implode(',', array_map(function() {return "%d";}, $arlo_templatetaghidden)) . ") OR ettag.tag_id IS NULL)";
+                $tag_id_substitutes = implode(', ', array_map(function() {return "%d";}, $arlo_templatetaghidden));
+                $where .= " AND NOT EXISTS( SELECT tag_id FROM $t11 WHERE tag_id IN ($tag_id_substitutes) AND et.et_id = et_id AND import_id = et.import_id )";
                 $parameters = array_merge($parameters, $arlo_templatetaghidden);    
             }
         endif;
 
         if(!empty($arlo_presenter)) :
-            $join .= " LEFT JOIN $t9 epresenter ON epresenter.e_id = e.e_id AND epresenter.import_id = e.import_id";
+            $join['epresenter'] = " LEFT JOIN $t9 AS epresenter ON epresenter.e_id = e.e_id AND epresenter.import_id = e.import_id";
             $where .= " AND p_arlo_id = %d";
             $parameters[] = intval(current(explode('-', $arlo_presenter)));
         endif;      
@@ -536,7 +540,7 @@ class UpcomingEvents {
             ) o
         ON 
             e.e_id = o.e_id
-        $join
+        " . implode("\n", $join) . "
         $where
         GROUP BY 
             et.et_arlo_id, e.e_id

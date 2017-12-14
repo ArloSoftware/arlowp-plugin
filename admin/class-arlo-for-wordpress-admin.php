@@ -596,13 +596,13 @@ class Arlo_For_Wordpress_Admin {
 		//normalize filters options
 		$filters = array();
 
-		if (is_array($setting_array[$settings_name]) && count($setting_array[$settings_name])) {
+		if (isset($setting_array[$settings_name]) && is_array($setting_array[$settings_name]) && count($setting_array[$settings_name])) {
 			foreach($setting_array[$settings_name] as $filter_group_name => $filter_group) {
 				foreach ($filter_group as $filter_name => $filter_settings) {
 					foreach ($filter_settings as $filter_setting_id => $filter_setting) {
-						$old_value = esc_html($filter_setting['filteroldvalue']);
-						$new_value = esc_html($filter_setting['filternewvalue']);
-
+						$old_value = (isset($filter_setting['filteroldvalue']) ? esc_html($filter_setting['filteroldvalue']) : '');
+						$new_value = (isset($filter_setting['filternewvalue']) ? esc_html($filter_setting['filternewvalue']) : '');
+						
 						if (isset($filter_setting["filteraction"]) && $filter_setting["filteraction"] == "rename" && isset($old_value) && !empty($new_value)) {
 							$filters[$filter_group_name][$filter_name][$old_value] = $new_value;
 						}
@@ -680,7 +680,10 @@ class Arlo_For_Wordpress_Admin {
 		}
 
 		//check if the tax exempt tag has changed
-		if (!empty($import_id) && $new['taxexempt_tag'] != $old['taxexempt_tag']) {
+		if (!empty($import_id) && (
+			(isset($new['taxexempt_tag']) && isset($old['taxexempt_tag']) && $new['taxexempt_tag'] != $old['taxexempt_tag']) ||
+			!isset($new['taxexempt_tag']) || !isset($old['taxexempt_tag'])
+			)) {
 			$plugin->get_importer()->set_tax_exempt_events($import_id);
 		}
 
@@ -697,7 +700,7 @@ class Arlo_For_Wordpress_Admin {
 
 		//normalize filter options and save them
 		$this->normalize_filter_options('arlo_filter_settings', $new);
-		$this->normalize_filter_options('page_filter_settings', $new);
+		$this->normalize_filter_options('arlo_page_filter_settings', $new);
 
 		// need to check for posts-page change here
 		// loop through each post type and check if the posts-page has changed

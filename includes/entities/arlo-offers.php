@@ -52,9 +52,7 @@ class Offers {
 				
 				
 				case 'event_template_id':
-					$join[] = "
-					LEFT JOIN {$wpdb->prefix}arlo_eventtemplates AS et USING (et_id) 
-					";
+					$join[] = " LEFT JOIN {$wpdb->prefix}arlo_eventtemplates AS et USING (et_id) ";
 					$where[] = "et.import_id = %d ";
 					$parameters[] = $import_id;
 
@@ -88,7 +86,7 @@ class Offers {
 			$order = ' ORDER BY ' . implode(', ', $order);
 		}
 		
-		$join = implode("\r", $join);
+		$join = implode("\n", $join);
 
 		$query = $wpdb->prepare($query.$join.$where.$order, $parameters);
 

@@ -14,41 +14,48 @@ class Filters {
         $base_category = ((isset($GLOBALS['arlo_filter_base']['category']) && is_array($GLOBALS['arlo_filter_base']['category']) && count($GLOBALS['arlo_filter_base']['category'])) ? $GLOBALS['arlo_filter_base']['category'] : 0);
         $exclude_category = ((isset($GLOBALS['arlo_filter_base']['categoryhidden']) && is_array($GLOBALS['arlo_filter_base']['categoryhidden']) && count($GLOBALS['arlo_filter_base']['categoryhidden'])) ? $GLOBALS['arlo_filter_base']['categoryhidden'] : 0);
 
-        if (!empty($post_id) || $post_id === 0) {
-            $join[] = "LEFT JOIN 
-                        {$wpdb->prefix}arlo_eventtemplates AS et
-                    ON 
-                        et.et_arlo_id = e.et_arlo_id
-                        " . (!empty($arlo_region) ? 'AND et.et_region = "' . esc_sql($arlo_region) . '"' : '' );
-
-            $wherep[] = 'AND 
-                et_post_id = ' . $post_id;
-        }
-
         switch ($filter) {
             case 'location':
                 $t1 = "{$wpdb->prefix}arlo_events";
                 $where[] = " e_locationname != '' ";
                 $where[] = " e.import_id = $import_id ";
-                
+
                 if (!empty($arlo_region)) {
-                    $where[] = " AND e.e_region = '" . esc_sql($arlo_region) . "'";
+                    $where[] = " e.e_region = '" . esc_sql($arlo_region) . "'";
                 }
+
+                if (!empty($post_id) || $post_id === 0) {
+                    $join['et'] = " LEFT JOIN 
+                                {$wpdb->prefix}arlo_eventtemplates AS et
+                            ON 
+                                et.et_arlo_id = e.et_arlo_id
+                            AND
+                                et.import_id = e.import_id
+                                " . (!empty($arlo_region) ? 'AND et.et_region = "' . esc_sql($arlo_region) . '"' : '' );
+        
+                    $where[] = ' et_post_id = ' . $post_id;
+                }                
 
                 if (is_array($base_category) || is_array($exclude_category)) {
 
                     $categories_flatten_list = CategoriesEntity::get_flattened_category_list_for_filter($base_category, $exclude_category, $import_id);
-                    
-                    $join[] = "
-                    LEFT JOIN 
-                        {$wpdb->prefix}arlo_eventtemplates AS et
-                    ON
-                        et.et_arlo_id = e.et_arlo_id
-                    AND
-                        et.import_id = e.import_id
-                    ";
 
-                    $join[] = "
+                    if (!is_array($categories_flatten_list) || !count($categories_flatten_list)) {
+                        $categories_flatten_list = [ ['id' => 0, 'value' => 'none', 'string' => 'none']];
+                    }
+                    
+                    if (empty($post_id)) {
+                        $join['et'] = "
+                        LEFT JOIN 
+                            {$wpdb->prefix}arlo_eventtemplates AS et
+                        ON 
+                            et.et_arlo_id = e.et_arlo_id
+                        AND
+                            et.import_id = e.import_id
+                        " . (!empty($arlo_region) ? 'AND et.et_region = "' . esc_sql($arlo_region) . '"' : '' );
+                    }
+
+                    $join['etc'] = "
                     LEFT JOIN 
                         {$wpdb->prefix}arlo_eventtemplates_categories AS etc
                     ON
@@ -100,7 +107,7 @@ class Filters {
 
             case 'state':
 
-                $join[] =
+                $join['e'] =
                     "
                     LEFT JOIN 
                         {$wpdb->prefix}arlo_events AS e
@@ -110,26 +117,45 @@ class Filters {
                         v.import_id = e.import_id                    
                     ";
 
+                if (!empty($post_id) || $post_id === 0) {
+                    $join['et'] = "
+                    LEFT JOIN 
+                        {$wpdb->prefix}arlo_eventtemplates AS et
+                    ON 
+                        et.et_arlo_id = e.et_arlo_id
+                    AND
+                        et.import_id = e.import_id
+                    " . (!empty($arlo_region) ? 'AND et.et_region = "' . esc_sql($arlo_region) . '"' : '' );
+                    $where[] = ' et_post_id = ' . $post_id;
+                }                      
+
                 $where[] = " e.import_id = $import_id ";
 
                 if (!empty($arlo_region)) {
-                    $where[] = " AND e.e_region = '" . esc_sql($arlo_region) . "'";
+                    $where[] = " e.e_region = '" . esc_sql($arlo_region) . "'";
                 }
 
                 if (is_array($base_category) || is_array($exclude_category)) {
 
-                    $categories_flatten_list = CategoriesEntity::get_flattened_category_list_for_filter($base_category, $exclude_category, $import_id);        
+                    $categories_flatten_list = CategoriesEntity::get_flattened_category_list_for_filter($base_category, $exclude_category, $import_id);   
                     
-                    $join[] = "
-                    LEFT JOIN 
-                        {$wpdb->prefix}arlo_eventtemplates AS et
-                    ON
-                        et.et_arlo_id = e.et_arlo_id
-                    AND
-                        et.import_id = e.import_id
-                    ";
+                    if (!is_array($categories_flatten_list) || !count($categories_flatten_list)) {
+                        $categories_flatten_list = [ ['id' => 0, 'value' => 'none', 'string' => 'none']];
+                    }
+                    
+                    if (empty($post_id)) {
+                        $join['et'] = "
+                        LEFT JOIN 
+                            {$wpdb->prefix}arlo_eventtemplates AS et
+                        ON 
+                            et.et_arlo_id = e.et_arlo_id
+                        AND
+                            et.import_id = e.import_id
+                        " . (!empty($arlo_region) ? 'AND et.et_region = "' . esc_sql($arlo_region) . '"' : '' );
+                    }
 
-                    $join[] = "
+
+                    $join['etc'] = "
                     LEFT JOIN 
                         {$wpdb->prefix}arlo_eventtemplates_categories AS etc
                     ON

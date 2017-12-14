@@ -210,7 +210,7 @@ class OnlineActivities {
     private static function shortcode_onlineactivites_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
 
-        $filter_settings = get_option('page_filter_settings', []);                       
+        $filter_settings = get_option('arlo_page_filter_settings', []);                       
 
         $template_name = Shortcodes::get_template_name($shortcode_name,'onlineactivites_list','oa');
         $templates = arlo_get_option('templates');
@@ -341,7 +341,7 @@ class OnlineActivities {
 
         $output = '';
 
-        $join = '';
+        $join = [];
         $where = '';
         $parameters = array();
 
@@ -388,22 +388,23 @@ class OnlineActivities {
         endif;
 
         if(!empty($arlo_oatag)) :
-            $join .= " LEFT JOIN $t4 oa_tag ON oa_tag.oa_id = oa.oa_id AND oa_tag.import_id = oa.import_id";
+            $join['oa_tag'] = " LEFT JOIN $t4 AS oa_tag ON oa_tag.oa_id = oa.oa_id AND oa_tag.import_id = oa.import_id";
 
             $where .= " AND oa_tag.tag_id = %d";
             $parameters[] = $arlo_oatag;
         endif;
 
         if(!empty($arlo_templatetag) || !empty($arlo_templatetaghidden)) :    
-            $join .= " LEFT JOIN $t6 ett ON ett.et_id = et.et_id AND ett.import_id = et.import_id";
-
             if (!empty($arlo_templatetag)) {
+                $join['ett'] = " LEFT JOIN $t6 AS ett ON ett.et_id = et.et_id AND ett.import_id = et.import_id";
+
                 $where .= " AND ett.tag_id IN (" . implode(',', array_map(function() {return "%d";}, $arlo_templatetag)) . ")";
                 $parameters = array_merge($parameters, $arlo_templatetag);    
             }
             
             if (!empty($arlo_templatetaghidden)) {
-                $where .= " AND (ett.tag_id NOT IN (" . implode(',', array_map(function() {return "%d";}, $arlo_templatetaghidden)) . ") OR ett.tag_id IS NULL)";
+                $tag_id_substitutes = implode(', ', array_map(function() {return "%d";}, $arlo_templatetaghidden));
+                $where .= " AND NOT EXISTS( SELECT tag_id FROM $t6 WHERE tag_id IN ($tag_id_substitutes) AND et.et_id = et_id AND import_id = et.import_id )";
                 $parameters = array_merge($parameters, $arlo_templatetaghidden);    
             }
         endif;
@@ -479,7 +480,7 @@ class OnlineActivities {
                 c.c_arlo_id = etc.c_arlo_id
             AND
                 c.import_id = etc.import_id
-            $join
+            " . implode("\n", $join) ."
             WHERE
             $where
             $order
@@ -506,7 +507,7 @@ class OnlineActivities {
         
         $page_type = $filter_group = \Arlo_For_Wordpress::get_current_page_arlo_type('oa');
 
-        if (!empty($settings['post_types']['oa']['posts_page'])) {
+        if (!empty($settings['post_types'][$page_type]['posts_page'])) {
             $page_link = get_permalink(get_post($settings['post_types'][$page_type]['posts_page']));
         } else {
             $page_link = get_permalink(get_post($post));
@@ -523,7 +524,7 @@ class OnlineActivities {
 
             $items = Filters::get_filter_options($filter_key, $import_id);
             
-            $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'), 'generic', $att);
+            $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'), 'generic', $att, 'oa');
         endforeach;
 
         if (!empty($filter_html)) {

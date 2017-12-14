@@ -103,9 +103,9 @@ class Importer {
 		if (!empty($settings['taxexempt_tag'])) {
 			$sql = $this->dbl->prepare("
 			UPDATE 
-				{$this->dbl->prefix}_arlo_events AS e, 
-				{$this->dbl->prefix}_arlo_events_tags AS et, 
-				{$this->dbl->prefix}_arlo_tags AS t 
+				{$this->dbl->prefix}arlo_events AS e, 
+				{$this->dbl->prefix}arlo_events_tags AS et, 
+				{$this->dbl->prefix}arlo_tags AS t 
 			SET 
 				e_is_taxexempt = 1
 			WHERE 
@@ -124,7 +124,7 @@ class Importer {
 		} else {
 			$sql = $this->dbl->prepare("
 			UPDATE 
-				{$this->dbl->prefix}_arlo_events AS e
+				{$this->dbl->prefix}arlo_events AS e
 			SET 
 				e_is_taxexempt = 0
 			WHERE 
@@ -132,7 +132,7 @@ class Importer {
 			", [$import_id]);
 		}
 		
-		$this->dbl->query($sql);
+		$query = $this->dbl->query($sql);
 
 		if ($query === false) {					
 			throw new \Exception('SQL error at set_tax_exempt_events: ' . $this->dbl->last_error);

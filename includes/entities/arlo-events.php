@@ -11,7 +11,7 @@ class Events {
 		$where = array("e.import_id = %d");
 		$parameters[] =  $import_id;
 		$t1 = "{$wpdb->prefix}arlo_events";
-        $join = '';
+        $join = [];
 
 		// conditions
 		foreach($conditions as $key => $value) {
@@ -55,7 +55,7 @@ class Events {
 				break;
 
 				case 'state':
-					$join = " LEFT JOIN $t1 ce ON e.e_arlo_id = ce.e_parent_arlo_id AND e.import_id = ce.import_id";
+					$join['ce'] = " LEFT JOIN $t1 AS ce ON e.e_arlo_id = ce.e_parent_arlo_id AND e.import_id = ce.import_id";
 
 					if(is_array($value) && count($value) > 1) {
 						$ids_string = implode(',', array_map(function() {return "%d";}, $value));
@@ -99,7 +99,7 @@ class Events {
 
 		$group = " GROUP BY e.e_id";
 
-		$query = $wpdb->prepare($query.$join.$where.$group.$order, $parameters);
+		$query = $wpdb->prepare($query.implode("\n", $join).$where.$group.$order, $parameters);
 	
 		if ($query) {
 			return (!empty($limit)) ? $wpdb->get_results($query.$limit) : $wpdb->get_row($query);

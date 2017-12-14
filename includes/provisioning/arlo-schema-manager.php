@@ -6,8 +6,8 @@ use Arlo\Logger;
 
 class SchemaManager {
 
-	const DB_SCHEMA_HASH = 'c1fc5873b2c060df777000e7e19066dd4389d8cd';
-	const DB_SCHEMA_VERSION = '3.1.0';
+	const DB_SCHEMA_HASH = '35da0c3b05f17b445244e64977737eec9ab4495d';
+	const DB_SCHEMA_VERSION = '3.6.0';
 
 	/* database layer */
 	private $dbl;
@@ -218,6 +218,7 @@ class SchemaManager {
 			KEY et_arlo_id (et_arlo_id),
 			KEY e_arlo_id (e_arlo_id),
 			KEY e_region (e_region),
+			KEY e_is_taxexempt (e_is_taxexempt),
 			KEY v_id (v_id))
 			CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";";
 

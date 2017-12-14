@@ -53,6 +53,8 @@ class Templates {
         $settings = get_option('arlo_settings');  
         $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
 
+        $join = [];
+
         extract(shortcode_atts(array(
             'limit'	=> 5,
             'base' => 'category',
@@ -83,7 +85,7 @@ class Templates {
                             )
                 ";
                 
-                $join = "		
+                $join['t'] = "		
                 LEFT JOIN 
                     {$wpdb->prefix}arlo_eventtemplates_tags AS t
                 ON
@@ -106,7 +108,7 @@ class Templates {
                             )
                 ";		
             
-                $join = "
+                $join['c'] = "
                 LEFT JOIN 
                     {$wpdb->prefix}arlo_eventtemplates_categories AS c
                 ON
@@ -118,7 +120,7 @@ class Templates {
         }
             
         if ($onlyscheduled === "true") {
-            $join .= "
+            $join['e'] = "
             INNER JOIN 
                 {$wpdb->prefix}arlo_events AS e
             ON
@@ -145,7 +147,7 @@ class Templates {
                 et.et_registerinteresturi 
             FROM 
                 {$wpdb->prefix}arlo_eventtemplates AS et
-            {$join}
+            " . implode("\n", $join) ."
             WHERE 
                 et.import_id = " . $import_id . "
             AND
@@ -269,7 +271,7 @@ class Templates {
     private static function template_list_initializer($content = '', $atts = [], $shortcode_name = '', $import_id = '', $template_name) {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
 
-        $filter_settings = get_option('page_filter_settings', []);        
+        $filter_settings = get_option('arlo_page_filter_settings', []);        
         
         $templates = arlo_get_option('templates');
         $content = $templates[$template_name]['html'];
@@ -386,7 +388,7 @@ class Templates {
         $sql = self::generate_list_sql($atts, $import_id);
 
         $items = $wpdb->get_results($sql, ARRAY_A);
-            
+        
         if(empty($items)) :
             if (!(isset($atts['show_only_at_bottom']) && $atts['show_only_at_bottom'] == "true" && isset($GLOBALS['arlo_categories_count']) && $GLOBALS['arlo_categories_count'])) :
                 $GLOBALS['no_event_text'] = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', 'arlo-for-wordpress');
@@ -607,7 +609,7 @@ class Templates {
 
             $items = Filters::get_filter_options($filter_key, $import_id);
 
-            $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'), 'generic', $att);
+            $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'), 'generic', $att, $filter_group);
 
         endforeach; 
             
@@ -713,7 +715,7 @@ class Templates {
         $group = (isset($GLOBALS['arlo_group_template_by_id']) && $GLOBALS['arlo_group_template_by_id']) ? 'GROUP BY et.et_arlo_id' : '';	
         $parameters[] = $import_id;
 
-        $join = "";
+        $join = [];
         $field_list = "";
 
         $arlo_location = !empty($atts['location']) ? $atts['location'] : null;
@@ -746,7 +748,7 @@ class Templates {
 
         if(isset($arlo_location) || isset($arlo_locationhidden) || isset($arlo_delivery) || isset($arlo_deliveryhidden) || !empty($arlo_state) ) :
 
-            $join .= " LEFT JOIN $t5 e ON e.et_arlo_id = et.et_arlo_id AND e.import_id = et.import_id";
+            $join['e'] = " LEFT JOIN $t5 AS e ON e.et_arlo_id = et.et_arlo_id AND e.import_id = et.import_id ";
             
             if (!empty($arlo_location)) {
                 $where .= " AND e.e_locationname IN (" . implode(',', array_map(function() {return "%s";}, $arlo_location)) . ")";                
@@ -759,7 +761,7 @@ class Templates {
             }
 
             if(isset($arlo_delivery) || isset($arlo_deliveryhidden)) {
-                if (!empty($arlo_delivery)) {
+                if (isset($arlo_delivery)) {
                     $where .= ' AND ( 1 ';
                     foreach ($arlo_delivery as $delivery) {
                         switch ($delivery) {
@@ -770,7 +772,7 @@ class Templates {
                                 $where .= " AND e.e_parent_arlo_id = 0 ";
                             break;
                             case 99: 
-                                $join .= " LEFT JOIN $t8 oa ON oa.oat_arlo_id = et.et_arlo_id AND oa.import_id = et.import_id";
+                                $join['oa'] = " LEFT JOIN $t8 AS oa ON oa.oat_arlo_id = et.et_arlo_id AND oa.import_id = et.import_id ";
                                 $where .= (count($arlo_delivery) > 1 ? ' OR ' : ' AND ') . ' oa_id IS NOT NULL ';
                             break;        
                         } 
@@ -779,8 +781,8 @@ class Templates {
                     
                 }
     
-                if (!empty($arlo_deliveryhidden)) {            
-                    $join .= " LEFT JOIN $t8 oa ON oa.oat_arlo_id = et.et_arlo_id AND oa.import_id = et.import_id";
+                if (isset($arlo_deliveryhidden)) {            
+                    $join['oa'] = " LEFT JOIN $t8 AS oa ON oa.oat_arlo_id = et.et_arlo_id AND oa.import_id = et.import_id ";
                     foreach ($arlo_deliveryhidden as $delivery) {
                         switch ($delivery) {
                             case 0:
@@ -805,9 +807,7 @@ class Templates {
             }
 
             if(!empty($arlo_state)) :                
-                $join .= "
-                    LEFT JOIN $t5 ce ON e.e_arlo_id = ce.e_parent_arlo_id AND e.import_id = ce.import_id
-                ";
+                $join['ce']  = " LEFT JOIN $t5 ce ON e.e_arlo_id = ce.e_parent_arlo_id AND e.import_id = ce.import_id ";
 
                 $venues_query = $wpdb->prepare("SELECT v.v_arlo_id FROM {$wpdb->prefix}arlo_venues v WHERE v.v_physicaladdressstate = %s", $arlo_state);
                 $venues = array_map(function ($venue) {
@@ -838,16 +838,18 @@ class Templates {
         endif;	
 
         if(!empty($arlo_templatetag) || !empty($arlo_templatetaghidden)) :
-            $join .= " LEFT JOIN $t6 ett ON et.et_id = ett.et_id AND ett.import_id = et.import_id";
 
             if (!empty($arlo_templatetag)) {
+                $join['ett'] = " LEFT JOIN $t6 AS ett ON et.et_id = ett.et_id AND ett.import_id = et.import_id ";
+
                 $where .= " AND ett.tag_id IN (" . implode(',', array_map(function() {return "%d";}, $arlo_templatetag)) . ")";
                 $parameters = array_merge($parameters, $arlo_templatetag);    
             }
             
             if (!empty($arlo_templatetaghidden)) {
-                $where .= " AND (ett.tag_id NOT IN (" . implode(',', array_map(function() {return "%d";}, $arlo_templatetaghidden)) . ") OR ett.tag_id IS NULL)";
-                $parameters = array_merge($parameters, $arlo_templatetaghidden);    
+                $tag_id_substitutes = implode(', ', array_map(function() {return "%d";}, $arlo_templatetaghidden));
+                $where .= " AND NOT EXISTS( SELECT tag_id FROM $t6 WHERE tag_id IN ($tag_id_substitutes) AND et.et_id = et_id AND import_id = et.import_id )";
+                $parameters = array_merge($parameters, $arlo_templatetaghidden);
             }
         endif;
 
@@ -939,7 +941,7 @@ class Templates {
             $field_list 
         FROM 
             $t1 et 
-        $join
+        " . implode("\n", $join) . "
         LEFT JOIN $t2 post 
             ON et.et_post_id = post.ID 
         LEFT JOIN $t3 etc
@@ -952,7 +954,7 @@ class Templates {
         $limit_field";
 
         $query = $wpdb->prepare($sql, $parameters);
-
+        
         if ($query) {
             return $query;
         } else {

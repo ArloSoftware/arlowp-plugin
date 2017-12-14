@@ -298,7 +298,8 @@ function arlo_register_custom_post_types() {
 				if (!empty($_COOKIE['arlo-region']) && in_array($_COOKIE['arlo-region'], array_keys($regions))) {
 					$selected_region = $_COOKIE['arlo-region'];
 				} else {
-					$selected_region = reset(array_keys($regions));
+					$regions_keys = array_keys($regions);
+					$selected_region = reset($regions_keys);
 				}
 				
 				setcookie("arlo-region", $selected_region, time()+60*60*24*30, '/', $domain);	
@@ -318,7 +319,8 @@ function arlo_register_custom_post_types() {
 			}
 		} else {
 			if (empty($_COOKIE['arlo-region'])) {
-				setcookie("arlo-region", reset(array_keys($regions)), time()+60*60*24*30, '/', $domain);
+				$regions_keys = array_keys($regions);
+				setcookie("arlo-region", reset($regions_keys), time()+60*60*24*30, '/', $domain);
 				wp_redirect($_SERVER['REQUEST_URI']);
 			}
 		}

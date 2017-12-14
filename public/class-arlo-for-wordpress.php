@@ -1102,18 +1102,15 @@ class Arlo_For_Wordpress {
 		$settings = get_option('arlo_settings');
 		$page_id = get_query_var('page_id', '');
 		$obj = get_queried_object();
-		
-		$page_id = (empty($obj->ID) ? $page_id : $obj->ID);
 
-		$category = \Arlo\Utilities::get_att_string('category');
+		$page_id = (empty($obj->ID) ? $page_id : $obj->ID);
 
 		if (!empty($obj->post_type) && $obj->post_type == 'arlo_event' && !empty($obj->post_content)) {
 			$desc = strip_tags($obj->post_content);
-		} else if (!empty($category)) {
-			$import_id = $this->get_importer()->get_current_import_id();
-			$category_data = \Arlo\Entities\Categories::get([ 'id' => intval($category)], 1, $import_id);
-			if (!empty($category_data) && !empty($category_data->c_header)) {
-				$desc = strip_tags($category_data->c_header);
+		} else {
+			$category = $this->fetch_category($page_id);
+			if (!empty($category) && !empty($category->c_header)) {
+				$desc = strip_tags($category->c_header);
 			}
 		}
 
@@ -1129,7 +1126,38 @@ class Arlo_For_Wordpress {
 			
 			echo '<meta name="description" content="' . htmlspecialchars($desc, ENT_COMPAT, 'UTF-8') . '">';
 		}
-	}	
+	}
+
+	private function fetch_category($page_id) {
+		$filter_settings = get_option('arlo_page_filter_settings', []);
+
+		$page = get_post($page_id);
+		if (!$page) return;
+		
+		$template_name = $page->post_name;
+
+		//too early to call get_selected_categories()
+		$stored_atts = [];
+		\Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, [], $stored_atts, '\Arlo\Utilities::convert_string_to_int_array');
+		\Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, [], $stored_atts, '\Arlo\Utilities::convert_string_to_int_array', null, true);
+		$category_slug_or_array = \Arlo\Utilities::get_att_string('category', $stored_atts);
+
+		$category_id = 0;
+		if (is_array($category_slug_or_array)) {
+			if (isset($category_slug_or_array[0])) {
+				$category_id = $category_slug_or_array[0];
+			}
+		} else {
+			$category_id = intval($category_slug_or_array);
+		}
+
+		if (empty($category_id)) {
+			return '';
+		}
+
+		$import_id = $this->get_importer()->get_current_import_id();
+		return \Arlo\Entities\Categories::get([ 'id' => intval($category_id)], 1, $import_id);
+	}
 	
 	
 	
@@ -1806,7 +1834,7 @@ class Arlo_For_Wordpress {
 			? strtoupper(get_query_var('arlo-region', ''))
 			: (!empty($_COOKIE['arlo-region']) ? $_COOKIE['arlo-region'] : '');
 
-		return (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+		return (!empty($arlo_region) && is_array($regions) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
     }
     
    	public function get_tag_by_id($tag_id) {
