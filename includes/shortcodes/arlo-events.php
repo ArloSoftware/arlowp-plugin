@@ -927,6 +927,32 @@ class Events {
         }        
     }
 
+    private static function shortcode_event_isfull($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if(!isset($GLOBALS['arlo_event_list_item']) || empty($GLOBALS['arlo_event_list_item']['e_isfull'])) return;
+
+        extract(shortcode_atts(array(
+            'output' => 'Event full'
+        ), $atts, $shortcode_name, $import_id));
+
+        if ($GLOBALS['arlo_event_list_item']["e_isfull"] == 1) {
+            return $output;
+        }
+    }
+
+    private static function shortcode_event_offers_hasdiscount($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if(!isset($GLOBALS['arlo_event_list_item']) || empty($GLOBALS['arlo_event_list_item']['e_id'])) return;
+
+        extract(shortcode_atts(array(
+            'output' => 'Discount'
+        ), $atts, $shortcode_name, $import_id));
+
+        $offers = Shortcodes::get_advertised_offers($GLOBALS['arlo_event_list_item']['e_id'], 'e_id', $import_id, $GLOBALS['arlo_event_list_item']['e_is_taxexempt']);
+
+        if (array_search('1', array_column($offers, 'o_isdiscountoffer')) !== false || array_search('1', array_column($offers, 'replacement_discount')) !== false) {
+            return $output;
+        }
+    }
+
     private static function shortcode_event_next_running($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_eventtemplate']) || empty($GLOBALS['arlo_eventtemplate']['et_arlo_id'])) return;
         $return = "";
