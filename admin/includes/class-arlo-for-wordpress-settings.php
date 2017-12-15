@@ -842,7 +842,7 @@ class Arlo_For_Wordpress_Settings {
 				. '</select>
 			</div>
 
-			<div class="arlo-filter-new-value" ' . (!empty($filter_new_value) ? 'style="display: block"' : '') . '><input type="text" name="arlo_settings[' . $setting_name . '][' . $filter_group . '][' . $filter_key . '][' . $settings_id . '][filternewvalue]" value="' . $filter_new_value . '"></div>
+			<div class="arlo-filter-new-value" ' . (!empty($filter_new_value) ? 'style="display: block"' : '') . '><input type="text" name="arlo_settings[' . $setting_name . '][' . $filter_group . '][' . $filter_key . '][' . $settings_id . '][filternewvalue]" value="' . $filter_new_value . '" maxlength="64"></div>
 		</li>';
 
 		return $option_html;
