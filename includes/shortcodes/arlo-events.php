@@ -930,10 +930,10 @@ class Events {
         if(!isset($GLOBALS['arlo_eventtemplate']) || empty($GLOBALS['arlo_eventtemplate']['et_arlo_id'])) return;
         $return = "";
 
-        $arlo_location = \Arlo\Utilities::clean_string_url_parameter('arlo-location');
-        $arlo_delivery = \Arlo\Utilities::clean_int_url_parameter('arlo-delivery');
+        $arlo_location = \Arlo\Utilities::get_att_string('location');
+        $arlo_delivery = \Arlo\Utilities::get_att_int('delivery');
         $arlo_state = \Arlo\Utilities::clean_string_url_parameter('arlo-state');
-
+        
         if (!empty($GLOBALS['arlo_eventtemplate']['et_region'])) {
             $arlo_region = $GLOBALS['arlo_eventtemplate']['et_region'];
         } else {
