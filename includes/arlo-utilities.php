@@ -52,6 +52,9 @@ class Utilities {
     public static function get_att_int($name, $atts = []) {
         $int_parameter = self::clean_int_url_parameter('arlo-'.$name);
         $prioritised = self::get_att_generic($name, $atts, $int_parameter);
+        if (!strlen($prioritised)) {
+            return null;
+        }
         return intval($prioritised);
     }
 
