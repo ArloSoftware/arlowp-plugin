@@ -415,51 +415,6 @@ class Events {
         return Shortcodes::advertised_offers($id, 'e_id', $import_id);
     }
 
-    private static function get_event_presenters($import_id) {
-        global $wpdb;
-
-        $id = isset($GLOBALS['arlo_event_session_list_item']['e_id']) ? $GLOBALS['arlo_event_session_list_item']['e_id'] : $GLOBALS['arlo_event_list_item']['e_id'];
-
-        $cache_key = md5( serialize( $id ) );
-        $cache_category = 'ArloPresenters';
-
-        if($cached = wp_cache_get($cache_key, $cache_category)) {
-            return $cached;
-        }
-
-        $t1 = "{$wpdb->prefix}arlo_events_presenters";
-        $t2 = "{$wpdb->prefix}arlo_presenters";
-
-        $result = $wpdb->get_results("
-        SELECT 
-            p.p_firstname, 
-            p.p_lastname, 
-            p.p_post_name,
-            p.p_post_id,
-            p.p_viewuri 
-        FROM 
-            $t1 exp 
-        INNER JOIN 
-            $t2 p
-        ON 
-            exp.p_arlo_id = p.p_arlo_id 
-        AND 
-            exp.import_id = p.import_id
-        WHERE 
-            exp.e_id = {$id}
-        AND 
-            p.import_id = $import_id
-        GROUP BY 
-            p.p_arlo_id
-        ORDER BY 
-            exp.p_order", ARRAY_A);
-
-        wp_cache_add( $cache_key, $result, $cache_category, 30 );
-
-        return $result;
-
-    }
-
     private static function shortcode_event_presenters($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
 
         // merge and extract attributes
@@ -474,7 +429,8 @@ class Events {
             $output .= '<ul class="arlo-list event-presenters">';
         }
 
-        $items = self::get_event_presenters($import_id);
+        $e_id = $id = isset($GLOBALS['arlo_event_session_list_item']['e_id']) ? $GLOBALS['arlo_event_session_list_item']['e_id'] : $GLOBALS['arlo_event_list_item']['e_id'];
+        $items = \Arlo\Entities\Presenters::get(['e_id' => $e_id], null, null, $import_id);
 
         $presenters = array();
 
@@ -1035,7 +991,9 @@ class Events {
 
         // Presenters
         $performers = array();
-        foreach (self::get_event_presenters($import_id) as $i => $presenter) {
+        $e_id = $id = isset($GLOBALS['arlo_event_session_list_item']['e_id']) ? $GLOBALS['arlo_event_session_list_item']['e_id'] : $GLOBALS['arlo_event_list_item']['e_id'];
+        $presenters = \Arlo\Entities\Presenters::get(['e_id' => $e_id], null, null, $import_id);
+        foreach ($presenters as $i => $presenter) {
             array_push($performers,Shortcodes::get_performer($presenter,$link));
         }
 

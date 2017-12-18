@@ -1763,11 +1763,11 @@ class Arlo_For_Wordpress {
 			
 			case 'presenter':
 				$presenter = \Arlo\Entities\Presenters::get(array('id' => intval($_GET['arlo_id'])), array(), 1, $import_id);
-				
+
 				if(!$presenter) return;
 				
-				$post = arlo_get_post_by_name($presenter->p_post_name, 'arlo_presenter');
-				
+				$post = arlo_get_post_by_name($presenter['p_post_name'], 'arlo_presenter');
+
 				if(!$post) return;
 				
 				$location = get_permalink($post->ID);
