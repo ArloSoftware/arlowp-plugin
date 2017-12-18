@@ -146,9 +146,9 @@ class Venues {
     }    
     
     private static function shortcode_venue_permalink($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        if(!isset($GLOBALS['arlo_venue_list_item']['post_id'])) return '';
+        if(!isset($GLOBALS['arlo_venue_list_item']['v_post_id'])) return '';
 
-        return get_permalink($GLOBALS['arlo_venue_list_item']['post_id']);        
+        return get_permalink($GLOBALS['arlo_venue_list_item']['v_post_id']);        
     }
 
     private static function get_map_query() {
