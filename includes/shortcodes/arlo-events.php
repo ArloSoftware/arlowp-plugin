@@ -933,6 +933,11 @@ class Events {
         $arlo_location = \Arlo\Utilities::get_att_string('location');
         $arlo_delivery = \Arlo\Utilities::get_att_int('delivery');
         $arlo_state = \Arlo\Utilities::clean_string_url_parameter('arlo-state');
+
+        $arlo_page_filter_settings = get_option('arlo_page_filter_settings', []);
+        if (isset($arlo_page_filter_settings['hiddenfilters']['events']['delivery'][0])) {
+            $arlo_delivery_hidden = $arlo_page_filter_settings['hiddenfilters']['events']['delivery'][0];
+        }
         
         if (!empty($GLOBALS['arlo_eventtemplate']['et_region'])) {
             $arlo_region = $GLOBALS['arlo_eventtemplate']['et_region'];
@@ -981,14 +986,20 @@ class Events {
         if(isset($arlo_delivery) && is_numeric($arlo_delivery) && $arlo_delivery <= 1) {
             $conditions['e.e_isonline = %d'] = $arlo_delivery;
         }
+        else if(isset($arlo_delivery_hidden) && is_numeric($arlo_delivery_hidden) && $arlo_delivery_hidden <= 1) {
+            $conditions['e.e_isonline <> %d'] = $arlo_delivery_hidden;
+        }
 
         if (isset($arlo_state) && isset($GLOBALS['state_filter_venues'])) {
             $conditions['state'] = $GLOBALS['state_filter_venues'];
         }
         
-        $events = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), $limit, $import_id);
+        $events = [];
+        if( !(isset($arlo_delivery) && is_numeric($arlo_delivery) && $arlo_delivery > 1) ) {
+            $events = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), $limit, $import_id);
+        }
         $oa = \Arlo\Entities\OnlineActivities::get($oaconditions, null, 1, $import_id);
-        
+
         if ($layout == "list") {
             $return = '<ul class="arlo-event-next-running">';
         }
