@@ -812,13 +812,12 @@ class Templates {
                 $venues = \Arlo\Entities\Venues::get(['state' => $arlo_state], null, null, $import_id);
 
                 if(is_array($venues) && count($venues) > 1) {
-
                     $venues = array_map(function ($venue) {
                         return $venue['v_arlo_id'];
                     }, $venues);
-
+                    
                     $GLOBALS['state_filter_venues'] = $venues;
-                        
+
                     $ids_string = implode(',', array_map(function() {return "%d";}, $venues));
                     $where .= " AND (ce.v_id IN (" . $ids_string . ") OR e.v_id IN (" . $ids_string . "))";
 

@@ -199,8 +199,7 @@ class Events {
         };
 
         if (!empty($arlo_state)) {
-
-            $venues = \Arlo\Entities\Venues::get(['state' => $arlo_state], null, null, $import_id, ['v_arlo_id']);
+            $venues = \Arlo\Entities\Venues::get(['state' => $arlo_state], null, null, $import_id);
 
             if (count($venues)) {
                 $join['ce'] = " LEFT JOIN $t2 AS ce ON $t2.e_arlo_id = ce.e_parent_arlo_id AND $t2.import_id = ce.import_id ";

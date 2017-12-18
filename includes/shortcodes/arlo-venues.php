@@ -235,6 +235,8 @@ class Venues {
     }
     
     private static function shortcode_venue_address($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if (!isset($GLOBALS['arlo_venue_list_item'])) return;
+
         // merge and extract attributes
         extract(shortcode_atts(array(
             'layout' => 'list',
@@ -368,6 +370,8 @@ class Venues {
 
     private static function get_venue_snippet($link) {
         $venue_snippet = array();
+
+        if (!isset($GLOBALS['arlo_venue_list_item'])) return $venue_snippet;
 
         // Basic
         $venue_snippet = array();

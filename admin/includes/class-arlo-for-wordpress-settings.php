@@ -27,7 +27,8 @@ class Arlo_For_Wordpress_Settings {
 		// allocates the wp-options option key value pair that will store the plugin settings
 		register_setting( 'arlo_settings', 'arlo_settings', array(
 			'sanitize_callback' => function($input) {
-				$input['regionid'] = array_map('strtoupper',$input['regionid']);
+				$region_id = (isset($input['regionid']) && is_array($input['regionid']) ? $input['regionid'] : []);
+				$input['regionid'] = array_map('strtoupper', $region_id);
 				return $input;
 			}
 		));		
@@ -122,7 +123,9 @@ class Arlo_For_Wordpress_Settings {
 					if ($stored_themes_settings[$theme_id]->templates !== false) {
 						//update the main setting with the stored theme
 						foreach ($settings_object['templates'] as $page => $template) {
-							$settings_object['templates'][$page]['html'] = $stored_themes_settings[$theme_id]->templates[$page]['html'];
+							if (isset($stored_themes_settings[$theme_id]->templates[$page]['html'])) {
+								$settings_object['templates'][$page]['html'] = $stored_themes_settings[$theme_id]->templates[$page]['html'];
+							}
 						}
 						update_option('arlo_settings', $settings_object, 1);
 						update_option('arlo_themes_settings', $stored_themes_settings, 1);
@@ -839,7 +842,7 @@ class Arlo_For_Wordpress_Settings {
 				. '</select>
 			</div>
 
-			<div class="arlo-filter-new-value" ' . (!empty($filter_new_value) ? 'style="display: block"' : '') . '><input type="text" name="arlo_settings[' . $setting_name . '][' . $filter_group . '][' . $filter_key . '][' . $settings_id . '][filternewvalue]" value="' . $filter_new_value . '"></div>
+			<div class="arlo-filter-new-value" ' . (!empty($filter_new_value) ? 'style="display: block"' : '') . '><input type="text" name="arlo_settings[' . $setting_name . '][' . $filter_group . '][' . $filter_key . '][' . $settings_id . '][filternewvalue]" value="' . $filter_new_value . '" maxlength="64"></div>
 		</li>';
 
 		return $option_html;

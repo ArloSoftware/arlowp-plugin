@@ -416,7 +416,7 @@ class UpcomingEvents {
                     return $venue['v_arlo_id'];
                 }, $venues);
                 
-                $where .= " AND (ce.v_id IN (" . implode(',', array_map(function() {return "%d";}, $venues)) . ") OR v.v_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $venues)) . "))";
+                $where .= " AND (ce.v_id IN (" . implode(',', array_map(function() {return "%d";}, $venues)) . ") OR e.v_id IN (" . implode(',', array_map(function() {return "%d";}, $venues)) . "))";
                 $parameters = array_merge($parameters, $venues);
                 $parameters = array_merge($parameters, $venues);
             }
