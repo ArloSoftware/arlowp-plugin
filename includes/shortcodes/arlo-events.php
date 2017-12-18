@@ -934,10 +934,8 @@ class Events {
         $arlo_delivery = \Arlo\Utilities::get_att_int('delivery');
         $arlo_state = \Arlo\Utilities::clean_string_url_parameter('arlo-state');
 
-        $arlo_page_filter_settings = get_option('arlo_page_filter_settings', []);
-        if (isset($arlo_page_filter_settings['hiddenfilters']['events']['delivery'][0])) {
-            $arlo_delivery_hidden = $arlo_page_filter_settings['hiddenfilters']['events']['delivery'][0];
-        }
+        $arlo_location_hidden = \Arlo\Utilities::get_att_string('locationhidden');
+        $arlo_delivery_hidden = \Arlo\Utilities::get_att_int('deliveryhidden');
         
         if (!empty($GLOBALS['arlo_eventtemplate']['et_region'])) {
             $arlo_region = $GLOBALS['arlo_eventtemplate']['et_region'];
@@ -981,6 +979,9 @@ class Events {
 
         if (!empty($arlo_location)) {
             $conditions['e.e_locationname = %s'] = $arlo_location;
+        }
+        else if (!empty($arlo_location_hidden)) {
+            $conditions['e.e_locationname <> %s'] = $arlo_location_hidden;
         }
 
         if(isset($arlo_delivery) && is_numeric($arlo_delivery) && $arlo_delivery <= 1) {
