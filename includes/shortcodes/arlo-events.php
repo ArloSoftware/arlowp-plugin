@@ -339,12 +339,12 @@ class Events {
         $start_date = new \DateTime($event['e_startdatetime']);
         $end_date = new \DateTime($event['e_finishdatetime']);
 
-        $args[1] = $startdateformat;
+        $args[1]['format'] = $startdateformat;
         $formatted_start_date = '<span class="arlo-start-date">' .  call_user_func_array('self::shortcode_event_start_date', $args) . '</span>';
 
         $formatted_end_date = '';
         if ($start_date->format('Y-m-d') !== $end_date ->format('Y-m-d')) {
-            $args[1] = $enddateformat;
+            $args[1]['format'] = $enddateformat;
             $formatted_end_date = '<span class="arlo-end-date">' . call_user_func_array('self::shortcode_event_end_date', $args) . '</span>';
         }
 
