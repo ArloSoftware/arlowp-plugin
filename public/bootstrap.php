@@ -321,7 +321,10 @@ function arlo_register_custom_post_types() {
 			if (empty($_COOKIE['arlo-region'])) {
 				$regions_keys = array_keys($regions);
 				setcookie("arlo-region", reset($regions_keys), time()+60*60*24*30, '/', $domain);
-				wp_redirect($_SERVER['REQUEST_URI']);
+				
+				//Some hosting has high level caching (caches the redirects) and no cookies are available which means it can stuck in a redirect loop
+				if (!empty($_COOKIE['arlo-region']))
+					wp_redirect($_SERVER['REQUEST_URI']);
 			}
 		}
 	}
