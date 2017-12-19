@@ -930,10 +930,13 @@ class Events {
         if(!isset($GLOBALS['arlo_eventtemplate']) || empty($GLOBALS['arlo_eventtemplate']['et_arlo_id'])) return;
         $return = "";
 
-        $arlo_location = \Arlo\Utilities::clean_string_url_parameter('arlo-location');
-        $arlo_delivery = \Arlo\Utilities::clean_int_url_parameter('arlo-delivery');
+        $arlo_location = \Arlo\Utilities::get_att_string('location');
+        $arlo_delivery = \Arlo\Utilities::get_att_int('delivery');
         $arlo_state = \Arlo\Utilities::clean_string_url_parameter('arlo-state');
 
+        $arlo_location_hidden = \Arlo\Utilities::get_att_string('locationhidden');
+        $arlo_delivery_hidden = \Arlo\Utilities::get_att_int('deliveryhidden');
+        
         if (!empty($GLOBALS['arlo_eventtemplate']['et_region'])) {
             $arlo_region = $GLOBALS['arlo_eventtemplate']['et_region'];
         } else {
@@ -977,18 +980,27 @@ class Events {
         if (!empty($arlo_location)) {
             $conditions['e.e_locationname = %s'] = $arlo_location;
         }
+        else if (!empty($arlo_location_hidden)) {
+            $conditions['e.e_locationname <> %s'] = $arlo_location_hidden;
+        }
 
         if(isset($arlo_delivery) && is_numeric($arlo_delivery) && $arlo_delivery <= 1) {
             $conditions['e.e_isonline = %d'] = $arlo_delivery;
+        }
+        else if(isset($arlo_delivery_hidden) && is_numeric($arlo_delivery_hidden) && $arlo_delivery_hidden <= 1) {
+            $conditions['e.e_isonline <> %d'] = $arlo_delivery_hidden;
         }
 
         if (isset($arlo_state) && isset($GLOBALS['state_filter_venues'])) {
             $conditions['state'] = $GLOBALS['state_filter_venues'];
         }
         
-        $events = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), $limit, $import_id);
+        $events = [];
+        if( !(isset($arlo_delivery) && is_numeric($arlo_delivery) && $arlo_delivery > 1) ) {
+            $events = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), $limit, $import_id);
+        }
         $oa = \Arlo\Entities\OnlineActivities::get($oaconditions, null, 1, $import_id);
-        
+
         if ($layout == "list") {
             $return = '<ul class="arlo-event-next-running">';
         }
