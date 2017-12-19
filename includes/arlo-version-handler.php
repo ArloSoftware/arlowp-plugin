@@ -665,7 +665,7 @@ class VersionHandler {
 
 				if ($is_notice_required) {
 					$message = [
-						'<p>'. __('The Filters tab has been removed. All per-page filter settings are now lost. They can still be configured from the Arlo management platform instead. Only the delivery filter is configurable now and it is common to all pages. This can be done in the General Settings.', 'arlo-for-wordpress' ) . '</p>'
+						'<p>'. __('The Filters tab has been removed so previous filter settings are no longer available. The delivery filter settings are now configured from the General Settings tab and apply to all Arlo for WordPress pages. Locations, tags and categories should be managed from the Arlo management platform.', 'arlo-for-wordpress' ) . '</p>'
 					];
 					if (!$this->message_handler->set_message('import_error', __('Filter settings deleted', 'arlo-for-wordpress' ), implode('', $message), true)) {
 						Logger::log("Couldn't create Arlo 3.6 filters settings lost notice message");
