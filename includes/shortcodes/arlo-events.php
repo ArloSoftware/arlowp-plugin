@@ -1067,6 +1067,11 @@ class Events {
             $format = DateFormatter::date_format_to_strftime_format($format);
         }
 
+        $display_count = (strpos($text, '{%count%}') !== false);
+        if ($display_count) {
+            $limit = 100;
+        }
+        
         $removeyear = ($removeyear == "false" || $removeyear == "0" ? false : true);
         
         $conditions = array(
@@ -1107,8 +1112,6 @@ class Events {
             $events = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), $limit, $import_id);
         }
         $oa = \Arlo\Entities\OnlineActivities::get($oaconditions, null, 1, $import_id);
-
-        $display_count = (strpos($text, '{%count%}') !== false) ? true : false;
 
         if ($layout == "list") {
             $return = '<ul class="arlo-event-next-running">';
