@@ -345,7 +345,7 @@ class Events {
         $formatted_end_date = '';
         if ($start_date->format('Y-m-d') !== $end_date ->format('Y-m-d')) {
             $args[1]['format'] = $enddateformat;
-            $formatted_end_date = '<span class="arlo-end-date">' . call_user_func_array('self::shortcode_event_end_date', $args) . '</span>';
+            $formatted_end_date = ' - <span class="arlo-end-date">' . call_user_func_array('self::shortcode_event_end_date', $args) . '</span>';
         }
 
         return $formatted_start_date . $formatted_end_date;
