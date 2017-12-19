@@ -1038,12 +1038,12 @@ class Events {
         if(!isset($GLOBALS['arlo_eventtemplate']) || empty($GLOBALS['arlo_eventtemplate']['et_arlo_id'])) return;
         $return = "";
 
-        $arlo_location = \Arlo\Utilities::get_att_string('location');
-        $arlo_delivery = \Arlo\Utilities::get_att_int('delivery');
+        $arlo_location = \Arlo\Utilities::get_filter_keys_string_array('location');
+        $arlo_delivery = \Arlo\Utilities::get_filter_keys_int_array('delivery');
         $arlo_state = \Arlo\Utilities::clean_string_url_parameter('arlo-state');
 
-        $arlo_location_hidden = \Arlo\Utilities::get_att_string('locationhidden');
-        $arlo_delivery_hidden = \Arlo\Utilities::get_att_int('deliveryhidden');
+        $arlo_location_hidden = \Arlo\Utilities::get_filter_keys_string_array('locationhidden');
+        $arlo_delivery_hidden = \Arlo\Utilities::get_filter_keys_int_array('deliveryhidden');
         
         if (!empty($GLOBALS['arlo_eventtemplate']['et_region'])) {
             $arlo_region = $GLOBALS['arlo_eventtemplate']['et_region'];
@@ -1085,17 +1085,17 @@ class Events {
         }
 
         if (!empty($arlo_location)) {
-            $conditions['e.e_locationname = %s'] = $arlo_location;
+            $conditions['e.e_locationname IN ( %s )'] = implode(', ', $arlo_location);
         }
         else if (!empty($arlo_location_hidden)) {
-            $conditions['e.e_locationname <> %s'] = $arlo_location_hidden;
+            $conditions['e.e_locationname NOT IN ( %s )'] = implode(', ', $arlo_location_hidden);
         }
 
-        if(isset($arlo_delivery) && is_numeric($arlo_delivery) && $arlo_delivery <= 1) {
-            $conditions['e.e_isonline = %d'] = $arlo_delivery;
+        if(!empty($arlo_delivery)) {
+            $conditions['e.e_isonline IN ( %d )'] = implode(', ', $arlo_delivery);
         }
-        else if(isset($arlo_delivery_hidden) && is_numeric($arlo_delivery_hidden) && $arlo_delivery_hidden <= 1) {
-            $conditions['e.e_isonline <> %d'] = $arlo_delivery_hidden;
+        else if(!empty($arlo_delivery_hidden)) {
+            $conditions['e.e_isonline NOT IN ( %d )'] = implode(', ', $arlo_delivery_hidden);
         }
 
         if (isset($arlo_state) && isset($GLOBALS['state_filter_venues'])) {
@@ -1103,7 +1103,7 @@ class Events {
         }
         
         $events = [];
-        if( !(isset($arlo_delivery) && is_numeric($arlo_delivery) && $arlo_delivery > 1) ) {
+        if( empty($arlo_delivery) || !in_array(99, $arlo_delivery) ) {
             $events = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), $limit, $import_id);
         }
         $oa = \Arlo\Entities\OnlineActivities::get($oaconditions, null, 1, $import_id);
@@ -1183,7 +1183,7 @@ class Events {
             } 
             
             //show only, if there is no events or delivery filter set to "OA"
-            if ((count($events) == 0 || (isset($arlo_delivery) && is_numeric($arlo_delivery) && $arlo_delivery > 1)) && count($oa)) {
+            if ((count($events) == 0 || in_array(99, $arlo_delivery)) && count($oa)) {
                 $reference_terms = json_decode($oa->oa_reference_terms, true);
                 $buttonclass = 'arlo-register';
     

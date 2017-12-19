@@ -27,6 +27,75 @@ class Utilities {
 		return $now;    
     }
 
+    public static function get_filter_keys_string_array($name, $atts = []) {
+        $url_parameter = self::clean_string_url_parameter('arlo-'.$name);
+        $global_att = self::get_shortcode_att_string_array($name, $atts);
+        $by_page = self::get_filter_setting_string_array($name);
+        return self::get_only_prioritised_filter_array($url_parameter, $global_att, $by_page);
+    }
+
+    public static function get_filter_keys_int_array($name, $atts = []) {
+        $url_parameter = self::clean_int_url_parameter('arlo-'.$name);
+        $global_att = self::get_shortcode_att_int_array($name, $atts);
+        $by_page = self::get_filter_setting_int_array($name);
+        return self::get_only_prioritised_filter_array($url_parameter, $global_att, $by_page);
+    }
+
+    private static function get_only_prioritised_filter_array($url_parameter, $shortcode_att, $bypage_filter) {
+        //1. from url parameter a.k.a. user specified
+        if (!empty($url_parameter) || $url_parameter == "0") {
+            return [$url_parameter];
+        }
+        //2. specified on the global shortcode itself
+        if (count($shortcode_att)) {
+            return $shortcode_att;
+        }
+        //3. filtered by page
+        if (count($bypage_filter)) {
+            return $bypage_filter;
+        }
+        return [];
+    }
+
+    private static function get_shortcode_att_string_array($att_name, $atts) {
+        if (!isset($atts[$att_name])) {
+            return [];
+        }
+        if (!is_array($atts[$att_name])) {
+            return [$atts[$att_name]];
+        }
+        return $atts[$att_name];
+    }
+
+    private static function get_shortcode_att_int_array($att_name, $atts) {
+        if (!isset($atts[$att_name])) {
+            return [];
+        }
+        if (!is_array($atts[$att_name])) {
+            return [ self::to_int_or_null($atts[$att_name]) ];
+        }
+        return array_map('self::to_int_or_null', $atts[$att_name]);
+    }
+
+    private static function get_filter_setting_string_array($att_name) {
+        if (!isset($GLOBALS['arlo_filter_base'][$att_name])) {
+            return [];
+        }
+        return $GLOBALS['arlo_filter_base'][$att_name];
+    }
+
+    private static function get_filter_setting_int_array($att_name) {
+        if (!isset($GLOBALS['arlo_filter_base'][$att_name])) {
+            return [];
+        }
+        return array_map('self::to_int_or_null', $GLOBALS['arlo_filter_base'][$att_name]);
+    }
+
+    private static function to_int_or_null($to_be_converted) {
+        return (is_numeric($to_be_converted) ? intval($to_be_converted) : null);
+    }
+
+
     public static function clean_string_url_parameter($parameter_name) {
         return !empty($_GET[$parameter_name]) ? wp_unslash($_GET[$parameter_name]) : wp_unslash(urldecode(get_query_var($parameter_name)));
     }
@@ -46,35 +115,12 @@ class Utilities {
 
     public static function get_att_string($name, $atts = []) {
         $string_parameter = self::clean_string_url_parameter('arlo-'.$name);
-        return self::get_att_generic($name, $atts, $string_parameter);
+        return !empty($string_parameter) || $string_parameter == "0" ? $string_parameter : ( is_array($atts) && array_key_exists($name, $atts) ? $atts[$name] : '' );
     }
 
     public static function get_att_int($name, $atts = []) {
         $int_parameter = self::clean_int_url_parameter('arlo-'.$name);
-        $prioritised = self::get_att_generic($name, $atts, $int_parameter);
-        return (strlen($prioritised) == 0 ? null : intval($prioritised));
-    }
-
-    private static function get_att_generic($name, $atts, $url_parameter) {
-        $on_global = (isset($atts[$name]) ? $atts[$name] : null);
-        $by_page = (isset($GLOBALS['arlo_filter_base'][$name][0]) ? $GLOBALS['arlo_filter_base'][$name][0] : null);
-        return self::prioritise_att($url_parameter, $on_global, $by_page);
-    }
-
-    private static function prioritise_att($url_att, $shortcode_att, $bypage_att) {
-        //1. from url parameter a.k.a. user specified
-        if (!empty($url_att) || $url_att == "0") {
-            return $url_att;
-        }
-        //2. specified on the global shortcode itself
-        if (!is_null($shortcode_att)) {
-            return $shortcode_att;
-        }
-        //3. filtered by page
-        if (!is_null($bypage_att)) {
-            return $bypage_att;
-        }
-        return '';
+        return !empty($int_parameter) || $int_parameter == "0" ? $int_parameter : ( is_array($atts) && array_key_exists($name, $atts) ? intval($atts[$name]) : '' );
     }
 
     public static function process_att($new_atts_array, $callback, $att_name = '', $atts = [], $value = null) {
