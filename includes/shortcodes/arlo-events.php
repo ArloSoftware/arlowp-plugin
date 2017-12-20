@@ -1090,36 +1090,27 @@ class Events {
         }
 
         if (!empty($arlo_location)) {
-            $locations_array = [];
-            foreach ($arlo_location as $l) {
-                $locations_array[] = '\''.str_replace('\'', '\'\'', $l).'\'';
-            }
-            $locations = implode(', ', $locations_array);
-            $conditions['e.e_locationname IN ( '.$locations.' )'] = null;
+            $conditions['e.e_locationname IN ( %s* )'] = $arlo_location;
         }
         else if (!empty($arlo_location_hidden)) {
-            $locations_array = [];
-            foreach ($arlo_location_hidden as $l) {
-                $locations_array[] = '\''.str_replace('\'', '\'\'', $l).'\'';
-            }
-            $locations = implode(', ', $locations_array);
-            $conditions['e.e_locationname NOT IN ( '.$locations.' )'] = null;
+            $conditions['e.e_locationname NOT IN ( %s* )'] = $arlo_location_hidden;
         }
 
         if(!empty($arlo_delivery)) {
-            $ids = implode(', ', $arlo_delivery);
-            $conditions['e.e_isonline IN ( '.$ids.' )'] = null;
+            $conditions['e.e_isonline IN ( %d* )'] = $arlo_delivery;
         }
         else if(!empty($arlo_delivery_hidden)) {
-            $ids = implode(', ', $arlo_delivery_hidden);
-            $conditions['e.e_isonline NOT IN ( '.$ids.' )'] = null;
+            $conditions['e.e_isonline NOT IN ( %d* )'] = $arlo_delivery_hidden;
         }
 
         if (isset($arlo_state) && isset($GLOBALS['state_filter_venues'])) {
             $conditions['state'] = $GLOBALS['state_filter_venues'];
         }
-        
-        $events = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), $limit, $import_id);
+
+        $events = [];
+        if (empty($arlo_delivery) || !(in_array(0, $arlo_delivery) && in_array(1, $arlo_delivery))) {
+            $events = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), $limit, $import_id);
+        }
         $oa = \Arlo\Entities\OnlineActivities::get($oaconditions, null, 1, $import_id);
 
         if ($layout == "list") {
