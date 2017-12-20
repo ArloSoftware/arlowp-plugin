@@ -1012,7 +1012,7 @@ class Events {
         if(!isset($GLOBALS['arlo_event_list_item']) || empty($GLOBALS['arlo_event_list_item']['e_isfull'])) return;
 
         extract(shortcode_atts(array(
-            'output' => 'Event full'
+            'output' => 'Full'
         ), $atts, $shortcode_name, $import_id));
 
         if ($GLOBALS['arlo_event_list_item']["e_isfull"] == 1) {
