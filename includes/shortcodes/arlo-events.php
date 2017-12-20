@@ -1090,27 +1090,36 @@ class Events {
         }
 
         if (!empty($arlo_location)) {
-            $conditions['e.e_locationname IN ( %s )'] = implode(', ', $arlo_location);
+            $locations_array = [];
+            foreach ($arlo_location as $l) {
+                $locations_array[] = '\''.str_replace('\'', '\'\'', $l).'\'';
+            }
+            $locations = implode(', ', $locations_array);
+            $conditions['e.e_locationname IN ( '.$locations.' )'] = null;
         }
         else if (!empty($arlo_location_hidden)) {
-            $conditions['e.e_locationname NOT IN ( %s )'] = implode(', ', $arlo_location_hidden);
+            $locations_array = [];
+            foreach ($arlo_location_hidden as $l) {
+                $locations_array[] = '\''.str_replace('\'', '\'\'', $l).'\'';
+            }
+            $locations = implode(', ', $locations_array);
+            $conditions['e.e_locationname NOT IN ( '.$locations.' )'] = null;
         }
 
         if(!empty($arlo_delivery)) {
-            $conditions['e.e_isonline IN ( %d )'] = implode(', ', $arlo_delivery);
+            $ids = implode(', ', $arlo_delivery);
+            $conditions['e.e_isonline IN ( '.$ids.' )'] = null;
         }
         else if(!empty($arlo_delivery_hidden)) {
-            $conditions['e.e_isonline NOT IN ( %d )'] = implode(', ', $arlo_delivery_hidden);
+            $ids = implode(', ', $arlo_delivery_hidden);
+            $conditions['e.e_isonline NOT IN ( '.$ids.' )'] = null;
         }
 
         if (isset($arlo_state) && isset($GLOBALS['state_filter_venues'])) {
             $conditions['state'] = $GLOBALS['state_filter_venues'];
         }
         
-        $events = [];
-        if( empty($arlo_delivery) || !in_array(99, $arlo_delivery) ) {
-            $events = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), $limit, $import_id);
-        }
+        $events = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), $limit, $import_id);
         $oa = \Arlo\Entities\OnlineActivities::get($oaconditions, null, 1, $import_id);
 
         if ($layout == "list") {
@@ -1186,7 +1195,7 @@ class Events {
             } 
             
             //show only, if there is no events or delivery filter set to "OA"
-            if ((count($events) == 0 || in_array(99, $arlo_delivery)) && count($oa)) {
+            if ((count($events) == 0 || (count($arlo_delivery) == 1 && $arlo_delivery[0] == 99)) && count($oa)) {
                 $reference_terms = json_decode($oa->oa_reference_terms, true);
                 $buttonclass = 'arlo-register';
     
