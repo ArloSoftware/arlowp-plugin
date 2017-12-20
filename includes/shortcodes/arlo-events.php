@@ -1090,17 +1090,17 @@ class Events {
         }
 
         if (!empty($arlo_location)) {
-            $conditions['e.e_locationname IN ( %s* )'] = $arlo_location;
+            $conditions['e.e_locationname IN ( %s )'] = $arlo_location;
         }
         else if (!empty($arlo_location_hidden)) {
-            $conditions['e.e_locationname NOT IN ( %s* )'] = $arlo_location_hidden;
+            $conditions['e.e_locationname NOT IN ( %s )'] = $arlo_location_hidden;
         }
 
         if(!empty($arlo_delivery)) {
-            $conditions['e.e_isonline IN ( %d* )'] = $arlo_delivery;
+            $conditions['e.e_isonline IN ( %d )'] = $arlo_delivery;
         }
         else if(!empty($arlo_delivery_hidden)) {
-            $conditions['e.e_isonline NOT IN ( %d* )'] = $arlo_delivery_hidden;
+            $conditions['e.e_isonline NOT IN ( %d )'] = $arlo_delivery_hidden;
         }
 
         if (isset($arlo_state) && isset($GLOBALS['state_filter_venues'])) {

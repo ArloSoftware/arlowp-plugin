@@ -75,8 +75,8 @@ class Events {
 
 				default:
 					if (is_array($value)) {
-						$enhanced = str_replace('%s*', substr(str_repeat('%s, ', count($value)), 0, -2), $key);
-						$where[] = str_replace('%d*', substr(str_repeat('%d, ', count($value)), 0, -2), $enhanced);
+						$enhanced = str_replace('%s', substr(str_repeat('%s, ', count($value)), 0, -2), $key);
+						$where[] = str_replace('%d', substr(str_repeat('%d, ', count($value)), 0, -2), $enhanced);
 						$parameters = array_merge($parameters, $value);
 					} else {
 						$where[] = $key;
