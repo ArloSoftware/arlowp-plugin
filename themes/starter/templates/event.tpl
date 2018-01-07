@@ -30,12 +30,12 @@
 
               <div class="hidden visible-xs relative">
                 <div class="date bg-primary text-white pull-left">
-                  <div class="day">[arlo_event_start_date format="%e"]</div>
-                  <div class="month">[arlo_event_start_date format="%b"]</div>
+                  <div class="day">[arlo_start_event_date format="%e"]</div>
+                  <div class="month">[arlo_start_event_date format="%b"]</div>
                 </div>
                 <div class="event-content md-p-l-70 md-p-b-10 md-p-t-10 md-p-r-0 xl-p-r-20 xl-p-l-20 lg-p-r-20 lg-p-l-20">
                   [arlo_event_location wrap='<h5 class="text-primary no-margin"><i class="icons8-marker"></i> %s</h5>']
-                  <h5 class="no-margin">[arlo_event_duration wrap='%s,'] [arlo_event_start_date format="%I:%M %p"] - [arlo_event_end_date format="%I:%M %p"]</h5>
+                  <h5 class="no-margin">[arlo_event_duration wrap='%s,'] [arlo_start_event_date format="%I:%M %p"] - [arlo_end_event_date format="%I:%M %p"]</h5>
                 </div>
                 <a href="#" class="btn-expand mobile">
                   <i class="fa fa-angle-down" aria-hidden="true"></i>
@@ -44,11 +44,15 @@
 
               <div class="mobile-expanded-visible">
                 <div class="visible-overflow xs-padding-20">
+
+	        [arlo_event_isfull output="Sold out" wrap='<div class="arlo-event-label arlo-full text-white bg-danger">%s</div>']
+	        [arlo_event_offers_hasdiscount output="Discount" wrap='<div class="arlo-event-label arlo-full text-white bg-success">%s</div>']
+
                   <div class="col-2-events">
                     <div class="col-1-events">
                       <h3 class='m-t-0 m-l-0 m-r-0 lh-1 m-b-10 hidden-xs'>[arlo_event_start_date format="%a %e %b"]</h3>
                       <div class="m-b-10">
-                        <p class="expanded-visible no-margin normal-text visible-1-event hidden-xs">[arlo_event_start_date format="%e %B %Y"]</p>
+                        <p class="expanded-visible no-margin normal-text visible-1-event hidden-xs">[arlo_event_dates startdateformat="%e %B %Y" enddateformat="%e %B %Y"]</p>
                         <p class="expanded-visible no-margin normal-text visible-1-event hidden visible-xs">[arlo_event_start_date format="%e %B %Y"]</p>
                         <p class="truncate-1 no-margin time normal-text visible-1-event visible-2-events">[arlo_event_duration], [arlo_event_start_date format="%I:%M %p"] - [arlo_event_end_date format="%I:%M %p"]</p>
                       </div>
@@ -58,6 +62,12 @@
                        [arlo_event_location wrap='<div class="m-b-10">
                         <p class="location truncate-1 normal-text visible-1-event visible-2-events m-b-0"><i class="icons8-marker pull-left"></i> <span class="block m-l-25">%s</span></p>
                       </div>']
+
+                       <div class="expanded-visible location-full">
+                          [arlo_venue_permalink wrap='<a href="%s">'][arlo_venue_name]</a>
+                          [arlo_venue_address wrap='<div class="muted">%s</div>']
+                        </div>
+
                     </div>
                   </div>
 
@@ -70,13 +80,38 @@
                       <i class="icons8-building pull-left"></i> <span class="block m-l-25">Provided by %s</span>
                     </div>']
 
-					[arlo_event_session_list_item]
-					    <div class="arlo_session">
-					        <h6>[arlo_event_name]</h6>
-					        <div>[arlo_event_start_date format="%a %d %b %H:%M"] - [arlo_event_end_date format="%a %d %b %H:%M"]</div>
-					        [arlo_event_location]
-					    </div>
-					[/arlo_event_session_list_item]
+								[arlo_event_session_list_item layout="popup" wrap='<div class="m-b-10"><i class="icons8-clock pull-left m-r-5"></i> %s</div>']
+
+					<div class="row m-b-10 b-b b-grey p-b-10 m-l-15 m-r-15">
+				      <div class="col-xs-12 padding-0">
+				        <strong class="m-b-5 block">[arlo_event_name]</strong>
+				      </div>
+				      <div class="col-xs-12 col-sm-7 p-l-0 xs-p-r-0">
+				        <div class="row row-fix">
+				          <div class="col-xs-12 col-sm-6 col-md-5 xs-p-l-0 xs-p-r-0">
+				            <div class="session-timespan m-b-5">[arlo_event_start_date format="%H:%M"] - [arlo_event_end_date format="%H:%M"]</div>
+				            <div class="muted m-b-5">[arlo_event_session_description]</div>
+				            <div class="location block m-b-5 hidden-xs"><a href="#"><i class="icons8-marker pull-left"></i> <span class="block m-l-25">[arlo_event_location]</span></a></div>
+				            <div class="visible-xs text-primary">[arlo_event_location]</div>
+				          </div>
+
+				          <div class="col-xs-12 col-sm-6 col-md-4 xs-p-l-0 xs-p-r-0">
+				            <div class="m-b-5 xs-p-t-15">[arlo_event_offers]</div>
+				          </div>
+
+				          <div class="col-xs-12 col-sm-6 col-md-3 xs-p-l-0 xs-p-r-0">
+				            <div class="m-b-5 xs-p-t-15">
+				              [arlo_event_presenters layout="list"]
+				            </div>
+				          </div>
+				        </div>
+				      </div>
+				      <div class="col-xs-12 col-sm-5 p-r-0 xs-p-l-0">
+				        <div class="xs-p-t-15">[arlo_event_template_summary]</div>
+				      </div>
+				    </div>
+
+				[/arlo_event_session_list_item]
 
                     [arlo_event_presenters wrap='<div class="presenters truncate-1 visible-1-event visible-2-events m-b-10">
                       <i class="icons8-user pull-left"></i> <span class="block m-l-25">Presented by %s</span>

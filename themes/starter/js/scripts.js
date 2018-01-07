@@ -82,7 +82,7 @@ jQuery(function($){
 
         animateInItems();
 
-        if (!isTouchEnabled()) {
+        /*if (!isTouchEnabled()) {
             $('.popover-trigger').click(function() {
                 $('.popover-trigger').each(function() {
                     $(this).popover('hide');
@@ -100,7 +100,7 @@ jQuery(function($){
                     return $(this).find(".popover-title").html();
                 }
             });
-        }
+        }*/
 
         function calculateEventHeights() {
             if ($('.arlo#arlo').width() >= 768) {

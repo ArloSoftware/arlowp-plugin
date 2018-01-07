@@ -37,7 +37,10 @@
               </a>
             </div>
 
-            [arlo_event_template_permalink wrap='<a class="bg-master-lighter padding-20 block large-text hidden-xs" href="%s">']View upcoming dates</a>
+<div class="bg-master-lighter padding-20 block large-text hidden-xs">
+            [arlo_event_next_running text='View upcoming dates ({%count%})']
+</div>
+
 
             <div class="mobile-expanded-visible">
               <div class="sm-padding-15">
