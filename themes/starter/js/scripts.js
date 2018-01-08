@@ -52,8 +52,6 @@ jQuery(function($){
     $(document).ready(function() {
         'use strict';
 
-        $('.selectize').selectize({create: false});
-
         setNumberOfEventColumns('.arlo#arlo');
         setNumberOfEvents();
 
@@ -197,7 +195,7 @@ jQuery(function($){
         });
 
 
-        if (isTouchEnabled()) {
+        if (isTouchEnabled() && typeof jQuery().slick === "function") {
             $('.arlo#arlo .scheduled-dates, .arlo#arlo .search-scheduled-dates').slick({
                 prevArrow: false,
                 nextArrow: false,

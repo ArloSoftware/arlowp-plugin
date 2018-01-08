@@ -27,5 +27,6 @@
     </div>
 
     <a class="btn btn-secondary m-t-10 m-r-10" href="schedule" target="_blank">View schedule</a> <a class="btn btn-secondary m-t-10 m-r-10" href="upcoming" target="_blank">View upcoming</a>
-
+    
+    [arlo_venue_rich_snippet]
 </div>

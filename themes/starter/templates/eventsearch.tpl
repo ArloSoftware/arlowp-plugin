@@ -17,6 +17,7 @@
             </div>
 
           </div>
+        [arlo_event_template_rich_snippet]
     [/arlo_event_template_list_item]
 
 [arlo_no_event_text]

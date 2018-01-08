@@ -1636,6 +1636,7 @@ replaceme {
     z-index: 99;
     transition: box-shadow 0.3s;
   }
+
   .arlo#arlo:not(.arlo-xs) .events-1 .event:hover > .event-container,
   .arlo#arlo:not(.arlo-xs):not(.arlo-xs) .events-2 .event:hover > .event-container,
   .arlo#arlo:not(.arlo-xs) .events-3 .event:hover > .event-container,
@@ -1721,7 +1722,7 @@ replaceme {
   .arlo#arlo:not(.arlo-xs) .events-2 .event.expanded .event-container,
   .arlo#arlo:not(.arlo-xs) .events-3 .event.expanded .event-container,
   .arlo#arlo:not(.arlo-xs) .events-4 .event.expanded .event-container {
-    z-index: 3;
+    z-index: 999;
     position: absolute;
     width: calc(100% - 10px);
     height: auto;
@@ -13646,6 +13647,14 @@ replaceme {
 .arlo#arlo:not(.arlo-xs) .arlo-filters select {
   margin-right: 10px;
   float: left;
+  margin-bottom: 10px;
+}
+
+.arlo#arlo .arlo-filter-region {
+  margin-bottom: 10px;
+  -webkit-box-shadow: -1px 1px 3px 0px rgba(121, 129, 135, 0.3);
+  box-shadow: -1px 1px 3px 0px rgba(121, 129, 135, 0.3);
+  padding: 10px;
 }
 
 .arlo#arlo .event .arlo-event-registration .arlo-event-full {
@@ -14010,4 +14019,8 @@ replaceme {
   -webkit-font-smoothing: antialiased;
   font-smoothing: antialiased;
   margin-right: 5px;
+}
+
+.arlo#arlo .presenter ul {
+  margin-left: 1em;
 }
