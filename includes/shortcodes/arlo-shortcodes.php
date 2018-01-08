@@ -470,6 +470,8 @@ class Shortcodes {
         $settings = get_option('arlo_settings');  
         $price_setting = (isset($settings['price_setting']) && $is_tax_exempt != true ? esc_attr($settings['price_setting']) : ARLO_PLUGIN_PREFIX . '-exclgst');
 		$free_text = (isset($settings['free_text']) ? esc_attr($settings['free_text']) : __('Free', 'arlo-for-wordpress'));
+
+		if (empty($offers_array)) { return ''; }
 		
         foreach($offers_array as $offer) {
 
