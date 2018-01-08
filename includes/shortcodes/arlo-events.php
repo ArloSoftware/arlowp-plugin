@@ -412,7 +412,7 @@ class Events {
 
     private static function shortcode_event_offers($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         $id = isset($GLOBALS['arlo_event_session_list_item']['e_id']) ? $GLOBALS['arlo_event_session_list_item']['e_id'] : $GLOBALS['arlo_event_list_item']['e_id'];
-        return Shortcodes::advertised_offers($id, 'e_id', $import_id);
+        return Shortcodes::advertised_offers($id, 'e_id', $import_id, $GLOBALS['arlo_event_list_item']['e_is_taxexempt']);
     }
 
     private static function shortcode_event_presenters($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -700,8 +700,8 @@ class Events {
 
         $settings = get_option('arlo_settings');  
         $price_setting = (isset($settings['price_setting'])) ? $settings['price_setting'] : ARLO_PLUGIN_PREFIX . '-exclgst';
-        $price_field = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? 'o_offeramounttaxexclusive' : 'o_offeramounttaxinclusive';
-        $price_field_show = $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? 'o_formattedamounttaxexclusive' : 'o_formattedamounttaxinclusive';
+        $price_field = ($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' || $GLOBALS['arlo_event_list_item']['e_is_taxexempt'] == '1' ? 'o_offeramounttaxexclusive' : 'o_offeramounttaxinclusive');
+        $price_field_show = ($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' || $GLOBALS['arlo_event_list_item']['e_is_taxexempt'] == '1' ? 'o_formattedamounttaxexclusive' : 'o_formattedamounttaxinclusive');
         $free_text = (isset($settings['free_text'])) ? $settings['free_text'] : __('Free', 'arlo-for-wordpress');
         
         $offer = '';
@@ -793,7 +793,7 @@ class Events {
         if((float)$offer->$price_field == 0) {
             return htmlentities($free_text, ENT_QUOTES, "UTF-8");
         }
-        
+
         $fromtext = '';
         if (strtolower($showfrom) === "true") {
             $fromtext = '<span class="arlo-from-text">' . __('From', 'arlo-for-wordpress') . '</span> ';
