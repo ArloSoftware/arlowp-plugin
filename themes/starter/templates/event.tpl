@@ -100,7 +100,8 @@
 				          </div>
 
 				          <div class="col-xs-12 col-sm-6 col-md-3 xs-p-l-0 xs-p-r-0">
-				            <div class="m-b-5 xs-p-t-15">
+		                   [arlo_event_notice wrap='<p class="normal-text m-b-10 expanded-visible">%s</p>']
+  				            <div class="m-b-5 xs-p-t-15">
 				              [arlo_event_presenters layout="list"]
 				            </div>
 				          </div>
