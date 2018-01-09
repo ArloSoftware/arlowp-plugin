@@ -30,12 +30,12 @@
 
               <div class="hidden visible-xs relative">
                 <div class="date bg-primary text-white pull-left">
-                  <div class="day">[arlo_start_event_date format="%e"]</div>
-                  <div class="month">[arlo_start_event_date format="%b"]</div>
+                  <div class="day">[arlo_event_start_date format="%e"]</div>
+                  <div class="month">[arlo_event_start_date format="%b"]</div>
                 </div>
-                <div class="event-content md-p-l-70 md-p-b-10 md-p-t-10 md-p-r-0 xl-p-r-20 xl-p-l-20 lg-p-r-20 lg-p-l-20">
+                <div class="event-content md-p-l-70 md-p-b-10 md-p-t-10 md-p-r-10 xl-p-r-20 xl-p-l-20 lg-p-r-20 lg-p-l-20">
                   [arlo_event_location wrap='<h5 class="text-primary no-margin"><i class="icons8-marker"></i> %s</h5>']
-                  <h5 class="no-margin">[arlo_event_duration wrap='%s,'] [arlo_start_event_date format="%I:%M %p"] - [arlo_end_event_date format="%I:%M %p"]</h5>
+                  <h5 class="no-margin">[arlo_event_duration wrap='%s,'] [arlo_event_start_date format="%I:%M %p"] - [arlo_event_end_date format="%I:%M %p"]</h5>
                 </div>
                 <a href="#" class="btn-expand mobile">
                   <i class="fa fa-angle-down" aria-hidden="true"></i>
@@ -53,7 +53,7 @@
                       <h3 class='m-t-0 m-l-0 m-r-0 lh-1 m-b-10 hidden-xs'>[arlo_event_start_date format="%a %e %b"]</h3>
                       <div class="m-b-10">
                         <p class="expanded-visible no-margin normal-text visible-1-event hidden-xs">[arlo_event_dates startdateformat="%e %B %Y" enddateformat="%e %B %Y"]</p>
-                        <p class="expanded-visible no-margin normal-text visible-1-event hidden visible-xs">[arlo_event_start_date format="%e %B %Y"]</p>
+                        <p class="expanded-visible no-margin normal-text visible-1-event hidden visible-xs">[arlo_event_dates startdateformat="%e %B %Y" enddateformat="%e %B %Y"]</p>
                         <p class="truncate-1 no-margin time normal-text visible-1-event visible-2-events">[arlo_event_duration], [arlo_event_start_date format="%I:%M %p"] - [arlo_event_end_date format="%I:%M %p"]</p>
                       </div>
                     </div>
@@ -100,7 +100,8 @@
 				          </div>
 
 				          <div class="col-xs-12 col-sm-6 col-md-3 xs-p-l-0 xs-p-r-0">
-				            <div class="m-b-5 xs-p-t-15">
+		                   [arlo_event_notice wrap='<p class="normal-text m-b-10 expanded-visible">%s</p>']
+  				            <div class="m-b-5 xs-p-t-15">
 				              [arlo_event_presenters layout="list"]
 				            </div>
 				          </div>
@@ -136,6 +137,8 @@
 
             </div>
           </div>
+          
+        [arlo_event_rich_snippet]
 
 		[/arlo_event_list_item] 
 		[/arlo_event_list]

@@ -64,6 +64,7 @@
   -ms-text-size-adjust: 100%;
   font-weight: 300;
   color: #2c2c2c;
+  padding: 0;
 }
 .arlo#arlo h1,
 .arlo .dark-tooltip h1 {
