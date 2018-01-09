@@ -33,7 +33,7 @@
                   <div class="day">[arlo_event_start_date format="%e"]</div>
                   <div class="month">[arlo_event_start_date format="%b"]</div>
                 </div>
-                <div class="event-content md-p-l-70 md-p-b-10 md-p-t-10 md-p-r-0 xl-p-r-20 xl-p-l-20 lg-p-r-20 lg-p-l-20">
+                <div class="event-content md-p-l-70 md-p-b-10 md-p-t-10 md-p-r-10 xl-p-r-20 xl-p-l-20 lg-p-r-20 lg-p-l-20">
                   [arlo_event_location wrap='<h5 class="text-primary no-margin"><i class="icons8-marker"></i> %s</h5>']
                   <h5 class="no-margin">[arlo_event_duration wrap='%s,'] [arlo_event_start_date format="%I:%M %p"] - [arlo_event_end_date format="%I:%M %p"]</h5>
                 </div>

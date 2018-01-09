@@ -1371,6 +1371,16 @@
   font-size: 28px;
   margin-bottom: 5px;
 }
+.arlo#arlo:not(.arlo-lg) .event-card .date .day {
+  font-size: 0;
+}
+.arlo#arlo:not(.arlo-lg) .event-card .date .day .arlo-start-date {
+  font-size: 17px;
+  line-height: 1.3;
+}
+.arlo#arlo:not(.arlo-lg) .event-card .date .day .arlo-end-date {
+  display: none;
+}
 .arlo#arlo .discount,
 .arlo#arlo .original-price {
   color: #10cfbd;
@@ -14023,4 +14033,12 @@ replaceme {
 
 .arlo#arlo .presenter ul {
   margin-left: 1em;
+}
+.arlo#arlo.arlo-xs .event-card .card-front .arlo-event-label {
+  transform: rotate(45deg);
+  right: -40px;
+  top: -40px;
+  height: 80px;
+  width: 80px;
+  padding-top: 60px;
 }
