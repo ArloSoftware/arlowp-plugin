@@ -388,7 +388,7 @@ class Templates {
         $sql = self::generate_list_sql($atts, $import_id);
 
         $items = $wpdb->get_results($sql, ARRAY_A);
-        
+
         if(empty($items)) :
             if (!(isset($atts['show_only_at_bottom']) && $atts['show_only_at_bottom'] == "true" && isset($GLOBALS['arlo_categories_count']) && $GLOBALS['arlo_categories_count'])) :
                 $GLOBALS['no_event_text'] = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', 'arlo-for-wordpress');
@@ -744,100 +744,95 @@ class Templates {
 
         if (!empty($arlo_locationhidden) && !is_array($arlo_locationhidden)) {
             $arlo_locationhidden = [$arlo_locationhidden];
-        }        
+        }
 
-        if(isset($arlo_location) || isset($arlo_locationhidden) || isset($arlo_delivery) || isset($arlo_deliveryhidden) || !empty($arlo_state) ) :
+        if (!empty($arlo_location)) {
+            $where .= " AND e.e_locationname IN (" . implode(',', array_map(function() {return "%s";}, $arlo_location)) . ")";                
+            $parameters = array_merge($parameters, $arlo_location);    
+        }
 
-            $join['e'] = " LEFT JOIN $t5 AS e ON e.et_arlo_id = et.et_arlo_id AND e.import_id = et.import_id ";
-            
-            if (!empty($arlo_location)) {
-                $where .= " AND e.e_locationname IN (" . implode(',', array_map(function() {return "%s";}, $arlo_location)) . ")";                
-                $parameters = array_merge($parameters, $arlo_location);    
+        if (!empty($arlo_locationhidden)) {    
+            $where .= " AND e.e_locationname NOT IN (" . implode(',', array_map(function() {return "%s";}, $arlo_locationhidden)) . ")";                
+            $parameters = array_merge($parameters, $arlo_locationhidden);    
+        }
+
+        if(isset($arlo_delivery) || isset($arlo_deliveryhidden)) {
+            if (isset($arlo_delivery)) {
+                $where .= ' AND ( 1 ';
+                foreach ($arlo_delivery as $delivery) {
+                    switch ($delivery) {
+                        case 0:
+                        case 1: 
+                            $where .=  " AND e.e_isonline = %d ";
+                            $parameters[] = $delivery;    
+                            $where .= " AND e.e_parent_arlo_id = 0 ";
+                        break;
+                        case 99: 
+                            $join['oa'] = " LEFT JOIN $t8 AS oa ON oa.oat_arlo_id = et.et_arlo_id AND oa.import_id = et.import_id ";
+                            $where .= (count($arlo_delivery) > 1 ? ' OR ' : ' AND ') . ' oa_id IS NOT NULL ';
+                        break;        
+                    } 
+                }
+                $where .= ' ) ';
+                
             }
 
-            if (!empty($arlo_locationhidden)) {    
-                $where .= " AND e.e_locationname NOT IN (" . implode(',', array_map(function() {return "%s";}, $arlo_locationhidden)) . ")";                
-                $parameters = array_merge($parameters, $arlo_locationhidden);    
+            if (isset($arlo_deliveryhidden)) {            
+                $join['oa'] = " LEFT JOIN $t8 AS oa ON oa.oat_arlo_id = et.et_arlo_id AND oa.import_id = et.import_id ";
+                foreach ($arlo_deliveryhidden as $delivery) {
+                    switch ($delivery) {
+                        case 0:
+                        case 1: 
+                            $where .= " AND ( (e.e_parent_arlo_id = 0 AND e.e_isonline != %d ) OR oa_id IS NOT NULL )";
+                            $parameters[] = $delivery;
+                        break;
+                        case 99: 
+                            $where .= " AND e.e_parent_arlo_id = 0 ";
+                            $where .= ' AND oa_id IS NULL ';
+                        break;        
+                    } 
+                }
             }
+        } else {
+            $where .= " AND e.e_parent_arlo_id = 0 ";
+        }
+        
+        if (!empty($arlo_region)) {
+            $where .= ' AND e.e_region = %s';
+            $parameters[] = $arlo_region;
+        }
 
-            if(isset($arlo_delivery) || isset($arlo_deliveryhidden)) {
-                if (isset($arlo_delivery)) {
-                    $where .= ' AND ( 1 ';
-                    foreach ($arlo_delivery as $delivery) {
-                        switch ($delivery) {
-                            case 0:
-                            case 1: 
-                                $where .=  " AND e.e_isonline = %d ";
-                                $parameters[] = $delivery;    
-                                $where .= " AND e.e_parent_arlo_id = 0 ";
-                            break;
-                            case 99: 
-                                $join['oa'] = " LEFT JOIN $t8 AS oa ON oa.oat_arlo_id = et.et_arlo_id AND oa.import_id = et.import_id ";
-                                $where .= (count($arlo_delivery) > 1 ? ' OR ' : ' AND ') . ' oa_id IS NOT NULL ';
-                            break;        
-                        } 
-                    }
-                    $where .= ' ) ';
-                    
-                }
-    
-                if (isset($arlo_deliveryhidden)) {            
-                    $join['oa'] = " LEFT JOIN $t8 AS oa ON oa.oat_arlo_id = et.et_arlo_id AND oa.import_id = et.import_id ";
-                    foreach ($arlo_deliveryhidden as $delivery) {
-                        switch ($delivery) {
-                            case 0:
-                            case 1: 
-                                $where .= " AND ( (e.e_parent_arlo_id = 0 AND e.e_isonline != %d ) OR oa_id IS NOT NULL )";
-                                $parameters[] = $delivery;
-                            break;
-                            case 99: 
-                                $where .= " AND e.e_parent_arlo_id = 0 ";
-                                $where .= ' AND oa_id IS NULL ';
-                            break;        
-                        } 
-                    }
-                }
+        if(!empty($arlo_state)) :                
+            $join['ce']  = " LEFT JOIN $t5 ce ON e.e_arlo_id = ce.e_parent_arlo_id AND e.import_id = ce.import_id ";
+
+            $venues = \Arlo\Entities\Venues::get(['state' => $arlo_state], null, null, $import_id);
+
+            if(is_array($venues) && count($venues) > 1) {
+                $venues = array_map(function ($venue) {
+                    return $venue['v_arlo_id'];
+                }, $venues);
+                
+                $GLOBALS['state_filter_venues'] = $venues;
+
+                $ids_string = implode(',', array_map(function() {return "%d";}, $venues));
+                $where .= " AND (ce.v_id IN (" . $ids_string . ") OR e.v_id IN (" . $ids_string . "))";
+
+                $parameters = array_merge($parameters, $venues);
+                $parameters = array_merge($parameters, $venues);
             } else {
-                $where .= " AND e.e_parent_arlo_id = 0 ";
-            }
+                if (is_array($venues)) {
+                    $venues = array_shift($venues);
+                }
+
+                $where .= " AND (ce.v_id = %d OR e.v_id = %d)";
+                $parameters[] = $venues;
+                $parameters[] = $venues;	
+            }                
+
+        endif;
+
+        $group = 'GROUP BY c.c_arlo_id, et.et_arlo_id';
             
-            if (!empty($arlo_region)) {
-                $where .= ' AND e.e_region = %s';
-                $parameters[] = $arlo_region;
-            }
-
-            if(!empty($arlo_state)) :                
-                $join['ce']  = " LEFT JOIN $t5 ce ON e.e_arlo_id = ce.e_parent_arlo_id AND e.import_id = ce.import_id ";
-
-                $venues = \Arlo\Entities\Venues::get(['state' => $arlo_state], null, null, $import_id);
-
-                if(is_array($venues) && count($venues) > 1) {
-                    $venues = array_map(function ($venue) {
-                        return $venue['v_arlo_id'];
-                    }, $venues);
-                    
-                    $GLOBALS['state_filter_venues'] = $venues;
-
-                    $ids_string = implode(',', array_map(function() {return "%d";}, $venues));
-                    $where .= " AND (ce.v_id IN (" . $ids_string . ") OR e.v_id IN (" . $ids_string . "))";
-
-                    $parameters = array_merge($parameters, $venues);
-                    $parameters = array_merge($parameters, $venues);
-                } else {
-                    if (is_array($venues)) {
-                        $venues = array_shift($venues);
-                    }
-
-                    $where .= " AND (ce.v_id = %d OR e.v_id = %d)";
-                    $parameters[] = $venues;
-                    $parameters[] = $venues;	
-                }                
-
-            endif;
-
-            $group = 'GROUP BY c.c_arlo_id, et.et_arlo_id';
-            
-        endif;	
 
         if(!empty($arlo_templatetag) || !empty($arlo_templatetaghidden)) :
 
@@ -935,7 +930,7 @@ class Templates {
 
             $limit_field = " LIMIT $offset,$limit ";
 
-            $field_list = "et.*, post.ID as post_id, etc.c_arlo_id, c.*" . ($additional_fields ? ' ,' . implode(' ,', $additional_fields) : '');
+            $field_list = "et.*, post.ID as post_id, etc.c_arlo_id, c.*, e.e_is_taxexempt" . ($additional_fields ? ' ,' . implode(' ,', $additional_fields) : '');
         }
         
         $sql = "
@@ -950,6 +945,8 @@ class Templates {
             ON etc.et_arlo_id = et.et_arlo_id AND etc.import_id = et.import_id
         LEFT JOIN $t4 c
             ON c.c_arlo_id = etc.c_arlo_id AND c.import_id = etc.import_id
+        LEFT JOIN $t5 e
+            ON e.et_arlo_id = et.et_arlo_id AND e.import_id = et.import_id
         $where 
         $group 
         $order
