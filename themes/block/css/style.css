@@ -651,7 +651,7 @@ body.arlo {
     border-radius: 50%;
 }
 
-.arlo#arlo .upcoming .arlo-event-subhead > div:last-child:after {
+.arlo#arlo .upcoming .arlo-event-subhead > div:first-child:last-child:after {
     display: none;
 }
 

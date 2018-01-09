@@ -498,6 +498,7 @@ class UpcomingEvents {
             e.e_isonline,
             e.e_parent_arlo_id,
             e.e_region,
+            e.e_is_taxexempt,
             e.e_credits,
             et.et_id,
             et.et_name, 
