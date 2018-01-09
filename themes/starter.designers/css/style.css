@@ -1176,14 +1176,38 @@
     width: auto;
     bottom: auto;
     color: #6d5cae;
-    width: 85px;
+    width: 120px;
     height: 80px;
     text-align: right;
+  }
+  .arlo#arlo:not(.arlo-sm) .event-card .card-front .date .day {
+    font-size: 14px;
   }
   .arlo#arlo:not(.arlo-sm) .event-card .card-front .date .day,
   .arlo#arlo:not(.arlo-sm) .event-card .card-front .date .month {
     color: #6d5cae;
     line-height: 1.2;
+  }
+
+  .arlo#arlo:not(.arlo-sm) .event-card .card-front .date .day .arlo-start-date,
+  .arlo#arlo:not(.arlo-sm) .event-card .card-front .date .month .arlo-start-date {
+    display: inline-block;
+    width: 50px;
+    vertical-align: top;
+    font-size: 24px;
+  }
+
+  .arlo#arlo:not(.arlo-sm) .event-card .card-front .date .day .arlo-end-date,
+  .arlo#arlo:not(.arlo-sm) .event-card .card-front .date .month .arlo-end-date {
+    display: inline-block;
+    font-size: 10px;
+    width:20px;
+    vertical-align: top;
+  }
+
+  .arlo#arlo:not(.arlo-sm) .event-card .card-front .date .day *,
+  .arlo#arlo:not(.arlo-sm) .event-card .card-front .date .month * {
+    color: #6d5cae;
   }
   .arlo#arlo:not(.arlo-sm) .event-card .card-front .date .day {
     font-size: 24px;
@@ -1347,6 +1371,16 @@
   font-size: 28px;
   margin-bottom: 5px;
 }
+.arlo#arlo:not(.arlo-lg) .event-card .date .day {
+  font-size: 0;
+}
+.arlo#arlo:not(.arlo-lg) .event-card .date .day .arlo-start-date {
+  font-size: 17px;
+  line-height: 1.3;
+}
+.arlo#arlo:not(.arlo-lg) .event-card .date .day .arlo-end-date {
+  display: none;
+}
 .arlo#arlo .discount,
 .arlo#arlo .original-price {
   color: #10cfbd;
@@ -1354,8 +1388,7 @@
 .arlo#arlo .original-price {
   text-decoration: line-through;
 }
-.arlo#arlo .corner-label,
-.arlo#arlo:not(.arlo-sm) .event-card .arlo-event-registration .arlo-event-full {
+.arlo#arlo .corner-label {
   background-color: #10cfbd;
   position: absolute;
   right: -60px;
@@ -1368,8 +1401,7 @@
   color: white;
   text-align: center;
 }
-.arlo#arlo .corner-label.sold-out,
-.arlo#arlo:not(.arlo-sm) .event-card .arlo-event-registration .arlo-event-full {
+.arlo#arlo .corner-label.sold-out {
   background-color: #f55753;
 }
 .arlo#arlo .corner-label.limited-places {
@@ -1390,8 +1422,7 @@
   font-size: 18px;
   font-weight: bold;
 }
-.arlo#arlo .event-card .card-back .corner-label,
-.arlo#arlo:not(.arlo-sm) .event-card .arlo-event-registration .arlo-event-full {
+.arlo#arlo .event-card .card-back .corner-label {
   transform: rotate(-45deg);
   right: auto;
   left: -40px;
@@ -1408,14 +1439,6 @@
 }
 .arlo#arlo .event-card .card-back .corner-label.limited-places div {
   font-size: 24px;
-}
-.arlo#arlo:not(.arlo-sm) .event-card .arlo-event-registration .arlo-event-full {
-  left: -40px;
-  top: -40px;
-  padding-left: 24px;
-  padding-right: 24px;
-  line-height: 12px;
-  padding-top: 53px;
 }
 .arlo#arlo .truncate-1,
 .arlo#arlo .truncate-2,
@@ -1609,14 +1632,15 @@
   .arlo#arlo:not(.arlo-xs) .events-4 .event .event-container {
     position: relative;
     /*height: 100%;*/
-    z-index: 1;
+    z-index: 99;
     transition: box-shadow 0.3s;
   }
+
   .arlo#arlo:not(.arlo-xs) .events-1 .event:hover > .event-container,
   .arlo#arlo:not(.arlo-xs):not(.arlo-xs) .events-2 .event:hover > .event-container,
   .arlo#arlo:not(.arlo-xs) .events-3 .event:hover > .event-container,
   .arlo#arlo:not(.arlo-xs) .events-4 .event:hover > .event-container {
-    z-index: 2;
+    z-index: 999;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
     -webkit-box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
   }
@@ -1697,7 +1721,7 @@
   .arlo#arlo:not(.arlo-xs) .events-2 .event.expanded .event-container,
   .arlo#arlo:not(.arlo-xs) .events-3 .event.expanded .event-container,
   .arlo#arlo:not(.arlo-xs) .events-4 .event.expanded .event-container {
-    z-index: 3;
+    z-index: 999;
     position: absolute;
     width: calc(100% - 10px);
     height: auto;
@@ -6220,6 +6244,9 @@
   height: 100%;
   width: 100%;
 }
+.arlo#arlo .modal {
+  overflow: auto;
+}
 .arlo#arlo .modal .close:focus {
   outline: 0;
 }
@@ -6272,8 +6299,8 @@
 }
 .arlo#arlo .modal .modal-header {
   text-align: center;
-  border-bottom: 0;
   padding: 25px;
+  margin-bottom: 15px;
 }
 .arlo#arlo .modal .modal-header .mobile-close {
   display: none;
@@ -6303,7 +6330,7 @@
 }
 .arlo#arlo .modal .modal-body {
   box-shadow: none;
-  padding: 0;
+  /* padding: 0; */
   padding-top: 0;
   white-space: normal;
 }
@@ -6332,6 +6359,7 @@
 }
 .arlo#arlo .modal.fade {
   opacity: 1 !important;
+  background-color: rgba(0,0,0,.6);
 }
 .arlo#arlo .modal.fade.stick-up .modal-dialog {
   -webkit-transform: translate3d(0, -100%, 0);
@@ -13618,6 +13646,14 @@
 .arlo#arlo:not(.arlo-xs) .arlo-filters select {
   margin-right: 10px;
   float: left;
+  margin-bottom: 10px;
+}
+
+.arlo#arlo .arlo-filter-region {
+  margin-bottom: 10px;
+  -webkit-box-shadow: -1px 1px 3px 0px rgba(121, 129, 135, 0.3);
+  box-shadow: -1px 1px 3px 0px rgba(121, 129, 135, 0.3);
+  padding: 10px;
 }
 
 .arlo#arlo .event .arlo-event-registration .arlo-event-full {
@@ -13916,4 +13952,82 @@
 .arlo#arlo .arlo-event-registration p {
   font-size: 16px;
   text-align: left;
+}
+
+.arlo#arlo .event-card .arlo-event-registration .arlo-event-full {
+  display: none;
+}
+
+.arlo#arlo .event-card .card-back .arlo-event-label,
+.arlo#arlo .event-card .card-front .arlo-event-label {
+  position: absolute;
+  font-size: 10px;
+}
+
+.arlo#arlo .event-card .card-back .arlo-event-label {
+  transform: rotate(-45deg);
+  right: auto;
+  left: -40px;
+  top: -40px;
+  height: 80px;
+  width: 80px;
+  padding-top: 60px;
+}
+
+.arlo#arlo .event-card .card-front .arlo-event-label {
+  top: auto;
+  bottom: -50px;
+  transform: rotate(-43.2deg);
+  padding-top: 5px;
+  text-align: center;
+  padding-left: 0;
+  width: 90px;
+  height: 90px;
+  right: -45px;
+}
+
+.arlo#arlo .event .mobile-expanded-visible .arlo-event-label {
+  position: absolute;
+  right: -40px;
+  top: -40px;
+  height: 80px;
+  width: 80px;
+  transform: rotate(45deg);
+  padding-top: 60px;
+  font-size: 10px;
+  color: white;
+  text-align: center;
+}
+
+.arlo#arlo .modal-title {
+  float: left;
+}
+
+.arlo#arlo .arlo-bootstrap-modal .event-presenters li:not(:empty):before {
+  content: "\f141";
+  display: inline-block;
+  font-family: "Arlo-starter-template--Master";
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  line-height: 1;
+  text-decoration: inherit;
+  text-rendering: optimizeLegibility;
+  text-transform: none;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-smoothing: antialiased;
+  margin-right: 5px;
+}
+
+.arlo#arlo .presenter ul {
+  margin-left: 1em;
+}
+.arlo#arlo.arlo-xs .event-card .card-front .arlo-event-label {
+  transform: rotate(45deg);
+  right: -40px;
+  top: -40px;
+  height: 80px;
+  width: 80px;
+  padding-top: 60px;
 }

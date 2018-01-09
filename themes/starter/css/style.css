@@ -1388,8 +1388,7 @@
 .arlo#arlo .original-price {
   text-decoration: line-through;
 }
-.arlo#arlo .corner-label,
-replaceme {
+.arlo#arlo .corner-label {
   background-color: #10cfbd;
   position: absolute;
   right: -60px;
@@ -1402,8 +1401,7 @@ replaceme {
   color: white;
   text-align: center;
 }
-.arlo#arlo .corner-label.sold-out,
-replaceme {
+.arlo#arlo .corner-label.sold-out {
   background-color: #f55753;
 }
 .arlo#arlo .corner-label.limited-places {
@@ -1424,8 +1422,7 @@ replaceme {
   font-size: 18px;
   font-weight: bold;
 }
-.arlo#arlo .event-card .card-back .corner-label,
-replaceme {
+.arlo#arlo .event-card .card-back .corner-label {
   transform: rotate(-45deg);
   right: auto;
   left: -40px;
@@ -1442,14 +1439,6 @@ replaceme {
 }
 .arlo#arlo .event-card .card-back .corner-label.limited-places div {
   font-size: 24px;
-}
-replaceme {
-  left: -40px;
-  top: -40px;
-  padding-left: 24px;
-  padding-right: 24px;
-  line-height: 12px;
-  padding-top: 53px;
 }
 .arlo#arlo .truncate-1,
 .arlo#arlo .truncate-2,

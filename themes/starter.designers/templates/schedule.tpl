@@ -29,7 +29,7 @@
               <a href="#" class="btn-expand mobile">
                 <i class="fa fa-angle-down" aria-hidden="true"></i>
               </a>
-              <div class="mobile-expanded-visible">
+              <div class="mobile-expanded-visible xl-p-b-35">
                 <p class="normal-text truncate-3 summary m-b-0 md-m-b-15">[arlo_event_template_summary]</p>
                 <div class="align-bottom template-details">
                   [arlo_event_template_advertised_duration wrap='<p class="truncate-1 inline md-block duration m-r-20 m-b-0 md-m-b-10"><i class="icons8-clock pull-left"></i> <span class="block m-l-20">%s</span></p>']
