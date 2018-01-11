@@ -15,11 +15,6 @@ class Events extends BaseImporter {
 	protected function save_entity($item) {
 		if (!empty($item->EventID) && is_numeric($item->EventID) && $item->EventID > 0) {
 			$entity_id = $this->save_event_data($item, 0);
-
-			//only save for events, not for sessions
-			if (isset($item->Tags) && !empty($item->Tags)) {
-				$this->save_tags($item->Tags, $entity_id, 'event');
-			}
 		}
 	}
 
@@ -71,9 +66,14 @@ class Events extends BaseImporter {
 			$this->save_advertised_offer($item->AdvertisedOffers, (!empty($item->Region) ? $item->Region : $region), null, $entity_id);
 		}
 		
-		// prsenters
+		//presenters
 		if(!empty($item->Presenters) && is_array($item->Presenters)) {
 			$this->save_presenters($item->Presenters, $entity_id);
+		}
+		
+		//event tags or session tags
+		if(!empty($item->Tags) && is_array($item->Tags)) {
+			$this->save_tags($item->Tags, $entity_id, 'event');
 		}
 		
 		//Save session information
