@@ -540,6 +540,7 @@ body.arlo {
 .arlo#arlo .arlo-filters {
     overflow: auto;
     margin: 0;
+    float: left;
 }
 
 .arlo#arlo .arlo-filters select {
@@ -547,7 +548,16 @@ body.arlo {
     border-radius: 20px;
     padding: .5em 1em;
     margin-right: 1em;
-    float: left;
+    margin-bottom: .5em;
+    width: 100%;
+    height: auto;
+}
+
+.arlo#arlo select.arlo-filter-region {
+    border: none;
+    border-radius: 20px;
+    padding: .5em 1em;
+    margin-right: 1em;
     margin-bottom: .5em;
     width: 100%;
     height: auto;
@@ -561,6 +571,10 @@ body.arlo {
 
 @media (min-width: 550px) {
     .arlo#arlo .arlo-filters select {
+        width: auto;
+    }
+
+    .arlo#arlo select.arlo-filter-region {
         width: auto;
     }
 }

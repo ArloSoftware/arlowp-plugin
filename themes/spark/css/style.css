@@ -596,6 +596,16 @@ body.arlo {
     border: none;
 }
 
+.arlo#arlo select.arlo-filter-region {
+    float: left;
+    width: auto;
+    min-width: 200px;
+    height: auto;
+    margin-right: 5px;
+    margin-bottom: .5em;
+    border: none;
+}
+
 .arlo#arlo .arlo-catalogue-filters .arlo-categories {
     display: inline-block;
     vertical-align: top;
@@ -608,6 +618,11 @@ body.arlo {
 }
 
 .arlo#arlo.arlo-sm .arlo-filters select {
+    width: 100%;
+    min-width: 100%;
+}
+
+.arlo#arlo.arlo-sm select.arlo-filter-region {
     width: 100%;
     min-width: 100%;
 }

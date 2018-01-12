@@ -4,6 +4,8 @@
             [arlo_category_header]
     </div>
 
+    [arlo_template_region_selector]
+
     <div class="arlo-catalogue-filters">
         [arlo_event_template_filters filters="category,delivery,location"]
     </div>
