@@ -995,7 +995,8 @@ body.arlo {
         width: auto;
     }
 
-    .arlo#arlo select {
+    .arlo#arlo select,
+    .arlo#arlo select:focus {
         margin-right: .5em;
     }
 }
