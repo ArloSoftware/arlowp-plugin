@@ -1651,7 +1651,7 @@ class Arlo_For_Wordpress {
 		foreach (Arlo_For_Wordpress::$templates as $key => $val) {
 			if ($key == 'new_custom') { continue; }
 			$template_type = array_key_exists( 'type', $val ) ? $val['type'] : $key;
-			$templates[ARLO_PLUGIN_PREFIX . '-' . $key] = $theme_templates[$template_type]['html'];
+			$templates[ARLO_PLUGIN_PREFIX . '-' . $key] = (isset($theme_templates[$template_type]['html']) ? $theme_templates[$template_type]['html'] : '');
 		}
 
 		return $templates;
