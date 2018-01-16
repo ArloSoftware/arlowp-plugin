@@ -1284,6 +1284,10 @@ body.arlo {
 
 /* Filters */
 
+.arlo#arlo select.arlo-filter-region {
+    margin-right: 0.5em;
+}
+
 .arlo#arlo .arlo-filters {
     overflow: auto;
     margin-bottom: 1em;
