@@ -539,7 +539,19 @@ class Events {
                     $open = '
                     <div class="arlo-bootstrap-modal">
 
-                        <a href="#" data-toggle="modal" data-target="#' . $modal_id . '">
+                        <style>
+                            /* transform is conflicting with transform - see tfs bug 71033 */
+                            .arlo#arlo .arlo-list.catalogue .arlo-cf.arlo-catalogue-event:hover,
+                            .arlo#arlo .arlo-list.events .arlo-event:hover,
+                            .arlo#arlo .arlo-list.template-online-activities .arlo-online-activity:hover,
+                            .arlo#arlo .presenter-events li:hover,
+                            .arlo#arlo .arlo-schedule-event:hover {
+                                -webkit-transform: none;
+                                transform: none;
+                            }
+                        </style>
+
+                        <a href="#" data-toggle="modal" data-target="#' . $modal_id . '" data-keyboard="true">
                           ' .  htmlentities($label, ENT_QUOTES, "UTF-8") . '
                         </a>
 
