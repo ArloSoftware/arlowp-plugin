@@ -968,7 +968,8 @@ body.arlo {
     bottom: 20px;
 }
 
-.arlo#arlo .arlo-tooltip-button {
+.arlo#arlo .arlo-tooltip-button,
+.arlo#arlo .arlo-popup-button {
     display: inline-block;
 }
 
