@@ -255,6 +255,12 @@ p.arlo-no-results {
 	text-align: right;
 }
 
+.arlo-popup-body {
+	max-height: 600px;
+	max-height: 80vh;
+	overflow-y: auto;
+}
+
 /* BOXED LAYOUT OVERRIDE */
 
 
