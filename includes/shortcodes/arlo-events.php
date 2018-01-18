@@ -537,7 +537,7 @@ class Events {
                     $modal_id = ARLO_PLUGIN_PREFIX . '_session_modal_' . $GLOBALS['arlo_event_list_item']['e_arlo_id'];
 
                     $open = '
-                    <div class="arlo-bootstrap-modal">
+                    <div class="arlo-bootstrap-modal ' . ARLO_PLUGIN_PREFIX . '-popup-button">
 
                         <style>
                             /* transform is conflicting with transform - see tfs bug 71033 */
