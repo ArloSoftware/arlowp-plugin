@@ -782,7 +782,8 @@ body.arlo {
     font-size: 1em;
 }
 
-.arlo#arlo .arlo-tooltip-button {
+.arlo#arlo .arlo-tooltip-button,
+.arlo#arlo .arlo-popup-button {
     text-align: left;
     display: inline-block;
 }
