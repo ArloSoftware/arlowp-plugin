@@ -916,6 +916,18 @@ body.arlo {
     font-weight: 600;
 }
 
+.arlo#arlo .arlo-popup-modal .modal-header {
+    padding-bottom: 0px;
+}
+
+.arlo#arlo .arlo-popup-modal .modal-header h5 {
+    margin: 0px;
+}
+
+.arlo .arlo-popup-modal .modal-header .close {
+    display: none;
+}
+
 .arlo .arlo_session {
     margin-top: .5em;
     padding-bottom: .5em;

@@ -1269,6 +1269,22 @@ body.arlo {
     color: white;
 }
 
+.arlo#arlo .arlo-popup-modal .modal-header {
+    padding-bottom: 0px;
+}
+
+.arlo#arlo .arlo-popup-modal .modal-header h5 {
+    margin: 0px;
+}
+
+.arlo#arlo .arlo-popup-modal .modal-body {
+    padding-top: 0px;
+}
+
+.arlo .arlo-popup-modal .modal-header .close {
+    display: none;
+}
+
 .arlo .arlo_session {
     margin-top: .5em;
     padding-bottom: .5em;
