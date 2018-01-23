@@ -1032,6 +1032,10 @@ body.arlo {
     float: left;
 }
 
+.arlo#arlo select.arlo-filter-region {
+    float: none;
+}
+
 
 
 /* Pagination */

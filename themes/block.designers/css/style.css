@@ -1285,10 +1285,6 @@ body.arlo {
 
 /* Filters */
 
-.arlo#arlo select.arlo-filter-region {
-    margin-right: 0.5em;
-}
-
 .arlo#arlo .arlo-filters {
     overflow: auto;
     margin-bottom: 1em;
@@ -1326,6 +1322,11 @@ body.arlo {
 .arlo#arlo select,
 .arlo#arlo .arlo-filters-buttons {
     float: left;
+}
+
+.arlo#arlo select.arlo-filter-region {
+    float: none;
+    margin-bottom: 0px;
 }
 
 
