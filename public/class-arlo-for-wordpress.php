@@ -895,7 +895,7 @@ class Arlo_For_Wordpress {
 	/**
 	 * Set the date to show the review notice
 	 *
-	 * @since    3.7.0
+	 * @since    3.6.0
 	 *
 	 */	
 	public function set_review_notice_date($increment) {
@@ -907,7 +907,7 @@ class Arlo_For_Wordpress {
 	/**
 	 * Increment the date to show the review notice
 	 *
-	 * @since    3.7.0
+	 * @since    3.6.0
 	 *
 	 */	
 	public function increment_review_notice_date() {
@@ -919,7 +919,7 @@ class Arlo_For_Wordpress {
 	/**
 	 * Add a review message
 	 *
-	 * @since    3.7.0
+	 * @since    3.6.0
 	 *
 	 */	
 	public function arlo_add_review_message() {
