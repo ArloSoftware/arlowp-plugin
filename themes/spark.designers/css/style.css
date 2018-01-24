@@ -606,6 +606,11 @@ body.arlo {
     border: none;
 }
 
+.arlo#arlo .arlo-filter-region-search select.arlo-filter-region {
+    float: none;
+    margin-bottom: 2em;
+}
+
 .arlo#arlo .arlo-catalogue-filters .arlo-categories {
     display: inline-block;
     vertical-align: top;
