@@ -59,6 +59,16 @@ class Categories {
 					}
 					continue;
 				break;
+				
+				case 'ignored':
+					if(is_array($value) && count($value)) {
+						$where[] = "c.c_arlo_id NOT IN (" . implode(',', array_map(function() {return "%d";}, $value)) . ")";
+						$parameters = array_merge($parameters, $value);
+					} else if(!empty($value)) {
+						$where[] = "c.c_arlo_id <> %d";
+						$parameters[] = $value;
+					}
+				break;
 			}
 		}
 		
@@ -81,18 +91,18 @@ class Categories {
 
 	}
 	
-	static function getTree($start_id = 0, $depth = 1, $level = 0, $import_id = null, $insert_self = false) {
+	static function getTree($start_id = 0, $depth = 1, $level = 0, $ignored_categories = null, $import_id = null, $insert_self = false) {
 		$result = null;
 		$depth = intval($depth);
 		$level = intval($level);
 		$start_id = intval($start_id);
 
-		$categories = self::get(['parent_id' => $start_id], null, $import_id);
+		$categories = self::get(['parent_id' => $start_id, 'ignored' => $ignored_categories], null, $import_id);
 
 		foreach($categories as $item) {		
 			$item->depth_level = $level;	
 			if($depth - 1 > $level) {
-				$item->children = self::getTree($item->c_arlo_id, $depth, $level+1, $import_id);
+				$item->children = self::getTree($item->c_arlo_id, $depth, $level+1, null, $import_id);
 			} else {
 				unset($item->children);
 			}
@@ -167,13 +177,13 @@ class Categories {
                 $cats = [];
             
                 foreach ($categories as $cat_id) {
-                    $cat_tree = self::getTree($cat_id, 100, 0, $import_id, true);
+                    $cat_tree = self::getTree($cat_id, 100, 0, null, $import_id, true);
                     $cats = array_merge($cats, (is_array($cat_tree) ? $cat_tree : []));
                 }
             } else {
-                $cats = self::getTree($categories, 1, 0, $import_id);
+                $cats = self::getTree($categories, 1, 0, null, $import_id);
                 if (!empty($cats)) {
-                    $cats = self::getTree($cats[0]->c_arlo_id, 100, 0, $import_id);
+                    $cats = self::getTree($cats[0]->c_arlo_id, 100, 0, null, $import_id);
                 }
             }
 
