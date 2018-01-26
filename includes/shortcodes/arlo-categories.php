@@ -157,12 +157,16 @@ class Categories {
         $events_url = get_page_link($post_types[$page_type]['posts_page']);
         
         if(!is_array($items) || empty($items)) return '';
-        
+
+        $page_filter_settings = get_option("arlo_page_filter_settings");
+        $ignored_items = (isset($page_filter_settings['hiddenfilters']['events']['category']) ? $page_filter_settings['hiddenfilters']['events']['category'] : []);
+
         $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
         
         $html = '<ul class="arlo-category-list">';
 
         foreach($items as $cat) {
+            if (in_array($cat->c_arlo_id, $ignored_items)) continue;
             $href = $events_url . (!empty($arlo_region) ? 'region-' . $arlo_region . '/' : '') . ($cat->c_parent_id != 0 ? 'cat-' . esc_attr($cat->c_slug) : '');
             $cat_name = $cat->c_name . ( !is_null($counts) ?  sprintf($counts, $cat->c_template_num) : '' );
             $child_li = (isset($cat->children) ? self::generate_category_ul($cat->children, $counts, $widget) : '');
