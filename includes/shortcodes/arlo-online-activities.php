@@ -171,8 +171,10 @@ class OnlineActivities {
     }
 
     private static function shortcode_oa_registration ($content = '', $atts, $shortcode_name, $import_id = '') {
+        if(!isset($GLOBALS['arlo_oa_list_item']['oa_registermessage'])) return '';
+
         $registeruri = $GLOBALS['arlo_oa_list_item']['oa_registeruri'];
-        $registermessage = $GLOBALS['arlo_oa_list_item']['oa_registermessage'];
+        $registermessage = esc_html($GLOBALS['arlo_oa_list_item']['oa_registermessage']);
             
         $class = (!empty($atts['class']) ? $atts['class'] : 'button' );
 
@@ -190,6 +192,8 @@ class OnlineActivities {
     } 
 
     private static function shortcode_oa_offers ($content = '', $atts, $shortcode_name, $import_id = ''){
+        if(!isset($GLOBALS['arlo_oa_list_item']['oa_id'])) return '';
+
         return Shortcodes::advertised_offers($GLOBALS['arlo_oa_list_item']['oa_id'], 'oa_id', $import_id);
     }
 
@@ -540,6 +544,8 @@ class OnlineActivities {
     }
 
     private static function shortcode_oa_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if(!isset($GLOBALS['arlo_oa_list_item']['et_post_name'])) return '';
+
         $oa_snippet = self::get_snippet_data($atts,$shortcode_name,$import_id);
         return Shortcodes::create_rich_snippet( json_encode($oa_snippet) );
     }
