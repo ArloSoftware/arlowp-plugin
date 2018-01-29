@@ -13654,6 +13654,9 @@
   -webkit-box-shadow: -1px 1px 3px 0px rgba(121, 129, 135, 0.3);
   box-shadow: -1px 1px 3px 0px rgba(121, 129, 135, 0.3);
   padding: 10px;
+  float: left;
+  margin-right: 10px;
+  color: rgb(109, 92, 174);
 }
 
 .arlo#arlo .event .arlo-event-registration .arlo-event-full {
@@ -14030,4 +14033,9 @@
   height: 80px;
   width: 80px;
   padding-top: 60px;
+}
+
+.arlo#arlo.arlo-sm .arlo-filter-region {
+  margin-right: 0px;
+  width: 100%;
 }

@@ -2,7 +2,9 @@
 [arlo_category_title wrap="<h1>%s</h1>"]
 [arlo_category_header]
 
-[arlo_categories title=" " wrap='<div class="arlo-categories m-t-15 collapse" id="arlo-categories">%s</div>']
+[arlo_template_region_selector]
+
+[arlo_categories title=" " wrap='<div class="arlo-categories m-t-10 collapse" id="arlo-categories">%s</div>']
 
   <button data-toggle="collapse" data-target="#arlo-categories" class="btn form-control full-width m-b-20 filter-toggle collapsed">
       <div class="display-filters">
@@ -14,7 +16,6 @@
       </div>
     </button>
 
-[arlo_template_region_selector]
 
 
 <div class="clearfix row-fix row events">
@@ -37,9 +38,9 @@
               </a>
             </div>
 
-<div class="bg-master-lighter padding-20 block large-text hidden-xs">
-            [arlo_event_next_running text='View upcoming dates ({%count%})']
-</div>
+            <div class="bg-master-lighter padding-20 block large-text hidden-xs">
+                [arlo_event_next_running text='View upcoming dates ({%count%})']
+            </div>
 
 
             <div class="mobile-expanded-visible">
