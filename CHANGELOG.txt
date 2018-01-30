@@ -1,3 +1,10 @@
+== V3.5.2 ==
+
+Bugfixes
+------------------
+Allow import with PHP 7.2
+
+
 == V3.5.1 ==
 
 Bugfixes

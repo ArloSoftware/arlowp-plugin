@@ -27,8 +27,13 @@ class Crypto {
 	const IV_LENGTH = 16;
 
 	public static function decrypt($encrypted, $key, $crypto_method, $hash_method, $gzip = false) {
-		if (!extension_loaded('mcrypt') ) {
-			throw new \Exception('mCrypt is not available');
+		if (!extension_loaded('mcrypt') && !function_exists('mcrypt_decrypt')) {
+			if (!function_exists('mcrypt_decrypt') ) {
+				throw new \Exception('mCrypt replacement is not available');
+			}
+			if (!extension_loaded('mcrypt') ) {
+				throw new \Exception('mCrypt is not available');
+			}
 		}
 
 		list($key_m, $key_e) = self::derive_secondary_keys($key, $hash_method);
@@ -44,8 +49,9 @@ class Crypto {
 				//last bytes are HMAC
 				if (substr($encrypted, strlen($encrypted) - self::MAC_LENGTH) == $hmac) {
 					$decrypted = mcrypt_decrypt(self::$available_crypto_methods[$crypto_method], $key_e, $cyphertext, MCRYPT_MODE_CBC, $iv);
-					if (!empty($php_errormsg)) {
-						throw new \Exception($php_errormsg);
+					$last_error = error_get_last();
+					if (empty($decrypted) && isset($last_error['message'])) {
+						throw new \Exception($last_error['message']);
 					}
 
 					return trim(($gzip ? gzdecode($decrypted) : $decrypted));
@@ -61,8 +67,9 @@ class Crypto {
 	public static function derive_secondary_keys($key, $hash_method) {
 		$key = base64_decode($key);
     	$hashed_key = hash(self::$available_hasher_methods[$hash_method], $key, true);
-		if (!empty($php_errormsg)) {
-			throw new \Exception($php_errormsg);
+		$last_error = error_get_last();
+		if (empty($hashed_key) && isset($last_error['message'])) {
+			throw new \Exception($last_error['message']);
 		}
 
 		return [
@@ -118,5 +125,17 @@ class Crypto {
 		} else {
 			throw new \Exception('Empty value for JWE header "enc" is not supported ');
 		}	
+	}
+
+	public static function load_mcrypt_compat_if_needed() {
+		if (!function_exists('mcrypt_decrypt') ) {
+			// mCrypt deprecated in 7.2 so load mcrypt_compat
+			//https://github.com/phpseclib/mcrypt_compat
+			//https://github.com/phpseclib/phpseclib
+			require_once( plugin_dir_path( __FILE__ ) . 'mcrypt_compat/phpseclib/crypt/Common/SymmetricKey.php');
+			require_once( plugin_dir_path( __FILE__ ) . 'mcrypt_compat/phpseclib/crypt/Common/BlockCipher.php');
+			require_once( plugin_dir_path( __FILE__ ) . 'mcrypt_compat/phpseclib/crypt/rijndael.php');
+			require_once( plugin_dir_path( __FILE__ ) . 'mcrypt_compat/mcrypt.php');
+		}
 	}
 }

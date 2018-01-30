@@ -885,6 +885,13 @@ class Arlo_For_Wordpress_Settings {
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">	  
+				<li>Allow import with PHP 7.2</li>
+			</ul>
+		</p>
+
+		<h4>Version 3.5.1</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">	  
 				<li>Admin page gets into a redirect loop on some webservers</li>
 				<li>Wrong filter URL if a global level shortcode is used on a home page</li>
 			</ul>
