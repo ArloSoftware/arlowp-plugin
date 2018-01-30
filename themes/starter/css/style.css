@@ -4529,13 +4529,14 @@
 .arlo#arlo .event .arlo-register,
 .arlo#arlo .arlo-show-more-link,
 .arlo#arlo .arlo-show-more-link:focus,
-.arlo#arlo .event .button.arlo-register {
+.arlo#arlo .event .button.arlo-register{
   color: #fff;
   background-color: #4e5ec1;
   border-color: #4e5ec1;
   position: relative;
   overflow: hidden;
 }
+
 .arlo#arlo .btn-secondary:after {
   content: '';
   position: absolute;
@@ -14038,4 +14039,8 @@
 .arlo#arlo.arlo-sm .arlo-filter-region {
   margin-right: 0px;
   width: 100%;
+}
+
+.arlo#arlo .presenter-events li:hover {
+  margin-left: 10px;
 }
