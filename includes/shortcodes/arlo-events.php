@@ -1224,7 +1224,7 @@ class Events {
                             break;
                     }
     
-                    $return .= sprintf('<%s %s class="%s">%s</%s>', $tag, $href, $class, $reference_terms['Plural'], $tag);
+                    $return .= sprintf('<%s %s class="%s">%s</%s>', $tag, $href, $class, $reference_terms['Singular'], $tag);
                 }
             }
         }
