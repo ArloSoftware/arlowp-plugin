@@ -41,7 +41,8 @@ class SystemRequirements {
 				'name' => 'mCrypt enabled',
 				'expected_value' => 'Yes',
 				'current_value' => function () {
-					return extension_loaded('mcrypt') ? 'Yes': 'No';
+					//return extension_loaded('mcrypt') ? 'Yes': 'No';
+					return function_exists('mcrypt_decrypt') ? 'Yes': 'No';
 				},
 				'check' => function($current_value, $expected_value) {
 					return $current_value == 'Yes';
@@ -51,7 +52,8 @@ class SystemRequirements {
 				'name' => 'RIJNDAEL 128 available',
 				'expected_value' => 'Yes',
 				'current_value' => function () {
-					return extension_loaded('mcrypt') && in_array('rijndael-128', mcrypt_list_algorithms()) ? 'Yes' : 'No';
+					//return extension_loaded('mcrypt') && in_array('rijndael-128', mcrypt_list_algorithms()) ? 'Yes' : 'No';
+					return  in_array('rijndael-128', mcrypt_list_algorithms()) ? 'Yes' : 'No';
 				},
 				'check' => function($current_value, $expected_value) {
 					return $current_value == 'Yes';
@@ -61,7 +63,8 @@ class SystemRequirements {
 				'name' => 'CBC mode available',
 				'expected_value' => 'Yes',
 				'current_value' => function () {
-					return extension_loaded('mcrypt') && in_array('cbc', mcrypt_list_modes()) ? 'Yes' : 'No';
+					//return extension_loaded('mcrypt') && in_array('cbc', mcrypt_list_modes()) ? 'Yes' : 'No';
+					return  in_array('cbc', mcrypt_list_modes()) ? 'Yes' : 'No';
 				},
 				'check' => function($current_value, $expected_value) {
 					return $current_value == 'Yes';

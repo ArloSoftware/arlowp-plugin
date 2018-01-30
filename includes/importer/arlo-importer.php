@@ -619,4 +619,8 @@ class Importer {
 			return false;
 		}
 	}
+
+	public function optionally_load_mcrypt_compat() {
+		Crypto::load_mcrypt_compat_if_needed();
+	}
 }
