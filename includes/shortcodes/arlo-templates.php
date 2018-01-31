@@ -789,7 +789,6 @@ class Templates {
                         break;
                         case 99: 
                             $where .= " AND e.e_parent_arlo_id = 0 ";
-                            $where .= ' AND oa_id IS NULL ';
                         break;        
                     } 
                 }

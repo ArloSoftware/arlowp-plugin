@@ -1053,8 +1053,8 @@ class Events {
         $arlo_delivery = \Arlo\Utilities::get_filter_keys_int_array('delivery');
         $arlo_state = \Arlo\Utilities::clean_string_url_parameter('arlo-state');
 
-        $arlo_location_hidden = \Arlo\Utilities::get_filter_keys_string_array('locationhidden');
-        $arlo_delivery_hidden = \Arlo\Utilities::get_filter_keys_int_array('deliveryhidden');
+        $arlo_locationhidden = \Arlo\Utilities::get_filter_keys_string_array('locationhidden');
+        $arlo_deliveryhidden = \Arlo\Utilities::get_filter_keys_int_array('deliveryhidden');
         
         if (!empty($GLOBALS['arlo_eventtemplate']['et_region'])) {
             $arlo_region = $GLOBALS['arlo_eventtemplate']['et_region'];
@@ -1103,15 +1103,15 @@ class Events {
         if (!empty($arlo_location)) {
             $conditions['e.e_locationname IN ( %s )'] = $arlo_location;
         }
-        else if (!empty($arlo_location_hidden)) {
-            $conditions['e.e_locationname NOT IN ( %s )'] = $arlo_location_hidden;
+        else if (!empty($arlo_locationhidden)) {
+            $conditions['e.e_locationname NOT IN ( %s )'] = $arlo_locationhidden;
         }
 
         if(!empty($arlo_delivery)) {
             $conditions['e.e_isonline IN ( %d )'] = $arlo_delivery;
         }
-        else if(!empty($arlo_delivery_hidden)) {
-            $conditions['e.e_isonline NOT IN ( %d )'] = $arlo_delivery_hidden;
+        else if(!empty($arlo_deliveryhidden)) {
+            $conditions['e.e_isonline NOT IN ( %d )'] = $arlo_deliveryhidden;
         }
 
         if (isset($arlo_state) && isset($GLOBALS['state_filter_venues'])) {
