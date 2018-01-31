@@ -3814,6 +3814,7 @@
 .arlo#arlo ul.arlo-category-list {
   list-style: none;
   margin-left: 0;
+  padding-left: 0;
 }
 
 .arlo#arlo .presenter-events,
@@ -4529,13 +4530,14 @@
 .arlo#arlo .event .arlo-register,
 .arlo#arlo .arlo-show-more-link,
 .arlo#arlo .arlo-show-more-link:focus,
-.arlo#arlo .event .button.arlo-register {
+.arlo#arlo .event .button.arlo-register{
   color: #fff;
   background-color: #4e5ec1;
   border-color: #4e5ec1;
   position: relative;
   overflow: hidden;
 }
+
 .arlo#arlo .btn-secondary:after {
   content: '';
   position: absolute;
@@ -13654,6 +13656,9 @@
   -webkit-box-shadow: -1px 1px 3px 0px rgba(121, 129, 135, 0.3);
   box-shadow: -1px 1px 3px 0px rgba(121, 129, 135, 0.3);
   padding: 10px;
+  float: left;
+  margin-right: 10px;
+  color: rgb(109, 92, 174);
 }
 
 .arlo#arlo .event .arlo-event-registration .arlo-event-full {
@@ -14030,4 +14035,24 @@
   height: 80px;
   width: 80px;
   padding-top: 60px;
+}
+
+.arlo#arlo.arlo-sm .arlo-filter-region {
+  margin-right: 0px;
+  width: 100%;
+}
+
+.arlo#arlo .presenter-events li:hover {
+  margin-left: 10px;
+}
+
+.arlo#arlo .arlo-timezone select {
+    border-radius: 3px;
+    width: auto;
+    border: none;
+    padding: 10px;
+    color: #6d5cae;
+    -webkit-box-shadow: -1px 1px 3px 0px rgba(121, 129, 135, 0.3);
+    box-shadow: -1px 1px 3px 0px rgba(121, 129, 135, 0.3);
+    font-size: 14px;
 }

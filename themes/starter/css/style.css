@@ -14045,3 +14045,14 @@
 .arlo#arlo .presenter-events li:hover {
   margin-left: 10px;
 }
+
+.arlo#arlo .arlo-timezone select {
+    border-radius: 3px;
+    width: auto;
+    border: none;
+    padding: 10px;
+    color: #6d5cae;
+    -webkit-box-shadow: -1px 1px 3px 0px rgba(121, 129, 135, 0.3);
+    box-shadow: -1px 1px 3px 0px rgba(121, 129, 135, 0.3);
+    font-size: 14px;
+}
