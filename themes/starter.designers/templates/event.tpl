@@ -149,7 +149,9 @@
 			[arlo_event_template_register_interest]
 			[arlo_suggest_datelocation wrap="<div class='arlo-suggest'>%s</div>"]
 		</div>
-
+	</div>
+	<div class="arlo-clear-both"></div>
+	
 		[arlo_oa_list]
         <div class="clearfix row p-b-20">
 			[arlo_oa_list_item]
@@ -193,23 +195,10 @@
 
             	</div>
 
-			<!-- <li class="arlo-cf arlo-online-activity">
-				[arlo_oa_reference_term wrap='<div class="arlo-event-headline">%s</div>']
-				[arlo_oa_credits]
-				
-				[arlo_oa_delivery_description label="Delivery: " wrap='<div class="arlo-delivery-desc">%s</div>']
-				[arlo_oa_offers]
-				[arlo_oa_registration]
-			</li>
-			[arlo_oa_rich_snippet] -->
-
 			[/arlo_oa_list_item]
 		</div>
 		[/arlo_oa_list]		
-		
-	</div>
-	<div class="arlo-clear-both"></div>
-	
+
 	[arlo_content_field_item]
 		[arlo_content_field_name wrap='<h3>%s</h3>']
 		[arlo_content_field_text wrap='<p>%s</p>']
