@@ -134,7 +134,7 @@ class Crypto {
 			//https://github.com/phpseclib/phpseclib
 			require_once( plugin_dir_path( __FILE__ ) . 'mcrypt_compat/phpseclib/Crypt/Common/SymmetricKey.php');
 			require_once( plugin_dir_path( __FILE__ ) . 'mcrypt_compat/phpseclib/Crypt/Common/BlockCipher.php');
-			require_once( plugin_dir_path( __FILE__ ) . 'mcrypt_compat/phpseclib/Crypt/rijndael.php');
+			require_once( plugin_dir_path( __FILE__ ) . 'mcrypt_compat/phpseclib/Crypt/Rijndael.php');
 			require_once( plugin_dir_path( __FILE__ ) . 'mcrypt_compat/mcrypt.php');
 		}
 	}
