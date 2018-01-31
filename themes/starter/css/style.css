@@ -3814,6 +3814,7 @@
 .arlo#arlo ul.arlo-category-list {
   list-style: none;
   margin-left: 0;
+  padding-left: 0;
 }
 
 .arlo#arlo .presenter-events,

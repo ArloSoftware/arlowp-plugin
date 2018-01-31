@@ -7,7 +7,7 @@ jQuery(function($){
 
         $container.removeClass('arlo-xs arlo-sm arlo-md');
 
-        if (containerWidth < 1200) {
+        if (containerWidth < 1100) {
             $container.addClass('arlo-md');
         }
 
