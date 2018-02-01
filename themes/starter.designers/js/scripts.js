@@ -7,7 +7,7 @@ jQuery(function($){
 
         $container.removeClass('arlo-xs arlo-sm arlo-md');
 
-        if (containerWidth < 1200) {
+        if (containerWidth < 1100) {
             $container.addClass('arlo-md');
         }
 
@@ -52,8 +52,6 @@ jQuery(function($){
     $(document).ready(function() {
         'use strict';
 
-        $('.selectize').selectize({create: false});
-
         setNumberOfEventColumns('.arlo#arlo');
         setNumberOfEvents();
 
@@ -82,7 +80,7 @@ jQuery(function($){
 
         animateInItems();
 
-        if (!isTouchEnabled()) {
+        /*if (!isTouchEnabled()) {
             $('.popover-trigger').click(function() {
                 $('.popover-trigger').each(function() {
                     $(this).popover('hide');
@@ -100,7 +98,7 @@ jQuery(function($){
                     return $(this).find(".popover-title").html();
                 }
             });
-        }
+        }*/
 
         function calculateEventHeights() {
             if ($('.arlo#arlo').width() >= 768) {
@@ -125,35 +123,42 @@ jQuery(function($){
             setTimeout(calculateEventHeights,0);
         });
 
-        // collapsable elements
-        if ( !$('.arlo#arlo').hasClass('arlo-xs') ) {
-             $('.arlo#arlo .event .event-container').on({
-              focusout: function(e) {
-                $(this).closest('.event').removeClass('expanded');
-              },
-              click: function(e) {
-                var eventItem = $(this).closest('.event');
-                if ( eventItem.hasClass('expanded') ) {
-                    setTimeout(function() {
-                        eventItem.find('.event-container').focusout();
-                    }, 0);
-                } else {
-                    eventItem.addClass('expanded');
-                }
-              }
-            });
-        } else {
-            // Expand mobile
-            $('.arlo#arlo .event-content, .arlo#arlo .online-activity .btn-expand.mobile, .arlo#arlo .event .btn-expand.mobile, .arlo#arlo .template-details, .arlo#arlo .schedule-item').click(function(event) {
-                expandMobile(event,this);
-            });
+        function attachExpandEvents() {
+            // collapsable elements
+            if ( !$('.arlo#arlo').hasClass('arlo-xs') ) {
+                 $('.arlo#arlo .event .event-container').on({
+                  focusout: function(e) {
+                    $(this).closest('.event').removeClass('expanded');
+                  },
+                  click: function(e) {
+                    var eventItem = $(this).closest('.event');
+                    if ( eventItem.hasClass('expanded') ) {
+                        setTimeout(function() {
+                            eventItem.find('.event-container').focusout();
+                        }, 0);
+                    } else {
+                        eventItem.addClass('expanded');
+                    }
+                  }
+                });
+            } else {
+                // Expand mobile
+                $('.arlo#arlo .event-content, .arlo#arlo .online-activity .btn-expand.mobile, .arlo#arlo .event .btn-expand.mobile, .arlo#arlo .template-details, .arlo#arlo .schedule-item').click(function(event) {
+                    expandMobile(event,this);
+                });
+            }
+
+            if ($('.arlo#arlo').width() > 768 && $('.arlo#arlo').width() < 992) {
+                $('.arlo#arlo .schedule-item').click(function(event) {
+                    expandMobile(event,this);
+                });
+            }
         }
 
-        if ($('.arlo#arlo').width() > 768 && $('.arlo#arlo').width() < 992) {
-            $('.arlo#arlo .schedule-item').click(function(event) {
-                expandMobile(event,this);
-            });
-        }
+        attachExpandEvents();
+
+        $(window).scroll(attachExpandEvents);
+
 
         function expandMobile(event,_this) {
             if (!$(event.target).is('a:not(.btn-expand), button')) {
@@ -197,7 +202,7 @@ jQuery(function($){
         });
 
 
-        if (isTouchEnabled()) {
+        if (isTouchEnabled() && typeof jQuery().slick === "function") {
             $('.arlo#arlo .scheduled-dates, .arlo#arlo .search-scheduled-dates').slick({
                 prevArrow: false,
                 nextArrow: false,

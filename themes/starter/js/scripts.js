@@ -123,35 +123,42 @@ jQuery(function($){
             setTimeout(calculateEventHeights,0);
         });
 
-        // collapsable elements
-        if ( !$('.arlo#arlo').hasClass('arlo-xs') ) {
-             $('.arlo#arlo .event .event-container').on({
-              focusout: function(e) {
-                $(this).closest('.event').removeClass('expanded');
-              },
-              click: function(e) {
-                var eventItem = $(this).closest('.event');
-                if ( eventItem.hasClass('expanded') ) {
-                    setTimeout(function() {
-                        eventItem.find('.event-container').focusout();
-                    }, 0);
-                } else {
-                    eventItem.addClass('expanded');
-                }
-              }
-            });
-        } else {
-            // Expand mobile
-            $('.arlo#arlo .event-content, .arlo#arlo .online-activity .btn-expand.mobile, .arlo#arlo .event .btn-expand.mobile, .arlo#arlo .template-details, .arlo#arlo .schedule-item').click(function(event) {
-                expandMobile(event,this);
-            });
+        function attachExpandEvents() {
+            // collapsable elements
+            if ( !$('.arlo#arlo').hasClass('arlo-xs') ) {
+                 $('.arlo#arlo .event .event-container').on({
+                  focusout: function(e) {
+                    $(this).closest('.event').removeClass('expanded');
+                  },
+                  click: function(e) {
+                    var eventItem = $(this).closest('.event');
+                    if ( eventItem.hasClass('expanded') ) {
+                        setTimeout(function() {
+                            eventItem.find('.event-container').focusout();
+                        }, 0);
+                    } else {
+                        eventItem.addClass('expanded');
+                    }
+                  }
+                });
+            } else {
+                // Expand mobile
+                $('.arlo#arlo .event-content, .arlo#arlo .online-activity .btn-expand.mobile, .arlo#arlo .event .btn-expand.mobile, .arlo#arlo .template-details, .arlo#arlo .schedule-item').click(function(event) {
+                    expandMobile(event,this);
+                });
+            }
+
+            if ($('.arlo#arlo').width() > 768 && $('.arlo#arlo').width() < 992) {
+                $('.arlo#arlo .schedule-item').click(function(event) {
+                    expandMobile(event,this);
+                });
+            }
         }
 
-        if ($('.arlo#arlo').width() > 768 && $('.arlo#arlo').width() < 992) {
-            $('.arlo#arlo .schedule-item').click(function(event) {
-                expandMobile(event,this);
-            });
-        }
+        attachExpandEvents();
+
+        $(window).scroll(attachExpandEvents);
+
 
         function expandMobile(event,_this) {
             if (!$(event.target).is('a:not(.btn-expand), button')) {
