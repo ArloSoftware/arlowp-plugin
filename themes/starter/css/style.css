@@ -14009,6 +14009,7 @@
 
 .arlo#arlo .modal-title {
   float: left;
+  color: white;
 }
 
 .arlo#arlo .arlo-bootstrap-modal .event-presenters li:not(:empty):before {
