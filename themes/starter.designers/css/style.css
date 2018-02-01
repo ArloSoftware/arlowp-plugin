@@ -13889,6 +13889,7 @@
   padding: 6px 17px;
   position: relative;
   display: inline-block;
+  overflow: hidden;
 }
 
 .arlo#arlo .search-scheduled-dates a:after {
