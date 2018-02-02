@@ -126,6 +126,28 @@
 			gravity: 'north'
 		});
 
+
+		//modal init
+		$('.arlo-sessions-popup-trigger').each(function(i, el) {
+			var modal = new tingle.modal({
+				footer: true,
+				cssClass: ['arlo'],
+			    closeMethods: ['overlay', 'button', 'escape']
+			});
+
+			var popupContent = $($(el).data('target')).html();
+
+			modal.setContent(popupContent);
+
+			modal.addFooterBtn('Close', 'arlo-close-btn button btn btn-primary', function() {
+			    modal.close();
+			});
+
+			$(el).click(function(e) {
+				e.preventDefault();
+				modal.open()
+			});
+		});
 	});
 	
 	function getUriRegion() {

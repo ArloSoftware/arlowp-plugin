@@ -4292,6 +4292,7 @@
   }
 
 .arlo#arlo .btn,
+.arlo .btn,
 .arlo#arlo .button,
 .arlo#arlo .arlo-show-more-link,
 .arlo#arlo .arlo-no-results a {
@@ -4431,6 +4432,7 @@
   background-color: #fff;
 }
 .arlo#arlo .btn-primary,
+.arlo .btn-primary,
 .arlo#arlo .btn-primary:focus,
 .arlo#arlo .arlo-no-results a,
 .arlo#arlo .arlo-no-results a:focus,
@@ -6246,286 +6248,6 @@
   height: 100%;
   width: 100%;
 }
-.arlo#arlo .modal {
-  overflow: auto;
-}
-.arlo#arlo .modal .close:focus {
-  outline: 0;
-}
-.arlo#arlo .modal .modal-dialog {
-  transition: all .2s !important;
-  margin: 0;
-}
-.arlo#arlo .modal .modal-dialog .modal-content {
-  border-radius: 0;
-}
-
-  .arlo#arlo:not(.arlo-xs) .modal .modal-dialog {
-    width: 95%;
-    margin: 20px auto;
-  }
-  .arlo#arlo:not(.arlo-xs) .modal .modal-dialog .modal-content {
-    border-radius: 3px;
-  }
-
-.arlo#arlo .modal.fade .modal-dialog {
-  -webkit-transform: translate(0, 0);
-  -ms-transform: translate(0, 0);
-  -o-transform: translate(0, 0);
-  transform: translate(0, 0);
-}
-
-  .arlo#arlo.arlo-xs .modal.fade .modal-dialog {
-    -webkit-transform: translate(0, -25%);
-    -ms-transform: translate(0, -25%);
-    -o-transform: translate(0, -25%);
-    transform: translate(0, -25%);
-  }
-
-.arlo#arlo .modal.fade.in .modal-dialog {
-  -webkit-transform: translate(0, 0);
-  -ms-transform: translate(0, 0);
-  -o-transform: translate(0, 0);
-  transform: translate(0, 0);
-}
-
-  .arlo#arlo.arlo-sm .modal .modal-lg {
-    width: 95%;
-    max-width: 1100px;
-  }
-
-.arlo#arlo .modal .modal-content {
-  border: 1px solid #f2f6f7;
-  border-radius: 3px;
-  box-shadow: none;
-}
-.arlo#arlo .modal .modal-header {
-  text-align: center;
-  padding: 25px;
-  margin-bottom: 15px;
-}
-.arlo#arlo .modal .modal-header .mobile-close {
-  display: none;
-}
-
-  .arlo#arlo.arlo-xs .modal .modal-header {
-    background-color: #000;
-    padding: 15px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-  }
-  .arlo#arlo.arlo-xs .modal .modal-header h4 {
-    color: #fff;
-  }
-  .arlo#arlo.arlo-xs .modal .modal-header .mobile-close {
-    font-size: 24px;
-    display: inline-block;
-  }
-  .arlo#arlo.arlo-xs .modal .modal-header .close {
-    display: none;
-  }
-
-.arlo#arlo .modal .modal-header p {
-  color: #8b91a0;
-}
-.arlo#arlo .modal .modal-body {
-  box-shadow: none;
-  /* padding: 0; */
-  padding-top: 0;
-  white-space: normal;
-}
-.arlo#arlo .modal .modal-body > div:first-child {
-  margin-top: 0 !important;
-}
-
-  .arlo#arlo.arlo-xs .modal .modal-body {
-    margin-top: 55px;
-  }
-
-.arlo#arlo .modal .modal-footer {
-  border-top: none;
-  box-shadow: none;
-  margin-top: 0;
-  padding: 25px;
-  padding-top: 0;
-}
-
-  .arlo#arlo.arlo-xs .modal .modal-footer {
-    padding: 15px;
-  }
-
-.arlo#arlo .modal .drop-shadow {
-  box-shadow: 0 0 9px rgba(191, 191, 191, 0.36) !important;
-}
-.arlo#arlo .modal.fade {
-  opacity: 1 !important;
-  background-color: rgba(0,0,0,.6);
-}
-.arlo#arlo .modal.fade.stick-up .modal-dialog {
-  -webkit-transform: translate3d(0, -100%, 0);
-  transform: translate3d(0, -100%, 0);
-  -ms-transform: translate(0, -100%);
-  margin-top: -5px;
-}
-.arlo#arlo .modal.fade.stick-up.in .modal-dialog {
-  -webkit-transform: translate3d(0, 0, 0);
-  transform: translate3d(0, 0, 0);
-  -ms-transform: translate(0, 0);
-}
-.arlo#arlo .modal.fade.slide-up {
-  height: 100%;
-  top: auto;
-}
-.arlo#arlo .modal.fade.slide-up.in .modal-dialog {
-  -webkit-transform: translate3d(0, 0, 0);
-  transform: translate3d(0, 0, 0);
-  -ms-transform: translate(0, 0);
-}
-.arlo#arlo .modal.fade.slide-up.disable-scroll {
-  overflow: hidden;
-}
-.arlo#arlo .modal.fade.slide-up .modal-dialog {
-  display: table;
-  height: 100%;
-  -webkit-transform: translate3d(0, 75%, 0);
-  transform: translate3d(0, 75%, 0);
-  -ms-transform: translate(0, 75%);
-}
-.arlo#arlo .modal.fade.slide-up .modal-content-wrapper {
-  display: table-cell;
-  vertical-align: middle;
-}
-.arlo#arlo .modal.fade.center-scale .modal-dialog {
-  display: table;
-  height: 100%;
-}
-.arlo#arlo .modal.fade.center-scale .modal-content {
-  display: table-cell;
-  vertical-align: middle;
-  border: 0;
-  background: transparent;
-}
-.arlo#arlo .modal.fade.center-scale .modal-content .modal-header {
-  border-bottom: 0px;
-}
-.arlo#arlo .modal.fade.center-scale.in .modal-dialog {
-  opacity: 1;
-  -webkit-transform: scale(1);
-  -ms-transform: scale(1);
-  transform: scale(1);
-}
-.arlo#arlo .modal.fade.center-scale .modal-dialog {
-  opacity: 0;
-  -webkit-transform: scale(0.6);
-  -ms-transform: scale(0.6);
-  transform: scale(0.6);
-}
-.arlo#arlo .modal.fade.fill-in {
-  background-color: rgba(255, 255, 255, 0);
-  -webkit-transition: background-color 0.3s;
-  transition: background-color 0.3s;
-}
-.arlo#arlo .modal.fade.fill-in > .close {
-  margin-top: 20px;
-  margin-right: 20px;
-  opacity: 0.6;
-}
-.arlo#arlo .modal.fade.fill-in > .close > i {
-  font-size: 16px;
-}
-.arlo#arlo .modal.fade.fill-in .modal-dialog {
-  display: table;
-  height: 100%;
-}
-.arlo#arlo .modal.fade.fill-in .modal-content {
-  display: table-cell;
-  vertical-align: middle;
-  border: 0;
-  background: transparent;
-}
-.arlo#arlo .modal.fade.fill-in .modal-content .modal-header {
-  border-bottom: 0px;
-}
-.arlo#arlo .modal.fade.fill-in.in {
-  background-color: rgba(255, 255, 255, 0.85);
-}
-.arlo#arlo .modal.fade.fill-in.in .modal-dialog {
-  opacity: 1;
-  -webkit-transform: scale(1);
-  -ms-transform: scale(1);
-  transform: scale(1);
-}
-.arlo#arlo .modal.fade.fill-in .modal-dialog {
-  opacity: 0;
-  -webkit-transform: scale(0.6);
-  -ms-transform: scale(0.6);
-  transform: scale(0.6);
-}
-.arlo#arlo .modal.fade.slide-right .close {
-  position: absolute;
-  top: 0;
-  right: 0;
-  margin-right: 10px;
-  z-index: 10;
-}
-.arlo#arlo .modal.fade.slide-right.in .modal-dialog {
-  -webkit-transform: translate3d(0, 0, 0);
-  transform: translate3d(0, 0, 0);
-  -ms-transform: translate(0, 0);
-}
-.arlo#arlo .modal.fade.slide-right .modal-dialog {
-  position: absolute;
-  right: 0;
-  margin: 0;
-  height: 100%;
-  -webkit-transform: translate3d(100%, 0, 0);
-  transform: translate3d(100%, 0, 0);
-  -ms-transform: translate(100%, 0);
-}
-.arlo#arlo .modal.fade.slide-right .modal-dialog .modal-content-wrapper {
-  height: 100%;
-}
-.arlo#arlo .modal.fade.slide-right .modal-dialog .modal-content {
-  height: 100%;
-}
-.arlo#arlo .modal.fade.slide-right .modal-content {
-  border-radius: 0px;
-}
-.arlo#arlo .fill-in-modal .modal-backdrop {
-  background-color: transparent;
-}
-.arlo#arlo .modal-backdrop {
-  opacity: 0;
-  -webkit-transition: opacity 0.2s linear;
-  transition: opacity 0.2s linear;
-}
-.arlo#arlo .modal-backdrop.in {
-  opacity: 0.30;
-}
-
-  .arlo#arlo.arlo-xs .modal.fill-in .modal-dialog {
-    width: calc(100% - 20px);
-  }
-  .arlo#arlo.arlo-xs .modal.slide-up .modal-dialog {
-    width: calc(100% - 20px);
-  }
-
-
-  .arlo#arlo:not(.arlo-xs) .modal.stick-up .modal-dialog {
-    margin: -5px auto;
-  }
-  .arlo#arlo:not(.arlo-xs) .modal.slide-up .modal-dialog {
-    margin: 0 auto;
-  }
-  .arlo#arlo:not(.arlo-xs) .modal.fill-in .modal-dialog {
-    margin: 0 auto;
-  }
-  .arlo#arlo:not(.arlo-xs) .modal .modal-content {
-    box-shadow: none;
-  }
-
 .arlo#arlo .nav-tabs > li {
   padding-left: 0;
   padding-right: 0;
@@ -14062,4 +13784,172 @@
     -webkit-box-shadow: -1px 1px 3px 0px rgba(121, 129, 135, 0.3);
     box-shadow: -1px 1px 3px 0px rgba(121, 129, 135, 0.3);
     font-size: 14px;
+}
+
+
+
+
+/** sessions popups **/
+
+.arlo .session-popup-content {
+  display: none;
+}
+
+.tingle-modal-box {
+  width: 80%;
+}
+
+.tingle-modal-box__content {
+    padding: 1rem 2rem;
+}
+
+.arlo .tingle-modal-box__content button.arlo-btn-primary {
+  color: white;
+}
+
+.arlo .tingle-modal-box .session-presenters li:not(:empty):before {
+  content: "\f141";
+  display: inline-block;
+  font-family: "Arlo-starter-template--Master";
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  line-height: 1;
+  text-decoration: inherit;
+  text-rendering: optimizeLegibility;
+  text-transform: none;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-smoothing: antialiased;
+  margin-right: 5px;
+}
+
+.arlo .session-time,
+.arlo .session-presenters,
+.arlo .session-offers,
+.arlo .session-summary {
+    float: left;
+    padding: 0 10px;
+    min-height: 1px;
+}
+
+.arlo .session-time {
+    width: 20%;
+    padding-left: 0;
+}
+
+.arlo .session-offers {
+    width: 19%;
+}
+
+.arlo .session-presenters {
+    width: 19%;
+}
+
+.arlo .session-summary {
+    width: 40%;
+    padding-right: 0;
+}
+
+.arlo .tingle-modal__closeIcon {
+  font-size: 4rem;
+}
+
+.arlo .session-header {
+    padding: 10px 25px;
+}
+
+@media (max-width: 992px) {
+  .tingle-modal-box {
+    width: 100%;
+    border-radius: 0;
+  }
+
+  .arlo .session-time,
+  .arlo .session-presenters,
+  .arlo .session-offers,
+  .arlo .session-summary {
+      float: none;
+      padding: 0;
+      width: 100%;
+  }
+}
+
+@media (max-width: 540px) {
+  .tingle-modal__close {
+    background-color: transparent;
+    width: auto;
+    left: auto;
+    right: 20px;
+  }
+
+  .arlo .tingle-modal__closeIcon {
+    font-size: 2rem;
+  }
+
+  .arlo .tingle-modal__closeLabel,
+  .arlo .tingle-modal__closeIcon {
+    color: white;
+  }
+
+  .arlo-sessions-popup-header {
+    background: #131313;
+    margin-bottom: 10px;
+  }
+
+  .arlo .session-header h2 {
+    margin: 0;
+    font-size: 20px;
+    color: white;
+  }
+
+   button.arlo-btn-primary {
+    width: 100%;
+  }
+
+  .tingle-modal {
+    padding-top: 0;
+  }
+
+  .tingle-modal-box__content {
+    padding: 0;
+  }
+
+  .arlo-sessions-popup-inner {
+    padding: .5rem 1rem;
+  }
+
+  .arlo-sessions-popup-header {
+    padding: 12px 20px;
+  }
+
+  .arlo-sessions-popup-header h2 {
+    margin: 0;
+    color: white;
+    font-size: 26px;
+  }
+}
+
+.arlo-sessions-popup-inner {
+  font-size: 14px;
+}
+
+.arlo-sessions-popup-inner .muted {
+  opacity: .5;
+}
+
+.arlo-sessions-popup-inner .session-row {
+  overflow: auto;
+  clear: both;
+  padding: 10px 2px;
+  border-bottom: 1px solid #e6e6e6;
+  line-height: 1.8;
+}
+
+.arlo-sessions-popup-inner .icons8-marker:before {
+  line-height: 1.8;
+}
+
+.arlo-sessions-popup-inner .session-row:last-child {
+  border-bottom: 0;
 }
