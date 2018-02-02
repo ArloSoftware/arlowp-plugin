@@ -124,13 +124,17 @@ jQuery(function($){
         });
 
         function attachExpandEvents() {
+
             // collapsable elements
             if ( !$('.arlo#arlo').hasClass('arlo-xs') ) {
+                $('.arlo#arlo .event .event-container').off('click');
+                $('.arlo#arlo .event .event-container').off('focusout');
+
                  $('.arlo#arlo .event .event-container').on({
                   focusout: function(e) {
                     $(this).closest('.event').removeClass('expanded');
                   },
-                  click: function(e) {
+                  click: function(e) {                    
                     var eventItem = $(this).closest('.event');
                     if ( eventItem.hasClass('expanded') ) {
                         setTimeout(function() {

@@ -13890,6 +13890,8 @@
   position: relative;
   display: inline-block;
   overflow: hidden;
+  margin-right: 5px;
+  margin-bottom: 5px;
 }
 
 .arlo#arlo .search-scheduled-dates a:after {
@@ -14007,6 +14009,9 @@
 
 .arlo#arlo .modal-title {
   float: left;
+}
+
+.arlo#arlo.arlo-xs .modal-title {
   color: white;
 }
 

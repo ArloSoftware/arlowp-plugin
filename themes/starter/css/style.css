@@ -14009,6 +14009,9 @@
 
 .arlo#arlo .modal-title {
   float: left;
+}
+
+.arlo#arlo.arlo-xs .modal-title {
   color: white;
 }
 
