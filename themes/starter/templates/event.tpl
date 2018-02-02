@@ -169,7 +169,7 @@
 							  <p>[arlo_oa_offers]</p>
 							</div>
 							<div class="col-xs-4 col-md-3 text-right md-p-l-0 p-r-0">
-							  <a class="btn btn-secondary sm-m-b-10" href="#">Purchase</a>
+							  [arlo_oa_registration]
 							</div>
 						</div>
 
