@@ -13759,7 +13759,7 @@
 .arlo#arlo .presenter ul {
   margin-left: 1em;
 }
-.arlo#arlo.arlo-xs .event-card .card-front .arlo-event-label {
+.arlo#arlo.arlo-sm .event-card .card-front .arlo-event-label {
   transform: rotate(45deg);
   right: -40px;
   top: -40px;
