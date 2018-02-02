@@ -13645,6 +13645,7 @@
   box-shadow: -1px 1px 3px 0px rgba(121, 129, 135, 0.3);
   padding: 10px;
   display: flex;
+  margin-bottom: 20px;
 }
 
 .arlo#arlo.arlo-xs .arlo-search {
