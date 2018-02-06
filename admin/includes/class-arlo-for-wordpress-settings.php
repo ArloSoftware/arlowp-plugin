@@ -885,6 +885,13 @@ class Arlo_For_Wordpress_Settings {
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">	  
+				<li>Allow import with PHP 7.2 on Linux</li>
+			</ul>
+		</p>
+
+		<h4>Version 3.5.2</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">	  
 				<li>Allow import with PHP 7.2</li>
 			</ul>
 		</p>
