@@ -298,7 +298,7 @@ if (typeof (Arlo) === "undefined") {
 			var me = this;
 
 			if (tabID !== 'new_custom') {
-				Cookies.set("arlo-vertical-tab", tabID, { path: '/', expires: 7 });
+				Cookies.set("arlo-vertical-tab", tabID, { path: '/', domain: window.location.hostname, expires: 7 });
 			}
 
 			$('.arlo_pages_section .arlo-field-wrap').hide();
@@ -325,7 +325,7 @@ if (typeof (Arlo) === "undefined") {
 			$('#' + me.pluginSlug + '-tab-' + tabID).addClass('nav-tab-active');
 			
 			Cookies.remove("arlo-vertical-tab", { path: '/' });
-			Cookies.set("arlo-nav-tab", tabID, { path: '/', expires: 7 });
+			Cookies.set("arlo-nav-tab", tabID, { path: '/', domain: window.location.hostname, expires: 7 });
 
 			switch (tabID) {
 				case 'customcss':
