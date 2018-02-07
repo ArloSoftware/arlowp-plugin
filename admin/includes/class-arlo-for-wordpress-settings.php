@@ -960,6 +960,7 @@ class Arlo_For_Wordpress_Settings {
 				<li>New "layout" attribute for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_session_list_item" target="_blank">[arlo_event_session_list_item]</a> to show the session information as a tooltip or as a popup</li>
 				<li>New "separator" attribute for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_next_running" target="_blank">[arlo_event_next_running]</a></li>
 				<li>New <em>{%count%}</em> placeholder in "text" attribute for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_next_running" target="_blank">[arlo_event_next_running]</a></li>
+				<li>Allow import with PHP 7.2 on Linux</li>
 				<li>Filters was not redirecting properly when containing slashes</li>
 				<li>Show all except on Tags still show event if it has multiple tags</li>
 				<li>Reset button moves on selection of drop down (Jazz Theme)</li>
@@ -967,7 +968,14 @@ class Arlo_For_Wordpress_Settings {
 				<li>Session tags are not diplayed by <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_tags" target="_blank">[arlo_event_tags]</a></li>
 				<li>With some Arlo Themes <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_template_region_selector" target="_blank">[arlo_template_region_selector]</a> and <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_template_search_region_selector" target="_blank">[arlo_template_search_region_selector]</a> are breaking the layout</li>
 			</ul>
-		</p>	
+		</p>
+
+		<h4>Version 3.5.2</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">	  
+				<li>Allow import with PHP 7.2</li>
+			</ul>
+		</p>
 
 		<h4>Version 3.5.1</h4>
 		<p>

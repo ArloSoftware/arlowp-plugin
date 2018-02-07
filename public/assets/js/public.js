@@ -179,7 +179,7 @@
     function changeRegion(uriRegion, newRegion) {
 
 	    //Manually set cookie
-    	Cookies.set("arlo-region", newRegion, { path: "/" });
+    	Cookies.set("arlo-region", newRegion, { path: "/", domain: window.location.hostname });
 
     	if (uriRegion) {
 		    window.location.href = window.location.href.replace("/region-" + uriRegion + "/", "/region-" + newRegion + "/").replace(/location-\w+(%\d+)?\w*/g,"");

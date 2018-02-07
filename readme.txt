@@ -191,12 +191,17 @@ New "layout" attribute for [arlo_event_session_list_item] to show the session in
 New "separator" attribute for [arlo_event_next_running]
 New {%count%} placeholder in "text" attribute for [arlo_event_next_running]
 
+Allow import with PHP 7.2 on Linux
 Filters was not redirecting properly when containing slashes
 Show all except on Tags still show event if it has multiple tags
 Reset button moves on selection of drop down (Jazz Theme)
 Ensure filter priority - user first global shortcode second and filter by page at last
 Session tags are not diplayed by [arlo_event_tags]
 With some Arlo Themes [arlo_template_region_selector] and [arlo_template_search_region_selector] are breaking the layout
+
+= 3.5.2 =
+
+Allow import with PHP 7.2
 
 = 3.5.1 =
 
