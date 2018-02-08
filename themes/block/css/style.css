@@ -1289,7 +1289,6 @@ body.arlo {
     margin-top: .5em;
     padding-bottom: .5em;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    color: rgba(255,255,255,.5);
 }
 
 .arlo .arlo_session:last-child {
