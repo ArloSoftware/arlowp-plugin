@@ -27,7 +27,8 @@ class Arlo_For_Wordpress_Settings {
 		// allocates the wp-options option key value pair that will store the plugin settings
 		register_setting( 'arlo_settings', 'arlo_settings', array(
 			'sanitize_callback' => function($input) {
-				$input['regionid'] = array_map('strtoupper',$input['regionid']);
+				$region_id = (isset($input['regionid']) && is_array($input['regionid']) ? $input['regionid'] : []);
+				$input['regionid'] = array_map('strtoupper', $region_id);
 				return $input;
 			}
 		));		
@@ -109,7 +110,7 @@ class Arlo_For_Wordpress_Settings {
 					$stored_themes_settings = get_option( 'arlo_themes_settings', [] );
 
 					//check if there is already a stored settings for the theme, or need to be reset
-					if ($_GET['reset'] == 1 || empty($stored_themes_settings[$theme_id])) {
+					if ((!empty($_GET['reset']) && $_GET['reset'] == 1) || empty($stored_themes_settings[$theme_id])) {
 						$stored_themes_settings[$theme_id] = $theme_settings[$theme_id];
 						$stored_themes_settings[$theme_id]->templates = $theme_manager->load_default_templates($theme_id);
 					}
@@ -122,7 +123,9 @@ class Arlo_For_Wordpress_Settings {
 					if ($stored_themes_settings[$theme_id]->templates !== false) {
 						//update the main setting with the stored theme
 						foreach ($settings_object['templates'] as $page => $template) {
-							$settings_object['templates'][$page]['html'] = $stored_themes_settings[$theme_id]->templates[$page]['html'];
+							if (isset($stored_themes_settings[$theme_id]->templates[$page]['html'])) {
+								$settings_object['templates'][$page]['html'] = $stored_themes_settings[$theme_id]->templates[$page]['html'];
+							}
 						}
 						update_option('arlo_settings', $settings_object, 1);
 						update_option('arlo_themes_settings', $stored_themes_settings, 1);
@@ -198,7 +201,7 @@ class Arlo_For_Wordpress_Settings {
 
 		// create a section for the API Endpoint
 		add_settings_section( 'arlo_general_section', __('General Settings', 'arlo-for-wordpress' ), null, 'arlo-for-wordpress' );
-
+		
 		// create API Endpoint field                
 		add_settings_field(
                         'arlo_platform_name', 
@@ -290,8 +293,22 @@ class Arlo_For_Wordpress_Settings {
                             'id' => 'import_callback_host',
                             'label_for' => 'import_callback_host',
                             )
-                );
+				);
+				
+				add_settings_field(
+					'arlo_taxexempt_tag', 
+					'<label for="arlo_taxexempt_tag">'.__('Tax exempt tag', 'arlo-for-wordpress' ).' <a href="https://support.arlo.co/hc/en-gb/articles/115001999286-Set-an-event-as-tax-free" target="_blank"><i class="arlo-icons8 arlo-icons8-help-filled size-16"></i></a></label>', 
+					array($this, 'arlo_simple_input_callback'), 
+					$this->plugin_slug, 'arlo_general_section', 
+					array(
+						'id' => 'taxexempt_tag',
+						'label_for' => 'taxexempt_tag',
+						)
+			);
+			
 
+		add_settings_field('arlo_filters', null, array($this, 'arlo_filter_settings_callback'), $this->plugin_slug, 'arlo_general_section',  array('id'=>'filters'));    
+				
 
 		/*
 		 *
@@ -325,17 +342,6 @@ class Arlo_For_Wordpress_Settings {
 		 
 		add_settings_section('arlo_customcss_section', null, null, $this->plugin_slug );				
 		add_settings_field( 'arlo_customcss', null, array($this, 'arlo_simple_textarea_callback'), $this->plugin_slug, 'arlo_customcss_section', array('id'=>'customcss', 'after_html' => '<p>Learn how to <a href="https://support.arlo.co/hc/en-gb/articles/115001714006" target="_blank">override existing styles</a> by adding <a href="#" class="arlo-settings-link" id="theme_customcss">Custom CSS</a></p>') );
-
-
-		/*
-		 *
-		 * Filters Section Settings
-		 *
-		 */ 
-		 
-		add_settings_section('arlo_filters_section', null, null, $this->plugin_slug );	
-
-		add_settings_field('arlo_filters', null, array($this, 'arlo_filter_settings_callback'), $this->plugin_slug, 'arlo_filters_section',  array('id'=>'filters'));    
 
 		
 		/*
@@ -493,133 +499,48 @@ class Arlo_For_Wordpress_Settings {
 	}
 	
 	function arlo_filter_settings_callback() {
-		$settings_object = get_option('arlo_settings');
-		$setting_id = 'filter_settings';
-		$filter_settings = get_option('arlo_filter_settings', array());
+		$filter_actions = [
+			'rename' => __('Rename', 'arlo-for-wordpress'),
+			'exclude' => __('Exclude', 'arlo-for-wordpress')
+		];
 		
-		$output = '<div id="'.ARLO_PLUGIN_PREFIX.'-filter-select" class="cf">';
+		$output = '<div id="'.ARLO_PLUGIN_PREFIX.'-filter-terminology" class="cf">';
 
-		$output .= '<h3>Filter Settings</h3>';
+		$output .= '<h3>Filter terminology</h3>';
 
-		$output .= '<label>Select page: </label>';
-
-		$output .= '<select name="arlo_settings['.$setting_id.']" id="arlo-filter-settings">';
-
-		$filters_settings_html = '';
-
-		foreach(Arlo_For_Wordpress::$templates as $filter_group => $arlo_template) {
-			$filter_type = (!empty($arlo_template['type']) ? $arlo_template['type'] : $arlo_template['id']);
-
-			//hack, because the key in the templates are not the same as in the filters
-			$filter_type = ($filter_type == 'events' ? 'template' : $filter_type);
-
-			if (!array_key_exists($filter_type, Arlo_For_Wordpress::$available_filters))
-				continue;
-
-			$filter_group_values = Arlo_For_Wordpress::$available_filters[$filter_type];
-			
-		    $output .= '<option value="' . $filter_group . '" >' . $arlo_template['name'] . '</option>';
-
-		    $filters_settings_html .= '<div id="arlo-' . $filter_group . '-filters" class="arlo-filter-group">';
-
-		    foreach($filter_group_values['filters'] as $filter_key => $filter) {
-		    	$filters_settings_html .= '<div class="arlo-filter-settings">';
-
-		    	$filters_settings_html .= '<h4>' . __($filter,'arlo-for-wordpress') . '</h4>';
-
-			    $filters_settings_html .= '
-				    <div id="arlo-filters-header">
-						<div class="arlo-filter-old-value">Option text</div>
-						<div class="arlo-filter-new-value">Replacement text</div>
-						<div class="arlo-filter-toggle">Hide this option?</div>
-				    </div>
-			    ';
-
-			    $filters_settings_html .= '
-				    <div id="arlo-filter-empty">
-						<ul>
-							<li>
-								<div class="arlo-filter-old-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][setting_id][filteroldvalue]" tabindex="1"></div>
-								<div class="arlo-filter-controls">
-									<i class="arlo-icons8-minus arlo-icons8 size-21"></i>
-									<i class="arlo-icons8-plus arlo-icons8 size-21"></i>
-								</div>
-								<div class="arlo-filter-toggle">
-									<input type="checkbox" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][setting_id][filterhideoption]" value="hidden" tabindex="3">
-								</div>
-								<div class="arlo-filter-new-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.'][setting_id][filternewvalue]" tabindex="2"></div>
-							</li>
-						</ul>
-				    </div>
-				    ';
-
-				$filters_settings_html .= '<ul class="arlo-available-filters">';
-
-				if (is_array($filter_settings)) {
-
-					if (!empty($filter_settings[$filter_group][$filter_key]) && count($filter_settings[$filter_group][$filter_key])) {
-
-						foreach($filter_settings[$filter_group][$filter_key] as $old_value => $new_value) {
-							$is_hidden = false;
-					    	$existing_filter_setting_id = rand();
-
-							if (isset($filter_settings["arlohiddenfilters"]) && $filter_settings["arlohiddenfilters"][$filter_group][$filter_key]) {
-								$is_hidden = in_array($old_value,$filter_settings["arlohiddenfilters"][$filter_group][$filter_key]);
-							}
-
-							$checked = $is_hidden ? ' checked="checked"' : '';
-
-							$filters_settings_html .=  '<li>
-								<div class="arlo-filter-old-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$existing_filter_setting_id.'][filteroldvalue]" value="'.$old_value.'" tabindex="1"></div>
-								<div class="arlo-filter-controls">
-									<i class="arlo-icons8-minus arlo-icons8 size-21"></i>
-									<i class="arlo-icons8-plus arlo-icons8 size-21"></i>
-								</div>
-								<div class="arlo-filter-toggle">
-									<input type="checkbox" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$existing_filter_setting_id.'][filterhideoption]" value="hidden" ' . $checked . ' tabindex="3">
-								</div>
-								<div class="arlo-filter-new-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$existing_filter_setting_id.'][filternewvalue]" value="' . $new_value . '" tabindex="2"></div>
-							  </li>
-							 ';
-						}
-
-					}
-
-				}
-
-				$new_filter_setting_id = rand();
-		
-				$filters_settings_html .= '<li>
-						<div class="arlo-filter-old-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$new_filter_setting_id.'][filteroldvalue]" tabindex="1"></div>
-						<div class="arlo-filter-controls">
-							<i class="arlo-icons8-minus arlo-icons8 size-21"></i>
-							<i class="arlo-icons8-plus arlo-icons8 size-21"></i>
-						</div>
-						<div class="arlo-filter-toggle">
-							<input type="checkbox" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$new_filter_setting_id.'][filterhideoption]" value="hidden" tabindex="3">
-						</div>
-						<div class="arlo-filter-new-value"><input type="text" name="arlo_settings[arlo_filter_settings]['.$filter_group.']['.$filter_key.']['.$new_filter_setting_id.'][filternewvalue]" tabindex="2"></div>
-				  </li>
-				</ul>';
-
-				$filters_settings_html .= '</div><hr>';
-		    }
-
-
-
-		    $filters_settings_html .= '</div>';
-
-		}
+		$available_page_filters = array(
+			'generic' => array(
+				'name' => 'Generic',
+				'filters' => array(
+					'delivery' => 'Delivery', 
+				)
+			)
+		);
 				
-		$output .= '</select>';
-
-		$output .= $filters_settings_html;
+		$output .= $this->arlo_output_filter_editor('arlo_filter_settings', $available_page_filters, 'generic', 'generic', $filter_actions, '', 'arlo-always-visible');
 
 		$output .= '</div>';
 
 		echo $output;
-	}	
+	}
 
+	function get_select_filter_options(&$item, $key, $options = []) {
+		if (empty($item['string']) && empty($item['value'])) {
+			$item = array(
+				'string' => $item,
+				'value' => $key,
+				'id' => $key
+			);
+		}
+
+		extract($options);
+
+		$value = (isset($value_field) && isset($item[$value_field]) ? $item[$value_field] : $item["string"]); 
+		
+		$selected = (isset($selected_value) && $value == htmlentities($selected_value) ? ' selected="selected" ' : '');
+
+		$item = "<option value='" . esc_attr($value) . "' " . $selected . ">" . esc_html($item["string"]) . "</option>";
+	}
 
 	function arlo_checkbox_callback($args) {
 		if (empty($args['option_name'])) return;
@@ -686,10 +607,11 @@ class Arlo_For_Wordpress_Settings {
 		echo '</h3>';
 
     	if ($is_custom_shortcode) {
+			$type_name = ($type == 'events' ? 'catalogue' : $type);
 			echo '
 			<div class="arlo-label"><label>' .  __("Shortcode type", 'arlo-for-wordpress' ) . '</label></div>
 			<div class="arlo-field">
-				<span>'.ucfirst($type).' '.__('page', 'arlo-for-wordpress' ).'</span>
+				<span>'.ucfirst($type_name).' '.__('page', 'arlo-for-wordpress' ).'</span>
 			</div><br><br>';
     	}
 
@@ -727,12 +649,12 @@ class Arlo_For_Wordpress_Settings {
     	if ($is_new_shortcode_page) {
     		$this->arlo_output_new_shortcode_page();
     	} else {
-    		$this->arlo_output_template_page($settings_object, $id);
+    		$this->arlo_output_template_page($settings_object, $id, $type);
     	}
 	}
 
-	function arlo_output_template_page($settings_object, $id) {
-	    $val = isset($settings_object['templates'][$id]['html']) ? $settings_object['templates'][$id]['html'] : '';
+	function arlo_output_template_page($settings_object, $id, $type) {
+		$val = isset($settings_object['templates'][$id]['html']) ? $settings_object['templates'][$id]['html'] : '';
 	   
 	    $this->arlo_reload_template($id);
 
@@ -744,9 +666,22 @@ class Arlo_For_Wordpress_Settings {
 	    		. ' content
 	    		</label>
 	    	</div>';
-	    }
+		}
+		
+		echo '
+		<div class="wp-editor-wrap">
+		';
 
-    	wp_editor($val, $id, array('textarea_name'=>'arlo_settings[templates]['.$id.'][html]','textarea_rows'=>'20'));
+		wp_editor($val, $id, array('textarea_name'=>'arlo_settings[templates]['.$id.'][html]','textarea_rows'=>'20'));
+
+		echo '
+		<div class="cf"></div>
+		<h2>' . __('Page filtered by ', 'arlo-for-wordpress' ) . '</h2>
+			' . $this->arlo_output_filter_editor('arlo_page_filter_settings', Arlo_For_Wordpress::$available_page_filters, $type, $id, Arlo_For_Wordpress::$page_filter_options, 'page', 'arlo-always-visible') . '
+		</div>';
+
+		
+
 	}
 
 	function arlo_output_new_shortcode_page() {
@@ -786,6 +721,131 @@ class Arlo_For_Wordpress_Settings {
 				</div>
 				<div class="cf"></div>';
 		}
+	}
+
+	function arlo_output_filter_editor($setting_name, $available_page_filters, $filter_type, $filter_group, $actions = [], $id_prefix = '', $class = '') {
+		$filters_settings_html = '';
+		$filter_settings = get_option($setting_name, array());
+
+		//hack, because the key in the templates are not the same as in the filters
+		$filter_type = ($filter_type == 'events' ? 'template' : $filter_type);
+
+		$filter_group_values = (isset($available_page_filters[$filter_type]) ? $available_page_filters[$filter_type] : []);
+
+		$available_filters = [];
+		if (isset($filter_group_values['filters']) && is_array($filter_group_values['filters'])) {;
+			$available_filters = $filter_group_values['filters'];
+		}
+		
+		$filters_settings_html .= '<div id="arlo-' . (!empty($id_prefix) ? $id_prefix . '-' : '') . $filter_group . '-filters" class="arlo-filter-group ' . $class . '">';
+		$import_id = Arlo_For_Wordpress::get_instance()->get_importer()->get_current_import_id();
+
+		if (count($available_filters) && !empty($import_id)) {
+			
+			foreach($available_filters as $filter_key => $filter) {
+				$filter_options = \Arlo\Shortcodes\Filters::get_filter_options($filter_key, $import_id);
+				$default_filter_options = $filter_options;
+				array_walk($default_filter_options, 'self::get_select_filter_options', ['value_field' => 'id']);
+
+				$expand_filter = (!empty($filter_settings[$filter_group][$filter_key]) && count($filter_settings[$filter_group][$filter_key])) 
+								|| (!empty($filter_settings["hiddenfilters"][$filter_group][$filter_key])) 
+								|| (!empty($filter_settings["showonlyfilters"][$filter_group][$filter_key]));
+	
+								$filters_settings_html .= '
+								<div class="arlo-filter-settings ' . ($expand_filter ? 'filter-section-expanded' : '') . '">
+									<a class="arlo-filter-section-toggle"><h2>' . __($filter,'arlo-for-wordpress') . '</h2></a>
+									<div id="arlo-filter-empty">
+										<ul>
+											' . $this->arlo_output_filter_actions($actions, $setting_name, $default_filter_options, $filter_group, $filter_key, '', 'setting_id') . '
+										</ul>
+									</div>
+								
+									<ul class="arlo-available-filters" style="display: ' . ($expand_filter ? 'block' : 'none') . '">
+									';
+
+				if (is_array($filter_settings)) {
+
+					if (!empty($filter_settings[$filter_group][$filter_key]) && count($filter_settings[$filter_group][$filter_key])) {
+						foreach($filter_settings[$filter_group][$filter_key] as $old_value => $new_value) {
+							/* rename entries */								
+							$filter_rename_setting_options = $filter_options;
+							array_walk($filter_rename_setting_options, 'self::get_select_filter_options', ['selected_value' => $old_value, 'value_field' => 'id']);
+							$filters_settings_html .= $this->arlo_output_filter_actions($actions, $setting_name, $filter_rename_setting_options, $filter_group, $filter_key, $new_value, rand(), 'rename');
+						}
+					}
+	
+					if (!empty($filter_settings["hiddenfilters"][$filter_group][$filter_key])) {
+						foreach($filter_settings["hiddenfilters"][$filter_group][$filter_key] as $old_value) {
+							/* hidden/exclude entries */	
+							$filter_hidden_setting_options = $filter_options;
+							array_walk($filter_hidden_setting_options, 'self::get_select_filter_options', ['selected_value' => $old_value, 'value_field' => 'id']);
+							$filters_settings_html .= $this->arlo_output_filter_actions($actions, $setting_name, $filter_hidden_setting_options, $filter_group, $filter_key, '', rand(), 'exclude');
+						}
+					}
+	
+					if (!empty($filter_settings["showonlyfilters"][$filter_group][$filter_key])) {
+						foreach($filter_settings["showonlyfilters"][$filter_group][$filter_key] as $old_value) {
+							/* show only entries */
+							$filter_hidden_setting_options = $filter_options;
+							array_walk($filter_hidden_setting_options, 'self::get_select_filter_options', ['selected_value' => $old_value, 'value_field' => 'id']);
+							$filters_settings_html .= $this->arlo_output_filter_actions($actions, $setting_name, $filter_hidden_setting_options, $filter_group, $filter_key, '', rand(), 'showonly');
+						}
+					}				
+				}
+
+				/* Empty entry */
+				array_walk($filter_options, 'self::get_select_filter_options', ['value_field' => 'id']);
+				$filters_settings_html .= $this->arlo_output_filter_actions($actions, $setting_name, $filter_options, $filter_group, $filter_key, '', rand());
+	
+				$filters_settings_html .= '</ul></div>';						
+			}
+		} else {
+			$filters_settings_html .= '<div>' . __('No filter option available', 'arlo-for-wordpress') . '</div>';
+		}
+
+		$filters_settings_html .= '</div>';
+
+		return $filters_settings_html;
+	}
+
+	function arlo_output_filter_actions($actions,  $setting_name, $filter_options_array = [], $filter_group, $filter_key, $filter_new_value, $settings_id, $selected_action = '') {
+		$option_html = '
+		<li>';
+		
+		if (is_array($actions) && count($actions)) {
+			$actions = array_merge(['' => __('Select an action', 'arlo-for-wordpress')], $actions);
+			$option_html .= '
+			<div class="arlo-filter-action">
+				<select name="arlo_settings[' . $setting_name . ']['.$filter_group.']['.$filter_key.'][' . $settings_id . '][filteraction]">
+				';
+				
+			foreach ($actions as $value => $text) {
+				$selected = ($value == $selected_action ? 'selected="selected"' : '');
+				$option_html .= sprintf('<option value="%s" %s>%s</option>', esc_attr($value), $selected, esc_html($text));
+			}
+						
+			$option_html .= '
+					</select>
+				</div>';
+		}
+
+		$option_html .= '
+			<div class="arlo-filter-controls">
+				<i class="arlo-icons8-minus arlo-icons8 size-21"></i>
+				<i class="arlo-icons8-plus arlo-icons8 size-21"></i>
+			</div>
+
+			<div class="arlo-filter-old-value">
+				<select name="arlo_settings[' . $setting_name . '][' . $filter_group . '][' . $filter_key . '][' . $settings_id . '][filteroldvalue]">
+					<option value="">Select an option</option>' .
+						implode($filter_options_array, '')
+				. '</select>
+			</div>
+
+			<div class="arlo-filter-new-value" ' . (!empty($filter_new_value) ? 'style="display: block"' : '') . '><input type="text" name="arlo_settings[' . $setting_name . '][' . $filter_group . '][' . $filter_key . '][' . $settings_id . '][filternewvalue]" value="' . $filter_new_value . '" maxlength="64"></div>
+		</li>';
+
+		return $option_html;
 	}
 	
 	function arlo_check_current_tasks() {
@@ -883,6 +943,34 @@ class Arlo_For_Wordpress_Settings {
 		<p><strong>If you are experiencing problems after an update, please deactivate and re-activate the plugin and re-synchronize the data.</strong></p>
 		
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">
+				<li>Remove the ability to rename and exclude filter options</li>
+				<li>New "Starter template" Arlo Theme</li>
+				<li>Use category header as meta description if category is selected as a filter</li>
+				<li>Ability to filter <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes" target="_blank">global level shortcodes</a> by mutliple categories/location/templatetag/eventtag</li>
+				<li>Delivery filter for on demand events (online activities)</li>
+				<li>Support tax exempt tags</li>
+				<li>Make venue related shortcodes available within the <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_list_item" target="_blank">[arlo_event_list_item]</a> or <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/upcomingeventrelated#arlo_upcoming_list_item" target="_blank">[arlo_upcoming_list_item]</a> shortcodes</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_duration_description" target="_blank">[arlo_event_duration_description]</a> shortcode</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_dates" target="_blank">[arlo_event_dates]</a> shortcode</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_isfull" target="_blank">[arlo_event_isfull]</a> shortcode</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_offers_hasdiscount" target="_blank">[arlo_event_offers_hasdiscount]</a> shortcode</li>
+				<li>New "show_child_elements" attribute for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/upcomingeventrelated#arlo_upcoming_list_item" target="_blank">[arlo_upcoming_list_item]</a></li>
+				<li>New "layout" attribute for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_session_list_item" target="_blank">[arlo_event_session_list_item]</a> to show the session information as a tooltip or as a popup</li>
+				<li>New "separator" attribute for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_next_running" target="_blank">[arlo_event_next_running]</a></li>
+				<li>New <em>{%count%}</em> placeholder in "text" attribute for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_next_running" target="_blank">[arlo_event_next_running]</a></li>
+				<li>Allow import with PHP 7.2 on Linux</li>
+				<li>Filters was not redirecting properly when containing slashes</li>
+				<li>Show all except on Tags still show event if it has multiple tags</li>
+				<li>Reset button moves on selection of drop down (Jazz Theme)</li>
+				<li>Ensure filter priority - user first global shortcode second and filter by page at last</li>
+				<li>Session tags are not diplayed by <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_tags" target="_blank">[arlo_event_tags]</a></li>
+				<li>With some Arlo Themes <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_template_region_selector" target="_blank">[arlo_template_region_selector]</a> and <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_template_search_region_selector" target="_blank">[arlo_template_search_region_selector]</a> are breaking the layout</li>
+			</ul>
+		</p>
+
+		<h4>Version 3.5.2</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">	  
 				<li>Allow import with PHP 7.2</li>

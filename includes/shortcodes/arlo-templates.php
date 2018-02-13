@@ -53,6 +53,8 @@ class Templates {
         $settings = get_option('arlo_settings');  
         $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
 
+        $join = [];
+
         extract(shortcode_atts(array(
             'limit'	=> 5,
             'base' => 'category',
@@ -83,7 +85,7 @@ class Templates {
                             )
                 ";
                 
-                $join = "		
+                $join['t'] = "		
                 LEFT JOIN 
                     {$wpdb->prefix}arlo_eventtemplates_tags AS t
                 ON
@@ -106,7 +108,7 @@ class Templates {
                             )
                 ";		
             
-                $join = "
+                $join['c'] = "
                 LEFT JOIN 
                     {$wpdb->prefix}arlo_eventtemplates_categories AS c
                 ON
@@ -118,7 +120,7 @@ class Templates {
         }
             
         if ($onlyscheduled === "true") {
-            $join .= "
+            $join['e'] = "
             INNER JOIN 
                 {$wpdb->prefix}arlo_events AS e
             ON
@@ -145,7 +147,7 @@ class Templates {
                 et.et_registerinteresturi 
             FROM 
                 {$wpdb->prefix}arlo_eventtemplates AS et
-            {$join}
+            " . implode("\n", $join) ."
             WHERE 
                 et.import_id = " . $import_id . "
             AND
@@ -253,25 +255,42 @@ class Templates {
     }
 
     private static function shortcode_event_template_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        if (get_option('arlo_plugin_disabled', '0') == '1') return;
-
+        
         $template_name = Shortcodes::get_template_name($shortcode_name,'event_template_list','events');
-        $templates = arlo_get_option('templates');
-        $content = $templates[$template_name]['html'];
 
-        self::$event_template_atts = self::get_event_template_atts($atts);
-
-	    return $content;
+	    return self::template_list_initializer($content, $atts, $shortcode_name, $import_id, $template_name);
     }
 
     private static function shortcode_schedule($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        if (get_option('arlo_plugin_disabled', '0') == '1') return;
+
         $template_name = Shortcodes::get_template_name($shortcode_name,'schedule','schedule');
+
+        return self::template_list_initializer($content, $atts, $shortcode_name, $import_id, $template_name);
+    }
+
+    private static function template_list_initializer($content = '', $atts = [], $shortcode_name = '', $import_id = '', $template_name) {
+        if (get_option('arlo_plugin_disabled', '0') == '1') return;
+
+        $filter_settings = get_option('arlo_page_filter_settings', []);        
+        
         $templates = arlo_get_option('templates');
         $content = $templates[$template_name]['html'];
 
-        self::$event_template_atts = self::get_event_template_atts($atts);
-        return $content;
+        self::$event_template_atts = self::get_event_template_atts($atts, $import_id);
+
+        \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Utilities::convert_string_to_int_array');
+        \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Utilities::convert_string_to_int_array', null, true);
+        
+        \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id]);
+        \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id], true);
+
+        \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Utilities::convert_string_to_int_array');
+        \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Utilities::convert_string_to_int_array', null, true);
+
+        \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Utilities::convert_string_to_string_array');
+        \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Utilities::convert_string_to_string_array', null, true);        
+
+        return $content;        
     }
 
     private static function shortcode_event_template_search_list ($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -281,19 +300,24 @@ class Templates {
         $content = $templates['eventsearch']['html'];
         $GLOBALS['arlo_search_page'] = true;
 
-        self::$event_template_atts = self::get_event_template_atts($atts);
+        self::$event_template_atts = self::get_event_template_atts($atts, $import_id);
 
         return $content;
     }
 
-    private static function get_event_template_atts($atts) {
+    private static function get_event_template_atts($atts, $import_id) {
         $new_atts = [];
 
+        $templatetag = \Arlo\Entities\Tags::get_tag_ids_by_tag(\Arlo\Utilities::get_att_string('templatetag', $atts), $import_id);        
+
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'location', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'locationhidden', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'category', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'categoryhidden', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'search', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_int', 'delivery', $atts);
-        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'templatetag', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_int', 'deliveryhidden', $atts);        
+        $new_atts = \Arlo\Utilities::process_att($new_atts, null, 'templatetag', $atts, $templatetag);        
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'state', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo_For_Wordpress::get_region_parameter', 'region');
 
@@ -364,7 +388,7 @@ class Templates {
         $sql = self::generate_list_sql($atts, $import_id);
 
         $items = $wpdb->get_results($sql, ARRAY_A);
-            
+
         if(empty($items)) :
             if (!(isset($atts['show_only_at_bottom']) && $atts['show_only_at_bottom'] == "true" && isset($GLOBALS['arlo_categories_count']) && $GLOBALS['arlo_categories_count'])) :
                 $GLOBALS['no_event_text'] = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', 'arlo-for-wordpress');
@@ -495,9 +519,10 @@ class Templates {
         $output = '';
         
         if (!empty($GLOBALS['no_event']) && !empty($GLOBALS['no_onlineactivity'])) {
-            $no_event_text = !empty($settings['noeventontemplate_text']) ? $settings['noeventontemplate_text'] : __('Interested in attending? Have a suggestion about running this course near you?', 'arlo-for-wordpress');
+            $no_event_text = __('No scheduled event', 'arlo-for-wordpress');
             
             if (!empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) {
+                $no_event_text = !empty($settings['noeventontemplate_text']) ? $settings['noeventontemplate_text'] : __('Interested in attending? Have a suggestion about running this course near you?', 'arlo-for-wordpress');
                 $no_event_text .= '<br /><a href="' . esc_url($GLOBALS['arlo_eventtemplate']['et_registerinteresturi']) . '">' . __('Register your interest now', 'arlo-for-wordpress') . '</a>';
             }
             
@@ -578,133 +603,14 @@ class Templates {
 
         foreach(\Arlo_For_Wordpress::$available_filters[$page_type == 'schedule' ? 'schedule' : 'template']['filters'] as $filter_key => $filter):
 
-            $att = strval(self::$event_template_atts[$filter_key]);
+            $att = (isset(self::$event_template_atts[$filter_key]) && is_string(self::$event_template_atts[$filter_key]) ? self::$event_template_atts[$filter_key] : '');
 
             if (!in_array($filter_key, $filters_array))
                 continue;
 
-            switch($filter_key) :
+            $items = Filters::get_filter_options($filter_key, $import_id);
 
-                case 'category' :
-
-                    //root category select
-                    $cats = CategoriesEntity::getTree(0, 1, 0, $import_id); 
-                    if (!empty($cats)) {
-                        $cats = CategoriesEntity::getTree($cats[0]->c_arlo_id, 100, 0, $import_id);
-                    }
-                    
-                    if (is_array($cats)) {
-                        $filter_html .= Shortcodes::create_filter($filter_key, CategoriesEntity::child_categories($cats), __('All categories', 'arlo-for-wordpress'), $filter_group, $att);
-                    }
-                    
-                    break;
-                    
-                case 'delivery' :
-
-                    // delivery select
-
-                    $filter_html .= Shortcodes::create_filter($filter_key, \Arlo_For_Wordpress::$delivery_labels, __('All delivery options', 'arlo-for-wordpress'), $filter_group, $att);
-
-                    break;              
-
-                case 'location' :
-
-                    // location select
-
-                    $t1 = "{$wpdb->prefix}arlo_events";
-
-                    $items = $wpdb->get_results(
-                        "SELECT 
-                            DISTINCT(e.e_locationname)
-                        FROM 
-                            $t1 e 
-                        WHERE 
-                            e_locationname != ''
-                        AND
-                            e.import_id = " . $import_id . "
-                        GROUP BY 
-                            e.e_locationname 
-                        ORDER BY 
-                            e.e_locationname", ARRAY_A);
-
-                    $locations = array();
-
-                    foreach ($items as $item) {
-                        $locations[] = array(
-                            'string' => $item['e_locationname'],
-                            'value' => $item['e_locationname'],
-                        );
-                    }
-
-                    $filter_html .= Shortcodes::create_filter($filter_key, $locations, __('All locations', 'arlo-for-wordpress'), $filter_group, $att);
-
-                    break;
-
-                case 'state' :
-                    $items = $wpdb->get_results(
-                        "SELECT DISTINCT
-                            v.v_physicaladdressstate
-                        FROM 
-                            {$wpdb->prefix}arlo_venues AS v
-                        LEFT JOIN 
-                            {$wpdb->prefix}arlo_events AS e
-                        ON
-                            v.v_arlo_id = e.v_id
-                        AND
-                            v.import_id = e.import_id
-                        WHERE 
-                            e.import_id = $import_id
-                        ORDER BY v_name", ARRAY_A);
-
-
-                    $states = array();
-
-                    foreach ($items as $item) {
-                        if (!empty($item['v_physicaladdressstate']) || in_array($item['v_physicaladdressstate'],[0,"0"], true) ) {
-                            $states[] = array(
-                                'string' => $item['v_physicaladdressstate'],
-                                'value' => $item['v_physicaladdressstate'],
-                            );
-                        }
-                    }
-
-                    $filter_html .= Shortcodes::create_filter($filter_key, $states, __('Select state', 'arlo-for-wordpress'), $filter_group, $att);                
-                    
-                    break;
-
-                case 'templatetag' :
-                    //template tag select
-                    
-                    $items = $wpdb->get_results(
-                        "SELECT DISTINCT
-                            t.id,
-                            t.tag
-                        FROM 
-                            {$wpdb->prefix}arlo_eventtemplates_tags AS ett
-                        LEFT JOIN 
-                            {$wpdb->prefix}arlo_tags AS t
-                        ON
-                            t.id = ett.tag_id
-                        AND
-                            t.import_id = ett.import_id
-                        WHERE 
-                            ett.import_id = $import_id
-                        ORDER BY tag", ARRAY_A);
-
-                    $tags = array();
-                    
-                    foreach ($items as $item) {
-                        $tags[] = array(
-                            'string' => $item['tag'],
-                            'value' => $item['tag'],
-                        );
-                    }
-
-                    $filter_html .= Shortcodes::create_filter($filter_key, $tags, __('Select tag', 'arlo-for-wordpress'), $filter_group, $att);                
-                    
-                    break;
-
-            endswitch;
+            $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'), 'generic', $att, $filter_group);
 
         endforeach; 
             
@@ -804,86 +710,143 @@ class Templates {
         $t5 = "{$wpdb->prefix}arlo_events";
         $t6 = "{$wpdb->prefix}arlo_eventtemplates_tags";
         $t7 = "{$wpdb->prefix}arlo_tags";
+        $t8 = "{$wpdb->prefix}arlo_onlineactivities";
             
         $where = "WHERE post.post_type = 'arlo_event' AND et.import_id = %d";
         $group = (isset($GLOBALS['arlo_group_template_by_id']) && $GLOBALS['arlo_group_template_by_id']) ? 'GROUP BY et.et_arlo_id' : '';	
         $parameters[] = $import_id;
 
-        $join = "";
+        $join = [];
         $field_list = "";
 
         $arlo_location = !empty($atts['location']) ? $atts['location'] : null;
+        $arlo_locationhidden = !empty($atts['locationhidden']) ? $atts['locationhidden'] : null;
         $arlo_state = !empty($atts['state']) ? $atts['state'] : null;
         $arlo_category = !empty($atts['category']) ? $atts['category'] : null;
+        $arlo_categoryhidden = !empty($atts['categoryhidden']) ? $atts['categoryhidden'] : null;        
         $arlo_delivery = isset($atts['delivery']) ? $atts['delivery'] : null;
+        $arlo_deliveryhidden = isset($atts['deliveryhidden']) ? $atts['deliveryhidden'] : null;        
         $arlo_templatetag = !empty($atts['templatetag']) ? $atts['templatetag'] : null;
+        $arlo_templatetaghidden = isset($atts['templatetaghidden']) ? $atts['templatetaghidden'] : null;        
         $arlo_search = !empty($atts['search']) ? $atts['search'] : null;
         $arlo_region = !empty($atts['region']) ? $atts['region'] : null;
 
-        if(!empty($arlo_location) || (isset($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) || !empty($arlo_state) ) :
+        if (isset($arlo_delivery) && !is_array($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) {
+            $arlo_delivery = [$arlo_delivery];
+        }
 
-            $join .= " LEFT JOIN $t5 e ON e.et_arlo_id = et.et_arlo_id AND e.import_id = et.import_id";
-            $where .= " AND e.e_parent_arlo_id = 0";
-            
-            if(!empty($arlo_location)) :
-                $where .= " AND e.e_locationname = %s ";
-                $parameters[] = $arlo_location;
-            endif;	
-            
-            if(isset($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) :
-                $where .= " AND e.e_isonline = %d ";
-                $parameters[] = $arlo_delivery;
-            endif;	
-            
-            if (!empty($arlo_region)) {
-                $where .= ' AND e.e_region = %s';
-                $parameters[] = $arlo_region;
+        if (isset($arlo_deliveryhidden) && !is_array($arlo_deliveryhidden) && strlen($arlo_deliveryhidden) && is_numeric($arlo_deliveryhidden)) {
+            $arlo_deliveryhidden = [$arlo_deliveryhidden];
+        }
+
+        if (!empty($arlo_location) && !is_array($arlo_location)) {
+            $arlo_location = [$arlo_location];
+        }
+
+        if (!empty($arlo_locationhidden) && !is_array($arlo_locationhidden)) {
+            $arlo_locationhidden = [$arlo_locationhidden];
+        }
+
+        if (!empty($arlo_location)) {
+            $where .= " AND e.e_locationname IN (" . implode(',', array_map(function() {return "%s";}, $arlo_location)) . ")";                
+            $parameters = array_merge($parameters, $arlo_location);    
+        }
+
+        if (!empty($arlo_locationhidden)) {    
+            $where .= " AND e.e_locationname NOT IN (" . implode(',', array_map(function() {return "%s";}, $arlo_locationhidden)) . ")";                
+            $parameters = array_merge($parameters, $arlo_locationhidden);    
+        }
+
+        if(isset($arlo_delivery) || isset($arlo_deliveryhidden)) {
+            if (isset($arlo_delivery)) {
+                $where .= ' AND ( 1 ';
+                foreach ($arlo_delivery as $delivery) {
+                    switch ($delivery) {
+                        case 0:
+                        case 1: 
+                            $where .=  " AND e.e_isonline = %d ";
+                            $parameters[] = $delivery;    
+                            $where .= " AND e.e_parent_arlo_id = 0 ";
+                        break;
+                        case 99: 
+                            $join['oa'] = " LEFT JOIN $t8 AS oa ON oa.oat_arlo_id = et.et_arlo_id AND oa.import_id = et.import_id ";
+                            $where .= (count($arlo_delivery) > 1 ? ' OR ' : ' AND ') . ' oa_id IS NOT NULL ';
+                        break;        
+                    } 
+                }
+                $where .= ' ) ';
+                
             }
 
-            if(!empty($arlo_state)) :                
-                $join .= "
-                    LEFT JOIN $t5 ce ON e.e_arlo_id = ce.e_parent_arlo_id AND e.import_id = ce.import_id
-                ";
+            if (isset($arlo_deliveryhidden)) {            
+                $join['oa'] = " LEFT JOIN $t8 AS oa ON oa.oat_arlo_id = et.et_arlo_id AND oa.import_id = et.import_id ";
+                foreach ($arlo_deliveryhidden as $delivery) {
+                    switch ($delivery) {
+                        case 0:
+                        case 1: 
+                            $where .= " AND ( (e.e_parent_arlo_id = 0 AND e.e_isonline != %d ) OR oa_id IS NOT NULL )";
+                            $parameters[] = $delivery;
+                        break;
+                        case 99: 
+                            $where .= " AND e.e_parent_arlo_id = 0 ";
+                        break;        
+                    } 
+                }
+            }
+        } else {
+            $where .= " AND e.e_parent_arlo_id = 0 ";
+        }
+        
+        if (!empty($arlo_region)) {
+            $where .= ' AND e.e_region = %s';
+            $parameters[] = $arlo_region;
+        }
 
-                $venues_query = $wpdb->prepare("SELECT v.v_arlo_id FROM {$wpdb->prefix}arlo_venues v WHERE v.v_physicaladdressstate = %s", $arlo_state);
+        if(!empty($arlo_state)) :                
+            $join['ce']  = " LEFT JOIN $t5 ce ON e.e_arlo_id = ce.e_parent_arlo_id AND e.import_id = ce.import_id ";
+
+            $venues = \Arlo\Entities\Venues::get(['state' => $arlo_state], null, null, $import_id);
+
+            if(is_array($venues) && count($venues) > 1) {
                 $venues = array_map(function ($venue) {
-                  return $venue['v_arlo_id'];
-                }, $wpdb->get_results( $venues_query, ARRAY_A));
-
+                    return $venue['v_arlo_id'];
+                }, $venues);
+                
                 $GLOBALS['state_filter_venues'] = $venues;
 
-                if(is_array($venues) && count($venues) > 1) {
-                    $ids_string = implode(',', array_map(function() {return "%d";}, $venues));
-                    $where .= " AND (ce.v_id IN (" . $ids_string . ") OR e.v_id IN (" . $ids_string . "))";
-                    $parameters = array_merge($parameters, $venues);
-                    $parameters = array_merge($parameters, $venues);
-                } else {
-                    if (is_array($venues)) {
-                        $venues = array_shift($venues);
-                    }
+                $ids_string = implode(',', array_map(function() {return "%d";}, $venues));
+                $where .= " AND (ce.v_id IN (" . $ids_string . ") OR e.v_id IN (" . $ids_string . "))";
 
-                    $where .= " AND (ce.v_id = %d OR e.v_id = %d)";
-                    $parameters[] = $venues;
-                    $parameters[] = $venues;	
-                }                
-
-            endif;
-
-            $group = 'GROUP BY et.et_arlo_id';
-            
-        endif;	
-        
-        if(!empty($arlo_templatetag)) :
-            $join .= " LEFT JOIN $t6 ett ON et.et_id = ett.et_id AND ett.import_id = et.import_id";
-            
-            
-            if (!is_numeric($arlo_templatetag)) {
-                $where .= " AND tag.tag = %s ";
-                $parameters[] = $arlo_templatetag;
-                $join .= " LEFT JOIN $t7 tag ON tag.id = ett.tag_id AND ett.import_id = tag.import_id";
+                $parameters = array_merge($parameters, $venues);
+                $parameters = array_merge($parameters, $venues);
             } else {
-                $where .= " AND ett.tag_id = %d ";
-                $parameters[] = intval($arlo_templatetag);
+                if (is_array($venues)) {
+                    $venues = array_shift($venues);
+                }
+
+                $where .= " AND (ce.v_id = %d OR e.v_id = %d)";
+                $parameters[] = $venues;
+                $parameters[] = $venues;	
+            }                
+
+        endif;
+
+        $group = 'GROUP BY c.c_arlo_id, et.et_arlo_id';
+            
+
+        if(!empty($arlo_templatetag) || !empty($arlo_templatetaghidden)) :
+
+            if (!empty($arlo_templatetag)) {
+                $join['ett'] = " LEFT JOIN $t6 AS ett ON et.et_id = ett.et_id AND ett.import_id = et.import_id ";
+
+                $where .= " AND ett.tag_id IN (" . implode(',', array_map(function() {return "%d";}, $arlo_templatetag)) . ")";
+                $parameters = array_merge($parameters, $arlo_templatetag);    
+            }
+            
+            if (!empty($arlo_templatetaghidden)) {
+                $tag_id_substitutes = implode(', ', array_map(function() {return "%d";}, $arlo_templatetaghidden));
+                $where .= " AND NOT EXISTS( SELECT tag_id FROM $t6 WHERE tag_id IN ($tag_id_substitutes) AND et.et_id = et_id AND import_id = et.import_id )";
+                $parameters = array_merge($parameters, $arlo_templatetaghidden);
             }
         endif;
 
@@ -908,48 +871,38 @@ class Templates {
             $where .= ' AND et.et_region = %s';
             $parameters[] = $arlo_region;
         }		
+        
+        $GLOBALS['show_child_elements'] = false;
+        if(!empty($arlo_category) || !empty($arlo_categoryhidden)) {
+            $arlo_category = \Arlo\Utilities::convert_string_to_int_array($arlo_category);
+            $arlo_categoryhidden = \Arlo\Utilities::convert_string_to_int_array($arlo_categoryhidden);
+
+            $where .= ' AND (';
+
+            if (!empty($arlo_category)) {
+                $where .= " c.c_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $arlo_category)) . ")";                
+                $parameters = array_merge($parameters, $arlo_category);    
+            }
+
+            if (!empty($arlo_categoryhidden)) {
+                if (!empty($arlo_category))
+                    $where .= " AND ";
+
+                //need to exclude all the child categories
+                $categoriesnot_flatten_list = CategoriesEntity::get_flattened_category_list_for_filter($arlo_categoryhidden, [], $import_id);
                 
-        if(!empty($arlo_category) || !empty($atts['category'])) {
-
-            $cat_id = 0;
-
-            $cat_slug = (!empty($arlo_category) ? $arlo_category : $atts['category']);
-
-            $where .= " AND ( c.c_slug = %s";
-            $parameters[] = $cat_slug;
+                $where .= " ( c.c_arlo_id NOT IN (" . implode(',', array_map(function() {return "%d";}, $categoriesnot_flatten_list)) . ") OR c.c_arlo_id IS NULL)";
+                $parameters = array_merge($parameters, array_map(function($cat) { return $cat['id']; }, $categoriesnot_flatten_list));
+            }
             
-            $cat_id = $wpdb->get_var($wpdb->prepare("
-            SELECT
-                c_arlo_id
-            FROM 
-                {$wpdb->prefix}arlo_categories
-            WHERE 
-                c_slug = %s
-            AND
-                import_id = %d
-            ", [$cat_slug, $import_id]));
-            
-            if (is_null($cat_id)) {
-                $cat_id = 0;
-            } 
-            
-            if (isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true") {
+            if ((isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true") || (isset($GLOBALS['show_child_elements']) && $GLOBALS['show_child_elements'])) {
                 $GLOBALS['show_child_elements'] = true;
-            
-                $cats = CategoriesEntity::getTree($cat_id, null, 0, $import_id);
 
-                $categories_tree = CategoriesEntity::child_categories($cats);
-
-                if (is_array($categories_tree)) {
-                    $ids = array_map(function($item) {
-                        return $item['id'];
-                    }, $categories_tree);
+                $categories_flatten_list = CategoriesEntity::get_flattened_category_list_for_filter($arlo_category, $arlo_categoryhidden, $import_id);
                     
-                    
-                    if (is_array($ids) && count($ids)) {
-                        $where .= " OR c.c_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $ids)) . ")";
-                        $parameters = array_merge($parameters, $ids);
-                    }
+                if (is_array($categories_flatten_list) && count($categories_flatten_list)) {
+                    $where .= " OR c.c_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $categories_flatten_list)) . ")";
+                    $parameters = array_merge($parameters, array_map(function($cat) { return $cat['id']; }, $categories_flatten_list));
                 }
             } 
             
@@ -977,7 +930,7 @@ class Templates {
 
             $limit_field = " LIMIT $offset,$limit ";
 
-            $field_list = "et.*, post.ID as post_id, etc.c_arlo_id, c.*" . ($additional_fields ? ' ,' . implode(' ,', $additional_fields) : '');
+            $field_list = "et.*, post.ID as post_id, etc.c_arlo_id, c.*, e.e_is_taxexempt" . ($additional_fields ? ' ,' . implode(' ,', $additional_fields) : '');
         }
         
         $sql = "
@@ -985,20 +938,22 @@ class Templates {
             $field_list 
         FROM 
             $t1 et 
-        $join
+        " . implode("\n", $join) . "
         LEFT JOIN $t2 post 
             ON et.et_post_id = post.ID 
         LEFT JOIN $t3 etc
             ON etc.et_arlo_id = et.et_arlo_id AND etc.import_id = et.import_id
         LEFT JOIN $t4 c
             ON c.c_arlo_id = etc.c_arlo_id AND c.import_id = etc.import_id
+        LEFT JOIN $t5 e
+            ON e.et_arlo_id = et.et_arlo_id AND e.import_id = et.import_id
         $where 
         $group 
         $order
         $limit_field";
 
         $query = $wpdb->prepare($sql, $parameters);
-
+        
         if ($query) {
             return $query;
         } else {

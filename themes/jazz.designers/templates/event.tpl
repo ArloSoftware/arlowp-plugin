@@ -15,12 +15,11 @@
                     <div class="arlo-date">
                         [arlo_event_start_date format="%d %B"]
                     </div>
-                    <div class="arlo-event-time">[arlo_event_duration], [arlo_event_start_date format="%I:%M %p"] - [arlo_event_end_date format="%I:%M %p"]</div>
+                    <div class="arlo-event-time">[arlo_event_duration_description format="%I:%M %p"]</div>
                 </div>
 
                 <div class="arlo-event-body">
                    [arlo_event_location label="" wrap="<div class='arlo-event-location'>%s</div>"]
-                   [arlo_event_session_description wrap='<div class="arlo-event-session-description">%s</div>']
                    [arlo_event_session_list_item]
                        <div class="arlo_session">
                            <h6>[arlo_event_name]</h6>
@@ -29,6 +28,7 @@
                        </div>
                    [/arlo_event_session_list_item]
                    [arlo_event_presenters wrap='<div class="arlo-event-presenters">%s</div>']
+                   [arlo_event_notice wrap='<div class="arlo-event-notice">%s</div>']
                    [arlo_event_credits wrap='<div class="arlo-event-credits">%s</div>']
                    [arlo_event_offers wrap='<div class="arlo-color4">%s</div>']
                    [arlo_event_tags layout="list"]
@@ -38,7 +38,12 @@
         [arlo_event_rich_snippet]
         [/arlo_event_list_item]
         [/arlo_event_list]
-        
+    </ul>
+
+    [arlo_event_template_register_interest wrap='<div class="arlo-background-color2">%s</div>']
+    [arlo_suggest_datelocation wrap="<div class='arlo-suggest arlo-background-color2'>%s</div>"]
+
+    <ul class="arlo-list arlo-show-more template-online-activities">
         [arlo_oa_list]
             [arlo_oa_list_item]
             <li class="arlo-cf arlo-online-activity arlo-background-color2">
@@ -48,17 +53,13 @@
                     
                     [arlo_oa_delivery_description wrap='<div class="arlo-delivery-desc">%s</div>']
                     [arlo_oa_offers]
-                    [arlo_oa_registration]
+                    [arlo_oa_registration class="arlo-button"]
             </li>
             [arlo_oa_rich_snippet]
             [/arlo_oa_list_item]
-        [/arlo_oa_list]
-        
+        [/arlo_oa_list]     
     </ul>
 
-    [arlo_event_template_register_interest wrap='<div class="arlo-background-color2">%s</div>']
-    [arlo_suggest_datelocation wrap="<div class='arlo-suggest arlo-background-color2'>%s</div>"]
-    
     <div class="arlo-content-fields">
     [arlo_content_field_item]
        <div class="arlo-content-field">

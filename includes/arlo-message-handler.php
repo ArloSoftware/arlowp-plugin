@@ -108,7 +108,18 @@ class MessageHandler {
 		
 		return $query !== false;
 	}	
-	
+
+	public function delete_messages($type) {			
+		$sql = '
+			DELETE FROM 
+				' . $this->table . ' 
+			WHERE type = %s
+		';
+
+		$query = $this->dbl->query($this->dbl->prepare($sql, $type));
+	}	
+
+
 	public function get_messages($type = null, $global = false) {
 		$global = (isset($global) && is_bool($global) ? $global : null );
 		$type = (!empty($type) ? $type : null);

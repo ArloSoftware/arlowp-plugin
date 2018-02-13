@@ -568,6 +568,11 @@ body.arlo {
     border: none;
 }
 
+.arlo#arlo .arlo-next-running > a,
+.arlo#arlo .arlo-next-running > span  {
+    margin-left: 0.5em;
+}
+
 
 
 
@@ -646,8 +651,12 @@ body.arlo {
     border-radius: 50%;
 }
 
-.arlo#arlo .upcoming .arlo-event-subhead > div:last-child:after {
+.arlo#arlo .upcoming .arlo-event-subhead > div:first-child:last-child:after {
     display: none;
+}
+
+.arlo#arlo .upcoming .arlo-event-notice {
+    margin-bottom: .5em;
 }
 
 .arlo#arlo .upcoming .arlo-template-summary {
@@ -775,7 +784,7 @@ body.arlo {
     overflow: hidden;
 }
 
-.arlo#arlo .arlo-list.events .arlo-online-activity,
+.arlo#arlo .arlo-list.template-online-activities .arlo-online-activity,
 .arlo#arlo .arlo-list.events .arlo-event {
     -webkit-transition: all .2s ease-in-out;
     transition: all .2s ease-in-out;
@@ -783,13 +792,13 @@ body.arlo {
 }
 
 .arlo#arlo .arlo-list.events .arlo-event:hover,
-.arlo#arlo .arlo-list.events .arlo-online-activity:hover {
+.arlo#arlo .arlo-list.template-online-activities .arlo-online-activity:hover {
     -webkit-transform: translateY(-5px);
     transform: translateY(-5px);
     box-shadow: 0 20px 40px rgba(0,0,0,0.2);
 }
 
-.arlo#arlo .arlo-list.events .arlo-online-activity {
+.arlo#arlo .arlo-list.template-online-activities .arlo-online-activity {
     clear: both;
     width: 100%;
     padding: 1.5em 1.8em;
@@ -798,7 +807,7 @@ body.arlo {
     margin-bottom: 1em;
 }
 
-.arlo#arlo .arlo-list.events .arlo-online-activity h3 {
+.arlo#arlo .arlo-list.template-online-activities .arlo-online-activity h3 {
     margin-top: 0;
     margin-bottom: .3em;
     line-height: 1;
@@ -838,6 +847,7 @@ body.arlo {
     text-align: center;
     padding: .5em 1em;
     background-color: rgba(0, 0, 0, 0.04);
+    margin-bottom: 1.5em;
 }
 
 .arlo#arlo .arlo-content-field {
@@ -958,7 +968,8 @@ body.arlo {
     bottom: 20px;
 }
 
-.arlo#arlo .arlo-tooltip-button {
+.arlo#arlo .arlo-tooltip-button,
+.arlo#arlo .arlo-popup-button {
     display: inline-block;
 }
 
@@ -1262,7 +1273,6 @@ body.arlo {
     margin-top: .5em;
     padding-bottom: .5em;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    color: rgba(255,255,255,.5);
 }
 
 .arlo .arlo_session:last-child {
@@ -1311,6 +1321,10 @@ body.arlo {
 .arlo#arlo select,
 .arlo#arlo .arlo-filters-buttons {
     float: left;
+}
+
+.arlo#arlo select.arlo-filter-region {
+    float: none;
 }
 
 

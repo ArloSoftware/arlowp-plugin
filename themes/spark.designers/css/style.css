@@ -596,6 +596,21 @@ body.arlo {
     border: none;
 }
 
+.arlo#arlo select.arlo-filter-region {
+    float: left;
+    width: auto;
+    min-width: 200px;
+    height: auto;
+    margin-right: 5px;
+    margin-bottom: .5em;
+    border: none;
+}
+
+.arlo#arlo .arlo-filter-region-search select.arlo-filter-region {
+    float: none;
+    margin-bottom: 2em;
+}
+
 .arlo#arlo .arlo-catalogue-filters .arlo-categories {
     display: inline-block;
     vertical-align: top;
@@ -608,6 +623,11 @@ body.arlo {
 }
 
 .arlo#arlo.arlo-sm .arlo-filters select {
+    width: 100%;
+    min-width: 100%;
+}
+
+.arlo#arlo.arlo-sm select.arlo-filter-region {
     width: 100%;
     min-width: 100%;
 }
@@ -823,6 +843,10 @@ body.arlo {
     overflow: visible;
 }
 
+.arlo#arlo.arlo-xs .arlo-event-details .arlo-event-notice {
+    clear: both;
+}
+
 .arlo#arlo.arlo-xs .arlo-event-details .arlo-template-summary {
     clear: both;
 }
@@ -861,6 +885,10 @@ body.arlo {
 
 .arlo#arlo .arlo-event-offers .replaced {
     margin-right: .5em;
+}
+
+.arlo#arlo .arlo-event-notice {
+    margin: .5em 0;
 }
 
 .arlo#arlo .arlo-template-summary {
@@ -1071,6 +1099,11 @@ body.arlo {
     margin-right: 5px;
 }
 
+
+.arlo#arlo .arlo-next-running > a,
+.arlo#arlo .arlo-next-running > span  {
+    margin-left: 0.5em;
+}
 
 .arlo#arlo .arlo-next-running span {
     cursor: inherit;

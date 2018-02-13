@@ -2,6 +2,8 @@
 
 namespace Arlo;
 
+use Arlo\Entities\Categories as CategoriesEntity;
+
 class Utilities {
 
 	public static function array_ikey_exists($key,$arr) { 
@@ -25,18 +27,77 @@ class Utilities {
 		return $now;    
     }
 
+    public static function get_filter_keys_string_array($name, $atts = []) {
+        $url_parameter = self::clean_string_url_parameter('arlo-'.$name);
+        $global_att = self::get_shortcode_att_string_array($name, $atts);
+        $by_page = self::get_filter_setting_string_array($name);
+        return self::get_only_prioritised_filter_array($url_parameter, $global_att, $by_page);
+    }
+
+    public static function get_filter_keys_int_array($name, $atts = []) {
+        $url_parameter = self::clean_int_url_parameter('arlo-'.$name);
+        $global_att = self::get_shortcode_att_int_array($name, $atts);
+        $by_page = self::get_filter_setting_int_array($name);
+        return self::get_only_prioritised_filter_array($url_parameter, $global_att, $by_page);
+    }
+
+    private static function get_only_prioritised_filter_array($url_parameter, $shortcode_att, $bypage_filter) {
+        //1. from url parameter a.k.a. user specified
+        if (!empty($url_parameter) || $url_parameter == "0") {
+            return [$url_parameter];
+        }
+        //2. specified on the global shortcode itself
+        if (count($shortcode_att)) {
+            return $shortcode_att;
+        }
+        //3. filtered by page
+        if (count($bypage_filter)) {
+            return $bypage_filter;
+        }
+        return [];
+    }
+
+    private static function get_shortcode_att_string_array($att_name, $atts) {
+        if (!isset($atts[$att_name])) {
+            return [];
+        }
+        if (!is_array($atts[$att_name])) {
+            return [$atts[$att_name]];
+        }
+        return $atts[$att_name];
+    }
+
+    private static function get_shortcode_att_int_array($att_name, $atts) {
+        if (!isset($atts[$att_name])) {
+            return [];
+        }
+        if (!is_array($atts[$att_name])) {
+            return [ self::to_int_or_null($atts[$att_name]) ];
+        }
+        return array_map('self::to_int_or_null', $atts[$att_name]);
+    }
+
+    private static function get_filter_setting_string_array($att_name) {
+        if (!isset($GLOBALS['arlo_filter_base'][$att_name])) {
+            return [];
+        }
+        return $GLOBALS['arlo_filter_base'][$att_name];
+    }
+
+    private static function get_filter_setting_int_array($att_name) {
+        if (!isset($GLOBALS['arlo_filter_base'][$att_name])) {
+            return [];
+        }
+        return array_map('self::to_int_or_null', $GLOBALS['arlo_filter_base'][$att_name]);
+    }
+
+    private static function to_int_or_null($to_be_converted) {
+        return (is_numeric($to_be_converted) ? intval($to_be_converted) : null);
+    }
+
+
     public static function clean_string_url_parameter($parameter_name) {
         return !empty($_GET[$parameter_name]) ? wp_unslash($_GET[$parameter_name]) : wp_unslash(urldecode(get_query_var($parameter_name)));
-    }
-
-    public static function get_att_string($name, $atts) {
-        $string_parameter = self::clean_string_url_parameter('arlo-'.$name);
-        return !empty($string_parameter) || $string_parameter == "0" ? $string_parameter : ( is_array($atts) && array_key_exists($name, $atts) ? $atts[$name] : '' );
-    }
-
-    public static function get_att_int($name, $atts) {
-        $int_parameter = self::clean_int_url_parameter('arlo-'.$name);
-        return !empty($int_parameter) || $int_parameter == "0" ? $int_parameter : ( is_array($atts) && array_key_exists($name, $atts) ? intval($atts[$name]) : '' );
     }
 
     public static function clean_int_url_parameter($parameter_name) {
@@ -52,9 +113,20 @@ class Utilities {
         return null;
     }
 
-    public static function process_att($new_atts_array, $callback, $att_name = '', $atts = []) {
-        $value = call_user_func($callback, $att_name, $atts);
-        
+    public static function get_att_string($name, $atts = []) {
+        $string_parameter = self::clean_string_url_parameter('arlo-'.$name);
+        return !empty($string_parameter) || $string_parameter == "0" ? $string_parameter : ( is_array($atts) && array_key_exists($name, $atts) ? $atts[$name] : '' );
+    }
+
+    public static function get_att_int($name, $atts = []) {
+        $int_parameter = self::clean_int_url_parameter('arlo-'.$name);
+        return !empty($int_parameter) || $int_parameter == "0" ? $int_parameter : ( is_array($atts) && array_key_exists($name, $atts) ? intval($atts[$name]) : '' );
+    }
+
+    public static function process_att($new_atts_array, $callback, $att_name = '', $atts = [], $value = null) {
+        if (!empty($callback) && is_callable($callback))
+            $value = call_user_func($callback, $att_name, $atts);
+       
 		if (!is_null($value) && (!empty($value) || is_numeric($value))) {
 			$new_atts_array[$att_name] = $value;
         }
@@ -118,4 +190,87 @@ class Utilities {
         return (get_home_url() . $rel);
     }
 
+    public static function convert_string_to_int_array($string) {
+        if (is_string($string)) {
+            $string = explode(',', $string);
+        }
+
+        if (!empty($string)) {
+            return array_filter(
+                array_map(function($int) {
+                    return intval($int);
+                }, $string), 
+                function($int) {
+                    return $int >= 0;
+                });
+        }
+
+        return [];
+    }
+
+    public static function convert_string_to_string_array($string) {
+        if (is_string($string)) {
+            $string = explode(',', $string);
+        }
+
+        if (!empty($string)) {
+            return array_filter(
+                array_map(function($s) {
+                    return trim($s);
+                }, $string), 
+                function($s) {
+                    return !empty($s);
+                });
+        }
+
+        return [];
+    }
+
+    public static function set_base_filter($template_name, $filter_name = '', $filter_settings = [], $atts = [], &$stored_atts = [], $callback = '', $callback_parameters = [], $is_hidden = false ) {
+        $parameter = \Arlo\Utilities::clean_string_url_parameter('arlo-' . $filter_name);
+        $filter_setting_section = ($is_hidden ? 'hiddenfilters' : 'showonlyfilters');
+        $filter_setting_name = $filter_name;
+        $filter_name = ($is_hidden ? $filter_name . 'hidden' : $filter_setting_name);
+
+        if (is_array($atts) && count($atts) && !empty($atts[$filter_name])) {
+            
+            $value = $atts[$filter_name];
+            
+            $value = self::call_user_func_with_callback($value, $callback, $callback_parameters);
+
+            $GLOBALS['arlo_filter_base'][$filter_name] = $value;              
+
+            if (!isset($stored_atts[$filter_name])) {
+                $stored_atts[$filter_name] = $GLOBALS['arlo_filter_base'][$filter_name];
+            }
+
+        } else if (isset($filter_settings[$filter_setting_section]) && isset($filter_settings[$filter_setting_section][$template_name]) && isset($filter_settings[$filter_setting_section][$template_name][$filter_setting_name])) {
+            //this is always an array, coming from the admin UI
+            $value = array_values($filter_settings[$filter_setting_section][$template_name][$filter_setting_name]);
+
+            $value = self::call_user_func_with_callback($value, $callback, $callback_parameters);
+
+            $GLOBALS['arlo_filter_base'][$filter_name] = $value;
+            
+            if (empty($parameter) || $is_hidden) {
+                $stored_atts[$filter_name] = $GLOBALS['arlo_filter_base'][$filter_name];
+            }
+        }
+    }
+
+    public static function call_user_func_with_callback($value, $callback = '', $callback_parameters = []) {
+        $parameters = [$value];
+
+        if (is_array($callback_parameters)) {
+            $parameters = array_merge($parameters, $callback_parameters);
+        } else if (!empty($callback_parameters)) {
+            $parameters[] = $callback_parameters;
+        }
+
+        if (!empty($callback) && is_callable($callback)) {
+            $value = call_user_func_array($callback, $parameters);
+        }
+
+        return $value;
+    }
 }

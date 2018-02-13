@@ -24,7 +24,7 @@ class NoticeHandler {
 	}
 
 	public function global_notices() {
-		$messages = array_merge($this->message_handler->get_messages('import_error', true), $this->message_handler->get_messages('error', true));
+		$messages = array_merge($this->message_handler->get_messages('import_error', true), $this->message_handler->get_messages('error', true), $this->message_handler->get_messages('review', true));
 		
 		foreach ($messages as $message) {
 			echo $this->create_notice($message);
@@ -46,12 +46,12 @@ class NoticeHandler {
 		$global_message = '';
 		if (!empty($message->global)) {
 			$global_message = '<td class="logo" valign="top" style="width: 60px; padding-top: 1em;">
-						<a href="http://www.arlo.co" target="_blank"><i class="arlo-icons8 size-48 arlo-yellow arlo-icons8-arlo-logo-for-font arlo-middle"></i></a>
+						<a href="http://www.arlo.co" target="_blank" class="arlo-logo"></a>
 					</td>';
 		}
 
 		return '
-		<div class="notice ' . $notice_type . ' ' . (!empty($message->class) ? $message->class : '' ) . ' arlo-message ' . (isset($message->is_dismissable) && $message->is_dismissable ? 'is-dismissible' : '' ) . ' arlo-' . $message->type .  '" ' . 
+		<div class="notice ' . $notice_type . ' ' . (!empty($message->class) ? $message->class : '' ) . ' arlo-message ' . (isset($message->is_dismissable) && $message->is_dismissable ? 'is-dismissible' : '' ) . (!empty($message->type) ? ' arlo-' . $message->type : '' ) .  '" ' . 
 		(!empty($message->id) ? 'id="' . $message->id . '"' : '' ) . '>
 			<table>
 				<tr>
@@ -112,6 +112,7 @@ class NoticeHandler {
 	public function connected_platform_notice() {
 		if (strtolower($this->settings['platform_name']) === \Arlo_For_Wordpress::DEFAULT_PLATFORM) {
 			$message = new \stdClass();
+			$message->type = 'notice';
 			$message->class = 'updated';
 			$message->title = 'Connected to demo data';
 			$message->global = true;

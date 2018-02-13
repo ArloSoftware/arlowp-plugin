@@ -15,6 +15,7 @@
 }
 
 .arlo .arlo-list.events > li,
+.arlo .arlo-list.template-online-activities > li,
 .arlo .arlo-list.upcoming > li.arlo-event,
 .arlo .arlo-list.arlo-online-activities > li {
 	border: 1px solid #ccc;
@@ -24,6 +25,7 @@
 }
 
 .arlo .arlo-list.events > li:last-child, 
+.arlo .arlo-list.template-online-activities > li:last-child, 
 .arlo .arlo-list.upcoming > li:last-child {
 	margin-bottom: 0;
 }
@@ -98,6 +100,7 @@
 .arlo .arlo-event-location,
 .arlo .arlo-event-provider,
 .arlo .arlo-event-presenters,
+.arlo .arlo-event-notice,
 .arlo .arlo-event-session-description,
 .arlo .arlo-event-time {
 	display: block;
@@ -268,6 +271,7 @@
     margin-left: 0px;
 }
 
+.arlo .arlo-boxed .arlo-list.template-online-activities .arlo-cf,
 .arlo .arlo-boxed .arlo-list.events .arlo-cf,
 .arlo .arlo-boxed .arlo-list.upcoming .arlo-cf,
 .arlo .arlo-boxed .arlo-list.arlo-online-activities .arlo-cf  {
@@ -278,6 +282,7 @@
 }
 
 @media (min-width: 550px) {
+	.arlo .arlo-boxed .arlo-list.template-online-activities .arlo-cf,
 	.arlo .arlo-boxed .arlo-list.events .arlo-cf,
 	.arlo .arlo-boxed .arlo-list.upcoming .arlo-cf,
 	.arlo .arlo-boxed .arlo-list.arlo-online-activities .arlo-cf {
@@ -360,6 +365,11 @@
 .arlo .arlo-boxed .arlo-suggest .arlo-register-interest {
     text-align: center;
 }
+
+.arlo .arlo-register {
+	margin-right: 0.5em;
+}
+
 
 .arlo .arlo-boxed .arlo-show-more-link-container {
     border: none;

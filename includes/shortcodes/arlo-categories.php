@@ -24,7 +24,7 @@ class Categories {
     private static function shortcode_categories($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         $return = '';
 
-        $arlo_category = self::get_selected_category();
+        $arlo_categories = self::get_selected_categories();
 
         // calculate depth
         $depth = (isset($atts['depth'])) ? (int)$atts['depth'] : 1;
@@ -40,46 +40,63 @@ class Categories {
                     
         // start at
         $start_at = (isset($atts['parent'])) ? (int)$atts['parent'] : 0;
-        if(!isset($atts['parent']) && $start_at == 0 && !empty($arlo_category)) {
-            $slug = $arlo_category;
-            $start_at = intval(current(explode('-', $slug)));
+
+        if (is_array($arlo_categories)) {
+            if (count($arlo_categories) > 1) {
+                $title = str_replace('%s','', $title);
+            }
+
+            $page_type = \Arlo_For_Wordpress::get_current_page_arlo_type();
+            $page_type = ($page_type == 'event' ? 'events' : $page_type);
+
+            $page_filter_settings = get_option("arlo_page_filter_settings");
+            $ignored_categories = (isset($page_filter_settings['hiddenfilters'][$page_type]['category']) ? $page_filter_settings['hiddenfilters'][$page_type]['category'] : []);
+
+            foreach ($arlo_categories as $i => $arlo_category) {
+                if(!isset($atts['parent']) && $start_at == 0 && !empty($arlo_category)) {
+                    $slug = $arlo_category;
+                    $start_at = intval(current(explode('-', $slug)));
+                }
+        
+                if($title && $i == 0) {
+                    $conditions = array('id' => $start_at);
+                    
+                    if($start_at == 0) {
+                        $conditions = array('parent_id' => 0);
+                    }
+
+                    $current = CategoriesEntity::get($conditions, 1, $import_id);
+                    
+                    $return .= sprintf($title, esc_html($current->c_name));
+                }
+                
+                if ($depth > 0) {
+                    if ($start_at == 0) {
+                        $root = CategoriesEntity::getTree($start_at, 1, 0, $ignored_categories, $import_id);
+                                
+                        if (!empty($root)) {
+                            $start_at = $root[0]->c_arlo_id;
+                        }
+                    }
+                    
+                    $tree = CategoriesEntity::getTree($start_at, $depth, 0, $ignored_categories, $import_id);
+
+                    $GLOBALS['arlo_categories_count'] = count($tree);		
+                            
+                    if(!empty($tree)) {		
+                        $return .= self::generate_category_ul($tree, $counts, $widget);	
+                    }	
+                }
+                $start_at = 0;
+            }    
         }
 
-        if($title) {
-            $conditions = array('id' => $start_at);
-            
-            if($start_at == 0) {
-                $conditions = array('parent_id' => 0);
-            }
-            
-            $current = CategoriesEntity::get($conditions, 1, $import_id);
-            
-            $return .= sprintf($title, esc_html($current->c_name));
-        }
-        
-        if ($depth > 0) {
-            if ($start_at == 0) {
-                $root = CategoriesEntity::getTree($start_at, 1, 0, $import_id);
-                        
-                if (!empty($root)) {
-                    $start_at = $root[0]->c_arlo_id;
-                }
-            }
-            
-            $tree = CategoriesEntity::getTree($start_at, $depth, 0, $import_id);	
-            
-            $GLOBALS['arlo_categories_count'] = count($tree);		
-                    
-            if(!empty($tree)) {		
-                $return .= self::generate_category_ul($tree, $counts, $widget);	
-            }	
-        }
-        
         return $return;
     }
 
     private static function shortcode_category_title($content = '', $atts, $shortcode_name, $import_id = '') {
-        $arlo_category = self::get_selected_category();
+        $selected_categories = self::get_selected_categories();
+        $arlo_category = array_shift($selected_categories);
         
         if (!empty($arlo_category)) {
             $category = CategoriesEntity::get(array('id' => current(explode('-', $arlo_category))), 1, $import_id);
@@ -93,7 +110,8 @@ class Categories {
     }
 
     private static function shortcode_category_header($content = '', $atts, $shortcode_name, $import_id = '') {
-        $arlo_category = self::get_selected_category();
+        $selected_categories = self::get_selected_categories();
+        $arlo_category = array_shift($selected_categories);
         
         if (!empty($arlo_category)) {
             $category = CategoriesEntity::get(array('id' => current(explode('-', $arlo_category))), 1, $import_id);
@@ -107,7 +125,8 @@ class Categories {
     } 
 
     private static function shortcode_category_footer ($content = '', $atts, $shortcode_name, $import_id = ''){
-        $arlo_category = self::get_selected_category();
+        $selected_categories = self::get_selected_categories();
+        $arlo_category = array_shift($selected_categories);
         
         if (!empty($arlo_category)) {
             $category = CategoriesEntity::get(array('id' => current(explode('-', $arlo_category))), 1, $import_id);
@@ -120,15 +139,13 @@ class Categories {
         return $category->c_footer;
     }
 
-    private static function get_selected_category() {
+    private static function get_selected_categories() {
         $category_atts = !empty(\Arlo\Shortcodes\Templates::$event_template_atts) ? \Arlo\Shortcodes\Templates::$event_template_atts : 
         (!empty(\Arlo\Shortcodes\UpcomingEvents::$upcoming_list_item_atts) ? \Arlo\Shortcodes\UpcomingEvents::$upcoming_list_item_atts :
         (!empty(\Arlo\Shortcodes\OnlineActivities::$oa_list_atts) ? \Arlo\Shortcodes\OnlineActivities::$oa_list_atts :
         null));
-
-
-        return \Arlo\Utilities::get_att_string('category', $category_atts);
-
+     
+        return \Arlo\Utilities::convert_string_to_int_array(\Arlo\Utilities::get_att_string('category', $category_atts));
     }
 
     // category list
@@ -146,7 +163,7 @@ class Categories {
         $events_url = get_page_link($post_types[$page_type]['posts_page']);
         
         if(!is_array($items) || empty($items)) return '';
-        
+
         $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
         
         $html = '<ul class="arlo-category-list">';

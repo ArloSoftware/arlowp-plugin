@@ -32,6 +32,7 @@
 * [arlo_event_delivery]
 * [arlo_event_session_description]
 * [arlo_event_presenters layout='list||string' link='true||false']
+* [arlo_event_notice]
 * [arlo_event_offers]
 * [arlo_event_registration]
 ---
@@ -41,6 +42,7 @@
 * [arlo_upcoming_list]
 * [arlo_upcoming_list_item][/arlo_upcoming_list_item]
 * [arlo_upcoming_list_pagination]
+* [arlo_event_notice]
 * [arlo_upcoming_offer]
 
 ## Presenter

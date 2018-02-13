@@ -1,16 +1,19 @@
 <?php
 	global $wpdb;
 	$import_id = Arlo_For_Wordpress::get_instance()->get_importer()->get_current_import_id();
-
-    $tags = $wpdb->get_results(
-        "SELECT DISTINCT
-            t.tag,
-            t.id
-        FROM 
-            {$wpdb->prefix}arlo_tags AS t
-        WHERE 
-            t.import_id = $import_id
-        ORDER BY tag", ARRAY_A);
+	
+	$tags = [];
+	if (!empty($import_id)) {
+		$tags = $wpdb->get_results(
+			"SELECT DISTINCT
+				t.tag,
+				t.id
+			FROM 
+				{$wpdb->prefix}arlo_tags AS t
+			WHERE 
+				t.import_id = $import_id
+			ORDER BY tag", ARRAY_A);	
+	}
 ?>
 
 

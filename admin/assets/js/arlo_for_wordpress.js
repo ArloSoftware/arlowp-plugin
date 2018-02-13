@@ -84,9 +84,11 @@ if (typeof (Arlo) === "undefined") {
 			$( ".arlo-filter-group" ).disableSelection();	
 			
 			$('.arlo-filter-group').on('click', 'li .arlo-icons8-minus', function () {
+				var parent = $(this).closest('.arlo-available-filters');
 				$(this).parentsUntil("li").parent().remove();
-				if ($('.arlo-available-filters-section > li').length === 0) {
-					me.addFilter();
+				
+				if (parent.find('li').length === 0) {
+					me.addFilter(parent);
 				}
 			});
 			
@@ -95,8 +97,30 @@ if (typeof (Arlo) === "undefined") {
 				me.addFilter(parent);
 			});
 		},
+		filterActionChange: function() {
+			$('.arlo-filter-action select').each(function() {
+				var val = $(this).val();
+				if (val == 'rename') {
+					$(this).closest('li').find('.arlo-filter-new-value').show();
+				}
+			});
+			$('.arlo-filter-action select').change(function() {
+				var val = $(this).val()
+				if (val == 'rename') {
+					$(this).closest('li').find('.arlo-filter-new-value').show();
+				} else {
+					$(this).closest('li').find('.arlo-filter-new-value').hide();
+				}
+			});
+			$('.arlo_pages_section .arlo-filter-action select').change(function() {
+				var val = $(this).val();
+				if (val == 'exclude' || val == 'showonly') {
+					$(this).closest('.arlo-available-filters').find('.arlo-filter-action select').val(val);
+				}
+			});
+		},
 		showFilterGroupSettings: function(val) {
-			$('.arlo-filter-group').hide();
+			$('.arlo-filter-group:not(.arlo-always-visible)').hide();
 			$("#arlo-" + val + "-filters").show();
 		},
 		checkTasks: function() {
@@ -143,13 +167,15 @@ if (typeof (Arlo) === "undefined") {
 
 			var setting_id = Math.floor(Math.random() * 1000000);
 
-			newElement.find('input').each( function(index,element) {
+			newElement.find('input, select').each( function(index, element) {
 				var name = $(element).attr('name').replace('setting_id',setting_id);
 				$(element).attr('name',name);
 			});
 
 			if (newElement.length == 1) {
+				newElement.find('.arlo-filter-action select').val(parent.find('.arlo-filter-action select').val());
 				parent.append(newElement);
+				this.filterActionChange();
 			}
 		},
 		createTaskPlaceholder: function(taskID) {
@@ -298,7 +324,7 @@ if (typeof (Arlo) === "undefined") {
 			var me = this;
 
 			if (tabID !== 'new_custom') {
-				Cookies.set("arlo-vertical-tab", tabID, { path: '/', expires: 7 });
+				Cookies.set("arlo-vertical-tab", tabID, { path: '/', domain: window.location.hostname, expires: 7 });
 			}
 
 			$('.arlo_pages_section .arlo-field-wrap').hide();
@@ -325,7 +351,7 @@ if (typeof (Arlo) === "undefined") {
 			$('#' + me.pluginSlug + '-tab-' + tabID).addClass('nav-tab-active');
 			
 			Cookies.remove("arlo-vertical-tab", { path: '/' });
-			Cookies.set("arlo-nav-tab", tabID, { path: '/', expires: 7 });
+			Cookies.set("arlo-nav-tab", tabID, { path: '/', domain: window.location.hostname, expires: 7 });
 
 			switch (tabID) {
 				case 'customcss':
@@ -502,8 +528,8 @@ if (typeof (Arlo) === "undefined") {
 			});
 
 			//dismissible message
-			$('.toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-dismiss').click(function() {
-				var id = $(this).parent().attr('id').split('-').pop();
+			$('.toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-dismiss, .toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-dismiss-custom').click(function() {
+				var id = $(this).closest('.notice.is-dismissible.arlo-message').attr('id');
 				if (id != null) {
 					var data = {
 						action: 'arlo_dismiss_message',
@@ -512,8 +538,14 @@ if (typeof (Arlo) === "undefined") {
 					
 					$.post(me.ajaxUrl, data);
 				}
-			})		
-			
+			})
+
+			$('.toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-dismiss-custom, .toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-ask-later').click(function(e) {
+				e.preventDefault();
+				$(this).closest('.arlo-message').fadeOut(function() {
+					$(this).closest('.arlo-message').remove();
+				});
+			});
 			
 			//dismissible admin notices
 			$('.toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-user-dismissable-message .notice-dismiss').click(function() {
@@ -526,7 +558,15 @@ if (typeof (Arlo) === "undefined") {
 					
 					$.post(me.ajaxUrl, data);
 				}
-			})	
+			});
+
+			$('.toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-ask-later').click(function() {
+				var data = {
+					action: 'arlo_increment_review_notice_date'
+				}
+				
+				$.post(me.ajaxUrl, data);
+			});
 
 			//turn off arlo_send_data
 			$('#arlo_turn_off_send_data').click(function() {
@@ -556,7 +596,15 @@ if (typeof (Arlo) === "undefined") {
 				if (confirm(message)) {
 					document.location = target.attr('href');
 				} 				
-			})
+			});
+
+			this.filterActionChange();
+
+			$('.arlo-filter-section-toggle').click(function() {
+				$(this).closest('.arlo-filter-settings').find('.arlo-available-filters').slideToggle();
+				$(this).closest('.arlo-filter-settings').toggleClass('filter-section-expanded');
+			});
+
 		},
 		getEventsForWebinar: function() {
 			var me = this,

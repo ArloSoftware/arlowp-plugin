@@ -82,7 +82,10 @@ class Shortcodes {
 	    // all shortcodes are run through filters to allow external manipulation if required, however we also need a means of running the passed function
 	    add_filter('arlo_shortcode_content_' . $shortcode_name, function($content='', $atts, $shortcode_name, $import_id='') use($closure) {
 			global $arlo_plugin;
-		    return $closure->invokeArgs(array($content, $atts, $shortcode_name, $arlo_plugin->get_importer()->get_current_import_id(), ''));
+			$import_id = $arlo_plugin->get_importer()->get_current_import_id();
+
+			if (!empty($import_id))
+		    	return $closure->invokeArgs(array($content, $atts, $shortcode_name, $import_id, ''));
 	    }, 10, 3);
 		
     }
@@ -145,70 +148,76 @@ class Shortcodes {
 		return self::create_filter('region', $regions, null, null, \Arlo_For_Wordpress::get_region_parameter());
 	}
 
-	public static function create_filter($type, $items, $label=null, $group=null, $att_default=null) {
-		if (count($items) == 0) {
+	public static function create_filter($type, $items, $label, $group, $att_default=null, $page = '') {
+		if (count($items) == 0 || !is_array($items)) {
 			return '';
 		}
 
-		$filter_settings = get_option('arlo_filter_settings');
+		$filter_settings = get_option('arlo_filter_settings', []);
+		$page_filter_settings = get_option('arlo_page_filter_settings', []);
 
 		if (!empty($filter_settings[$group][$type][$label]) ) {
 			$label = $filter_settings[$group][$type][$label];
 		}
-
-		if (!empty($filter_settings['arlohiddenfilters'])) {
-			$hidden_filters = $filter_settings['arlohiddenfilters'];
-		}
-
-		$filter_html = '<select id="arlo-filter-' . esc_attr($type) . '" class="arlo-filter-' . esc_attr($type) . '" name="arlo-' . esc_attr($type) . '">';
-
-		if (!is_null($label))
-			$filter_html .= '<option value="">' . esc_html($label) . '</option>';
 
 		$urlParameter = \Arlo\Utilities::clean_string_url_parameter('arlo-' . $type);
 
 		$selected_value = !empty($urlParameter) || $urlParameter == "0" ? $urlParameter : (!empty($att_default) || $att_default == "0" ? $att_default : '');
 
 		$options_html = '';
-			
+
 		foreach($items as $key => $item) {
 			if (empty($item['string']) && empty($item['value'])) {
 				$item = array(
 					'string' => $item,
-					'value' => $key
+					'value' => $key,
+					'id' => $key
 				);
 			}
-
-			$value_label = $item['string'];
-
-			$matches = array();
-			preg_match('~([&ndash;]*\s*)(.*)~',$value_label,$matches);
-
-			$value_prefix = $matches[1];
-			$value = $matches[2];
-
-			$is_hidden = false;
-			if (!empty($hidden_filters[$group][$type])) {
-				$is_hidden = in_array(esc_html($value),$hidden_filters[$group][$type]);
+			
+			if (!isset($item['id'])) {
+				$item['id'] = $item['value'];
 			}
 
-			if (!$is_hidden) {
-				$value_label = $item['string'];
+			$option_label = '';
+			if (!empty($filter_settings[$group][$type][$item['id']])) {
+				$option_label = $filter_settings[$group][$type][$item['id']];
+			}
+			else if (!empty($filter_settings[$group][$type][$item['string']])) {
+				$option_label = $filter_settings[$group][$type][$item['string']];
+			}
 
+			$is_hidden = false;
+			if (!empty($filter_settings['hiddenfilters'][$group][$type])) {
+				$is_hidden = in_array($item['id'], $filter_settings['hiddenfilters'][$group][$type]);
+			}
 
-				if (!empty(get_option('arlo_filter_settings')[$group][$type][htmlspecialchars($value)])) {
-					$value_label = $value_prefix . get_option('arlo_filter_settings')[$group][$type][htmlspecialchars($value)];
-				}
+			if (!empty($page_filter_settings['hiddenfilters'][$page][$type])) {
+				$is_hidden = in_array($item['id'], $page_filter_settings['hiddenfilters'][$page][$type]);
+			}
+
+			$show_only = true;
+			if (!empty($page_filter_settings['showonlyfilters'][$page][$type])) {
+				$show_only = in_array($item['id'], $page_filter_settings['showonlyfilters'][$page][$type]);
+			}			
+
+			if (!$is_hidden && $show_only) {
+				$option_label = !empty($option_label) ? $option_label : $item['string'];
 
                 $selected = (strlen($selected_value) && strtolower($selected_value) == strtolower($item['value'])) ? ' selected="selected"' : '';
 
-				$options_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>' . esc_html($value_label) . '</option>';
+				$options_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>' . esc_html($option_label) . '</option>';
 			}
 		}
 
 		if (strlen($options_html) == 0) {
 			return '';
 		}
+
+		$filter_html = '<select id="arlo-filter-' . esc_attr($type) . '" class="arlo-filter-' . esc_attr($type) . '" name="arlo-' . esc_attr($type) . '">';
+		
+		if (!is_null($label))
+			$filter_html .= '<option value="">' . esc_html($label) . '</option>';
 
 		$filter_html .= $options_html;
 
@@ -444,24 +453,26 @@ class Shortcodes {
         );
 	}
 
-	public static function advertised_offers($id, $id_field, $import_id) {
+	public static function advertised_offers($id, $id_field, $import_id, $is_tax_exempt = false) {
 		global $wpdb;
                
         $regions = get_option('arlo_regions');	
         
         $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
+        $arlo_region = (!empty($arlo_region) && is_array($regions) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
 
         $t1 = "{$wpdb->prefix}arlo_offers";
         
         $offers_array = self::get_advertised_offers($id, $id_field, $import_id);
 
-        $offers = '<ul class="arlo-list arlo-event-offers">';
-            
+		$offers = '<ul class="arlo-list arlo-event-offers">';
+		
         $settings = get_option('arlo_settings');  
-        $price_setting = (isset($settings['price_setting'])) ? esc_attr($settings['price_setting']) : ARLO_PLUGIN_PREFIX . '-exclgst';      
-        $free_text = (isset($settings['free_text'])) ? esc_attr($settings['free_text']) : __('Free', 'arlo-for-wordpress');
+        $price_setting = (isset($settings['price_setting']) && $is_tax_exempt != true ? esc_attr($settings['price_setting']) : ARLO_PLUGIN_PREFIX . '-exclgst');
+		$free_text = (isset($settings['free_text']) ? esc_attr($settings['free_text']) : __('Free', 'arlo-for-wordpress'));
 
+		if (empty($offers_array)) { return ''; }
+		
         foreach($offers_array as $offer) {
 
             extract($offer);
@@ -485,8 +496,8 @@ class Shortcodes {
             $offers .= (!is_null($o_label) || $o_label != '') ? $o_label.' ':'';
             if($amount > 0) {
                 $offers .= '<span class="amount">' . esc_html($famount) . '</span> ';
-                // only include the excl. tax if the offer is not replaced			
-                $offers .= $replaced ? '' : '<span class="arlo-price-tax">' . esc_html(($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode) : sprintf(__('incl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode))) . '</span>';
+                // only include the excl. tax if the offer is not replaced and not tax exempt
+                $offers .= $replaced ? '' : (!$is_tax_exempt ? '<span class="arlo-price-tax">' . esc_html(($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode) : sprintf(__('incl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode))) . '</span>'  : '');
             } else {
                 $offers .= '<span class="amount free">' . esc_html($free_text) . '</span> ';
             }
@@ -498,7 +509,12 @@ class Shortcodes {
                 
                 // display replacement offer label if there is one
                 $offers .= (!is_null($replacement_label) || $replacement_label != '') ? esc_html($replacement_label) . ' ' : '';
-                $offers .= '<span class="amount">' . ($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $replacement_formatted_amount_taxexclusive : $replacement_formatted_amount_taxinclusive) . '</span> <span class="arlo-price-tax">' . esc_html(($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode) : sprintf(__('incl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode))) . '</span>';
+				$offers .= '<span class="amount">' . ($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $replacement_formatted_amount_taxexclusive : $replacement_formatted_amount_taxinclusive) . '</span>';
+				
+				if (!$is_tax_exempt) {
+					$offers.= '<span class="arlo-price-tax">' . esc_html(($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode) : sprintf(__('incl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode))) . '</span>';
+				}
+
                 // display replacement offer message if there is one
                 $offers .= (!is_null($replacement_message) || $replacement_message != '') ? ' ' . esc_html($replacement_message) : '';
 
@@ -514,7 +530,9 @@ class Shortcodes {
 	}
 
 	public static function get_rich_snippet_field($event, $field) {
-		return array_key_exists($field,$event) ? ( !empty($event[$field]) ? $event[$field] : '' ) : '';
+		if (!empty($event)) {
+			return array_key_exists($field, $event) ? ( !empty($event[$field]) ? $event[$field] : '' ) : '';
+		}
 	}
 
     public static function get_template_permalink($post_name, $region) {
@@ -528,7 +546,7 @@ class Shortcodes {
             $arlo_region = $region;
         } else {
             $arlo_region = get_query_var('arlo-region', '');
-            $arlo_region = (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+            $arlo_region = (!empty($arlo_region) && is_array($regions) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
         }
 
         if (!empty($arlo_region)) {

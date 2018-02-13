@@ -146,9 +146,9 @@ class Venues {
     }    
     
     private static function shortcode_venue_permalink($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        if(!isset($GLOBALS['arlo_venue_list_item']['post_id'])) return '';
+        if(!isset($GLOBALS['arlo_venue_list_item']['v_post_id'])) return '';
 
-        return get_permalink($GLOBALS['arlo_venue_list_item']['post_id']);        
+        return get_permalink($GLOBALS['arlo_venue_list_item']['v_post_id']);        
     }
 
     private static function get_map_query() {
@@ -177,13 +177,11 @@ class Venues {
     private static function shortcode_venue_map($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         $settings = get_option('arlo_settings');
         
-        $api_key = $settings['googlemaps_api_key']; 
-        if (empty($api_key)) {
-            if (strtolower($settings['platform_name']) == \Arlo_For_Wordpress::DEFAULT_PLATFORM) {
+        $api_key = (!empty($settings['googlemaps_api_key']) ? $settings['googlemaps_api_key'] : '');
+        if (empty($api_key) && strtolower($settings['platform_name']) == \Arlo_For_Wordpress::DEFAULT_PLATFORM) {
                 $api_key = \Arlo_For_Wordpress::GOOGLE_MAPS_API_KEY;
-            } else {
-                return;
-            }
+        } else {
+            return;
         }
         
         // merge and extract attributes
@@ -237,6 +235,8 @@ class Venues {
     }
     
     private static function shortcode_venue_address($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if (!isset($GLOBALS['arlo_venue_list_item'])) return;
+
         // merge and extract attributes
         extract(shortcode_atts(array(
             'layout' => 'list',
@@ -370,6 +370,8 @@ class Venues {
 
     private static function get_venue_snippet($link) {
         $venue_snippet = array();
+
+        if (!isset($GLOBALS['arlo_venue_list_item'])) return $venue_snippet;
 
         // Basic
         $venue_snippet = array();

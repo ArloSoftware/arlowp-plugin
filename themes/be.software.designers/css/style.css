@@ -320,6 +320,11 @@ body.arlo {
     border: 1px solid #1dc6bc;
 }
 
+.arlo#arlo .arlo-next-running > a,
+.arlo#arlo .arlo-next-running > span  {
+    margin-left: 0.5em;
+}
+
 .arlo#arlo .arlo-color2,
 .arlo#arlo .arlo-buttons .arlo-event-registration .arlo-places-remaining,
 .arlo#arlo .event-search-list .arlo-next-running a,
@@ -415,6 +420,11 @@ body.arlo {
     text-decoration: none;
 }
 
+.arlo#arlo .arlo-next-running a,
+.arlo#arlo .arlo-next-running span {
+    width: auto;
+}
+
 .arlo#arlo select {
     color: black;
 }
@@ -444,7 +454,7 @@ body.arlo {
 .arlo#arlo .arlo-pagination .page-numbers.prev:hover,
 .arlo#arlo .arlo-category-list li a:hover,
 .arlo#arlo .arlo-next-running a:hover,
-.arlo#arlo .catalogue .arlo-next-running a.arlo-register,
+.arlo#arlo .catalogue .arlo-next-running a.arlo-register:hover,
 .arlo#arlo .arlo-event-registration > a:hover,
 .arlo#arlo .arlo-show-more-link:hover,
 .arlo#arlo .arlo-oa-registration > a:hover {
@@ -530,6 +540,7 @@ body.arlo {
 .arlo#arlo .arlo-filters {
     overflow: auto;
     margin: 0;
+    float: left;
 }
 
 .arlo#arlo .arlo-filters select {
@@ -537,7 +548,16 @@ body.arlo {
     border-radius: 20px;
     padding: .5em 1em;
     margin-right: 1em;
-    float: left;
+    margin-bottom: .5em;
+    width: 100%;
+    height: auto;
+}
+
+.arlo#arlo select.arlo-filter-region {
+    border: none;
+    border-radius: 20px;
+    padding: .5em 1em;
+    margin-right: 1em;
     margin-bottom: .5em;
     width: 100%;
     height: auto;
@@ -551,6 +571,10 @@ body.arlo {
 
 @media (min-width: 550px) {
     .arlo#arlo .arlo-filters select {
+        width: auto;
+    }
+
+    .arlo#arlo select.arlo-filter-region {
         width: auto;
     }
 }
@@ -758,7 +782,8 @@ body.arlo {
     font-size: 1em;
 }
 
-.arlo#arlo .arlo-tooltip-button {
+.arlo#arlo .arlo-tooltip-button,
+.arlo#arlo .arlo-popup-button {
     text-align: left;
     display: inline-block;
 }

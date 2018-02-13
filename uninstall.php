@@ -27,6 +27,8 @@ function arlo_uninstall() {
 	arlo_delete_custom_posts();
 
 	arlo_delete_options();
+
+	arlo_delete_cookies();
 }
 
 /**
@@ -108,6 +110,11 @@ function arlo_delete_options() {
 	foreach ($options as $option) {
 		delete_option($option);
 	}
+}
+
+function arlo_delete_cookies() {
+	setcookie('arlo-vertical-tab', null, -1, '/');
+	setcookie('arlo-nav-tab', null, -1, '/');
 }
 
 arlo_uninstall();

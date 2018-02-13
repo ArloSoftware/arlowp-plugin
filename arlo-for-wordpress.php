@@ -8,15 +8,15 @@
  * @package   Arlo_For_Wordpress
  * @author    Arlo <info@arlo.co>
  * @license   GPL-2.0+
- * @link      http://arlo.co
+ * @link      https://arlo.co
  * @copyright 2018 Arlo
  *
  * @wordpress-plugin
  * Plugin Name:       Arlo
  * Description:       Connect your WordPress to Arlo
- * Version:           3.5.2
+ * Version:           3.6
  * Author:            Arlo
- * Author URI:        http://arlo.co
+ * Author URI:        https://arlo.co
  * Text Domain:       arlo-for-wordpress
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
@@ -82,6 +82,7 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-timezone-manager.php'
 	
 //include shortcodes
 require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-shortcodes.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-filters.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-categories.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-online-activities.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-templates.php');
@@ -98,6 +99,7 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/entities/arlo-categories.p
 require_once( plugin_dir_path( __FILE__ ) . 'includes/entities/arlo-offers.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/entities/arlo-venues.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/entities/arlo-presenters.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/entities/arlo-tags.php');
 
 //include importer
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-importer.php');

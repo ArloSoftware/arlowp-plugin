@@ -171,8 +171,10 @@ class OnlineActivities {
     }
 
     private static function shortcode_oa_registration ($content = '', $atts, $shortcode_name, $import_id = '') {
+        if(!isset($GLOBALS['arlo_oa_list_item']['oa_registermessage'])) return '';
+
         $registeruri = $GLOBALS['arlo_oa_list_item']['oa_registeruri'];
-        $registermessage = $GLOBALS['arlo_oa_list_item']['oa_registermessage'];
+        $registermessage = esc_html($GLOBALS['arlo_oa_list_item']['oa_registermessage']);
             
         $class = (!empty($atts['class']) ? $atts['class'] : 'button' );
 
@@ -190,15 +192,20 @@ class OnlineActivities {
     } 
 
     private static function shortcode_oa_offers ($content = '', $atts, $shortcode_name, $import_id = ''){
+        if(!isset($GLOBALS['arlo_oa_list_item']['oa_id'])) return '';
+
         return Shortcodes::advertised_offers($GLOBALS['arlo_oa_list_item']['oa_id'], 'oa_id', $import_id);
     }
 
-    private static function get_oa_atts($atts) {
+    private static function get_oa_atts($atts, $import_id) {
         $new_atts = [];
-        
+
+        $templatetag = \Arlo\Entities\Tags::get_tag_ids_by_tag(\Arlo\Utilities::get_att_string('templatetag', $atts), $import_id);
+
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'category', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'categoryhidden', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'oatag', $atts);
-        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'templatetag', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, null, 'templatetag', $atts, $templatetag);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo_For_Wordpress::get_region_parameter', 'region');
 
         return $new_atts;
@@ -207,12 +214,20 @@ class OnlineActivities {
     private static function shortcode_onlineactivites_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
 
+        $filter_settings = get_option('arlo_page_filter_settings', []);                       
+
         $template_name = Shortcodes::get_template_name($shortcode_name,'onlineactivites_list','oa');
-
-        self::$oa_list_atts = self::get_oa_atts($atts);
-
         $templates = arlo_get_option('templates');
         $content = $templates[$template_name]['html'];
+
+        self::$oa_list_atts = self::get_oa_atts($atts, $import_id);
+
+        \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$oa_list_atts, '\Arlo\Utilities::convert_string_to_int_array');
+        \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$oa_list_atts, '\Arlo\Utilities::convert_string_to_int_array', null, true);       
+
+        \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$oa_list_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id]);
+        \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$oa_list_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id], true);
+
         return do_shortcode($content);        
     }
 
@@ -330,7 +345,7 @@ class OnlineActivities {
 
         $output = '';
 
-        $join = '';
+        $join = [];
         $where = '';
         $parameters = array();
 
@@ -351,31 +366,55 @@ class OnlineActivities {
         }       
 
         $arlo_category = !empty($atts['category']) ? $atts['category'] : null;
+        $arlo_categoryhidden = !empty($atts['categoryhidden']) ? $atts['categoryhidden'] : null;               
         $arlo_oatag = !empty($atts['oatag']) ? $atts['oatag'] : null;
         $arlo_templatetag = isset($atts['templatetag']) ? $atts['templatetag'] : null;
+        $arlo_templatetaghidden = isset($atts['templatetaghidden']) ? $atts['templatetaghidden'] : null;
 
-        if(!empty($arlo_category)) :
-            $where .= " AND etc.c_arlo_id = %d";
-            $parameters[] = $arlo_category;
+        if(!empty($arlo_category) || !empty($arlo_categoryhidden)) :
+
+            $arlo_category = \Arlo\Utilities::convert_string_to_int_array($arlo_category);
+            $arlo_categoryhidden = \Arlo\Utilities::convert_string_to_int_array($arlo_categoryhidden);
+
+            if (!empty($arlo_category)) {
+                $where .= " AND etc.c_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $arlo_category)) . ")";       
+            
+                $parameters = array_merge($parameters, $arlo_category);    
+            }
+
+            if (!empty($arlo_categoryhidden)) {
+                //need to exclude all the child categories
+                $categoriesnot_flatten_list = CategoriesEntity::get_flattened_category_list_for_filter($arlo_categoryhidden, [], $import_id);
+                
+                $where .= " AND  (etc.c_arlo_id NOT IN (" . implode(',', array_map(function() {return "%d";}, $categoriesnot_flatten_list)) . ") OR etc.c_arlo_id IS NULL)";
+                $parameters = array_merge($parameters, array_map(function($cat) { return $cat['id']; }, $categoriesnot_flatten_list));
+            }
         endif;
 
         if(!empty($arlo_oatag)) :
-            $join .= " LEFT JOIN $t4 oa_tag ON oa_tag.oa_id = oa.oa_id AND oa_tag.import_id = oa.import_id";
+            $join['oa_tag'] = " LEFT JOIN $t4 AS oa_tag ON oa_tag.oa_id = oa.oa_id AND oa_tag.import_id = oa.import_id";
 
             $where .= " AND oa_tag.tag_id = %d";
             $parameters[] = $arlo_oatag;
         endif;
 
-        if(!empty($arlo_templatetag)) :
-            $join .= " LEFT JOIN $t6 ett ON ett.et_id = et.et_id AND ett.import_id = et.import_id";
+        if(!empty($arlo_templatetag) || !empty($arlo_templatetaghidden)) :    
+            if (!empty($arlo_templatetag)) {
+                $join['ett'] = " LEFT JOIN $t6 AS ett ON ett.et_id = et.et_id AND ett.import_id = et.import_id";
 
-            $where .= " AND ett.tag_id = %d";
+                $where .= " AND ett.tag_id IN (" . implode(',', array_map(function() {return "%d";}, $arlo_templatetag)) . ")";
+                $parameters = array_merge($parameters, $arlo_templatetag);    
+            }
             
-            $parameters[] = $arlo_templatetag;
+            if (!empty($arlo_templatetaghidden)) {
+                $tag_id_substitutes = implode(', ', array_map(function() {return "%d";}, $arlo_templatetaghidden));
+                $where .= " AND NOT EXISTS( SELECT tag_id FROM $t6 WHERE tag_id IN ($tag_id_substitutes) AND et.et_id = et_id AND import_id = et.import_id )";
+                $parameters = array_merge($parameters, $arlo_templatetaghidden);    
+            }
         endif;
 
         $field_list = '
-            DISTINCT oa.oa_id
+            oa.oa_id
         ';
 
         $limit_field = $order = '';
@@ -445,13 +484,13 @@ class OnlineActivities {
                 c.c_arlo_id = etc.c_arlo_id
             AND
                 c.import_id = etc.import_id
-            $join
+            " . implode("\n", $join) ."
             WHERE
             $where
             $order
             $limit_field
             ";
-        
+
 
         return $wpdb->prepare($sql, $parameters);
     }  
@@ -467,12 +506,12 @@ class OnlineActivities {
         ), $atts, $shortcode_name, $import_id));
 
         $filters_array = explode(',',$filters);
-        
+
         $settings = get_option('arlo_settings');
         
         $page_type = $filter_group = \Arlo_For_Wordpress::get_current_page_arlo_type('oa');
 
-        if (!empty($settings['post_types']['oa']['posts_page'])) {
+        if (!empty($settings['post_types'][$page_type]['posts_page'])) {
             $page_link = get_permalink(get_post($settings['post_types'][$page_type]['posts_page']));
         } else {
             $page_link = get_permalink(get_post($post));
@@ -481,90 +520,15 @@ class OnlineActivities {
         $filter_html = '';
 
         foreach($filters_array as $filter_key):
-
-            $att = strval(self::$oa_list_atts[$filter_key]);
-
+            
+            $att = (isset(self::$oa_list_atts[$filter_key]) && is_string(self::$oa_list_atts[$filter_key]) ? self::$oa_list_atts[$filter_key] : '');
+            
             if (!array_key_exists($filter_key, \Arlo_For_Wordpress::$available_filters['oa']['filters']))
                 continue;
 
-            switch($filter_key) :
-
-                case 'category' :
-                    $cats = CategoriesEntity::getTree(0, 1, 0, $import_id);
-                    
-                    if (!empty($cats)) {
-                        $cats = CategoriesEntity::getTree($cats[0]->c_arlo_id, 100, 0, $import_id);
-                    }
-
-                    if (is_array($cats)) {
-                        $filter_html .= Shortcodes::create_filter($filter_key, CategoriesEntity::child_categories($cats), __('All categories', 'arlo-for-wordpress'),$filter_group,$att);                  
-                    }
-
-                    break;
-
-                case 'oatag' :
-                    $items = $wpdb->get_results(
-                        "SELECT DISTINCT
-                            t.id,
-                            t.tag
-                        FROM 
-                            {$wpdb->prefix}arlo_onlineactivities_tags AS oatag
-                        LEFT JOIN 
-                            {$wpdb->prefix}arlo_tags AS t
-                        ON
-                            t.id = oatag.tag_id
-                        AND
-                            t.import_id = oatag.import_id
-                        WHERE 
-                            oatag.import_id = $import_id
-                        ORDER BY tag", ARRAY_A);
-
-                    $tags = array();
-
-                    foreach ($items as $item) {
-                        $tags[] = array(
-                            'string' => $item['tag'],
-                            'value' => $item['id'] . '-' . $item['tag'],
-                        );
-                    }
-
-                    $filter_html .= Shortcodes::create_filter($filter_key, $tags, __('Select tag', 'arlo-for-wordpress'),$filter_group,$att);              
-
-                    break;
-
-                case 'templatetag' :
-                    //template tag select
-                    
-                    $items = $wpdb->get_results(
-                        "SELECT DISTINCT
-                            t.id,
-                            t.tag
-                        FROM 
-                            {$wpdb->prefix}arlo_eventtemplates_tags AS ett
-                        LEFT JOIN 
-                            {$wpdb->prefix}arlo_tags AS t
-                        ON
-                            t.id = ett.tag_id
-                        AND
-                            t.import_id = ett.import_id
-                        WHERE 
-                            ett.import_id = $import_id
-                        ORDER BY tag", ARRAY_A);
-
-                    $tags = array();
-                    
-                    foreach ($items as $item) {
-                        $tags[] = array(
-                            'string' => $item['tag'],
-                            'value' => $item['id'] . '-' . $item['tag'],
-                        );
-                    }
-
-                    $filter_html .= Shortcodes::create_filter($filter_key, $tags, __('Select tag', 'arlo-for-wordpress'),$filter_group,$att);               
-                    
-                    break;
-
-            endswitch;
+            $items = Filters::get_filter_options($filter_key, $import_id);
+            
+            $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'), 'generic', $att, 'oa');
         endforeach;
 
         if (!empty($filter_html)) {
@@ -580,6 +544,8 @@ class OnlineActivities {
     }
 
     private static function shortcode_oa_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if(!isset($GLOBALS['arlo_oa_list_item']['et_post_name'])) return '';
+
         $oa_snippet = self::get_snippet_data($atts,$shortcode_name,$import_id);
         return Shortcodes::create_rich_snippet( json_encode($oa_snippet) );
     }

@@ -254,6 +254,7 @@ class Arlo_For_Wordpress {
     public static $delivery_labels = array(
         0 => 'Workshop',
         1 => 'Online',
+        99 => 'Online Activity'
     );
     
 	/**
@@ -367,7 +368,7 @@ class Arlo_For_Wordpress {
 		'oa' => array(
 			'name' => 'Online activities',
 			'filters' => array(
-				'oatag' => 'Online activity tag', 
+				//'oatag' => 'Online activity tag',  //OA cannot be tagged currently
 				'templatetag' => 'Template tag',
 				'category' => 'Category'
 			)
@@ -392,8 +393,87 @@ class Arlo_For_Wordpress {
 				'state' => 'State'
 			)
 		)
-
 	);
+
+	/**
+	 * $available_page_filters: defines the available filters for the plugin
+	 *
+	 * @since    3.6.0
+	 *
+	 * @var      array
+	 */
+
+	public static  $available_page_filters = array(
+		'upcoming' => array(
+			'name' => 'Upcoming',
+			'filters' => array(
+				'category' => 'Category', 
+				'location' => 'Location', 
+				'delivery' => 'Delivery', 
+				'eventtag' => 'Event tag', 
+				'templatetag' => 'Template tag', 
+			)
+		),
+		'oa' => array(
+			'name' => 'Online activities',
+			'filters' => array(
+				'category' => 'Category',
+				'templatetag' => 'Template tag',
+			)
+		),
+		'template' => array(
+			'name' => 'Catalogue',
+			'filters' => array(
+				'category' => 'Category', 
+				'delivery' => 'Delivery', 
+				'location' => 'Location', 
+				'templatetag' => 'Template tag',
+			)
+		),
+		'schedule' => array(
+			'name' => 'Schedule',
+			'filters' => array(
+				'category' => 'Category', 
+				'delivery' => 'Delivery', 
+				'location' => 'Location', 
+				'templatetag' => 'Template tag',
+			)
+		)
+	);	
+
+	/**
+	 * $page_filter_options: behaviour selector for page filters
+	 *
+	 * @since    3.6.0
+	 *
+	 * @var      array
+	 */
+
+    public static $page_filter_options = array(
+		'showonly' => 'Hide all except',
+        'exclude' => 'Show all except',
+    );	
+
+
+	/**
+	 * $filter_labels: maps filter name to their labels
+	 *
+	 * @since    3.5.0
+	 *
+	 * @var      array
+	 */
+
+    public static $filter_labels = array(
+        'category' => 'All categories',
+        'delivery' => 'All delivery options',
+        'month' => 'All months',
+        'location' => 'All locations',
+        'state' => 'Select state',
+        'eventtag' => 'Select tag',
+        'templatetag' => 'Select tag',
+        'presenter' => 'All presenters',
+        'oatag' => 'All tags'
+    );
 
 
 	/**
@@ -413,6 +493,9 @@ class Arlo_For_Wordpress {
 
 		// Register custom post types
 		add_action( 'init', 'arlo_register_custom_post_types');
+
+		// Add review notice
+		add_action( 'init', array( $this, 'arlo_add_review_message' ) );
 
 		// Load public-facing style sheet and JavaScript.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
@@ -445,6 +528,8 @@ class Arlo_For_Wordpress {
 	
 	
 		add_action( 'wp_ajax_arlo_dismissible_notice', array($this, 'dismissible_notice_callback'));
+
+		add_action( 'wp_ajax_arlo_increment_review_notice_date', array($this, 'increment_review_notice_date'));
 
 		add_action( 'wp_ajax_arlo_turn_off_send_data', array($this, 'turn_off_send_data_callback'));
 		
@@ -788,6 +873,9 @@ class Arlo_For_Wordpress {
 		// run import every 15 minutes
 		Logger::log("Plugin activated");
 
+		// set date to show review notice
+		self::set_review_notice_date("+7 day");
+
 		// now add pages
 		self::add_pages();
 
@@ -806,6 +894,54 @@ class Arlo_For_Wordpress {
 			do_action('arlo_scheduler');
 		}
 	}
+
+
+	/**
+	 * Set the date to show the review notice
+	 *
+	 * @since    3.6.0
+	 *
+	 */	
+	public function set_review_notice_date($increment) {
+		$date = \DateTime::createFromFormat('U', strtotime($increment, time()))->format("Y-m-d H:i:s");
+		update_option('arlo_review_notice_date',$date);
+	}
+
+
+	/**
+	 * Increment the date to show the review notice
+	 *
+	 * @since    3.6.0
+	 *
+	 */	
+	public function increment_review_notice_date() {
+		self::set_review_notice_date("+1 month");
+		$this->get_message_handler()->delete_messages('review');
+	}
+
+
+	/**
+	 * Add a review message
+	 *
+	 * @since    3.6.0
+	 *
+	 */	
+	public function arlo_add_review_message() {
+		$review_notice_date = get_option('arlo_review_notice_date');
+
+		if (time() >= strtotime($review_notice_date) && $this->get_message_handler()->get_message_by_type_count('review', true) == 0) {
+			$message = "<p>
+				It's great to see that you've been using the <strong>Arlo for WordPress</strong> plugin for a while now. Hopefully you're happy with it! If so, would you consider leaving a positive review? It really helps to support the plugin and helps others to discover it too!
+			</p>
+			<p>
+				<a href='https://wordpress.org/support/plugin/arlo-training-and-event-management-system/reviews/' target='_blank' class='arlo-review-option'>Sure, I'd love to!</a> &#8226; <a href='#' target='_blank' class='arlo-review-option notice-dismiss-custom'>No thanks</a> &#8226; <a href='https://support.arlo.co/hc/en-gb/requests/new' target='_blank' class='arlo-review-option'>I actually need some help</a> &#8226; <a href='#' target='_blank' class='arlo-review-option notice-ask-later'>Ask me later</a>
+			</p>
+			";
+
+			$this->get_message_handler()->set_message('review', '', $message, true);
+		}
+	}
+
 
 	/**
 	 * Set the default theme
@@ -905,8 +1041,15 @@ class Arlo_For_Wordpress {
 	 * @since    1.0.0
 	 */
 	public function enqueue_styles() {
+
+		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-tingle', '//cdnjs.cloudflare.com/ajax/libs/tingle/0.12.0/tingle.css', VersionHandler::VERSION );
+
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css?20170424', __FILE__ ), array(), VersionHandler::VERSION );
+
+		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-bootstrap-modals', plugins_url( 'assets/css/libs/bootstrap-modals.css?20170424', __FILE__ ), array(), VersionHandler::VERSION );
+
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-darktooltip', plugins_url( 'assets/css/libs/darktooltip.min.css', __FILE__ ), array(), VersionHandler::VERSION );
+
 		wp_enqueue_style( $this->plugin_slug .'-arlo-icons8', plugins_url( '../admin/assets/fonts/icons8/Arlo-WP.css', __FILE__ ), array(), VersionHandler::VERSION );
 
 		//enqueue theme related styles
@@ -1026,12 +1169,20 @@ class Arlo_For_Wordpress {
 		$settings = get_option('arlo_settings');
 		$page_id = get_query_var('page_id', '');
 		$obj = get_queried_object();
-		
+
 		$page_id = (empty($obj->ID) ? $page_id : $obj->ID);
-		
+
 		if (!empty($obj->post_type) && $obj->post_type == 'arlo_event' && !empty($obj->post_content)) {
-			$ellipsis = '';
 			$desc = strip_tags($obj->post_content);
+		} else {
+			$category = $this->fetch_category($page_id);
+			if (!empty($category) && !empty($category->c_header)) {
+				$desc = strip_tags($category->c_header);
+			}
+		}
+
+		if (!empty($desc)) {
+			$ellipsis = '';
 			if (strlen($desc) >= 150) {
 				$end_pos = strpos($desc, " ", 140);
 				$ellipsis = '...';
@@ -1040,9 +1191,40 @@ class Arlo_For_Wordpress {
 			}
 			$desc = substr($desc, 0, $end_pos) . $ellipsis;
 			
-			echo '<meta description="' . htmlspecialchars($desc, ENT_COMPAT, 'UTF-8') . '">';
+			echo '<meta name="description" content="' . htmlspecialchars($desc, ENT_COMPAT, 'UTF-8') . '">';
 		}
-	}	
+	}
+
+	private function fetch_category($page_id) {
+		$filter_settings = get_option('arlo_page_filter_settings', []);
+
+		$page = get_post($page_id);
+		if (!$page) return;
+		
+		$template_name = $page->post_name;
+
+		//too early to call get_selected_categories()
+		$stored_atts = [];
+		\Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, [], $stored_atts, '\Arlo\Utilities::convert_string_to_int_array');
+		\Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, [], $stored_atts, '\Arlo\Utilities::convert_string_to_int_array', null, true);
+		$category_slug_or_array = \Arlo\Utilities::get_att_string('category', $stored_atts);
+
+		$category_id = 0;
+		if (is_array($category_slug_or_array)) {
+			if (isset($category_slug_or_array[0])) {
+				$category_id = $category_slug_or_array[0];
+			}
+		} else {
+			$category_id = intval($category_slug_or_array);
+		}
+
+		if (empty($category_id)) {
+			return '';
+		}
+
+		$import_id = $this->get_importer()->get_current_import_id();
+		return \Arlo\Entities\Categories::get([ 'id' => intval($category_id)], 1, $import_id);
+	}
 	
 	
 	
@@ -1069,7 +1251,12 @@ class Arlo_For_Wordpress {
 	 * @since    1.0.0
 	 */
 	public function enqueue_scripts() {
+		wp_enqueue_script( $this->plugin_slug . '-plugin-script-tingle', '//cdnjs.cloudflare.com/ajax/libs/tingle/0.12.0/tingle.min.js', VersionHandler::VERSION );
+
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script', plugins_url( 'assets/js/public.js?20170424', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION );
+
+		wp_enqueue_script( $this->plugin_slug . '-plugin-script-bootstrap-modals', plugins_url( 'assets/js/libs/bootstrap-modals.min.js?20171112', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION );
+
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script-darktooltip', plugins_url( 'assets/js/libs/jquery.darktooltip.min.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION );
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script-cookie', plugins_url( 'assets/js/libs/js.cookie.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION );
 		wp_localize_script( $this->plugin_slug . '-plugin-script', 'objectL10n', array(
@@ -1478,7 +1665,7 @@ class Arlo_For_Wordpress {
 		foreach (Arlo_For_Wordpress::$templates as $key => $val) {
 			if ($key == 'new_custom') { continue; }
 			$template_type = array_key_exists( 'type', $val ) ? $val['type'] : $key;
-			$templates[ARLO_PLUGIN_PREFIX . '-' . $key] = $theme_templates[$template_type]['html'];
+			$templates[ARLO_PLUGIN_PREFIX . '-' . $key] = (isset($theme_templates[$template_type]['html']) ? $theme_templates[$template_type]['html'] : '');
 		}
 
 		return $templates;
@@ -1590,11 +1777,11 @@ class Arlo_For_Wordpress {
 			
 			case 'presenter':
 				$presenter = \Arlo\Entities\Presenters::get(array('id' => intval($_GET['arlo_id'])), array(), 1, $import_id);
-				
+
 				if(!$presenter) return;
 				
-				$post = arlo_get_post_by_name($presenter->p_post_name, 'arlo_presenter');
-				
+				$post = arlo_get_post_by_name($presenter['p_post_name'], 'arlo_presenter');
+
 				if(!$post) return;
 				
 				$location = get_permalink($post->ID);
@@ -1719,7 +1906,7 @@ class Arlo_For_Wordpress {
 			? strtoupper(get_query_var('arlo-region', ''))
 			: (!empty($_COOKIE['arlo-region']) ? $_COOKIE['arlo-region'] : '');
 
-		return (!empty($arlo_region) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+		return (!empty($arlo_region) && is_array($regions) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
     }
     
    	public function get_tag_by_id($tag_id) {

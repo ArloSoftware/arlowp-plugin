@@ -99,6 +99,7 @@
 .arlo-event-location,
 .arlo-event-provider,
 .arlo-event-presenters,
+.arlo-event-notice,
 .arlo-event-session-description,
 .arlo-event-time
 {
@@ -254,6 +255,12 @@ p.arlo-no-results {
 	text-align: right;
 }
 
+.arlo-popup-body {
+	max-height: 600px;
+	max-height: 80vh;
+	overflow-y: auto;
+}
+
 /* BOXED LAYOUT OVERRIDE */
 
 
@@ -406,3 +413,9 @@ p.arlo-no-results {
 	box-shadow: none !important;
 	text-shadow: none !important;
 }
+
+
+.arlo-sessions-popup-content {
+	display: none;
+}
+

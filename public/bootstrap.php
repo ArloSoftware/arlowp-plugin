@@ -248,7 +248,7 @@ function arlo_register_custom_post_types() {
 	if (strpos($_SERVER['QUERY_STRING'], 'arlo-search') !== false && !empty($_GET['arlo-search'])) {
 		if(isset($settings['post_types']['eventsearch']['posts_page']) && $settings['post_types']['eventsearch']['posts_page'] != 0) {
 			$slug = substr(substr(str_replace(get_home_url(), '', get_permalink($settings['post_types']['eventsearch']['posts_page'])), 0, -1), 1);
-			$location = '/' . $slug . '/search/' . rawurlencode(wp_unslash($_GET['arlo-search'])) . '/';
+			$location = '/' . $slug . '/search/' . rawurlencode(str_replace(['/','\\'], '', wp_unslash($_GET['arlo-search']))) . '/';
 			wp_redirect( get_home_url() . $location );
 			exit();
 		}
@@ -298,7 +298,8 @@ function arlo_register_custom_post_types() {
 				if (!empty($_COOKIE['arlo-region']) && in_array($_COOKIE['arlo-region'], array_keys($regions))) {
 					$selected_region = $_COOKIE['arlo-region'];
 				} else {
-					$selected_region = reset(array_keys($regions));
+					$regions_keys = array_keys($regions);
+					$selected_region = reset($regions_keys);
 				}
 				
 				setcookie("arlo-region", $selected_region, time()+60*60*24*30, '/', $domain);	
@@ -318,8 +319,12 @@ function arlo_register_custom_post_types() {
 			}
 		} else {
 			if (empty($_COOKIE['arlo-region'])) {
-				setcookie("arlo-region", reset(array_keys($regions)), time()+60*60*24*30, '/', $domain);
-				wp_redirect($_SERVER['REQUEST_URI']);
+				$regions_keys = array_keys($regions);
+				setcookie("arlo-region", reset($regions_keys), time()+60*60*24*30, '/', $domain);
+				
+				//Some hosting has high level caching (caches the redirects) and no cookies are available which means it can stuck in a redirect loop
+				if (!empty($_COOKIE['arlo-region']))
+					wp_redirect($_SERVER['REQUEST_URI']);
 			}
 		}
 	}

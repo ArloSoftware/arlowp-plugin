@@ -6,8 +6,8 @@ use Arlo\Logger;
 
 class SchemaManager {
 
-	const DB_SCHEMA_HASH = '48ea9f90faccf74546d647038566f6e3b6c20dc0';
-	const DB_SCHEMA_VERSION = '3.0.0';
+	const DB_SCHEMA_HASH = '35da0c3b05f17b445244e64977737eec9ab4495d';
+	const DB_SCHEMA_VERSION = '3.6.0';
 
 	/* database layer */
 	private $dbl;
@@ -212,11 +212,13 @@ class SchemaManager {
 			e_isonline tinyint(1) NOT NULL DEFAULT FALSE,
 			e_parent_arlo_id int(11) NOT NULL,
 			e_region varchar(5) NOT NULL,	
+			e_is_taxexempt tinyint(1) NOT NULL DEFAULT FALSE,
 			import_id int(10) unsigned DEFAULT NULL,
 			PRIMARY KEY  (e_id),
 			KEY et_arlo_id (et_arlo_id),
 			KEY e_arlo_id (e_arlo_id),
 			KEY e_region (e_region),
+			KEY e_is_taxexempt (e_is_taxexempt),
 			KEY v_id (v_id))
 			CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";";
 
@@ -522,7 +524,7 @@ class SchemaManager {
 
 		$sql = "CREATE TABLE $table_name (
 			id int(10) unsigned NOT NULL AUTO_INCREMENT,
-			type enum('import_error', 'information', 'error') DEFAULT NULL,
+			type enum('import_error', 'information', 'error', 'review') DEFAULT NULL,
 			title varchar(255) DEFAULT NULL,
 			message text NOT NULL,
 			global tinyint(1) DEFAULT 0,

@@ -50,16 +50,16 @@
                 
         $('.arlo-filters > select').change(function() {
         	var filters = {
-        		'search-': 'arlo-filter-search',
-        		'cat-': 'arlo-filter-category',
-        		'month-': 'arlo-filter-month',
-        		'location-': 'arlo-filter-location',
-        		'delivery-': 'arlo-filter-delivery',
-        		'eventtag-': 'arlo-filter-eventtag',
-        		'templatetag-': 'arlo-filter-templatetag',
-	    		'oatag-': 'arlo-filter-oatag',
-        		'presenter-': 'arlo-filter-presenter',
-        		'state-': 'arlo-filter-state'
+        		'search': 'arlo-filter-search',
+        		'cat': 'arlo-filter-category',
+        		'month': 'arlo-filter-month',
+        		'location': 'arlo-filter-location',
+        		'delivery': 'arlo-filter-delivery',
+        		'eventtag': 'arlo-filter-eventtag',
+        		'templatetag': 'arlo-filter-templatetag',
+	    		'oatag': 'arlo-filter-oatag',
+        		'presenter': 'arlo-filter-presenter',
+        		'state': 'arlo-filter-state'
         	};
         	
         	var page = $('#arlo-page').val();
@@ -73,17 +73,34 @@
 			}
 
         	var url = page;
-        	
-        	for (var i in filters) {
-        		if (filters.hasOwnProperty(i) && $('#' + filters[i]).length == 1 && $('#' + filters[i]).val().trim() != '') {
-        			if (i == 'search-') {
-        				url += 'search/' + encodeURIComponent($('#' + filters[i]).val().trim()) + '/'; 
-        			} else {
-        				url += i + encodeURIComponent($('#' + filters[i]).val().trim()) + '/'; 
-        			}
+			var urlParams = [];
+
+			for (var i in filters) {
+        		if (filters.hasOwnProperty(i) && $('#' + filters[i]).length == 1) {
+					var content = $('#' + filters[i]).val().trim();
+					if (content != '') {
+						if (content.indexOf('/') === -1 || content.indexOf('\\') === -1) {
+							if (i == 'search') {
+								url += 'search/' + encodeURIComponent(content) + '/'; 
+							} else {
+								url += i + '-' + encodeURIComponent(content) + '/'; 
+							}
+						} else {
+							//default url structure does not work with slashes
+							if (i == 'cat') {
+								urlParams.push('arlo-category=' + encodeURIComponent(content));
+							} else {
+								urlParams.push('arlo-' + i + '=' + encodeURIComponent(content));
+							}
+						}
+					}
         		} 
-        	}
-        	
+			}
+
+			if (urlParams.length > 0) {
+				url += '?' + urlParams.join('&');
+			}
+
         	document.location = url;
         });
         
@@ -109,6 +126,28 @@
 			gravity: 'north'
 		});
 
+
+		//modal init
+		$('.arlo-sessions-popup-trigger').each(function(i, el) {
+			var modal = new tingle.modal({
+				footer: true,
+				cssClass: ['arlo'],
+			    closeMethods: ['overlay', 'button', 'escape']
+			});
+
+			var popupContent = $($(el).data('target')).html();
+
+			modal.setContent(popupContent);
+
+			modal.addFooterBtn('Close', 'arlo-close-btn button btn btn-primary', function() {
+			    modal.close();
+			});
+
+			$(el).click(function(e) {
+				e.preventDefault();
+				modal.open()
+			});
+		});
 	});
 	
 	function getUriRegion() {
@@ -140,7 +179,7 @@
     function changeRegion(uriRegion, newRegion) {
 
 	    //Manually set cookie
-    	Cookies.set("arlo-region", newRegion, { path: "/" });
+    	Cookies.set("arlo-region", newRegion, { path: "/", domain: window.location.hostname });
 
     	if (uriRegion) {
 		    window.location.href = window.location.href.replace("/region-" + uriRegion + "/", "/region-" + newRegion + "/").replace(/location-\w+(%\d+)?\w*/g,"");

@@ -5,7 +5,7 @@ namespace Arlo;
 use Arlo\Utilities;
 
 class VersionHandler {
-	const VERSION = '3.5.2';
+	const VERSION = '3.6';
 
 	private $dbl;
 	private $message_handler;
@@ -53,6 +53,10 @@ class VersionHandler {
 			$this->run_pre_data_update('3.0');
 		}			
 		
+		if (version_compare($old_version, '3.6') < 0) {
+			$this->run_pre_data_update('3.6');
+		}			
+		
 		arlo_add_datamodel();	
 
 		if (version_compare($old_version, '2.2.1') < 0) {
@@ -98,6 +102,10 @@ class VersionHandler {
 		if (version_compare($old_version, '3.5.1') < 0) {
 			$this->do_update('3.5.1');
 		}
+
+		if (version_compare($old_version, '3.6') < 0) {
+			$this->do_update('3.6');
+		}
 	}
 	
 	private function run_pre_data_update($version) {
@@ -135,7 +143,7 @@ class VersionHandler {
 				if (!is_null($exists)) {
 					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events_presenters CHANGE  e_arlo_id  e_id int( 11 ) NOT NULL DEFAULT  '0'");
 						
-				}				
+				}
 
 				$exists = $this->dbl->get_var("SHOW KEYS FROM " . $this->dbl->prefix . "arlo_categories WHERE key_name = 'c_arlo_id'", 0, 0);
 				if (!is_null($exists)) {
@@ -176,6 +184,14 @@ class VersionHandler {
 			case '3.0':
 				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events DROP e_summary;");
 				$this->dbl->query("DROP TABLE " . $this->dbl->prefix . "arlo_timezones_olson;");
+			break;	
+
+			case '3.6':
+			$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_events LIKE 'e_is_taxexempt'", 0, 0);
+			if (is_null($exists)) {
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events ADD e_is_taxexempt TINYINT(1) NOT NULL DEFAULT '0' AFTER e_isonline");
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events ADD INDEX (e_is_taxexempt(1))");
+			}
 			break;					
 		}
 	}	
@@ -520,6 +536,8 @@ class VersionHandler {
 				}
 
 				update_option('arlo_filter_settings', $filter_settings);
+
+				$this->plugin->set_review_notice_date('now');
 			break;
 
 			case '3.5.1':
@@ -533,7 +551,130 @@ class VersionHandler {
 				unset( $_COOKIE['arlo-vertical-tab'] );
 				setcookie('arlo-vertical-tab', null, -1, '/', $domain);
 				
+			break;			
+
+			case '3.6':
+				//update filter settings, if there is
+				$filter_settings = get_option('arlo_filter_settings', []);
+
+				//use numeric key for filters, etc
+				$new_settings_array = [];
+				foreach ($filter_settings as $page => $filter_options) {
+					if ($page == 'arlohiddenfilters') {
+						continue;
+					}
+		
+					if (!isset($new_settings_array[$page])) {
+						$new_settings_array[$page] = [];
+					}
+		
+					foreach ($filter_options as $group => $filters) {
+						if (!isset($new_settings_array[$page][$group])) {
+							$new_settings_array[$page][$group] = [];
+						}
+		
+						switch ($group) {
+							case 'category':
+							break;
+		
+							case 'delivery':
+								foreach ($filters as $old_value => $new_value) {
+									$delivery_key = array_search($old_value, \Arlo_For_Wordpress::$delivery_labels);
+									if ($delivery_key !== false && !empty($new_value))
+										$new_settings_array[$page][$group][$delivery_key] = $new_value;
+								}
+							break;
+							default: 
+								foreach ($filters as $old_value => $new_value) {
+									if (!empty($new_value))
+										$new_settings_array[$page][$group][$old_value] = $new_value;
+									
+								}
+							break;
+						}
+					}
+				}
+				if (isset($filter_settings['arlohiddenfilters']) && is_array($filter_settings['arlohiddenfilters'])) {
+					foreach ($filter_settings['arlohiddenfilters'] as $page => $filter_options) {		
+						if (!isset($new_settings_array['hiddenfilters'][$page])) {
+							$new_settings_array['hiddenfilters'][$page] = [];
+						}
+			
+						foreach ($filter_options as $group => $filters) {
+							if (!isset($new_settings_array['hiddenfilters'][$page][$group])) {
+								$new_settings_array['hiddenfilters'][$page][$group] = [];
+							}
+			
+							switch ($group) {
+								case 'category':
+								break;
+			
+								case 'delivery':
+									foreach ($filters as $filter) {
+										$delivery_key = array_search($filter, \Arlo_For_Wordpress::$delivery_labels);
+										if ($delivery_key !== false)
+											$new_settings_array['hiddenfilters'][$page][$group][] = $delivery_key;
+									}
+								break;
+								default: 
+									foreach ($filters as $filter) {
+										if (!empty($filter))
+											$new_settings_array['hiddenfilters'][$page][$group][] = $filter;
+										
+									}
+								break;
+							}
+						}
+					}
+				}
+				
+
+				//now remove by-page filters and only keep hidden and delivery
+				$filter_settings = $new_settings_array;
+				$is_notice_required = false;
+				$filter_parts = ['showonlyfilters', 'hiddenfilters', 'generic'];
+
+				//create new generic section
+				foreach ($filter_settings as $page => $filter_options) {
+					if (!in_array($page, $filter_parts)) {
+						foreach ($filter_options as $group => $filters) {
+							//copy first delivery filters
+							if ($group == 'delivery' && empty($filter_settings['generic'])) {
+								$filter_settings['generic'] = array('delivery' => $filters);
+								break;
+							}
+						}
+					}
+				}
+
+				//remove obsolete filter settings
+				foreach ($filter_settings as $page => $filter_options) {
+					if (!in_array($page, $filter_parts)) {
+						//remove the whole page
+						unset($filter_settings[$page]);
+						$is_notice_required = true;
+					} else {
+						foreach ($filter_options as $group => $filters) {
+							//remove all non-delivery groups
+							if ($group != 'delivery') {
+								unset($filter_settings[$page][$group]);
+							}
+						}
+					}
+				}
+
+				if ($is_notice_required) {
+					$message = [
+						'<p>'. __('The Filters tab has been removed and previous filter settings are no longer available. The delivery filter settings are now configured from the General Settings tab and apply to all Arlo for WordPress pages. Locations, tags and categories should be managed from the Arlo management platform.', 'arlo-for-wordpress' ) . '</p>'
+					];
+					if (!$this->message_handler->set_message('import_error', __('Filter settings deleted', 'arlo-for-wordpress' ), implode('', $message), true)) {
+						Logger::log("Couldn't create Arlo 3.6 filters settings lost notice message");
+					}
+				}
+
+				update_option('arlo_filter_settings', $filter_settings);
 			break;
+
 		}	
 	}
 

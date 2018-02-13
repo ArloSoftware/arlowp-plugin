@@ -9,6 +9,7 @@
         [arlo_categories wrap='<div class="arlo-categories">%s</div>']
 
         [arlo_event_template_filters filters="location"]
+        [arlo_template_region_selector]
     </div>
 
     <ul class="arlo-list catalogue">

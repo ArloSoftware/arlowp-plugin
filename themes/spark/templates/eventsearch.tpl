@@ -1,6 +1,6 @@
 <div class="arlo" id="arlo">
 
-    [arlo_template_search_region_selector]
+    [arlo_template_search_region_selector wrap='<div class="arlo-filter-region-search">%s</div>']
 
     [arlo_search_field placeholder="Search events" buttonclass="arlo-button" showbutton="true" wrap='<div class="arlo-cf">%s</div>']
 

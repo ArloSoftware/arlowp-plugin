@@ -5,8 +5,8 @@
  * @package   Arlo_For_Wordpress_Admin
  * @author    Arlo <info@arlo.co>
  * @license   GPL-2.0+
- * @link      http://arlo.co
- * @copyright 2015 Arlo
+ * @link      https://arlo.co
+ * @copyright 2018 Arlo
  */
 
 /**
@@ -591,10 +591,60 @@ class Arlo_For_Wordpress_Admin {
 
 		return $new;
 	}
+
+	private function normalize_filter_options($settings_name, $setting_array) {
+		//normalize filters options
+		$filters = array();
+
+		if (isset($setting_array[$settings_name]) && is_array($setting_array[$settings_name]) && count($setting_array[$settings_name])) {
+			foreach($setting_array[$settings_name] as $filter_group_name => $filter_group) {
+				foreach ($filter_group as $filter_name => $filter_settings) {
+					foreach ($filter_settings as $filter_setting_id => $filter_setting) {
+						$old_value = (isset($filter_setting['filteroldvalue']) ? esc_html($filter_setting['filteroldvalue']) : '');
+						$new_value = (isset($filter_setting['filternewvalue']) ? esc_html($filter_setting['filternewvalue']) : '');
+						if (strlen($new_value) > 64) {
+							$new_value = substr($new_value, 0, 64);
+						}
+						
+						if (isset($filter_setting["filteraction"]) && $filter_setting["filteraction"] == "rename" && isset($old_value) && !empty($new_value)) {
+							$filters[$filter_group_name][$filter_name][$old_value] = $new_value;
+						}
+
+						if (isset($filter_setting["filteraction"]) && $filter_setting["filteraction"] == "exclude" && isset($old_value) && $old_value != '') {
+							if (!isset($filters['hiddenfilters'][$filter_group_name][$filter_name])) {
+								$filters['hiddenfilters'][$filter_group_name][$filter_name] = array();
+							}
+
+							array_push($filters['hiddenfilters'][$filter_group_name][$filter_name], htmlspecialchars_decode($old_value, ENT_QUOTES));
+						} else if (isset($filter_setting["filteraction"]) && $filter_setting["filteraction"] == "showonly"  && isset($old_value) && $old_value != '') {
+							if (!isset($filters['showonlyfilters'][$filter_group_name][$filter_name])) {
+								$filters['showonlyfilters'][$filter_group_name][$filter_name] = array();
+							}
+
+							array_push($filters['showonlyfilters'][$filter_group_name][$filter_name], htmlspecialchars_decode($old_value, ENT_QUOTES));
+						}
+						else {
+							if (!empty($filters['hiddenfilters'][$filter_group_name][$filter_name])) {
+								$old_value_index = array_search($old_value, $filters['hiddenfilters'][$filter_group_name][$filter_name]);
+
+								if ($old_value_index) {
+									unset( $filters['hiddenfilters'][$filter_group_name][$filter_name][$old_value_index] );
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		update_option($settings_name, $filters);
+	}
 		
 	public function settings_saved($old) {
 		$new = get_option('arlo_settings', array());
+		$import_id = get_option('arlo_import_id');
 		$old_regions = get_option('arlo_regions', array());
+		$plugin = Arlo_For_Wordpress::get_instance();
 
 		//save theme changes
 		$theme_id = get_option('arlo_theme', Arlo_For_Wordpress::DEFAULT_THEME);
@@ -603,7 +653,6 @@ class Arlo_For_Wordpress_Admin {
 		update_option('arlo_themes_settings', $stored_themes_settings, 1);
 			
 		if($old['platform_name'] != $new['platform_name'] && !empty($new['platform_name'])) {
-			$plugin = Arlo_For_Wordpress::get_instance();
 			$plugin->determine_url_structure($new['platform_name']);
 			
 			$scheduler = $plugin->get_scheduler();
@@ -623,7 +672,8 @@ class Arlo_For_Wordpress_Admin {
 
 			if (WP_Filesystem($creds)) {
 				global $wp_filesystem;
-				$new['customcss'] = preg_replace('/<\/style>/i', '', $new['customcss']);
+				$custom_css = (isset($new['customcss']) ? $new['customcss'] : '');
+				$new['customcss'] = preg_replace('/<\/style>/i', '', $custom_css);
 				
 				$filename = trailingslashit(plugin_dir_path( __FILE__ )).'../public/assets/css/custom.css';
 				if ($wp_filesystem->put_contents( $filename, $new['customcss'], FS_CHMOD_FILE)) {
@@ -633,6 +683,13 @@ class Arlo_For_Wordpress_Admin {
 			}	
 		}
 
+		//check if the tax exempt tag has changed
+		if (!empty($import_id) && (
+			(isset($new['taxexempt_tag']) && isset($old['taxexempt_tag']) && $new['taxexempt_tag'] != $old['taxexempt_tag']) ||
+			!isset($new['taxexempt_tag']) || !isset($old['taxexempt_tag'])
+			)) {
+			$plugin->get_importer()->set_tax_exempt_events($import_id);
+		}
 
 		//normalize regions
 		$regions = array();
@@ -643,45 +700,11 @@ class Arlo_For_Wordpress_Admin {
 				}
 			}
 		}
-		
 		update_option('arlo_regions', $regions);
 
-
-		//normalize filters options
-		$filters = array();
-		if (is_array($new['arlo_filter_settings']) && count($new['arlo_filter_settings'])) {
-			foreach($new['arlo_filter_settings'] as $filter_group_name => $filter_group) {
-				foreach ($filter_group as $filter_name => $filter_settings) {
-					foreach ($filter_settings as $filter_setting_id => $filter_setting) {
-						$old_value = esc_html($filter_setting['filteroldvalue']);
-						$new_value = esc_html($filter_setting['filternewvalue']);
-
-						if ( !empty($old_value) || !empty($new_value) ) {
-							$filters[$filter_group_name][$filter_name][$old_value] = $new_value;
-						}
-
-						if ( !empty($filter_setting["filterhideoption"]) ) {
-							if (!isset($filters['arlohiddenfilters'][$filter_group_name][$filter_name])) {
-							    $filters['arlohiddenfilters'][$filter_group_name][$filter_name] = array();
-							}
-
-							array_push($filters['arlohiddenfilters'][$filter_group_name][$filter_name], $old_value);
-						} else {
-							if (!empty($filters['arlohiddenfilters'][$filter_group_name][$filter_name])) {
-								$old_value_index = array_search($old_value, $filters['arlohiddenfilters'][$filter_group_name][$filter_name]);
-
-								if ($old_value_index) {
-									unset( $filters['arlohiddenfilters'][$filter_group_name][$filter_name][$old_value_index] );
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		update_option('arlo_filter_settings', $filters);
-
+		//normalize filter options and save them
+		$this->normalize_filter_options('arlo_filter_settings', $new);
+		$this->normalize_filter_options('arlo_page_filter_settings', $new);
 
 		// need to check for posts-page change here
 		// loop through each post type and check if the posts-page has changed

@@ -59,6 +59,16 @@ class Categories {
 					}
 					continue;
 				break;
+				
+				case 'ignored':
+					if(is_array($value) && count($value)) {
+						$where[] = "c.c_arlo_id NOT IN (" . implode(',', array_map(function() {return "%d";}, $value)) . ")";
+						$parameters = array_merge($parameters, $value);
+					} else if(!empty($value)) {
+						$where[] = "c.c_arlo_id <> %d";
+						$parameters[] = $value;
+					}
+				break;
 			}
 		}
 		
@@ -81,22 +91,29 @@ class Categories {
 
 	}
 	
-	static function getTree($start_id = 0, $depth = 1, $level = 0, $import_id = null) {
+	static function getTree($start_id = 0, $depth = 1, $level = 0, $ignored_categories = null, $import_id = null, $insert_self = false) {
 		$result = null;
 		$depth = intval($depth);
 		$level = intval($level);
-		$conditions = array('parent_id' => intval($start_id));
-		
-		$categories = self::get($conditions, null, $import_id);
+		$start_id = intval($start_id);
+
+		$categories = self::get(['parent_id' => $start_id, 'ignored' => $ignored_categories], null, $import_id);
 
 		foreach($categories as $item) {		
 			$item->depth_level = $level;	
 			if($depth - 1 > $level) {
-				$item->children = self::getTree($item->c_arlo_id, $depth, $level+1, $import_id);
+				$item->children = self::getTree($item->c_arlo_id, $depth, $level+1, null, $import_id);
 			} else {
 				unset($item->children);
 			}
 			$result[] = $item;
+		}
+		
+		if ($insert_self) {
+			$category = self::get(['id' => $start_id], null, $import_id);
+			$category->children = $result;
+
+			return [$category];
 		}
 		
 		return $result;
@@ -122,4 +139,57 @@ class Categories {
 
 		return $output;
 	} 
+
+	static function get_flattened_category_list_for_filter($base_category, $exclude_category, $import_id) {
+		$cache_key = md5(serialize(func_get_args()));
+		
+        if(!($categories_flatten_list = wp_cache_get($cache_key, 'ArloFilterCategoryList'))) {
+			
+			$cats = self::get_merged_tree($base_category, $import_id);
+			$categories_flatten_list = self::child_categories($cats);
+
+			if (!is_array($exclude_category)) {
+				$exclude_category = [$exclude_category];
+			}
+			$exclude_category = array_filter($exclude_category, function($val) {
+				return intval($val) > 0;
+			});
+			if (count($exclude_category)) {
+				$cats_not = self::get_merged_tree($exclude_category, $import_id);
+				$categoriesnot_flatten_list = self::child_categories($cats_not);
+
+				$categories_flatten_list = array_udiff($categories_flatten_list, $categoriesnot_flatten_list, function($a, $b) {
+					return ($a['id'] - $b['id']);
+				});
+			}
+			
+            wp_cache_add( $cache_key, $categories_flatten_list, 'ArloFilterCategoryList', 30 );
+        }
+
+        return $categories_flatten_list;
+	}
+	
+	static function get_merged_tree($categories = [], $import_id) {
+		$cache_key = md5(serialize(func_get_args()));
+                            
+        if(!($cats = wp_cache_get($cache_key, 'ArloMergedCategoryList'))) {
+			if (is_array($categories)) {                    
+                $cats = [];
+            
+                foreach ($categories as $cat_id) {
+                    $cat_tree = self::getTree($cat_id, 100, 0, null, $import_id, true);
+                    $cats = array_merge($cats, (is_array($cat_tree) ? $cat_tree : []));
+                }
+            } else {
+                $cats = self::getTree($categories, 1, 0, null, $import_id);
+                if (!empty($cats)) {
+                    $cats = self::getTree($cats[0]->c_arlo_id, 100, 0, null, $import_id);
+                }
+            }
+
+            wp_cache_add( $cache_key, $cats, 'ArloMergedCategoryList', 30 );
+        }
+
+        return $cats;
+	}
 }

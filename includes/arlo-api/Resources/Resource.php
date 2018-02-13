@@ -29,7 +29,7 @@ class Resource
         if (array_key_exists($name, $this->data)) {
             return $this->data[$name];
         }
-
+        /*
         if (WP_DEBUG) {
             $trace = debug_backtrace();
             trigger_error(
@@ -38,6 +38,7 @@ class Resource
                 ' on line ' . $trace[0]['line'],
                 E_USER_NOTICE);    
         }
+        */
 
         return null;
     }

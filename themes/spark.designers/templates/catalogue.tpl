@@ -5,6 +5,7 @@
     </div>
 
     <div class="arlo-catalogue-filters">
+        [arlo_template_region_selector]
         [arlo_event_template_filters filters="location"]
         [arlo_categories wrap='<div class="arlo-categories">%s</div>']
     </div>
