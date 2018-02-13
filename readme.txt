@@ -2,7 +2,7 @@
 Contributors: ArloSoftware, adamfentosi, gabriel-arlo
 Tags: online registration, event registration, training management,  event management, event plugin, training company software, training calendar, training administration, training management software, training provider, solution, events calendar, wordpress events, event ticketing, wordpress lms, class registration, conference registration,  ticket, registration, event manager, training, booking, ticketing, courses, events, training, calendar, course management
 Requires at least: 4.4
-Tested up to: 4.9.2
+Tested up to: 4.9
 Stable tag: 3.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -45,7 +45,7 @@ Arlo’s learning management solution allows you to include quizzes, SCORM objec
 * [Marketing tools](https://www.arlo.co/features/marketing-tools?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) - Run targeted campaigns to promote your training and events. Track conversions in Google and Bing from website registrations, and integrate your marketing automation tool to generate new leads. Leverage social media to share your courses and events.
 
 = Requirements =
-* PHP Version - WordPress PHP version must be 5.5 or higher. (Note: The plugin supports up to PHP 7.0, but not PHP 7.1)
+* PHP Version - WordPress PHP version must be 5.5 or higher.
 * Shared Server Hosting - Slow shared server hosting can cause issues with the data import. If you have shared server hosting please ensure you [set up a Cron Job](http://developer.arlo.co/doc/wordpress/import#import-cron-job?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing).
 * WordPress version - Your WordPress should be kept updated to the latest version available. 
 * Cache plugins - Caching plugins can interfere with the Arlo WordPress plugin. Once changes have been made to the Arlo plugin, ensure you clear or reset your caching plugins if you have them. 
