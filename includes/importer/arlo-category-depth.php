@@ -44,7 +44,7 @@ class CategoryDepth extends BaseImporter {
 			}		
 		}
 		
-		if (is_array($cats = CategoriesEntity::getTree(0, 1000, 0, $this->import_id))) {
+		if (is_array($cats = CategoriesEntity::getTree(0, 1000, 0, null, $this->import_id))) {
 			$this->set_category_depth_level($cats, $this->import_id);
 			
 			$sql = "SELECT MAX(c_depth_level) FROM " . $this->dbl->prefix . "arlo_categories WHERE import_id = " . $this->import_id . "";

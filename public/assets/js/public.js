@@ -126,6 +126,28 @@
 			gravity: 'north'
 		});
 
+
+		//modal init
+		$('.arlo-sessions-popup-trigger').each(function(i, el) {
+			var modal = new tingle.modal({
+				footer: true,
+				cssClass: ['arlo'],
+			    closeMethods: ['overlay', 'button', 'escape']
+			});
+
+			var popupContent = $($(el).data('target')).html();
+
+			modal.setContent(popupContent);
+
+			modal.addFooterBtn('Close', 'arlo-close-btn button btn btn-primary', function() {
+			    modal.close();
+			});
+
+			$(el).click(function(e) {
+				e.preventDefault();
+				modal.open()
+			});
+		});
 	});
 	
 	function getUriRegion() {
@@ -157,7 +179,7 @@
     function changeRegion(uriRegion, newRegion) {
 
 	    //Manually set cookie
-    	Cookies.set("arlo-region", newRegion, { path: "/" });
+    	Cookies.set("arlo-region", newRegion, { path: "/", domain: window.location.hostname });
 
     	if (uriRegion) {
 		    window.location.href = window.location.href.replace("/region-" + uriRegion + "/", "/region-" + newRegion + "/").replace(/location-\w+(%\d+)?\w*/g,"");

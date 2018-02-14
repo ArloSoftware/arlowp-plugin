@@ -80,39 +80,32 @@
                       <i class="icons8-building pull-left"></i> <span class="block m-l-25">Provided by %s</span>
                     </div>']
 
-								[arlo_event_session_list_item layout="popup" wrap='<div class="m-b-10"><i class="icons8-clock pull-left m-r-5"></i> %s</div>']
+						[arlo_event_session_list_item layout="popup" wrap='<div class="m-b-10"><i class="icons8-clock pull-left m-r-5"></i> %s</div>']
+							<div class="session-row">
+								<div class="session-name">
+									<strong class="m-b-5 block">[arlo_event_name]</strong>
+								</div>
 
-					<div class="row m-b-10 b-b b-grey p-b-10 m-l-15 m-r-15">
-				      <div class="col-xs-12 padding-0">
-				        <strong class="m-b-5 block">[arlo_event_name]</strong>
-				      </div>
-				      <div class="col-xs-12 col-sm-7 p-l-0 xs-p-r-0">
-				        <div class="row row-fix">
-				          <div class="col-xs-12 col-sm-6 col-md-5 xs-p-l-0 xs-p-r-0">
-				            <div class="session-timespan m-b-5">[arlo_event_start_date format="%H:%M"] - [arlo_event_end_date format="%H:%M"]</div>
-				            <div class="muted m-b-5">[arlo_event_session_description]</div>
-				            <div class="location block m-b-5 hidden-xs"><a href="#"><i class="icons8-marker pull-left"></i> <span class="block m-l-25">[arlo_event_location]</span></a></div>
-				            <div class="visible-xs text-primary">[arlo_event_location]</div>
-				          </div>
+								<div class="session-time">
+									<div class="session-timespan m-b-5">[arlo_event_start_date format="%H:%M"] - [arlo_event_end_date format="%H:%M"]</div>
+									<div class="muted m-b-5">[arlo_event_session_description]</div>
+									<div class="location block m-b-5"><a href="#"><i class="icons8-marker pull-left"></i> <span class="block m-l-25">[arlo_event_location]</span></a></div>
+								</div>
 
-				          <div class="col-xs-12 col-sm-6 col-md-4 xs-p-l-0 xs-p-r-0">
-				            <div class="m-b-5 xs-p-t-15">[arlo_event_offers]</div>
-				          </div>
+								<div class="session-offers">
+						            <div class="m-b-5 xs-p-t-15">[arlo_event_offers]</div>
+								</div>
 
-				          <div class="col-xs-12 col-sm-6 col-md-3 xs-p-l-0 xs-p-r-0">
-		                   [arlo_event_notice wrap='<p class="normal-text m-b-10 expanded-visible">%s</p>']
-  				            <div class="m-b-5 xs-p-t-15">
-				              [arlo_event_presenters layout="list"]
-				            </div>
-				          </div>
-				        </div>
-				      </div>
-				      <div class="col-xs-12 col-sm-5 p-r-0 xs-p-l-0">
-				        <div class="xs-p-t-15">[arlo_event_template_summary]</div>
-				      </div>
-				    </div>
+								<div class="session-presenters">
+				                   [arlo_event_notice wrap='<p class="normal-text m-b-10 expanded-visible">%s</p>']
+									<div class="m-b-5 xs-p-t-15">[arlo_event_presenters layout="list"]</div>
+								</div>
 
-				[/arlo_event_session_list_item]
+								<div class="session-summary">
+									<div class="xs-p-t-15">[arlo_event_template_summary]</div>
+								</div>
+							</div>
+						[/arlo_event_session_list_item]
 
                     [arlo_event_presenters wrap='<div class="presenters truncate-1 visible-1-event visible-2-events m-b-10">
                       <i class="icons8-user pull-left"></i> <span class="block m-l-25">Presented by %s</span>
@@ -149,7 +142,9 @@
 			[arlo_event_template_register_interest]
 			[arlo_suggest_datelocation wrap="<div class='arlo-suggest'>%s</div>"]
 		</div>
-
+	</div>
+	<div class="arlo-clear-both"></div>
+	
 		[arlo_oa_list]
         <div class="clearfix row p-b-20">
 			[arlo_oa_list_item]
@@ -174,7 +169,7 @@
 							  <p>[arlo_oa_offers]</p>
 							</div>
 							<div class="col-xs-4 col-md-3 text-right md-p-l-0 p-r-0">
-							  <a class="btn btn-secondary sm-m-b-10" href="#">Purchase</a>
+							  [arlo_oa_registration]
 							</div>
 						</div>
 
@@ -193,23 +188,10 @@
 
             	</div>
 
-			<!-- <li class="arlo-cf arlo-online-activity">
-				[arlo_oa_reference_term wrap='<div class="arlo-event-headline">%s</div>']
-				[arlo_oa_credits]
-				
-				[arlo_oa_delivery_description label="Delivery: " wrap='<div class="arlo-delivery-desc">%s</div>']
-				[arlo_oa_offers]
-				[arlo_oa_registration]
-			</li>
-			[arlo_oa_rich_snippet] -->
-
 			[/arlo_oa_list_item]
 		</div>
 		[/arlo_oa_list]		
-		
-	</div>
-	<div class="arlo-clear-both"></div>
-	
+
 	[arlo_content_field_item]
 		[arlo_content_field_name wrap='<h3>%s</h3>']
 		[arlo_content_field_text wrap='<p>%s</p>']

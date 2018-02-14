@@ -808,7 +808,9 @@ class Arlo_For_Wordpress {
 		
 		if (!empty($plugin_version)) {
             $import_id  = get_option('arlo_import_id',"");
-            $last_import = $plugin->get_importer()->get_last_import_date();
+			$last_import = $plugin->get_importer()->get_last_import_date();
+			
+			$plugin->get_importer()->optionally_load_mcrypt_compat();
 
 			//check system requirements and disable the import
 			if (!SystemRequirements::overall_check()) {
@@ -834,6 +836,8 @@ class Arlo_For_Wordpress {
 			arlo_add_datamodel();
 
 			$plugin->get_version_handler()->set_installed_version();
+
+			$plugin->get_importer()->optionally_load_mcrypt_compat();
 
 			//check system requirements and disable the plugin/import
 			if (!SystemRequirements::overall_check()) {
@@ -1037,9 +1041,15 @@ class Arlo_For_Wordpress {
 	 * @since    1.0.0
 	 */
 	public function enqueue_styles() {
+
+		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-tingle', '//cdnjs.cloudflare.com/ajax/libs/tingle/0.12.0/tingle.css', VersionHandler::VERSION );
+
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css?20170424', __FILE__ ), array(), VersionHandler::VERSION );
+
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-bootstrap-modals', plugins_url( 'assets/css/libs/bootstrap-modals.css?20170424', __FILE__ ), array(), VersionHandler::VERSION );
+
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-darktooltip', plugins_url( 'assets/css/libs/darktooltip.min.css', __FILE__ ), array(), VersionHandler::VERSION );
+
 		wp_enqueue_style( $this->plugin_slug .'-arlo-icons8', plugins_url( '../admin/assets/fonts/icons8/Arlo-WP.css', __FILE__ ), array(), VersionHandler::VERSION );
 
 		//enqueue theme related styles
@@ -1241,8 +1251,12 @@ class Arlo_For_Wordpress {
 	 * @since    1.0.0
 	 */
 	public function enqueue_scripts() {
+		wp_enqueue_script( $this->plugin_slug . '-plugin-script-tingle', '//cdnjs.cloudflare.com/ajax/libs/tingle/0.12.0/tingle.min.js', VersionHandler::VERSION );
+
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script', plugins_url( 'assets/js/public.js?20170424', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION );
+
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script-bootstrap-modals', plugins_url( 'assets/js/libs/bootstrap-modals.min.js?20171112', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION );
+
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script-darktooltip', plugins_url( 'assets/js/libs/jquery.darktooltip.min.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION );
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script-cookie', plugins_url( 'assets/js/libs/js.cookie.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION );
 		wp_localize_script( $this->plugin_slug . '-plugin-script', 'objectL10n', array(

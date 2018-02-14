@@ -46,6 +46,12 @@ class Categories {
                 $title = str_replace('%s','', $title);
             }
 
+            $page_type = \Arlo_For_Wordpress::get_current_page_arlo_type();
+            $page_type = ($page_type == 'event' ? 'events' : $page_type);
+
+            $page_filter_settings = get_option("arlo_page_filter_settings");
+            $ignored_categories = (isset($page_filter_settings['hiddenfilters'][$page_type]['category']) ? $page_filter_settings['hiddenfilters'][$page_type]['category'] : []);
+
             foreach ($arlo_categories as $i => $arlo_category) {
                 if(!isset($atts['parent']) && $start_at == 0 && !empty($arlo_category)) {
                     $slug = $arlo_category;
@@ -58,7 +64,7 @@ class Categories {
                     if($start_at == 0) {
                         $conditions = array('parent_id' => 0);
                     }
-                    
+
                     $current = CategoriesEntity::get($conditions, 1, $import_id);
                     
                     $return .= sprintf($title, esc_html($current->c_name));
@@ -66,15 +72,15 @@ class Categories {
                 
                 if ($depth > 0) {
                     if ($start_at == 0) {
-                        $root = CategoriesEntity::getTree($start_at, 1, 0, $import_id);
+                        $root = CategoriesEntity::getTree($start_at, 1, 0, $ignored_categories, $import_id);
                                 
                         if (!empty($root)) {
                             $start_at = $root[0]->c_arlo_id;
                         }
                     }
                     
-                    $tree = CategoriesEntity::getTree($start_at, $depth, 0, $import_id);	
-                    
+                    $tree = CategoriesEntity::getTree($start_at, $depth, 0, $ignored_categories, $import_id);
+
                     $GLOBALS['arlo_categories_count'] = count($tree);		
                             
                     if(!empty($tree)) {		
@@ -157,7 +163,7 @@ class Categories {
         $events_url = get_page_link($post_types[$page_type]['posts_page']);
         
         if(!is_array($items) || empty($items)) return '';
-        
+
         $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
         
         $html = '<ul class="arlo-category-list">';

@@ -537,47 +537,16 @@ class Events {
                     $modal_id = ARLO_PLUGIN_PREFIX . '_session_modal_' . $GLOBALS['arlo_event_list_item']['e_arlo_id'];
 
                     $open = '
-                    <div class="arlo-bootstrap-modal ' . ARLO_PLUGIN_PREFIX . '-popup-button">
-
-                        <style>
-                            /* transform is conflicting with transform - see tfs bug 71033 */
-                            .arlo#arlo .arlo-list.catalogue .arlo-cf.arlo-catalogue-event:hover,
-                            .arlo#arlo .arlo-list.events .arlo-event:hover,
-                            .arlo#arlo .arlo-list.template-online-activities .arlo-online-activity:hover,
-                            .arlo#arlo .presenter-events li:hover,
-                            .arlo#arlo .arlo-schedule-event:hover {
-                                -webkit-transform: none;
-                                transform: none;
-                            }
-                        </style>
-
-                        <a href="#" data-toggle="modal" data-target="#' . $modal_id . '" data-keyboard="true">
+                        <a href="" class="arlo-sessions-popup-trigger" data-target="#' . $modal_id . '">
                           ' .  htmlentities($label, ENT_QUOTES, "UTF-8") . '
                         </a>
 
-                        <div class="modal fade ' . ARLO_PLUGIN_PREFIX . '-popup-modal" id="' . $modal_id . '" tabindex="-1" role="dialog" aria-hidden="true">
-                          <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                              <div class="modal-header">
-                                <h5 class="modal-title">' . htmlentities($header, ENT_QUOTES, "UTF-8") . '</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                  <span aria-hidden="true">&times;</span>
-                                </button>
-                              </div>
-                              <div class="modal-body arlo-popup-body">
-                    ';
+                        <div class="arlo-sessions-popup-content" id="' . $modal_id . '">
+                            <div class="arlo-sessions-popup-header"><h2>' . htmlentities($header, ENT_QUOTES, "UTF-8") . '</h2></div>
+                            <div class="arlo-sessions-popup-inner">
+                            ';
 
-                    $close = '
-                              </div>
-                              <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                    </div>
-                    ';
+                    $close = '</div></div>';
                     break;
 
                 case 'none':
@@ -1053,8 +1022,8 @@ class Events {
         $arlo_delivery = \Arlo\Utilities::get_filter_keys_int_array('delivery');
         $arlo_state = \Arlo\Utilities::clean_string_url_parameter('arlo-state');
 
-        $arlo_location_hidden = \Arlo\Utilities::get_filter_keys_string_array('locationhidden');
-        $arlo_delivery_hidden = \Arlo\Utilities::get_filter_keys_int_array('deliveryhidden');
+        $arlo_locationhidden = \Arlo\Utilities::get_filter_keys_string_array('locationhidden');
+        $arlo_deliveryhidden = \Arlo\Utilities::get_filter_keys_int_array('deliveryhidden');
         
         if (!empty($GLOBALS['arlo_eventtemplate']['et_region'])) {
             $arlo_region = $GLOBALS['arlo_eventtemplate']['et_region'];
@@ -1103,15 +1072,15 @@ class Events {
         if (!empty($arlo_location)) {
             $conditions['e.e_locationname IN ( %s )'] = $arlo_location;
         }
-        else if (!empty($arlo_location_hidden)) {
-            $conditions['e.e_locationname NOT IN ( %s )'] = $arlo_location_hidden;
+        else if (!empty($arlo_locationhidden)) {
+            $conditions['e.e_locationname NOT IN ( %s )'] = $arlo_locationhidden;
         }
 
         if(!empty($arlo_delivery)) {
             $conditions['e.e_isonline IN ( %d )'] = $arlo_delivery;
         }
-        else if(!empty($arlo_delivery_hidden)) {
-            $conditions['e.e_isonline NOT IN ( %d )'] = $arlo_delivery_hidden;
+        else if(!empty($arlo_deliveryhidden)) {
+            $conditions['e.e_isonline NOT IN ( %d )'] = $arlo_deliveryhidden;
         }
 
         if (isset($arlo_state) && isset($GLOBALS['state_filter_venues'])) {
@@ -1162,20 +1131,20 @@ class Events {
     
                         $link = ($layout == 'list' ? "<li>" : "");
     
-                        $buttonclass = $event->e_isfull ? $buttonclass . ' arlo-event-full' : $buttonclass . ' arlo-register' ;
+                        $fullclass = $event->e_isfull ? ' arlo-event-full' : ' arlo-register';
     
                         switch ($template_link) {
                             case "permalink":
                                 $url = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
     
-                                $link .= self::get_event_date_link($url, $buttonclass, $display_text);
+                                $link .= self::get_event_date_link($url, $buttonclass . $fullclass, $display_text);
                                 break;
                             case "none":
                                 $link .= '<span class="' . esc_attr($dateclass) . '">' . $display_text . '</span>';
                                 break;
                             case "viewuri":
                                 $url = $GLOBALS['arlo_eventtemplate']['et_viewuri'];
-                                $link .= self::get_event_date_link($url, $buttonclass, $display_text);
+                                $link .= self::get_event_date_link($url, $buttonclass . $fullclass, $display_text);
                                 break;
                             case "registerlink":
                                 if ($event->e_registeruri && !$event->e_isfull) {
@@ -1183,7 +1152,7 @@ class Events {
                                 } else {
                                     $url = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
                                 }
-                                $link .= self::get_event_date_link($url, $buttonclass, $display_text);
+                                $link .= self::get_event_date_link($url, $buttonclass . $fullclass, $display_text);
                                 break;
                         }
     
@@ -1224,7 +1193,7 @@ class Events {
                             break;
                     }
     
-                    $return .= sprintf('<%s %s class="%s">%s</%s>', $tag, $href, $class, $reference_terms['Plural'], $tag);
+                    $return .= sprintf('<%s %s class="%s">%s</%s>', $tag, $href, $class, $reference_terms['Singular'], $tag);
                 }
             }
         }

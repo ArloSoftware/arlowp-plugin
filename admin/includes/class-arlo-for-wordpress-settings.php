@@ -946,15 +946,38 @@ class Arlo_For_Wordpress_Settings {
 		<p>
 			<ul class="arlo-whatsnew-list">
 				<li>Remove the ability to rename and exclude filter options</li>
-				<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_next_running" target="_blank">[arlo_event_next_running]</a> has a "separator" attribute, if it\'s not used as a list layout</li>
+				<li>New "Starter template" Arlo Theme</li>
 				<li>Use category header as meta description if category is selected as a filter</li>
 				<li>Ability to filter <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes" target="_blank">global level shortcodes</a> by mutliple categories/location/templatetag/eventtag</li>
 				<li>Delivery filter for on demand events (online activities)</li>
 				<li>Support tax exempt tags</li>
+				<li>Make venue related shortcodes available within the <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_list_item" target="_blank">[arlo_event_list_item]</a> or <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/upcomingeventrelated#arlo_upcoming_list_item" target="_blank">[arlo_upcoming_list_item]</a> shortcodes</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_duration_description" target="_blank">[arlo_event_duration_description]</a> shortcode</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_dates" target="_blank">[arlo_event_dates]</a> shortcode</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_isfull" target="_blank">[arlo_event_isfull]</a> shortcode</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_offers_hasdiscount" target="_blank">[arlo_event_offers_hasdiscount]</a> shortcode</li>
+				<li>New "show_child_elements" attribute for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/upcomingeventrelated#arlo_upcoming_list_item" target="_blank">[arlo_upcoming_list_item]</a></li>
+				<li>New "layout" attribute for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_session_list_item" target="_blank">[arlo_event_session_list_item]</a> to show the session information as a tooltip or as a popup</li>
+				<li>New "separator" attribute for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_next_running" target="_blank">[arlo_event_next_running]</a></li>
+				<li>New <em>{%count%}</em> placeholder in "text" attribute for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_next_running" target="_blank">[arlo_event_next_running]</a></li>
+				<li>Allow import with PHP 7.2 on Linux</li>
+				<li>Filters was not redirecting properly when containing slashes</li>
+				<li>Show all except on Tags still show event if it has multiple tags</li>
+				<li>Reset button moves on selection of drop down (Jazz Theme)</li>
+				<li>Ensure filter priority - user first global shortcode second and filter by page at last</li>
+				<li>Session tags are not diplayed by <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_tags" target="_blank">[arlo_event_tags]</a></li>
+				<li>With some Arlo Themes <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_template_region_selector" target="_blank">[arlo_template_region_selector]</a> and <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_template_search_region_selector" target="_blank">[arlo_template_search_region_selector]</a> are breaking the layout</li>
 			</ul>
-		</p>	
+		</p>
 
-		<h4>Version 3.5</h4>
+		<h4>Version 3.5.2</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">	  
+				<li>Allow import with PHP 7.2</li>
+			</ul>
+		</p>
+
+		<h4>Version 3.5.1</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">	  
 				<li>Admin page gets into a redirect loop on some webservers</li>

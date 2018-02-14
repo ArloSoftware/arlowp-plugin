@@ -1,4 +1,6 @@
 <div class="arlo" id="arlo">
+
+	
 	[arlo_template_region_selector]
 	[arlo_upcoming_event_filters filtertext='Filter' resettext="Reset" filters='category,month,location' wrap='<div id="filters" class="collapse">%s</div>']
 
@@ -45,8 +47,7 @@
 
 			    <div class="collapse event-expandable">
 
-			      <p>[arlo_event_dates startdateformat="%A, %e %B %G" enddateformat="%A, %e %B %G"]
-</p>
+			      <p>[arlo_event_dates startdateformat="%A, %e %B %G" enddateformat="%A, %e %B %G"]</p>
 			      <p class="muted">[arlo_event_start_date format="%I:%M %p"] - [arlo_event_end_date format="%I:%M %p"] ([arlo_event_duration])</p>
 
 			      [arlo_event_provider wrap='<div class="m-t-10 m-b-10">Provided by %s</div>']

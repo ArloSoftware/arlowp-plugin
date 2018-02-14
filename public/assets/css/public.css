@@ -413,3 +413,9 @@ p.arlo-no-results {
 	box-shadow: none !important;
 	text-shadow: none !important;
 }
+
+
+.arlo-sessions-popup-content {
+	display: none;
+}
+
