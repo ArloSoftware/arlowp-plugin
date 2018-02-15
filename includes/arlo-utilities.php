@@ -273,4 +273,12 @@ class Utilities {
 
         return $value;
     }
+
+    public static function settingToMegabytes($setting) {
+        if (strpos($setting, 'G')) {
+            return (intval($setting) * 1024) . 'M';
+        }
+        return $setting;
+    }
+
 }

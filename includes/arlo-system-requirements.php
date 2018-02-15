@@ -11,7 +11,8 @@ class SystemRequirements {
 				'name' => 'Memory limit',
 				'expected_value' => '64M',
 				'current_value' => function () {
-					return ini_get('memory_limit');
+					$memory_limit_setting = ini_get('memory_limit');
+					return Utilities::settingToMegabytes($memory_limit_setting);
 				},
 				'check' => function($current_value, $expected_value) {
 					return intval($current_value) >= intval($expected_value);
