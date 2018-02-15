@@ -25,7 +25,7 @@ use Arlo\SystemRequirements;
  * @author    Arlo <info@arlo.co>
  * @license   GPL-2.0+
  * @link      http://arlo.co
- * @copyright 2015 Arlo
+ * @copyright 2018 Arlo
  * 
  */
 
@@ -38,7 +38,7 @@ use Arlo\SystemRequirements;
  *
  *
  * @package Arlo_For_Wordpress
- * @author  Adam Fentosi <adam.fentosi@arlo.co>
+ * @author  Adam Fentosi <adam.fentosi@arlo.co>, Gabriel Oheix
  */
 class Arlo_For_Wordpress {
 

@@ -1,6 +1,8 @@
 <?php
 namespace Arlo\Shortcodes;
 
+use Arlo_For_Wordpress;
+
 class Shortcodes {
 	public static function init() {
 		//TODO: Autoloader
@@ -81,8 +83,8 @@ class Shortcodes {
 	    // assign the passed function to a filter
 	    // all shortcodes are run through filters to allow external manipulation if required, however we also need a means of running the passed function
 	    add_filter('arlo_shortcode_content_' . $shortcode_name, function($content='', $atts, $shortcode_name, $import_id='') use($closure) {
-			global $arlo_plugin;
-			$import_id = $arlo_plugin->get_importer()->get_current_import_id();
+			$plugin = Arlo_For_Wordpress::get_instance();
+			$import_id = $plugin->get_importer()->get_current_import_id();
 
 			if (!empty($import_id))
 		    	return $closure->invokeArgs(array($content, $atts, $shortcode_name, $import_id, ''));
@@ -303,8 +305,7 @@ class Shortcodes {
 	}	
 
 	private static function shortcode_timezones($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-		//TODO: nasty to use the global $arlo_plugin, need to refactor 
-		global $post, $wpdb, $arlo_plugin;
+		global $post, $wpdb;
 	
 		// only allow this to be used on the eventtemplate page
 		if($post->post_type != 'arlo_event') {
@@ -344,7 +345,8 @@ class Shortcodes {
 		$content = '<form method="GET" class="arlo-timezone">';
 		$content .= '<select name="timezone"><option value="">' . __('Select a time zone', 'arlo-for-wordpress') . '</option>';
 
-		$timezones = $arlo_plugin->get_timezone_manager()->get_indexed_timezones();
+		$plugin = Arlo_For_Wordpress::get_instance();
+		$timezones = $plugin->get_timezone_manager()->get_indexed_timezones();
 
 		foreach($timezones as $timezone_id => $timezone) {
 			$selected = false;

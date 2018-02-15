@@ -19,7 +19,7 @@
  * @TODO: Rename this class to a proper name for your plugin.
  *
  * @package Arlo_For_Wordpress_Admin
- * @author  Your Name <email@example.com>
+ * @author  Adam Fentosi <adam.fentosi@arlo.co>, Gabriel Oheix
  */
 
 use Arlo\VersionHandler;

@@ -1,6 +1,7 @@
 <?php
 namespace Arlo\Shortcodes;
 
+use Arlo_For_Wordpress;
 use Arlo\DateFormatter;
 
 class Events {
@@ -1212,7 +1213,7 @@ class Events {
     
 
     public static function event_date_formatter($atts, $date, $offset, $is_online = false, $timezoneid = null) {
-        global $arlo_plugin;
+        $plugin = Arlo_For_Wordpress::get_instance();
         $timezone = $wp_timezone = $selected_timezone = null;
         $original_timezone = date_default_timezone_get();
         $formatted_end_date = '';
@@ -1223,7 +1224,7 @@ class Events {
 
         $utc_timezone_name = "UTC";
 
-        $timezone_array = $arlo_plugin->get_timezone_manager()->get_indexed_timezones($timezoneid);
+        $timezone_array = $plugin->get_timezone_manager()->get_indexed_timezones($timezoneid);
         if (!is_null($timezone_array) && !empty($timezone_array['windows_tz_id']) && !empty(\Arlo\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$timezone_array['windows_tz_id']])) {
             $timezone = new \DateTimeZone(\Arlo\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$timezone_array['windows_tz_id']]);
         } else {
