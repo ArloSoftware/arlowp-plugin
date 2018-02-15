@@ -65,8 +65,8 @@ jQuery(function($){
         
         // set same height per line
         if ($events.length) {
-            var parent = $events.first().parent();
             var modulo = 99;
+            var parent = $events.first().parent();
             if (parent.hasClass('arlo-cols-5')) { modulo = 5; }
             if (parent.hasClass('arlo-cols-4')) { modulo = 4; }
             if (parent.hasClass('arlo-cols-3')) { modulo = 3; }
@@ -76,8 +76,12 @@ jQuery(function($){
             var eventsSubset = [];
             for (var i = 0; i < $events.length; i++) {
                 eventsSubset.push($events[i]);
+
+                var zeroRemainder = (eventsSubset.length % modulo === 0); //https://stackoverflow.com/questions/16505559/how-can-i-use-modulo-operator-in-javascript
+                var successorIsDivider =  $($events[i]).nextAll('li:first').hasClass('arlo-group-divider');
+
                 // adjust heights per row
-                if (eventsSubset.length % modulo === 0) { //https://stackoverflow.com/questions/16505559/how-can-i-use-modulo-operator-in-javascript
+                if (zeroRemainder || successorIsDivider) {
                     setHeightForSubset(eventsSubset);
                     eventsSubset = [];
                 }
