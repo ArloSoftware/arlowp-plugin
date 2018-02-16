@@ -275,4 +275,7 @@ class Arlo_For_Wordpress_Categories_Widget extends WP_Widget {
 } // end class
 
 // TODO: Remember to change 'Widget_Name' to match the class name definition
-add_action( 'widgets_init', create_function( '', 'register_widget("Arlo_For_Wordpress_Categories_Widget");' ) );
+add_action( 'widgets_init', 'register_widget_categories_widget' );
+function register_widget_categories_widget() {
+	register_widget("Arlo_For_Wordpress_Categories_Widget");
+}
