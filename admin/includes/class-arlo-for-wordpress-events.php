@@ -5,8 +5,8 @@
  * @package   Arlo_For_Wordpress_Admin
  * @author    Arlo <info@arlo.co>
  * @license   GPL-2.0+
- * @link      http://arlo.co
- * @copyright 2016 Arlo
+ * @link      https://arlo.co
+ * @copyright 2018 Arlo
  */
  
 require_once 'class-arlo-for-wordpress-lists.php';

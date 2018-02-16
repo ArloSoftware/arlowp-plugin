@@ -24,7 +24,7 @@ use Arlo\SystemRequirements;
  * @package   Arlo_For_Wordpress
  * @author    Arlo <info@arlo.co>
  * @license   GPL-2.0+
- * @link      http://arlo.co
+ * @link      https://arlo.co
  * @copyright 2018 Arlo
  * 
  */

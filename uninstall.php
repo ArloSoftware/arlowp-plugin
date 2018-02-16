@@ -5,8 +5,8 @@
  * @package   Arlo_For_Wordpress_Admin
  * @author    Arlo <info@arlo.co>
  * @license   GPL-2.0+
- * @link      http://arlo.co
- * @copyright 2015 Arlo
+ * @link      https://arlo.co
+ * @copyright 2018 Arlo
  */
 
 // If uninstall not called from WordPress, then exit
