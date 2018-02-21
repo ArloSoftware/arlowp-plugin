@@ -27,13 +27,8 @@ class Crypto {
 	const IV_LENGTH = 16;
 
 	public static function decrypt($encrypted, $key, $crypto_method, $hash_method, $gzip = false) {
-		if (!extension_loaded('mcrypt') && !function_exists('mcrypt_decrypt')) {
-			if (!function_exists('mcrypt_decrypt') ) {
-				throw new \Exception('mCrypt replacement is not available');
-			}
-			if (!extension_loaded('mcrypt') ) {
-				throw new \Exception('mCrypt is not available');
-			}
+		if (!extension_loaded('mcrypt') ) {
+			throw new \Exception('mCrypt is not available');
 		}
 
 		list($key_m, $key_e) = self::derive_secondary_keys($key, $hash_method);
@@ -125,17 +120,5 @@ class Crypto {
 		} else {
 			throw new \Exception('Empty value for JWE header "enc" is not supported ');
 		}	
-	}
-
-	public static function load_mcrypt_compat_if_needed() {
-		if (!function_exists('mcrypt_decrypt') ) {
-			// mCrypt deprecated in 7.2 so load mcrypt_compat
-			//https://github.com/phpseclib/mcrypt_compat
-			//https://github.com/phpseclib/phpseclib
-			require_once( plugin_dir_path( __FILE__ ) . 'mcrypt_compat/phpseclib/Crypt/Common/SymmetricKey.php');
-			require_once( plugin_dir_path( __FILE__ ) . 'mcrypt_compat/phpseclib/Crypt/Common/BlockCipher.php');
-			require_once( plugin_dir_path( __FILE__ ) . 'mcrypt_compat/phpseclib/Crypt/Rijndael.php');
-			require_once( plugin_dir_path( __FILE__ ) . 'mcrypt_compat/mcrypt.php');
-		}
 	}
 }
