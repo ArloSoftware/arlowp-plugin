@@ -451,20 +451,24 @@ class Importer {
 				$import = $this->get_import_entry($this->import_id, null, 1);
 
 				if (!is_null($import)) {
-					$callback_json = json_decode($import->callback_json);
+					if (!empty($import->callback_json)) {
+						$callback_json = json_decode($import->callback_json);
 
-					if (json_last_error() != JSON_ERROR_NONE) {
-						error_log("JSON Decode error: " . json_last_error_msg());
-						Logger::log_error("JSON Decode error: " . json_last_error_msg(), $this->import_id);
-					}
+						if (json_last_error() != JSON_ERROR_NONE) {
+							error_log("JSON Decode error: " . json_last_error_msg());
+							Logger::log_error("JSON Decode error: " . json_last_error_msg(), $this->import_id);
+						}
 
-					if (!empty($callback_json->SnapshotUri)) {
-						$this->current_task_class->uri = $callback_json->SnapshotUri;
+						if (!empty($callback_json->SnapshotUri)) {
+							$this->current_task_class->uri = $callback_json->SnapshotUri;
 
-						$this->current_task_class->filename = $this->import_id;
-						$this->current_task_class->response_json = json_decode($import->response_json);
-					} elseif (!empty($callback_json->Error)) {
-						Logger::log_error($callback_json->Error->Code . ': ' . $callback_json->Error->Message, $this->import_id);
+							$this->current_task_class->filename = $this->import_id;
+							$this->current_task_class->response_json = json_decode($import->response_json);
+						} elseif (!empty($callback_json->Error)) {
+							Logger::log_error($callback_json->Error->Code . ': ' . $callback_json->Error->Message, $this->import_id);
+						}
+					} else {
+						Logger::log_error('The import callback did not happen', $this->import_id);
 					}
 				} else {
 					Logger::log_error('Couldn\'t retrive the import from database', $this->import_id);
