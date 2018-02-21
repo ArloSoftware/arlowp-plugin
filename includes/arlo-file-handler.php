@@ -41,6 +41,10 @@ class FileHandler {
 		$success = fwrite($fp, $data);
 		fclose($fp);
 
+		if (false === $success) {
+			error_log("Cannot write to file $file. Please check write permissions.");
+		}
+
 		return $success;
 	}	
 
