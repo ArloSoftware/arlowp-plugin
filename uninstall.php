@@ -101,7 +101,6 @@ function arlo_delete_options() {
 		'arlo_last_import',
 		'arlo_new_url_structure',
 		'arlo_plugin_version',
-		'arlo_theme',
 		'arlo_import_disabled',
 		'arlo_plugin_disabled',
 		'arlo_updated',
