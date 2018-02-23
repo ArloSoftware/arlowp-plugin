@@ -794,7 +794,7 @@ class Templates {
                 }
             }
         } else {
-            $where .= " AND e.e_parent_arlo_id = 0 ";
+            $where .= " AND (e.e_parent_arlo_id = 0 OR e.e_parent_arlo_id IS NULL) ";
         }
         
         if (!empty($arlo_region)) {
