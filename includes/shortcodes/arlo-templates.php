@@ -796,11 +796,6 @@ class Templates {
         } else {
             $where .= " AND (e.e_parent_arlo_id = 0 OR e.e_parent_arlo_id IS NULL) ";
         }
-        
-        if (!empty($arlo_region)) {
-            $where .= ' AND e.e_region = %s';
-            $parameters[] = $arlo_region;
-        }
 
         if(!empty($arlo_state)) :                
             $join['ce']  = " LEFT JOIN $t5 ce ON e.e_arlo_id = ce.e_parent_arlo_id AND e.import_id = ce.import_id ";
@@ -868,7 +863,7 @@ class Templates {
         }	
         
         if (!empty($arlo_region)) {
-            $where .= ' AND et.et_region = %s';
+            $where .= ' AND et.et_region = %s AND (e.e_region = et.et_region OR e.e_region IS NULL)';
             $parameters[] = $arlo_region;
         }		
         
