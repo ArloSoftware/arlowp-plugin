@@ -944,6 +944,13 @@ class Arlo_For_Wordpress_Settings {
 		
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
+			<ul class="arlo-whatsnew-list">	  
+				<li>Timezones blocking the import on some specific platforms</li>
+			</ul>
+		</p>
+
+		<h4>Version 3.6</h4>
+		<p>
 			<ul class="arlo-whatsnew-list">
 				<li>Remove the ability to rename and exclude filter options</li>
 				<li>New "Starter template" Arlo Theme</li>

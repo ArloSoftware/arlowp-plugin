@@ -5,7 +5,7 @@ namespace Arlo;
 use Arlo\Utilities;
 
 class VersionHandler {
-	const VERSION = '3.6';
+	const VERSION = '3.6.1';
 
 	private $dbl;
 	private $message_handler;
@@ -55,7 +55,11 @@ class VersionHandler {
 		
 		if (version_compare($old_version, '3.6') < 0) {
 			$this->run_pre_data_update('3.6');
-		}			
+		}		
+		
+		if (version_compare($old_version, '3.6.1') < 0) {
+			$this->run_pre_data_update('3.6.1');
+		}
 		
 		arlo_add_datamodel();	
 
