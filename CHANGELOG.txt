@@ -1,3 +1,10 @@
+== V3.6.1 ==
+
+Bugfixes
+------------------
+Timezones blocking the import on some specific platforms
+
+
 == V3.6 ==
 
 Deprecated features

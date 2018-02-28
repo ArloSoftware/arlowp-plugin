@@ -5,7 +5,7 @@ namespace Arlo;
 use Arlo\Utilities;
 
 class VersionHandler {
-	const VERSION = '3.6';
+	const VERSION = '3.6.1';
 
 	private $dbl;
 	private $message_handler;
@@ -55,7 +55,11 @@ class VersionHandler {
 		
 		if (version_compare($old_version, '3.6') < 0) {
 			$this->run_pre_data_update('3.6');
-		}			
+		}		
+		
+		if (version_compare($old_version, '3.6.1') < 0) {
+			$this->run_pre_data_update('3.6.1');
+		}
 		
 		arlo_add_datamodel();	
 
@@ -187,12 +191,26 @@ class VersionHandler {
 			break;	
 
 			case '3.6':
-			$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_events LIKE 'e_is_taxexempt'", 0, 0);
-			if (is_null($exists)) {
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events ADD e_is_taxexempt TINYINT(1) NOT NULL DEFAULT '0' AFTER e_isonline");
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events ADD INDEX (e_is_taxexempt(1))");
-			}
-			break;					
+				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_events LIKE 'e_is_taxexempt'", 0, 0);
+				if (is_null($exists)) {
+					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events ADD e_is_taxexempt TINYINT(1) NOT NULL DEFAULT '0' AFTER e_isonline");
+					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events ADD INDEX (e_is_taxexempt(1))");
+				}
+			break;
+
+			case '3.6.1':
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events DROP e_timezone_id;");
+				$this->dbl->query("DROP TABLE " . $this->dbl->prefix . "arlo_timezones;");
+				$this->dbl->query("CREATE TABLE " . $this->dbl->prefix . "arlo_timezones (
+					id int(11) NOT NULL,
+					name varchar(256) NOT NULL,
+					windows_tz_id varchar(256) NOT NULL,
+					import_id int(10) unsigned NOT NULL,
+					PRIMARY KEY  (id, import_id)) 
+					CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";
+				");
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events ADD e_timezone_id INT(11) NULL AFTER e_timezone");
+			break;
 		}
 	}	
 	
