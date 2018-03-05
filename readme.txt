@@ -3,7 +3,7 @@ Contributors: ArloSoftware, adamfentosi, gabriel-arlo
 Tags: online registration, event registration, training management,  event management, event plugin, training company software, training calendar, training administration, training management software, training provider, solution, events calendar, wordpress events, event ticketing, wordpress lms, class registration, conference registration,  ticket, registration, event manager, training, booking, ticketing, courses, events, training, calendar, course management
 Requires at least: 4.4
 Tested up to: 4.9
-Stable tag: 3.6
+Stable tag: 3.6.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,6 +19,7 @@ Pre-built plugin themes:
 * [Jazz](https://support.arlo.co/hc/en-gb/articles/115001600463-Theme-Jazz?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
 * [Block](https://support.arlo.co/hc/en-gb/articles/115001797703-Theme-Block?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
 * [Spark](https://support.arlo.co/hc/en-gb/articles/115003325783?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) 
+* [Starter](https://support.arlo.co/hc/en-gb/articles/360000311006?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
 
 
 = Event & Training Management Solution =
@@ -171,6 +172,10 @@ The Arlo - Training and Event Management, and online registration plugin is only
 11. Theme Jazz - Upcoming events
 
 == Changelog ==
+
+= 3.6.1 =
+
+Timezones blocking the import on some specific platforms
 
 = 3.6 =
 

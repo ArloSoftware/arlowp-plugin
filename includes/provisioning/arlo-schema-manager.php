@@ -6,8 +6,8 @@ use Arlo\Logger;
 
 class SchemaManager {
 
-	const DB_SCHEMA_HASH = '75b454e55cdff5e381c5cabbacc963fd00b43e09';
-	const DB_SCHEMA_VERSION = '3.6.0';
+	const DB_SCHEMA_HASH = 'ad86e0b68e0f7cbe49117695901b081c68ddb00d';
+	const DB_SCHEMA_VERSION = '3.6.1';
 
 	/* database layer */
 	private $dbl;
@@ -54,7 +54,7 @@ class SchemaManager {
 	}
 
 	public function check_db_schema() {
- 		if ($this->create_db_schema_hash() !== self::DB_SCHEMA_HASH) {
+		if ($this->create_db_schema_hash() !== self::DB_SCHEMA_HASH) {
 			//delete tables and re-create them
 			$this->delete_tables();
 			$this->install_schema();
@@ -194,7 +194,7 @@ class SchemaManager {
 			e_finishdatetime DATETIME NULL,
 			e_datetimeoffset varchar(6) NULL,
 			e_timezone varchar(10) NULL,
-			e_timezone_id tinyint(3) UNSIGNED NULL,
+			e_timezone_id int(11) NULL,
 			v_id int(11) NULL,
 			e_locationname varchar(255) NULL,
 			e_locationroomname varchar(255) NULL,
@@ -459,7 +459,7 @@ class SchemaManager {
 
 		$sql = "
 			CREATE TABLE " . $table_name . " (
-			id tinyint(3) unsigned NOT NULL,
+			id int(11) NOT NULL,
 			name varchar(256) NOT NULL,
 			windows_tz_id varchar(256) NOT NULL,
 			import_id int(10) unsigned NOT NULL,

@@ -16,5 +16,8 @@
             "https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.7.1/slick.min.js",
             "https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/js/collapse.min.js"
         ]
-    }
+    },
+    "images": [
+        "/images/starter1.jpg"
+    ]
 }
