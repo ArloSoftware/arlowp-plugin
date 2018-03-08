@@ -39,7 +39,8 @@ class Crypto {
 
 		$zipped = self::decrypt($iv, $encrypted, $key, $methods[0], $methods[1]);
 
-		return gzdecode($zipped);
+		$unzipped = gzdecode($zipped);
+		return trim($unzipped);
 	}
 
 	public static function decrypt($iv, $encrypted, $key, $crypto_method, $hash_method) {
@@ -64,7 +65,7 @@ class Crypto {
 		} else {
 			$decrypted = self::decrypt_with_openssl($iv, $ciphertext, $keys['enc'], $crypto_method);
 		}
-		return trim($decrypted);
+		return $decrypted;
 	}
 
 
@@ -144,7 +145,8 @@ class Crypto {
 		$jwe_header = json_decode($jwe['header']);
 		$jwe_header_enc = explode('-', $jwe_header->enc);
 
-		return self::decrypt($jwe['iv'], $jwe['cipher_text'], $key, $jwe_header_enc[0], $jwe_header_enc[1]);
+		$decrypted = self::decrypt($jwe['iv'], $jwe['cipher_text'], $key, $jwe_header_enc[0], $jwe_header_enc[1]);
+		return trim($decrypted);
 	}
 
 	private static function jwe_valider_parts($jwe = []) {
