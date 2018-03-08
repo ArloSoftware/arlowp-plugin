@@ -30,9 +30,9 @@ class Download extends BaseImporter  {
 			$content = $this->get_remote_data($this->uri);
 			if (!empty($content) && $content !== false) {
 
-				//need to decode with the given key
-				$methods = explode('-', $this->response_json->Result->EncryptedResponse->enc);
-				$content = Crypto::decrypt($content, $this->response_json->Result->EncryptedResponse->key->k, $methods[0], $methods[1], 1);
+				$key = $this->response_json->Result->EncryptedResponse->key->k;
+				$method = $this->response_json->Result->EncryptedResponse->enc;
+				$content = Crypto::decrypt_gzip($content, $key, $method);
 
 				$filename = self::$dir . $this->filename . '.dec.json';
 				if ($this->file_handler->write_file($filename, $content)) {
