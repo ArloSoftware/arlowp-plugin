@@ -502,6 +502,7 @@ class UpcomingEvents {
             e.e_is_taxexempt,
             e.e_credits,
             et.et_id,
+            et.et_code,
             et.et_name, 
             et.et_post_name, 
             et.et_post_id,
