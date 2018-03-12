@@ -17,7 +17,7 @@ class SystemRequirements {
 					return PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION . '.' . PHP_RELEASE_VERSION;
 				},
 				'check' => function($current_value, $expected_value) {
-					return true;  //no check for retro-compatibility
+					return null;  //no check for retro-compatibility
 				}
 			],
 			[
@@ -30,7 +30,7 @@ class SystemRequirements {
 					return $GLOBALS['wp_version'];
 				},
 				'check' => function($current_value, $expected_value) {
-					return true;  //no check for retro-compatibility
+					return null;  //no check for retro-compatibility
 				}
 			],
 			[
