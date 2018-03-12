@@ -8,6 +8,32 @@ class SystemRequirements {
 	public static function get_system_requirements() {
 		return [
 			[
+				'name' => 'PHP version',
+				'expected_value' => '5.5',
+				'current_value' => function () {
+					if (!defined('PHP_MAJOR_VERSION') || !defined('PHP_MINOR_VERSION') || !defined('PHP_RELEASE_VERSION')) {
+						return 'Unknown';
+					}
+					return PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION . '.' . PHP_RELEASE_VERSION;
+				},
+				'check' => function($current_value, $expected_value) {
+					return true;  //no check for retro-compatibility
+				}
+			],
+			[
+				'name' => 'WordPress version',
+				'expected_value' => '4.4',
+				'current_value' => function () {
+					if (!isset($GLOBALS['wp_version'])) {
+						return 'Unknown';
+					}
+					return $GLOBALS['wp_version'];
+				},
+				'check' => function($current_value, $expected_value) {
+					return true;  //no check for retro-compatibility
+				}
+			],
+			[
 				'name' => 'Memory limit',
 				'expected_value' => '64M',
 				'current_value' => function () {
