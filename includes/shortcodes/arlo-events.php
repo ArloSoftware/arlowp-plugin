@@ -1094,24 +1094,27 @@ class Events {
         }
         $oa = \Arlo\Entities\OnlineActivities::get($oaconditions, null, 1, $import_id);
 
+        $events_count = ($events == null ? 0 : (is_object($events) ? 1 : count($events)));
+        $oa_count = ($oa == null ? 0 : (is_object($oa) ? 1 : count($oa)));
+
         if ($layout == "list") {
             $return = '<ul class="arlo-event-next-running">';
         }
         
-        if(count($events) == 0 && count($oa) == 0 && !empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) {
+        if($events_count == 0 && $oa_count == 0 && !empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) {
             $return = '<a href="' . esc_url($GLOBALS['arlo_eventtemplate']['et_registerinteresturi']) . '" title="' . __('Register interest', 'arlo-for-wordpress') . '" class="' . esc_attr($buttonclass) . '">' . __('Register interest', 'arlo-for-wordpress') . '</a>';
         } else {
-            if ($display_count && count($events)) {
+            if ($display_count && $events_count) {
                 $return .= ($layout == 'list' ? "<li>" : "");
 
-                $display_text = str_replace('{%count%}', count($oa) + count($events), $text);
+                $display_text = str_replace('{%count%}', $oa_count + $events_count, $text);
 
                 $href = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
 
                 $return .= sprintf('<a href="%s">%s</a>', esc_html($href), esc_html($display_text));
 
                 $return .= ($layout == 'list' ? "</li>" : "");
-            } else if (count($events)) {
+            } else if ($events_count) {
                 $return_links = [];
                 
                 if (!is_array($events)) {
@@ -1167,7 +1170,7 @@ class Events {
             } 
             
             //show only, if there is no events or delivery filter set to "OA"
-            if ((count($events) == 0 || (count($arlo_delivery) == 1 && $arlo_delivery[0] == 99)) && count($oa)) {
+            if (($events_count == 0 || (count($arlo_delivery) == 1 && $arlo_delivery[0] == 99)) && $oa_count) {
                 $reference_terms = json_decode($oa->oa_reference_terms, true);
                 $buttonclass = 'arlo-register';
     

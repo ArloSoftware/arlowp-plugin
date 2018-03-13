@@ -270,4 +270,7 @@ class Arlo_For_Wordpress_Region_Selector extends WP_Widget {
 } // end class
 
 // TODO: Remember to change 'Widget_Name' to match the class name definition
-add_action( 'widgets_init', create_function( '', 'register_widget("Arlo_For_Wordpress_Region_Selector");' ) );
+add_action( 'widgets_init', 'register_widget_region_selector' );
+function register_widget_region_selector() {
+	register_widget("Arlo_For_Wordpress_Region_Selector");
+}
