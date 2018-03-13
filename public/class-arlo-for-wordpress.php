@@ -810,8 +810,6 @@ class Arlo_For_Wordpress {
             $import_id  = get_option('arlo_import_id',"");
 			$last_import = $plugin->get_importer()->get_last_import_date();
 			
-			$plugin->get_importer()->optionally_load_mcrypt_compat();
-
 			//check system requirements and disable the import
 			if (!SystemRequirements::overall_check()) {
 				update_option( 'arlo_import_disabled', 1 );
@@ -836,8 +834,6 @@ class Arlo_For_Wordpress {
 			arlo_add_datamodel();
 
 			$plugin->get_version_handler()->set_installed_version();
-
-			$plugin->get_importer()->optionally_load_mcrypt_compat();
 
 			//check system requirements and disable the plugin/import
 			if (!SystemRequirements::overall_check()) {
