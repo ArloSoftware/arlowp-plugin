@@ -1042,12 +1042,15 @@ class Arlo_For_Wordpress_Settings {
 			$current_value = $req['current_value']();
 			$check = $req['check']($current_value, $req['expected_value']);
 
+			$good_or_bad = ($check === null ? '' : ($check ? $good : $bad));
+			$green_or_red = ($check === null ? '' : ($check ? 'green' : 'red'));
+
 			echo '
 			<tr>
-				<td class="arlo-required-setting-icon">' . ($check ? $good : $bad) . '</td>
+				<td class="arlo-required-setting-icon">' . $good_or_bad . '</td>
 				<td class="arlo-required-setting">' . $req['name'] . '</td>
 				<td class="arlo-required-setting-value">' . $req['expected_value'] . '</td>
-				<td class="arlo-required-setting-value ' . ($check ? 'green' : 'red') . '">' . $current_value . '</td>
+				<td class="arlo-required-setting-value ' . $green_or_red . '">' . $current_value . '</td>
 			</tr>			
 			';
 		}
