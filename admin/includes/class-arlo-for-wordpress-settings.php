@@ -945,7 +945,24 @@ class Arlo_For_Wordpress_Settings {
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">	  
-				<li>Timezones blocking the import on some specific platforms</li>
+				<li>Full support for PHP 7</li>
+				<li>Use OpenSSL for encryption</li>
+				<li>PHP and WordPress version now visible on System requirements tab</li>
+				<li>Improve Log error message on import failure</li>
+				<li>Using the Delete functionality of WordPress keep most of my settings but lose my theme</li>
+				<li>Event search show duplicates of events with multiple categories</li>
+				<li>First plugin activation sometimes fails with a Fatal error</li>
+				<li>Timezones in filter are not sorted by time offset</li>
+				<li>Default Spark designer template do not allow enough space for the day of the month not to wrap</li>
+				<li>memory_limit in php.ini cannot be specified in GB</li>
+				<li>[arlo_event_template_code] does not appear when specified on Upcoming pages</li>
+			</ul>
+		</p>
+
+		<h4>Version 3.6.1</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">	  
+			<li>Timezones blocking the import on some specific platforms</li>
 			</ul>
 		</p>
 
