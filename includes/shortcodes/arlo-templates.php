@@ -295,7 +295,7 @@ class Templates {
 
     private static function shortcode_event_template_search_list ($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
-        
+
         $templates = arlo_get_option('templates');
         $content = $templates['eventsearch']['html'];
         $GLOBALS['arlo_search_page'] = true;
@@ -714,7 +714,6 @@ class Templates {
         $t8 = "{$wpdb->prefix}arlo_onlineactivities";
             
         $where = "WHERE post.post_type = 'arlo_event' AND et.import_id = %d";
-        $group = (isset($GLOBALS['arlo_group_template_by_id']) && $GLOBALS['arlo_group_template_by_id']) ? 'GROUP BY et.et_arlo_id' : '';	
         $parameters[] = $import_id;
 
         $join = [];
@@ -827,8 +826,12 @@ class Templates {
 
         endif;
 
-        $group = 'GROUP BY c.c_arlo_id, et.et_arlo_id';
-            
+        $group = '';
+        if (!empty($GLOBALS['arlo_group_template_by_id'])) {
+            $group = 'GROUP BY et.et_arlo_id';
+        } else {
+            $group = 'GROUP BY c.c_arlo_id, et.et_arlo_id';
+        }
 
         if(!empty($arlo_templatetag) || !empty($arlo_templatetaghidden)) :
 
