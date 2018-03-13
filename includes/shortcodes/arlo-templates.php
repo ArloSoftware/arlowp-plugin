@@ -513,17 +513,18 @@ class Templates {
     }
 
     private static function shortcode_event_template_register_interest($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        global $post, $wpdb;
         $settings = get_option('arlo_settings');
         
         $output = '';
         
         if (!empty($GLOBALS['no_event']) && !empty($GLOBALS['no_onlineactivity'])) {
-            $no_event_text = __('No scheduled event', 'arlo-for-wordpress');
-            
+            $no_event_text = '';
+
             if (!empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) {
                 $no_event_text = !empty($settings['noeventontemplate_text']) ? $settings['noeventontemplate_text'] : __('Interested in attending? Have a suggestion about running this course near you?', 'arlo-for-wordpress');
                 $no_event_text .= '<br /><a href="' . esc_url($GLOBALS['arlo_eventtemplate']['et_registerinteresturi']) . '">' . __('Register your interest now', 'arlo-for-wordpress') . '</a>';
+            } else {
+                $no_event_text = (!empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', 'arlo-for-wordpress'));
             }
             
             $output = '<p class="arlo-no-results">' . $no_event_text . '</p>';	
