@@ -269,7 +269,7 @@ class Arlo_For_Wordpress_Settings {
                         array(
                             'id' => 'noeventontemplate_text',
                             'label_for' => 'arlo_noeventontemplate_text',
-                            'default_val' => __('Interested in attending? Have a suggestion about running this course near you?', 'arlo-for-wordpress' ),
+                            'default_val' => __('Interested in attending? Have a suggestion about running this event near you?', 'arlo-for-wordpress' ),
                             )
                 );
                 

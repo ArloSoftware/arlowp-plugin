@@ -521,7 +521,7 @@ class Templates {
             $no_event_text = '';
 
             if (!empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) {
-                $no_event_text = !empty($settings['noeventontemplate_text']) ? $settings['noeventontemplate_text'] : __('Interested in attending? Have a suggestion about running this course near you?', 'arlo-for-wordpress');
+                $no_event_text = !empty($settings['noeventontemplate_text']) ? $settings['noeventontemplate_text'] : __('Interested in attending? Have a suggestion about running this event near you?', 'arlo-for-wordpress');
                 $no_event_text .= '<br /><a href="' . esc_url($GLOBALS['arlo_eventtemplate']['et_registerinteresturi']) . '">' . __('Register your interest now', 'arlo-for-wordpress') . '</a>';
             } else {
                 $no_event_text = (!empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', 'arlo-for-wordpress'));
