@@ -37,9 +37,6 @@ class Download extends BaseImporter  {
 				$filename = self::$dir . $this->filename . '.dec.json';
 				if ($this->file_handler->write_file($filename, $content)) {
 					$this->is_finished = true;
-				} else {
-					Logger::log_error('Missing write permission on \'import\' directory', $this->import_id);
-					throw new \Exception('Missing write permission on \'import\' directory');
 				}
 				unset($content);
 			} else {
