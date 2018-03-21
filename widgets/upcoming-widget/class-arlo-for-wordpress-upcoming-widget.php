@@ -3,8 +3,8 @@
  * @package   Arlo_For_Wordpress
  * @author    Arlo <info@arlo.co>
  * @license   GPL-2.0+
- * @link      http://arlo.co
- * @copyright 2015 Arlo
+ * @link      https://arlo.co
+ * @copyright 2018 Arlo
  */
 
 use Arlo\Utilities;
@@ -280,4 +280,7 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 } // end class
 
 // TODO: Remember to change 'Widget_Name' to match the class name definition
-add_action( 'widgets_init', create_function( '', 'register_widget("Arlo_For_Wordpress_Upcoming_Widget");' ) );
+add_action( 'widgets_init', 'register_widget_upcoming_widget' );
+function register_widget_upcoming_widget() {
+	register_widget("Arlo_For_Wordpress_Upcoming_Widget");
+}

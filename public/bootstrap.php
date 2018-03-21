@@ -1,8 +1,5 @@
 <?php
 
-$arlo_plugin = Arlo_For_Wordpress::get_instance();
-$arlo_plugin_slug = $arlo_plugin->get_plugin_slug();
-
 /*
  * Change meta title
  */
@@ -72,9 +69,10 @@ add_filter('page_template', function($template){
  */
  
 function set_title($title, $id = null, $meta = false){
-	global $post, $arlo_plugin;
+	global $post;
 
-	$import_id = $arlo_plugin->get_importer()->get_current_import_id();	
+	$plugin = Arlo_For_Wordpress::get_instance();
+	$import_id = $plugin->get_importer()->get_current_import_id();	
 	
 	$title = htmlentities($title, ENT_QUOTES, "UTF-8", false);
 	

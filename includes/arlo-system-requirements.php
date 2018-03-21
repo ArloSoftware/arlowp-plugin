@@ -8,10 +8,37 @@ class SystemRequirements {
 	public static function get_system_requirements() {
 		return [
 			[
+				'name' => 'PHP version',
+				'expected_value' => '5.5',
+				'current_value' => function () {
+					if (!defined('PHP_MAJOR_VERSION') || !defined('PHP_MINOR_VERSION') || !defined('PHP_RELEASE_VERSION')) {
+						return 'Unknown';
+					}
+					return PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION . '.' . PHP_RELEASE_VERSION;
+				},
+				'check' => function($current_value, $expected_value) {
+					return null;  //no check for retro-compatibility
+				}
+			],
+			[
+				'name' => 'WordPress version',
+				'expected_value' => '4.4',
+				'current_value' => function () {
+					if (!isset($GLOBALS['wp_version'])) {
+						return 'Unknown';
+					}
+					return $GLOBALS['wp_version'];
+				},
+				'check' => function($current_value, $expected_value) {
+					return null;  //no check for retro-compatibility
+				}
+			],
+			[
 				'name' => 'Memory limit',
 				'expected_value' => '64M',
 				'current_value' => function () {
-					return ini_get('memory_limit');
+					$memory_limit_setting = ini_get('memory_limit');
+					return Utilities::settingToMegabytes($memory_limit_setting);
 				},
 				'check' => function($current_value, $expected_value) {
 					return intval($current_value) >= intval($expected_value);
@@ -38,22 +65,32 @@ class SystemRequirements {
 				}
 			],
 			[
-				'name' => 'mCrypt enabled',
-				'expected_value' => 'Yes',
+				'name' => 'OpenSSL or mCrypt enabled',
+				'expected_value' => 'OpenSSL',
 				'current_value' => function () {
-					//return extension_loaded('mcrypt') ? 'Yes': 'No';
-					return function_exists('mcrypt_decrypt') ? 'Yes': 'No';
+					if (extension_loaded('mcrypt')) {
+						return 'mCrypt';
+					}
+					elseif (extension_loaded('openssl')) {
+						return 'OpenSSL';
+					}
+					return 'None';
 				},
 				'check' => function($current_value, $expected_value) {
-					return $current_value == 'Yes';
+					return in_array($current_value, ['OpenSSL', 'mCrypt']);
 				}
 			],
 			[
 				'name' => 'RIJNDAEL 128 available',
 				'expected_value' => 'Yes',
 				'current_value' => function () {
-					//return extension_loaded('mcrypt') && in_array('rijndael-128', mcrypt_list_algorithms()) ? 'Yes' : 'No';
-					return  in_array('rijndael-128', mcrypt_list_algorithms()) ? 'Yes' : 'No';
+					if (extension_loaded('mcrypt')) {
+						return (in_array(MCRYPT_RIJNDAEL_128, mcrypt_list_algorithms()) ? 'Yes' : 'No');
+					}
+					elseif (extension_loaded('openssl')) {
+						return (in_array('AES-256-CBC', openssl_get_cipher_methods()) ? 'Yes' : 'No');
+					}
+					return 'N/A';
 				},
 				'check' => function($current_value, $expected_value) {
 					return $current_value == 'Yes';
@@ -63,8 +100,13 @@ class SystemRequirements {
 				'name' => 'CBC mode available',
 				'expected_value' => 'Yes',
 				'current_value' => function () {
-					//return extension_loaded('mcrypt') && in_array('cbc', mcrypt_list_modes()) ? 'Yes' : 'No';
-					return  in_array('cbc', mcrypt_list_modes()) ? 'Yes' : 'No';
+					if (extension_loaded('mcrypt')) {
+						return (in_array(MCRYPT_MODE_CBC, mcrypt_list_modes()) ? 'Yes' : 'No');
+					}
+					elseif (extension_loaded('openssl')) {
+						return (in_array('AES-256-CBC', openssl_get_cipher_methods()) ? 'Yes' : 'No');
+					}
+					return 'N/A';
 				},
 				'check' => function($current_value, $expected_value) {
 					return $current_value == 'Yes';

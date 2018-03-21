@@ -3,7 +3,7 @@ Contributors: ArloSoftware, adamfentosi, gabriel-arlo
 Tags: online registration, event registration, training management,  event management, event plugin, training company software, training calendar, training administration, training management software, training provider, solution, events calendar, wordpress events, event ticketing, wordpress lms, class registration, conference registration,  ticket, registration, event manager, training, booking, ticketing, courses, events, training, calendar, course management
 Requires at least: 4.4
 Tested up to: 4.9
-Stable tag: 3.6.1
+Stable tag: 3.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -172,6 +172,21 @@ The Arlo - Training and Event Management, and online registration plugin is only
 11. Theme Jazz - Upcoming events
 
 == Changelog ==
+
+= 3.7 =
+
+Full support for PHP 7
+Use OpenSSL for encryption
+PHP and WordPress version now visible on System requirements tab
+Improve Log error message on import failure
+
+Using the Delete functionality of WordPress keep most of my settings but lose my theme
+Event search show duplicates of events with multiple categories
+First plugin activation sometimes fails with a Fatal error
+Timezones in filter are not sorted by time offset
+Default Spark designer template do not allow enough space for the day of the month not to wrap
+memory_limit in php.ini cannot be specified in GB
+[arlo_event_template_code] does not appear when specified on Upcoming pages
 
 = 3.6.1 =
 

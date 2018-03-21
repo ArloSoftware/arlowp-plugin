@@ -2,6 +2,8 @@
 
 namespace Arlo;
 
+use Arlo\Utilities;
+
 class Environment {
     protected $memory_limit;
 
@@ -21,7 +23,8 @@ class Environment {
 
     protected function get_memory_limit() {
         if ( function_exists( 'ini_get' ) ) {
-            $memory_limit = ini_get( 'memory_limit' );
+            $memory_limit_setting = ini_get( 'memory_limit' );
+            $memory_limit = Utilities::settingToMegabytes($memory_limit_setting);
         } else {
             // Sensible default.
             $memory_limit = '128M';

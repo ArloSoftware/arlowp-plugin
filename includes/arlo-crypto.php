@@ -5,12 +5,16 @@ namespace Arlo;
 use \Arlo\Logger;
 
 class Crypto {
-	public static $available_crypto_methods = [
-		'A256CBC' => MCRYPT_RIJNDAEL_128,
-	];
-
 	public static $available_hasher_methods = [
 		'HS512' => 'sha512',
+	];
+
+	public static $available_cipher_methods = [
+		'A256CBC' => 'RIJNDAEL_128',
+	];
+
+	public static $available_cipher_modes = [
+		'A256CBC' => 'MODE_CBC',
 	];
 
 	public static $jwe_part_keys = [
@@ -26,43 +30,44 @@ class Crypto {
 	const MAC_LENGTH = 32; 
 	const IV_LENGTH = 16;
 
-	public static function decrypt($encrypted, $key, $crypto_method, $hash_method, $gzip = false) {
-		if (!extension_loaded('mcrypt') && !function_exists('mcrypt_decrypt')) {
-			if (!function_exists('mcrypt_decrypt') ) {
-				throw new \Exception('mCrypt replacement is not available');
-			}
-			if (!extension_loaded('mcrypt') ) {
-				throw new \Exception('mCrypt is not available');
-			}
+
+	public static function decrypt_gzip($fullencrypted, $key, $method) {
+		$iv = substr($fullencrypted, 0, self::IV_LENGTH);
+		$encrypted = substr($fullencrypted, self::IV_LENGTH, strlen($fullencrypted) - self::IV_LENGTH);
+
+		$methods = explode('-', $method);
+
+		$zipped = self::decrypt($iv, $encrypted, $key, $methods[0], $methods[1]);
+
+		$unzipped = gzdecode($zipped);
+		return trim($unzipped);
+	}
+
+	public static function decrypt($iv, $encrypted, $key, $crypto_method, $hash_method) {
+		if (!array_key_exists($hash_method, self::$available_hasher_methods)) {
+			throw new \Exception("Hash method '" . $hash_method . "' is not supported");
 		}
 
-		list($key_m, $key_e) = self::derive_secondary_keys($key, $hash_method);
+		$keys = self::derive_secondary_keys($key, $hash_method);
 
-		if (array_key_exists($crypto_method, self::$available_crypto_methods)) {
-			//first bytes are IV
-			$iv = substr($encrypted, 0, self::IV_LENGTH);
-			$cyphertext = substr($encrypted, self::IV_LENGTH, strlen($encrypted) - self::MAC_LENGTH - self::IV_LENGTH);
+		$ciphertext = substr($encrypted, 0, strlen($encrypted) - self::MAC_LENGTH);
+		$hmac = substr($encrypted, strlen($encrypted) - self::MAC_LENGTH);
+		$hasher = self::$available_hasher_methods[ $hash_method ];
 
-			if (array_key_exists($hash_method, self::$available_hasher_methods)) {
-				$hmac = substr(hash_hmac(self::$available_hasher_methods[$hash_method], $iv . $cyphertext, $key_m, true), 0, self::MAC_LENGTH);
+		if (!self::hmac_validation($iv, $ciphertext, $keys['mac'], $hasher, $hmac)) {
+			throw new \Exception("Hmac validation failed");
+		}
 
-				//last bytes are HMAC
-				if (substr($encrypted, strlen($encrypted) - self::MAC_LENGTH) == $hmac) {
-					$decrypted = mcrypt_decrypt(self::$available_crypto_methods[$crypto_method], $key_e, $cyphertext, MCRYPT_MODE_CBC, $iv);
-					$last_error = error_get_last();
-					if (empty($decrypted) && isset($last_error['message'])) {
-						throw new \Exception($last_error['message']);
-					}
-
-					return trim(($gzip ? gzdecode($decrypted) : $decrypted));
-				} else {
-					throw new \Exception('Invalid HMAC');
-				}
-			} 
-			throw new \Exception('The hash method is not the required one');
-		} 
-		throw new \Exception('The encryption method is not the required one');
+		//use mCrypt by default for retrocompatibility
+		$decrypted = '';
+		if (extension_loaded('mcrypt')) {
+			$decrypted = self::decrypt_with_mcrypt($iv, $ciphertext, $keys['enc'], $crypto_method);
+		} else {
+			$decrypted = self::decrypt_with_openssl($iv, $ciphertext, $keys['enc'], $crypto_method);
+		}
+		return $decrypted;
 	}
+
 
 	public static function derive_secondary_keys($key, $hash_method) {
 		$key = base64_decode($key);
@@ -73,10 +78,53 @@ class Crypto {
 		}
 
 		return [
-			substr($hashed_key, 0, self::MAC_KEY_LENGTH),
-			substr($hashed_key, self::MAC_KEY_LENGTH, self::ENCRYPTION_KEY_LENGTH)
+			'mac' => substr($hashed_key, 0, self::MAC_KEY_LENGTH),
+			'enc' => substr($hashed_key, self::MAC_KEY_LENGTH, self::ENCRYPTION_KEY_LENGTH)
 		];
 	}
+
+	public static function hmac_validation($iv, $ciphertext, $key, $method, $hmac) {
+		$computed = hash_hmac($method, $iv . $ciphertext, $key, true);
+
+		$a = substr($hmac, 0, self::MAC_LENGTH);
+		$b = substr($computed, 0, self::MAC_LENGTH);
+
+		return (strlen($a) == strlen($b) && $a == $b);
+	}
+
+
+	private static function decrypt_with_mcrypt($iv, $ciphertext, $key, $method) {
+		$algo = self::$available_cipher_methods[ $method ];
+		$mode = self::$available_cipher_modes[ $method ];
+
+		if ('RIJNDAEL_128' == $algo && 'MODE_CBC' == $mode) {
+			$decrypted = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $key, $ciphertext, MCRYPT_MODE_CBC, $iv);
+			
+			$last_error = error_get_last();
+			if (empty($decrypted) && isset($last_error['message'])) {
+				throw new \Exception('mCrypt cannot decrypt data: ' . $last_error['message']);
+			}
+		} else {
+			throw new \Exception("The cryptographic method chosen for mCrypt (" . $method . ") is not supported by the plugin");
+		}
+		return $decrypted;
+	}
+
+	private static function decrypt_with_openssl($iv, $ciphertext, $key, $method) {
+		$algo = self::$available_cipher_methods[ $method ];
+		$mode = self::$available_cipher_modes[ $method ];
+
+		if ('RIJNDAEL_128' == $algo && 'MODE_CBC' == $mode) {
+			$decrypted = openssl_decrypt($ciphertext, 'AES-256-CBC', $key, OPENSSL_RAW_DATA|OPENSSL_ZERO_PADDING, $iv);
+			if (empty($decrypted)) {
+				throw new \Exception('OpenSSL cannot decrypt data for an unknown reason');
+			}
+		} else {
+			throw new \Exception("The cryptographic method chosen for OpenSSL (" . $method . ") is not supported by the plugin");
+		}
+		return $decrypted;
+	}
+
 
 	public static function jwe_decrypt($jwe = '', $key) {
 		$jwe_parts = explode('.', $jwe);
@@ -97,7 +145,8 @@ class Crypto {
 		$jwe_header = json_decode($jwe['header']);
 		$jwe_header_enc = explode('-', $jwe_header->enc);
 
-		return self::decrypt($jwe['iv'] . $jwe['cipher_text'], $key, $jwe_header_enc[0], $jwe_header_enc[1]);
+		$decrypted = self::decrypt($jwe['iv'], $jwe['cipher_text'], $key, $jwe_header_enc[0], $jwe_header_enc[1]);
+		return trim($decrypted);
 	}
 
 	private static function jwe_valider_parts($jwe = []) {
@@ -118,24 +167,25 @@ class Crypto {
 
 		if (!empty($jwe_header->enc)) {
 			$enc = explode('-', $jwe_header->enc);
+
+			$cipher_methods = self::$available_cipher_methods;
+			$cipher_modes = self::$available_cipher_modes;
+			$hasher_methods = self::$available_hasher_methods;
 			
-			if (!(count($enc) == 2 && array_key_exists($enc[0], self::$available_crypto_methods) && array_key_exists($enc[1], self::$available_hasher_methods))) {
+			if (count($enc) != 2) {
 				throw new \Exception(sprintf('JWE header "enc" value of "%s" is not supported', $jwe_header->enc));
+			}
+			if (!array_key_exists($enc[0], $cipher_methods)) {
+				throw new \Exception(sprintf('JWE header "enc" value of "%s" is not supported (cipher method)', $jwe_header->enc));
+			}
+			if (!array_key_exists($enc[0], $cipher_modes)) {
+				throw new \Exception(sprintf('JWE header "enc" value of "%s" is not supported (cipher mode)', $jwe_header->enc));
+			}
+			if (!array_key_exists($enc[1], $hasher_methods)) {
+				throw new \Exception(sprintf('JWE header "enc" value of "%s" is not supported (hasher method)', $jwe_header->enc));
 			}
 		} else {
 			throw new \Exception('Empty value for JWE header "enc" is not supported ');
 		}	
-	}
-
-	public static function load_mcrypt_compat_if_needed() {
-		if (!function_exists('mcrypt_decrypt') ) {
-			// mCrypt deprecated in 7.2 so load mcrypt_compat
-			//https://github.com/phpseclib/mcrypt_compat
-			//https://github.com/phpseclib/phpseclib
-			require_once( plugin_dir_path( __FILE__ ) . 'mcrypt_compat/phpseclib/Crypt/Common/SymmetricKey.php');
-			require_once( plugin_dir_path( __FILE__ ) . 'mcrypt_compat/phpseclib/Crypt/Common/BlockCipher.php');
-			require_once( plugin_dir_path( __FILE__ ) . 'mcrypt_compat/phpseclib/Crypt/Rijndael.php');
-			require_once( plugin_dir_path( __FILE__ ) . 'mcrypt_compat/mcrypt.php');
-		}
 	}
 }

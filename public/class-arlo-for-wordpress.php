@@ -24,8 +24,8 @@ use Arlo\SystemRequirements;
  * @package   Arlo_For_Wordpress
  * @author    Arlo <info@arlo.co>
  * @license   GPL-2.0+
- * @link      http://arlo.co
- * @copyright 2015 Arlo
+ * @link      https://arlo.co
+ * @copyright 2018 Arlo
  * 
  */
 
@@ -38,7 +38,7 @@ use Arlo\SystemRequirements;
  *
  *
  * @package Arlo_For_Wordpress
- * @author  Adam Fentosi <adam.fentosi@arlo.co>
+ * @author  Adam Fentosi <adam.fentosi@arlo.co>, Gabriel Oheix
  */
 class Arlo_For_Wordpress {
 
@@ -810,8 +810,6 @@ class Arlo_For_Wordpress {
             $import_id  = get_option('arlo_import_id',"");
 			$last_import = $plugin->get_importer()->get_last_import_date();
 			
-			$plugin->get_importer()->optionally_load_mcrypt_compat();
-
 			//check system requirements and disable the import
 			if (!SystemRequirements::overall_check()) {
 				update_option( 'arlo_import_disabled', 1 );
@@ -836,8 +834,6 @@ class Arlo_For_Wordpress {
 			arlo_add_datamodel();
 
 			$plugin->get_version_handler()->set_installed_version();
-
-			$plugin->get_importer()->optionally_load_mcrypt_compat();
 
 			//check system requirements and disable the plugin/import
 			if (!SystemRequirements::overall_check()) {

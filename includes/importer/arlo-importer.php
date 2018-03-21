@@ -272,6 +272,14 @@ class Importer {
 
 				//pretty nasty, but need to know if our plugin throws the error or something else (like a cache plugin)
 				if (strpos($file, 'arlo') !== false) {
+
+					// specific error for file permission
+					if (strpos($str, 'fopen(') === 0) {
+						if (strpos($str, 'ermission denied') > 0) {
+							Logger::log("Missing write permission" . (strpos($str, "/import/") > 0 ? " on 'import' directory" : ""), $this->import_id);
+						}
+					}
+
 					throw new \Exception($str);
 				}
 			}, E_ALL & ~E_USER_NOTICE & ~E_NOTICE  & ~E_DEPRECATED);
@@ -451,20 +459,24 @@ class Importer {
 				$import = $this->get_import_entry($this->import_id, null, 1);
 
 				if (!is_null($import)) {
-					$callback_json = json_decode($import->callback_json);
+					if (!empty($import->callback_json)) {
+						$callback_json = json_decode($import->callback_json);
 
-					if (json_last_error() != JSON_ERROR_NONE) {
-						error_log("JSON Decode error: " . json_last_error_msg());
-						Logger::log_error("JSON Decode error: " . json_last_error_msg(), $this->import_id);
-					}
+						if (json_last_error() != JSON_ERROR_NONE) {
+							error_log("JSON Decode error: " . json_last_error_msg());
+							Logger::log_error("JSON Decode error: " . json_last_error_msg(), $this->import_id);
+						}
 
-					if (!empty($callback_json->SnapshotUri)) {
-						$this->current_task_class->uri = $callback_json->SnapshotUri;
+						if (!empty($callback_json->SnapshotUri)) {
+							$this->current_task_class->uri = $callback_json->SnapshotUri;
 
-						$this->current_task_class->filename = $this->import_id;
-						$this->current_task_class->response_json = json_decode($import->response_json);
-					} elseif (!empty($callback_json->Error)) {
-						Logger::log_error($callback_json->Error->Code . ': ' . $callback_json->Error->Message, $this->import_id);
+							$this->current_task_class->filename = $this->import_id;
+							$this->current_task_class->response_json = json_decode($import->response_json);
+						} elseif (!empty($callback_json->Error)) {
+							Logger::log_error($callback_json->Error->Code . ': ' . $callback_json->Error->Message, $this->import_id);
+						}
+					} else {
+						Logger::log_error('The import callback did not happen', $this->import_id);
 					}
 				} else {
 					Logger::log_error('Couldn\'t retrive the import from database', $this->import_id);
@@ -660,9 +672,5 @@ class Importer {
 		} else {
 			return false;
 		}
-	}
-
-	public function optionally_load_mcrypt_compat() {
-		Crypto::load_mcrypt_compat_if_needed();
 	}
 }

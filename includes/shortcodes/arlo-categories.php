@@ -81,7 +81,7 @@ class Categories {
                     
                     $tree = CategoriesEntity::getTree($start_at, $depth, 0, $ignored_categories, $import_id);
 
-                    $GLOBALS['arlo_categories_count'] = count($tree);		
+                    $GLOBALS['arlo_categories_count'] = (empty($tree) ? 0 : count($tree));
                             
                     if(!empty($tree)) {		
                         $return .= self::generate_category_ul($tree, $counts, $widget);	

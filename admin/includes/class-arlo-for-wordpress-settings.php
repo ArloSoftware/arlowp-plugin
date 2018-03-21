@@ -5,8 +5,8 @@
  * @package   Arlo_For_Wordpress_Admin
  * @author    Arlo <info@arlo.co>
  * @license   GPL-2.0+
- * @link      http://arlo.co
- * @copyright 2015 Arlo
+ * @link      https://arlo.co
+ * @copyright 2018 Arlo
  */
 
  use Arlo\Logger;
@@ -269,7 +269,7 @@ class Arlo_For_Wordpress_Settings {
                         array(
                             'id' => 'noeventontemplate_text',
                             'label_for' => 'arlo_noeventontemplate_text',
-                            'default_val' => __('Interested in attending? Have a suggestion about running this course near you?', 'arlo-for-wordpress' ),
+                            'default_val' => __('Interested in attending? Have a suggestion about running this event near you?', 'arlo-for-wordpress' ),
                             )
                 );
                 
@@ -945,7 +945,24 @@ class Arlo_For_Wordpress_Settings {
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">	  
-				<li>Timezones blocking the import on some specific platforms</li>
+				<li>Full support for PHP 7</li>
+				<li>Use OpenSSL for encryption</li>
+				<li>PHP and WordPress version now visible on System requirements tab</li>
+				<li>Improve Log error message on import failure</li>
+				<li>Using the Delete functionality of WordPress keep most of my settings but lose my theme</li>
+				<li>Event search show duplicates of events with multiple categories</li>
+				<li>First plugin activation sometimes fails with a Fatal error</li>
+				<li>Timezones in filter are not sorted by time offset</li>
+				<li>Default Spark designer template do not allow enough space for the day of the month not to wrap</li>
+				<li>memory_limit in php.ini cannot be specified in GB</li>
+				<li>[arlo_event_template_code] does not appear when specified on Upcoming pages</li>
+			</ul>
+		</p>
+
+		<h4>Version 3.6.1</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">	  
+			<li>Timezones blocking the import on some specific platforms</li>
 			</ul>
 		</p>
 
@@ -1042,12 +1059,15 @@ class Arlo_For_Wordpress_Settings {
 			$current_value = $req['current_value']();
 			$check = $req['check']($current_value, $req['expected_value']);
 
+			$good_or_bad = ($check === null ? '' : ($check ? $good : $bad));
+			$green_or_red = ($check === null ? '' : ($check ? 'green' : 'red'));
+
 			echo '
 			<tr>
-				<td class="arlo-required-setting-icon">' . ($check ? $good : $bad) . '</td>
+				<td class="arlo-required-setting-icon">' . $good_or_bad . '</td>
 				<td class="arlo-required-setting">' . $req['name'] . '</td>
 				<td class="arlo-required-setting-value">' . $req['expected_value'] . '</td>
-				<td class="arlo-required-setting-value ' . ($check ? 'green' : 'red') . '">' . $current_value . '</td>
+				<td class="arlo-required-setting-value ' . $green_or_red . '">' . $current_value . '</td>
 			</tr>			
 			';
 		}
