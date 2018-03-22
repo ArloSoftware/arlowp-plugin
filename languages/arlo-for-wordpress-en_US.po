@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Arlo For WordPress v3.0.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/arlowp-plugin\n"
-"POT-Creation-Date: 2018-03-20 10:22+1300\n"
-"PO-Revision-Date: 2018-03-20 10:38+1300\n"
+"POT-Creation-Date: 2018-03-22 17:27+1300\n"
+"PO-Revision-Date: 2018-03-22 17:27+1300\n"
 "Last-Translator: Adam Fentosi <fentosi.adam@gmail.com>\n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -229,8 +229,8 @@ msgid "\"Free\" text"
 msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-settings.php:246
-#: includes/shortcodes/arlo-events.php:690
-#: includes/shortcodes/arlo-shortcodes.php:494
+#: includes/shortcodes/arlo-events.php:687
+#: includes/shortcodes/arlo-shortcodes.php:474
 #: includes/shortcodes/arlo-upcoming-events.php:208
 msgid "Free"
 msgstr ""
@@ -407,7 +407,7 @@ msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-templates.php:34
 #: admin/includes/class-arlo-for-wordpress-templates.php:66
-#: includes/shortcodes/arlo-events.php:1108
+#: includes/shortcodes/arlo-events.php:1105
 msgid "Register interest"
 msgstr ""
 
@@ -463,7 +463,7 @@ msgstr ""
 msgid "Template help text"
 msgstr ""
 
-#: admin/views/list.php:25 includes/shortcodes/arlo-shortcodes.php:293
+#: admin/views/list.php:25 includes/shortcodes/arlo-shortcodes.php:288
 msgid "Search"
 msgstr ""
 
@@ -553,7 +553,7 @@ msgstr ""
 
 #: includes/arlo-notice-handler.php:224
 msgid ""
-"Jon <a target=\"_blank\" href=\"\" class=\"webinar_url\">Arlo for WordPress "
+"Join <a target=\"_blank\" href=\"\" class=\"webinar_url\">Arlo for WordPress "
 "Getting started</a> webinar on <span id=\"webinar_date\"></span>"
 msgstr ""
 
@@ -702,39 +702,39 @@ msgstr[1] ""
 msgid "Session information"
 msgstr ""
 
-#: includes/shortcodes/arlo-events.php:622
+#: includes/shortcodes/arlo-events.php:619
 msgid "1 day"
 msgstr ""
 
-#: includes/shortcodes/arlo-events.php:630
+#: includes/shortcodes/arlo-events.php:627
 #, php-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/shortcodes/arlo-events.php:638
+#: includes/shortcodes/arlo-events.php:635
 #, php-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/shortcodes/arlo-events.php:648
+#: includes/shortcodes/arlo-events.php:645
 #, php-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/shortcodes/arlo-events.php:655
+#: includes/shortcodes/arlo-events.php:652
 #, php-format
 msgid "%d week"
 msgid_plural "%d weeks"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/shortcodes/arlo-events.php:784
+#: includes/shortcodes/arlo-events.php:781
 msgid "From"
 msgstr ""
 
@@ -742,27 +742,27 @@ msgstr ""
 msgid "No online activities to show"
 msgstr ""
 
-#: includes/shortcodes/arlo-shortcodes.php:46
+#: includes/shortcodes/arlo-shortcodes.php:41
 #, php-format
 msgid "Powered by %s"
 msgstr ""
 
-#: includes/shortcodes/arlo-shortcodes.php:292
+#: includes/shortcodes/arlo-shortcodes.php:287
 msgid "Search for an event"
 msgstr ""
 
-#: includes/shortcodes/arlo-shortcodes.php:366
+#: includes/shortcodes/arlo-shortcodes.php:346
 msgid "Select a time zone"
 msgstr ""
 
-#: includes/shortcodes/arlo-shortcodes.php:522
-#: includes/shortcodes/arlo-shortcodes.php:537
+#: includes/shortcodes/arlo-shortcodes.php:502
+#: includes/shortcodes/arlo-shortcodes.php:517
 #, php-format
 msgid "excl. %s"
 msgstr ""
 
-#: includes/shortcodes/arlo-shortcodes.php:522
-#: includes/shortcodes/arlo-shortcodes.php:537
+#: includes/shortcodes/arlo-shortcodes.php:502
+#: includes/shortcodes/arlo-shortcodes.php:517
 #, php-format
 msgid "incl. %s"
 msgstr ""
