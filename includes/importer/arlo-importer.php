@@ -271,7 +271,8 @@ class Importer {
 				error_log($str . ' in ' . $file . ' on line ' . $line);
 
 				//pretty nasty, but need to know if our plugin throws the error or something else (like a cache plugin)
-				if (strpos($file, 'arlo') !== false) {
+				//arlo- is in case $file would not include the path; just 'arlo' would catch all errors for hosted servers like vanguard.wpdemo.arlo.co where domain is used in the plugin file path
+				if (strpos($file, 'arlo-') !== false || strpos($file, 'arlowp')) {
 
 					// specific error for file permission
 					if (strpos($str, 'fopen(') === 0) {
