@@ -1,3 +1,23 @@
+== V3.7 ==
+
+Enhancement
+------------------
+Full support for PHP 7
+Use OpenSSL for encryption
+PHP and WordPress version now visible on System requirements tab
+Improve Log error message on import failure
+
+Bugfixes
+------------------
+Using the Delete functionality of WordPress keep most of my settings but lose my theme
+Event search show duplicates of events with multiple categories
+First plugin activation sometimes fails with a Fatal error
+Timezones in filter are not sorted by time offset
+Default Spark designer template do not allow enough space for the day of the month not to wrap
+memory_limit in php.ini cannot be specified in GB
+[arlo_event_template_code] does not appear when specified on Upcoming pages
+
+
 == V3.6.1 ==
 
 Bugfixes

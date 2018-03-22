@@ -272,6 +272,14 @@ class Importer {
 
 				//pretty nasty, but need to know if our plugin throws the error or something else (like a cache plugin)
 				if (strpos($file, 'arlo') !== false) {
+
+					// specific error for file permission
+					if (strpos($str, 'fopen(') === 0) {
+						if (strpos($str, 'ermission denied') > 0) {
+							Logger::log("Missing write permission" . (strpos($str, "/import/") > 0 ? " on 'import' directory" : ""), $this->import_id);
+						}
+					}
+
 					throw new \Exception($str);
 				}
 			}, E_ALL & ~E_USER_NOTICE & ~E_NOTICE  & ~E_DEPRECATED);
