@@ -1763,8 +1763,8 @@ class Arlo_For_Wordpress {
 				$venue = \Arlo\Entities\Venues::get(array('id' => intval($_GET['arlo_id'])), array(), 1, $import_id);
 				
 				if(!$venue) return;
-				
-				$post = arlo_get_post_by_name($venue->v_post_name, 'arlo_venue');
+
+				$post = arlo_get_post_by_name($venue['v_post_name'], 'arlo_venue');
 				
 				if(!$post) return;
 				
