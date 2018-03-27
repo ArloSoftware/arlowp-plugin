@@ -16,6 +16,7 @@ use Arlo\Environment;
 use Arlo\ThemeManager;
 use Arlo\TimeZoneManager;
 use Arlo\SystemRequirements;
+use Arlo\Redirect;
 
 /**
  * Arlo for WordPress.
@@ -1730,66 +1731,7 @@ class Arlo_For_Wordpress {
 	}
 	
 	public function redirect_proxy() {
-		$settings = get_option('arlo_settings');
-		$import_id = $this->get_importer()->get_current_import_id();
-		
-		if(!isset($_GET['object_post_type']) || !isset($_GET['arlo_id'])) return;
-		
-		switch($_GET['object_post_type']) {
-			case 'event':
-				//check if it's a private event				
-				if ((!empty($_GET['e']) || !empty($_GET['t'])) && !empty($settings['platform_name'])) {
-					$platform_url = strpos($settings['platform_name'], '.') !== false ? $settings['platform_name'] : $settings['platform_name'] . '.arlo.co';
-
-					$url = 'http://' . $platform_url . '/events/' . intval($_GET['arlo_id']) . '-fake-redirect-url?';
-					$url .= (!empty($_GET['e']) ? 'e=' . $_GET['e'] : '');
-					$url .= (!empty($_GET['t']) ? 't=' . $_GET['t'] : '');
-					
-					$location = $url;
-				} else {
-					$event = \Arlo\Entities\Templates::get(array('id' => intval($_GET['arlo_id'])), array(), 1, $import_id);
-					
-					if(!$event) return;
-					
-					$post = arlo_get_post_by_name($event->et_post_name, 'arlo_event');
-					
-					if(!$post) return;
-					
-					$location = get_permalink($post->ID);					
-				}
-			break;
-			
-			case 'venue':
-				$venue = \Arlo\Entities\Venues::get(array('id' => intval($_GET['arlo_id'])), array(), 1, $import_id);
-				
-				if(!$venue) return;
-
-				$post = arlo_get_post_by_name($venue['v_post_name'], 'arlo_venue');
-				
-				if(!$post) return;
-				
-				$location = get_permalink($post->ID);
-			break;
-			
-			case 'presenter':
-				$presenter = \Arlo\Entities\Presenters::get(array('id' => intval($_GET['arlo_id'])), array(), 1, $import_id);
-
-				if(!$presenter) return;
-				
-				$post = arlo_get_post_by_name($presenter['p_post_name'], 'arlo_presenter');
-
-				if(!$post) return;
-				
-				$location = get_permalink($post->ID);
-			break;
-			
-			default:
-				return;
-			break;
-		}
-		
-		wp_redirect( $location, 301 );
-		exit;
+		Redirect::object_post_redirect();
 	}		
 	
 	public function start_scheduler_callback() {		
