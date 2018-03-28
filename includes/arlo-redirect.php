@@ -2,9 +2,11 @@
 
 namespace Arlo;
 
+use Arlo_For_Wordpress;
 use Arlo\Entities\Templates;
 use Arlo\Entities\Venues;
 use Arlo\Entities\Presenters;
+use Arlo\Entities\Categories;
 
 class Redirect {
 
@@ -28,6 +30,7 @@ class Redirect {
                     break;
 
                 case 'category':
+                    self::object_post_category_redirect($arlo_id);   // redirects
                     break;
             }
         }
@@ -58,7 +61,7 @@ class Redirect {
 
 
     private static function object_post_event_redirect($arlo_id) {
-        $plugin = \Arlo_For_Wordpress::get_instance();
+        $plugin = Arlo_For_Wordpress::get_instance();
         $import_id = $plugin->get_importer()->get_current_import_id();
 
         $eventtemplate = Templates::get(['id' => $arlo_id], [], 1, $import_id);
@@ -78,7 +81,7 @@ class Redirect {
     }
 
     private static function object_post_venue_redirect($arlo_id) {
-        $plugin = \Arlo_For_Wordpress::get_instance();
+        $plugin = Arlo_For_Wordpress::get_instance();
         $import_id = $plugin->get_importer()->get_current_import_id();
 
         $venue = Venues::get(['id' => $arlo_id], [], 1, $import_id);
@@ -98,7 +101,7 @@ class Redirect {
     }
 
     private static function object_post_presenter_redirect($arlo_id) {
-        $plugin = \Arlo_For_Wordpress::get_instance();
+        $plugin = Arlo_For_Wordpress::get_instance();
         $import_id = $plugin->get_importer()->get_current_import_id();
 
         $presenter = Presenters::get(['id' => $arlo_id], [], 1, $import_id);
@@ -111,6 +114,36 @@ class Redirect {
                     wp_redirect($redirect_url, 301);
                     exit;
                 }
+            }
+        }
+        http_response_code(404);
+        die('Page not found (todo)');
+    }
+
+    private static function object_post_category_redirect($arlo_id) {
+        $plugin = Arlo_For_Wordpress::get_instance();
+        $import_id = $plugin->get_importer()->get_current_import_id();
+
+        $category = Categories::get(['id' => $arlo_id], 1, $import_id);
+
+        if (!empty($category) && !empty($category->c_slug)) {
+            $post = arlo_get_post_by_name('events', 'page');
+            if (!empty($post) && !empty($post->ID)) {
+                $redirect_url = get_permalink($post->ID) . 'cat-' . $category->c_slug;
+                wp_redirect($redirect_url, 301);
+                exit;
+            }
+            $post = arlo_get_post_by_name('schedule', 'page');
+            if (!empty($post) && !empty($post->ID)) {
+                $redirect_url = get_permalink($post->ID) . 'cat-' . $category->c_slug;
+                wp_redirect($redirect_url, 301);
+                exit;
+            }
+            $post = arlo_get_post_by_name('upcoming', 'page');
+            if (!empty($post) && !empty($post->ID)) {
+                $redirect_url = get_permalink($post->ID) . 'cat-' . $category->c_slug;
+                wp_redirect($redirect_url, 301);
+                exit;
             }
         }
         http_response_code(404);

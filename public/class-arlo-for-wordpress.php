@@ -1550,7 +1550,7 @@ class Arlo_For_Wordpress {
 		
 		$error = [];
 
-		foreach (self::$pages as $id => $page) {
+		foreach (self::$pages as $page) {
 			//try to find and publish the page
 			$args = array(
   				'name' => $page['name'],
@@ -1908,7 +1908,7 @@ class Arlo_For_Wordpress {
 	public function add_pages($page_name = '') {
 		$page_ids = [];
 		
-		foreach($this::$pages as $page) {
+		foreach(self::$pages as $page) {
 			if (!empty($page_name) && $page['name'] != $page_name) continue;
 
 			$current_page = get_page_by_title($page['title']);
