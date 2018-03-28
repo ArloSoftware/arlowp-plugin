@@ -159,7 +159,7 @@ class UpcomingEvents {
 
             foreach($items as $key => $item) {
                 if(is_null($previous) || date('m',strtotime($item['e_startdatetime'])) != date('m',strtotime($previous['e_startdatetime']))) {
-                    $item['show_divider'] = strftime('%B', strtotime($item['e_startdatetime']));
+                    $item['show_divider'] = strftime('%B %Y', strtotime($item['e_startdatetime']));
                 }
 
                 $GLOBALS['arlo_event_list_item'] = $item;
