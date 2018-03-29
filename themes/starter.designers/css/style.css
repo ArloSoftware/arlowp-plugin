@@ -13853,6 +13853,10 @@
     padding-right: 0;
 }
 
+.arlo .session-full {
+    color: #f55753;
+}
+
 .arlo .tingle-modal__closeIcon {
   font-size: 4rem;
 }
