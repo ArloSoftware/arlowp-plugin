@@ -516,6 +516,7 @@ class Events {
                 e_isonline,
                 e_timezone_id,
                 e_sessiondescription,
+                e_isfull,
                 0 AS v_id
             FROM
                 {$wpdb->prefix}arlo_events
@@ -990,13 +991,15 @@ class Events {
     }
 
     private static function shortcode_event_isfull($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        if(!isset($GLOBALS['arlo_event_list_item']) || empty($GLOBALS['arlo_event_list_item']['e_isfull'])) return;
+        if (empty($GLOBALS['arlo_event_list_item']['e_isfull']) && empty($GLOBALS['arlo_event_session_list_item']['e_isfull'])) return;
+
+        $event = (!empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item']);
 
         extract(shortcode_atts(array(
             'output' => 'Full'
         ), $atts, $shortcode_name, $import_id));
 
-        if ($GLOBALS['arlo_event_list_item']["e_isfull"] == 1) {
+        if ($event["e_isfull"] == 1) {
             return $output;
         }
     }
