@@ -705,6 +705,8 @@ class Events {
             }
 
             $offer = \Arlo\Entities\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $import_id);
+
+            if(empty($offer)) return;
         }
 
         // if none, try the event template offer
