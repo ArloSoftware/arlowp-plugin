@@ -592,23 +592,24 @@ class Events {
     }
 
     private static function shortcode_event_duration($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        if(!isset($GLOBALS['arlo_event_list_item']) || empty($GLOBALS['arlo_event_list_item']['et_arlo_id'])) return;
+        if(empty($GLOBALS['arlo_event_list_item']['et_arlo_id']) && empty($GLOBALS['arlo_event_list_item']['e_startdatetime']) && empty($GLOBALS['arlo_event_session_list_item']['e_startdatetime'])) return;
 
-        $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
+        $event = (!empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item']);
 
-        $conditions = array(
-            'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id'],
-            'parent_id' => 0
-        );
-
-        if (!empty($arlo_region)) {
-            $conditions['region'] = $arlo_region; 
-        }
-
-        if (!empty($GLOBALS['arlo_event_list_item']['e_startdatetime']) && !empty($GLOBALS['arlo_event_list_item']['e_finishdatetime'])) {
-            $start = $GLOBALS['arlo_event_list_item']['e_startdatetime'];
-            $end = $GLOBALS['arlo_event_list_item']['e_finishdatetime'];
+        if (!empty($event['e_startdatetime']) && !empty($event['e_finishdatetime'])) {
+            $start = $event['e_startdatetime'];
+            $end = $event['e_finishdatetime'];
         } else {
+            $conditions = array(
+                'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id'],
+                'parent_id' => 0
+            );
+
+            $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
+            if (!empty($arlo_region)) {
+                $conditions['region'] = $arlo_region; 
+            }
+    
             $events = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), 1, $import_id);
             
             if(empty($events)) return;
@@ -623,7 +624,6 @@ class Events {
             
         // if we're the same day, display hours
         if(date('d-m', strtotime($start)) == date('d-m', strtotime($end)) || $hours <= 6) {
-            
                     
             if ($hours > 6) {
                 return __('1 day', 'arlo-for-wordpress');
