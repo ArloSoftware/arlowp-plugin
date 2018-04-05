@@ -24,7 +24,11 @@
 
 * [arlo_event_list][/arlo_event_list]
 * [arlo_event_list_item][/arlo_event_list_item]
+* [arlo_event_name]
 * [arlo_event_code]
+* [arlo_event_duration]
+* [arlo_event_price]
+* [arlo_event_next_running]
 * [arlo_event_start_date format=""]
 * [arlo_event_end_date format=""]
 * [arlo_event_location]
@@ -35,7 +39,14 @@
 * [arlo_event_presenters layout='list||string' link='true||false']
 * [arlo_event_notice]
 * [arlo_event_offers]
+* [arlo_event_offers_hasdiscount]
 * [arlo_event_registration]
+* [arlo_event_isfull]
+* [arlo_event_notice]
+* [arlo_event_tags]
+* [arlo_event_credits]
+* [arlo_event_rich_snippet]
+* [arlo_event_session_list_item][/arlo_event_session_list_item]
 ---
 
 ## Upcoming
