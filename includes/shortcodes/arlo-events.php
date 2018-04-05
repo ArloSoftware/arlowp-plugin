@@ -356,7 +356,15 @@ class Events {
         if(!isset($GLOBALS['arlo_event_list_item']['e_sessiondescription'])) return '';
 
         return esc_html($GLOBALS['arlo_event_list_item']['e_sessiondescription']);
-    }                    
+    }
+
+    private static function shortcode_event_summary($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if(empty($GLOBALS['arlo_event_list_item']['e_summary']) && empty($GLOBALS['arlo_event_session_list_item']['e_summary'])) return '';
+
+        $event = (!empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item']);
+
+        return esc_html($event['e_summary']);
+    }
 
     private static function shortcode_event_credits($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_event_list_item']['e_credits'])) return '';
@@ -516,6 +524,7 @@ class Events {
                 e_isonline,
                 e_timezone_id,
                 e_sessiondescription,
+                e_summary,
                 e_isfull,
                 0 AS v_id
             FROM
