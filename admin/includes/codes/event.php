@@ -25,6 +25,7 @@
 					<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_provider" target="_blank">[arlo_event_provider]</a></li>
 					<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_delivery" target="_blank">[arlo_event_delivery]</a></li>
 					<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_session_description" target="_blank">[arlo_event_session_description]</a></li>
+					<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_summary" target="_blank">[arlo_event_summary]</a></li>
 					<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_presenters" target="_blank">[arlo_event_presenters]</a></li>
 					<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_offers" target="_blank">[arlo_event_offers]</a></li>
 					<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_offers_hasdiscount" target="_blank">[arlo_event_offers_hasdiscount]</a></li>
@@ -43,6 +44,7 @@
 							<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_end_date" target="_blank">[arlo_event_end_date]</a></li>
 							<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_dates" target="_blank">[arlo_event_dates]</a></li>
 							<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_location" target="_blank">[arlo_event_location]</a></li>
+							<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_summary" target="_blank">[arlo_event_summary]</a></li>
 							<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_presenters" target="_blank">[arlo_event_presenters]</a></li>
 							<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_tags" target="_blank">[arlo_event_tags]</a></li>
 							<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_rich_snippet" target="_blank">[arlo_event_rich_snippet]</a></li>
