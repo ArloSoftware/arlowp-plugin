@@ -103,7 +103,7 @@
 												</div>
 
 												<div class="session-summary">
-													<div class="xs-p-t-15">[arlo_event_template_summary]</div>
+													<div class="xs-p-t-15">[arlo_event_summary]</div>
 												</div>
 
 												<div class="session-full">
