@@ -40,6 +40,7 @@
 						<ul>
 							<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_name" target="_blank">[arlo_event_name]</a></li>
 							<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_code" target="_blank">[arlo_event_code]</a></li>
+							<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_duration" target="_blank">[arlo_event_duration]</a></li>
 							<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_price" target="_blank">[arlo_event_price]</a></li>
 						 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_start_date" target="_blank">[arlo_event_start_date]</a></li>
 							<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_end_date" target="_blank">[arlo_event_end_date]</a></li>
