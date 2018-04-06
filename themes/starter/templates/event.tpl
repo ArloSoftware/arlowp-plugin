@@ -89,7 +89,7 @@
 
 												<div class="session-time">
 													<div class="session-timespan m-b-5">[arlo_event_start_date format="%H:%M"] - [arlo_event_end_date format="%H:%M"]</div>
-													<div class="muted m-b-5">[arlo_event_session_description]</div>
+													<div class="muted m-b-5">[arlo_event_duration]</div>
 													<div class="location block m-b-5"><a href="#"><i class="icons8-marker pull-left"></i> <span class="block m-l-25">[arlo_event_location]</span></a></div>
 												</div>
 

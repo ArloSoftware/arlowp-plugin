@@ -91,7 +91,7 @@
 													<div class="row row-fix">
 														<div class="col-xs-12 col-sm-6 col-md-5 xs-p-l-0 xs-p-r-0">
 															<div class="session-timespan m-b-5">[arlo_event_start_date format="%H:%M"] - [arlo_event_end_date format="%H:%M"]</div>
-															<div class="muted m-b-5">[arlo_event_session_description]</div>
+															<div class="muted m-b-5">[arlo_event_duration]</div>
 															<div class="location block m-b-5 hidden-xs"><a href="#"><i class="icons8-marker pull-left"></i> <span class="block m-l-25">[arlo_event_location]</span></a></div>
 															<div class="visible-xs text-primary">[arlo_event_location]</div>
 														</div>
