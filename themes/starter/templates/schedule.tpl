@@ -39,7 +39,7 @@
             <div class="col-md-6 col-xs-12 md-p-l-0 p-l-30 p-r-0">
 
               <div class="scheduled-dates">
-                [arlo_event_next_running text="{%date%}<div class='location truncate-1'>{%location%}</div>" limit="12"]
+                [arlo_event_next_running text="{%date%}<div class='location truncate-1'>{%location%}</div>" limit="12" format="period"]
               </div>
             </div>
           </div>
