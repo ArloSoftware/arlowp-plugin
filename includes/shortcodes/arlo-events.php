@@ -1057,8 +1057,8 @@ class Events {
             'text' => '{%date%}',
             'template_link' => 'registerlink'
         ), $atts, $shortcode_name, $import_id));
-        
-        if (strpos($format, '%') === false) {
+
+        if (strpos($format, '%') === false && strcmp($format, 'period') != 0) {
             $format = DateFormatter::date_format_to_strftime_format($format);
         }
 
@@ -1142,8 +1142,26 @@ class Events {
                         }
                         
                         $location = $event->e_locationname;
-                       
-                        $date = self::event_date_formatter(['format' => $format], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
+
+                        if ($format == 'period') {
+                            $startDay = self::event_date_formatter(['format' => 'j'], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
+                            $startMonth = self::event_date_formatter(['format' => 'M'], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
+                            $startYear = self::event_date_formatter(['format' => 'y'], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
+                            $finishDay = self::event_date_formatter(['format' => 'j'], $event->e_finishdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
+                            $finishMonth = self::event_date_formatter(['format' => 'M'], $event->e_finishdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
+                            $finishYear = self::event_date_formatter(['format' => 'y'], $event->e_finishdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
+
+                            if (strcmp($startYear, $finishYear) != 0 || strcmp($startMonth, $finishMonth) != 0) {
+                                $date = sprintf("%s %s - %s %s", $startDay, $startMonth, $finishDay, $finishMonth);
+                            }
+                            else if (strcmp($startDay, $finishDay) != 0) {
+                                $date = sprintf("%s - %s %s", $startDay, $finishDay, $startMonth);
+                            } else {
+                                $date = sprintf("%s %s", $startDay, $startMonth);
+                            }
+                        } else {
+                            $date = self::event_date_formatter(['format' => $format], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
+                        }
     
                         $display_text = str_replace(['{%date%}', '{%location%}'], [esc_html($date), esc_html($location)], $text);
     
