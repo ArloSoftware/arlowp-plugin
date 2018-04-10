@@ -687,6 +687,7 @@ class Events {
         // merge and extract attributes
         extract(shortcode_atts(array(
             'showfrom' => 'true',
+            'order' => 'session,template,firstevent,onlineactivity',
         ), $atts, $shortcode_name, $import_id));
         
 
@@ -700,86 +701,109 @@ class Events {
         
         $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
 
-        // attempt to find session offer
-        if (isset($GLOBALS['arlo_event_session_list_item'])) {
-            $showfrom = false;
-            
-            $conditions = array(
-                'event_id' => $GLOBALS['arlo_event_session_list_item']['e_id'],
-                'discounts' => false
-            );
-            
-            if (!empty($arlo_region)) {
-                $conditions['region'] = $arlo_region; 
+        $order_array = explode(',', $order);
+        foreach($order_array as $order_item) {
+            $order_item = trim($order_item);
+
+            switch ($order_item) {
+
+                case 'session':
+                    // attempt to find session offer
+                    if (isset($GLOBALS['arlo_event_session_list_item'])) {
+                        $showfrom = false;
+                        
+                        $conditions = array(
+                            'event_id' => $GLOBALS['arlo_event_session_list_item']['e_id'],
+                            'discounts' => false
+                        );
+                        
+                        if (!empty($arlo_region)) {
+                            $conditions['region'] = $arlo_region; 
+                        }
+
+                        $offer = \Arlo\Entities\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $import_id);
+                    }
+                    break;
+
+                case 'template':
+                    // if none, try the event template offer
+                    $conditions = array(
+                        'event_template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id'],
+                        'parent_id' => 0
+                    );
+                    
+                    if (!empty($arlo_region)) {
+                        $conditions['region'] = $arlo_region; 
+                    }
+
+                    $offer = \Arlo\Entities\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $import_id);
+                    break;
+
+                case 'firstevent':
+                    // if none, try the associated events
+                    $conditions = array(
+                        'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id']
+                    );
+
+                    if (!empty($arlo_region)) {
+                        $conditions['region'] = $arlo_region; 
+                    }               
+
+                    $event = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), 1, $import_id);
+
+                    if(empty($event)) return;
+                    
+                    $conditions = array(
+                        'event_id' => $event->e_id,
+                        'discounts' => false
+                    );
+                    
+                    if (!empty($arlo_region)) {
+                        $conditions['region'] = $arlo_region; 
+                    }       
+                    
+                    $offer = \Arlo\Entities\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $import_id);
+                    break;
+
+                case 'onlineactivity':
+                    // if none, try the associated online activity
+                    $conditions = array(
+                        'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id']
+                    );
+                    
+                    $oa = \Arlo\Entities\OnlineActivities::get($conditions, null, 1, $import_id);
+                    
+                    if(empty($oa)) return;
+                    
+                    $conditions = array(
+                        'oa_id' => $oa->oa_id,
+                        'discounts' => false
+                    );
+                    
+                    if (!empty($arlo_region)) {
+                        $conditions['region'] = $arlo_region; 
+                    }       
+                    
+                    $offer = \Arlo\Entities\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $import_id);
+                    break;
+
+                case 'event':
+                    // this specific event only
+                    $conditions = array(
+                        'event_id' => $GLOBALS['arlo_event_list_item']['e_id'],
+                        'discounts' => false
+                    );
+                    
+                    if (!empty($arlo_region)) {
+                        $conditions['region'] = $arlo_region; 
+                    }       
+                    
+                    $offer = \Arlo\Entities\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $import_id);
+                    break;
             }
 
-            $offer = \Arlo\Entities\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $import_id);
-
-            if(empty($offer)) return;
+            if($offer) break; // exit foreach
         }
-
-        // if none, try the event template offer
-        if(!$offer) {
-            $conditions = array(
-                'event_template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id'],
-                'parent_id' => 0
-            );
-            
-            if (!empty($arlo_region)) {
-                $conditions['region'] = $arlo_region; 
-            }
-
-            $offer = \Arlo\Entities\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $import_id);
-        }
-
-        // if none, try the associated events
-        if(!$offer) {
-            $conditions = array(
-                'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id']
-            );
-
-            if (!empty($arlo_region)) {
-                $conditions['region'] = $arlo_region; 
-            }               
-
-            $event = \Arlo\Entities\Events::get($conditions, array('e.e_startdatetime ASC'), 1, $import_id);
-
-            if(empty($event)) return;
-            
-            $conditions = array(
-                'event_id' => $event->e_id,
-                'discounts' => false
-            );
-            
-            if (!empty($arlo_region)) {
-                $conditions['region'] = $arlo_region; 
-            }       
-            
-            $offer = \Arlo\Entities\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $import_id);
-        }
-
-       
-        // if none, try the associated online activity
-        if(!$offer) {
-            $conditions = array(
-                'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id']
-            );
-            
-            $oa = \Arlo\Entities\OnlineActivities::get($conditions, null, 1, $import_id);
-            
-            if(empty($oa)) return;
-            
-            $conditions = array(
-                'oa_id' => $oa->oa_id,
-                'discounts' => false
-            );
-            
-            if (!empty($arlo_region)) {
-                $conditions['region'] = $arlo_region; 
-            }       
-            
-            $offer = \Arlo\Entities\Offers::get($conditions, array("o.{$price_field} ASC"), 1, $import_id);
-        }   
 
         if(empty($offer)) return;
         
@@ -793,7 +817,7 @@ class Events {
             $fromtext = '<span class="arlo-from-text">' . __('From', 'arlo-for-wordpress') . '</span> ';
         }
 
-        return $fromtext . $offer->$price_field_show;        
+        return $fromtext . esc_html($offer->$price_field_show);
     }
 
     private static function shortcode_event_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
