@@ -1192,19 +1192,21 @@ class Events {
                         $link = ($layout == 'list' ? "<li>" : "");
     
                         $fullclass = $event->e_isfull ? ' arlo-event-full' : ' arlo-register';
-    
+
+                        $remainingclass = (!empty($event->e_placesremaining) ? ' arlo-event-limited-places' : '');
+
                         switch ($template_link) {
                             case "permalink":
                                 $url = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
     
-                                $link .= self::get_event_date_link($url, $buttonclass . $fullclass, $display_text);
+                                $link .= self::get_event_date_link($url, $buttonclass . $fullclass . $remainingclass, $display_text);
                                 break;
                             case "none":
                                 $link .= '<span class="' . esc_attr($dateclass) . '">' . $display_text . '</span>';
                                 break;
                             case "viewuri":
                                 $url = $GLOBALS['arlo_eventtemplate']['et_viewuri'];
-                                $link .= self::get_event_date_link($url, $buttonclass . $fullclass, $display_text);
+                                $link .= self::get_event_date_link($url, $buttonclass . $fullclass . $remainingclass, $display_text);
                                 break;
                             case "registerlink":
                                 if ($event->e_registeruri && !$event->e_isfull) {
@@ -1212,7 +1214,7 @@ class Events {
                                 } else {
                                     $url = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
                                 }
-                                $link .= self::get_event_date_link($url, $buttonclass . $fullclass, $display_text);
+                                $link .= self::get_event_date_link($url, $buttonclass . $fullclass . $remainingclass, $display_text);
                                 break;
                         }
     

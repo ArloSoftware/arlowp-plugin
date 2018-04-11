@@ -2620,6 +2620,20 @@
   margin-bottom: 12px;
   font-weight: normal;
 }
+.arlo#arlo .schedule-item .scheduled-dates a.arlo-event-limited-places::before {
+  content: " ";
+  position: absolute;
+  top: -16px;
+  left: -15px;
+  transform: rotate(-45deg);
+  width: 30px;
+  height: 30px;
+  border: solid transparent 15px;
+  border-bottom-color: #f8d053;
+}
+.arlo#arlo .schedule-item .scheduled-dates a.arlo-event-limited-places:first-child::before {
+  left: -16px;
+}
 .arlo#arlo .schedule-item .scheduled-dates a:not(.arlo-register):not(.arlo-event-full) {
   max-width: none;
   line-height: 40px;
