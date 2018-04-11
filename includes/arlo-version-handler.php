@@ -221,6 +221,10 @@ class VersionHandler {
 				if (is_null($exists)) {
 					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events ADD e_summary TEXT NULL AFTER e_sessiondescription");
 				}
+				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_eventtemplates LIKE 'et_registerprivateinteresturi'", 0, 0);
+				if (is_null($exists)) {
+					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_eventtemplates ADD et_registerprivateinteresturi TEXT NULL AFTER et_registerinteresturi");
+				}
 			break;
 		}
 	}	
