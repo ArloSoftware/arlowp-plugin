@@ -767,6 +767,8 @@ class Events {
 
                 case 'onlineactivity':
                     // if none, try the associated online activity
+                    $showfrom = false;
+
                     $conditions = array(
                         'template_id' => $GLOBALS['arlo_event_list_item']['et_arlo_id']
                     );
@@ -789,6 +791,8 @@ class Events {
 
                 case 'event':
                     // this specific event only
+                    $showfrom = false;
+
                     $conditions = array(
                         'event_id' => $GLOBALS['arlo_event_list_item']['e_id'],
                         'discounts' => false
