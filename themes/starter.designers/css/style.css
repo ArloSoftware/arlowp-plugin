@@ -13448,6 +13448,12 @@
     text-align: center;
 }
 
+.arlo#arlo .arlo-private-links .arlo-suggest {
+    background-color: #fafafa;
+    padding: 15px;
+    text-align: center;
+}
+
 .arlo#arlo .arlo-advertised-duration {
     line-height: 1;
 }
@@ -13496,6 +13502,10 @@
 }
 
 .arlo#arlo .arlo-links {
+  margin: 20px 0;
+}
+
+.arlo#arlo .arlo-private-links .arlo-suggest {
   margin: 20px 0;
 }
 

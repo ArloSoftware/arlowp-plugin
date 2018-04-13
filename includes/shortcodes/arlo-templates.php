@@ -509,7 +509,7 @@ class Templates {
             }	
         }
         
-        return $output;        
+        return $output;
     }
 
     private static function shortcode_event_template_register_interest($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -530,7 +530,7 @@ class Templates {
             $output = '<p class="arlo-no-results">' . $no_event_text . '</p>';	
         }
 
-        return $output;        
+        return $output;
     }
 
     private static function shortcode_event_template_code($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -630,7 +630,7 @@ class Templates {
 
     private static function shortcode_suggest_datelocation($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $post, $wpdb;
-        
+
         // merge and extract attributes
         extract(shortcode_atts(array(
             'text'	=> __('None of these dates work for you? %s Suggest another date & time %s', 'arlo-for-wordpress'),
@@ -678,7 +678,33 @@ class Templates {
         $content = sprintf(esc_html($text), '<a href="' . esc_url($GLOBALS['arlo_eventtemplate']['et_registerinteresturi']) . '" class="arlo-register-interest">', '</a>');
 
         return $content;
-    }   
+    }
+
+    private static function shortcode_suggest_private_datelocation($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if (!empty($GLOBALS['no_event']) || empty($GLOBALS['arlo_eventtemplate']['et_registerprivateinteresturi'])) return;
+
+        // merge and extract attributes
+        extract(shortcode_atts(array(
+            'text' => 'Want to run this event in-house? %s Enquire about running this event in-house %s'
+        ), $atts, $shortcode_name, $import_id));
+
+        $output = '';
+
+        $text = esc_html($text);
+
+        $open = '<a href="' . esc_url($GLOBALS['arlo_eventtemplate']['et_registerprivateinteresturi']) . '" class="arlo-register-private-interest">';
+        $close = '</a>';
+
+        if (strpos($text, '%s')) {
+            $parts = explode('%s', $text);
+            $parts[1] = $open . $parts[1] . $close;
+            $output = implode('', $parts);
+        } else {
+            $output = $open . $text . $close;
+        }
+
+        return $output;
+    }
 
     private static function shortcode_template_region_selector ($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         return Shortcodes::create_region_selector("event");
