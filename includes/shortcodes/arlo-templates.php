@@ -533,6 +533,21 @@ class Templates {
         return $output;
     }
 
+    private static function shortcode_event_template_register_private_interest($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if (empty($GLOBALS['no_event']) || empty($GLOBALS['arlo_eventtemplate']['et_registerprivateinteresturi'])) return;
+        
+        // merge and extract attributes
+        extract(shortcode_atts(array(
+            'text' => __('Want to run this event in-house? %s Enquire about running this event in-house %s', 'arlo-for-wordpress')
+        ), $atts, $shortcode_name, $import_id));
+
+        $link = Shortcodes::build_custom_link($text, $GLOBALS['arlo_eventtemplate']['et_registerprivateinteresturi'], 'arlo-register-private-interest-link');
+
+        $output = '<p class="arlo-register-private-interest">' . $link . '</p>';
+
+        return $output;
+    }
+
     private static function shortcode_event_template_code($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_eventtemplate']['et_code'])) return '';
         
