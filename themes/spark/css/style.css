@@ -338,6 +338,8 @@ body.arlo {
 .arlo#arlo .arlo-tooltip-button,
 .arlo#arlo .arlo-suggest a,
 .arlo#arlo .arlo-no-results a,
+.arlo#arlo .arlo-register-private-interest a,
+.arlo#arlo .arlo-suggest-private-datelocation a,
 .arlo .dark-tooltip h6,
 .arlo#arlo .arlo-event-offers .discount,
 .arlo#arlo .arlo-event-offers .discount *,
@@ -415,6 +417,7 @@ body.arlo {
 .arlo#arlo select,
 .arlo#arlo .arlo-category-list li a,
 .arlo#arlo p.arlo-no-results,
+.arlo#arlo p.arlo-register-private-interest,
 .arlo#arlo .arlo-next-running span,
 .arlo#arlo .arlo-pagination .page-numbers.current {
     background-color: #e6e6e6;
@@ -1241,6 +1244,13 @@ body.arlo {
     clear: both;
 }
 
+.arlo#arlo .arlo-suggest-private-datelocation {
+    text-align: center;
+    padding: .5em;
+    clear: both;
+    background-color: #e6e6e6;
+}
+
 .arlo#arlo .arlo-content-fields {
     margin-top: 2em;
 }
@@ -1251,12 +1261,22 @@ body.arlo {
     font-size: 1em;
 }
 
+.arlo#arlo p.arlo-register-private-interest {
+    text-align: center;
+    padding: 1em;
+    font-size: 1em;
+}
+
 .arlo#arlo .arlo-suggest a,
+.arlo#arlo .arlo-register-private-interest a,
+.arlo#arlo .arlo-suggest-private-datelocation a,
 .arlo#arlo .arlo-no-results a {
     font-weight: 600;
 }
 
 .arlo#arlo .arlo-suggest a:hover,
+.arlo#arlo .arlo-register-private-interest a:hover,
+.arlo#arlo .arlo-suggest-private-datelocation a:hover,
 .arlo#arlo .arlo-no-results a:hover {
     text-decoration: underline;
 }
