@@ -792,6 +792,13 @@ body.arlo {
     padding: .5em 1em;
 }
 
+.arlo#arlo .arlo-suggest-private-datelocation {
+    text-align: center;
+    padding: .5em 1em;
+    clear: both;
+    background-color: #f8f8f8;
+}
+
 .arlo#arlo .arlo-content-field {
     margin-bottom: 3em;
 }
@@ -808,6 +815,16 @@ body.arlo {
     padding: 1em 2em;
     text-align: center;
     font-size: 1em;
+}
+
+.arlo#arlo .arlo-register-private-interest {
+    padding: 1em 2em;
+    text-align: center;
+    font-size: 1em;
+}
+
+.arlo#arlo p.arlo-suggest-private-datelocation {
+    margin-bottom: 0.5em;
 }
 
 .arlo#arlo .arlo-places-remaining {
