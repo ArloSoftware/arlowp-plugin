@@ -13448,13 +13448,8 @@
     text-align: center;
 }
 
-.arlo#arlo .arlo-register-private-interest {
-    background-color: #fafafa;
-    padding: 15px;
-    text-align: center;
-}
-
-.arlo#arlo .arlo-private-links .arlo-suggest {
+.arlo#arlo .arlo-register-private-interest,
+.arlo#arlo .arlo-suggest-private-datelocation {
     background-color: #fafafa;
     padding: 15px;
     text-align: center;
@@ -13511,11 +13506,8 @@
   margin: 20px 0;
 }
 
-.arlo#arlo .arlo-private-links .arlo-suggest {
-  margin: 20px 0;
-}
-
-.arlo#arlo .arlo-register-private-interest {
+.arlo#arlo .arlo-register-private-interest,
+.arlo#arlo .arlo-suggest-private-datelocation {
   margin: 20px 0;
 }
 

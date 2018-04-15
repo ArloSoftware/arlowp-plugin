@@ -535,7 +535,7 @@ class Templates {
 
     private static function shortcode_event_template_register_private_interest($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (empty($GLOBALS['no_event']) || empty($GLOBALS['arlo_eventtemplate']['et_registerprivateinteresturi'])) return;
-        
+
         // merge and extract attributes
         extract(shortcode_atts(array(
             'text' => __('Want to run this event in-house? %s Enquire about running this event in-house %s', 'arlo-for-wordpress')
@@ -700,23 +700,12 @@ class Templates {
 
         // merge and extract attributes
         extract(shortcode_atts(array(
-            'text' => 'Want to run this event in-house? %s Enquire about running this event in-house %s'
+            'text' => __('Want to run this event in-house? %s Enquire about running this event in-house %s', 'arlo-for-wordpress')
         ), $atts, $shortcode_name, $import_id));
 
-        $output = '';
+        $link = Shortcodes::build_custom_link($text, $GLOBALS['arlo_eventtemplate']['et_registerprivateinteresturi'], 'arlo-suggest-private-datelocation-link');
 
-        $text = esc_html($text);
-
-        $open = '<a href="' . esc_url($GLOBALS['arlo_eventtemplate']['et_registerprivateinteresturi']) . '" class="arlo-register-private-interest">';
-        $close = '</a>';
-
-        if (strpos($text, '%s')) {
-            $parts = explode('%s', $text);
-            $parts[1] = $open . $parts[1] . $close;
-            $output = implode('', $parts);
-        } else {
-            $output = $open . $text . $close;
-        }
+        $output = '<p class="arlo-suggest-private-datelocation">' . $link . '</p>';
 
         return $output;
     }
