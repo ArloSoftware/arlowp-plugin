@@ -2624,6 +2624,28 @@
   max-width: none;
   line-height: 40px;
 }
+.arlo#arlo .schedule-item .scheduled-dates a.arlo-event-limited-places::before {
+  content: " ";
+  position: absolute;
+  top: -16px;
+  left: -16px;
+  transform: rotate(-45deg);
+  width: 32px;
+  height: 32px;
+  border: solid transparent 16px;
+  border-bottom-color: #f8d053;
+}
+.arlo#arlo .schedule-item .scheduled-dates a.arlo-event-discount:not(.arlo-event-full)::after {
+  content: " ";
+  position: absolute;
+  bottom: -16px;
+  right: -16px;
+  transform: rotate(-45deg);
+  width: 32px;
+  height: 32px;
+  border: solid transparent 16px;
+  border-top-color: #10cfbd;
+}
 .arlo#arlo .schedule-item .scheduled-dates a div {
   font-size: 12px;
 }
@@ -13851,6 +13873,10 @@
 .arlo .session-summary {
     width: 40%;
     padding-right: 0;
+}
+
+.arlo .session-full {
+    color: #f55753;
 }
 
 .arlo .tingle-modal__closeIcon {

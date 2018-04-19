@@ -5,7 +5,7 @@ namespace Arlo;
 use Arlo\Utilities;
 
 class VersionHandler {
-	const VERSION = '3.7';
+	const VERSION = '3.8';
 
 	private $dbl;
 	private $message_handler;
@@ -59,6 +59,10 @@ class VersionHandler {
 		
 		if (version_compare($old_version, '3.6.1') < 0) {
 			$this->run_pre_data_update('3.6.1');
+		}
+		
+		if (version_compare($old_version, '3.8') < 0) {
+			$this->run_pre_data_update('3.8');
 		}
 		
 		arlo_add_datamodel();	
@@ -210,6 +214,13 @@ class VersionHandler {
 					CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";
 				");
 				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events ADD e_timezone_id INT(11) NULL AFTER e_timezone");
+			break;
+
+			case '3.8':
+				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_events LIKE 'e_summary'", 0, 0);
+				if (is_null($exists)) {
+					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events ADD e_summary TEXT NULL AFTER e_sessiondescription");
+				}
 			break;
 		}
 	}	

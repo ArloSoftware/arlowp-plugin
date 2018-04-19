@@ -22,8 +22,8 @@ class Events extends BaseImporter {
 		$query = $this->dbl->query(
 			$this->dbl->prepare( 
 				"INSERT INTO " . $this->table_name ." 
-				(e_arlo_id, et_arlo_id, e_parent_arlo_id, e_code, e_name, e_startdatetime, e_finishdatetime, e_datetimeoffset, e_timezone, e_timezone_id, v_id, e_locationname, e_locationroomname, e_locationvisible , e_isfull, e_placesremaining, e_sessiondescription, e_notice, e_viewuri, e_registermessage, e_registeruri, e_providerorganisation, e_providerwebsite, e_isonline, e_credits, e_region, import_id) 
-				VALUES ( %d, %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) 
+				(e_arlo_id, et_arlo_id, e_parent_arlo_id, e_code, e_name, e_startdatetime, e_finishdatetime, e_datetimeoffset, e_timezone, e_timezone_id, v_id, e_locationname, e_locationroomname, e_locationvisible , e_isfull, e_placesremaining, e_sessiondescription, e_summary, e_notice, e_viewuri, e_registermessage, e_registeruri, e_providerorganisation, e_providerwebsite, e_isonline, e_credits, e_region, import_id) 
+				VALUES ( %d, %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) 
 				", 
 			    $item->EventID,
 				@$item->EventTemplateID,
@@ -42,6 +42,7 @@ class Events extends BaseImporter {
 				@$item->IsFull,
 				@$item->PlacesRemaining,
 				@$item->SessionsDescription,
+				@$item->Summary,
 				@$item->Notice,
 				@$item->ViewUri,
 				@$item->RegistrationInfo->RegisterMessage,
