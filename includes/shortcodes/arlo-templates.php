@@ -509,7 +509,7 @@ class Templates {
             }	
         }
         
-        return $output;        
+        return $output;
     }
 
     private static function shortcode_event_template_register_interest($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -530,7 +530,22 @@ class Templates {
             $output = '<p class="arlo-no-results">' . $no_event_text . '</p>';	
         }
 
-        return $output;        
+        return $output;
+    }
+
+    private static function shortcode_event_template_register_private_interest($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if (empty($GLOBALS['no_event']) || empty($GLOBALS['arlo_eventtemplate']['et_registerprivateinteresturi'])) return;
+
+        // merge and extract attributes
+        extract(shortcode_atts(array(
+            'text' => __('Want to run this event in-house? %s Enquire about running this event in-house %s', 'arlo-for-wordpress')
+        ), $atts, $shortcode_name, $import_id));
+
+        $link = Shortcodes::build_custom_link($text, $GLOBALS['arlo_eventtemplate']['et_registerprivateinteresturi'], 'arlo-register-private-interest-link');
+
+        $output = '<p class="arlo-register-private-interest">' . $link . '</p>';
+
+        return $output;
     }
 
     private static function shortcode_event_template_code($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -629,56 +644,33 @@ class Templates {
     }
 
     private static function shortcode_suggest_datelocation($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        global $post, $wpdb;
-        
+        global $post;
+        if (!empty($GLOBALS['no_event']) || empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi']) || $post->post_type != 'arlo_event') return;
+
         // merge and extract attributes
         extract(shortcode_atts(array(
-            'text'	=> __('None of these dates work for you? %s Suggest another date & time %s', 'arlo-for-wordpress'),
+            'text' => __('None of these dates work for you? %s Suggest another date & time %s', 'arlo-for-wordpress')
         ), $atts, $shortcode_name, $import_id));
-        
-        if(!isset($GLOBALS['arlo_eventtemplate']['et_registerinteresturi']) || empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) return '';
-        
-        // only allow this to be used on the eventtemplate page
-        if($post->post_type != 'arlo_event') {
-            return '';
-        }
-        
-        // find out if we have any online events
-        $t1 = "{$wpdb->prefix}arlo_eventtemplates";
-        $t2 = "{$wpdb->prefix}arlo_events";
-        
-        $items = $wpdb->get_results("
-            SELECT 
-                $t2.e_isonline, 
-                $t2.e_datetimeoffset 
-            FROM 
-                $t2
-            LEFT JOIN 
-                $t1
-            ON 
-                $t2.et_arlo_id = $t1.et_arlo_id 
-            AND 
-                $t2.e_parent_arlo_id = 0
-            AND
-                $t1.import_id = $t2.import_id
-            WHERE 
-                $t1.et_post_id = $post->ID
-            AND
-                $t2.import_id = $import_id
-            ", ARRAY_A);
-                
-        if(empty($items)) {
-            return '';
-        }
 
-        if (strpos($text, '%s') === false) {
-            $text = '%s' . $text . '%s';
-        }
-        
-        $content = sprintf(esc_html($text), '<a href="' . esc_url($GLOBALS['arlo_eventtemplate']['et_registerinteresturi']) . '" class="arlo-register-interest">', '</a>');
+        $link = Shortcodes::build_custom_link($text, $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'], 'arlo-register-interest');
 
-        return $content;
-    }   
+        return $link;
+    }
+
+    private static function shortcode_suggest_private_datelocation($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if (!empty($GLOBALS['no_event']) || empty($GLOBALS['arlo_eventtemplate']['et_registerprivateinteresturi'])) return;
+
+        // merge and extract attributes
+        extract(shortcode_atts(array(
+            'text' => __('Want to run this event in-house? %s Enquire about running this event in-house %s', 'arlo-for-wordpress')
+        ), $atts, $shortcode_name, $import_id));
+
+        $link = Shortcodes::build_custom_link($text, $GLOBALS['arlo_eventtemplate']['et_registerprivateinteresturi'], 'arlo-suggest-private-datelocation-link');
+
+        $output = '<p class="arlo-suggest-private-datelocation">' . $link . '</p>';
+
+        return $output;
+    }
 
     private static function shortcode_template_region_selector ($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         return Shortcodes::create_region_selector("event");

@@ -243,6 +243,13 @@ p.arlo-no-results {
 	font-size: 0.8em;
 }
 
+p.arlo-register-private-interest {
+	padding: 1em;
+	text-align: center;
+	background-color: #f3f3f3;
+	font-size: 0.8em;
+}
+
 /* Tooltip */
 
 .arlo-tooltip-html {

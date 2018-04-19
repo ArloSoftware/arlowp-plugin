@@ -151,6 +151,11 @@
 
 		<div class="arlo-clear-both"></div>
 
+		<div class="arlo-private-links">
+			[arlo_event_template_register_private_interest]
+			[arlo_suggest_private_datelocation]
+		</div>
+
 		<div class="arlo-links">
 			[arlo_event_template_register_interest]
 			[arlo_suggest_datelocation wrap="<div class='arlo-suggest'>%s</div>"]

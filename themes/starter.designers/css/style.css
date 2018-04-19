@@ -13448,6 +13448,13 @@
     text-align: center;
 }
 
+.arlo#arlo .arlo-register-private-interest,
+.arlo#arlo .arlo-suggest-private-datelocation {
+    background-color: #fafafa;
+    padding: 15px;
+    text-align: center;
+}
+
 .arlo#arlo .arlo-advertised-duration {
     line-height: 1;
 }
@@ -13496,6 +13503,11 @@
 }
 
 .arlo#arlo .arlo-links {
+  margin: 20px 0;
+}
+
+.arlo#arlo .arlo-register-private-interest,
+.arlo#arlo .arlo-suggest-private-datelocation {
   margin: 20px 0;
 }
 

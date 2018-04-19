@@ -581,5 +581,25 @@ class Shortcodes {
     public static function get_template_name($shortcode_name,$default_shortcode_name,$default_template_name) {
         $shortcode_name_root = str_replace('arlo_', '', $shortcode_name);
         return $shortcode_name_root != $default_shortcode_name ? $shortcode_name_root : $default_template_name;
-    }
+	}
+
+
+	public static function build_custom_link($text, $url, $cssclass) {
+        $link = '';
+
+        $open = sprintf('<a href="%s" class="%s">', esc_url($url), esc_attr($cssclass));
+        $close = '</a>';
+
+		// Allow syntax: "Before link and %s link itself %s"
+        if (strpos($text, '%s')) {
+            $parts = explode('%s', esc_html($text));
+            $parts[1] = $open . $parts[1] . $close;
+            $link = implode('', $parts);
+        } else {
+            $link = $open . esc_html($text) . $close;
+		}
+		
+		return $link;
+	}
+
 }
