@@ -428,6 +428,7 @@ class UpcomingEvents {
             $join['etag'] = " LEFT JOIN $t7 AS etag ON etag.e_id = e.e_id AND etag.import_id = e.import_id";
             
             if (!empty($arlo_eventtag)) {
+                $arlo_eventtag = \Arlo\Utilities::convert_string_to_string_array($arlo_eventtag);
                 $where .= " AND etag.tag_id IN (" . implode(',', array_map(function() {return "%d";}, $arlo_eventtag)) . ")";
                 $parameters = array_merge($parameters, $arlo_eventtag);    
             }
@@ -442,6 +443,7 @@ class UpcomingEvents {
             if (!empty($arlo_templatetag)) {
                 $join['ettag'] = " LEFT JOIN $t11 AS ettag ON ettag.et_id = et.et_id AND ettag.import_id = et.import_id";
 
+                $arlo_templatetag = \Arlo\Utilities::convert_string_to_string_array($arlo_templatetag);
                 $where .= " AND ettag.tag_id IN (" . implode(',', array_map(function() {return "%d";}, $arlo_templatetag)) . ")";
                 $parameters = array_merge($parameters, $arlo_templatetag);    
             }
