@@ -3,7 +3,7 @@ Contributors: ArloSoftware, adamfentosi, gabriel-arlo
 Tags: online registration, event registration, training management,  event management, event plugin, training company software, training calendar, training administration, training management software, training provider, solution, events calendar, wordpress events, event ticketing, wordpress lms, class registration, conference registration,  ticket, registration, event manager, training, booking, ticketing, courses, events, training, calendar, course management
 Requires at least: 4.4
 Tested up to: 4.9
-Stable tag: 3.7
+Stable tag: 3.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -172,6 +172,22 @@ The Arlo - Training and Event Management, and online registration plugin is only
 11. Theme Jazz - Upcoming events
 
 == Changelog ==
+
+= 3.8 =
+
+External URL support for Arlo's sitemap
+New [arlo_event_summary] shortcode to display sessions description
+New [arlo_event_template_register_private_interest] shortcode for private lead form link
+New [arlo_suggest_private_datelocation] shortcode for private lead form link
+New "order" attribute for [arlo_event_price]
+New "period" option to show end date for [arlo_event_next_running]
+Year is added after the month used as a delimiter on the Upcoming page
+Add discount and places remaining corner labels on Schedule page of the "Starter template" theme
+
+Upcoming widget is not working when tags are specified
+[arlo_event_isfull] now working on sessions too
+[arlo_event_duration] now showing session duration on sessions
+Other WordPress plugin errors are sometimes stopping the import
 
 = 3.7 =
 
