@@ -956,6 +956,7 @@ class Arlo_For_Wordpress_Settings {
 				<li>Upcoming widget is not working when tags are specified</li>
 				<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_isfull" target="_blank">[arlo_event_isfull]</a> now working on sessions too</li>
 				<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_duration" target="_blank">[arlo_event_duration]</a> now showing session duration on sessions</li>
+				<li>Event of 6 hours X minutes is not showing 1 day</li>
 				<li>Other WordPress plugin errors are sometimes stopping the import</li>
 			</ul>
 		</p>

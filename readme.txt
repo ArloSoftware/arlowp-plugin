@@ -187,6 +187,7 @@ Add discount and places remaining corner labels on Schedule page of the "Starter
 Upcoming widget is not working when tags are specified
 [arlo_event_isfull] now working on sessions too
 [arlo_event_duration] now showing session duration on sessions
+Event of 6 hours X minutes is not showing 1 day
 Other WordPress plugin errors are sometimes stopping the import
 
 = 3.7 =
