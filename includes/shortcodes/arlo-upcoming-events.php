@@ -351,9 +351,13 @@ class UpcomingEvents {
                 //need to exclude all the child categories
                 $categoriesnot_flatten_list = CategoriesEntity::get_flattened_category_list_for_filter($arlo_categoryhidden, [], $import_id);
                 
-                $tag_id_substitutes = implode(', ', array_map(function() {return "%d";}, $categoriesnot_flatten_list));
-                $where .= " NOT EXISTS( SELECT c_arlo_id FROM $t5 WHERE c_arlo_id IN ($tag_id_substitutes) AND et_arlo_id = et.et_arlo_id AND import_id = et.import_id )";
-                $parameters = array_merge($parameters, array_map(function($cat) { return $cat['id']; }, $categoriesnot_flatten_list));
+                if (count($categoriesnot_flatten_list)) {
+                    $tag_id_substitutes = implode(', ', array_map(function() {return "%d";}, $categoriesnot_flatten_list));
+                    $where .= " NOT EXISTS( SELECT c_arlo_id FROM $t5 WHERE c_arlo_id IN ($tag_id_substitutes) AND et_arlo_id = et.et_arlo_id AND import_id = et.import_id )";
+                    $parameters = array_merge($parameters, array_map(function($cat) { return $cat['id']; }, $categoriesnot_flatten_list));
+                } else {
+                    $where .= "1 = 1";
+                }
             }
 
             $join['etc'] = " LEFT JOIN 

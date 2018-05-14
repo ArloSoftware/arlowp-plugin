@@ -882,8 +882,12 @@ class Templates {
                 //need to exclude all the child categories
                 $categoriesnot_flatten_list = CategoriesEntity::get_flattened_category_list_for_filter($arlo_categoryhidden, [], $import_id);
                 
-                $where .= " ( c.c_arlo_id NOT IN (" . implode(',', array_map(function() {return "%d";}, $categoriesnot_flatten_list)) . ") OR c.c_arlo_id IS NULL)";
-                $parameters = array_merge($parameters, array_map(function($cat) { return $cat['id']; }, $categoriesnot_flatten_list));
+                if (count($categoriesnot_flatten_list)) {
+                    $where .= " ( c.c_arlo_id NOT IN (" . implode(',', array_map(function() {return "%d";}, $categoriesnot_flatten_list)) . ") OR c.c_arlo_id IS NULL)";
+                    $parameters = array_merge($parameters, array_map(function($cat) { return $cat['id']; }, $categoriesnot_flatten_list));
+                } else {
+                    $where .= "1 = 1";
+                }
             }
             
             if ((isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true") || (isset($GLOBALS['show_child_elements']) && $GLOBALS['show_child_elements'])) {

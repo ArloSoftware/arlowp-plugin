@@ -385,9 +385,11 @@ class OnlineActivities {
             if (!empty($arlo_categoryhidden)) {
                 //need to exclude all the child categories
                 $categoriesnot_flatten_list = CategoriesEntity::get_flattened_category_list_for_filter($arlo_categoryhidden, [], $import_id);
-                
-                $where .= " AND  (etc.c_arlo_id NOT IN (" . implode(',', array_map(function() {return "%d";}, $categoriesnot_flatten_list)) . ") OR etc.c_arlo_id IS NULL)";
-                $parameters = array_merge($parameters, array_map(function($cat) { return $cat['id']; }, $categoriesnot_flatten_list));
+
+                if (count($categoriesnot_flatten_list)) {
+                    $where .= " AND  (etc.c_arlo_id NOT IN (" . implode(',', array_map(function() {return "%d";}, $categoriesnot_flatten_list)) . ") OR etc.c_arlo_id IS NULL)";
+                    $parameters = array_merge($parameters, array_map(function($cat) { return $cat['id']; }, $categoriesnot_flatten_list));
+                }
             }
         endif;
 
