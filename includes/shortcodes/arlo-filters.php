@@ -164,7 +164,7 @@ class Filters {
                         etc.import_id = et.import_id
                     ";
 
-                    $where[] = " c_arlo_id IN (" . implode(", ", array_map(function($cat) { return $cat['id']; }, $categories_flatten_list)) . ") ";
+                    $where[] = " (c_arlo_id IS NULL OR c_arlo_id IN (" . implode(", ", array_map(function($cat) { return $cat['id']; }, $categories_flatten_list)) . ")) ";
                 }
 
 
