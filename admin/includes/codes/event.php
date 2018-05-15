@@ -88,7 +88,9 @@
 	</li>	
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivityrelated#arlo_oa_list" target="_blank">[/arlo_oa_list]</a></li>	
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_register_interest" target="_blank">[arlo_event_template_register_interest]</a></li>
+	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_register_private_interest" target="_blank">[arlo_event_template_register_private_interest]</a></li>
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_suggest_datelocation" target="_blank">[arlo_suggest_datelocation]</a></li>
+	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_suggest_private_datelocation" target="_blank">[arlo_suggest_private_datelocation]</a></li>
 	<li>
 		<a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_content_field_item" target="_blank">[arlo_content_field_item]</a>
 		<ul>
