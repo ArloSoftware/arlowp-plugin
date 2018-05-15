@@ -121,6 +121,11 @@ class UpcomingEvents {
             self::$upcoming_list_item_atts['templatetag'] = trim($atts['templatetag']);
         }
 
+        $region = \Arlo_For_Wordpress::get_region_parameter();
+        if (!empty($region)) {
+            self::$upcoming_list_item_atts['region'] = $region;
+        }
+
         $template = $content ? $content : arlo_get_template('upcoming_widget');
 
         return do_shortcode($template);
@@ -141,7 +146,7 @@ class UpcomingEvents {
             $atts = [];
         }
 
-        $atts = array_merge($atts, self::$upcoming_list_item_atts);      
+        $atts = array_merge($atts, self::$upcoming_list_item_atts);
 
         $sql = self::generate_list_sql($atts, $import_id);
 
