@@ -850,6 +850,14 @@ body.arlo {
     margin-bottom: 1.5em;
 }
 
+.arlo#arlo .arlo-suggest-private-datelocation {
+    text-align: center;
+    padding: .5em 1em;
+    background-color: rgba(0, 0, 0, 0.04);
+    margin-bottom: 1.5em;
+    clear: both;
+}
+
 .arlo#arlo .arlo-content-field {
     margin-bottom: 3em;
 }
@@ -880,6 +888,14 @@ body.arlo {
 }
 
 .arlo#arlo .arlo-no-results {
+    padding: 1em 2em;
+    text-align: center;
+    clear: both;
+    background-color: rgba(0, 0, 0, 0.04);
+    font-size: 1em;
+}
+
+.arlo#arlo .arlo-register-private-interest {
     padding: 1em 2em;
     text-align: center;
     clear: both;

@@ -2624,6 +2624,28 @@
   max-width: none;
   line-height: 40px;
 }
+.arlo#arlo .schedule-item .scheduled-dates a.arlo-event-limited-places::before {
+  content: " ";
+  position: absolute;
+  top: -16px;
+  left: -16px;
+  transform: rotate(-45deg);
+  width: 32px;
+  height: 32px;
+  border: solid transparent 16px;
+  border-bottom-color: #f8d053;
+}
+.arlo#arlo .schedule-item .scheduled-dates a.arlo-event-discount:not(.arlo-event-full)::after {
+  content: " ";
+  position: absolute;
+  bottom: -16px;
+  right: -16px;
+  transform: rotate(-45deg);
+  width: 32px;
+  height: 32px;
+  border: solid transparent 16px;
+  border-top-color: #10cfbd;
+}
 .arlo#arlo .schedule-item .scheduled-dates a div {
   font-size: 12px;
 }
@@ -13426,6 +13448,17 @@
     text-align: center;
 }
 
+.arlo#arlo .arlo-register-private-interest,
+.arlo#arlo .arlo-suggest-private-datelocation {
+    background-color: #fafafa;
+    padding: 15px;
+    text-align: center;
+}
+
+.arlo#arlo p.arlo-suggest-private-datelocation {
+    font-size: inherit;
+}
+
 .arlo#arlo .arlo-advertised-duration {
     line-height: 1;
 }
@@ -13474,6 +13507,11 @@
 }
 
 .arlo#arlo .arlo-links {
+  margin: 20px 0;
+}
+
+.arlo#arlo .arlo-register-private-interest,
+.arlo#arlo .arlo-suggest-private-datelocation {
   margin: 20px 0;
 }
 
@@ -13851,6 +13889,11 @@
 .arlo .session-summary {
     width: 40%;
     padding-right: 0;
+}
+
+.arlo .session-full {
+    clear: both;
+    color: #f55753;
 }
 
 .arlo .tingle-modal__closeIcon {

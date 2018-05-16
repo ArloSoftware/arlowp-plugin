@@ -792,6 +792,13 @@ body.arlo {
     padding: .5em 1em;
 }
 
+.arlo#arlo .arlo-suggest-private-datelocation {
+    text-align: center;
+    padding: .5em 1em;
+    clear: both;
+    background-color: #f8f8f8;
+}
+
 .arlo#arlo .arlo-content-field {
     margin-bottom: 3em;
 }

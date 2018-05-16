@@ -993,11 +993,25 @@ body.arlo {
     clear: both;
 }
 
+.arlo#arlo .arlo-suggest-private-datelocation {
+    text-align: center;
+    padding: .5em;
+    clear: both;
+    background-color: #F1F7FB;
+}
+
 .arlo#arlo .arlo-content-fields {
     margin-top: 2em;
 }
 
 .arlo#arlo p.arlo-no-results {
+    background-color: #f3f3f3;
+    text-align: center;
+    padding: 1em;
+    font-size: 1em;
+}
+
+.arlo#arlo p.arlo-register-private-interest {
     background-color: #f3f3f3;
     text-align: center;
     padding: 1em;

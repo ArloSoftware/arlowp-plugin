@@ -945,6 +945,25 @@ class Arlo_For_Wordpress_Settings {
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">	  
+				<li>External URL support for Arlo&#39;s sitemap</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_summary" target="_blank">[arlo_event_summary]</a> shortcode to display sessions description</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_register_private_interest" target="_blank">[arlo_event_template_register_private_interest]</a> shortcode for private lead form link</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_suggest_private_datelocation" target="_blank">[arlo_suggest_private_datelocation]</a> shortcode for private lead form link</li>
+				<li>New "order" attribute for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_price" target="_blank">[arlo_event_price]</a></li>
+				<li>New "period" option to show end date for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_next_running" target="_blank">[arlo_event_next_running]</a></li>
+				<li>Year is added after the month used as a delimiter on the Upcoming page</li>
+				<li>Add discount and places remaining corner labels on Schedule page of the <a href="https://support.arlo.co/hc/en-gb/articles/360000311006-Theme-Starter" target="_blank">Starter template theme</a></li>
+				<li>Upcoming widget is not working when tags are specified</li>
+				<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_isfull" target="_blank">[arlo_event_isfull]</a> now working on sessions too</li>
+				<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_duration" target="_blank">[arlo_event_duration]</a> now showing session duration on sessions</li>
+				<li>Event of 6 hours X minutes is not showing 1 day</li>
+				<li>Other WordPress plugin errors are sometimes stopping the import</li>
+			</ul>
+		</p>
+
+		<h4>Version 3.7</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">	  
 				<li>Full support for PHP 7</li>
 				<li>Use OpenSSL for encryption</li>
 				<li>PHP and WordPress version now visible on System requirements tab</li>
@@ -962,7 +981,7 @@ class Arlo_For_Wordpress_Settings {
 		<h4>Version 3.6.1</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">	  
-			<li>Timezones blocking the import on some specific platforms</li>
+				<li>Timezones blocking the import on some specific platforms</li>
 			</ul>
 		</p>
 

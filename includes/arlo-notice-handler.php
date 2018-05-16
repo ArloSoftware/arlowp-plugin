@@ -221,7 +221,7 @@ class NoticeHandler {
 					<a target="_blank" href="https://www.arlo.co/video/wordpress-overview" target="_blank"><i class="arlo-icons8 arlo-icons8-circled-play size-36 arlo-yellow arlo-middle "></i>' . __('Watch overview video', 'arlo-for-wordpress' ) .'</a>
 					<span class="arlo-webinar">
 						<i class="arlo-icons8 arlo-icons8-headset size-36 arlo-yellow arlo-middle"></i>
-						' . __('Jon <a target="_blank" href="" class="webinar_url">Arlo for WordPress Getting started</a> webinar on <span id="webinar_date"></span>', 'arlo-for-wordpress' ) . '
+						' . __('Join <a target="_blank" href="" class="webinar_url">Arlo for WordPress Getting started</a> webinar on <span id="webinar_date"></span>', 'arlo-for-wordpress' ) . '
 						' . __('<a target="_blank" href="" class="webinar_url">Register now!</a> or <a target="_blank" href="" id="webinar_template_url">view more times</a>', 'arlo-for-wordpress' ) . '
 					</span>
 				</p>';

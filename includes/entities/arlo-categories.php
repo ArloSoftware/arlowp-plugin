@@ -111,9 +111,10 @@ class Categories {
 		
 		if ($insert_self) {
 			$category = self::get(['id' => $start_id], null, $import_id);
-			$category->children = $result;
-
-			return [$category];
+			if (is_object($category)) {
+				$category->children = $result;
+				return [$category];
+			}
 		}
 		
 		return $result;

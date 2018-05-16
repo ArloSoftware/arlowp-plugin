@@ -121,6 +121,11 @@ class UpcomingEvents {
             self::$upcoming_list_item_atts['templatetag'] = trim($atts['templatetag']);
         }
 
+        $region = \Arlo_For_Wordpress::get_region_parameter();
+        if (!empty($region)) {
+            self::$upcoming_list_item_atts['region'] = $region;
+        }
+
         $template = $content ? $content : arlo_get_template('upcoming_widget');
 
         return do_shortcode($template);
@@ -141,7 +146,7 @@ class UpcomingEvents {
             $atts = [];
         }
 
-        $atts = array_merge($atts, self::$upcoming_list_item_atts);      
+        $atts = array_merge($atts, self::$upcoming_list_item_atts);
 
         $sql = self::generate_list_sql($atts, $import_id);
 
@@ -159,7 +164,7 @@ class UpcomingEvents {
 
             foreach($items as $key => $item) {
                 if(is_null($previous) || date('m',strtotime($item['e_startdatetime'])) != date('m',strtotime($previous['e_startdatetime']))) {
-                    $item['show_divider'] = strftime('%B', strtotime($item['e_startdatetime']));
+                    $item['show_divider'] = strftime('%B %Y', strtotime($item['e_startdatetime']));
                 }
 
                 $GLOBALS['arlo_event_list_item'] = $item;
@@ -351,9 +356,13 @@ class UpcomingEvents {
                 //need to exclude all the child categories
                 $categoriesnot_flatten_list = CategoriesEntity::get_flattened_category_list_for_filter($arlo_categoryhidden, [], $import_id);
                 
-                $tag_id_substitutes = implode(', ', array_map(function() {return "%d";}, $categoriesnot_flatten_list));
-                $where .= " NOT EXISTS( SELECT c_arlo_id FROM $t5 WHERE c_arlo_id IN ($tag_id_substitutes) AND et_arlo_id = et.et_arlo_id AND import_id = et.import_id )";
-                $parameters = array_merge($parameters, array_map(function($cat) { return $cat['id']; }, $categoriesnot_flatten_list));
+                if (count($categoriesnot_flatten_list)) {
+                    $tag_id_substitutes = implode(', ', array_map(function() {return "%d";}, $categoriesnot_flatten_list));
+                    $where .= " NOT EXISTS( SELECT c_arlo_id FROM $t5 WHERE c_arlo_id IN ($tag_id_substitutes) AND et_arlo_id = et.et_arlo_id AND import_id = et.import_id )";
+                    $parameters = array_merge($parameters, array_map(function($cat) { return $cat['id']; }, $categoriesnot_flatten_list));
+                } else {
+                    $where .= "1 = 1";
+                }
             }
 
             $join['etc'] = " LEFT JOIN 
@@ -428,6 +437,7 @@ class UpcomingEvents {
             $join['etag'] = " LEFT JOIN $t7 AS etag ON etag.e_id = e.e_id AND etag.import_id = e.import_id";
             
             if (!empty($arlo_eventtag)) {
+                $arlo_eventtag = \Arlo\Utilities::convert_string_to_string_array($arlo_eventtag);
                 $where .= " AND etag.tag_id IN (" . implode(',', array_map(function() {return "%d";}, $arlo_eventtag)) . ")";
                 $parameters = array_merge($parameters, $arlo_eventtag);    
             }
@@ -442,6 +452,7 @@ class UpcomingEvents {
             if (!empty($arlo_templatetag)) {
                 $join['ettag'] = " LEFT JOIN $t11 AS ettag ON ettag.et_id = et.et_id AND ettag.import_id = et.import_id";
 
+                $arlo_templatetag = \Arlo\Utilities::convert_string_to_string_array($arlo_templatetag);
                 $where .= " AND ettag.tag_id IN (" . implode(',', array_map(function() {return "%d";}, $arlo_templatetag)) . ")";
                 $parameters = array_merge($parameters, $arlo_templatetag);    
             }
