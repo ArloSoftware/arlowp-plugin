@@ -624,8 +624,8 @@ class Events {
             
         // if we're the same day, display hours
         if(date('d-m', strtotime($start)) == date('d-m', strtotime($end)) || $hours <= 6) {
-                    
-            if ($hours > 6) {
+
+            if ($hours >= 6) {
                 return __('1 day', 'arlo-for-wordpress');
             }
 
