@@ -274,8 +274,8 @@ class UpcomingEvents {
         $parameters = [];
 
         $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
-        $page = !empty($_GET['paged']) ? intval($_GET['paged']) : intval(get_query_var('paged'));
-        $offset = ($page > 0) ? $page * $limit - $limit: 0;
+        $page = arlo_current_page();
+        $offset = ($page - 1) * $limit;
 
         $t1 = "{$wpdb->prefix}arlo_events";
         $t2 = "{$wpdb->prefix}arlo_eventtemplates";

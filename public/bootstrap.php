@@ -491,7 +491,7 @@ function arlo_pagination($num, $limit=null) {
 	
 	$big = 999999999;
 	
-	$current = !empty($_GET['paged']) ? intval($_GET['paged']) : intval(get_query_var('paged'));
+	$current = arlo_current_page();
 	
 	return paginate_links(array(
 		'base' => str_replace( $big, '%#%', esc_url( get_pagenum_link( $big ) ) ),
@@ -500,6 +500,32 @@ function arlo_pagination($num, $limit=null) {
 		'total' => ceil($num/$limit),
 		'mid_size' => 6
 	));
+}
+
+/**
+ * Detect the current page from WordPress variables
+ *
+ * @since    4.0.0
+ *
+ * @return   int The current page
+ */
+function arlo_current_page() {
+	$page = 0;
+
+	//not sure why we watch that one first
+	if (!empty($_GET['paged'])) {
+		$page = intval($_GET['paged']);
+	}
+	//the normal one used on post/pages
+	else if(!empty(get_query_var('paged'))) {
+		$page = intval(get_query_var('paged'));
+	}
+	//the one in use for static pages (like Homepage)
+	else if(!empty(get_query_var('page'))) {
+		$page = intval(get_query_var('page'));
+	}
+
+	return ($page > 0 ? $page : 1);
 }
 
 /**
