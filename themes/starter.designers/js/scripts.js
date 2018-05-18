@@ -161,8 +161,6 @@ jQuery(function($){
 
         attachExpandEvents();
 
-        $(window).scroll(attachExpandEvents);
-
 
         function expandMobile(event,_this) {
             if (!$(event.target).is('a:not(.btn-expand), button')) {
