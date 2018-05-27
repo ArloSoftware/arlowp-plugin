@@ -50,7 +50,7 @@ class Redirect {
 
             if (!empty($platform_name)) {
                 // assuming containing a dot means specified dns
-                $platform_url = (strpos($platform_name, '.') ? $platform_name : $platform_name . 'arlo.co');
+                $platform_url = (strpos($platform_name, '.') ? $platform_name : $platform_name . '.arlo.co');
 
                 $redirect_url = 'http://' . $platform_url . '/events/' . $arlo_id . '-fake-redirect-url?' . (!empty($e) ? 'e=' . $e : (!empty($t) ? 't=' . $t : ''));
                 wp_redirect($redirect_url, 301);
