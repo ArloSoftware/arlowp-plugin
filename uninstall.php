@@ -29,6 +29,14 @@ function arlo_uninstall() {
 	arlo_delete_options();
 
 	arlo_delete_cookies();
+
+	// Nuke all settings if "Keep settings..." is unchecked
+	$nuke = get_option("arlo_nuke_on_delete", 0);
+	if (!empty($nuke)) {
+
+		arlo_delete_important_options();
+
+	}
 }
 
 /**
@@ -80,14 +88,14 @@ function arlo_delete_custom_posts() {
 
 	global $wpdb;
 
-	$sql = "DELETE FROM $wpdb->posts WHERE post_type IN ('arlo_events', 'arlo_presenters', 'arlo_venues')";
+	$sql = "DELETE FROM $wpdb->posts WHERE post_type IN ('arlo_events', 'arlo_presenters', 'arlo_venues', 'arlo_event', 'arlo_presenter', 'arlo_venue')";
 
 	$wpdb->query($sql);
 
 }
 
 /**
- * Delete Arlo wp-options records 
+ * Delete Arlo wp-options records but keep important settings
  * @since: 1.0
  * @param:
  * @return:
@@ -104,6 +112,35 @@ function arlo_delete_options() {
 		'arlo_import_disabled',
 		'arlo_plugin_disabled',
 		'arlo_updated',
+	];
+	
+	foreach ($options as $option) {
+		delete_option($option);
+	}
+}
+
+/**
+ * Delete all Arlo wp-options records considered as important settings
+ * @since: 4.0
+ * @param:
+ * @return:
+ */
+function arlo_delete_important_options() {
+
+	$options = [
+		'arlo_schema_version',
+		'arlo_nuke_on_delete',
+		'arlo_settings',
+		'arlo_regions',
+		'arlo_theme',
+		'arlo_themes_settings',
+		'arlo_filter_settings',
+		'arlo_page_filter_settings',
+		'arlo_review_notice_date',
+		'widget_arlo-for-wordpress-upcoming-widget',
+		'widget_arlo-for-wordpress-categories-widget',
+		'widget_arlo-for-wordpress-search-widget',
+		'widget_arlo-for-wordpress-region-selector',
 	];
 	
 	foreach ($options as $option) {
