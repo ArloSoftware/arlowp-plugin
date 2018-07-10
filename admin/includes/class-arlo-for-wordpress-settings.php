@@ -945,6 +945,13 @@ class Arlo_For_Wordpress_Settings {
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">	  
+				<li>Load balanced architectures do not allow the import to run correctly</li>
+			</ul>
+		</p>
+
+		<h4>Version 3.8</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">	  
 				<li>External URL support for Arlo&#39;s sitemap</li>
 				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_summary" target="_blank">[arlo_event_summary]</a> shortcode to display sessions description</li>
 				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_register_private_interest" target="_blank">[arlo_event_template_register_private_interest]</a> shortcode for private lead form link</li>
