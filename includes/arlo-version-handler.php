@@ -5,7 +5,7 @@ namespace Arlo;
 use Arlo\Utilities;
 
 class VersionHandler {
-	const VERSION = '3.8';
+	const VERSION = '3.8.1';
 
 	private $dbl;
 	private $message_handler;
@@ -63,6 +63,10 @@ class VersionHandler {
 		
 		if (version_compare($old_version, '3.8') < 0) {
 			$this->run_pre_data_update('3.8');
+		}
+		
+		if (version_compare($old_version, '3.8.1') < 0) {
+			$this->run_pre_data_update('3.8.1');
 		}
 		
 		arlo_add_datamodel();	
@@ -224,6 +228,13 @@ class VersionHandler {
 				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_eventtemplates LIKE 'et_registerprivateinteresturi'", 0, 0);
 				if (is_null($exists)) {
 					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_eventtemplates ADD et_registerprivateinteresturi TEXT NULL AFTER et_registerinteresturi");
+				}
+			break;
+
+			case '3.8.1':
+				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_async_tasks LIKE 'task_hostname'", 0, 0);
+				if (is_null($exists)) {
+					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_async_tasks ADD task_hostname varchar(255) DEFAULT NULL AFTER task_status_text");
 				}
 			break;
 		}

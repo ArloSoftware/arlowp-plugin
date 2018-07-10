@@ -52,16 +52,17 @@ class Scheduler {
 	
 	public function set_task($task = '', $priority = 0) {
 		if (empty($task)) return false;
-		$utc_date = gmdate("Y-m-d H:i:s"); 
+		$utc_date = gmdate("Y-m-d H:i:s");
+		$hostname = $this->get_hostname();
 	
 		$sql = "
 		INSERT INTO
-			{$this->table} (task_priority, task_task, task_created)
+			{$this->table} (task_priority, task_task, task_hostname, task_created)
 		VALUES
-			(%d, %s, %s)
+			(%d, %s, %s, %s)
 		";
 		
-		$query = $this->dbl->query($this->dbl->prepare($sql, $priority, $task, $utc_date));
+		$query = $this->dbl->query($this->dbl->prepare($sql, $priority, $task, $hostname, $utc_date));
 		
 		if ($query) {
 			return $this->dbl->insert_id;
@@ -165,6 +166,7 @@ class Scheduler {
 			task_status,
 			task_priority,
 			task_status_text,
+			task_hostname,
 			task_modified,
 			data_text AS task_data_text
 		FROM
@@ -221,8 +223,15 @@ class Scheduler {
 	public function run_task($task_id = null) {
 		$task_id = (!empty($task_id) && is_numeric($task_id) ? $task_id : null);
 		if ($this->check_empty_slot_for_task()) {
-			
 			$task = !is_null($task_id) ? $this->get_task_data($task_id) : $this->get_next_task();
+
+			// Do not process if current machine is not the one initiating the task
+			// Instead re-run the scheduler - used by load balanced architectures
+			if (isset($task[0]->task_hostname) && !$this->is_current_hostname($task[0]->task_hostname)) {
+				$this->kick_off_scheduler();
+				return;
+			}
+
 			$this->process_task($task);
 		}
 	}
@@ -379,5 +388,15 @@ class Scheduler {
 			'cookies'   => $_COOKIE,
 			'sslverify' => apply_filters( 'https_local_ssl_verify', false ),
 		);
-	}	
+	}
+
+	private function get_hostname() {
+		return gethostname();
+	}
+
+	private function is_current_hostname($hostname) {
+		$h = $this->get_hostname();
+		return $h == $hostname;
+	}
+
 }
