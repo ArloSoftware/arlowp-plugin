@@ -82,6 +82,7 @@ class Scheduler {
 		SET
 			task_status = {$task_status},
 			task_status_text = {$task_status_text},
+			task_lb_count = 0,
 			task_modified = '{$utc_date}'
 		WHERE
 			task_id = " . (intval($task_id)) . "
@@ -109,6 +110,20 @@ class Scheduler {
 			data_text = '%s'
 		";
 		$query = $this->dbl->query($this->dbl->prepare($sql, $task_id, $data, $data));		
+	}
+
+	private function update_task_lb_count($task_id, $new_count) {
+		$sql = "
+		UPDATE 	
+			{$this->table}
+		SET
+			task_lb_count = %d
+		WHERE
+			task_id = %d
+		";
+
+		$query = $this->dbl->prepare($sql, $new_count, $task_id);
+		$this->dbl->query($query);
 	}
 	
 	public function check_empty_slot_for_task() {
@@ -167,6 +182,7 @@ class Scheduler {
 			task_priority,
 			task_status_text,
 			task_hostname,
+			task_lb_count,
 			task_modified,
 			data_text AS task_data_text
 		FROM
@@ -228,8 +244,13 @@ class Scheduler {
 			// Do not process if current machine is not the one initiating the task
 			// Instead re-run the scheduler - used by load balanced architectures
 			if (isset($task[0]->task_hostname) && !$this->is_current_hostname($task[0]->task_hostname)) {
-				$this->kick_off_scheduler();
-				return;
+				if (empty($task[0]->task_lb_count) || intval($task[0]->task_lb_count) < 20) {
+					$new_count = (is_numeric($task[0]->task_lb_count) ? $task[0]->task_lb_count + 1 : 1);
+					$this->update_task_lb_count($task[0]->task_id, $new_count);
+
+					$this->kick_off_scheduler();
+					return;
+				}
 			}
 
 			$this->process_task($task);

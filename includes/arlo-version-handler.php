@@ -236,6 +236,10 @@ class VersionHandler {
 				if (is_null($exists)) {
 					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_async_tasks ADD task_hostname varchar(255) DEFAULT NULL AFTER task_status_text");
 				}
+				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_async_tasks LIKE 'task_lb_count'", 0, 0);
+				if (is_null($exists)) {
+					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_async_tasks ADD task_lb_count tinyint(4) NOT NULL DEFAULT '0' AFTER task_hostname");
+				}
 			break;
 		}
 	}	
