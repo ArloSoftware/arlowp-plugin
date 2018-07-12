@@ -1,3 +1,10 @@
+== V3.8.1 ==
+
+Bugfixes
+------------------
+Load balanced architectures do not allow the import to run correctly
+
+
 == V3.8 ==
 
 Enhancement
