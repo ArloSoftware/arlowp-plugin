@@ -6,8 +6,8 @@ use Arlo\Logger;
 
 class SchemaManager {
 
-	const DB_SCHEMA_HASH = '5360d04cc8e0b90596a1fe912b74cb197d61697b';
-	const DB_SCHEMA_VERSION = '3.8.0';
+	const DB_SCHEMA_HASH = '609debdab5b843b557534b817c893bb71df2be6f';
+	const DB_SCHEMA_VERSION = '3.8.1';
 
 	/* database layer */
 	private $dbl;
@@ -118,6 +118,8 @@ class SchemaManager {
 		task_task varchar(255) DEFAULT NULL,
 		task_status tinyint(4) NOT NULL DEFAULT '0' COMMENT '0:scheduled, 1:paused, 2:in_progress, 3: failed, 4: completed',
 		task_status_text varchar(255) DEFAULT NULL,
+		task_hostname varchar(255) DEFAULT NULL,
+		task_lb_count tinyint(4) NOT NULL DEFAULT '0',
 		task_created timestamp NULL DEFAULT NULL COMMENT 'Dates are in UTC',
 		task_modified timestamp NULL DEFAULT NULL COMMENT 'Dates are in UTC',
 		PRIMARY KEY  (task_id),
