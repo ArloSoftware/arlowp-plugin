@@ -109,17 +109,9 @@ class UpcomingEvents {
             'limit' => ''
         ), $atts, $shortcode_name, $import_id);
 
-        if (isset($atts['limit']) && is_numeric($atts['limit'])) {
-            self::$upcoming_list_item_atts['limit'] = $atts['limit'];
-        }
-
-        if (!empty($atts['eventtag'])) {
-            self::$upcoming_list_item_atts['eventtag'] = trim($atts['eventtag']);
-        }
-
-        if (!empty($atts['templatetag'])) {
-            self::$upcoming_list_item_atts['templatetag'] = trim($atts['templatetag']);
-        }
+        self::$upcoming_list_item_atts['limit'] = $atts['limit'];
+        self::$upcoming_list_item_atts['eventtag'] = trim($atts['eventtag']);
+        self::$upcoming_list_item_atts['templatetag'] = trim($atts['templatetag']);
 
         $region = \Arlo_For_Wordpress::get_region_parameter();
         if (!empty($region)) {
