@@ -23,7 +23,12 @@ add_filter( 'document_title_parts', function($title) {
 add_filter( 'the_title', function($title, $id = null) {
 	$new_title = set_title($title, $id);
 
-	return esc_html($new_title['title']) . (!empty($new_title['subtitle']) ? '<span class="cat-title-ext">' . (!empty($new_title['title']) ? ': ':'') . esc_html($new_title['subtitle']) . ' </span>' : '' ) ;
+	if (empty($new_title['subtitle'])) {
+		return $new_title['title'];
+	}
+
+	$title_with_glue = (empty($new_title['title']) ? '' : $new_title['title'] . ': ');
+	return $title_with_glue . '<span class="cat-title-ext">' . esc_html($new_title['subtitle']) . ' </span>';
 }, 10, 2);
 
 /*
@@ -74,8 +79,6 @@ function set_title($title, $id = null, $meta = false){
 	$plugin = Arlo_For_Wordpress::get_instance();
 	$import_id = $plugin->get_importer()->get_current_import_id();	
 	
-	$title = htmlentities($title, ENT_QUOTES, "UTF-8", false);
-	
 	$settings = get_option('arlo_settings');
 	
 	$pages = [];
@@ -121,8 +124,8 @@ function set_title($title, $id = null, $meta = false){
 		}
 	} else if (!empty($arlo_location)) {
 		$subtitle = $arlo_location;
-	} else if (!empty($arlo_location)) {
-		$subtitle = $arlo_location;
+	} else if (!empty($arlo_search)) {
+		$subtitle = $arlo_search;
 	}
 	        
 	return [
