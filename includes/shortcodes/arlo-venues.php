@@ -180,8 +180,10 @@ class Venues {
         
         $api_key = (!empty($settings['googlemaps_api_key']) ? $settings['googlemaps_api_key'] : '');
         if (empty($api_key) && strtolower($settings['platform_name']) == \Arlo_For_Wordpress::DEFAULT_PLATFORM) {
-                $api_key = \Arlo_For_Wordpress::GOOGLE_MAPS_API_KEY;
-        } else {
+            $api_key = \Arlo_For_Wordpress::GOOGLE_MAPS_API_KEY;
+        }
+
+        if (empty($api_key)) {
             return;
         }
         
