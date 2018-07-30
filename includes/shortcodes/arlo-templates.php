@@ -298,7 +298,6 @@ class Templates {
 
         $templates = arlo_get_option('templates');
         $content = $templates['eventsearch']['html'];
-        $GLOBALS['arlo_search_page'] = true;
 
         self::$event_template_atts = self::get_event_template_atts($atts, $import_id);
 
@@ -369,13 +368,6 @@ class Templates {
         }
 
         $settings = get_option('arlo_settings');  
-
-        //we need to determine, if it's group by "category" and has a divider, if not, and if we are on the search page, we need to group the templates
-        //see bug 68492
-        
-        if (!((isset($GLOBALS['arlo_search_page']) && $GLOBALS['arlo_search_page'] && isset($atts['group']) && strpos($content, "arlo_group_divider") !== false) || !isset($GLOBALS['arlo_search_page']))) {
-            $GLOBALS['arlo_group_template_by_id'] = true; //it's a global, because the paging should know about it, which is a separate shortcode
-        }
 
         $output = '';
 
@@ -710,6 +702,9 @@ class Templates {
 
         $join = [];
         $field_list = "";
+        $group = "";
+        $order = "";
+        $limit_field = "";
 
         $arlo_location = !empty($atts['location']) ? $atts['location'] : null;
         $arlo_locationhidden = !empty($atts['locationhidden']) ? $atts['locationhidden'] : null;
@@ -818,13 +813,6 @@ class Templates {
 
         endif;
 
-        $group = '';
-        if (!empty($GLOBALS['arlo_group_template_by_id'])) {
-            $group = 'GROUP BY et.et_arlo_id';
-        } else {
-            $group = 'GROUP BY c.c_arlo_id, et.et_arlo_id';
-        }
-
         if(!empty($arlo_templatetag) || !empty($arlo_templatetaghidden)) :
 
             if (!empty($arlo_templatetag)) {
@@ -905,29 +893,37 @@ class Templates {
         } else if (!(isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true")) {
             $where .= ' AND (c.c_parent_id = (SELECT c_arlo_id FROM ' . $t4 . ' WHERE c_parent_id = 0 AND import_id = %d) OR c.c_parent_id IS NULL)';
             $parameters[] = $import_id;
-        }	
-        
-        $order = $limit_field = '';
-        $field_list .= 'et.et_id';
+        }
+
+        //grouping
+        $att_group = (empty($atts['group']) ? '' : $atts['group']);
+        switch ($att_group) {
+            case 'category':
+                $group = 'GROUP BY c.c_arlo_id, et.et_arlo_id';
+            break;
+            default:
+                $group = 'GROUP BY et.et_arlo_id';
+            break;
+        }
 
         if (!$for_pagination) {
             //ordering
-            $order = "ORDER BY et.et_name ASC";
-            
-            // if grouping is set...
-            if(isset($atts['group']) && !isset($GLOBALS['arlo_group_template_by_id'])) {
-                switch($atts['group']) {
-                    case 'category':
-                        $order = "ORDER BY c.c_order ASC, etc.et_order ASC, c.c_name ASC, et.et_name ASC";
-                    break;
-                }
+            switch ($att_group) {
+                case 'category':
+                    $order = "ORDER BY c.c_order ASC, etc.et_order ASC, c.c_name ASC, et.et_name ASC";
+                break;
+                default:
+                    $order = "ORDER BY et.et_name ASC";
+                break;
             }
-
+            
             $limit_field = " LIMIT $offset,$limit ";
 
             $field_list = "et.*, post.ID as post_id, etc.c_arlo_id, c.*, e.e_is_taxexempt" . ($additional_fields ? ' ,' . implode(' ,', $additional_fields) : '');
+        } else {
+            $field_list = "et.et_id";
         }
-        
+
         $sql = "
         SELECT
             $field_list 
