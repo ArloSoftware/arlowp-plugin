@@ -2,6 +2,7 @@
 namespace Arlo\Shortcodes;
 
 use Arlo\Entities\Categories as CategoriesEntity;
+use Arlo\Entities\Tags as TagsEntity;
 
 class UpcomingEvents {
     public static $upcoming_list_item_atts = [];
@@ -109,9 +110,15 @@ class UpcomingEvents {
             'limit' => ''
         ), $atts, $shortcode_name, $import_id);
 
+        $eventtag_tag = urldecode($atts['eventtag']);
+        $eventtag_id = TagsEntity::get_first_id_by_tag($eventtag_tag, $import_id);
+
+        $templatetag_tag = urldecode($atts['templatetag']);
+        $templatetag_id = TagsEntity::get_first_id_by_tag($templatetag_tag, $import_id);
+
+        self::$upcoming_list_item_atts['eventtag'] = $eventtag_id;
+        self::$upcoming_list_item_atts['templatetag'] = $templatetag_id;
         self::$upcoming_list_item_atts['limit'] = $atts['limit'];
-        self::$upcoming_list_item_atts['eventtag'] = trim($atts['eventtag']);
-        self::$upcoming_list_item_atts['templatetag'] = trim($atts['templatetag']);
 
         $region = \Arlo_For_Wordpress::get_region_parameter();
         if (!empty($region)) {

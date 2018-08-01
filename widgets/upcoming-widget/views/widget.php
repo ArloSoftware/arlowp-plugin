@@ -7,17 +7,17 @@
 
 	$limit = '';
 	if (isset($instance['number']) && is_numeric($instance['number'])) {
-		$limit = " limit='".$instance['number']."' ";
+		$limit = " limit='" . intval($instance['number']) . "' ";
 	}
 
 	$eventtag = '';
 	if (!empty($instance['eventtag'])) {
-		$eventtag = " eventtag='".$instance['eventtag']."' ";
+		$eventtag = " eventtag='" . urlencode($instance['eventtag']) . "' ";	//esc_attr not enough (for example: ])
 	}
 
 	$templatetag = '';
 	if (!empty($instance['templatetag'])) {
-		$templatetag = " templatetag='".$instance['templatetag']."' ";
+		$templatetag = " templatetag='" . urlencode($instance['templatetag']) . "' ";
 	}
 
     $template = !empty($instance['template']) ? $instance['template'] : arlo_get_template('upcoming_widget');

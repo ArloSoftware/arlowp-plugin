@@ -174,15 +174,15 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 
 		$instance = $old_instance;
 
-		$instance['title'] = strip_tags( wp_unslash($new_instance['title']) );
+		$instance['title'] = $new_instance['title'];
 		$instance['number'] = intval($new_instance['number']);
-		$instance['template'] = wp_unslash($new_instance['template']);
-		$instance['eventtag'] = wp_unslash($new_instance['eventtag']);
-		$instance['templatetag'] = wp_unslash($new_instance['templatetag']);
+		$instance['template'] = $new_instance['template'];
+		$instance['eventtag'] = $new_instance['eventtag'];
+		$instance['templatetag'] = $new_instance['templatetag'];
 
 		return $instance;
 
-	} // end widget
+	}
 
 	/**
 	 * Generates the administration form for the widget.
@@ -198,11 +198,11 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 		);
 
 		// TODO: Store the values of the widget in their own variable
-		$title = esc_attr( $instance['title'] );
-		$number = esc_attr( $instance['number']);
-		$template = esc_attr( $instance['template']);
-		$eventtag = esc_attr( $instance['eventtag']);
-		$templatetag = esc_attr( $instance['templatetag']);
+		$title = $instance['title'];
+		$number = $instance['number'];
+		$template = $instance['template'];
+		$eventtag = $instance['eventtag'];
+		$templatetag = $instance['templatetag'];
 
 		// Display the admin form
 		include( plugin_dir_path(__FILE__) . 'views/admin.php' );
