@@ -1,6 +1,7 @@
 <div class="arlo" id="arlo">
 	[arlo_event_template_summary wrap="<p>%s</p>"]
-	[arlo_event_template_advertised_duration wrap='<div class="arlo-advertised-duration muted m-b-15"><i class="icons8-clock pull-left m-r-5"></i> %s</div>']
+	[arlo_event_template_advertised_duration wrap='<div class="arlo-advertised-duration muted m-b-15 inline m-r-20"><i class="icons8-clock pull-left m-r-5"></i> %s</div>']
+	[arlo_event_template_advertised_price wrap='<div class="arlo-advertised-price muted m-b-15 inline m-r-20"><i class="icons8-us-dollar pull-left m-r-5"></i> %s</div>']
 
 	<div class="arlo-event-template-filters collapse" id="filters">
 		[arlo_event_filters filters="location,delivery"]

@@ -13459,7 +13459,8 @@
     font-size: inherit;
 }
 
-.arlo#arlo .arlo-advertised-duration {
+.arlo#arlo .arlo-advertised-duration,
+.arlo#arlo .arlo-advertised-price {
     line-height: 1;
 }
 

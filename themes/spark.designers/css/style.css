@@ -498,6 +498,7 @@ body.arlo {
 .arlo#arlo .arlo-event-registration>a.arlo-waiting-list,
 .arlo#arlo .arlo-list.catalogue .arlo-next-running p,
 .arlo#arlo .arlo-list.catalogue .arlo-advertised-duration span,
+.arlo#arlo .arlo-list.catalogue .arlo-advertised-price span,
 .arlo#arlo .arlo-list.catalogue .arlo-offers span,
 .arlo#arlo .arlo-reference-term,
 .arlo-categories-widget .arlo-category-list li ul {
@@ -1097,6 +1098,7 @@ body.arlo {
 }
 
 .arlo#arlo .arlo-list.catalogue .arlo-advertised-duration,
+.arlo#arlo .arlo-list.catalogue .arlo-advertised-price,
 .arlo#arlo .arlo-list.catalogue .arlo-offers {
     margin-right: 20px;
     font-weight: 600;

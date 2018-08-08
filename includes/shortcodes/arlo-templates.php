@@ -2,6 +2,7 @@
 namespace Arlo\Shortcodes;
 
 use Arlo\Entities\Categories as CategoriesEntity;
+use Arlo\Entities\Events as EventsEntity;
 
 class Templates {
     public static $event_template_atts = [];
@@ -574,6 +575,50 @@ class Templates {
         return esc_html($GLOBALS['arlo_eventtemplate']['et_advertised_duration']);
     }
 
+    private static function shortcode_event_template_advertised_price($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        global $wpdb;
+        if (empty($GLOBALS['arlo_eventtemplate']['et_arlo_id'])) return;
+
+        extract(shortcode_atts(array(
+            'showfrom' => 'true',
+            'showtaxsuffix' => 'true'
+        ), $atts, $shortcode_name, $import_id));
+
+        $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
+        
+        $sql = self::generate_bestoffer_list_sql($GLOBALS['arlo_eventtemplate']['et_arlo_id'], $arlo_region, 1, $import_id);
+
+        $offer = $wpdb->get_row($sql, OBJECT);
+        if (empty($offer)) return;
+
+        //price setting and free text
+        $settings = get_option('arlo_settings');
+        $free_text = (isset($settings['free_text'])) ? $settings['free_text'] : __('Free', 'arlo-for-wordpress');
+        $exclgst = (isset($settings['price_setting']) && $settings['price_setting'] === ARLO_PLUGIN_PREFIX . '-exclgst');
+
+        if ($offer->o_offeramounttaxexclusive == 0) {
+            return esc_html($free_text);
+        }
+
+        $fromtext = '';
+        if (strtolower($showfrom) === "true") {
+            $fromtext = __('From', 'arlo-for-wordpress') . ' ';
+        }
+
+        $taxsuffix = '';
+        if (strtolower($showtaxsuffix) === "true" && !$offer->e_is_taxexempt) {
+            if ($exclgst) {
+                $taxsuffix = ' ' . sprintf(__('excl. %s', 'arlo-for-wordpress'), $offer->o_taxrateshortcode);
+            } else {
+                $taxsuffix = ' ' . sprintf(__('incl. %s', 'arlo-for-wordpress'), $offer->o_taxrateshortcode);
+            }
+        }
+
+        $formattedprice = ($exclgst || $offer->e_is_taxexempt ? $offer->o_formattedamounttaxexclusive : $offer->o_formattedamounttaxinclusive);
+
+        return esc_html($fromtext . $formattedprice . $taxsuffix);
+    }
+
     private static function shortcode_event_template_filters($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         return self::generate_template_filters_form($atts, $shortcode_name, $import_id, 'event');
     }
@@ -950,6 +995,51 @@ class Templates {
         } else {
             throw new \Exception("Couldn't prepapre SQL statement");
         }
+    }
+
+    private static function generate_bestoffer_list_sql($template_id, $region, $limit, $import_id) {
+        global $wpdb;
+
+        $t1 = "{$wpdb->prefix}arlo_offers";
+        $t2 = "{$wpdb->prefix}arlo_eventtemplates";
+        $t3 = "{$wpdb->prefix}arlo_events";
+        $t4 = "{$wpdb->prefix}arlo_onlineactivities";
+
+        $parameters = [];
+
+        $sql = "
+        SELECT
+            o.*,
+            e.e_is_taxexempt
+        FROM 
+            $t1 o
+        LEFT JOIN $t2 et
+            ON et.et_id = o.et_id AND et.import_id = o.import_id
+        LEFT JOIN $t3 e
+            ON e.e_id = o.e_id AND e.import_id = o.import_id
+        LEFT JOIN $t4 oa
+            ON oa.oa_id = o.oa_id AND e.import_id = o.import_id
+        WHERE o.import_id = %d
+            AND (et.et_arlo_id = %d OR e.et_arlo_id = %d OR oa.oat_arlo_id = %d)";
+
+        $parameters[] = $import_id;
+        $parameters[] = $template_id; //et
+        $parameters[] = $template_id; //e
+        $parameters[] = $template_id; //oa
+
+        if ($region) {
+            $sql .= " AND o.o_region = %s";
+            $parameters[] = $region;
+        }
+
+        $sql .= "
+        ORDER BY o.o_offeramounttaxexclusive ASC
+        LIMIT %d";
+
+        $parameters[] = $limit;
+
+        $query = $wpdb->prepare($sql, $parameters);
+        return $query;
     }
 
     private static function shortcode_event_template_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
