@@ -53,16 +53,15 @@ class Scheduler {
 	public function set_task($task = '', $priority = 0) {
 		if (empty($task)) return false;
 		$utc_date = gmdate("Y-m-d H:i:s");
-		$hostname = $this->get_hostname();
 	
 		$sql = "
 		INSERT INTO
-			{$this->table} (task_priority, task_task, task_hostname, task_created)
+			{$this->table} (task_priority, task_task, task_created)
 		VALUES
-			(%d, %s, %s, %s)
+			(%d, %s, %s)
 		";
 		
-		$query = $this->dbl->query($this->dbl->prepare($sql, $priority, $task, $hostname, $utc_date));
+		$query = $this->dbl->query($this->dbl->prepare($sql, $priority, $task, $utc_date));
 		
 		if ($query) {
 			return $this->dbl->insert_id;
@@ -82,7 +81,6 @@ class Scheduler {
 		SET
 			task_status = {$task_status},
 			task_status_text = {$task_status_text},
-			task_lb_count = 0,
 			task_modified = '{$utc_date}'
 		WHERE
 			task_id = " . (intval($task_id)) . "
@@ -112,20 +110,6 @@ class Scheduler {
 		$query = $this->dbl->query($this->dbl->prepare($sql, $task_id, $data, $data));		
 	}
 
-	private function update_task_lb_count($task_id, $new_count) {
-		$sql = "
-		UPDATE 	
-			{$this->table}
-		SET
-			task_lb_count = %d
-		WHERE
-			task_id = %d
-		";
-
-		$query = $this->dbl->prepare($sql, $new_count, $task_id);
-		$this->dbl->query($query);
-	}
-	
 	public function check_empty_slot_for_task() {
 		return $this->max_simultaneous_task > $this->get_running_tasks_count();
 	}
@@ -181,8 +165,6 @@ class Scheduler {
 			task_status,
 			task_priority,
 			task_status_text,
-			task_hostname,
-			task_lb_count,
 			task_modified,
 			data_text AS task_data_text
 		FROM
@@ -239,20 +221,8 @@ class Scheduler {
 	public function run_task($task_id = null) {
 		$task_id = (!empty($task_id) && is_numeric($task_id) ? $task_id : null);
 		if ($this->check_empty_slot_for_task()) {
+
 			$task = !is_null($task_id) ? $this->get_task_data($task_id) : $this->get_next_task();
-
-			// Do not process if current machine is not the one initiating the task
-			// Instead re-run the scheduler - used by load balanced architectures
-			if (isset($task[0]->task_hostname) && !$this->is_current_hostname($task[0]->task_hostname)) {
-				if (empty($task[0]->task_lb_count) || intval($task[0]->task_lb_count) < 20) {
-					$new_count = (is_numeric($task[0]->task_lb_count) ? $task[0]->task_lb_count + 1 : 1);
-					$this->update_task_lb_count($task[0]->task_id, $new_count);
-
-					$this->kick_off_scheduler();
-					return;
-				}
-			}
-
 			$this->process_task($task);
 		}
 	}
@@ -409,15 +379,6 @@ class Scheduler {
 			'cookies'   => $_COOKIE,
 			'sslverify' => apply_filters( 'https_local_ssl_verify', false ),
 		);
-	}
-
-	private function get_hostname() {
-		return gethostname();
-	}
-
-	private function is_current_hostname($hostname) {
-		$h = $this->get_hostname();
-		return $h == $hostname;
 	}
 
 }
