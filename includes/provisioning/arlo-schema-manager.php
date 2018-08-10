@@ -6,8 +6,8 @@ use Arlo\Logger;
 
 class SchemaManager {
 
-	const DB_SCHEMA_HASH = 'd1ff88bdded4bad7cb2efcd5b36a482b91bac978';
-	const DB_SCHEMA_VERSION = '3.8.1';
+	const DB_SCHEMA_HASH = '2ceeac7d4de72b7c1a10d185fe0b88bf8185a779';
+	const DB_SCHEMA_VERSION = '3.9.0';
 
 	/* database layer */
 	private $dbl;
@@ -98,6 +98,7 @@ class SchemaManager {
 		$this->install_table_arlo_events_presenters();
 		$this->install_table_arlo_log();
 		$this->install_table_arlo_import();
+		$this->install_table_arlo_import_parts();
 		$this->install_table_arlo_import_lock();
 		$this->install_table_arlo_categories();
 		$this->install_table_arlo_eventtemplates_categories();
@@ -523,6 +524,23 @@ class SchemaManager {
 		$this->dbl->sync_schema($sql);        
 	}
 
+	private function install_table_arlo_import_parts() {	
+		$table_name = $this->dbl->prefix . "arlo_import_parts";
+			
+		$sql = "CREATE TABLE $table_name (
+			  	id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+				import_id INT(10) UNSIGNED NOT NULL,
+				part ENUM('image', 'fragment') NOT NULL,
+				iteration SMALLINT(5) UNSIGNED NOT NULL,
+				import_text LONGTEXT NULL DEFAULT NULL,
+				created datetime NOT NULL,
+				modified datetime NULL DEFAULT NULL,
+				PRIMARY KEY  (id)
+			) CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";";
+		
+		$this->dbl->sync_schema($sql);        
+	}
+
 	private function install_table_arlo_messages() {	
 		$table_name = $this->dbl->prefix . "arlo_messages";
 
@@ -567,6 +585,7 @@ class SchemaManager {
 				$this->dbl->prefix . "arlo_messages, " .
 				$this->dbl->prefix . "arlo_log," .
 				$this->dbl->prefix . "arlo_import," .
+				$this->dbl->prefix . "arlo_import_parts," .
 				$this->dbl->prefix . "arlo_import_lock";
 
 		$this->dbl->query($sql);
