@@ -17,6 +17,7 @@ class Importer {
 	private $dbl;
 	private $api_client;
 	private $scheduler;
+	private $importing_parts;
 	private $file_handler;
 
 	private $current_import_id;
@@ -49,7 +50,7 @@ class Importer {
 	public $is_finished = false;
 	public $dir;
 
-	public function __construct($environment, $dbl, $message_handler, $api_client, $scheduler) {
+	public function __construct($environment, $dbl, $message_handler, $api_client, $scheduler, $importing_parts) {
 		$this->dir = trailingslashit(plugin_dir_path( __FILE__ )).'../../import/';
 
 		$this->environment = $environment;
@@ -57,6 +58,7 @@ class Importer {
 		$this->message_handler = $message_handler;
 		$this->api_client = $api_client;
 		$this->scheduler = $scheduler;
+		$this->importing_parts = $importing_parts;
 	}
 
 	public function generate_import_id() {
@@ -232,10 +234,19 @@ class Importer {
 	}
 
 	private function get_data_json() {
-		$filename = $this->dir . $this->import_id . '.dec.json';
-	
+		$item = $this->importing_parts->get_import_part("image", null, $this->import_id);
+
+		if (empty($item)) {
+			throw new \Exception("Import Error: the import \"image\" part cannot be found");
+		}
+		if (empty($item->import_text)) {
+			throw new \Exception("Import Error: the content of the import part is empty");
+		}
+
+		$this->data_json = json_decode($item->import_text);
+
 		if (is_null($this->data_json)) {
-			$this->data_json = $this->file_handler->read_file_as_json($filename);
+			throw new \Exception("JSON Error: " . json_last_error_msg());
 		}
 	}
 
@@ -448,7 +459,7 @@ class Importer {
 		
 		$class_name = "Arlo\Importer\\" . $import_task;
 
-		$this->current_task_class = new $class_name($this, $this->dbl, $this->message_handler, (!empty($this->data_json->$import_task) ? $this->data_json->$import_task : null), $this->current_task_iteration, $this->api_client, $this->file_handler, $this->scheduler);
+		$this->current_task_class = new $class_name($this, $this->dbl, $this->message_handler, (!empty($this->data_json->$import_task) ? $this->data_json->$import_task : null), $this->current_task_iteration, $this->api_client, $this->file_handler, $this->scheduler, $this->importing_parts);
 		$this->current_task_class->task_id = $this->task_id;
 
 		//we need to do some special setup for different tasks
@@ -470,8 +481,8 @@ class Importer {
 
 						if (!empty($callback_json->SnapshotUri)) {
 							$this->current_task_class->uri = $callback_json->SnapshotUri;
-
-							$this->current_task_class->filename = $this->import_id;
+							$this->current_task_class->import_part = "image";
+							$this->current_task_class->import_iteration = null;
 							$this->current_task_class->response_json = json_decode($import->response_json);
 						} elseif (!empty($callback_json->Error)) {
 							Logger::log_error($callback_json->Error->Code . ': ' . $callback_json->Error->Message, $this->import_id);

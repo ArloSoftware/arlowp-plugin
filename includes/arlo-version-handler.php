@@ -257,7 +257,7 @@ class VersionHandler {
 						id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 						import_id INT(10) UNSIGNED NOT NULL,
 						part ENUM('image', 'fragment') NOT NULL,
-						iteration SMALLINT(5) UNSIGNED NOT NULL,
+						iteration SMALLINT(5) UNSIGNED NULL DEFAULT NULL,
 						import_text LONGTEXT NULL DEFAULT NULL,
 						created datetime NOT NULL,
 						modified datetime NULL DEFAULT NULL,

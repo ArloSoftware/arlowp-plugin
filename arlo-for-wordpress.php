@@ -104,6 +104,7 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/entities/arlo-tags.php');
 
 //include importer
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-importer.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-importing-parts.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-base-importer.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-import-request.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-download.php');

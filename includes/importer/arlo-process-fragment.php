@@ -101,11 +101,20 @@ class ProcessFragment extends BaseImporter {
 	}
 
 	private function get_data_json() {
+		$import_iteration = $this->iteration + 1;
+		$item = $this->importing_parts->get_import_part("fragment", $import_iteration, $this->import_id);
 
-		$filename = $this->importer->dir . $this->filename . '.dec.json';
-	
+		if (empty($item)) {
+			throw new \Exception("Import Error: the import \"fragment\" part cannot be found");
+		}
+		if (empty($item->import_text)) {
+			throw new \Exception("Import Error: the content of the fragment import part is empty");
+		}
+
+		$this->data_json = json_decode($item->import_text);
+
 		if (is_null($this->data_json)) {
-			$this->data_json = $this->file_handler->read_file_as_json($filename);
+			throw new \Exception("JSON error: " . json_last_error_msg());
 		}
 	}
 	public function run() {
@@ -117,7 +126,7 @@ class ProcessFragment extends BaseImporter {
 
 		$class_name = "Arlo\Importer\\" . $import_task;
 
-		$this->current_task_class = new $class_name($this->importer, $this->dbl, $this->message_handler, (!empty($this->data_json->$import_task) ? $this->data_json->$import_task : null), $this->current_task_iteration, $this->api_client, $this->file_handler);		
+		$this->current_task_class = new $class_name($this->importer, $this->dbl, $this->message_handler, (!empty($this->data_json->$import_task) ? $this->data_json->$import_task : null), $this->current_task_iteration, $this->api_client, $this->file_handler, null, $this->importing_parts);		
 		
 		if (!empty($this->data_json->$import_task) || in_array($import_task, $this->irregular_tasks)) {			
 			//we need to do some special setup for different tasks
@@ -126,7 +135,8 @@ class ProcessFragment extends BaseImporter {
 					$import = $this->importer->get_import_entry($this->import_id, null, 1);
 					if (!is_null($import)) {
 						$this->current_task_class->uri = $this->uri;
-						$this->current_task_class->filename = $this->filename;
+						$this->current_task_class->import_part = "fragment";
+						$this->current_task_class->import_iteration = $this->iteration + 1;
 						$this->current_task_class->response_json = json_decode($import->response_json);			 
 					} else {
 						throw new \Exception('Couldn\'t retrive the import from database');
