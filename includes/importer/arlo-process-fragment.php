@@ -118,6 +118,7 @@ class ProcessFragment extends BaseImporter {
 	public function run() {
 		$import_task = $this->current_task;
 
+		$this->data_json = null;
 		if ($this->current_task_num > 0) {
 			$this->get_data_json();
 		}

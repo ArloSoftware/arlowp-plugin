@@ -441,7 +441,8 @@ class Importer {
     }	
 
 	private function run_import_task($import_task) {
-		if ($this->current_task_num > 1) {
+		$this->data_json = null;
+		if ($this->current_task_num == 2) {
 			$this->get_data_json();
 		}
 		
@@ -489,7 +490,6 @@ class Importer {
 				$this->current_task_class->set_state($this->state->subtask_state);
 
 				if (!empty($this->data_json->FullImageFragments->Elements[$this->current_task_iteration])) {
-					$this->current_task_class->filename = $this->import_id . '_f' . $this->current_task_iteration;
 					$this->current_task_desc .= ' ' . ($this->current_task_iteration+1) . '/' . count($this->data_json->FullImageFragments->Elements);
 					$this->current_task_class->uri = $this->data_json->FullImageFragments->Elements[$this->current_task_iteration]->Uri;
 				} else {
