@@ -2,11 +2,6 @@
 
 namespace Arlo\Importer;
 
-use Arlo\Logger;
-use Arlo\Utilities;
-use Arlo\FileHandler;
-use Arlo\Crypto;
-
 class ImportingParts {
 	private $dbl;
 
@@ -83,6 +78,14 @@ class ImportingParts {
         }
 
         return null;
+    }
+    
+    public function delete_all_import_parts() {
+        $sql = "DELETE FROM
+                {$this->table_name}
+            ";
+
+        $this->dbl->query($sql);
     }
 
 }

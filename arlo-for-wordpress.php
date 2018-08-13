@@ -74,7 +74,6 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-environment.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-notice-handler.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-message-handler.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-version-handler.php');
-require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-file-handler.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-logger.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-system-requirements.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-theme-manager.php');

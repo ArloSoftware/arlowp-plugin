@@ -4,7 +4,6 @@ namespace Arlo\Importer;
 
 use Arlo\Logger;
 use Arlo\Utilities;
-use Arlo\FileHandler;
 
 class ProcessFragment extends BaseImporter {
 
@@ -36,8 +35,7 @@ class ProcessFragment extends BaseImporter {
 			];
 
 	public $uri;
-	
-	public $filename;
+
 
 	protected function save_entity($item) {}
 
@@ -126,7 +124,7 @@ class ProcessFragment extends BaseImporter {
 
 		$class_name = "Arlo\Importer\\" . $import_task;
 
-		$this->current_task_class = new $class_name($this->importer, $this->dbl, $this->message_handler, (!empty($this->data_json->$import_task) ? $this->data_json->$import_task : null), $this->current_task_iteration, $this->api_client, $this->file_handler, null, $this->importing_parts);		
+		$this->current_task_class = new $class_name($this->importer, $this->dbl, $this->message_handler, (!empty($this->data_json->$import_task) ? $this->data_json->$import_task : null), $this->current_task_iteration, $this->api_client, $this->scheduler, $this->importing_parts);		
 		
 		if (!empty($this->data_json->$import_task) || in_array($import_task, $this->irregular_tasks)) {			
 			//we need to do some special setup for different tasks

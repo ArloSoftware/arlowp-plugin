@@ -4,7 +4,6 @@ namespace Arlo\Importer;
 
 use Arlo\Logger;
 use Arlo\Utilities;
-use Arlo\FileHandler;
 use Arlo\Crypto;
 
 class Importer {
@@ -18,7 +17,6 @@ class Importer {
 	private $api_client;
 	private $scheduler;
 	private $importing_parts;
-	private $file_handler;
 
 	private $current_import_id;
 	private $last_import_date;
@@ -48,11 +46,8 @@ class Importer {
 	public $import_id;
 	public $nonce;
 	public $is_finished = false;
-	public $dir;
 
 	public function __construct($environment, $dbl, $message_handler, $api_client, $scheduler, $importing_parts) {
-		$this->dir = trailingslashit(plugin_dir_path( __FILE__ )).'../../import/';
-
 		$this->environment = $environment;
 		$this->dbl = $dbl;
 		$this->message_handler = $message_handler;
@@ -67,9 +62,6 @@ class Importer {
 
 	public function set_import_id($import_id) {
 		$this->import_id = $import_id;
-
-		//pretty weird place for it, but the file name depends on the import_id
-		$this->file_handler = new FileHandler($this->dir, $import_id);
 	}
 
 	public function set_current_import_id($import_id) {
@@ -316,9 +308,7 @@ class Importer {
 					$this->scheduler->update_task($this->task_id, 4, "Import finished");
 					$this->scheduler->clear_cron();
 
-					foreach(glob($this->dir . $this->import_id . "*") as $file) {
-						$this->file_handler->delete_file($file);
-					}
+					$this->importing_parts->delete_all_import_parts();
 				} else if ($this->current_task_num > 0) {
 					$this->kick_off_scheduler();
 				}
@@ -328,7 +318,7 @@ class Importer {
 					$this->scheduler->update_task($this->task_id, 1);
 					$this->kick_off_scheduler();
 				} else {
-					Logger::log($e->getMessagE(), $this->import_id);
+					Logger::log($e->getMessage(), $this->import_id);
 					Logger::log('Synchronization failed, please check the <a href="?page=arlo-for-wordpress-logs&s='.$this->import_id.'">Log</a> ', $this->import_id);
 					//cancel the task
 					$this->scheduler->update_task($this->task_id, 3);
@@ -459,7 +449,7 @@ class Importer {
 		
 		$class_name = "Arlo\Importer\\" . $import_task;
 
-		$this->current_task_class = new $class_name($this, $this->dbl, $this->message_handler, (!empty($this->data_json->$import_task) ? $this->data_json->$import_task : null), $this->current_task_iteration, $this->api_client, $this->file_handler, $this->scheduler, $this->importing_parts);
+		$this->current_task_class = new $class_name($this, $this->dbl, $this->message_handler, (!empty($this->data_json->$import_task) ? $this->data_json->$import_task : null), $this->current_task_iteration, $this->api_client, $this->scheduler, $this->importing_parts);
 		$this->current_task_class->task_id = $this->task_id;
 
 		//we need to do some special setup for different tasks
