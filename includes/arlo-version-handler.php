@@ -251,6 +251,10 @@ class VersionHandler {
 				if (!is_null($exists)) {
 					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_async_tasks DROP task_lb_count");
 				}
+				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_async_tasks LIKE 'task_hostname'", 0, 0);
+				if (!is_null($exists)) {
+					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_async_tasks DROP task_hostname");
+				}
 				$exists = $this->dbl->get_var("SHOW TABLES LIKE '" . $this->dbl->prefix . "arlo_import_parts'", 0, 0);
 				if (is_null($exists)) {
 					$this->dbl->query("CREATE TABLE " . $this->dbl->prefix . "arlo_import_parts (
