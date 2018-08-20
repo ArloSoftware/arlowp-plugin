@@ -1171,11 +1171,7 @@ class Events {
                     $events = array($events);
                 }
 
-                $discount_conditions = array(
-                    'event_id' => array_map(function($e) { return $e->e_id; }, $events),
-                    'discounts' => true
-                );
-                $discount_offers = \Arlo\Entities\Offers::get($discount_conditions, null, null, $import_id);
+                $event_has_discount_offer = self::get_event_has_discount_offer_array($events, $import_id);
 
                 foreach ($events as $event) {
                     if (!empty($event->e_startdatetime)) {
@@ -1206,26 +1202,24 @@ class Events {
                         }
     
                         $display_text = str_replace(['{%date%}', '{%location%}'], [esc_html($date), esc_html($location)], $text);
-    
+
                         $link = ($layout == 'list' ? "<li>" : "");
     
                         $fullclass = $event->e_isfull ? ' arlo-event-full' : ' arlo-register';
-                        $remainingclass = (!empty($event->e_placesremaining) ? ' arlo-event-limited-places' : '');
-                        $discount = array_filter($discount_offers, function($o) use ($event) { return $o->e_id == $event->e_id; });
-                        $discountclass = (!empty($discount) ? ' arlo-event-discount' : '');
+                        $limitedclass = (!empty($event->e_placesremaining) ? ' arlo-event-limited' : '');
+                        $discountclass = (!empty($event_has_discount_offer[ $event->e_id ]) ? ' arlo-event-discount' : '');
 
                         switch ($template_link) {
                             case "permalink":
                                 $url = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
-    
-                                $link .= self::get_event_date_link($url, $buttonclass . $fullclass . $remainingclass . $discountclass, $display_text);
+                                $link .= self::get_event_date_link($url, $buttonclass . $fullclass . $limitedclass . $discountclass, $display_text);
                                 break;
                             case "none":
                                 $link .= '<span class="' . esc_attr($dateclass) . '">' . $display_text . '</span>';
                                 break;
                             case "viewuri":
                                 $url = $GLOBALS['arlo_eventtemplate']['et_viewuri'];
-                                $link .= self::get_event_date_link($url, $buttonclass . $fullclass . $remainingclass . $discountclass, $display_text);
+                                $link .= self::get_event_date_link($url, $buttonclass . $fullclass . $limitedclass . $discountclass, $display_text);
                                 break;
                             case "registerlink":
                                 if ($event->e_registeruri && !$event->e_isfull) {
@@ -1233,7 +1227,7 @@ class Events {
                                 } else {
                                     $url = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
                                 }
-                                $link .= self::get_event_date_link($url, $buttonclass . $fullclass . $remainingclass . $discountclass, $display_text);
+                                $link .= self::get_event_date_link($url, $buttonclass . $fullclass . $limitedclass . $discountclass, $display_text);
                                 break;
                         }
     
@@ -1249,7 +1243,7 @@ class Events {
             //show only, if there is no events or delivery filter set to "OA"
             if (($events_count == 0 || (count($arlo_delivery) == 1 && $arlo_delivery[0] == 99)) && $oa_count) {
                 $reference_terms = json_decode($oa->oa_reference_terms, true);
-                $buttonclass = 'arlo-register';
+                $buttonclass = 'arlo-register arlo-online-activity';
 
                 if (is_array($reference_terms) && isset($reference_terms['Plural'])) {
                     $tag = 'a';
@@ -1290,7 +1284,31 @@ class Events {
     private static function get_event_date_link($url, $buttonclass, $display_text) {
         return sprintf('<a href="%s" class="%s">%s</a>', esc_attr($url), esc_attr($buttonclass), $display_text);
     }
-    
+
+
+    private static function get_event_has_discount_offer_array($events, $import_id) {
+        $array = [];
+
+        foreach ($events as $event) {
+            if (isset($event->e_id)) {
+                $array[ $event->e_id ] = false;
+            }
+        }
+        $ids = array_keys($array);
+
+        $conditions = array(
+            'event_id' => $ids,
+            'discounts' => true
+        );
+        $offers = \Arlo\Entities\Offers::get($conditions, null, null, $import_id);
+
+        foreach ($offers as $offer) {
+            $array[ $offer->e_id ] = true;
+        }
+
+        return $array;
+    }
+
 
     public static function event_date_formatter($atts, $date, $offset, $is_online = false, $timezoneid = null) {
         $plugin = Arlo_For_Wordpress::get_instance();
