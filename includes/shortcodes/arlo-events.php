@@ -1065,6 +1065,20 @@ class Events {
         }
     }
 
+    private static function shortcode_event_haslimitedplaces($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if (empty($GLOBALS['arlo_event_list_item']['e_placesremaining']) && empty($GLOBALS['arlo_event_session_list_item']['e_placesremaining'])) return;
+
+        $event = (!empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item']);
+
+        extract(shortcode_atts(array(
+            'output' => 'Limited places'
+        ), $atts, $shortcode_name, $import_id));
+
+        if ($event["e_placesremaining"] > 0) {
+            return $output;
+        }
+    }
+
     private static function shortcode_event_next_running($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_eventtemplate']) || empty($GLOBALS['arlo_eventtemplate']['et_arlo_id'])) return;
         $return = "";

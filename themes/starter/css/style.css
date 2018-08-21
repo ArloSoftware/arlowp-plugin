@@ -13717,6 +13717,7 @@
 .arlo#arlo .event-card .card-front .arlo-event-label {
   position: absolute;
   font-size: 10px;
+  font-weight: 300;
 }
 
 .arlo#arlo .event-card .card-back .arlo-event-label {
@@ -13734,11 +13735,32 @@
   bottom: -50px;
   transform: rotate(-43.2deg);
   padding-top: 5px;
+  padding-left: 30px;
+  padding-right: 30px;
   text-align: center;
-  padding-left: 0;
-  width: 90px;
-  height: 90px;
-  right: -45px;
+  width: 120px;
+  height: 100px;
+  right: -55px;
+}
+
+.arlo#arlo .event-card .card-front .arlo-event-label ~ .arlo-event-label {
+  bottom: -35px;
+  width: 170px;
+  right: -60px;
+  z-index: -1;
+}
+
+.arlo#arlo .event-card .card-front .arlo-event-label.arlo-full ~ .arlo-event-label.arlo-discount {
+  display: none;
+}
+
+.arlo#arlo.arlo-sm .event-card .card-front .arlo-event-label {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.arlo#arlo.arlo-sm .event-card .card-front .arlo-event-label.arlo-limited-places {
+  display: none;
 }
 
 .arlo#arlo .event .mobile-expanded-visible .arlo-event-label {
