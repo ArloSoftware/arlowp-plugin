@@ -1257,7 +1257,7 @@ class Events {
             //show only, if there is no events or delivery filter set to "OA"
             if (($events_count == 0 || (count($arlo_delivery) == 1 && $arlo_delivery[0] == 99)) && $oa_count) {
                 $reference_terms = json_decode($oa->oa_reference_terms, true);
-                $buttonclass = 'arlo-register arlo-online-activity';
+                $buttonclass = 'arlo-register';
 
                 if (is_array($reference_terms) && isset($reference_terms['Plural'])) {
                     $tag = 'a';

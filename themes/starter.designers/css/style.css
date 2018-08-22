@@ -2620,15 +2620,13 @@
   margin-bottom: 12px;
   font-weight: 300;
   overflow: hidden;
+  line-height: 40px;
 }
 .arlo#arlo .schedule-item .scheduled-dates a.arlo-event-full {
   background-color: #f55753;
 }
 .arlo#arlo .schedule-item .scheduled-dates a:not(.arlo-register):not(.arlo-event-full) {
   max-width: none;
-  line-height: 40px;
-}
-.arlo#arlo .schedule-item .scheduled-dates a.arlo-online-activity {
   line-height: 40px;
 }
 .arlo#arlo .schedule-item .scheduled-dates a div {
