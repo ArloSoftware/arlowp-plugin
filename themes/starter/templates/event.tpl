@@ -118,7 +118,7 @@
                       <i class="icons8-user pull-left"></i> <span class="block m-l-25">Presented by %s</span>
                     </div>']
 
-                    <div class="price expanded-hidden hidden-xs">[arlo_event_price]</div>
+                    <div class="price expanded-hidden hidden-xs">[arlo_event_price order="event" showfrom="false"]</div>
 
                     <div class="price expanded-visible">
                       [arlo_event_offers]

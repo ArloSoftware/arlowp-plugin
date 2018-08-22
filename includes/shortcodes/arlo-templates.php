@@ -586,9 +586,11 @@ class Templates {
 
         $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
         
-        $sql = self::generate_bestoffer_list_sql($GLOBALS['arlo_eventtemplate']['et_arlo_id'], $arlo_region, 1, $import_id);
+        $sql = self::generate_bestoffer_list_sql($GLOBALS['arlo_eventtemplate']['et_arlo_id'], $arlo_region, 2, $import_id);
 
-        $offer = $wpdb->get_row($sql, OBJECT);
+        $offers = $wpdb->get_results($sql, OBJECT);
+        if (empty($offers)) return;
+        $offer = $offers[0];
         if (empty($offer)) return;
 
         //price setting and free text
@@ -601,7 +603,7 @@ class Templates {
         }
 
         $fromtext = '';
-        if (strtolower($showfrom) === "true") {
+        if (strtolower($showfrom) === "true" && count($offers) > 1) {
             $fromtext = __('From', 'arlo-for-wordpress') . ' ';
         }
 
@@ -1009,7 +1011,11 @@ class Templates {
 
         $sql = "
         SELECT
-            o.*,
+            o.o_offeramounttaxexclusive,
+            o.o_offeramounttaxinclusive,
+            o.o_formattedamounttaxexclusive,
+            o.o_formattedamounttaxinclusive,
+            o.o_taxrateshortcode,
             e.e_is_taxexempt
         FROM 
             $t1 o
@@ -1033,6 +1039,7 @@ class Templates {
         }
 
         $sql .= "
+        GROUP BY o.o_offeramounttaxexclusive
         ORDER BY o.o_offeramounttaxexclusive ASC
         LIMIT %d";
 
