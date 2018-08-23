@@ -5,6 +5,8 @@
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_link" target="_blank">[arlo_event_template_link]</a></li>
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_summary" target="_blank">[arlo_event_template_summary]</a></li>
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_advertised_duration" target="_blank">[arlo_event_template_advertised_duration]</a></li>
+	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_advertised_price" target="_blank">[arlo_event_template_advertised_price]</a></li>
+	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_advertised_presenters" target="_blank">[arlo_event_template_advertised_presenters]</a></li>
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_timezones" target="_blank">[arlo_timezones]</a></li>
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_filters" target="_blank">[arlo_event_filters]</a></li>
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_list" target="_blank">[arlo_event_list]</a></li>

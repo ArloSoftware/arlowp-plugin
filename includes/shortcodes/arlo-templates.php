@@ -2,7 +2,7 @@
 namespace Arlo\Shortcodes;
 
 use Arlo\Entities\Categories as CategoriesEntity;
-use Arlo\Entities\Events as EventsEntity;
+use Arlo\Entities\Presenters as PresentersEntity;
 
 class Templates {
     public static $event_template_atts = [];
@@ -619,6 +619,20 @@ class Templates {
         $formattedprice = ($exclgst || $offer->e_is_taxexempt ? $offer->o_formattedamounttaxexclusive : $offer->o_formattedamounttaxinclusive);
 
         return esc_html($fromtext . $formattedprice . $taxsuffix);
+    }
+
+    private static function shortcode_event_template_advertised_presenters($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if(empty($GLOBALS['arlo_eventtemplate']['et_arlo_id'])) return;
+
+        $presenters = PresentersEntity::get(['template_id' => $GLOBALS['arlo_eventtemplate']['et_arlo_id']], null, null, $import_id);
+        if (empty($presenters)) return;
+
+        $presenters_fullnames = array_map(function($presenter) {
+            return $presenter['p_firstname'] . ' ' . $presenter['p_lastname'];
+        }, $presenters);
+
+        $output = implode(', ', $presenters_fullnames);
+        return esc_html($output);
     }
 
     private static function shortcode_event_template_filters($content = '', $atts = [], $shortcode_name = '', $import_id = '') {

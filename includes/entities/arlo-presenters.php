@@ -63,7 +63,27 @@ class Presenters {
 							$parameters[] = $value;
 						}	
 					}
-
+				break;
+				case 'template_id': 
+					$order[] = 'p_order';
+					$join[] = '
+					INNER JOIN 
+						' . $wpdb->prefix . 'arlo_eventtemplates_presenters AS etp
+					ON 
+						p.p_arlo_id = etp.p_arlo_id 
+					AND 
+						p.import_id = etp.import_id
+					';
+					$join[] = '
+					INNER JOIN 
+						' . $wpdb->prefix . 'arlo_eventtemplates AS et
+					ON 
+						etp.et_id = et.et_id 
+					AND 
+						etp.import_id = et.import_id 
+					';
+					$where[] = "et.et_arlo_id = %d";
+					$parameters[] = $value;
 				break;
 			}
 		}
