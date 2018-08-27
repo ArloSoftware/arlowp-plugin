@@ -1,6 +1,6 @@
 [arlo_template_region_selector]
 [arlo_event_filters]
-[arlo_timezones wrap="<div class='arlo-timezone-toggle'>%s</div>"]
+[arlo_timezones wrap="<div class='arlo-timezone-selector'><p>Live online events</p>%s</div>"]
 [arlo_event_template_summary wrap="<p>%s</p>"]
 [arlo_event_template_advertised_duration wrap="<p>%s</p>"]
 
