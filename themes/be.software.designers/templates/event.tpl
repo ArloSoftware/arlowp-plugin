@@ -1,9 +1,11 @@
 <div class="arlo" id="arlo">
 
-    [arlo_template_region_selector]
-    [arlo_event_filters]
+    <div class="arlo-event-template-filters">
+        [arlo_template_region_selector wrap="<div class='arlo-region-selector'>%s</div>"]
+        [arlo_event_filters]
+        [arlo_timezones wrap="<div class='arlo-timezone-selector'><p>Live online events</p>%s</div>"]
+    </div>
 
-    [arlo_timezones wrap="<div class='arlo-timezone-toggle'>%s</div>"]
     [arlo_event_template_summary wrap="<p class='arlo-event-template-summary'>%s</p>"]
 
     <ul class="arlo-list arlo-show-more events" data-show="3" data-show-text="Show more">
