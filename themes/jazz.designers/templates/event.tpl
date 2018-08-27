@@ -12,7 +12,7 @@
     <ul class="arlo-list arlo-show-more events" data-show="3" data-show-text="Show more">
         [arlo_event_list]
         [arlo_event_list_item show="3"]
-        <li class="arlo-cf arlo-event arlo-background-color2">
+            <li class="arlo-cf arlo-event arlo-background-color2">
                 <div class="arlo-event-head">
                     <div class="arlo-date">
                         [arlo_event_start_date format="%d %B"]
@@ -36,7 +36,7 @@
                    [arlo_event_tags layout="list"]
                    [arlo_event_registration]
                 </div>
-        </li>
+            </li>
         [arlo_event_rich_snippet]
         [/arlo_event_list_item]
         [/arlo_event_list]

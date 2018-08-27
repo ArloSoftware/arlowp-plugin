@@ -629,6 +629,11 @@ body.arlo {
     max-width: 100%;
     vertical-align: top;
 }
+.arlo#arlo .arlo-timezone-selector {
+    display: inline-block;
+    max-width: 100%;
+    vertical-align: top;
+}
 
 .arlo#arlo.arlo-sm .arlo-filters select {
     width: 100%;
@@ -638,6 +643,38 @@ body.arlo {
 .arlo#arlo.arlo-sm select.arlo-filter-region {
     width: 100%;
     min-width: 100%;
+}
+
+
+.arlo#arlo .arlo-event-template-filters {
+    display: inline-block;
+    width: 100%;
+}
+
+.arlo#arlo .arlo-region-selector {
+    margin: 1em 0px;
+}
+
+.arlo#arlo .arlo-region-selector select.arlo-filter-region {
+    float: none;
+    min-width: 400px;
+}
+
+.arlo#arlo .arlo-event-template-filters .arlo-filters {
+    float: left;
+}
+
+.arlo#arlo .arlo-timezone-selector {
+    float: right;
+}
+
+.arlo#arlo .arlo-timezone-selector p {
+  display: inline-block;
+  padding: 0 10px;
+}
+
+.arlo#arlo .arlo-timezone-selector form {
+  display: inline-block;
 }
 
 
