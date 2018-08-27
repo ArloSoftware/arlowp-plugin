@@ -1016,6 +1016,12 @@ body.arlo {
     padding: 0;
     margin-bottom: 1em;
 }
+.arlo#arlo .arlo-timezone-selector select,
+.arlo#arlo .arlo-timezone-selector select:focus {
+    background-color: transparent;
+    padding: 0;
+    margin-bottom: 1em;
+}
 
 
 
@@ -1342,6 +1348,25 @@ body.arlo {
 
 .arlo#arlo select.arlo-filter-region {
     float: none;
+}
+
+
+.arlo#arlo .arlo-region-selector {
+    margin-bottom: 1.5em;
+}
+
+.arlo#arlo .arlo-region-selector select.arlo-filter-region {
+    min-width: 400px;
+}
+
+.arlo#arlo .arlo-timezone-selector p {
+    margin: 0px .5em;
+}
+
+.arlo#arlo .arlo-timezone-selector select,
+.arlo#arlo .arlo-timezone-selector select:focus {
+    float: none;
+    margin-bottom: 2em;
 }
 
 

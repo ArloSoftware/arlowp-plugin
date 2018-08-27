@@ -3,9 +3,9 @@
         [arlo_event_template_summary wrap="<p>%s</p>"]
     </div>
 
-    [arlo_template_region_selector]
+    [arlo_template_region_selector wrap="<div class='arlo-region-selector'>%s</div>"]
     [arlo_event_filters buttonclass="arlo-button"]
-    [arlo_timezones wrap="<div class='arlo-timezone-toggle'>%s</div>"]
+    [arlo_timezones wrap="<div class='arlo-timezone-selector'><p>Live online events</p>%s</div>"]
 
     <ul class="arlo-list arlo-show-more events" data-show="3" data-show-text="Show more">
         [arlo_event_list]
