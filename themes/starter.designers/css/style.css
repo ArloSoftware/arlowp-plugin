@@ -13463,9 +13463,44 @@
   display: block;
 }
 
+
+.arlo#arlo .arlo-region-selector {
+  margin: 1em 0;
+}
+
+.arlo#arlo .arlo-region-selector .arlo-filter-region {
+  float: none;
+  border: none;
+  min-width: 400px;
+}
+
 .arlo#arlo .arlo-timezone-toggle {
   float: right;
   opacity: .7;
+}
+.arlo#arlo .arlo-timezone-selector {
+  float: right;
+  opacity: .7;
+}
+
+.arlo#arlo.arlo-sm .arlo-timezone-selector {
+  float: none;
+}
+
+.arlo#arlo .arlo-timezone-selector p {
+  display: inline-block;
+  padding: 0 10px;
+  opacity: .5;
+}
+
+.arlo#arlo .arlo-timezone-selector form {
+  display: inline-block;
+}
+
+.arlo#arlo.arlo-sm .arlo-timezone-selector p,
+.arlo#arlo.arlo-sm .arlo-timezone-selector form,
+.arlo#arlo.arlo-sm .arlo-timezone-selector form select {
+  width: 100%;
 }
 
 .arlo#arlo:not(.arlo-sm) #arlo-event-filter {
