@@ -631,6 +631,9 @@ class Templates {
             return $presenter['p_firstname'] . ' ' . $presenter['p_lastname'];
         }, $presenters);
 
+        //one presenter occurrence per region (p_viewuri) - we would need a region on presenter too
+        $presenters_fullnames = array_unique($presenters_fullnames);
+
         $output = implode(', ', $presenters_fullnames);
         return esc_html($output);
     }
