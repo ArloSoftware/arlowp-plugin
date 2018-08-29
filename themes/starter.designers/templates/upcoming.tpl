@@ -1,8 +1,12 @@
 <div class="arlo" id="arlo">
 	[arlo_template_region_selector wrap="<div class='arlo-region-selector'>%s</div>"]
-	[arlo_upcoming_event_filters filtertext='Filter' resettext="Reset" filters='category,month,location' wrap='<div id="filters" class="collapse">%s</div>']
 
-	<button data-toggle="collapse" data-target="#filters" class="btn form-control full-width m-b-20 filter-toggle collapsed">
+	<div id="filters" class="collapse arlo-upcoming-filters">
+		[arlo_upcoming_event_filters filtertext='Filter' resettext="Reset" filters='category,month,location']
+		[arlo_timezones wrap="<div class='arlo-timezone-selector'><p>Live online events</p>%s</div>"]
+	</div>
+
+		<button data-toggle="collapse" data-target="#filters" class="btn form-control full-width m-b-20 filter-toggle collapsed">
       <div class="display-filters">
         Display filters
       </div>

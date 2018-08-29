@@ -13511,11 +13511,20 @@
   float: left;
 }
 
+.arlo#arlo:not(.arlo-sm) .arlo-upcoming-filters .arlo-filters {
+  float: left;
+}
+
 .arlo#arlo:not(.arlo-sm) #filters .arlo-filters {
   margin: 0;
 }
 
 .arlo#arlo .arlo-event-template-filters {
+  overflow: auto;
+  margin-bottom: 20px;
+}
+
+.arlo#arlo .arlo-upcoming-filters {
   overflow: auto;
   margin-bottom: 20px;
 }

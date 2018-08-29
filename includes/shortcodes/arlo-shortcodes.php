@@ -307,16 +307,14 @@ class Shortcodes {
 	private static function shortcode_timezones($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
 		global $post, $wpdb;
 	
-		// only allow this to be used on the eventtemplate page
-		if($post->post_type != 'arlo_event') {
-			return '';
-		}
-
 		$arlo_region = \Arlo_For_Wordpress::get_region_parameter();
 		
 		// find out if we have any online events
 		$t1 = "{$wpdb->prefix}arlo_eventtemplates";
 		$t2 = "{$wpdb->prefix}arlo_events";
+
+		$and_post_id = ($post->post_type != 'arlo_event' ? "" : " AND $t1.et_post_id = $post->ID");
+		$and_region = (empty($arlo_region) ? "" : " AND $t2.e_region = '" . esc_sql($arlo_region) . "'");
 		
 		$items = $wpdb->get_results("
 			SELECT 
@@ -335,10 +333,9 @@ class Shortcodes {
 			AND
 				$t1.import_id = $t2.import_id
 			WHERE 
-				$t1.et_post_id = $post->ID
-			AND 
 				$t2.import_id = $import_id
-			" . (empty($arlo_region) ? "" : " AND $t2.e_region = '" . esc_sql($arlo_region) . "'") . "
+			$and_post_id
+			$and_region
 			", ARRAY_A);
 		
 		if(empty($items)) {
