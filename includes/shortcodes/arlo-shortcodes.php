@@ -311,6 +311,8 @@ class Shortcodes {
 		if($post->post_type != 'arlo_event') {
 			return '';
 		}
+
+		$arlo_region = \Arlo_For_Wordpress::get_region_parameter();
 		
 		// find out if we have any online events
 		$t1 = "{$wpdb->prefix}arlo_eventtemplates";
@@ -336,6 +338,7 @@ class Shortcodes {
 				$t1.et_post_id = $post->ID
 			AND 
 				$t2.import_id = $import_id
+			" . (empty($arlo_region) ? "" : " AND $t2.e_region = '" . esc_sql($arlo_region) . "'") . "
 			", ARRAY_A);
 		
 		if(empty($items)) {
