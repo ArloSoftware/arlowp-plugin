@@ -13693,6 +13693,11 @@
   transform: translateX(0);
 }
 
+.arlo#arlo .arlo-search-field {
+  margin-right: 17px;
+  flex-grow: 1;
+}
+
 .arlo#arlo .arlo-search-button {
   padding: 6px 17px;
 }
@@ -13703,6 +13708,12 @@
   padding: 10px;
   display: flex;
   margin-bottom: 20px;
+}
+
+.arlo#arlo.arlo-xs .arlo-search-field {
+  width: 100%;
+  margin-right: 0px;
+  margin-bottom: 6px;
 }
 
 .arlo#arlo.arlo-xs .arlo-search {

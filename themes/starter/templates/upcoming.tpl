@@ -1,7 +1,5 @@
 <div class="arlo" id="arlo">
-
-	
-	[arlo_template_region_selector]
+	[arlo_template_region_selector wrap="<div class='arlo-region-selector'>%s</div>"]
 	[arlo_upcoming_event_filters filtertext='Filter' resettext="Reset" filters='category,month,location' wrap='<div id="filters" class="collapse">%s</div>']
 
 	<button data-toggle="collapse" data-target="#filters" class="btn form-control full-width m-b-20 filter-toggle collapsed">
