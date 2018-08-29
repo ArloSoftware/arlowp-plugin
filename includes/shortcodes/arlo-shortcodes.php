@@ -309,34 +309,53 @@ class Shortcodes {
 	
 		$arlo_region = \Arlo_For_Wordpress::get_region_parameter();
 		
-		// find out if we have any online events
-		$t1 = "{$wpdb->prefix}arlo_eventtemplates";
-		$t2 = "{$wpdb->prefix}arlo_events";
-
-		$and_post_id = ($post->post_type != 'arlo_event' ? "" : " AND $t1.et_post_id = $post->ID");
-		$and_region = (empty($arlo_region) ? "" : " AND $t2.e_region = '" . esc_sql($arlo_region) . "'");
-		
-		$items = $wpdb->get_results("
-			SELECT 
-				$t2.e_isonline, 
-				$t2.e_timezone_id 
-			FROM 
-				$t2
-			LEFT JOIN 
-				$t1
-			ON 
-				$t2.et_arlo_id = $t1.et_arlo_id 
-			AND 
-				$t2.e_isonline = 1 
-			AND 
-				$t2.e_parent_arlo_id = 0
-			AND
-				$t1.import_id = $t2.import_id
-			WHERE 
-				$t2.import_id = $import_id
-			$and_post_id
-			$and_region
-			", ARRAY_A);
+		// eventtemplate page using Post ID
+		if($post->post_type === 'arlo_event') {
+			// find out if we have any online events
+			$t1 = "{$wpdb->prefix}arlo_eventtemplates";
+			$t2 = "{$wpdb->prefix}arlo_events";
+			
+			$items = $wpdb->get_results("
+				SELECT 
+					$t2.e_isonline, 
+					$t2.e_timezone_id 
+				FROM 
+					$t2
+				LEFT JOIN 
+					$t1
+				ON 
+					$t2.et_arlo_id = $t1.et_arlo_id 
+				AND 
+					$t2.e_isonline = 1 
+				AND 
+					$t2.e_parent_arlo_id = 0
+				AND
+					$t1.import_id = $t2.import_id
+				WHERE 
+					$t1.et_post_id = $post->ID
+				AND 
+					$t2.import_id = $import_id
+				" . (empty($arlo_region) ? "" : " AND $t2.e_region = '" . esc_sql($arlo_region) . "'") . "
+				", ARRAY_A);
+		}
+		else {
+			$t1 = "{$wpdb->prefix}arlo_events";
+			
+			$items = $wpdb->get_results("
+				SELECT 
+					$t1.e_isonline, 
+					$t1.e_timezone_id 
+				FROM 
+					$t1
+				WHERE 
+					$t1.e_isonline = 1 
+				AND 
+					$t1.e_parent_arlo_id = 0
+				AND 
+					$t1.import_id = $import_id
+				" . (empty($arlo_region) ? "" : " AND $t1.e_region = '" . esc_sql($arlo_region) . "'") . "
+				", ARRAY_A);
+		}
 		
 		if(empty($items)) {
 			return '';
