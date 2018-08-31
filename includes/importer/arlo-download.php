@@ -10,17 +10,11 @@ class Download extends BaseImporter  {
 	const CONNECTION_TIMEOUT = 10;
 	const TIMEOUT = 20;
 
-	protected static $dir;
-	public $filename;
+	public $import_part;
+	public $import_iteration;
 	public $uri;
-
 	public $response_json;
 
-	public function __construct($importer, $dbl, $message_handler, $data, $iteration = 0, $api_client = null, $file_handler = null, $scheduler = null) {
-		parent::__construct($importer, $dbl, $message_handler, $data, $iteration, $api_client, $file_handler, $scheduler);
-
-		self::$dir = trailingslashit(plugin_dir_path( __FILE__ )).'../../import/';
-	}
 
 	protected function save_entity($item) {}
 
@@ -34,8 +28,8 @@ class Download extends BaseImporter  {
 				$method = $this->response_json->Result->EncryptedResponse->enc;
 				$content = Crypto::decrypt_gzip($content, $key, $method);
 
-				$filename = self::$dir . $this->filename . '.dec.json';
-				if ($this->file_handler->write_file($filename, $content)) {
+				$id = $this->importing_parts->add_import_part($this->import_part, $this->import_iteration, $content, $this->import_id);
+				if (!empty($id)) {
 					$this->is_finished = true;
 				}
 				unset($content);

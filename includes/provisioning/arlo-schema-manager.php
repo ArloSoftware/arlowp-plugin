@@ -6,8 +6,8 @@ use Arlo\Logger;
 
 class SchemaManager {
 
-	const DB_SCHEMA_HASH = '609debdab5b843b557534b817c893bb71df2be6f';
-	const DB_SCHEMA_VERSION = '3.8.1';
+	const DB_SCHEMA_HASH = '5e9c159e653ae231587aab6d339c4e5a650607d2';
+	const DB_SCHEMA_VERSION = '3.9.0';
 
 	/* database layer */
 	private $dbl;
@@ -98,6 +98,7 @@ class SchemaManager {
 		$this->install_table_arlo_events_presenters();
 		$this->install_table_arlo_log();
 		$this->install_table_arlo_import();
+		$this->install_table_arlo_import_parts();
 		$this->install_table_arlo_import_lock();
 		$this->install_table_arlo_categories();
 		$this->install_table_arlo_eventtemplates_categories();
@@ -118,8 +119,6 @@ class SchemaManager {
 		task_task varchar(255) DEFAULT NULL,
 		task_status tinyint(4) NOT NULL DEFAULT '0' COMMENT '0:scheduled, 1:paused, 2:in_progress, 3: failed, 4: completed',
 		task_status_text varchar(255) DEFAULT NULL,
-		task_hostname varchar(255) DEFAULT NULL,
-		task_lb_count tinyint(4) NOT NULL DEFAULT '0',
 		task_created timestamp NULL DEFAULT NULL COMMENT 'Dates are in UTC',
 		task_modified timestamp NULL DEFAULT NULL COMMENT 'Dates are in UTC',
 		PRIMARY KEY  (task_id),
@@ -524,6 +523,23 @@ class SchemaManager {
 		$this->dbl->sync_schema($sql);        
 	}
 
+	private function install_table_arlo_import_parts() {	
+		$table_name = $this->dbl->prefix . "arlo_import_parts";
+			
+		$sql = "CREATE TABLE $table_name (
+			  	id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+				import_id INT(10) UNSIGNED NOT NULL,
+				part ENUM('image', 'fragment') NOT NULL,
+				iteration SMALLINT(5) UNSIGNED NULL DEFAULT NULL,
+				import_text LONGTEXT NULL DEFAULT NULL,
+				created datetime NOT NULL,
+				modified datetime NULL DEFAULT NULL,
+				PRIMARY KEY  (id)
+			) CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";";
+		
+		$this->dbl->sync_schema($sql);        
+	}
+
 	private function install_table_arlo_messages() {	
 		$table_name = $this->dbl->prefix . "arlo_messages";
 
@@ -568,6 +584,7 @@ class SchemaManager {
 				$this->dbl->prefix . "arlo_messages, " .
 				$this->dbl->prefix . "arlo_log," .
 				$this->dbl->prefix . "arlo_import," .
+				$this->dbl->prefix . "arlo_import_parts," .
 				$this->dbl->prefix . "arlo_import_lock";
 
 		$this->dbl->query($sql);
