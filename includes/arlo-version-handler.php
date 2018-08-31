@@ -255,20 +255,25 @@ class VersionHandler {
 				if (!is_null($exists)) {
 					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_async_tasks DROP task_hostname");
 				}
-				$exists = $this->dbl->get_var("SHOW TABLES LIKE '" . $this->dbl->prefix . "arlo_import_parts'", 0, 0);
+				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_eventtemplates LIKE 'et_credits'", 0, 0);
 				if (is_null($exists)) {
-					$this->dbl->query("CREATE TABLE " . $this->dbl->prefix . "arlo_import_parts (
-						id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-						import_id INT(10) UNSIGNED NOT NULL,
-						part ENUM('image', 'fragment') NOT NULL,
-						iteration SMALLINT(5) UNSIGNED NULL DEFAULT NULL,
-						import_text LONGTEXT NULL DEFAULT NULL,
-						created datetime NOT NULL,
-						modified datetime NULL DEFAULT NULL,
-						PRIMARY KEY  (id)) 
-						CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";
-					");
+					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_eventtemplates ADD et_credits varchar(255) NULL AFTER et_registerprivateinteresturi");
 				}
+				$exists = $this->dbl->get_var("SHOW TABLES LIKE '" . $this->dbl->prefix . "arlo_import_parts'", 0, 0);
+				if (!is_null($exists)) {
+					$this->dbl->query("DROP TABLE " . $this->dbl->prefix . "arlo_import_parts;");
+				}
+				$this->dbl->query("CREATE TABLE " . $this->dbl->prefix . "arlo_import_parts (
+					id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+					import_id INT(10) UNSIGNED NOT NULL,
+					part ENUM('image', 'fragment') NOT NULL,
+					iteration SMALLINT(5) UNSIGNED NULL DEFAULT NULL,
+					import_text LONGTEXT NULL DEFAULT NULL,
+					created datetime NOT NULL,
+					modified datetime NULL DEFAULT NULL,
+					PRIMARY KEY  (id)) 
+					CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";
+				");
 			break;
 		}
 	}	
