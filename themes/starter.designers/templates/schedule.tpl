@@ -1,6 +1,7 @@
 <div class="arlo" id="arlo">
-[arlo_category_title wrap="<h1>%s</h1>"]
-[arlo_category_header]
+  [arlo_template_region_selector wrap="<div class='arlo-region-selector'>%s</div>"]
+  [arlo_category_title wrap="<h1>%s</h1>"]
+  [arlo_category_header]
 
     <div class="arlo-schedule-filters collapse" id="filters">
         [arlo_schedule_filters filters="location,category,delivery"]
@@ -15,10 +16,6 @@
         Hide filters
       </div>
     </button>
-
-[arlo_template_region_selector]
-
-
 
     [arlo_event_template_list_item group="category" limit="20"]
         [arlo_group_divider wrap='<h2 class="sm-m-b-15 m-b-30 m-t-30 clearfix">%s</h2>']          
@@ -39,7 +36,7 @@
             <div class="col-md-6 col-xs-12 md-p-l-0 p-l-30 p-r-0">
 
               <div class="scheduled-dates">
-                [arlo_event_next_running text="{%date%}<div class='location truncate-1'>{%location%}</div>" limit="12" format="period"]
+                [arlo_event_next_running text="<div class='normal-text truncate-1'>{%date%}</div><div class='location truncate-1'>{%location%}</div>" limit="12" format="period"]
               </div>
             </div>
           </div>

@@ -844,6 +844,9 @@ body.arlo {
 .arlo#arlo .arlo-timezone-toggle {
     float: right;
 }
+.arlo#arlo .arlo-timezone-selector {
+    float: right;
+}
 
 
 
@@ -1041,6 +1044,36 @@ body.arlo {
 
 .arlo#arlo select.arlo-filter-region {
     float: none;
+}
+
+
+.arlo#arlo .arlo-region-selector {
+    border: solid 1px transparent;
+    margin: 1em 0px;
+}
+
+.arlo#arlo .arlo-region-selector select.arlo-filter-region {
+    min-width: 400px;
+}
+
+.arlo#arlo .arlo-event-template-filters .arlo-filters {
+    float: left;
+}
+
+.arlo#arlo .arlo-timezone-selector {
+    float: right;
+    margin-top: .5em;
+    margin-bottom: 1em;
+}
+
+.arlo#arlo .arlo-timezone-selector p {
+  display: inline-block;
+  padding: 0px 10px;
+}
+
+.arlo#arlo .arlo-timezone-selector form {
+  display: inline-block;
+  vertical-align: middle;
 }
 
 

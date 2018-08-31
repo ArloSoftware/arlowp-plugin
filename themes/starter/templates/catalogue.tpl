@@ -1,8 +1,8 @@
 <div class="arlo" id="arlo">
+[arlo_template_region_selector wrap="<div class='arlo-region-selector'>%s</div>"]
+
 [arlo_category_title wrap="<h1>%s</h1>"]
 [arlo_category_header]
-
-[arlo_template_region_selector]
 
 [arlo_categories title=" " wrap='<div class="arlo-categories m-t-10 collapse" id="arlo-categories">%s</div>']
 

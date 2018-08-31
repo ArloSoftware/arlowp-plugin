@@ -1,11 +1,15 @@
 <div class="arlo" id="arlo">
-	[arlo_event_template_summary wrap="<p>%s</p>"]
-	[arlo_event_template_advertised_duration wrap='<div class="arlo-advertised-duration muted m-b-15"><i class="icons8-clock pull-left m-r-5"></i> %s</div>']
+	[arlo_template_region_selector wrap="<div class='arlo-region-selector'>%s</div>"]
 
-	<div class="arlo-event-template-filters collapse" id="filters">
+  [arlo_event_template_credits text='<span class="points">{%points%}</span><span class="points-label">{%label%}</span>' wrap='<div class="arlo-event-template-credits m-b-15 m-l-10 hidden-sm"><div class="pd-points-circle pd-points-circle-inverted">%s</div></div>']
+	[arlo_event_template_summary wrap="<p>%s</p>"]
+	[arlo_event_template_advertised_duration wrap='<div class="arlo-advertised-duration muted m-b-15 inline m-r-20"><i class="icons8-clock pull-left m-r-5"></i> %s</div>']
+	[arlo_event_template_advertised_price wrap='<div class="arlo-advertised-price muted m-b-15 inline m-r-20"><i class="icons8-us-dollar pull-left m-r-5"></i> %s</div>']
+	[arlo_event_template_advertised_presenters wrap='<div class="arlo-advertised-presenters muted m-b-15 inline m-r-20"><i class="icons8-user pull-left m-r-5"></i> %s</div>']
+
+	<div class="arlo-event-template-filters clearfix collapse" id="filters">
 		[arlo_event_filters filters="location,delivery"]
-		[arlo_template_region_selector]
-		[arlo_timezones wrap="<div class='arlo-timezone-toggle'>%s</div>"]
+		[arlo_timezones wrap="<div class='arlo-timezone-selector'><p>Live online events</p>%s</div>"]
 	</div>
 
 	<button data-toggle="collapse" data-target="#filters" class="btn form-control full-width m-b-20 filter-toggle collapsed">
@@ -117,7 +121,7 @@
                       <i class="icons8-user pull-left"></i> <span class="block m-l-25">Presented by %s</span>
                     </div>']
 
-                    <div class="price expanded-hidden hidden-xs">[arlo_event_price]</div>
+                    <div class="price expanded-hidden hidden-xs">[arlo_event_price order="event" showfrom="false"]</div>
 
                     <div class="price expanded-visible">
                       [arlo_event_offers]

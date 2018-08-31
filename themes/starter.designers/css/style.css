@@ -2618,33 +2618,16 @@
   margin-right: 6px;
   text-align: center;
   margin-bottom: 12px;
-  font-weight: normal;
+  font-weight: 300;
+  overflow: hidden;
+  line-height: 40px;
+}
+.arlo#arlo .schedule-item .scheduled-dates a.arlo-event-full {
+  background-color: #f55753;
 }
 .arlo#arlo .schedule-item .scheduled-dates a:not(.arlo-register):not(.arlo-event-full) {
   max-width: none;
   line-height: 40px;
-}
-.arlo#arlo .schedule-item .scheduled-dates a.arlo-event-limited-places::before {
-  content: " ";
-  position: absolute;
-  top: -16px;
-  left: -16px;
-  transform: rotate(-45deg);
-  width: 32px;
-  height: 32px;
-  border: solid transparent 16px;
-  border-bottom-color: #f8d053;
-}
-.arlo#arlo .schedule-item .scheduled-dates a.arlo-event-discount:not(.arlo-event-full)::after {
-  content: " ";
-  position: absolute;
-  bottom: -16px;
-  right: -16px;
-  transform: rotate(-45deg);
-  width: 32px;
-  height: 32px;
-  border: solid transparent 16px;
-  border-top-color: #10cfbd;
 }
 .arlo#arlo .schedule-item .scheduled-dates a div {
   font-size: 12px;
@@ -5155,8 +5138,7 @@
 .arlo#arlo fieldset[disabled] .btn-danger:active,
 .arlo#arlo .btn-danger.disabled.active,
 .arlo#arlo .btn-danger[disabled].active,
-.arlo#arlo fieldset[disabled] .btn-danger.active,
-.arlo#arlo .schedule-item .scheduled-dates a.arlo-event-full {
+.arlo#arlo fieldset[disabled] .btn-danger.active {
   background-color: #f55753;
   border-color: #f55753;
 }
@@ -13455,7 +13437,8 @@
     text-align: center;
 }
 
-.arlo#arlo .arlo-advertised-duration {
+.arlo#arlo .arlo-advertised-duration,
+.arlo#arlo .arlo-advertised-price {
     line-height: 1;
 }
 
@@ -13480,12 +13463,51 @@
   display: block;
 }
 
+
+.arlo#arlo .arlo-region-selector {
+  margin: 1em 0;
+}
+
+.arlo#arlo .arlo-region-selector .arlo-filter-region {
+  float: none;
+  border: none;
+  min-width: 400px;
+}
+
 .arlo#arlo .arlo-timezone-toggle {
   float: right;
   opacity: .7;
 }
+.arlo#arlo .arlo-timezone-selector {
+  float: right;
+  opacity: .7;
+}
+
+.arlo#arlo.arlo-sm .arlo-timezone-selector {
+  float: none;
+}
+
+.arlo#arlo .arlo-timezone-selector p {
+  display: inline-block;
+  padding: 0 10px;
+  opacity: .5;
+}
+
+.arlo#arlo .arlo-timezone-selector form {
+  display: inline-block;
+}
+
+.arlo#arlo.arlo-sm .arlo-timezone-selector p,
+.arlo#arlo.arlo-sm .arlo-timezone-selector form,
+.arlo#arlo.arlo-sm .arlo-timezone-selector form select {
+  width: 100%;
+}
 
 .arlo#arlo:not(.arlo-sm) #arlo-event-filter {
+  float: left;
+}
+
+.arlo#arlo:not(.arlo-sm) .arlo-upcoming-filters .arlo-filters {
   float: left;
 }
 
@@ -13494,6 +13516,11 @@
 }
 
 .arlo#arlo .arlo-event-template-filters {
+  overflow: auto;
+  margin-bottom: 20px;
+}
+
+.arlo#arlo .arlo-upcoming-filters {
   overflow: auto;
   margin-bottom: 20px;
 }
@@ -13671,6 +13698,11 @@
   transform: translateX(0);
 }
 
+.arlo#arlo .arlo-search-field {
+  margin-right: 17px;
+  flex-grow: 1;
+}
+
 .arlo#arlo .arlo-search-button {
   padding: 6px 17px;
 }
@@ -13681,6 +13713,12 @@
   padding: 10px;
   display: flex;
   margin-bottom: 20px;
+}
+
+.arlo#arlo.arlo-xs .arlo-search-field {
+  width: 100%;
+  margin-right: 0px;
+  margin-bottom: 6px;
 }
 
 .arlo#arlo.arlo-xs .arlo-search {
@@ -13728,6 +13766,7 @@
 .arlo#arlo .event-card .card-front .arlo-event-label {
   position: absolute;
   font-size: 10px;
+  font-weight: 300;
 }
 
 .arlo#arlo .event-card .card-back .arlo-event-label {
@@ -13745,11 +13784,32 @@
   bottom: -50px;
   transform: rotate(-43.2deg);
   padding-top: 5px;
+  padding-left: 30px;
+  padding-right: 30px;
   text-align: center;
-  padding-left: 0;
-  width: 90px;
-  height: 90px;
-  right: -45px;
+  width: 120px;
+  height: 100px;
+  right: -55px;
+}
+
+.arlo#arlo .event-card .card-front .arlo-event-label ~ .arlo-event-label {
+  bottom: -35px;
+  width: 170px;
+  right: -60px;
+  z-index: -1;
+}
+
+.arlo#arlo .event-card .card-front .arlo-event-label.arlo-full ~ .arlo-event-label.arlo-discount {
+  display: none;
+}
+
+.arlo#arlo.arlo-sm .event-card .card-front .arlo-event-label {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.arlo#arlo.arlo-sm .event-card .card-front .arlo-event-label.arlo-limited-places {
+  display: none;
 }
 
 .arlo#arlo .event .mobile-expanded-visible .arlo-event-label {

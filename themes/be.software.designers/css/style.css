@@ -579,6 +579,36 @@ body.arlo {
     }
 }
 
+.arlo#arlo .arlo-event-template-filters {
+    display: inline-block;
+    width: 100%;
+}
+
+.arlo#arlo .arlo-region-selector {
+    margin-bottom: 1.5em;
+}
+
+.arlo#arlo .arlo-region-selector select.arlo-filter-region {
+    min-width: 400px;
+}
+
+.arlo#arlo .arlo-event-template-filters .arlo-filters {
+    float: left;
+}
+
+.arlo#arlo .arlo-timezone-selector {
+    float: right;
+}
+
+.arlo#arlo .arlo-timezone-selector p {
+    display: inline-block;
+    margin: 0px 0.5em;
+}
+
+.arlo#arlo .arlo-timezone-selector form {
+    display: inline-block;
+}
+
 
 
 /* Utility classes */

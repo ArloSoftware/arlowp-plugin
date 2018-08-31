@@ -563,7 +563,8 @@ body.arlo {
     padding: 1em 0 2em;
 }
 
-.arlo#arlo .arlo-advertised-duration {
+.arlo#arlo .arlo-advertised-duration,
+.arlo#arlo .arlo-advertised-price {
     display: inline-block;
     padding: .1em 1em;
 }
@@ -1015,6 +1016,12 @@ body.arlo {
     padding: 0;
     margin-bottom: 1em;
 }
+.arlo#arlo .arlo-timezone-selector select,
+.arlo#arlo .arlo-timezone-selector select:focus {
+    background-color: transparent;
+    padding: 0;
+    margin-bottom: 1em;
+}
 
 
 
@@ -1360,6 +1367,25 @@ body.arlo {
 }
 
 
+.arlo#arlo .arlo-region-selector {
+    margin-bottom: 1.5em;
+}
+
+.arlo#arlo .arlo-region-selector select.arlo-filter-region {
+    min-width: 400px;
+}
+
+.arlo#arlo .arlo-timezone-selector p {
+    margin: 0px .5em;
+}
+
+.arlo#arlo .arlo-timezone-selector select,
+.arlo#arlo .arlo-timezone-selector select:focus {
+    float: none;
+    margin-bottom: 2em;
+}
+
+
 
 /* Pagination */
 
@@ -1532,6 +1558,7 @@ body.arlo {
 .arlo#arlo .arlo-list.schedule .arlo-next-running a:hover,
 .arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a:hover,
 .arlo#arlo .arlo-advertised-duration,
+.arlo#arlo .arlo-advertised-price,
 .arlo#arlo .arlo-event .arlo-event-full,
 .arlo#arlo .arlo-event_tags-list > li,
 .arlo#arlo .arlo-event-credits li,

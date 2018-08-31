@@ -1,5 +1,5 @@
 <div class="arlo arlo-boxed" id="arlo">
-    [arlo_template_region_selector]
+    [arlo_template_region_selector wrap="<div class='arlo-region-selector'>%s</div>"]
     <div class="arlo-oa-filters collapse" id="filters">[arlo_onlineactivites_filters]</div>
 
     <button data-toggle="collapse" data-target="#filters" class="btn form-control full-width m-b-20 filter-toggle collapsed">

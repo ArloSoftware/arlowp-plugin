@@ -1,4 +1,6 @@
 <div class="arlo" id="arlo">
+[arlo_template_region_selector wrap="<div class='arlo-region-selector'>%s</div>"]
+
 [arlo_category_title wrap="<h1>%s</h1>"]
 [arlo_category_header]
 
@@ -13,9 +15,6 @@
         Hide filters
       </div>
     </button>
-
-[arlo_template_region_selector]
-
 
 <div class="clearfix row-fix row events">
 [arlo_event_template_list_item group="category" limit="20"]
