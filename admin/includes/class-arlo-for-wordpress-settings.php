@@ -945,6 +945,13 @@ class Arlo_For_Wordpress_Settings {
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">	  
+				<li>TODO</li>
+			</ul>
+		</p>
+
+		<h4>Version 3.8.1</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">	  
 				<li>Load balanced architectures do not allow the import to run correctly</li>
 			</ul>
 		</p>
