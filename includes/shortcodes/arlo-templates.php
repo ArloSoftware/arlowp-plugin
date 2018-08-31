@@ -637,6 +637,27 @@ class Templates {
         $output = implode(', ', $presenters_fullnames);
         return esc_html($output);
     }
+    
+    private static function shortcode_event_template_credits($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if(empty($GLOBALS['arlo_eventtemplate']['et_credits'])) return;
+
+        // merge and extract attributes
+        extract(shortcode_atts(array(
+            'text' => '{%label%}: {%points%}'
+        ), $atts, $shortcode_name, $import_id));
+
+        $credits = json_decode($GLOBALS['arlo_eventtemplate']['et_credits']);
+        if (empty($credits)) return;
+
+        $credit = $credits[0];
+        if (empty($credit->Type) || empty($credit->Value)) return;
+
+        $output = $text;
+        $output = str_replace('{%label%}', $credit->Type, $output);
+        $output = str_replace('{%points%}', $credit->Value, $output);
+
+        return $output;
+    }
 
     private static function shortcode_event_template_filters($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         return self::generate_template_filters_form($atts, $shortcode_name, $import_id, 'event');
