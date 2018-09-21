@@ -518,6 +518,8 @@ class UpcomingEvents {
             et.et_post_id,
             et.et_descriptionsummary, 
             et.et_registerinteresturi, 
+            et.et_registerprivateinteresturi, 
+            et.et_credits, 
             et.et_region,
             et.et_viewuri,
             et.et_advertised_duration,

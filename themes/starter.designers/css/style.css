@@ -874,6 +874,11 @@
   opacity: .7;
 }
 
+
+.arlo-event-template-credits {
+  float: right;
+}
+
 .arlo#arlo .pd-points-circle {
   background-color: white;
   color: #6d5cae;
@@ -885,20 +890,24 @@
   border-radius: 100%;
 }
 
+.arlo#arlo .pd-points-circle-inverted {
+ background-color: #6d5cae;
+ color: white;
+}
 
-  .arlo#arlo:not(.arlo-xs) .pd-points-circle {
+  .arlo#arlo:not(.arlo-xs) :not(.arlo-event-template-credits) .pd-points-circle {
     position: absolute;
     right: 0;
     top: 50%;
     transform: translateY(-50%);
   }
 
-
 .arlo#arlo .pd-points-circle .points {
   display: block;
   font-size: 30px;
   font-weight: bold;
 }
+
 .arlo#arlo .overlay {
   position: fixed;
   left: 0;
