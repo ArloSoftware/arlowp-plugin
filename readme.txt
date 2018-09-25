@@ -175,7 +175,21 @@ The Arlo - Training and Event Management, and online registration plugin is only
 
 = 3.9 =
 
-TODO
+Improvement of the Starter themes
+New [arlo_event_template_advertised_price] shortcode
+New [arlo_event_template_advertised_presenters] shortcode
+New [arlo_event_template_credits] shortcode
+New [arlo_event_haslimitedplaces] shortcode
+Make Timezone selector [arlo_timezones] available on Upcoming page
+Better support for load balanced architectures
+
+Venue map not showing on Venue page
+Multiple instance of upcoming widget are conflicting
+Upcoming widget do not keep event/template tag after import
+WordPress Menus and Custom Links including html in their text field are html-escaped
+Best event price (From) includes Events hidden from website
+Glitch on expand button on Starter theme
+Discount should not display on Online Activities if only applied to events
 
 = 3.8.1 =
 

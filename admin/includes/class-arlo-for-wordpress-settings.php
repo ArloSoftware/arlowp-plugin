@@ -945,7 +945,20 @@ class Arlo_For_Wordpress_Settings {
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">	  
-				<li>TODO</li>
+				<li>Improvement of the Starter themes</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_advertised_price" target="_blank">[arlo_event_template_advertised_price]</a> shortcode</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_advertised_presenters" target="_blank">[arlo_event_template_advertised_presenters]</a> shortcode</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_credits" target="_blank">[arlo_event_template_credits]</a> shortcode</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_haslimitedplaces" target="_blank">[arlo_event_haslimitedplaces]</a> shortcode</li>
+				<li>Make Timezone selector <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_timezones" target="_blank">[arlo_timezones]</a> available on Upcoming page</li>
+				<li>Better support for load balanced architectures</li>
+				<li>Venue map not showing on Venue page</li>
+				<li>Multiple instance of upcoming widget are conflicting</li>
+				<li>Upcoming widget do not keep event/template tag after import</li>
+				<li>WordPress Menus and Custom Links including html in their text field are html-escaped</li>
+				<li>Best event price (From) includes Events hidden from website</li>
+				<li>Glitch on expand button on Starter theme</li>
+				<li>Discount should not display on Online Activities if only applied to events</li>
 			</ul>
 		</p>
 
