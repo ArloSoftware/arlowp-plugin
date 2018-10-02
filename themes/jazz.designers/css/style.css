@@ -312,6 +312,7 @@ body.arlo {
 .arlo#arlo .arlo-category-list,
 .arlo#arlo .arlo-event-credits,
 .arlo#arlo .arlo-event_tags-list,
+.arlo#arlo .arlo-event-template-credits,
 .arlo#arlo .presenter-events,
 .arlo#arlo .arlo-address-list,
 .arlo-categories-widget ul {
@@ -323,6 +324,7 @@ body.arlo {
 .arlo#arlo .arlo-list li,
 .arlo#arlo .arlo-category-list li,
 .arlo#arlo .arlo-event-credits li,
+.arlo#arlo .arlo-event-template-credits li,
 .arlo#arlo .arlo-event_tags-list li,
 .arlo#arlo .presenter-events li,
 .arlo#arlo .arlo-address-list li,

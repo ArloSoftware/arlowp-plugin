@@ -3,7 +3,9 @@
 .arlo-category-list,
 .arlo-category-list li,
 .arlo .arlo-event-credits,
-.arlo .arlo-event-credits li {
+.arlo .arlo-event-credits li,
+.arlo .arlo-event-template-credits,
+.arlo .arlo-event-template-credits li {
 	list-style-type: none;
 	list-style: none;
 	margin-left: 0;
