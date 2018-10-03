@@ -106,7 +106,8 @@ class Venues {
         global $wpdb;
 
         $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
-        $offset = (get_query_var('paged') && intval(get_query_var('paged')) > 0) ? intval(get_query_var('paged')) * $limit - $limit: 0 ;
+        $page = arlo_current_page();
+        $offset = ($page - 1) * $limit;
 
         $t1 = "{$wpdb->prefix}arlo_venues";
         $t2 = "{$wpdb->prefix}posts";
@@ -179,8 +180,10 @@ class Venues {
         
         $api_key = (!empty($settings['googlemaps_api_key']) ? $settings['googlemaps_api_key'] : '');
         if (empty($api_key) && strtolower($settings['platform_name']) == \Arlo_For_Wordpress::DEFAULT_PLATFORM) {
-                $api_key = \Arlo_For_Wordpress::GOOGLE_MAPS_API_KEY;
-        } else {
+            $api_key = \Arlo_For_Wordpress::GOOGLE_MAPS_API_KEY;
+        }
+
+        if (empty($api_key)) {
             return;
         }
         

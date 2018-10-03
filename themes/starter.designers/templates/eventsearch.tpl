@@ -1,7 +1,7 @@
 <div class="arlo" id="arlo">
-[arlo_template_region_selector]
+    [arlo_template_region_selector wrap="<div class='arlo-region-selector'>%s</div>"]
 
-[arlo_search_field placeholder="Search events" buttonclass="btn-primary" showbutton="true" buttontext='Search']
+    [arlo_search_field placeholder="Search events" buttonclass="btn-primary" showbutton="true" buttontext='Search']
 
     [arlo_event_template_list_item limit="10"]
           <div class="clearfix row search-item m-b-15 p-b-20 b-b b-grey">

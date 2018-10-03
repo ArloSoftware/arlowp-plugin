@@ -339,9 +339,8 @@ class OnlineActivities {
         $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
         
         $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
-        $page = !empty($_GET['paged']) ? intval($_GET['paged']) : intval(get_query_var('paged'));
-
-        $offset = ($page > 0) ? $page * $limit - $limit: 0 ;
+        $page = arlo_current_page();
+        $offset = ($page - 1) * $limit;
 
         $output = '';
 

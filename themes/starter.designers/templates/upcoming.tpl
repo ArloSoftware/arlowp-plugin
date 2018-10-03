@@ -1,8 +1,12 @@
 <div class="arlo" id="arlo">
-	[arlo_template_region_selector]
-	[arlo_upcoming_event_filters filtertext='Filter' resettext="Reset" filters='category,month,location' wrap='<div id="filters" class="collapse">%s</div>']
+	[arlo_template_region_selector wrap="<div class='arlo-region-selector'>%s</div>"]
 
-	<button data-toggle="collapse" data-target="#filters" class="btn form-control full-width m-b-20 filter-toggle collapsed">
+	<div id="filters" class="collapse arlo-upcoming-filters">
+		[arlo_upcoming_event_filters filtertext='Filter' resettext="Reset" filters='category,month,location']
+		[arlo_timezones wrap="<div class='arlo-timezone-selector'><p>Live online events</p>%s</div>"]
+	</div>
+
+		<button data-toggle="collapse" data-target="#filters" class="btn form-control full-width m-b-20 filter-toggle collapsed">
       <div class="display-filters">
         Display filters
       </div>
@@ -18,10 +22,10 @@
 		<div class="col-lg-4 col-md-6 col-xs-12 m-b-30 md-m-b-20 md-no-padding">
 			<div class="event-card text-center has-label" href="#">
 			  <div class="card-front bg-white h-v-centre-container drop-shadow">
-			  [arlo_event_isfull output="Sold out" wrap='<div class="arlo-event-label arlo-full text-white bg-danger">%s</div>']
 
-			  [arlo_event_offers_hasdiscount output="Discount" wrap='<div class="arlo-event-label arlo-discount text-white bg-success">%s</div>']
-
+			    [arlo_event_isfull output="Sold out" wrap='<div class="arlo-event-label arlo-full text-white bg-danger">%s</div>']
+			    [arlo_event_offers_hasdiscount output="Discount" wrap='<div class="arlo-event-label arlo-discount text-white bg-success">%s</div>']
+			    [arlo_event_haslimitedplaces output="Limited places" wrap='<div class="arlo-event-label arlo-limited-places text-white bg-warning">%s</div>']
 
 			    <div class="event-content-wrapper">
 

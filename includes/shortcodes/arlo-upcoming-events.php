@@ -2,6 +2,7 @@
 namespace Arlo\Shortcodes;
 
 use Arlo\Entities\Categories as CategoriesEntity;
+use Arlo\Entities\Tags as TagsEntity;
 
 class UpcomingEvents {
     public static $upcoming_list_item_atts = [];
@@ -109,17 +110,15 @@ class UpcomingEvents {
             'limit' => ''
         ), $atts, $shortcode_name, $import_id);
 
-        if (isset($atts['limit']) && is_numeric($atts['limit'])) {
-            self::$upcoming_list_item_atts['limit'] = $atts['limit'];
-        }
+        $eventtag_tag = urldecode($atts['eventtag']);
+        $eventtag_id = TagsEntity::get_first_id_by_tag($eventtag_tag, $import_id);
 
-        if (!empty($atts['eventtag'])) {
-            self::$upcoming_list_item_atts['eventtag'] = trim($atts['eventtag']);
-        }
+        $templatetag_tag = urldecode($atts['templatetag']);
+        $templatetag_id = TagsEntity::get_first_id_by_tag($templatetag_tag, $import_id);
 
-        if (!empty($atts['templatetag'])) {
-            self::$upcoming_list_item_atts['templatetag'] = trim($atts['templatetag']);
-        }
+        self::$upcoming_list_item_atts['eventtag'] = $eventtag_id;
+        self::$upcoming_list_item_atts['templatetag'] = $templatetag_id;
+        self::$upcoming_list_item_atts['limit'] = $atts['limit'];
 
         $region = \Arlo_For_Wordpress::get_region_parameter();
         if (!empty($region)) {
@@ -274,8 +273,8 @@ class UpcomingEvents {
         $parameters = [];
 
         $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
-        $page = !empty($_GET['paged']) ? intval($_GET['paged']) : intval(get_query_var('paged'));
-        $offset = ($page > 0) ? $page * $limit - $limit: 0;
+        $page = arlo_current_page();
+        $offset = ($page - 1) * $limit;
 
         $t1 = "{$wpdb->prefix}arlo_events";
         $t2 = "{$wpdb->prefix}arlo_eventtemplates";
@@ -519,6 +518,8 @@ class UpcomingEvents {
             et.et_post_id,
             et.et_descriptionsummary, 
             et.et_registerinteresturi, 
+            et.et_registerprivateinteresturi, 
+            et.et_credits, 
             et.et_region,
             et.et_viewuri,
             et.et_advertised_duration,

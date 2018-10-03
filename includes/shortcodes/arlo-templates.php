@@ -2,6 +2,7 @@
 namespace Arlo\Shortcodes;
 
 use Arlo\Entities\Categories as CategoriesEntity;
+use Arlo\Entities\Presenters as PresentersEntity;
 
 class Templates {
     public static $event_template_atts = [];
@@ -298,7 +299,6 @@ class Templates {
 
         $templates = arlo_get_option('templates');
         $content = $templates['eventsearch']['html'];
-        $GLOBALS['arlo_search_page'] = true;
 
         self::$event_template_atts = self::get_event_template_atts($atts, $import_id);
 
@@ -369,13 +369,6 @@ class Templates {
         }
 
         $settings = get_option('arlo_settings');  
-
-        //we need to determine, if it's group by "category" and has a divider, if not, and if we are on the search page, we need to group the templates
-        //see bug 68492
-        
-        if (!((isset($GLOBALS['arlo_search_page']) && $GLOBALS['arlo_search_page'] && isset($atts['group']) && strpos($content, "arlo_group_divider") !== false) || !isset($GLOBALS['arlo_search_page']))) {
-            $GLOBALS['arlo_group_template_by_id'] = true; //it's a global, because the paging should know about it, which is a separate shortcode
-        }
 
         $output = '';
 
@@ -582,6 +575,101 @@ class Templates {
         return esc_html($GLOBALS['arlo_eventtemplate']['et_advertised_duration']);
     }
 
+    private static function shortcode_event_template_advertised_price($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        global $wpdb;
+        if (empty($GLOBALS['arlo_eventtemplate']['et_arlo_id'])) return;
+
+        extract(shortcode_atts(array(
+            'showfrom' => 'true',
+            'showtaxsuffix' => 'true'
+        ), $atts, $shortcode_name, $import_id));
+
+        $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
+        
+        $sql = self::generate_bestoffer_list_sql($GLOBALS['arlo_eventtemplate']['et_arlo_id'], $arlo_region, 2, $import_id);
+
+        $offers = $wpdb->get_results($sql, OBJECT);
+        if (empty($offers)) return;
+        $offer = $offers[0];
+        if (empty($offer)) return;
+
+        //price setting and free text
+        $settings = get_option('arlo_settings');
+        $free_text = (isset($settings['free_text'])) ? $settings['free_text'] : __('Free', 'arlo-for-wordpress');
+        $exclgst = (isset($settings['price_setting']) && $settings['price_setting'] === ARLO_PLUGIN_PREFIX . '-exclgst');
+
+        if ($offer->o_offeramounttaxexclusive == 0) {
+            return esc_html($free_text);
+        }
+
+        $fromtext = '';
+        if (strtolower($showfrom) === "true" && count($offers) > 1) {
+            $fromtext = __('From', 'arlo-for-wordpress') . ' ';
+        }
+
+        $taxsuffix = '';
+        if (strtolower($showtaxsuffix) === "true" && !$offer->e_is_taxexempt) {
+            if ($exclgst) {
+                $taxsuffix = ' ' . sprintf(__('excl. %s', 'arlo-for-wordpress'), $offer->o_taxrateshortcode);
+            } else {
+                $taxsuffix = ' ' . sprintf(__('incl. %s', 'arlo-for-wordpress'), $offer->o_taxrateshortcode);
+            }
+        }
+
+        $formattedprice = ($exclgst || $offer->e_is_taxexempt ? $offer->o_formattedamounttaxexclusive : $offer->o_formattedamounttaxinclusive);
+
+        return esc_html($fromtext . $formattedprice . $taxsuffix);
+    }
+
+    private static function shortcode_event_template_advertised_presenters($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if (empty($GLOBALS['arlo_eventtemplate']['et_arlo_id'])) return;
+
+        $presenters = PresentersEntity::get(['template_id' => $GLOBALS['arlo_eventtemplate']['et_arlo_id']], null, null, $import_id);
+        if (empty($presenters)) return;
+
+        $presenters_fullnames = array_map(function($presenter) {
+            return $presenter['p_firstname'] . ' ' . $presenter['p_lastname'];
+        }, $presenters);
+
+        //one presenter occurrence per region (p_viewuri) - we would need a region on presenter too
+        $presenters_fullnames = array_unique($presenters_fullnames);
+
+        $output = implode(', ', $presenters_fullnames);
+        return esc_html($output);
+    }
+    
+    private static function shortcode_event_template_credits($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if (empty($GLOBALS['arlo_eventtemplate']['et_credits'])) return;
+
+        // merge and extract attributes
+        extract(shortcode_atts(array(
+            'layout' => 'list',
+            'text' => '{%label%}: {%points%}'
+        ), $atts, $shortcode_name, $import_id));
+
+        $credits = json_decode($GLOBALS['arlo_eventtemplate']['et_credits']);
+        if (empty($credits) || !is_array($credits)) return;
+
+        $output = '';
+        switch ($layout) {
+            default:
+                $output .= '<ul class="arlo-event-template-credits">';
+                foreach ($credits as $credit) {
+                    if (!empty($credit->Type) && !empty($credit->Value)) {
+                        $credit_type = esc_html($credit->Type);
+                        $credit_value = esc_html($credit->Value);
+                        $html = '<li>' . $text . '</li>';
+                        $html = str_replace('{%label%}', $credit_type, $html);
+                        $html = str_replace('{%points%}', $credit_value, $html);
+                        $output .= $html;
+                    }
+                }
+                $output .= '</ul>';
+            break;
+        }
+        return $output;
+    }
+
     private static function shortcode_event_template_filters($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         return self::generate_template_filters_form($atts, $shortcode_name, $import_id, 'event');
     }
@@ -690,8 +778,8 @@ class Templates {
         } 
 
         $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
-        $page = !empty($_GET['paged']) ? intval($_GET['paged']) : intval(get_query_var('paged'));
-        $offset = ($page > 0) ? $page * $limit - $limit: 0 ;
+        $page = arlo_current_page();
+        $offset = ($page - 1) * $limit;
 
         $parameters = [];
         $additional_fields = [];
@@ -710,6 +798,9 @@ class Templates {
 
         $join = [];
         $field_list = "";
+        $group = "";
+        $order = "";
+        $limit_field = "";
 
         $arlo_location = !empty($atts['location']) ? $atts['location'] : null;
         $arlo_locationhidden = !empty($atts['locationhidden']) ? $atts['locationhidden'] : null;
@@ -818,13 +909,6 @@ class Templates {
 
         endif;
 
-        $group = '';
-        if (!empty($GLOBALS['arlo_group_template_by_id'])) {
-            $group = 'GROUP BY et.et_arlo_id';
-        } else {
-            $group = 'GROUP BY c.c_arlo_id, et.et_arlo_id';
-        }
-
         if(!empty($arlo_templatetag) || !empty($arlo_templatetaghidden)) :
 
             if (!empty($arlo_templatetag)) {
@@ -905,29 +989,37 @@ class Templates {
         } else if (!(isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true")) {
             $where .= ' AND (c.c_parent_id = (SELECT c_arlo_id FROM ' . $t4 . ' WHERE c_parent_id = 0 AND import_id = %d) OR c.c_parent_id IS NULL)';
             $parameters[] = $import_id;
-        }	
-        
-        $order = $limit_field = '';
-        $field_list .= 'et.et_id';
+        }
+
+        //grouping
+        $att_group = (empty($atts['group']) ? '' : $atts['group']);
+        switch ($att_group) {
+            case 'category':
+                $group = 'GROUP BY c.c_arlo_id, et.et_arlo_id';
+            break;
+            default:
+                $group = 'GROUP BY et.et_arlo_id';
+            break;
+        }
 
         if (!$for_pagination) {
             //ordering
-            $order = "ORDER BY et.et_name ASC";
-            
-            // if grouping is set...
-            if(isset($atts['group']) && !isset($GLOBALS['arlo_group_template_by_id'])) {
-                switch($atts['group']) {
-                    case 'category':
-                        $order = "ORDER BY c.c_order ASC, etc.et_order ASC, c.c_name ASC, et.et_name ASC";
-                    break;
-                }
+            switch ($att_group) {
+                case 'category':
+                    $order = "ORDER BY c.c_order ASC, etc.et_order ASC, c.c_name ASC, et.et_name ASC";
+                break;
+                default:
+                    $order = "ORDER BY et.et_name ASC";
+                break;
             }
-
+            
             $limit_field = " LIMIT $offset,$limit ";
 
             $field_list = "et.*, post.ID as post_id, etc.c_arlo_id, c.*, e.e_is_taxexempt" . ($additional_fields ? ' ,' . implode(' ,', $additional_fields) : '');
+        } else {
+            $field_list = "et.et_id";
         }
-        
+
         $sql = "
         SELECT
             $field_list 
@@ -954,6 +1046,56 @@ class Templates {
         } else {
             throw new \Exception("Couldn't prepapre SQL statement");
         }
+    }
+
+    private static function generate_bestoffer_list_sql($template_id, $region, $limit, $import_id) {
+        global $wpdb;
+
+        $t1 = "{$wpdb->prefix}arlo_offers";
+        $t2 = "{$wpdb->prefix}arlo_eventtemplates";
+        $t3 = "{$wpdb->prefix}arlo_events";
+        $t4 = "{$wpdb->prefix}arlo_onlineactivities";
+
+        $parameters = [];
+
+        $sql = "
+        SELECT
+            o.o_offeramounttaxexclusive,
+            o.o_offeramounttaxinclusive,
+            o.o_formattedamounttaxexclusive,
+            o.o_formattedamounttaxinclusive,
+            o.o_taxrateshortcode,
+            e.e_is_taxexempt
+        FROM 
+            $t1 o
+        LEFT JOIN $t2 et
+            ON et.et_id = o.et_id AND et.import_id = o.import_id
+        LEFT JOIN $t3 e
+            ON e.e_id = o.e_id AND e.import_id = o.import_id
+        LEFT JOIN $t4 oa
+            ON oa.oa_id = o.oa_id AND e.import_id = o.import_id
+        WHERE o.import_id = %d
+            AND (et.et_arlo_id = %d OR e.et_arlo_id = %d OR oa.oat_arlo_id = %d)";
+
+        $parameters[] = $import_id;
+        $parameters[] = $template_id; //et
+        $parameters[] = $template_id; //e
+        $parameters[] = $template_id; //oa
+
+        if ($region) {
+            $sql .= " AND o.o_region = %s";
+            $parameters[] = $region;
+        }
+
+        $sql .= "
+        GROUP BY o.o_offeramounttaxexclusive
+        ORDER BY o.o_offeramounttaxexclusive ASC
+        LIMIT %d";
+
+        $parameters[] = $limit;
+
+        $query = $wpdb->prepare($sql, $parameters);
+        return $query;
     }
 
     private static function shortcode_event_template_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {

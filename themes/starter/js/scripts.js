@@ -49,11 +49,23 @@ jQuery(function($){
         }
     }
 
+    var setDiscountAndLimited = function (container) {
+        // set the corner labels on Schedule page for Discount and Limited places
+        var $container = $(container);
+
+        $container.find('.arlo-event-discount:not(.arlo-event-full)').append('<div class="corner-label discount"></div>');
+        $container.find('.arlo-event-limited:not(.arlo-event-full)').append('<div class="corner-label places-limited"></div>');
+    }
+
+
     $(document).ready(function() {
         'use strict';
 
         setNumberOfEventColumns('.arlo#arlo');
         setNumberOfEvents();
+
+        setDiscountAndLimited('.arlo#arlo .scheduled-dates');
+
 
         // Animate in items
         function animateIn(className) {
@@ -160,8 +172,6 @@ jQuery(function($){
         }
 
         attachExpandEvents();
-
-        $(window).scroll(attachExpandEvents);
 
 
         function expandMobile(event,_this) {

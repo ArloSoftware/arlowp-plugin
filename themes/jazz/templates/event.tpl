@@ -3,14 +3,16 @@
         [arlo_event_template_summary wrap="<p>%s</p>"]
     </div>
 
-    [arlo_template_region_selector]
-    [arlo_event_filters buttonclass="arlo-button"]
-    [arlo_timezones wrap="<div class='arlo-timezone-toggle'>%s</div>"]
+    <div class="arlo-event-template-filters">
+        [arlo_template_region_selector wrap="<div class='arlo-region-selector'>%s</div>"]
+        [arlo_event_filters buttonclass="arlo-button"]
+        [arlo_timezones wrap="<div class='arlo-timezone-selector'><p>Live online events</p>%s</div>"]
+    </div>
 
     <ul class="arlo-list arlo-show-more events" data-show="3" data-show-text="Show more">
         [arlo_event_list]
         [arlo_event_list_item show="3"]
-        <li class="arlo-cf arlo-event arlo-background-color2">
+            <li class="arlo-cf arlo-event arlo-background-color2">
                 <div class="arlo-event-head">
                     <div class="arlo-date arlo-font2">
                         [arlo_event_start_date format="%d %B"]
@@ -34,7 +36,7 @@
                    [arlo_event_tags layout="list"]
                    [arlo_event_registration class="arlo-button"]
                 </div>
-        </li>
+            </li>
         [arlo_event_rich_snippet]
         [/arlo_event_list_item]
         [/arlo_event_list]

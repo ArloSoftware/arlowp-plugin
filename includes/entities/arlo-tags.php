@@ -108,4 +108,18 @@ class Tags {
 
 		return null;
 	}
+
+	public static function get_first_id_by_tag($tag, $import_id) {
+		if (empty($tag)) return null;
+
+		$condition = [
+			'tag' => $tag
+		];
+
+		$tag_obj = self::get($condition, 1, $import_id);
+		if (empty($tag_obj->id)) return null;
+
+		return $tag_obj->id;
+	}
+
 }

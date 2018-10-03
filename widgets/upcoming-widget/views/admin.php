@@ -4,15 +4,18 @@
 	
 	$tags = [];
 	if (!empty($import_id)) {
-		$tags = $wpdb->get_results(
+		$all_tags = $wpdb->get_results(
 			"SELECT DISTINCT
-				t.tag,
-				t.id
+				t.tag
 			FROM 
 				{$wpdb->prefix}arlo_tags AS t
 			WHERE 
 				t.import_id = $import_id
-			ORDER BY tag", ARRAY_A);	
+			ORDER BY t.tag", ARRAY_A);	
+	}
+
+	foreach ($all_tags as $tag) {
+		$tags[] = $tag['tag'];
 	}
 ?>
 
@@ -20,19 +23,21 @@
 <!-- This file is used to markup the administration form of the widget. -->
 <p>
 	<label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title',$this->widget_slug); ?>:</label>
-	<input type="text" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" class="widefat" value="<?php echo $title; ?>" />
+	<input type="text" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" class="widefat" value="<?php echo esc_attr($title); ?>" />
 </p>
 <p>
 	<label for="<?php echo $this->get_field_id('number'); ?>"><?php _e('Number of events to show',$this->widget_slug); ?>:</label>
-	<input type="text" id="<?php echo $this->get_field_id('number'); ?>" name="<?php echo $this->get_field_name('number'); ?>" size="3" value="<?php echo $number; ?>" />
+	<input type="text" id="<?php echo $this->get_field_id('number'); ?>" name="<?php echo $this->get_field_name('number'); ?>" size="3" value="<?php echo esc_attr($number); ?>" />
 </p>
 <p>
 	<label for="<?php echo $this->get_field_id('eventtag'); ?>"><?php _e('Filter by event tag',$this->widget_slug); ?>:</label>
 	<select id="<?php echo $this->get_field_id('eventtag'); ?>" name="<?php echo $this->get_field_name('eventtag'); ?>" class="widefat">
 		<option value="">All event tags</option>
 		<?php foreach($tags as $tag) {
-			$selected = $eventtag == $tag['id'] || $eventtag == $tag['tag'] ? 'selected' : '';
-			echo '<option value="' . $tag['id'] . '" ' . $selected . '>' . $tag['tag'] . "</option>";
+			if (!empty($tag)) {
+				$selected = (strcmp($tag, $eventtag) ? '' : 'selected');
+				echo '<option value="' . esc_attr($tag) . '" ' . $selected . '>' . esc_html($tag) . '</option>';
+			}
 		} ?>
 	</select>
 </p>
@@ -42,8 +47,10 @@
 	<select id="<?php echo $this->get_field_id('templatetag'); ?>" name="<?php echo $this->get_field_name('templatetag'); ?>" class="widefat">
 		<option value="">All template tags</option>
 		<?php foreach($tags as $tag) {
-			$selected = $templatetag == $tag['id'] || $templatetag == $tag['tag'] ? 'selected' : '';
-			echo '<option value="' . $tag['id'] . '" ' . $selected . '>' . $tag['tag'] . "</option>";
+			if (!empty($tag)) {
+				$selected = (strcmp($tag, $templatetag) ? '' : 'selected');
+				echo '<option value="' . esc_attr($tag) . '" ' . $selected . '>' . esc_html($tag) . '</option>';
+			}
 		} ?>
 	</select>
 </p>
@@ -53,5 +60,5 @@
 		$template = !empty($template) ? $template : $default_template;
 	?>
 	<label for="<?php echo $this->get_field_id('template'); ?>"><?php _e('Template',$this->widget_slug); ?>:</label>
-	<textarea id="<?php echo $this->get_field_id('template'); ?>" name="<?php echo $this->get_field_name('template'); ?>" class="widefat"><?php echo $template; ?></textarea>
+	<textarea id="<?php echo $this->get_field_id('template'); ?>" name="<?php echo $this->get_field_name('template'); ?>" class="widefat"><?php echo esc_html($template); ?></textarea>
 </p>

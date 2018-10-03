@@ -3,7 +3,9 @@
 .arlo-category-list,
 .arlo-category-list li,
 .arlo .arlo-event-credits,
-.arlo .arlo-event-credits li {
+.arlo .arlo-event-credits li,
+.arlo .arlo-event-template-credits,
+.arlo .arlo-event-template-credits li {
 	list-style-type: none;
 	list-style: none;
 	margin-left: 0;
@@ -172,6 +174,14 @@
 	font-size: 0.75em;
 }
 
+.arlo .arlo-timezone-selector {
+	margin: 0.5em 0 1em 0;
+}
+
+.arlo .arlo-timezone-selector p {
+	margin: 0px;
+}
+
 @media (min-width: 550px) {
 
 	.arlo .arlo-filters-buttons {
@@ -187,6 +197,7 @@
 		margin-bottom: 0;
 	}
 }
+
 
 /* utility classes */
 
@@ -231,6 +242,10 @@
 }
 
 .arlo .arlo-timezone-toggle select {
+	margin-right: 0.5em;
+	width: auto;
+}
+.arlo .arlo-timezone-selector select {
 	margin-right: 0.5em;
 	width: auto;
 }

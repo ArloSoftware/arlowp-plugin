@@ -1,3 +1,28 @@
+== V3.9 ==
+
+Enhancement
+------------------
+
+Improvement of the Starter themes
+New [arlo_event_template_advertised_price] shortcode
+New [arlo_event_template_advertised_presenters] shortcode
+New [arlo_event_template_credits] shortcode
+New [arlo_event_haslimitedplaces] shortcode
+Make Timezone selector [arlo_timezones] available on Upcoming page
+Better support for load balanced architectures
+
+Bugfixes
+------------------
+
+Venue map not showing on Venue page
+Multiple instance of upcoming widget are conflicting
+Upcoming widget do not keep event/template tag after import
+WordPress Menus and Custom Links including html in their text field are html-escaped
+Best event price (From) includes Events hidden from website
+Glitch on expand button on Starter theme
+Discount should not display on Online Activities if only applied to events
+
+
 == V3.8.1 ==
 
 Bugfixes
@@ -17,7 +42,6 @@ New "order" attribute for [arlo_event_price]
 New "period" option to show end date for [arlo_event_next_running]
 Year is added after the month used as a delimiter on the Upcoming page
 Add discount and places remaining corner labels on Schedule page of the "Starter template" theme
-
 
 Bugfixes
 ------------------

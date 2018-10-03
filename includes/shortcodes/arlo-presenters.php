@@ -107,7 +107,8 @@ class Presenters {
         global $wpdb;
 
         $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
-        $offset = (get_query_var('paged') && intval(get_query_var('paged')) > 0) ? intval(get_query_var('paged')) * $limit - $limit: 0 ;
+        $page = arlo_current_page();
+        $offset = ($page - 1) * $limit;
 
         $t1 = "{$wpdb->prefix}arlo_presenters";
         $t2 = "{$wpdb->prefix}posts";
