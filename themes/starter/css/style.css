@@ -875,8 +875,12 @@
 }
 
 
-.arlo-event-template-credits {
+.arlo-event-template-credits-list {
   float: right;
+}
+
+.arlo-event-template-credits-list ul.arlo-event-template-credits > li {
+  display: inline-block;
 }
 
 .arlo#arlo .pd-points-circle {
@@ -895,7 +899,7 @@
   color: white;
 }
 
-  .arlo#arlo:not(.arlo-xs) :not(.arlo-event-template-credits) .pd-points-circle {
+  .arlo#arlo:not(.arlo-xs) div:not(.arlo-event-template-credits-list) .pd-points-circle {
     position: absolute;
     right: 0;
     top: 50%;
@@ -3816,7 +3820,8 @@
 .arlo#arlo ul.no-style,
 .arlo#arlo ul.presenter-events,
 .arlo#arlo ol.no-style,
-.arlo#arlo ul.arlo-event-credits {
+.arlo#arlo ul.arlo-event-credits,
+.arlo#arlo ul.arlo-event-template-credits {
   list-style: none;
 }
 
@@ -3834,7 +3839,9 @@
 .arlo#arlo .presenter-events,
 .arlo#arlo .presenter-events li,
 .arlo#arlo ul.arlo-event-credits,
-.arlo#arlo ul.arlo-event-credits li {
+.arlo#arlo ul.arlo-event-credits li,
+.arlo#arlo ul.arlo-event-template-credits,
+.arlo#arlo ul.arlo-event-template-credits li {
   margin-left: 0;
   padding-left: 0;
 }

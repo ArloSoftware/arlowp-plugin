@@ -622,7 +622,7 @@ class Templates {
     }
 
     private static function shortcode_event_template_advertised_presenters($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        if(empty($GLOBALS['arlo_eventtemplate']['et_arlo_id'])) return;
+        if (empty($GLOBALS['arlo_eventtemplate']['et_arlo_id'])) return;
 
         $presenters = PresentersEntity::get(['template_id' => $GLOBALS['arlo_eventtemplate']['et_arlo_id']], null, null, $import_id);
         if (empty($presenters)) return;
@@ -639,23 +639,34 @@ class Templates {
     }
     
     private static function shortcode_event_template_credits($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        if(empty($GLOBALS['arlo_eventtemplate']['et_credits'])) return;
+        if (empty($GLOBALS['arlo_eventtemplate']['et_credits'])) return;
 
         // merge and extract attributes
         extract(shortcode_atts(array(
+            'layout' => 'list',
             'text' => '{%label%}: {%points%}'
         ), $atts, $shortcode_name, $import_id));
 
         $credits = json_decode($GLOBALS['arlo_eventtemplate']['et_credits']);
-        if (empty($credits)) return;
+        if (empty($credits) || !is_array($credits)) return;
 
-        $credit = $credits[0];
-        if (empty($credit->Type) || empty($credit->Value)) return;
-
-        $output = $text;
-        $output = str_replace('{%label%}', $credit->Type, $output);
-        $output = str_replace('{%points%}', $credit->Value, $output);
-
+        $output = '';
+        switch ($layout) {
+            default:
+                $output .= '<ul class="arlo-event-template-credits">';
+                foreach ($credits as $credit) {
+                    if (!empty($credit->Type) && !empty($credit->Value)) {
+                        $credit_type = esc_html($credit->Type);
+                        $credit_value = esc_html($credit->Value);
+                        $html = '<li>' . $text . '</li>';
+                        $html = str_replace('{%label%}', $credit_type, $html);
+                        $html = str_replace('{%points%}', $credit_value, $html);
+                        $output .= $html;
+                    }
+                }
+                $output .= '</ul>';
+            break;
+        }
         return $output;
     }
 
