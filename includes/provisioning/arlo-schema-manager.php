@@ -6,8 +6,8 @@ use Arlo\Logger;
 
 class SchemaManager {
 
-	const DB_SCHEMA_HASH = '04697113c07369eac11b52e4b3ca3a1f7523ad76';
-	const DB_SCHEMA_VERSION = '3.9.0';
+	const DB_SCHEMA_HASH = '77aa076cfb580ca0e4df33e299c78caa7297a989';
+	const DB_SCHEMA_VERSION = '4.0.0';
 
 	/* database layer */
 	private $dbl;
@@ -156,6 +156,8 @@ class SchemaManager {
 			et_registerprivateinteresturi text NULL,
 			et_credits varchar(255) NULL,
 			et_viewuri text NULL,
+			et_hero_image text NULL,
+			et_list_image text NULL,
 			et_region varchar(5) NULL,
 			PRIMARY KEY  (et_id),
 			KEY et_post_id (et_post_id), 
