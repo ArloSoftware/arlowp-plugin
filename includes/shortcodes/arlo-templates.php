@@ -807,6 +807,14 @@ class Templates {
         }
     }
 
+    private static function shortcode_event_template_hero_image($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if (empty($GLOBALS['arlo_eventtemplate']['et_hero_image'])) return;
+
+        $url = $GLOBALS['arlo_eventtemplate']['et_hero_image'];
+        $filename = basename($url);
+        return '<img src="' . esc_attr($url) . '" alt="' . esc_attr($filename) . '">';
+    }
+
 
     private static function generate_list_sql($atts, $import_id, $for_pagination = false) {
         global $wpdb;
