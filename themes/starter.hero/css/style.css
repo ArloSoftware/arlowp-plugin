@@ -2811,12 +2811,12 @@
   background-color: #f8d053;
 }
 
-.arlo#arlo:not(.arlo-sm) .schedule-item .corner-label {
-  left: -15px;
-  top: -15px;
-  height: 30px;
-  width: 30px;
-}
+  .arlo#arlo:not(.arlo-sm) .schedule-item .corner-label {
+    left: -15px;
+    top: -15px;
+    height: 30px;
+    width: 30px;
+  }
 
 .arlo#arlo .schedule-item .popover .popover-title {
   line-height: 1.5;
@@ -13548,6 +13548,7 @@
 
 .arlo#arlo p.arlo-suggest-private-datelocation {
     font-size: inherit;
+    font-weight: inherit;
 }
 
 .arlo#arlo .arlo-advertised-duration,

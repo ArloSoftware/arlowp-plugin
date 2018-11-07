@@ -895,8 +895,8 @@
 }
 
 .arlo#arlo .pd-points-circle-inverted {
- background-color: #6d5cae;
- color: white;
+  background-color: #6d5cae;
+  color: white;
 }
 
   .arlo#arlo:not(.arlo-xs) div:not(.arlo-event-template-credits-list) .pd-points-circle {
@@ -2718,7 +2718,7 @@
   background-color: #f8d053;
 }
 
-  .arlo#arlo.arlo-sm .schedule-item .corner-label {
+  .arlo#arlo:not(.arlo-sm) .schedule-item .corner-label {
     left: -15px;
     top: -15px;
     height: 30px;
@@ -4554,7 +4554,7 @@
 .arlo#arlo .arlo-show-more-link,
 .arlo#arlo .arlo-show-more-link:focus,
 .arlo#arlo .event .button.arlo-register,
-.arlo#arlo .online-activity .arlo-register{
+.arlo#arlo .online-activity .arlo-register {
   color: #fff;
   background-color: #4e5ec1;
   border-color: #4e5ec1;
@@ -13453,6 +13453,11 @@
     text-align: center;
 }
 
+.arlo#arlo p.arlo-suggest-private-datelocation {
+    font-size: inherit;
+    font-weight: inherit;
+}
+
 .arlo#arlo .arlo-advertised-duration,
 .arlo#arlo .arlo-advertised-price {
     line-height: 1;
@@ -13964,6 +13969,7 @@
 }
 
 .arlo .session-full {
+    clear: both;
     color: #f55753;
 }
 
