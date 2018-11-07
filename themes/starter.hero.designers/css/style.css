@@ -1,3 +1,13 @@
+/* Arlo Theme - Starter Template */
+
+/*
+  min-width matching from js added classes
+
+  .arlo#arlo:not(.arlo-xs)  -  @media (min-width: 767px)
+  .arlo#arlo:not(.arlo-sm)  -  @media (min-width: 992px)
+  .arlo#arlo:not(.arlo-md)  -  @media (min-width: 1100px)
+*/
+
 .arlo#arlo {
   color: #626262;
 }
@@ -895,8 +905,8 @@
 }
 
 .arlo#arlo .pd-points-circle-inverted {
- background-color: #6d5cae;
- color: white;
+  background-color: #6d5cae;
+  color: white;
 }
 
   .arlo#arlo:not(.arlo-xs) div:not(.arlo-event-template-credits-list) .pd-points-circle {
@@ -2501,6 +2511,7 @@
 .arlo#arlo .catalogue-item .template-details {
   border-left: 20px solid #584b8d;
   overflow: hidden;
+  padding: 20px;
 }
 .arlo#arlo .catalogue-item .template-details .corner-label {
   left: auto;
@@ -2561,6 +2572,88 @@
   .arlo#arlo.arlo-sm .filters {
     float: none !important;
   }
+
+
+.arlo#arlo .catalogue-item.has-thumbnail .image-thumbnail img {
+  width: 100%;
+}
+
+  .arlo#arlo:not(.arlo-xs) .catalogue-item.has-thumbnail .image-thumbnail {
+    width: 100%;
+    height: 303px;
+    z-index: -2;
+    background-size: cover;
+    background-color: #f2f2f2;
+    background-repeat: no-repeat;
+  }
+
+  .arlo#arlo:not(.arlo-xs) .catalogue-item.has-thumbnail .image-thumbnail img {
+    transition: transform .3s ease;
+  }
+
+  .arlo#arlo:not(.arlo-sm) .catalogue-item.has-thumbnail .image-thumbnail img {
+    width: auto;
+  }
+
+  .arlo#arlo:not(.arlo-md) .catalogue-item.has-thumbnail .image-thumbnail {
+    height: 240px;
+  }
+
+  .arlo#arlo:not(.arlo-xs) .catalogue-item.has-thumbnail .template-details {
+    position: relative;
+    height: 160px;
+    overflow: visible;
+    padding: 0;
+    background-color: #fff;
+  }
+
+  .arlo#arlo:not(.arlo-xs) .catalogue-item.has-thumbnail .template-details .align-top {
+    height: auto;
+    min-height: 160px;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    padding: 20px;
+    transition: transform .3s ease;
+    background-color: #fff;
+  }
+
+  .arlo#arlo:not(.arlo-xs) .catalogue-item.has-thumbnail .template-details .align-bottom {
+    position: absolute;
+    left: 20px;
+    bottom: 20px;
+  }
+
+  .arlo#arlo:not(.arlo-xs) .catalogue-item.has-thumbnail .template-details .name {
+    height: auto;
+    font-weight: 500;
+    font-size: 18px;
+  }
+
+  .arlo#arlo:not(.arlo-xs) .catalogue-item.has-thumbnail .template-details .summary {
+    height: 3em;
+    opacity: 0;
+    margin-bottom: 3.5em;
+    font-size: 16px;
+    line-height: 1.5em;
+    transition: opacity .3s ease;
+  }
+
+  .arlo#arlo:not(.arlo-xs) .catalogue-item.has-thumbnail:hover .image-thumbnail img {
+    -webkit-transform: scale(1.2);
+    transform: scale(1.2);
+  }
+
+  .arlo#arlo:not(.arlo-xs) .catalogue-item.has-thumbnail:hover .template-details .align-top {
+    transform: translateY(-40%);
+  }
+
+  .arlo#arlo:not(.arlo-xs) .catalogue-item.has-thumbnail:hover .template-details .summary {
+    display: block;
+    height: auto;
+    opacity: 1;
+  }
+
 
 .arlo#arlo .schedule-item {
   position: relative;

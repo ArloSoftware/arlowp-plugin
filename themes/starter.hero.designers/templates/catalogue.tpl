@@ -20,11 +20,16 @@
 [arlo_event_template_list_item group="category" limit="20"]
     [arlo_group_divider wrap="<h2 class='m-b-30 clearfix sm-p-r-0 sm-p-l-0 p-r-15 p-l-15'>%s</h2>"]
 
-        <div class="col-lg-4 col-md-6 col-xs-12 m-b-30 sm-m-b-20 md-no-padding catalogue-item">
-          <div class="drop-shadow bg-white">
-            <div class="sm-padding-15 padding-20 template-details relative">
-              <h4 class='m-t-0 m-l-0 m-r-0 m-b-10 truncate-2 sm-m-b-5 name'>[arlo_event_template_permalink wrap='<a href="%s">'][arlo_event_template_name]</a></h4>
-              <p class="normal-text muted truncate-4 hidden-xs summary">[arlo_event_template_summary]</p>
+        <div class="col-lg-4 col-md-6 col-xs-12 m-b-30 sm-m-b-20 md-no-padding catalogue-item has-thumbnail">
+          <div class="drop-shadow bg-white relative no-overflow">
+            <div class="image-thumbnail">
+              [arlo_event_template_list_image]
+            </div>
+            <div class="template-details relative">
+              <div class="align-top xs-padding-0 padding-20">
+                <h4 class='m-t-0 m-l-0 m-r-0 m-b-10 truncate-2 sm-m-b-5 name'>[arlo_event_template_permalink wrap='<a href="%s">'][arlo_event_template_name]</a></h4>
+                <p class="normal-text muted truncate-4 hidden-xs summary">[arlo_event_template_summary]</p>
+              </div>
               <div class="align-bottom">
 
                 [arlo_event_template_advertised_duration wrap='<p class="truncate-1 sm-m-b-0 duration"><i class="icons8-clock hidden-xs pull-left"></i> <span class="block m-l-20 xs-m-l-0">%s</span></p>']
@@ -36,7 +41,7 @@
               </a>
             </div>
 
-<div class="bg-master-lighter padding-20 block large-text hidden-xs">
+<div class="bg-master-lighter relative padding-20 block large-text hidden-xs">
             [arlo_event_next_running text='View upcoming dates ({%count%})']
 </div>
 
