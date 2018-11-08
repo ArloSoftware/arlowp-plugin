@@ -20,7 +20,7 @@
 		[arlo_upcoming_list_item limit="20"]
 	    [arlo_group_divider wrap="<h2 class='m-b-30 clearfix sm-p-r-0 sm-p-l-0 p-r-15 p-l-15'>%s</h2>"]
 		<div class="col-lg-4 col-md-6 col-xs-12 m-b-30 md-m-b-20 md-no-padding">
-			<div class="event-card text-center has-label" href="#">
+			<div class="event-card text-center has-label has-thumbnail" href="#">
 			  <div class="card-front bg-white h-v-centre-container drop-shadow">
 
 			    [arlo_event_isfull output="Sold out" wrap='<div class="arlo-event-label arlo-full text-white bg-danger">%s</div>']
@@ -29,18 +29,26 @@
 
 			    <div class="event-content-wrapper">
 
-			      <div class="event-content md-p-l-70 md-p-b-10 md-p-t-10 md-p-r-0 xl-p-r-20 xl-p-l-20 lg-p-r-20 lg-p-l-20 centered">
-
-		            [arlo_event_template_permalink wrap='<a class="name" href="%s">']<span class="large-text">[arlo_event_template_name]</span></a>
-			        <p class="text-primary text-uppercase location md-no-margin"><i class="icons8-marker"></i> [arlo_event_location]</p>
+			      <div class="image-thumbnail">
+			        [arlo_event_template_list_image]
 			      </div>
 
-			      <div class="date padding-10">
-			        <h4 class="day no-margin">[arlo_event_dates startdateformat="%e %b" enddateformat="%e %b"]</h4>
-			      </div>
+			      <div class="event-content md-p-l-0 md-p-b-10 md-p-t-10 md-p-r-0 xl-p-r-10 xl-p-l-70 xl-p-t-10 xl-p-b-10 lg-p-r-10 lg-p-l-70 lg-p-t-10 lg-p-b-10">
 
-			      
-		          [arlo_event_price wrap='<div class="price padding-10 text-left">%s</div>']
+			        <div class="date padding-5">
+			          <h4 class="day no-margin">[arlo_event_start_date format="%e"]</h4>
+			          <h5 class="month no-margin">[arlo_event_start_date format="%b"]</h5>
+			        </div>
+
+			        <div class="md-p-l-70">
+			          <h4 class="name no-margin">
+			            [arlo_event_template_permalink wrap='<a href="%s">'][arlo_event_template_name]</a>
+			          </h4>
+			          <p class="text-primary text-uppercase location md-no-margin"><i class="icons8-marker"></i> [arlo_event_location]</p>
+			          [arlo_event_price wrap='<div class="price hidden-sm text-right md-p-t-0 lg-p-t-10 xl-p-t-10">%s</div>']
+			        </div>
+
+			      </div>
 
 			      <a class="btn-expand">
 			        <i class="fa fa-angle-down" aria-hidden="true"></i>
@@ -49,8 +57,7 @@
 
 			    <div class="collapse event-expandable">
 
-			      <p>[arlo_event_dates startdateformat="%A, %e %B %G" enddateformat="%A, %e %B %G"]
-</p>
+			      <p>[arlo_event_dates startdateformat="%A, %e %B %G" enddateformat="%A, %e %B %G"]</p>
 			      <p class="muted">[arlo_event_start_date format="%I:%M %p"] - [arlo_event_end_date format="%I:%M %p"] ([arlo_event_duration])</p>
 
 			      [arlo_event_provider wrap='<div class="m-t-10 m-b-10">Provided by %s</div>']

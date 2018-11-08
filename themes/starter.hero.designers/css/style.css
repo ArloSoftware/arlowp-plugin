@@ -1463,6 +1463,138 @@
 .arlo#arlo .event-card .card-back .corner-label.limited-places div {
   font-size: 24px;
 }
+
+
+.arlo#arlo .event-card.has-thumbnail .event-content-wrapper {
+  min-height: 0;
+  background-color: #f2f2f2;
+  background-repeat: no-repeat;
+}
+
+.arlo#arlo .event-card.has-thumbnail .image-thumbnail img {
+  width: 100%;
+}
+
+.arlo#arlo .event-card.has-thumbnail .event-content {
+  position: relative;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, .95);
+  text-align: left;
+}
+
+.arlo#arlo .event-card.has-thumbnail .event-content .name a {
+  color: #626262;
+}
+
+.arlo#arlo .event-card.has-thumbnail .event-content .date {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 60px;
+  height: 100%;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  background-color: #6D5CAE;
+}
+
+.arlo#arlo .event-card.has-thumbnail .event-content .date .day {
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 500;
+}
+
+.arlo#arlo .event-card.has-thumbnail .event-content .date .month {
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.arlo#arlo .event-card.has-thumbnail .event-content .date .day,
+.arlo#arlo .event-card.has-thumbnail .event-content .date .month {
+  color: #FFFFFF !important;
+}
+
+  .arlo#arlo:not(.arlo-sm) .event-card.has-thumbnail {
+    height: 303px;
+  }
+
+  .arlo#arlo:not(.arlo-sm) .event-card.has-thumbnail .image-thumbnail {
+    text-align: left;
+  }
+
+  .arlo#arlo:not(.arlo-sm) .event-card.has-thumbnail .image-thumbnail img {
+    width: auto;
+  }
+
+  .arlo#arlo:not(.arlo-sm) .event-card.has-thumbnail .event-content {
+    position: absolute;
+    min-height: 70px;
+  }
+
+  .arlo#arlo:not(.arlo-sm) .event-card.has-thumbnail .event-content .name {
+    font-size: 18px;
+    font-weight: normal;
+    line-height: 1.4;
+    text-align: left;
+  }
+
+  .arlo#arlo:not(.arlo-sm) .event-card.has-thumbnail .event-content > .date .start-date .month {
+    position: static;
+    transform: none;
+  }
+
+  .arlo#arlo:not(.arlo-sm) .event-card.has-thumbnail .event-content > .date .date-sep {
+    display: none;
+  }
+
+  .arlo#arlo:not(.arlo-sm) .event-card.has-thumbnail .event-content > .date .end-date {
+    padding-left: 0;
+    line-height: 1.4;
+    opacity: 0.6;
+  }
+
+  .arlo#arlo:not(.arlo-sm) .event-card.has-thumbnail .event-content > .date .end-date .day,
+  .arlo#arlo:not(.arlo-sm) .event-card.has-thumbnail .event-content > .date .end-date .month {
+    display: inline-block;
+    font-size: 10px;
+  }
+
+  .arlo#arlo:not(.arlo-sm) .event-card.has-thumbnail .event-content > .date .end-date .day:before {
+    content: "-";
+    margin-right: 1px;
+  }
+
+  .arlo#arlo:not(.arlo-sm) .event-card.has-thumbnail .event-content > .date .end-date .month {
+    margin-left: 3px !important;
+  }
+
+  .arlo#arlo:not(.arlo-sm) .event-card.has-thumbnail .event-content .location {
+    float: left;
+    font-size: 12px;
+    font-weight: 400;
+  }
+
+  .arlo#arlo:not(.arlo-sm) .event-card.has-thumbnail .event-content .price {
+    float: right;
+  }
+
+  .arlo#arlo:not(.arlo-sm) .event-card.has-thumbnail .card-back .summary {
+    height: 10.5em;
+  }
+
+  .arlo#arlo:not(.arlo-md) .event-card.has-thumbnail {
+    height: 240px;
+  }
+
+  .arlo#arlo:not(.arlo-md) .event-card.has-thumbnail .card-back .summary {
+    height: 6em;
+  }
+
+
 .arlo#arlo .truncate-1,
 .arlo#arlo .truncate-2,
 .arlo#arlo .truncate-3,
@@ -13974,6 +14106,24 @@
   height: 80px;
   width: 80px;
   padding-top: 60px;
+}
+
+.arlo#arlo .event-card.has-thumbnail .card-front .arlo-event-label {
+  z-index: 3;
+}
+
+.arlo#arlo:not(.arlo-sm) .event-card.has-thumbnail .card-front .arlo-event-label {
+  top: -60px;
+  right: -65px;
+  padding-top: 85px;
+  transform: rotate(45deg);
+  width: 120px;
+  height: 120px;
+}
+
+.arlo#arlo:not(.arlo-sm) .event-card.has-thumbnail .card-front .arlo-event-label.arlo-full,
+.arlo#arlo:not(.arlo-sm) .event-card.has-thumbnail .card-front .arlo-event-label.arlo-discount {
+  padding-top: 95px;
 }
 
 .arlo#arlo.arlo-sm .arlo-filter-region {

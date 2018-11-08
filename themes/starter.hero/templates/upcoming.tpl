@@ -28,25 +28,25 @@
 			    [arlo_event_haslimitedplaces output="Limited places" wrap='<div class="arlo-event-label arlo-limited-places text-white bg-warning">%s</div>']
 
 			    <div class="event-content-wrapper">
-					
-            <div class="image-thumbnail">
-              [arlo_event_template_list_image]
-            </div>
+
+			      <div class="image-thumbnail">
+			        [arlo_event_template_list_image]
+			      </div>
 
 			      <div class="event-content md-p-l-0 md-p-b-10 md-p-t-10 md-p-r-0 xl-p-r-10 xl-p-l-70 xl-p-t-10 xl-p-b-10 lg-p-r-10 lg-p-l-70 lg-p-t-10 lg-p-b-10">
 
-							<div class="date padding-5">
-								<h4 class="day no-margin">[arlo_event_start_date format="%e"]</h4>
-								<h5 class="month no-margin">[arlo_event_start_date format="%b"]</h5>
-							</div>
+			        <div class="date padding-5">
+			          <h4 class="day no-margin">[arlo_event_start_date format="%e"]</h4>
+			          <h5 class="month no-margin">[arlo_event_start_date format="%b"]</h5>
+			        </div>
 
-							<div class="md-p-l-70">
-								<h4 class="name no-margin">
-									[arlo_event_template_permalink wrap='<a href="%s">'][arlo_event_template_name]</a>
-								</h4>
-								<p class="text-primary text-uppercase location md-no-margin"><i class="icons8-marker"></i> [arlo_event_location]</p>
-								[arlo_event_price wrap='<div class="price hidden-sm text-right md-p-t-0 lg-p-t-10 xl-p-t-10">%s</div>']
-							</div>
+			        <div class="md-p-l-70">
+			          <h4 class="name no-margin">
+			            [arlo_event_template_permalink wrap='<a href="%s">'][arlo_event_template_name]</a>
+			          </h4>
+			          <p class="text-primary text-uppercase location md-no-margin"><i class="icons8-marker"></i> [arlo_event_location]</p>
+			          [arlo_event_price wrap='<div class="price hidden-sm text-right md-p-t-0 lg-p-t-10 xl-p-t-10">%s</div>']
+			        </div>
 
 			      </div>
 
