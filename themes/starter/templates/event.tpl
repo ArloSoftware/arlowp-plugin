@@ -1,11 +1,11 @@
 <div class="arlo" id="arlo">
-	[arlo_template_region_selector wrap="<div class='arlo-region-selector'>%s</div>"]
-
 	[arlo_event_template_credits text='<div class="pd-points-circle pd-points-circle-inverted m-b-15 m-l-10"><span class="points">{%points%}</span><span class="points-label">{%label%}</span></div>' wrap='<div class="arlo-event-template-credits-list hidden-sm">%s</div>']
 	[arlo_event_template_summary wrap="<p>%s</p>"]
 	[arlo_event_template_advertised_duration wrap='<div class="arlo-advertised-duration muted m-b-15 inline m-r-20"><i class="icons8-clock pull-left m-r-5"></i> %s</div>']
 	[arlo_event_template_advertised_price wrap='<div class="arlo-advertised-price muted m-b-15 inline m-r-20"><i class="icons8-us-dollar pull-left m-r-5"></i> %s</div>']
 	[arlo_event_template_advertised_presenters wrap='<div class="arlo-advertised-presenters muted m-b-15 inline m-r-20"><i class="icons8-user pull-left m-r-5"></i> %s</div>']
+
+	[arlo_template_region_selector wrap="<div class='arlo-region-selector'>%s</div>"]
 
 	<div class="arlo-event-template-filters clearfix collapse" id="filters">
 		[arlo_event_filters filters="location,delivery"]
