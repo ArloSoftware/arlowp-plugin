@@ -885,11 +885,11 @@
 }
 
 
-.arlo-event-template-credits-list {
+.arlo#arlo .arlo-event-template-credits-list {
   float: right;
 }
 
-.arlo-event-template-credits-list ul.arlo-event-template-credits > li {
+.arlo#arlo .arlo-event-template-credits-list ul.arlo-event-template-credits > li {
   display: inline-block;
 }
 
