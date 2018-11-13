@@ -1,6 +1,5 @@
 <div class="arlo" id="arlo">
 
-
 	<div class="arlo-hero-container">
 		[arlo_event_template_hero_image]
 
@@ -13,7 +12,6 @@
 			[arlo_event_template_credits text='<div class="banner-item muted sm-m-b-10 m-b-15 inline m-r-20"><i class="icons8-prize pull-left m-r-5"></i><span class="">{%points%} {%label%}</span></div>' wrap='<div class="arlo-event-template-credits-list-lined hidden"> %s</div>']
 		</div>
 	</div>
-
 
 	[arlo_template_region_selector wrap="<div class='arlo-region-selector'>%s</div>"]
 

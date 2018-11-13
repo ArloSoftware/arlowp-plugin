@@ -8514,14 +8514,6 @@
 .arlo#arlo .count-down h1 {
   font-size: 61px;
 }
-.arlo#arlo .lazy {
-  opacity: 0;
-  -webkit-transition: opacity 0.3s ease;
-  transition: opacity 0.3s ease;
-}
-.arlo#arlo .lazy.loaded {
-  opacity: 1;
-}
 .arlo#arlo .bg-overlay {
   -webkit-transition: opacity 0.3s ease;
   transition: opacity 0.3s ease;
