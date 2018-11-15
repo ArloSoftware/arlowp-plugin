@@ -362,11 +362,11 @@ class Arlo_For_Wordpress_Settings {
 
 		add_settings_field(
 			'arlo_keep_settings_on_delete_setting', 
-			'<label for="keep_settings">'.__('Keep settings when deleting the plugin (highly recommended)', 'arlo-for-wordpress' ).'</label>', 
-			array($this, 'arlo_keep_settings_checkbox_callback'), 
+			'<label for="arlo_keep_settings_on_delete">'.__('Keep settings when deleting the plugin (highly recommended)', 'arlo-for-wordpress' ).'</label>', 
+			array($this, 'arlo_checkbox_callback'), 
 			$this->plugin_slug, 
 			'arlo_misc_section', 
-			[]);
+			['option_name' => 'keep_settings']);
 
 		add_settings_field(
 			'arlo_fragmented_import_setting', 
@@ -401,7 +401,6 @@ class Arlo_For_Wordpress_Settings {
 			$this->plugin_slug, 
 			'arlo_misc_section', 
 			['option_name' => 'disable_ssl_verification']);
-								
 			
 		add_settings_field(
 			'arlo_download_log_setting', 
@@ -590,16 +589,6 @@ class Arlo_For_Wordpress_Settings {
         if (!empty($args['html'])) {
             $html .= $args['html'];
         }
-
-	    echo $html;
-	}
-
-	function arlo_keep_settings_checkbox_callback($args) {
-		$nuke = get_option("arlo_nuke_on_delete", 0);
-
-		$html = '<div id="'.ARLO_PLUGIN_PREFIX.'-keep_settings" class="cf">';
-		$html .= '<input type="checkbox" value="1" name="arlo_settings[keep_settings]" id="keep_settings" ' . ($nuke != 1 ? 'checked="checked"' : '') . '>';
-		$html .= '</div>';
 
 	    echo $html;
 	}

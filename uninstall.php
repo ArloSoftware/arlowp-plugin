@@ -31,8 +31,8 @@ function arlo_uninstall() {
 	arlo_delete_cookies();
 
 	// Nuke all settings if "Keep settings..." is unchecked
-	$nuke = get_option("arlo_nuke_on_delete", 0);
-	if (!empty($nuke)) {
+	$settings = get_option('arlo_settings');
+	if (empty($settings['keep_settings'])) {
 
 		arlo_delete_important_options();
 
@@ -130,7 +130,6 @@ function arlo_delete_important_options() {
 
 	$options = [
 		'arlo_schema_version',
-		'arlo_nuke_on_delete',
 		'arlo_settings',
 		'arlo_regions',
 		'arlo_theme',

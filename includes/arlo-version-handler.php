@@ -126,6 +126,10 @@ class VersionHandler {
 		if (version_compare($old_version, '3.6') < 0) {
 			$this->do_update('3.6');
 		}
+
+		if (version_compare($old_version, '4.0') < 0) {
+			$this->do_update('4.0');
+		}
 	}
 	
 	private function run_pre_data_update($version) {
@@ -770,6 +774,12 @@ class VersionHandler {
 				}
 
 				update_option('arlo_filter_settings', $filter_settings);
+			break;
+
+			case '4.0':
+				$settings = get_option('arlo_settings');
+				$settings['keep_settings'] = "1";
+				update_option('arlo_settings', $settings);
 			break;
 
 		}	

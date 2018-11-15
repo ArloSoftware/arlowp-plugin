@@ -1559,6 +1559,7 @@ class Arlo_For_Wordpress {
 		
 		if (empty($settings['platform_name'])) {
 			$settings['platform_name'] = Arlo_For_Wordpress::DEFAULT_PLATFORM;
+			$settings['keep_settings'] = "1";
 		}
 		
 		$error = [];

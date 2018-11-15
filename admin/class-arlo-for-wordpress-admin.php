@@ -553,12 +553,6 @@ class Arlo_For_Wordpress_Admin {
 			$new['sleep_between_import_tasks'] = \Arlo\Scheduler::MAX_SLEEP_BETWEEN_TASKS;
 		}
 
-		if (empty($new['keep_settings']) || $new['keep_settings'] != 1) { //unchecked
-			update_option("arlo_nuke_on_delete", 1);
-		} else {
-			update_option("arlo_nuke_on_delete", 0);
-		}
-
 		if (!empty($old["custom_shortcodes"])) {
 			$new["custom_shortcodes"] = $old["custom_shortcodes"];
 		} else {
@@ -594,7 +588,6 @@ class Arlo_For_Wordpress_Admin {
 		unset($new["new_custom_shortcode"]);
 		unset($new["new_custom_shortcode_type"]);
 		unset($new["delete_shortcode"]);
-		unset($new["keep_settings"]);
 
 		return $new;
 	}
