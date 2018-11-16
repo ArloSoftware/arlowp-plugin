@@ -101,8 +101,12 @@ class Arlo_For_Wordpress_Settings {
 				exit;
 			}
 
-			if (!empty($_GET['apply-theme']) && isset($_GET['_wpnonce']) && wp_verify_nonce($_GET['_wpnonce'], 'arlo-apply-theme-nonce')) {
-				$theme_id = $_GET['apply-theme'];
+			$apply_theme = filter_input(INPUT_GET, 'apply-theme', FILTER_SANITIZE_STRING);
+			$wpnonce = filter_input(INPUT_GET, '_wpnonce', FILTER_SANITIZE_STRING);
+			$reset = filter_input(INPUT_GET, 'reset', FILTER_SANITIZE_STRING);
+
+			if (!empty($apply_theme) && !empty($wpnonce) && wp_verify_nonce($wpnonce, 'arlo-apply-theme-nonce')) {
+				$theme_id = $apply_theme;
 				$theme_manager = $plugin->get_theme_manager();
 				
 				if ($theme_manager->is_theme_valid($theme_id)) {
@@ -110,7 +114,7 @@ class Arlo_For_Wordpress_Settings {
 					$stored_themes_settings = get_option( 'arlo_themes_settings', [] );
 
 					//check if there is already a stored settings for the theme, or need to be reset
-					if ((!empty($_GET['reset']) && $_GET['reset'] == 1) || empty($stored_themes_settings[$theme_id])) {
+					if ((!empty($reset) && $reset == 1) || empty($stored_themes_settings[$theme_id])) {
 						$stored_themes_settings[$theme_id] = $theme_settings[$theme_id];
 						$stored_themes_settings[$theme_id]->templates = $theme_manager->load_default_templates($theme_id);
 					}
@@ -140,10 +144,12 @@ class Arlo_For_Wordpress_Settings {
 			$urlparts = parse_url(site_url());
 			$domain = $urlparts['host'];
 
-			if (!empty($_GET['delete-shortcode']) && isset($_GET['_wpnonce']) && wp_verify_nonce($_GET['_wpnonce'], 'arlo-delete-shortcode-nonce')) {
+			$delete_shortcode = filter_input(INPUT_GET, 'delete-shortcode', FILTER_SANITIZE_STRING);
+
+			if (!empty($delete_shortcode) && !empty($wpnonce) && wp_verify_nonce($wpnonce, 'arlo-delete-shortcode-nonce')) {
 				unset( $_COOKIE['arlo-vertical-tab'] );
 				setcookie('arlo-vertical-tab', null, -1, '/', $domain);
-				$settings_object["delete_shortcode"] = $_GET['delete-shortcode'];
+				$settings_object["delete_shortcode"] = $delete_shortcode;
 				update_option('arlo_settings', $settings_object);
 				wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages') );
 			}

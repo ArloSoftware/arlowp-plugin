@@ -516,8 +516,9 @@ function arlo_current_page() {
 	$page = 0;
 
 	//not sure why we watch that one first
-	if (!empty($_GET['paged'])) {
-		$page = intval($_GET['paged']);
+	$paged = filter_input(INPUT_GET, 'paged', FILTER_SANITIZE_STRING);
+	if (!empty($paged)) {
+		$page = intval($paged);
 	}
 	//the normal one used on post/pages
 	else if(!empty(get_query_var('paged'))) {

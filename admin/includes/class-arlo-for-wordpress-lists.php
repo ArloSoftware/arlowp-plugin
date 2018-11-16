@@ -102,15 +102,18 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	}
 	
 	private function init_sql_variables() {
+		$order = filter_input(INPUT_GET, 'order', FILTER_SANITIZE_STRING);
+		$paged = filter_input(INPUT_GET, 'paged', FILTER_SANITIZE_STRING);
+
 		$this->orderby = $this->get_orderby_columnname();
-		$this->order = (!empty($_GET['order']) && in_array(strtolower($_GET['order']), ['asc','desc']) ? $_GET['order'] : '');
+		$this->order = (!empty($order) && in_array(strtolower($order), ['asc','desc']) ? $order : '');
 		
-		$this->paged = !empty($_GET["paged"]) ? intval($_GET["paged"]) : 1;	
+		$this->paged = !empty($paged) ? intval($paged) : 1;	
 		$this->paged = ($this->paged <= 0 ? 1 : $this->paged);
 	}
 	
 	private function get_orderby_columnname() {
-		$orderby = (!empty($_GET['orderby']) ? $_GET['orderby'] : '');
+		$orderby = filter_input(INPUT_GET, 'orderby', FILTER_SANITIZE_STRING);
 		$columns = $this->_column_headers[2];
 				
 		if (!empty($orderby)) {
@@ -144,28 +147,35 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	}
 	
 	private function get_sql_search_where_array() {
-		$where = array();		
-		if (!empty($_GET['s'])) {
+		$where = array();
+
+		$s = filter_input(INPUT_GET, 's', FILTER_SANITIZE_STRING);
+		$et_id = filter_input(INPUT_GET, 'et_id', FILTER_SANITIZE_STRING);
+		$ep_e_id = filter_input(INPUT_GET, 'ep_e_id', FILTER_SANITIZE_STRING);
+		$v_e_id = filter_input(INPUT_GET, 'v_e_id', FILTER_SANITIZE_STRING);
+		$e_parent_id = filter_input(INPUT_GET, 'e_parent_id', FILTER_SANITIZE_STRING);
+
+		if (!empty($s)) {
 			$search_fields = $this->get_searchable_fields();
 			foreach ($search_fields as $field) {
-				$where[] = $field . " LIKE '%" . esc_sql(wp_unslash($_GET['s'])) . "%'";
+				$where[] = $field . " LIKE '%" . esc_sql(wp_unslash($s)) . "%'";
 			}
 		}
 		
-		if (!empty($_GET['et_id']) && !empty(self::$filter_column_mapping['et_id']) && intval($_GET['et_id'] > 0)) {
-			$where[] = self::$filter_column_mapping['et_id'] .' = ' . intval($_GET['et_id']);
+		if (!empty($et_id) && !empty(self::$filter_column_mapping['et_id']) && intval($et_id > 0)) {
+			$where[] = self::$filter_column_mapping['et_id'] .' = ' . intval($et_id);
 		}
 		
-		if (!empty($_GET['ep_e_id']) && !empty(self::$filter_column_mapping['ep_e_id']) && intval($_GET['ep_e_id'] > 0)) {
-			$where[] = self::$filter_column_mapping['ep_e_id'] .' = ' . intval($_GET['ep_e_id']);
+		if (!empty($ep_e_id) && !empty(self::$filter_column_mapping['ep_e_id']) && intval($ep_e_id > 0)) {
+			$where[] = self::$filter_column_mapping['ep_e_id'] .' = ' . intval($ep_e_id);
 		}
 
-		if (!empty($_GET['v_e_id']) && !empty(self::$filter_column_mapping['v_e_id']) && intval($_GET['v_e_id'] > 0)) {
-			$where[] = self::$filter_column_mapping['v_e_id'] .' = ' . intval($_GET['v_e_id']);
+		if (!empty($v_e_id) && !empty(self::$filter_column_mapping['v_e_id']) && intval($v_e_id > 0)) {
+			$where[] = self::$filter_column_mapping['v_e_id'] .' = ' . intval($v_e_id);
 		}
 
-		if (!empty($_GET['e_parent_id']) && !empty(self::$filter_column_mapping['e_parent_id']) && intval($_GET['e_parent_id'] > 0)) {
-			$where[] = self::$filter_column_mapping['e_parent_id'] .' = ' . intval($_GET['e_parent_id']);
+		if (!empty($e_parent_id) && !empty(self::$filter_column_mapping['e_parent_id']) && intval($e_parent_id > 0)) {
+			$where[] = self::$filter_column_mapping['e_parent_id'] .' = ' . intval($e_parent_id);
 		}
 	
 

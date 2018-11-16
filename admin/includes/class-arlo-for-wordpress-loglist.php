@@ -63,15 +63,19 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 	}
 	
 	private function init_sql_variables() {
+		$order = filter_input(INPUT_GET, 'order', FILTER_SANITIZE_STRING);
+		$paged = filter_input(INPUT_GET, 'paged', FILTER_SANITIZE_STRING);
+
 		$this->orderby = $this->get_orderby_columnname();
-		$this->order = (!empty($_GET['order']) && in_array(strtolower($_GET['order']), ['asc','desc']) ? $_GET['order'] : 'desc');
+		$this->order = (!empty($order) && in_array(strtolower($order), ['asc','desc']) ? $order : 'desc');
 		
-		$this->paged = !empty($_GET["paged"]) ? intval($_GET["paged"]) : 1;	
+		$this->paged = !empty($paged) ? intval($paged) : 1;	
 		$this->paged = ($this->paged <= 0 ? 1 : $this->paged);
 	}
 	
 	private function get_orderby_columnname() {
-		$orderby = (!empty($_GET['orderby']) ? $_GET['orderby'] : 'id');
+		$orderby = filter_input(INPUT_GET, 'orderby', FILTER_SANITIZE_STRING);
+		$orderby = (!empty($orderby) ? $orderby : 'id');
 		$columns = $this->_column_headers[2];
 				
 		if (!empty($orderby)) {
@@ -105,11 +109,14 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 	}
 
 	private function get_sql_search_where_array() {
-		$where = array();		
-		if (!empty($_GET['s'])) {
+		$where = array();
+
+		$s = filter_input(INPUT_GET, 's', FILTER_SANITIZE_STRING);
+
+		if (!empty($s)) {
 			$search_fields = $this->get_searchable_fields();
 			foreach ($search_fields as $field) {
-				$where[] = $field . " LIKE '%" . esc_sql(wp_unslash($_GET['s'])) . "%'";
+				$where[] = $field . " LIKE '%" . esc_sql(wp_unslash($s)) . "%'";
 			}
 		}
 		return $where;	

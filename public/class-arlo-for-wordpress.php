@@ -1775,7 +1775,8 @@ class Arlo_For_Wordpress {
 	
 	
 	public function arlo_terminate_task_callback() {
-		$task_id = intval($_POST['taskID']);
+		$task_id_string = filter_input(INPUT_POST, 'taskID', FILTER_SANITIZE_STRING);
+		$task_id = intval($task_id_string);
 		if ($task_id > 0) {
 			
 			//need to terminate all the upcoming immediate tasks
@@ -1791,8 +1792,8 @@ class Arlo_For_Wordpress {
 	
 	
 	public function arlo_get_task_info_callback() {
-		$task_id = intval($_POST['taskID']);
-		
+		$task_id_string = filter_input(INPUT_POST, 'taskID', FILTER_SANITIZE_STRING);
+		$task_id = intval($task_id_string);
 		if ($task_id > 0) {
 			$task = $this->get_scheduler()->get_tasks(null, null, $task_id);
 			
@@ -1803,7 +1804,8 @@ class Arlo_For_Wordpress {
 	}
 	
 	public function dismiss_message_callback() {
-		$id = intval($_POST['id']);
+		$id_string = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_STRING);
+		$id = intval($id_string);
 		
 		if ($id > 0) {			
 			$this->get_message_handler()->dismiss_message($id);
@@ -1821,9 +1823,10 @@ class Arlo_For_Wordpress {
 	}		
 	
 	
-	public function dismissible_notice_callback() {		
-		if (!empty($_POST['id'])) {
-			$this->get_notice_handler()->dismiss_user_notice($_POST['id']);
+	public function dismissible_notice_callback() {
+		$id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_STRING);
+		if (!empty($id)) {
+			$this->get_notice_handler()->dismiss_user_notice($id);
 		}		
 		
 		echo 0;
