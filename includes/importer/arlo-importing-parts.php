@@ -16,32 +16,59 @@ class ImportingParts {
 
 	public function add_import_part($part, $iteration, $content, $import_id) {
         $utc_date = gmdate("Y-m-d H:i:s");
-        
+
         if (is_null($iteration)) { // as prepare() do not support null values
             $sql = "INSERT INTO 
                     {$this->table_name}
-                    (import_id, part, import_text, created)
+                    (import_id, part, created)
                 VALUES
-                    (%s, %s, %s, %s)
+                    (%s, %s, %s)
                 ";
 
-            $query = $this->dbl->prepare($sql, $import_id, $part, $content, $utc_date);
+            $query = $this->dbl->prepare($sql, $import_id, $part, $utc_date);
         } else {
             $sql = "INSERT INTO 
                     {$this->table_name}
-                    (import_id, part, iteration, import_text, created)
+                    (import_id, part, iteration, created)
                 VALUES
-                    (%s, %s, %d, %s, %s)
+                    (%s, %s, %d, %s)
                 ";
 
-            $query = $this->dbl->prepare($sql, $import_id, $part, $iteration, $content, $utc_date);
+            $query = $this->dbl->prepare($sql, $import_id, $part, $iteration, $utc_date);
         }
 
         $inserted = $this->dbl->query($query);
+        $insert_id = $this->dbl->insert_id;
 
-        if (!$inserted) return false;
+        if (empty($inserted) || empty($insert_id)) return false;
 
-        return $this->dbl->insert_id;
+
+        // insert by chunks
+
+        $size = 512 * 1024;
+        $offset = 0;
+        $chunk = substr($content, $offset, $size);
+
+        while (!empty($chunk)) {
+            usleep(10000); // 10 ms.
+
+            $sql = "UPDATE 
+                    {$this->table_name}
+                SET
+                    import_text = CONCAT_WS('', import_text, %s)
+                WHERE
+                    id = %d
+                ";
+
+            $query = $this->dbl->prepare($sql, $chunk, $insert_id);
+
+            $updated = $this->dbl->query($query);
+
+            $offset += $size;
+            $chunk = substr($content, $offset, $size);
+        }
+
+        return $insert_id;
     }
     
     public function get_import_part($part, $iteration, $import_id) {
