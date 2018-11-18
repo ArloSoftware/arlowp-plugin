@@ -23,7 +23,7 @@ class SystemRequirements {
 			],
 			[
 				'name' => 'WordPress version',
-				'expected_value' => '4.4',
+				'expected_value' => '4.7',
 				'current_value' => function () {
 					if (!isset($GLOBALS['wp_version'])) {
 						return 'Unknown';

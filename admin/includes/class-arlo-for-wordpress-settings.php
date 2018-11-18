@@ -958,6 +958,23 @@ class Arlo_For_Wordpress_Settings {
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">	  
+				<li>New WordPress <a href="https://wordpress.org/plugins/arlo-training-and-event-management-system/" target="_blank">minimum version requirement</a> of 4.7</li>
+				<li>New system requirements now checking against WordPress 4.7 and PHP 5.5</li>
+				<li>"Download log" file structure ID changed for Id</li>
+				<li>New "<a href="https://support.arlo.co/hc/en-gb/sections/115000452543-WordPress-Control-Themes" target="_blank">Starter Hero</a>" Arlo Theme</li>
+				<li>Manual plugin upload process available from this version</li>
+				<li>New "Keep settings" option for plugin deletion</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_hero_image" target="_blank">[arlo_event_template_hero_image]</a> shortcode</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_list_image" target="_blank">[arlo_event_template_list_image]</a> shortcode</li>
+				<li>Security improvements</li>
+				<li>Remove now unused "import" directory</li>
+				<li>"Download log" was showing an error when open in Excel</li>
+			</ul>
+		</p>
+
+		<h4>Version 3.9</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">	  
 				<li>Improvement of the Starter themes</li>
 				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_advertised_price" target="_blank">[arlo_event_template_advertised_price]</a> shortcode</li>
 				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_advertised_presenters" target="_blank">[arlo_event_template_advertised_presenters]</a> shortcode</li>
@@ -1001,101 +1018,6 @@ class Arlo_For_Wordpress_Settings {
 			</ul>
 		</p>
 
-		<h4>Version 3.7</h4>
-		<p>
-			<ul class="arlo-whatsnew-list">	  
-				<li>Full support for PHP 7</li>
-				<li>Use OpenSSL for encryption</li>
-				<li>PHP and WordPress version now visible on System requirements tab</li>
-				<li>Improve Log error message on import failure</li>
-				<li>Using the Delete functionality of WordPress keep most of my settings but lose my theme</li>
-				<li>Event search show duplicates of events with multiple categories</li>
-				<li>First plugin activation sometimes fails with a Fatal error</li>
-				<li>Timezones in filter are not sorted by time offset</li>
-				<li>Default Spark designer template do not allow enough space for the day of the month not to wrap</li>
-				<li>memory_limit in php.ini cannot be specified in GB</li>
-				<li>[arlo_event_template_code] does not appear when specified on Upcoming pages</li>
-			</ul>
-		</p>
-
-		<h4>Version 3.6.1</h4>
-		<p>
-			<ul class="arlo-whatsnew-list">	  
-				<li>Timezones blocking the import on some specific platforms</li>
-			</ul>
-		</p>
-
-		<h4>Version 3.6</h4>
-		<p>
-			<ul class="arlo-whatsnew-list">
-				<li>Remove the ability to rename and exclude filter options</li>
-				<li>New "Starter template" Arlo Theme</li>
-				<li>Use category header as meta description if category is selected as a filter</li>
-				<li>Ability to filter <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes" target="_blank">global level shortcodes</a> by mutliple categories/location/templatetag/eventtag</li>
-				<li>Delivery filter for on demand events (online activities)</li>
-				<li>Support tax exempt tags</li>
-				<li>Make venue related shortcodes available within the <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_list_item" target="_blank">[arlo_event_list_item]</a> or <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/upcomingeventrelated#arlo_upcoming_list_item" target="_blank">[arlo_upcoming_list_item]</a> shortcodes</li>
-				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_duration_description" target="_blank">[arlo_event_duration_description]</a> shortcode</li>
-				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_dates" target="_blank">[arlo_event_dates]</a> shortcode</li>
-				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_isfull" target="_blank">[arlo_event_isfull]</a> shortcode</li>
-				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_offers_hasdiscount" target="_blank">[arlo_event_offers_hasdiscount]</a> shortcode</li>
-				<li>New "show_child_elements" attribute for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/upcomingeventrelated#arlo_upcoming_list_item" target="_blank">[arlo_upcoming_list_item]</a></li>
-				<li>New "layout" attribute for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_session_list_item" target="_blank">[arlo_event_session_list_item]</a> to show the session information as a tooltip or as a popup</li>
-				<li>New "separator" attribute for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_next_running" target="_blank">[arlo_event_next_running]</a></li>
-				<li>New <em>{%count%}</em> placeholder in "text" attribute for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_next_running" target="_blank">[arlo_event_next_running]</a></li>
-				<li>Allow import with PHP 7.2 on Linux</li>
-				<li>Filters was not redirecting properly when containing slashes</li>
-				<li>Show all except on Tags still show event if it has multiple tags</li>
-				<li>Reset button moves on selection of drop down (Jazz Theme)</li>
-				<li>Ensure filter priority - user first global shortcode second and filter by page at last</li>
-				<li>Session tags are not diplayed by <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_tags" target="_blank">[arlo_event_tags]</a></li>
-				<li>With some Arlo Themes <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_template_region_selector" target="_blank">[arlo_template_region_selector]</a> and <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_template_search_region_selector" target="_blank">[arlo_template_search_region_selector]</a> are breaking the layout</li>
-			</ul>
-		</p>
-
-		<h4>Version 3.5.2</h4>
-		<p>
-			<ul class="arlo-whatsnew-list">	  
-				<li>Allow import with PHP 7.2</li>
-			</ul>
-		</p>
-
-		<h4>Version 3.5.1</h4>
-		<p>
-			<ul class="arlo-whatsnew-list">	  
-				<li>Admin page gets into a redirect loop on some webservers</li>
-				<li>Wrong filter URL if a global level shortcode is used on a home page</li>
-			</ul>
-		</p>
-
-		<h4>Version 3.5</h4>
-		<p>
-			<ul class="arlo-whatsnew-list">	  
-				<li>New "template_link" attribute for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_next_running" target="_blank">[arlo_event_next_running]</a></li>
-				<li>Enhance the output of <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_address" target="_blank">[arlo_venue_address]</a> and new "link" attribute</li>
-				<li>New "Region selector" widget</li>
-				<li>New "State" filter for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_filters" target="_blank">[arlo_event_filters]</a>, <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/upcomingeventrelated#arlo_upcoming_event_filters" target="_blank">[arlo_upcoming_event_filters]</a>, <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_filters" target="_blank">[arlo_event_template_filters]</a> and <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_schedule_filters" target="_blank">[arlo_schedule_filters]</a></li>
-				<li>New "templateid" attribute for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#arlo_upcoming_list" target="_blank">[arlo_upcoming_list]</a> global shortcode</li>
-				<li>Filter settings available for custom shortcodes</li>
-			</ul>
-		</p>	
-
-		<h4>Version 3.4.1</h4>
-		<p>
-			<ul class="arlo-whatsnew-list">	  
-				<li>Fix, global level shortcodes don\'t respect attribute settings</li>
-			</ul>
-		</p>	
-		<h4>Version 3.4</h4>		
-		<p>
-			<ul class="arlo-whatsnew-list">	  
-				<li>Resuable shortcodes</li>
-				<li>New "category", "location", "delivery" and "templatetag" attributes for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#arlo_event_template_list" target="_blank">[arlo_event_template_list]</a> global shortcode </li>
-				<li>New "category", "location", "delivery" and "templatetag" attributes for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#arlo_schedule" target="_blank">[arlo_schedule]</a> global shortcode </li>
-				<li>New "category", "location", "delivery", "eventtag", "templatetag", "presenter" and "month" attributes for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#arlo_upcoming_list" target="_blank">[arlo_upcoming_list]</a> global shortcode </li>
-				<li>New "category" attribute for <a href="https://developer.arlo.co/doc/wordpress/shortcodes/globalshortcodes#arlo_onlineactivites_list" target="_blank">[arlo_onlineactivites_list]</a> global shortcode </li>	
-			</ul>
-		</p>		
 		<a href="https://wordpress.org/plugins/arlo-training-and-event-management-system/#developers" target="_blank">More change log</a>
 	    ';
 	}

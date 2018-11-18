@@ -1,9 +1,9 @@
 === Arlo training and event management system ===
 Contributors: ArloSoftware, adamfentosi, gabriel-arlo
 Tags: online registration, event registration, training management,  event management, event plugin, training company software, training calendar, training administration, training management software, training provider, solution, events calendar, wordpress events, event ticketing, wordpress lms, class registration, conference registration,  ticket, registration, event manager, training, booking, ticketing, courses, events, training, calendar, course management
-Requires at least: 4.4
+Requires at least: 4.7
 Tested up to: 4.9
-Stable tag: 3.9
+Stable tag: 4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -172,6 +172,22 @@ The Arlo - Training and Event Management, and online registration plugin is only
 11. Theme Jazz - Upcoming events
 
 == Changelog ==
+
+= 4.0 =
+
+New WordPress minimum version requirement of 4.7
+New system requirements now checking against WordPress 4.7 and PHP 5.5
+"Download log" file structure ID changed for Id
+
+New "Starter Hero" Arlo Theme
+Manual plugin upload process available from this version
+New "Keep settings" option for plugin deletion
+New [arlo_event_template_hero_image] shortcode
+New [arlo_event_template_list_image] shortcode
+
+Security improvements
+Remove now unused "import" directory
+"Download log" was showing an error when open in Excel
 
 = 3.9 =
 
