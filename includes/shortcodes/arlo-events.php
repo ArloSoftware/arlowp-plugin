@@ -1166,7 +1166,9 @@ class Events {
         }
         
         if($events_count == 0 && $oa_count == 0 && !empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) {
-            $return = '<a href="' . esc_url($GLOBALS['arlo_eventtemplate']['et_registerinteresturi']) . '" title="' . __('Register interest', 'arlo-for-wordpress') . '" class="' . esc_attr($buttonclass) . '">' . __('Register interest', 'arlo-for-wordpress') . '</a>';
+            $return .= ($layout == 'list' ? "<li>" : "");
+            $return .= '<a href="' . esc_url($GLOBALS['arlo_eventtemplate']['et_registerinteresturi']) . '" title="' . __('Register interest', 'arlo-for-wordpress') . '" class="' . esc_attr($buttonclass) . '">' . __('Register interest', 'arlo-for-wordpress') . '</a>';
+            $return .= ($layout == 'list' ? "</li>" : "");
         } else {
             if ($display_count && $events_count) {
                 $return .= ($layout == 'list' ? "<li>" : "");
