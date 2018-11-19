@@ -105,7 +105,8 @@ class NoticeHandler {
 	public function dismiss_user_notice($notice_key = '') {
 		if (!empty($notice_key) && in_array($notice_key, \Arlo_For_Wordpress::$dismissible_notices)) {
 			$user = wp_get_current_user();
-			update_user_meta($user->ID, $_POST['id'], 0);
+			$id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_STRING);
+			update_user_meta($user->ID, $id, 0);
 		}
 	}
 	

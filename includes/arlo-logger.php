@@ -108,7 +108,7 @@ class Logger {
         $entries = $wpdb->get_results($sql, 'ARRAY_N');
 	
 		if (is_array($entries) && count($entries)) {
-			fputcsv($fp, array('ID', 'Log', 'CreatedDateTime', 'Successful'));
+			fputcsv($fp, array('Id', 'Log', 'CreatedDateTime', 'Successful'));
 			
 			foreach ($entries as $entry) {
 				fputcsv($fp, $entry);

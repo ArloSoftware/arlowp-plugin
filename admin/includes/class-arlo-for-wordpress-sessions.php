@@ -28,8 +28,10 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 	
 	public function get_title() {
 		$title = parent::get_title();
+
+		$e_parent_id = filter_input(INPUT_GET, 'e_parent_id', FILTER_SANITIZE_STRING);
 		
-		if (!empty($_GET['e_parent_id']) && !empty(self::$filter_column_mapping['e_parent_id']) && intval($_GET['e_parent_id'] > 0) && !empty($this->items[0]->event_name)) {
+		if (!empty($e_parent_id) && !empty(self::$filter_column_mapping['e_parent_id']) && intval($e_parent_id > 0) && !empty($this->items[0]->event_name)) {
 			$title .= ' for event: ' . $this->items[0]->event_name;
 		}
 		

@@ -766,8 +766,63 @@ class Templates {
 
     private static function shortcode_template_search_region_selector ($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         return Shortcodes::create_region_selector("eventsearch");
-    }        
-    
+    }
+
+    private static function shortcode_event_template_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        $et_snippet = self::get_rich_snippet_data($atts,$import_id,$shortcode_name);
+        return Shortcodes::create_rich_snippet( json_encode($et_snippet) );
+    }
+
+    private static function get_rich_snippet_data($atts,$import_id,$shortcode_name) {
+        extract(shortcode_atts(array(
+            'link' => 'permalink'
+        ), $atts, $shortcode_name, $import_id));
+
+        $event_template_snippet = array();
+
+        if (isset($GLOBALS["arlo_eventtemplate"])) {
+            $event_template_snippet['@context'] = 'http://schema.org';
+            $event_template_snippet['@type'] = 'Course';
+            $event_template_snippet['name'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_eventtemplate'],'et_name');
+
+            $et_link = '';
+            switch ($link) {
+                case 'viewuri': 
+                    $et_link = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_eventtemplate'],'et_viewuri');
+                break;  
+                default: 
+                    $et_link = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
+                break;
+            }
+
+            $et_link = \Arlo\Utilities::get_absolute_url($et_link);
+
+            $event_template_snippet['url'] = $et_link;
+
+            $event_template_snippet['description'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_eventtemplate'],'et_descriptionsummary');
+
+            return $event_template_snippet;
+        } else {
+            return '';
+        }
+    }
+
+    private static function shortcode_event_template_hero_image($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if (empty($GLOBALS['arlo_eventtemplate']['et_hero_image'])) return;
+
+        $url = $GLOBALS['arlo_eventtemplate']['et_hero_image'];
+        $filename = basename($url);
+        return '<img src="' . esc_attr($url) . '" alt="' . esc_attr($filename) . '">';
+    }
+
+    private static function shortcode_event_template_list_image($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if (empty($GLOBALS['arlo_eventtemplate']['et_list_image'])) return;
+
+        $url = $GLOBALS['arlo_eventtemplate']['et_list_image'];
+        $filename = basename($url);
+        return '<img src="' . esc_attr($url) . '" alt="' . esc_attr($filename) . '">';
+    }
+
 
     private static function generate_list_sql($atts, $import_id, $for_pagination = false) {
         global $wpdb;
@@ -1096,45 +1151,6 @@ class Templates {
 
         $query = $wpdb->prepare($sql, $parameters);
         return $query;
-    }
-
-    private static function shortcode_event_template_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        $et_snippet = self::get_rich_snippet_data($atts,$import_id,$shortcode_name);
-        return Shortcodes::create_rich_snippet( json_encode($et_snippet) );
-    }
-
-    private static function get_rich_snippet_data($atts,$import_id,$shortcode_name) {
-        extract(shortcode_atts(array(
-            'link' => 'permalink'
-        ), $atts, $shortcode_name, $import_id));
-
-        $event_template_snippet = array();
-
-        if (isset($GLOBALS["arlo_eventtemplate"])) {
-            $event_template_snippet['@context'] = 'http://schema.org';
-            $event_template_snippet['@type'] = 'Course';
-            $event_template_snippet['name'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_eventtemplate'],'et_name');
-
-            $et_link = '';
-            switch ($link) {
-                case 'viewuri': 
-                    $et_link = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_eventtemplate'],'et_viewuri');
-                break;  
-                default: 
-                    $et_link = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
-                break;
-            }
-
-            $et_link = \Arlo\Utilities::get_absolute_url($et_link);
-
-            $event_template_snippet['url'] = $et_link;
-
-            $event_template_snippet['description'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_eventtemplate'],'et_descriptionsummary');
-
-            return $event_template_snippet;
-        } else {
-            return '';
-        }
     }
 
 }

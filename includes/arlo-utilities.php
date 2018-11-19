@@ -97,12 +97,14 @@ class Utilities {
 
 
     public static function clean_string_url_parameter($parameter_name) {
-        return !empty($_GET[$parameter_name]) ? wp_unslash($_GET[$parameter_name]) : wp_unslash(urldecode(get_query_var($parameter_name)));
+        $parameter_value = filter_input(INPUT_GET, $parameter_name, FILTER_SANITIZE_STRING);
+        return !empty($parameter_value) ? wp_unslash($parameter_value) : wp_unslash(urldecode(get_query_var($parameter_name)));
     }
 
     public static function clean_int_url_parameter($parameter_name) {
-        if (isset($_GET[$parameter_name])) {
-            return intval($_GET[$parameter_name]);
+        $parameter_value = filter_input(INPUT_GET, $parameter_name, FILTER_SANITIZE_STRING);
+        if (!empty($parameter_value)) {
+            return intval($parameter_value);
         } else {
             $value = get_query_var($parameter_name);
             if (is_numeric($value)) {

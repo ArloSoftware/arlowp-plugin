@@ -17,12 +17,13 @@ class SystemRequirements {
 					return PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION . '.' . PHP_RELEASE_VERSION;
 				},
 				'check' => function($current_value, $expected_value) {
-					return null;  //no check for retro-compatibility
+					if (!strncmp('Unknown', $current_value, 7))	return null;
+					return version_compare($current_value, $expected_value) >= 0;
 				}
 			],
 			[
 				'name' => 'WordPress version',
-				'expected_value' => '4.4',
+				'expected_value' => '4.7',
 				'current_value' => function () {
 					if (!isset($GLOBALS['wp_version'])) {
 						return 'Unknown';
@@ -30,7 +31,8 @@ class SystemRequirements {
 					return $GLOBALS['wp_version'];
 				},
 				'check' => function($current_value, $expected_value) {
-					return null;  //no check for retro-compatibility
+					if (!strncmp('Unknown', $current_value, 7))	return null;
+					return version_compare($current_value, $expected_value) >= 0;
 				}
 			],
 			[

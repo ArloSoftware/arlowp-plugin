@@ -1,8 +1,30 @@
+== V4.0 ==
+
+Breaking changes
+------------------
+New WordPress minimum version requirement of 4.7
+New system requirements now checking against WordPress 4.7 and PHP 5.5
+"Download log" file structure ID changed for Id
+
+Enhancement
+------------------
+New "Starter Hero" Arlo Theme
+Manual plugin upload process available from this version
+New "Keep settings" option for plugin deletion
+New [arlo_event_template_hero_image] shortcode
+New [arlo_event_template_list_image] shortcode
+
+Bugfixes
+------------------
+Security improvements
+Remove now unused "import" directory
+"Download log" was showing an error when open in Excel
+
+
 == V3.9 ==
 
 Enhancement
 ------------------
-
 Improvement of the Starter themes
 New [arlo_event_template_advertised_price] shortcode
 New [arlo_event_template_advertised_presenters] shortcode
@@ -13,7 +35,6 @@ Better support for load balanced architectures
 
 Bugfixes
 ------------------
-
 Venue map not showing on Venue page
 Multiple instance of upcoming widget are conflicting
 Upcoming widget do not keep event/template tag after import
