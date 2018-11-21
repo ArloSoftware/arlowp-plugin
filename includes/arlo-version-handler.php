@@ -294,6 +294,17 @@ class VersionHandler {
 					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_eventtemplates ADD et_list_image text NULL AFTER et_hero_image");
 				}
 			break;
+
+			case 'next_version_number':
+				/////
+				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_timezones LIKE 'utc_offset'", 0, 0);
+				if (is_null($exists)) {
+					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_timezones ADD utc_offset INT(11) NOT NULL AFTER windows_tz_id");
+				}
+				// and in install_table_arlo_timezones() between windows_tz_id and import_id:
+				// utc_offset int(11) NOT NULL,
+				/////
+			break;
 		}
 	}	
 	

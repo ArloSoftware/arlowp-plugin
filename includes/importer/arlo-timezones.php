@@ -18,10 +18,11 @@ class Timezones extends BaseImporter {
 				'id' => $item->TimeZoneID,
 				'name' => $item->Name,
 				'windows_tz_id' => $item->WindowsTzID,
+				'utc_offset' => $item->UtcOffset,
 				'import_id' => $this->import_id
 			),
 			array(
-				'%d', '%s', '%s' , '%s'
+				'%d', '%s', '%s', '%d', '%s'
 			)
 		);
 

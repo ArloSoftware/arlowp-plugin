@@ -54,26 +54,10 @@ class TimeZoneManager {
 			{$table}
 		WHERE
 			import_id = " . $import_id . "
-		ORDER BY name
+		ORDER BY utc_offset, name
 		";
 
-		$items = $this->dbl->get_results($sql, ARRAY_A);
-
-		//until we introduce BaseUtcOffset to use in order by
-		uasort($items, 'self::sort_timezone_by_offset');
-
-		return $items;
-	}
-
-	private static function sort_timezone_by_offset($a, $b) {
-		//trick to guess timezone order from timezone like:
-		//(UTC+11:00) Solomon Is., New Caledonia
-		$ka = substr($a['name'], 4, 3) . substr($a['name'], 8, 2);
-		$kb = substr($b['name'], 4, 3) . substr($b['name'], 8, 2);
-		if (!is_numeric($ka) || !is_numeric($kb) || !strcmp($ka, $kb)) {
-			return strcmp($a['name'], $b['name']);
-		}
-		return $ka > $kb;
+		return $this->dbl->get_results($sql, ARRAY_A);
 	}
 
 }
