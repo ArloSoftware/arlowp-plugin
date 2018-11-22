@@ -90,7 +90,8 @@ class SystemRequirements {
 						return (in_array(MCRYPT_RIJNDAEL_128, mcrypt_list_algorithms()) ? 'Yes' : 'No');
 					}
 					elseif (extension_loaded('openssl')) {
-						return (in_array('AES-256-CBC', openssl_get_cipher_methods()) ? 'Yes' : 'No');
+						return (in_array('AES-256-CBC', openssl_get_cipher_methods())
+						     || in_array('aes-256-cbc', openssl_get_cipher_methods()) ? 'Yes' : 'No');
 					}
 					return 'N/A';
 				},
@@ -106,7 +107,8 @@ class SystemRequirements {
 						return (in_array(MCRYPT_MODE_CBC, mcrypt_list_modes()) ? 'Yes' : 'No');
 					}
 					elseif (extension_loaded('openssl')) {
-						return (in_array('AES-256-CBC', openssl_get_cipher_methods()) ? 'Yes' : 'No');
+						return (in_array('AES-256-CBC', openssl_get_cipher_methods())
+						     || in_array('aes-256-cbc', openssl_get_cipher_methods()) ? 'Yes' : 'No');
 					}
 					return 'N/A';
 				},
