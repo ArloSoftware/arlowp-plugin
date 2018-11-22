@@ -312,8 +312,9 @@ class Events {
         if(!isset($GLOBALS['arlo_event_list_item']['e_startdatetime']) && !isset($GLOBALS['arlo_event_session_list_item']['e_startdatetime'])) return '';
 
         $event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
-        
-        return esc_html(self::event_date_formatter($atts, $event['e_startdatetime'], $event['e_datetimeoffset'], $event['e_isonline'], $event['e_timezone_id']));
+
+        $format = (!empty($atts['format']) ? $atts['format'] : '');
+        return esc_html(self::event_date_formatter($format, $event['e_startdatetime'], $event['e_datetimeoffset'], $event['e_starttimezoneabbr'], $event['e_timezone_id'], $event['e_isonline']));
     }
 
     private static function shortcode_event_end_date($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -321,7 +322,8 @@ class Events {
         
         $event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
 
-        return esc_html(self::event_date_formatter($atts, $event['e_finishdatetime'], $event['e_datetimeoffset'], $event['e_isonline'], $event['e_timezone_id']));
+        $format = (!empty($atts['format']) ? $atts['format'] : '');
+        return esc_html(self::event_date_formatter($format, $event['e_finishdatetime'], $event['e_datetimeoffset'], $event['e_finishtimezoneabbr'], $event['e_timezone_id'], $event['e_isonline']));
     }
 
     private static function shortcode_event_dates($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -1198,12 +1200,12 @@ class Events {
                         $location = $event->e_locationname;
 
                         if ($format == 'period') {
-                            $startDay = self::event_date_formatter(['format' => 'j'], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
-                            $startMonth = self::event_date_formatter(['format' => 'M'], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
-                            $startYear = self::event_date_formatter(['format' => 'y'], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
-                            $finishDay = self::event_date_formatter(['format' => 'j'], $event->e_finishdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
-                            $finishMonth = self::event_date_formatter(['format' => 'M'], $event->e_finishdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
-                            $finishYear = self::event_date_formatter(['format' => 'y'], $event->e_finishdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
+                            $startDay = self::event_date_formatter('j', $event->e_startdatetime, $event->e_datetimeoffset, $event->e_starttimezoneabbr, $event->e_timezone_id, $event->e_isonline);
+                            $startMonth = self::event_date_formatter('M', $event->e_startdatetime, $event->e_datetimeoffset, $event->e_starttimezoneabbr, $event->e_timezone_id, $event->e_isonline);
+                            $startYear = self::event_date_formatter('y', $event->e_startdatetime, $event->e_datetimeoffset, $event->e_starttimezoneabbr, $event->e_timezone_id, $event->e_isonline);
+                            $finishDay = self::event_date_formatter('j', $event->e_finishdatetime, $event->e_datetimeoffset, $event->e_finishtimezoneabbr, $event->e_timezone_id, $event->e_isonline);
+                            $finishMonth = self::event_date_formatter('M', $event->e_finishdatetime, $event->e_datetimeoffset, $event->e_finishtimezoneabbr, $event->e_timezone_id, $event->e_isonline);
+                            $finishYear = self::event_date_formatter('y', $event->e_finishdatetime, $event->e_datetimeoffset, $event->e_finishtimezoneabbr, $event->e_timezone_id, $event->e_isonline);
 
                             if (strcmp($startYear, $finishYear) != 0 || strcmp($startMonth, $finishMonth) != 0) {
                                 $date = sprintf("%s %s - %s %s", $startDay, $startMonth, $finishDay, $finishMonth);
@@ -1214,7 +1216,7 @@ class Events {
                                 $date = sprintf("%s %s", $startDay, $startMonth);
                             }
                         } else {
-                            $date = self::event_date_formatter(['format' => $format], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
+                            $date = self::event_date_formatter($format, $event->e_startdatetime, $event->e_datetimeoffset, $event->e_starttimezoneabbr, $event->e_timezone_id, $event->e_isonline);
                         }
     
                         $display_text = str_replace(['{%date%}', '{%location%}'], [esc_html($date), esc_html($location)], $text);
@@ -1326,11 +1328,10 @@ class Events {
     }
 
 
-    public static function event_date_formatter($atts, $date, $offset, $is_online = false, $timezoneid = null) {
+    public static function event_date_formatter($format, $date, $offset, $abbreviation, $timezoneid, $is_online) {
         $plugin = Arlo_For_Wordpress::get_instance();
         $timezone = $wp_timezone = $selected_timezone = null;
         $original_timezone = date_default_timezone_get();
-        $formatted_end_date = '';
         
         $timewithtz = str_replace(' ', 'T', $date) . $offset;
 
@@ -1356,10 +1357,14 @@ class Events {
 
         $selected_timezone = null;
 
-        if (!empty($GLOBALS['selected_timezone_names']))
+        if (!empty($GLOBALS['selected_timezone_names'])) {
             $selected_timezone = new \DateTimeZone($GLOBALS['selected_timezone_names']);
+        }
       
         if($is_online) {
+            if ($timezone instanceof \DateTimeZone && $selected_timezone instanceof \DateTimeZone && $timezone->getName() != $selected_timezone->getName()) {
+                $abbreviation = "";
+            }
             if (!empty($selected_timezone)) {
                 try {
                     $timezone = $selected_timezone;
@@ -1368,14 +1373,19 @@ class Events {
                 if (!is_null($timezone)) {
                     $date->setTimezone($timezone);
                     date_default_timezone_set($timezone->getName());
-                }   
+                }
             }
         }
 
-        $format = 'D g:i A';
+        if (empty($abbreviation)) {
+            $abbreviation = $date->format('T');
+        }
 
-        if(isset($atts['format'])) $format = $atts['format'];
-                    
+
+        if (empty($format)) {
+            $format = 'D g:i A';
+        }
+
         if (strpos($format, '%') === false) {
             $format = DateFormatter::date_format_to_strftime_format($format);
         }
@@ -1388,7 +1398,7 @@ class Events {
 
         if (!is_null($timezone) && ($timezone->getName() == $utc_timezone_name || (!is_null($wp_timezone) && $wp_timezone->getOffset($date) != $timezone->getOffset($date)) || !is_null($selected_timezone) || $is_online) && preg_match('[I|M]', $format) === 1 && preg_match('[Z|z]', $format) === 0) {
             $format .= " %Z";
-        }        
+        }
 
         if (strpos($format, '%Z')) {
             $format = str_replace('%Z', '{TZ_ABBREV}', $format); //T
@@ -1396,9 +1406,9 @@ class Events {
 
         if (strpos($format, '%z')) {
             $format = str_replace('%z', '{TZ_OFFSET}', $format); //P
-        }        
+        }
 
-        $date = str_replace(['{TZ_ABBREV}', '{TZ_OFFSET}'], [$date->format('T'), $date->format('P')], strftime($format, $date->getTimestamp()));
+        $date = str_replace(['{TZ_ABBREV}', '{TZ_OFFSET}'], [$abbreviation, $date->format('P')], strftime($format, $date->getTimestamp()));
 
         //if we haven't got timezone, we need to append the timezone abbrev
         if ($is_online && is_null($timezone) && (preg_match('[I|M]', $format) === 1) && !empty($offset)) {
@@ -1407,6 +1417,7 @@ class Events {
 
         date_default_timezone_set($original_timezone);
 
-        return $date . $formatted_end_date;
-    }  
+        return $date;
+    }
+
 }
