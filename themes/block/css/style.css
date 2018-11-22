@@ -1270,6 +1270,16 @@ body.arlo {
     margin-bottom: 2em;
 }
 
+.arlo#arlo .arlo-schedule-event .arlo-schedule-column.arlo-next-running ul.arlo-event-next-running,
+.arlo#arlo .arlo-schedule-event .arlo-schedule-column.arlo-next-running ul.arlo-event-next-running > li {
+    margin: 0px;
+    padding: 0px;
+}
+
+.arlo#arlo .arlo-schedule-event .arlo-schedule-column.arlo-next-running ul.arlo-event-next-running {
+    list-style-type: none;
+}
+
 
 
 /* Sessions tooltips */

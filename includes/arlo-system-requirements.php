@@ -17,12 +17,13 @@ class SystemRequirements {
 					return PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION . '.' . PHP_RELEASE_VERSION;
 				},
 				'check' => function($current_value, $expected_value) {
-					return null;  //no check for retro-compatibility
+					if (!strncmp('Unknown', $current_value, 7))	return null;
+					return version_compare($current_value, $expected_value) >= 0;
 				}
 			],
 			[
 				'name' => 'WordPress version',
-				'expected_value' => '4.4',
+				'expected_value' => '4.7',
 				'current_value' => function () {
 					if (!isset($GLOBALS['wp_version'])) {
 						return 'Unknown';
@@ -30,7 +31,8 @@ class SystemRequirements {
 					return $GLOBALS['wp_version'];
 				},
 				'check' => function($current_value, $expected_value) {
-					return null;  //no check for retro-compatibility
+					if (!strncmp('Unknown', $current_value, 7))	return null;
+					return version_compare($current_value, $expected_value) >= 0;
 				}
 			],
 			[
@@ -88,7 +90,8 @@ class SystemRequirements {
 						return (in_array(MCRYPT_RIJNDAEL_128, mcrypt_list_algorithms()) ? 'Yes' : 'No');
 					}
 					elseif (extension_loaded('openssl')) {
-						return (in_array('AES-256-CBC', openssl_get_cipher_methods()) ? 'Yes' : 'No');
+						return (in_array('AES-256-CBC', openssl_get_cipher_methods())
+						     || in_array('aes-256-cbc', openssl_get_cipher_methods()) ? 'Yes' : 'No');
 					}
 					return 'N/A';
 				},
@@ -104,7 +107,8 @@ class SystemRequirements {
 						return (in_array(MCRYPT_MODE_CBC, mcrypt_list_modes()) ? 'Yes' : 'No');
 					}
 					elseif (extension_loaded('openssl')) {
-						return (in_array('AES-256-CBC', openssl_get_cipher_methods()) ? 'Yes' : 'No');
+						return (in_array('AES-256-CBC', openssl_get_cipher_methods())
+						     || in_array('aes-256-cbc', openssl_get_cipher_methods()) ? 'Yes' : 'No');
 					}
 					return 'N/A';
 				},

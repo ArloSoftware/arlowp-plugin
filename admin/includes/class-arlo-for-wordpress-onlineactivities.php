@@ -24,8 +24,10 @@ class Arlo_For_Wordpress_OnlineActivities extends Arlo_For_Wordpress_Lists  {
 	
 	public function get_title() {
 		$title = parent::get_title();
+
+		$et_id = filter_input(INPUT_GET, 'et_id', FILTER_SANITIZE_STRING);
 		
-		if (!empty($_GET['et_id']) && !empty(self::$filter_column_mapping['et_id']) && intval($_GET['et_id'] > 0) && !empty($this->items[0]->et_name)) {
+		if (!empty($et_id) && !empty(self::$filter_column_mapping['et_id']) && intval($et_id > 0) && !empty($this->items[0]->et_name)) {
 			$title .= ' for template: ' . $this->items[0]->et_name;
 		}
 		

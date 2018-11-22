@@ -28,8 +28,10 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists  {
 	
 	public function get_title() {
 		$title = parent::get_title();
-		
-		if (!empty($_GET['v_e_id']) && !empty(self::$filter_column_mapping['v_e_id']) && intval($_GET['v_e_id'] > 0) && !empty($this->items[0]->e_name)) {
+
+		$v_e_id = filter_input(INPUT_GET, 'v_e_id', FILTER_SANITIZE_STRING);
+
+		if (!empty($v_e_id) && !empty(self::$filter_column_mapping['v_e_id']) && intval($v_e_id > 0) && !empty($this->items[0]->e_name)) {
 			$title .= ' for event: ' . $this->items[0]->e_name;
 		}
 		

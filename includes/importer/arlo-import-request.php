@@ -26,7 +26,7 @@ class ImportRequest extends BaseImporter  {
 			'EventID', 'EventTemplateID', 'Name', 'Code', 'Description', 'Summary', 'StartDateTime', 'EndDateTime', 'TimeZoneID', 'TimeZone', 'Location', 'IsFull', 'PlacesRemaining', 'AdvertisedOffers', 'SessionsDescription', 'Presenters', 'Notice', 'ViewUri', 'RegistrationInfo', 'Provider', 'TemplateCode', 'Tags', 'Credits', 'Sessions.EventID', 'Sessions.Name', 'Sessions.Code', 'Sessions.Summary', 'Sessions.StartDateTime', 'Sessions.EndDateTime', 'Sessions.TimeZoneID', 'Sessions.TimeZone', 'Sessions.Location', 'Sessions.IsFull', 'Sessions.PlacesRemaining','Sessions.AdvertisedOffers', 'Sessions.Presenters', 'Sessions.Tags'
 		],
 		'Templates' => [
-			'TemplateID', 'Code', 'Name', 'Description', 'AdvertisedPresenters', 'AdvertisedDuration', 'BestAdvertisedOffers', 'ViewUri', 'RegisterInterestUri', 'RegisterPrivateInterestUri', 'Categories', 'Tags', 'Credits',
+			'TemplateID', 'Code', 'Name', 'Description', 'AdvertisedPresenters', 'AdvertisedDuration', 'BestAdvertisedOffers', 'ViewUri', 'RegisterInterestUri', 'RegisterPrivateInterestUri', 'Categories', 'Tags', 'Credits', 'Media',
 		],	
 		'Presenters' => [
 			'PresenterID', 'FirstName', 'LastName', 'ViewUri', 'Profile', 'SocialNetworkInfo',

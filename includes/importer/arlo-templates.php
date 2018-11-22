@@ -22,8 +22,8 @@ class Templates extends BaseImporter {
 			$query = $this->dbl->query(
 				$this->dbl->prepare( 
 					"INSERT INTO " . $this->table_name ." 
-					(et_arlo_id, et_code, et_name, et_descriptionsummary, et_advertised_duration, et_post_name, et_post_id, import_id, et_registerinteresturi, et_registerprivateinteresturi, et_credits, et_viewuri, et_region) 
-					VALUES ( %d, %s, %s, %s, %s, %s, %d, %s, %s, %s, %s, %s, %s) 
+					(et_arlo_id, et_code, et_name, et_descriptionsummary, et_advertised_duration, et_post_name, et_post_id, import_id, et_registerinteresturi, et_registerprivateinteresturi, et_credits, et_viewuri, et_hero_image, et_list_image, et_region) 
+					VALUES ( %d, %s, %s, %s, %s, %s, %d, %s, %s, %s, %s, %s, %s, %s, %s) 
 					", 
 					$item->TemplateID,
 					@$item->Code,
@@ -37,6 +37,8 @@ class Templates extends BaseImporter {
 					!empty($item->RegisterPrivateInterestUri) ? $item->RegisterPrivateInterestUri : '',
 					!empty($item->Credits) ? json_encode($item->Credits) : '',
 					!empty($item->ViewUri) ? $item->ViewUri : '',
+					!empty($item->Media->{'Template.HeroImage'}->Uri) ? $item->Media->{'Template.HeroImage'}->Uri : '',
+					!empty($item->Media->{'Template.ListImage'}->Uri) ? $item->Media->{'Template.ListImage'}->Uri : '',
 					(!empty($item->Region) ? $item->Region : '')
 				)
 			);

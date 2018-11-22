@@ -20,7 +20,8 @@
 	<?php } ?>
 	<div class="<?php echo ARLO_PLUGIN_PREFIX; ?>-sections-wrap <?php echo $list::TABLENAME ?>">	
 		<form action="" method="get" >
-			<input type="hidden" name="page" value="<?=$_GET['page']?>">
+			<?php $page_get = filter_input(INPUT_GET, 'page', FILTER_SANITIZE_STRING); ?>
+			<input type="hidden" name="page" value="<?=$page_get?>">
 <?php
 		$list->search_box( __( 'Search' ), 'arlo-search' );
 		$list->display();	

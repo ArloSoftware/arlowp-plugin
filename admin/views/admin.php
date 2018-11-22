@@ -24,7 +24,7 @@
 				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#regions" class="nav-tab" id="<?=$this->plugin_slug?>-tab-regions">Regions</a>
 				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#customcss" class="nav-tab" id="<?=$this->plugin_slug?>-tab-customcss">Custom CSS</a>
 				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#misc" class="nav-tab" id="<?=$this->plugin_slug?>-tab-misc">Misc</a>
-				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#systemrequirements" class="nav-tab" id="<?=$this->plugin_slug?>-tab-systemrequirements">System Requirements</a>
+				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#systemrequirements" class="nav-tab" id="<?=$this->plugin_slug?>-tab-systemrequirements">System requirements</a>
 				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#changelog" class="nav-tab" id="<?=$this->plugin_slug?>-tab-changelog">Changelog</a>
 				<a href="<?=admin_url( 'admin.php?page=arlo-for-wordpress')?>#support" class="nav-tab" id="<?=$this->plugin_slug?>-tab-support">Support</a>
 			</h2>		
