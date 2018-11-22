@@ -490,6 +490,8 @@ class UpcomingEvents {
             e.e_name,
             e.e_startdatetime,
             e.e_finishdatetime,
+            e.e_starttimezoneabbr,
+            e.e_finishtimezoneabbr,
             e.e_datetimeoffset,
             e.e_timezone,
             e.e_timezone_id,

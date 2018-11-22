@@ -6,7 +6,7 @@ use Arlo\Logger;
 
 class SchemaManager {
 
-	const DB_SCHEMA_HASH = '768ef238444a3043d42cf51e3e327fe674ebaefc';
+	const DB_SCHEMA_HASH = '2717e0ff610e14b6b3e5cd59ec69bd2a5c9fdcbc';
 	const DB_SCHEMA_VERSION = '4.0.0';
 
 	/* database layer */
@@ -198,6 +198,8 @@ class SchemaManager {
 			e_name varchar(255) NULL,
 			e_startdatetime DATETIME NOT NULL,
 			e_finishdatetime DATETIME NULL,
+			e_starttimezoneabbr varchar(7) NOT NULL,
+			e_finishtimezoneabbr varchar(7) NULL,
 			e_datetimeoffset varchar(6) NULL,
 			e_timezone varchar(10) NULL,
 			e_timezone_id int(11) NULL,
@@ -469,6 +471,7 @@ class SchemaManager {
 			id int(11) NOT NULL,
 			name varchar(256) NOT NULL,
 			windows_tz_id varchar(256) NOT NULL,
+			utc_offset int(11) NOT NULL,
 			import_id int(10) unsigned NOT NULL,
 			PRIMARY KEY  (id, import_id)) 
 			CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";	
