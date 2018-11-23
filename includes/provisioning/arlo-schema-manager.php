@@ -6,7 +6,7 @@ use Arlo\Logger;
 
 class SchemaManager {
 
-	const DB_SCHEMA_HASH = '3cdd552633f7c1cf8b9b65842025ffd583bcc041';
+	const DB_SCHEMA_HASH = '313bdfb4a8a812941ddd5f8ed79dcc32811a1b6d';
 	const DB_SCHEMA_VERSION = '4.0.0';
 
 	/* database layer */
@@ -198,9 +198,10 @@ class SchemaManager {
 			e_name varchar(255) NULL,
 			e_startdatetime DATETIME NOT NULL,
 			e_finishdatetime DATETIME NULL,
+			e_startdatetimeoffset varchar(6) NOT NULL,
+			e_finishdatetimeoffset varchar(6) NULL,
 			e_starttimezoneabbr varchar(7) NOT NULL,
 			e_finishtimezoneabbr varchar(7) NULL,
-			e_datetimeoffset varchar(6) NULL,
 			e_timezone_id int(11) NULL,
 			v_id int(11) NULL,
 			e_locationname varchar(255) NULL,

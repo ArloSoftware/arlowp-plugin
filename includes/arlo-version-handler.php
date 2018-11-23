@@ -309,6 +309,15 @@ class VersionHandler {
 				if (is_null($exists)) {
 					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events ADD e_starttimezoneabbr varchar(7) NOT NULL AFTER e_finishdatetime");
 				}
+				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_events LIKE 'e_finishdatetimeoffset'", 0, 0);
+				if (is_null($exists)) {
+					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events ADD e_finishdatetimeoffset varchar(6) NOT NULL AFTER e_finishdatetime");
+				}
+				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_events LIKE 'e_startdatetimeoffset'", 0, 0);
+				if (is_null($exists)) {
+					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events ADD e_startdatetimeoffset varchar(6) NOT NULL AFTER e_finishdatetime");
+				}
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events DROP e_datetimeoffset;");
 				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events DROP e_timezone;");
 				///// 2
 				///// 3

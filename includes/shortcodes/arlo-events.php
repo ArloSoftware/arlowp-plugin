@@ -314,7 +314,7 @@ class Events {
         $event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
 
         $format = (!empty($atts['format']) ? $atts['format'] : '');
-        return esc_html(self::event_date_formatter($format, $event['e_startdatetime'], $event['e_datetimeoffset'], $event['e_starttimezoneabbr'], $event['e_timezone_id'], $event['e_isonline']));
+        return esc_html(self::event_date_formatter($format, $event['e_startdatetime'], $event['e_startdatetimeoffset'], $event['e_starttimezoneabbr'], $event['e_timezone_id'], $event['e_isonline']));
     }
 
     private static function shortcode_event_end_date($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -323,7 +323,7 @@ class Events {
         $event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
 
         $format = (!empty($atts['format']) ? $atts['format'] : '');
-        return esc_html(self::event_date_formatter($format, $event['e_finishdatetime'], $event['e_datetimeoffset'], $event['e_finishtimezoneabbr'], $event['e_timezone_id'], $event['e_isonline']));
+        return esc_html(self::event_date_formatter($format, $event['e_finishdatetime'], $event['e_finishdatetimeoffset'], $event['e_finishtimezoneabbr'], $event['e_timezone_id'], $event['e_isonline']));
     }
 
     private static function shortcode_event_dates($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -522,7 +522,10 @@ class Events {
                 e_locationvisible,
                 e_startdatetime,
                 e_finishdatetime,
-                e_datetimeoffset,
+                e_startdatetimeoffset,
+                e_finishdatetimeoffset,
+                e_starttimezoneabbr,
+                e_finishtimezoneabbr,
                 e_isonline,
                 e_timezone_id,
                 e_sessiondescription,
@@ -1200,12 +1203,12 @@ class Events {
                         $location = $event->e_locationname;
 
                         if ($format == 'period') {
-                            $startDay = self::event_date_formatter('j', $event->e_startdatetime, $event->e_datetimeoffset, $event->e_starttimezoneabbr, $event->e_timezone_id, $event->e_isonline);
-                            $startMonth = self::event_date_formatter('M', $event->e_startdatetime, $event->e_datetimeoffset, $event->e_starttimezoneabbr, $event->e_timezone_id, $event->e_isonline);
-                            $startYear = self::event_date_formatter('y', $event->e_startdatetime, $event->e_datetimeoffset, $event->e_starttimezoneabbr, $event->e_timezone_id, $event->e_isonline);
-                            $finishDay = self::event_date_formatter('j', $event->e_finishdatetime, $event->e_datetimeoffset, $event->e_finishtimezoneabbr, $event->e_timezone_id, $event->e_isonline);
-                            $finishMonth = self::event_date_formatter('M', $event->e_finishdatetime, $event->e_datetimeoffset, $event->e_finishtimezoneabbr, $event->e_timezone_id, $event->e_isonline);
-                            $finishYear = self::event_date_formatter('y', $event->e_finishdatetime, $event->e_datetimeoffset, $event->e_finishtimezoneabbr, $event->e_timezone_id, $event->e_isonline);
+                            $startDay = self::event_date_formatter('j', $event->e_startdatetime, $event->e_startdatetimeoffset, $event->e_starttimezoneabbr, $event->e_timezone_id, $event->e_isonline);
+                            $startMonth = self::event_date_formatter('M', $event->e_startdatetime, $event->e_startdatetimeoffset, $event->e_starttimezoneabbr, $event->e_timezone_id, $event->e_isonline);
+                            $startYear = self::event_date_formatter('y', $event->e_startdatetime, $event->e_startdatetimeoffset, $event->e_starttimezoneabbr, $event->e_timezone_id, $event->e_isonline);
+                            $finishDay = self::event_date_formatter('j', $event->e_finishdatetime, $event->e_finishdatetimeoffset, $event->e_finishtimezoneabbr, $event->e_timezone_id, $event->e_isonline);
+                            $finishMonth = self::event_date_formatter('M', $event->e_finishdatetime, $event->e_finishdatetimeoffset, $event->e_finishtimezoneabbr, $event->e_timezone_id, $event->e_isonline);
+                            $finishYear = self::event_date_formatter('y', $event->e_finishdatetime, $event->e_finishdatetimeoffset, $event->e_finishtimezoneabbr, $event->e_timezone_id, $event->e_isonline);
 
                             if (strcmp($startYear, $finishYear) != 0 || strcmp($startMonth, $finishMonth) != 0) {
                                 $date = sprintf("%s %s - %s %s", $startDay, $startMonth, $finishDay, $finishMonth);
@@ -1216,7 +1219,7 @@ class Events {
                                 $date = sprintf("%s %s", $startDay, $startMonth);
                             }
                         } else {
-                            $date = self::event_date_formatter($format, $event->e_startdatetime, $event->e_datetimeoffset, $event->e_starttimezoneabbr, $event->e_timezone_id, $event->e_isonline);
+                            $date = self::event_date_formatter($format, $event->e_startdatetime, $event->e_startdatetimeoffset, $event->e_starttimezoneabbr, $event->e_timezone_id, $event->e_isonline);
                         }
     
                         $display_text = str_replace(['{%date%}', '{%location%}'], [esc_html($date), esc_html($location)], $text);

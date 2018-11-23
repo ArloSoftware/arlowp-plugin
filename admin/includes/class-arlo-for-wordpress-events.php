@@ -109,7 +109,7 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			case 'e_finishdatetime':
 				//convert to the given timezone, if available
 				if (!empty($this->timezones[$item->e_timezone_id])) {
-					 $timewithtz = str_replace(' ', 'T', $item->$column_name) . $item->e_datetimeoffset;
+					 $timewithtz = str_replace(' ', 'T', $item->$column_name) . $item->{$column_name.'offset'};
 					 
         			 $date = new \DateTime($timewithtz);
 
@@ -189,9 +189,10 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			e.e_name,
 			e.e_startdatetime,
 			e.e_finishdatetime,
+			e.e_startdatetimeoffset,
+			e.e_finishdatetimeoffset,
 			e.e_starttimezoneabbr,
 			e.e_finishtimezoneabbr,
-			e.e_datetimeoffset,
 			e.e_timezone_id,
 			v.v_name,
 			e.e_locationname,
