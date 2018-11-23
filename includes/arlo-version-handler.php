@@ -309,6 +309,7 @@ class VersionHandler {
 				if (is_null($exists)) {
 					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events ADD e_starttimezoneabbr varchar(7) NOT NULL AFTER e_finishdatetime");
 				}
+				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events DROP e_timezone;");
 				///// 2
 				///// 3
 				///// 4

@@ -121,8 +121,9 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 						return strftime("%Y-%m-%d %H:%M:%S", $date->getTimestamp() + $date->getOffset()) . " " . $date->format("T");
 					 }
 				}
-				
-				return esc_html($item->$column_name) . " " . esc_html($item->e_timezone);
+
+				$abbreviation = ($column_name == 'e_startdatetime' ? $item->e_starttimezoneabbr : $item->e_finishtimezoneabbr);
+				return esc_html($item->$column_name) . " " . esc_html($abbreviation);
 			break;
 			case 'v_name':
 				$field = '';				
@@ -188,8 +189,9 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			e.e_name,
 			e.e_startdatetime,
 			e.e_finishdatetime,
+			e.e_starttimezoneabbr,
+			e.e_finishtimezoneabbr,
 			e.e_datetimeoffset,
-			e.e_timezone,
 			e.e_timezone_id,
 			v.v_name,
 			e.e_locationname,
