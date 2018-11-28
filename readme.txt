@@ -1,5 +1,5 @@
 === Arlo training and event management system ===
-Contributors: ArloSoftware, adamfentosi, gabriel-arlo
+Contributors: ArloSoftware, adamfentosi, gabrielarlo
 Tags: online registration, event registration, training management,  event management, event plugin, training company software, training calendar, training administration, training management software, training provider, solution, events calendar, wordpress events, event ticketing, wordpress lms, class registration, conference registration,  ticket, registration, event manager, training, booking, ticketing, courses, events, training, calendar, course management
 Requires at least: 4.7
 Tested up to: 4.9
@@ -20,6 +20,7 @@ Pre-built plugin themes:
 * [Block](https://support.arlo.co/hc/en-gb/articles/115001797703-Theme-Block?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
 * [Spark](https://support.arlo.co/hc/en-gb/articles/115003325783?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) 
 * [Starter](https://support.arlo.co/hc/en-gb/articles/360000311006?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
+* [Starter Hero](https://support.arlo.co/hc/en-gb/articles/360020232631?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
 
 
 = Event & Training Management Solution =
@@ -46,10 +47,11 @@ Arlo’s learning management solution allows you to include quizzes, SCORM objec
 * [Marketing tools](https://www.arlo.co/features/marketing-tools?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) - Run targeted campaigns to promote your training and events. Track conversions in Google and Bing from website registrations, and integrate your marketing automation tool to generate new leads. Leverage social media to share your courses and events.
 
 = Requirements =
-* PHP Version - WordPress PHP version must be 5.5 or higher.
+* WordPress minimum version - Minimum required version of WordPress is 4.7 but WordPress should be kept up to date with the latest version.
+* PHP Version - Minimum PHP version must be 5.5 but PHP 7 onwards should be preferred.
 * Shared Server Hosting - Slow shared server hosting can cause issues with the data import. If you have shared server hosting please ensure you [set up a Cron Job](http://developer.arlo.co/doc/wordpress/import#import-cron-job?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing).
-* WordPress version - Your WordPress should be kept updated to the latest version available. 
 * Cache plugins - Caching plugins can interfere with the Arlo WordPress plugin. Once changes have been made to the Arlo plugin, ensure you clear or reset your caching plugins if you have them. 
+* IP Blocker plugins - Plugins blocking some IP can interfere with the sync system. Please allow [Arlo prod servers IPs](https://support.arlo.co/hc/en-gb/articles/360001023963?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing).
 * [Google Maps API key](https://developer.arlo.co/doc/wordpress/settings#general-settings?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) is required for the maps on the venue profile pages (You need to enable the [Google Static Maps API](https://developers.google.com/maps/documentation/javascript/get-api-key?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) for the project).
 * Arlo platform (Sign-up for a [free Arlo trial](https://www.arlo.co/register?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)) 
 
@@ -113,7 +115,7 @@ Sign-up for a [free Arlo trial](https://www.arlo.co/register?utm_source=wordpres
 
 = Once Activated =
 
-1. Go to your pages, Arlo will create 4 pages for you (Events, Upcoming events, Venues, Presenters), publish them if you want to use all the plugin's features.
+1. Go to your pages, Arlo will create several pages for you (Events, Upcoming Events, Event search, Schedule, Online Activities, Venues, Presenters). They will be automatically published so you can benefit from all the plugin's features.
 2. Visit 'Settings > Arlo' and add your Arlo platform name (for testing purpose you can use the 'demo-au' as a platform name)
 3. In 'Settings > Arlo', setup your post type pages (the previously created ones) and 
 4. In 'Settings > Arlo', save the settings
@@ -159,17 +161,24 @@ The Arlo - Training and Event Management, and online registration plugin is only
 
 == Screenshots ==
 
-1. Themes
-2. CustomCss
-3. General
-4. Pages
-5. Regions
-6. Support
-7. System requirements
-8. Theme Block - Catalouge
-9. Theme Block - Upcoming events
-10. Theme Jazz - Catalogue
-11. Theme Jazz - Upcoming events
+1. Arlo Themes
+2. Theme Starter - Catalogue
+3. Theme Starter - Upcoming events
+4. Theme Starter - Schedule
+5. Theme Starter Hero - Catalogue
+6. Theme Starter Hero - Upcoming events
+7. Theme Jazz - Catalogue
+8. Theme Spark - Upcoming events
+9. Theme Block - Catalogue
+10. Theme BeSoftware - Schedule
+11. Theme Starter - Presenters
+12. Theme Block - Venues
+13. Theme Starter - Catalogue - Mobile version
+14. Admin - Custom Css
+15. Admin - Pages
+16. Admin - General
+17. Admin - Regions
+18. Admin - System requirements
 
 == Changelog ==
 

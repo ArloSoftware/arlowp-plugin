@@ -961,7 +961,7 @@ class Arlo_For_Wordpress_Settings {
 				<li>New WordPress <a href="https://wordpress.org/plugins/arlo-training-and-event-management-system/" target="_blank">minimum version requirement</a> of 4.7</li>
 				<li>New system requirements now checking against WordPress 4.7 and PHP 5.5</li>
 				<li>"Download log" file structure ID changed for Id</li>
-				<li>New "<a href="https://support.arlo.co/hc/en-gb/sections/115000452543-WordPress-Control-Themes" target="_blank">Starter Hero</a>" Arlo Theme</li>
+				<li>New "<a href="https://support.arlo.co/hc/en-gb/articles/360020232631" target="_blank">Starter Hero</a>" Arlo Theme</li>
 				<li>Manual plugin upload process available from this version</li>
 				<li>New "Keep settings" option for plugin deletion</li>
 				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_hero_image" target="_blank">[arlo_event_template_hero_image]</a> shortcode</li>
