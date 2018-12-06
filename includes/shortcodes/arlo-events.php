@@ -1191,13 +1191,14 @@ class Events {
 
                 foreach ($events as $event) {
                     if (!empty($event->e_startdatetime)) {
+                        $dateFormat = $format;
                         if(date('y', strtotime($event->e_startdatetime)) == date('y') && $removeyear) {
-                            $format = trim(preg_replace('/\s+/', ' ', str_replace(["%Y", "%y", "Y", "y", "%g", "%G"], "", $format)));
+                            $dateFormat = trim(preg_replace('/\s+/', ' ', str_replace(["%Y", "%y", "Y", "y", "%g", "%G"], "", $dateFormat)));
                         }
                         
                         $location = $event->e_locationname;
 
-                        if ($format == 'period') {
+                        if ($dateFormat == 'period') {
                             $startDay = self::event_date_formatter(['format' => 'j'], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
                             $startMonth = self::event_date_formatter(['format' => 'M'], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
                             $startYear = self::event_date_formatter(['format' => 'y'], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
@@ -1214,7 +1215,7 @@ class Events {
                                 $date = sprintf("%s %s", $startDay, $startMonth);
                             }
                         } else {
-                            $date = self::event_date_formatter(['format' => $format], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
+                            $date = self::event_date_formatter(['format' => $dateFormat], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
                         }
     
                         $display_text = str_replace(['{%date%}', '{%location%}'], [esc_html($date), esc_html($location)], $text);
