@@ -4,7 +4,7 @@
     "name": "Block",
     "description": "Design includes key information displayed within boxes",
     "forDesigners": false,
-    "demoUrl": "",
+    "demoUrl": "https://support.arlo.co/hc/en-gb/articles/115001797703",
     "externalResources": {
         "stylesheets": [
             "https://fonts.googleapis.com/css?family=Roboto:400,400i,700,700i,900,900i"

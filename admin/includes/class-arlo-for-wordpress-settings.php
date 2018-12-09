@@ -1125,13 +1125,13 @@ class Arlo_For_Wordpress_Settings {
 				</div>
 				<div class="arlo-theme-buttons">
 					<ul>
-					' . (!empty($theme_data->demoUrl) ? '<li><a href="' . $theme_data->demoUrl . '" target="_blank">' . __('Preview', 'arlo-for-wordpress' ) . '</a></li>' : '' ) . '
 					' . ($selected_theme_id == $theme_data->id ? '
 						<li class="arlo-theme-current">Current</li>
 					':'
 						<li><a class="theme-apply" href="' . wp_nonce_url(admin_url('admin.php?page=arlo-for-wordpress&apply-theme=' . urlencode($theme_data->id)), 'arlo-apply-theme-nonce') . '">' . __('Apply', 'arlo-for-wordpress') . '</a></li>
 					') .
 						( $theme_data->id != 'custom' ? '<li><a class="theme-apply theme-reset" href="' . wp_nonce_url(admin_url('admin.php?page=arlo-for-wordpress&apply-theme=' . urlencode($theme_data->id) . '&reset=1'), 'arlo-apply-theme-nonce') . '">' . ($selected_theme_id == $theme_data->id ? __('Reset', 'arlo-for-wordpress') : __('Apply & Reset', 'arlo-for-wordpress')) . '</a></li>' : '') . '
+					' . (!empty($theme_data->demoUrl) ? '<li><a href="' . $theme_data->demoUrl . '" target="_blank">' . __('Preview', 'arlo-for-wordpress' ) . '</a></li>' : '' ) . '
 					</ul>
 				</div>
 			</li>';
