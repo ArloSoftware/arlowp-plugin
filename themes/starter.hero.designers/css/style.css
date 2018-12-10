@@ -3116,6 +3116,9 @@
 }
 .arlo#arlo .breadcrumbs ul li a {
   color: white;
+  display: block;
+  line-height: 25px;
+  font-size: 14px;
 }
 .arlo#arlo .breadcrumbs ul li.root {
   background-color: #6d5cae;
