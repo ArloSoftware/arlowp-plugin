@@ -193,4 +193,22 @@ class Categories {
 
         return $cats;
 	}
+
+	/**
+	 * Get a tree from a child element up
+	 * @param  integer $child_id  Child c_arlo_id to start from
+	 * @param  integer $import_id Import ID
+	 * @return array              Ordered array of categories with root first
+	 */
+	public static function get_tree_from_child($child_id, $import_id){
+		$cat = self::get(array('id' => $child_id), null, $import_id);
+		$results = [$cat];
+
+		while ($cat->c_parent_id != 1){
+			$cat = self::get(array('id' => $cat->c_parent_id), null, $import_id);
+			$results[] = $cat;
+		}
+
+		return array_reverse($results);
+	}
 }

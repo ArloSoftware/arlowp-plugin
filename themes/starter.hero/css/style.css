@@ -3087,9 +3087,10 @@
 }
 .arlo#arlo .breadcrumbs {
   position: relative;
+  height: 50px;
+  margin-bottom: 15px;
 }
 .arlo#arlo .breadcrumbs .outer {
-  width: 50%;
   background-color: #6d5cae;
   position: absolute;
   top: 0;

@@ -1297,6 +1297,52 @@ class Events {
         return $return;
     }
 
+    /**
+     * Shortcode for event template / catalogue breadcrumbs
+     * @param  string $content
+     * @param  array  $atts
+     * @param  string $shortcode_name
+     * @param  integer $import_id
+     * @return string
+     */
+    private static function shortcode_event_template_breadcrumbs($content = '', $atts = [], $shortcode_name = '', $import_id = ''){
+        extract(shortcode_atts(array(
+            'root_title'   => 'Events'
+        ), $atts, $shortcode_name, $import_id));
+
+        $events_url = get_page_link(get_option('arlo_settings')['post_types']['event']['posts_page']);
+        $html = '<div class="arlo-breadcrumbs breadcrumbs">
+            <div class="outer">
+                <div class="inner">
+                    <ul>
+                        <li class="root">
+                            <a href="' . $events_url . '">'.__($root_title, "arlo-for-wordpress").'</a>
+                        </li>';
+
+        $arlo_category = \Arlo\Utilities::clean_string_url_parameter('arlo-category');
+        $cat_slug = !empty($arlo_category) ? $arlo_category : '';
+        $cat = null;
+
+        if (!empty($cat_slug)){
+            $cat = \Arlo\Entities\Categories::get(array('slug' => $cat_slug), null, $import_id);
+
+            $tree = \Arlo\Entities\Categories::get_tree_from_child($cat->c_arlo_id, $import_id);
+            $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
+
+            foreach ($tree as $key => $currentCategory) {
+                $html .= '<li>
+                    <a href="' . $events_url . (!empty($arlo_region) ? 'region-' . $arlo_region . '/' : '') . ($currentCategory->c_parent_id != 0 ? 'cat-' . esc_attr($currentCategory->c_slug) : '') . '">' . $currentCategory->c_name . '</a>
+                </li>';
+            }
+        }
+
+        $html .= '</ul>
+                </div>
+            </div>
+        </div>';
+
+        return $html;
+    }
 
     private static function get_event_date_link($url, $buttonclass, $display_text) {
         return sprintf('<a href="%s" class="%s">%s</a>', esc_attr($url), esc_attr($buttonclass), $display_text);
