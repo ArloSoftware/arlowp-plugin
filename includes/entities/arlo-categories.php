@@ -204,7 +204,7 @@ class Categories {
 		$cat = self::get(array('id' => $child_id), null, $import_id);
 		$results = [$cat];
 
-		while ($cat->c_parent_id != 1){
+		while ($cat->c_parent_id > 1){
 			$cat = self::get(array('id' => $cat->c_parent_id), null, $import_id);
 			$results[] = $cat;
 		}
