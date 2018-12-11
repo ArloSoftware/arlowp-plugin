@@ -192,8 +192,12 @@ function arlo_register_custom_post_types() {
 					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(oatag-([^/]*))?/?(page/([^/]*))?/?(templatetag-([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-oatag=$matches[6]&paged=$matches[8]&arlo-templatetag=$matches[10]','top');
 				break;			
 				case 'event':
+					// Base event rule with only event and region
 					add_rewrite_rule('^' . $slug . '/(\d+-[^/]*)+/?(region-([^/]*))?/?$','index.php?arlo_event=$matches[1]&arlo-region=$matches[3]','top');
+					// Events with location and state
 					add_rewrite_rule('^' . $slug . '/(\d+-[^/]*)+/?(region-([^/]*))?/?(location-([^/]*))?/?(state-([^/]*))?/?$','index.php?arlo_event=$matches[1]&arlo-region=$matches[3]&arlo-location=$matches[5]&arlo-state=$matches[7]','top');
+					// Events with Event ID
+					add_rewrite_rule('^' . $slug . '/(\d+-[^/]*)+/?(region-([^/]*))?/?(event-([^/]*))?/?$','index.php?arlo_event=$matches[1]&arlo-region=$matches[3]&arlo-event-id=$matches[5]','top');
 
 					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(templatetag-([^/]*))?/?(state-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-delivery=$matches[10]&arlo-templatetag=$matches[12]&arlo-state=$matches[14]&paged=$matches[16]','top');
 				break;
@@ -229,6 +233,7 @@ function arlo_register_custom_post_types() {
 	add_rewrite_tag('%arlo-presenter%', '([^&]+)');
 	add_rewrite_tag('%arlo-templatetag%', '([^&]+)');
 	add_rewrite_tag('%arlo-search%', '([^&]+)');
+	add_rewrite_tag('%arlo-event-id%', '([^&]+)');
 	add_rewrite_tag('%paged%', '([^&]+)');
 	
 	// flush cached rewrite rules if we've just updated the arlo settings

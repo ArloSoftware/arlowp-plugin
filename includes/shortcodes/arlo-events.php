@@ -181,6 +181,7 @@ class Events {
         $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
         $arlo_location = \Arlo\Utilities::clean_string_url_parameter('arlo-location');
         $arlo_state = \Arlo\Utilities::clean_string_url_parameter('arlo-state');
+        $arlo_event_id = \Arlo\Utilities::clean_string_url_parameter('arlo-event-id');
         
         $t1 = "{$wpdb->prefix}arlo_eventtemplates";
         $t2 = "{$wpdb->prefix}arlo_events";
@@ -198,6 +199,11 @@ class Events {
             $where .= ' AND ' . $t2 .'.e_locationname = %s';
             $parameters[] = $arlo_location;
         };
+
+        if (!empty($arlo_event_id)){
+            $where .= ' AND ' . $t2 . '.e_arlo_id = %d';
+            $parameters[] = $arlo_event_id;
+        }
 
         if (!empty($arlo_state)) {
             $venues = \Arlo\Entities\Venues::get(['state' => $arlo_state], null, null, $import_id);
