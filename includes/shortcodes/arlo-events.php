@@ -1312,7 +1312,7 @@ class Events {
 
         $settings = get_option('arlo_settings');
 
-        if (!isset($settings['post_types']['event']['posts_page']) || empty($settings['post_types']['event']['posts_page'])){ return ''; }
+        if (empty($settings['post_types']['event']['posts_page'])){ return ''; }
         $events_url = get_page_link($settings['post_types']['event']['posts_page']);
 
         $html = '<div class="arlo-breadcrumbs breadcrumbs">
@@ -1320,7 +1320,7 @@ class Events {
                 <div class="inner">
                     <ul>
                         <li class="root">
-                            <a href="' . esc_url($events_url) . '">' . $origin . '</a>
+                            <a href="' . esc_url($events_url) . '">' . esc_html($origin) . '</a>
                         </li>';
 
         $arlo_category = \Arlo\Utilities::clean_string_url_parameter('arlo-category');
