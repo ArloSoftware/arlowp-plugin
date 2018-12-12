@@ -1424,3 +1424,17 @@ body.arlo {
         text-align: right;
     }
 }
+
+.arlo-breadcrumbs ul{
+    list-style: none;
+    padding-left: 0;
+    margin: 1em 0;
+}
+.arlo-breadcrumbs li{
+    display: inline-block;
+}
+.arlo-breadcrumbs li:not(:last-child)::after{
+    content: '>';
+    padding-left: 3px;
+    padding-right: 5px;
+}
