@@ -1384,7 +1384,9 @@ body.arlo {
 .arlo#arlo .arlo-list.event-search .arlo-next-running a.arlo-register:hover,
 .arlo#arlo .arlo-list.event-search .arlo-next-running span,
 .arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a.arlo-register,
-.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a.arlo-register:hover {
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a.arlo-register:hover,
+.arlo#arlo .arlo-event-registration .arlo-register:hover,
+.arlo#arlo .arlo-oa-registration .arlo-register:hover {
     color: white;
 }
 
