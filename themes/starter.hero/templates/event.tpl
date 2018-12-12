@@ -33,7 +33,7 @@
     <div class="clearfix row events-4 arlo-template-events-list p-b-10">
 
 		[arlo_event_list]
-		[arlo_event_list_item show="4"]
+		[arlo_event_list_item show="4" within_ul="false"]
 
 
           <div class="event m-b-10">
