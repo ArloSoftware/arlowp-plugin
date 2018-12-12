@@ -140,6 +140,12 @@ class Events {
         $sql = self::generate_events_list_sql($atts, $import_id);
 
         $items = $wpdb->get_results($sql, ARRAY_A);
+
+        extract(shortcode_atts(array(
+            'show' => '',
+            'within_ul' => 'true'
+        ), $atts, $shortcode_name, $import_id));
+        $within_ul = filter_var($within_ul, FILTER_VALIDATE_BOOLEAN);
         
         $output = '';
         
@@ -157,8 +163,10 @@ class Events {
                     $GLOBALS['arlo_venue_list_item'] = \Arlo\Entities\Venues::get($conditions, null, null, $import_id);    
                 }
 
-                if (!empty($atts['show']) && $key == $atts['show']) {
-                    $output .= '</ul><ul class="arlo-list arlo-show-more-hidden events">';
+                if (!empty($show) && $key == $show) {
+                    if ($within_ul){ $output .= "</ul>"; }
+                    $output .= '<ul class="arlo-list arlo-show-more-hidden events">';
+                    if (!$within_ul){ $output .= "</ul>"; }
                 }
         
                 $output .= do_shortcode($content);
