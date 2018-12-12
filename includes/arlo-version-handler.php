@@ -5,7 +5,7 @@ namespace Arlo;
 use Arlo\Utilities;
 
 class VersionHandler {
-	const VERSION = '4.0';
+	const VERSION = '4.1';
 
 	private $dbl;
 	private $message_handler;
@@ -293,10 +293,9 @@ class VersionHandler {
 				if (is_null($exists)) {
 					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_eventtemplates ADD et_list_image text NULL AFTER et_hero_image");
 				}
+			break;
 
-
-				///// 1
-				// next version - not 4.0
+			case '4.1':
 				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_timezones LIKE 'utc_offset'", 0, 0);
 				if (is_null($exists)) {
 					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_timezones ADD utc_offset INT(11) NOT NULL AFTER windows_tz_id");
@@ -319,9 +318,6 @@ class VersionHandler {
 				}
 				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events DROP e_datetimeoffset;");
 				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events DROP e_timezone;");
-				///// 2
-				///// 3
-				///// 4
 			break;
 		}
 	}	

@@ -958,6 +958,13 @@ class Arlo_For_Wordpress_Settings {
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">	  
+				<li>todo</li>
+			</ul>
+		</p>
+
+		<h4>Version 4.0</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">	  
 				<li>New WordPress <a href="https://wordpress.org/plugins/arlo-training-and-event-management-system/" target="_blank">minimum version requirement</a> of 4.7</li>
 				<li>New system requirements now checking against WordPress 4.7 and PHP 5.5</li>
 				<li>"Download log" file structure ID changed for Id</li>
