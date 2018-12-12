@@ -172,7 +172,19 @@ class Events {
                 $output .= do_shortcode($content);
 
                 unset($GLOBALS['arlo_venue_list_item']);
-            }   
+            }
+
+            $arlo_event_id = \Arlo\Utilities::clean_string_url_parameter('arlo-event-id');
+            if (!empty($arlo_event_id)){
+                $url = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
+
+                if ($within_ul){ $output .= "</ul>"; }
+                $output .= "<div class='arlo-single-show-wrapper'>
+                            <a href='" . esc_url($url) . "' class='arlo-show-more arlo-button button'>
+                                " . __("Show More", "arlo-for-wordpress") . "
+                            </a>
+                    </div>";
+            }
         } 
         
         return $output;        
@@ -1260,6 +1272,12 @@ class Events {
                                 }
                                 $link .= self::get_event_date_link($url, $buttonclass . $fullclass . $limitedclass . $discountclass, $display_text);
                                 break;
+                            case "single":
+                                $url = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
+                                if (substr($url, -1) != '/'){ $url .= '/'; }
+                                $url .= "event-" . $event->e_arlo_id . '/';
+                                $link .= self::get_event_date_link($url, $buttonclass . $fullclass . $limitedclass . $discountclass, $display_text);
+                                break;
                         }
     
                         $link .= ($layout == 'list' ? "</li>" : "");
@@ -1282,6 +1300,7 @@ class Events {
                     $href = '';
                     switch ($template_link) {
                         case "permalink":
+                        case "single":
                             $url = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
                             $href = 'href="' . esc_url($url) . '"';
                             break;

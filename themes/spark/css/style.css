@@ -1670,3 +1670,10 @@ body.arlo {
 .arlo-categories-widget .arlo-category-list li ul a {
     font-weight: 600;
 }
+
+.arlo-single-show-wrapper{
+  clear: both;
+  text-align: center;
+  padding-top: 10px;
+  margin-bottom: 5px;
+}

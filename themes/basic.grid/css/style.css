@@ -411,3 +411,9 @@
 .arlo .arlo-boxed .arlo-show-more-link:hover{
     outline: 6px solid #fff;
 }
+
+.arlo-single-show-wrapper{
+  clear: both;
+  padding-top: 10px;
+  margin-bottom: 5px;
+}
