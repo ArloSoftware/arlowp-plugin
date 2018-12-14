@@ -5,7 +5,7 @@ namespace Arlo;
 use Arlo\Utilities;
 
 class VersionHandler {
-	const VERSION = '4.0';
+	const VERSION = '4.1';
 
 	private $dbl;
 	private $message_handler;
@@ -75,6 +75,10 @@ class VersionHandler {
 		
 		if (version_compare($old_version, '4.0') < 0) {
 			$this->run_pre_data_update('4.0');
+		}
+
+		if (version_compare($old_version, '4.1') < 0) {
+			$this->run_pre_data_update('4.1');
 		}
 		
 		arlo_add_datamodel();	
@@ -292,6 +296,13 @@ class VersionHandler {
 				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_eventtemplates LIKE 'et_list_image'", 0, 0);
 				if (is_null($exists)) {
 					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_eventtemplates ADD et_list_image text NULL AFTER et_hero_image");
+				}
+			break;
+
+			case '4.1':
+				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_venues LIKE 'v_locationname'", 0, 0);
+				if (is_null($exists)) {
+					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_venues ADD v_locationname text NULL AFTER v_name");
 				}
 			break;
 		}

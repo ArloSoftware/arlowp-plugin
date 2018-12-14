@@ -6,5 +6,7 @@
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_directions" target="_blank">[arlo_venue_directions]</a></li>
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_parking" target="_blank">[arlo_venue_parking]</a></li>
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_map" target="_blank">[arlo_venue_map]</a></li>
+	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_schedule_link"></a>[arlo_venue_schedule_link]</li>
+	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_upcoming_link"></a>[arlo_venue_upcoming_link]</li>
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_rich_snippet" target="_blank">[arlo_venue_rich_snippet]</a></li>
 </ul>

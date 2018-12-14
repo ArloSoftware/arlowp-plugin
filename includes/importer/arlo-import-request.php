@@ -35,7 +35,7 @@ class ImportRequest extends BaseImporter  {
 			'OnlineActivityID', 'TemplateID', 'Name', 'Code', 'DeliveryDescription', 'ViewUri', 'ReferenceTerms', 'Credits', 'RegistrationInfo', 'AdvertisedOffers', 'Tags',
 		],
 		'Venues' => [
-			'VenueID', 'Name', 'GeoData', 'PhysicalAddress', 'FacilityInfo', 'ViewUri',
+			'VenueID', 'Name', 'GeoData', 'PhysicalAddress', 'FacilityInfo', 'ViewUri', 'LocationName',
 		],
 		'Categories' => [
 			'CategoryID', 'ParentCategoryID', 'Name', 'SequenceIndex', 'Description', 'Footer',
