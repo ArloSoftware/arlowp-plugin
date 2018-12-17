@@ -29,8 +29,8 @@
           [arlo_venue_parking label='<h4>Parking</h4>']
         </div>
       </div>
-      [arlo_venue_schedule_link class="btn btn-secondary m-t-10 m-r-10" target="_blank"]
-      [arlo_venue_upcoming_link class="btn btn-secondary m-t-10 m-r-10" target="_blank"]
+      [arlo_venue_locationname link_page="schedule" wrap='<a href="%s" class="btn btn-secondary m-t-10 m-r-10" target="_blank">View scheduled</a>']
+      [arlo_venue_locationname link_page="upcoming" wrap='<a href="%s" class="btn btn-secondary m-t-10 m-r-10" target="_blank">View upcoming</a>']
     </div>
         
     [arlo_venue_rich_snippet]

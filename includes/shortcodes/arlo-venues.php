@@ -372,70 +372,37 @@ class Venues {
     }
 
     /**
-     * Output link to Upcoming events with Venue location filter
+     * Output location name or url to Upcoming/Schedule events with Venue location filter
      * @param  string $content
      * @param  array  $atts
      * @param  string $shortcode_name
      * @param  string $import_id
-     * @return string                 <a> element
+     * @return string                 Location name or URLs filtered for location
      */
-    private static function shortcode_venue_upcoming_link($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        if(!isset($GLOBALS['arlo_venue_list_item'])) return 'nodata';
+    private static function shortcode_venue_locationname($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if(!isset($GLOBALS['arlo_venue_list_item']['v_locationname'])) return '';
 
         extract(shortcode_atts(array(
-            'target' => '_self',
-            'class' => ''
+            'link_page' => ''
         ), $atts, $shortcode_name, $import_id));
 
-        $upcoming_url = get_permalink(arlo_get_post_by_name('upcoming', 'page'));
-        if ($upcoming_url !== false){
-
-            $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
-            $upcoming_url .= (!empty($arlo_region) ? 'region-' . $arlo_region . '/' : '');
-            if (isset($GLOBALS['arlo_venue_list_item']['v_locationname'])){
-                $upcoming_url .= "location-" . urlencode($GLOBALS['arlo_venue_list_item']['v_locationname']) . '/';
-            } else {
-                // There is a magical redirect somewhere if ends with upcoming or schedule
-                $upcoming_url .= 'upcoming';
-            }
-            return sprintf('<a href="%s" target="%s" class="%s">' . __('View upcoming', 'arlo-for-wordpress') . '</a>', esc_url($upcoming_url), esc_attr($target), esc_attr($class));
-        } else {
-            // Cannot find upcoming url, 404
-            return '';
+        switch ($link_page) {
+            case 'upcoming':
+                $location_url = get_permalink(arlo_get_post_by_name('upcoming', 'page'));
+                break;
+            case 'schedule':
+                $location_url = get_permalink(arlo_get_post_by_name('schedule', 'page'));
+                break;
         }
-    }
 
-    /**
-     * Output link to Schedule with Venue location filter
-     * @param  string $content
-     * @param  array  $atts
-     * @param  string $shortcode_name
-     * @param  string $import_id
-     * @return string                 <a> element
-     */
-    private static function shortcode_venue_schedule_link($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        if(!isset($GLOBALS['arlo_venue_list_item'])) return 'nodata';
-
-        extract(shortcode_atts(array(
-            'target' => '_self',
-            'class' => ''
-        ), $atts, $shortcode_name, $import_id));
-
-        $schedule_url = get_permalink(arlo_get_post_by_name('schedule', 'page'));
-        if ($schedule_url !== false){
-
+        if (!empty($location_url)){
             $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
-            $schedule_url .= (!empty($arlo_region) ? 'region-' . $arlo_region . '/' : '');
-            if (isset($GLOBALS['arlo_venue_list_item']['v_locationname'])){
-                $schedule_url .= "location-" . urlencode($GLOBALS['arlo_venue_list_item']['v_locationname']) . '/';
-            } else {
-                // There is a magical redirect somewhere if ends with schedule or upcoming
-                $schedule_url .= 'schedule';
-            }
-            return sprintf('<a href="%s" target="%s" class="%s">' . __('View schedule', 'arlo-for-wordpress') . '</a>', esc_url($schedule_url), esc_attr($target), esc_attr($class));
+            $location_url .= (!empty($arlo_region) ? 'region-' . $arlo_region . '/' : '');
+
+            $location_url .= "location-" . urlencode($GLOBALS['arlo_venue_list_item']['v_locationname']) . '/';
+            return esc_url($location_url);
         } else {
-            // Cannot find upcoming url, 404
-            return '';
+            return esc_html($GLOBALS['arlo_venue_list_item']['v_locationname']);
         }
     }
 
