@@ -65,16 +65,19 @@ class Redirect {
         $import_id = $plugin->get_importer()->get_current_import_id();
 
         $eventtemplate = Templates::get(['id' => $arlo_id], [], 1, $import_id);
-        $redirect_url = 'thiseventpagedoesnotexist';
 
         if (!empty($eventtemplate) && !empty($eventtemplate->et_post_name)) {
             $post = arlo_get_post_by_name($eventtemplate->et_post_name, 'arlo_event');
             if (!empty($post) && !empty($post->ID)) {
                 $redirect_url = get_permalink($post->ID);
+                if (!empty($redirect_url)){
+                    wp_redirect($redirect_url, 301);
+                    exit;
+                }
             }
         }
-        wp_redirect($redirect_url, 301);
-        exit;
+        // Cannot redirect, so 404
+        self::object_404();
     }
 
     private static function object_post_venue_redirect($arlo_id) {
@@ -82,16 +85,19 @@ class Redirect {
         $import_id = $plugin->get_importer()->get_current_import_id();
 
         $venue = Venues::get(['id' => $arlo_id], [], 1, $import_id);
-        $redirect_url = 'thisvenuepagedoesnotexist';
 
         if (!empty($venue) && !empty($venue['v_post_name'])) {
             $post = arlo_get_post_by_name($venue['v_post_name'], 'arlo_venue');
             if (!empty($post) && !empty($post->ID)) {
                 $redirect_url = get_permalink($post->ID);
+                if (!empty($redirect_url)){
+                    wp_redirect($redirect_url, 301);
+                    exit;
+                }
             }
         }
-        wp_redirect($redirect_url, 301);
-        exit;
+        // Cannot redirect, so 404
+        self::object_404();
     }
 
     private static function object_post_presenter_redirect($arlo_id) {
@@ -99,7 +105,6 @@ class Redirect {
         $import_id = $plugin->get_importer()->get_current_import_id();
 
         $presenter = Presenters::get(['id' => $arlo_id], [], 1, $import_id);
-        $redirect_url = 'thispresenterpagedoesnotexist';
 
         if (!empty($presenter) && !empty($presenter['p_post_name'])) {
             $post = arlo_get_post_by_name($presenter['p_post_name'], 'arlo_presenter');
@@ -111,8 +116,8 @@ class Redirect {
                 }
             }
         }
-        wp_redirect($redirect_url, 301);
-        exit;
+        // Cannot redirect, so 404
+        self::object_404();
     }
 
     private static function object_post_category_redirect($arlo_id) {
@@ -141,8 +146,18 @@ class Redirect {
                 exit;
             }
         }
-        wp_redirect('thiscategorycannotbedisplayed', 301);
-        exit;
+        // Cannot redirect, so 404
+        self::object_404();
+    }
+
+    /**
+     * Return a 404 error
+     */
+    private static function object_404(){
+        global $wp_query;
+
+        $wp_query->set_404();
+        status_header(404);
     }
 
 }
