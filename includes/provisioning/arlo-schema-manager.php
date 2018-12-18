@@ -264,6 +264,7 @@ class SchemaManager {
 			v_id int(11) NOT NULL AUTO_INCREMENT,
 			v_arlo_id int(11) NOT NULL,
 			v_name varchar(255) NULL,
+			v_locationname varchar(255) NULL,
 			v_geodatapointlatitude DECIMAL(10,6) NULL,
 			v_geodatapointlongitude DECIMAL(10,6) NULL,
 			v_physicaladdressline1 varchar(255) NULL,
