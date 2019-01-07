@@ -1097,6 +1097,7 @@ class Events {
         $return = "";
 
         $arlo_location = \Arlo\Utilities::get_filter_keys_string_array('location');
+        $arlo_venue = \Arlo\Utilities::get_att_string('venue');
         $arlo_delivery = \Arlo\Utilities::get_filter_keys_int_array('delivery');
         $arlo_state = \Arlo\Utilities::clean_string_url_parameter('arlo-state');
 
@@ -1152,6 +1153,14 @@ class Events {
         }
         else if (!empty($arlo_locationhidden)) {
             $conditions['e.e_locationname NOT IN ( %s )'] = $arlo_locationhidden;
+        }
+
+        if (!empty($arlo_venue)) {
+            $arlo_venue = \Arlo\Utilities::convert_string_to_int_array($arlo_venue);
+            if (!empty($arlo_venue)) {
+                if (!is_array($arlo_venue)) { $arlo_venue = [$arlo_venue]; }
+                $conditions["e.v_id IN ( %s )"] = $arlo_venue;
+            }
         }
 
         if(!empty($arlo_delivery)) {

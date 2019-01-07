@@ -312,6 +312,7 @@ class Templates {
 
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'location', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'locationhidden', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'venue', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'category', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'categoryhidden', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'search', $atts);
@@ -859,6 +860,7 @@ class Templates {
 
         $arlo_location = !empty($atts['location']) ? $atts['location'] : null;
         $arlo_locationhidden = !empty($atts['locationhidden']) ? $atts['locationhidden'] : null;
+        $arlo_venue = !empty($atts['venue']) ? $atts['venue'] : null;
         $arlo_state = !empty($atts['state']) ? $atts['state'] : null;
         $arlo_category = !empty($atts['category']) ? $atts['category'] : null;
         $arlo_categoryhidden = !empty($atts['categoryhidden']) ? $atts['categoryhidden'] : null;        
@@ -893,6 +895,15 @@ class Templates {
         if (!empty($arlo_locationhidden)) {    
             $where .= " AND e.e_locationname NOT IN (" . implode(',', array_map(function() {return "%s";}, $arlo_locationhidden)) . ")";                
             $parameters = array_merge($parameters, $arlo_locationhidden);    
+        }
+
+        if (!empty($arlo_venue)) {
+            $arlo_venue = \Arlo\Utilities::convert_string_to_int_array($arlo_venue);
+            if (!empty($arlo_venue)) {
+                if (!is_array($arlo_venue)) { $arlo_venue = [$arlo_venue]; }
+                $where .= " AND e.v_id IN (" . implode(',', array_map(function() {return "%s";}, $arlo_venue)) . ")";
+                $parameters = array_merge($parameters, $arlo_venue);
+            }
         }
 
         if(isset($arlo_delivery) || isset($arlo_deliveryhidden)) {

@@ -372,37 +372,43 @@ class Venues {
     }
 
     /**
-     * Output location name or url to Upcoming/Schedule events with Venue location filter
+     * Output location name
      * @param  string $content
      * @param  array  $atts
      * @param  string $shortcode_name
      * @param  string $import_id
-     * @return string                 Location name or URLs filtered for location
+     * @return string                 Location name
      */
     private static function shortcode_venue_locationname($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_venue_list_item']['v_locationname'])) return '';
 
+        return esc_html($GLOBALS['arlo_venue_list_item']['v_locationname']);
+    }
+
+    /**
+     * Output links to event lists, filtered by venue
+     * @param  string $content
+     * @param  array  $atts
+     * @param  string $shortcode_name
+     * @param  string $import_id
+     * @return string
+     */
+    private static function shortcode_venue_events_link($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         extract(shortcode_atts(array(
-            'link_page' => ''
+            'link_page' => 'upcoming'
         ), $atts, $shortcode_name, $import_id));
 
-        switch ($link_page) {
-            case 'upcoming':
-                $location_url = get_permalink(arlo_get_post_by_name('upcoming', 'page'));
-                break;
-            case 'schedule':
-                $location_url = get_permalink(arlo_get_post_by_name('schedule', 'page'));
-                break;
-        }
+        $settings = get_option('arlo_settings');
+        $location_url = get_permalink($settings['post_types'][$link_page]['posts_page']);
 
         if (!empty($location_url)){
             $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
             $location_url .= (!empty($arlo_region) ? 'region-' . $arlo_region . '/' : '');
 
-            $location_url .= "location-" . urlencode($GLOBALS['arlo_venue_list_item']['v_locationname']) . '/';
+            $location_url .= "venue-" . urlencode($GLOBALS['arlo_venue_list_item']['v_arlo_id']) . '-' . urlencode($GLOBALS['arlo_venue_list_item']['v_name']) . '/';
             return esc_url($location_url);
         } else {
-            return esc_html($GLOBALS['arlo_venue_list_item']['v_locationname']);
+            return '';
         }
     }
 
