@@ -6,7 +6,7 @@ use Arlo\Logger;
 
 class SchemaManager {
 
-	const DB_SCHEMA_HASH = '990fac0bd7eb5124dcd5d57c5318f56b2b076c93';
+	const DB_SCHEMA_HASH = 'bd3433fc50d0f33591947e829b901f6483007777';
 	const DB_SCHEMA_VERSION = '4.1.0';
 
 	/* database layer */
@@ -266,6 +266,7 @@ class SchemaManager {
 			v_id int(11) NOT NULL AUTO_INCREMENT,
 			v_arlo_id int(11) NOT NULL,
 			v_name varchar(255) NULL,
+			v_locationname varchar(255) NULL,
 			v_geodatapointlatitude DECIMAL(10,6) NULL,
 			v_geodatapointlongitude DECIMAL(10,6) NULL,
 			v_physicaladdressline1 varchar(255) NULL,

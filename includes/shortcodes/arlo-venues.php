@@ -371,6 +371,41 @@ class Venues {
         return Shortcodes::create_rich_snippet( json_encode($venue_snippet) ); 
     }
 
+    /**
+     * Output location name or url to Upcoming/Schedule events with Venue location filter
+     * @param  string $content
+     * @param  array  $atts
+     * @param  string $shortcode_name
+     * @param  string $import_id
+     * @return string                 Location name or URLs filtered for location
+     */
+    private static function shortcode_venue_locationname($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if(!isset($GLOBALS['arlo_venue_list_item']['v_locationname'])) return '';
+
+        extract(shortcode_atts(array(
+            'link_page' => ''
+        ), $atts, $shortcode_name, $import_id));
+
+        switch ($link_page) {
+            case 'upcoming':
+                $location_url = get_permalink(arlo_get_post_by_name('upcoming', 'page'));
+                break;
+            case 'schedule':
+                $location_url = get_permalink(arlo_get_post_by_name('schedule', 'page'));
+                break;
+        }
+
+        if (!empty($location_url)){
+            $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
+            $location_url .= (!empty($arlo_region) ? 'region-' . $arlo_region . '/' : '');
+
+            $location_url .= "location-" . urlencode($GLOBALS['arlo_venue_list_item']['v_locationname']) . '/';
+            return esc_url($location_url);
+        } else {
+            return esc_html($GLOBALS['arlo_venue_list_item']['v_locationname']);
+        }
+    }
+
     private static function get_venue_snippet($link) {
         $venue_snippet = array();
 

@@ -12,7 +12,12 @@ class Environment {
 
     public function __construct() {
 		ini_set('max_execution_time', 3000);
-		set_time_limit(3000);	
+
+        $disabled_functions = array_map('trim', explode(',', ini_get('disable_functions')));
+
+        if (!in_array('set_time_limit', $disabled_functions)){
+    		set_time_limit(3000);
+        }
 
         $this->memory_limit = $this->get_memory_limit();
     }

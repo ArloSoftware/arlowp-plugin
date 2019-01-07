@@ -76,6 +76,10 @@ class VersionHandler {
 		if (version_compare($old_version, '4.0') < 0) {
 			$this->run_pre_data_update('4.0');
 		}
+
+		if (version_compare($old_version, '4.1') < 0) {
+			$this->run_pre_data_update('4.1');
+		}
 		
 		arlo_add_datamodel();	
 
@@ -318,6 +322,11 @@ class VersionHandler {
 				}
 				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events DROP e_datetimeoffset;");
 				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events DROP e_timezone;");
+
+				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_venues LIKE 'v_locationname'", 0, 0);
+				if (is_null($exists)) {
+					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_venues ADD v_locationname text NULL AFTER v_name");
+				}
 			break;
 		}
 	}	
