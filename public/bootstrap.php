@@ -632,9 +632,9 @@ function arlo_get_post_by_name($name, $post_type='post') {
 function arlo_add_datamodel() {
 	$plugin = Arlo_For_Wordpress::get_instance();
 
-	error_log("DB Hash before install_schema: " . $plugin->get_schema_manager()->create_db_schema_hash());
+	// error_log("DB Hash before install_schema: " . $plugin->get_schema_manager()->create_db_schema_hash());
 
 	$plugin->get_schema_manager()->install_schema();
 
-	error_log("DB Hash after install_schema: " . $plugin->get_schema_manager()->create_db_schema_hash());
+	// error_log("DB Hash after install_schema: " . $plugin->get_schema_manager()->create_db_schema_hash());
 }
