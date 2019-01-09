@@ -893,6 +893,10 @@ body.arlo {
     width: 100%;
 }
 
+.arlo#arlo .arlo-search-button{
+    vertical-align: unset;
+}
+
 @media (min-width: 550px) {
     .arlo#arlo .arlo-search-field,
     .arlo#arlo .arlo-search-button {
