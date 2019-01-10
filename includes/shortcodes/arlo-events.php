@@ -172,7 +172,19 @@ class Events {
                 $output .= do_shortcode($content);
 
                 unset($GLOBALS['arlo_venue_list_item']);
-            }   
+            }
+
+            $arlo_event_id = \Arlo\Utilities::clean_string_url_parameter('arlo-event-id');
+            if (!empty($arlo_event_id)){
+                $url = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
+
+                if ($within_ul){ $output .= "</ul>"; }
+                $output .= "<div class='arlo-single-show-wrapper'>
+                            <a href='" . esc_url($url) . "' class='arlo-show-more arlo-button button'>
+                                " . __("Show More", "arlo-for-wordpress") . "
+                            </a>
+                    </div>";
+            }
         } 
         
         return $output;        
@@ -189,6 +201,7 @@ class Events {
         $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
         $arlo_location = \Arlo\Utilities::clean_string_url_parameter('arlo-location');
         $arlo_state = \Arlo\Utilities::clean_string_url_parameter('arlo-state');
+        $arlo_event_id = \Arlo\Utilities::clean_string_url_parameter('arlo-event-id');
         
         $t1 = "{$wpdb->prefix}arlo_eventtemplates";
         $t2 = "{$wpdb->prefix}arlo_events";
@@ -206,6 +219,11 @@ class Events {
             $where .= ' AND ' . $t2 .'.e_locationname = %s';
             $parameters[] = $arlo_location;
         };
+
+        if (!empty($arlo_event_id)){
+            $where .= ' AND ' . $t2 . '.e_arlo_id = %d';
+            $parameters[] = $arlo_event_id;
+        }
 
         if (!empty($arlo_state)) {
             $venues = \Arlo\Entities\Venues::get(['state' => $arlo_state], null, null, $import_id);
@@ -1268,6 +1286,12 @@ class Events {
                                 }
                                 $link .= self::get_event_date_link($url, $buttonclass . $fullclass . $limitedclass . $discountclass, $display_text);
                                 break;
+                            case "single":
+                                $url = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
+                                if (substr($url, -1) != '/'){ $url .= '/'; }
+                                $url .= "event-" . $event->e_arlo_id . '/';
+                                $link .= self::get_event_date_link($url, $buttonclass . $fullclass . $limitedclass . $discountclass, $display_text);
+                                break;
                         }
     
                         $link .= ($layout == 'list' ? "</li>" : "");
@@ -1290,6 +1314,7 @@ class Events {
                     $href = '';
                     switch ($template_link) {
                         case "permalink":
+                        case "single":
                             $url = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
                             $href = 'href="' . esc_url($url) . '"';
                             break;

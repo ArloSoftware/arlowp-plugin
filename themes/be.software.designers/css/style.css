@@ -1438,3 +1438,10 @@ body.arlo {
     padding-left: 3px;
     padding-right: 5px;
 }
+
+.arlo-single-show-wrapper{
+  clear: both;
+  text-align: center;
+  padding-top: 5px;
+  margin-bottom: 5px;
+}

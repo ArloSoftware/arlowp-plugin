@@ -425,3 +425,9 @@
 	padding-left: 3px;
 	padding-right: 5px;
 }
+
+.arlo-single-show-wrapper{
+  clear: both;
+  padding-top: 10px;
+  margin-bottom: 5px;
+}

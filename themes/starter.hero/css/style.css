@@ -4836,7 +4836,8 @@
 .arlo#arlo .arlo-show-more-link,
 .arlo#arlo .arlo-show-more-link:focus,
 .arlo#arlo .event .button.arlo-register,
-.arlo#arlo .online-activity .arlo-register {
+.arlo#arlo .online-activity .arlo-register,
+.arlo#arlo .arlo-single-show-wrapper .arlo-show-more {
   color: #fff;
   background-color: #4e5ec1;
   border-color: #4e5ec1;
@@ -14366,4 +14367,10 @@
 
 .arlo-sessions-popup-inner .session-row:last-child {
   border-bottom: 0;
+}
+
+.arlo-single-show-wrapper{
+  clear: both;
+  text-align: center;
+  padding-top: 10px;
 }

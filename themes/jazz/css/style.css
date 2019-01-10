@@ -1308,7 +1308,8 @@ body.arlo {
 .arlo#arlo .arlo-button,
 .arlo#arlo .arlo-list.event-search .arlo-next-running a.arlo-register,
 .arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a.arlo-register,
-.arlo#arlo .arlo-list.schedule .arlo-next-running a.arlo-register {
+.arlo#arlo .arlo-list.schedule .arlo-next-running a.arlo-register,
+.arlo#arlo .arlo-single-show-wrapper .arlo-show-more {
     background-color: #f97070;
 }
 
@@ -1390,7 +1391,9 @@ body.arlo {
 .arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a.arlo-register,
 .arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a.arlo-register:hover,
 .arlo#arlo .arlo-event-registration .arlo-register:hover,
-.arlo#arlo .arlo-oa-registration .arlo-register:hover {
+.arlo#arlo .arlo-oa-registration .arlo-register:hover,
+.arlo#arlo .arlo-single-show-wrapper .arlo-show-more,
+.arlo#arlo .arlo-single-show-wrapper .arlo-show-more:hover {
     color: white;
 }
 
@@ -1430,4 +1433,11 @@ body.arlo {
     content: '>';
     padding-left: 3px;
     padding-right: 5px;
+}
+
+.arlo-single-show-wrapper{
+  clear: both;
+  text-align: center;
+  padding-top: 10px;
+  margin-bottom: 5px;
 }
