@@ -969,8 +969,25 @@ class Arlo_For_Wordpress_Settings {
 		
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
-			<ul class="arlo-whatsnew-list">	  
-				<li>todo</li>
+			<ul class="arlo-whatsnew-list">
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_breadcrumbs">[arlo_event_template_breadcrumbs]</a> shortcode</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_locationname">[arlo_venue_locationname]</a> shortcode</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_events_link">[arlo_venue_events_link]</a> shortcode</li>
+				<li>Event template page can now show a single event</li>
+				<li>Tested up to Wordpress 5.0</li>
+				<li>End date now uses correct timezone offset</li>
+				<li>Automatic navigation to new Page after creation</li>
+				<li>Timezone codes on Event template page</li>
+				<li>Fixed initial sync with platforms that have no Venues</li>
+				<li>Starter template Venue Schedule/Upcoming links now work</li>
+				<li>Next running date removes only current year</li>
+				<li>Preview button for all themes</li>
+				<li>Event list item now has option to no close unopened &lt;ul&gt; it expects.</li>
+				<li> - If you use any of the Starter templates we recommend updating your Event page to include `within_ul="false"` in the `<a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_list_item">[arlo_event_list_item]</a>` shortcode. If you have not customised you templates you can Reset your Starter theme.</li>
+				<li>Jazz Register button text is now visible on hover</li>
+				<li>Jazz search button aligment centered</li>
+				<li>Failed redirects 404 instead of 301</li>
+				<li>Check set_time_limit isn\'t disabled before use</li>
 			</ul>
 		</p>
 
