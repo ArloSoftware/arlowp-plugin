@@ -394,9 +394,14 @@ class Venues {
      * @return string
      */
     private static function shortcode_venue_events_link($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if (empty($GLOBALS['arlo_venue_list_item']['v_arlo_id'])){ return ''; }
+
         extract(shortcode_atts(array(
             'link_page' => 'upcoming'
         ), $atts, $shortcode_name, $import_id));
+
+        // Only two pages currently supported
+        if ($link_page != "upcoming" && $link_page != "schedule"){ return ''; }
 
         $settings = get_option('arlo_settings');
         $location_url = get_permalink($settings['post_types'][$link_page]['posts_page']);
