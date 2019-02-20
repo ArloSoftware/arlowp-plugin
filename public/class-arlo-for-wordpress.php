@@ -1723,25 +1723,24 @@ class Arlo_For_Wordpress {
 	}
 
 	public function add_cron_schedules($schedules) {
-		$schedules = [
+		return array_merge($schedules, [
 			'minutes_5' => [
 				'interval' => 300,
 				'display' => __('Once every 5 minutes')
-				],
+			],
 			'minutes_15' => [
 				'interval' => 900,
 				'display' => __('Once every 15 minutes')
-				],				
+			],        
 			'hourly' => [
 				'interval' => 3600,
 				'display' => __('Once every hour')
-				],
+			],
 			'minutes_30' => [
 				'interval' => 1800,
 				'display' => __('Every 30 minutes')
-				]
-			];
-		return $schedules;
+			]
+		]);
 	}
 	
 	public function redirect_proxy() {
