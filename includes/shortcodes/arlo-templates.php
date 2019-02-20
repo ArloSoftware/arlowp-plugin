@@ -330,6 +330,9 @@ class Templates {
 
         if (isset($GLOBALS['show_only_at_bottom']) && $GLOBALS['show_only_at_bottom']) return;
 
+        // Temporary fix for $atts unset. Requires fix/checks at a larger scale.
+        if (!is_array($atts) && empty($atts)){ $atts = []; }
+
         $atts['limit'] = intval(isset(self::$event_template_atts['limit']) ? self::$event_template_atts['limit'] : isset($atts['limit']) && is_numeric($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
 
         $atts = array_merge($atts,self::$event_template_atts);
