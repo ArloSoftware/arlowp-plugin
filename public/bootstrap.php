@@ -634,6 +634,23 @@ function arlo_get_post_by_name($name, $post_type='post') {
 	return false;
 }
 
+/**
+ * Check if current page is an Arlo Archive (Schedule/Upcoming/Presenters etc)
+ * @param  ID|WP_Post $post Current post
+ * @return bool
+ */
+function arlo_is_archive( $post = null ) {
+	$post = get_post( $post );
+	$settings = get_option('arlo_settings');
+
+	foreach($settings['post_types'] as $post_type => $config) {
+		if ($config['posts_page'] == $post->ID) {
+			return true;
+		}
+	}
+	return false;
+}
+
 function arlo_add_datamodel() {
 	$plugin = Arlo_For_Wordpress::get_instance();
 
