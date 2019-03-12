@@ -139,4 +139,53 @@ class SystemRequirements {
 
 		return $good;
 	}
+
+	public static function get_diagnostic_info() {
+		global $table_prefix;
+		global $wpdb;
+		$info = [];
+
+		$info['site_url'] = site_url();
+		$info['home_url'] = home_url();
+		$info['dbname'] = $wpdb->dbname;
+		$info['table_prefix'] = $table_prefix;
+		$info['wp_version'] = get_bloginfo( 'version', 'display' );
+		$info['db_version'] = $wpdb->db_version();
+		$info['db_mysqli'] = empty( $wpdb->use_mysqli ) ? 'no' : 'yes';
+		$info['wp_memory_limit'] = defined('WP_MEMORY_LIMIT') ? WP_MEMORY_LIMIT : 'Not defined';
+		$info['wp_debug'] = defined( 'WP_DEBUG' ) ? WP_DEBUG : 'False';
+		$info['wp_max_upload_size'] = size_format( wp_max_upload_size() );
+		$info['wp_cron'] = ( defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON ) ? 'Disabled' : 'Enabled';
+
+		$info['multisite'] = is_multisite() ? 'Yes' : 'No';
+		if ( is_multisite() ) {
+			$info['multisite_subdomain'] = is_subdomain_install() ? 'subdomain' : 'subdirectory';
+			$info['multisite_blogcount'] = get_blog_count();
+		}
+
+		$info['webserver'] = ! empty( $_SERVER['SERVER_SOFTWARE'] ) ? $_SERVER['SERVER_SOFTWARE'] : '';
+
+		$info['php_version'] = function_exists( 'phpversion' ) ? phpversion() : '?';
+		$info['memory_limit'] = function_exists( 'ini_get' ) ? ini_get( 'memory_limit' ) : 'Cannot find';
+		$info['memory_usage'] = size_format(memory_get_usage( true ));
+		$info['max_execution_time'] = function_exists( 'ini_get' ) ? ini_get( 'max_execution_time' ) : 'Cannot find';
+
+		// TODO This should have checks that metadata exists
+		$theme_info = wp_get_theme();
+		$info['theme_name'] = $theme_info->get('Name');
+		$info['theme_version'] = $theme_info->get('Version');
+		$info['theme_folder'] = $theme_info->get_stylesheet();
+
+		if ( is_child_theme() ) {
+			$parent_info = $theme_info->parent();
+			$info['theme_parent_name'] = $parent_info->get('Name');
+			$info['theme_parent_version'] = $parent_info->get('Version');
+			$info['theme_parent_folder'] = $parent_info->get_stylesheet();
+		}
+		
+		// TODO dropins
+		$dropins = get_dropins();
+
+		return $info;
+	}
 }
