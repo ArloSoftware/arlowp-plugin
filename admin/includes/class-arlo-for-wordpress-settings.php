@@ -970,7 +970,7 @@ class Arlo_For_Wordpress_Settings {
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">
-				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_breadcrumbs">[arlo_event_template_breadcrumbs]</a> shortcode</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/templateshortcodes/#arlo_breadcrumbs">[arlo_breadcrumbs]</a> shortcode</li>
 				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_locationname">[arlo_venue_locationname]</a> shortcode</li>
 				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_events_link">[arlo_venue_events_link]</a> shortcode</li>
 				<li>Event template page can now show a single event</li>

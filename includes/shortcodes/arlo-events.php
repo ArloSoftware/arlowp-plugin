@@ -1376,58 +1376,6 @@ class Events {
         return $return;
     }
 
-    /**
-     * Shortcode for event template / catalogue breadcrumbs
-     * @param  string $content
-     * @param  array  $atts
-     * @param  string $shortcode_name
-     * @param  integer $import_id
-     * @return string
-     */
-    private static function shortcode_event_template_breadcrumbs($content = '', $atts = [], $shortcode_name = '', $import_id = ''){
-        extract(shortcode_atts(array(
-            'origin'   => __('Events', "arlo-for-wordpress")
-        ), $atts, $shortcode_name, $import_id));
-
-        $settings = get_option('arlo_settings');
-
-        if (empty($settings['post_types']['event']['posts_page'])){ return ''; }
-        $events_url = get_page_link($settings['post_types']['event']['posts_page']);
-
-        $html = '<div class="arlo-breadcrumbs breadcrumbs">
-            <div class="outer">
-                <div class="inner">
-                    <ul>
-                        <li class="root">
-                            <a href="' . esc_url($events_url) . '">' . esc_html($origin) . '</a>
-                        </li>';
-
-        $arlo_category = \Arlo\Utilities::clean_string_url_parameter('arlo-category');
-        $cat_slug = (!empty($arlo_category) ? $arlo_category : '');
-        $cat = null;
-
-        if (!empty($cat_slug)){
-            $cat = \Arlo\Entities\Categories::get(array('slug' => $cat_slug), null, $import_id);
-
-            $tree = \Arlo\Entities\Categories::get_tree_from_child($cat->c_arlo_id, $import_id);
-            $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
-
-            foreach ($tree as $key => $currentCategory) {
-                $categoryUrl = $events_url . (!empty($arlo_region) ? 'region-' . $arlo_region . '/' : '') . ($currentCategory->c_parent_id != 0 ? 'cat-' . esc_attr($currentCategory->c_slug) : '');
-                $html .= '<li>
-                    <a href="' . esc_url($categoryUrl) . '">' . esc_html($currentCategory->c_name) . '</a>
-                </li>';
-            }
-        }
-
-        $html .= '</ul>
-                </div>
-            </div>
-        </div>';
-
-        return $html;
-    }
-
     private static function get_event_date_link($url, $buttonclass, $display_text) {
         return sprintf('<a href="%s" class="%s">%s</a>', esc_attr($url), esc_attr($buttonclass), $display_text);
     }
