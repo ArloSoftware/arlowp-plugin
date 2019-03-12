@@ -913,8 +913,16 @@ class Events {
         $event_snippet['@type'] = 'Event';
         $event_snippet['name'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'e_name');
 
-        $event_snippet['startDate'] = !empty($GLOBALS['arlo_event_list_item']['e_startdatetime']) ? date(DATE_ISO8601, strtotime($GLOBALS['arlo_event_list_item']['e_startdatetime'])) : '';
-        $event_snippet['endDate'] = !empty($GLOBALS['arlo_event_list_item']['e_startdatetime']) ? date(DATE_ISO8601, strtotime($GLOBALS['arlo_event_list_item']['e_finishdatetime'])) : '';
+        $event_snippet['startDate'] = Events::rich_snippet_time_format(
+            $GLOBALS['arlo_event_list_item']['e_startdatetime'],
+            $GLOBALS['arlo_event_list_item']['e_startdatetimeoffset'],
+            $GLOBALS['arlo_event_list_item']['e_timezone_id']
+        );
+        $event_snippet['endDate'] = Events::rich_snippet_time_format(
+            $GLOBALS['arlo_event_list_item']['e_finishdatetime'],
+            $GLOBALS['arlo_event_list_item']['e_finishdatetimeoffset'],
+            $GLOBALS['arlo_event_list_item']['e_timezone_id']
+        );
 
         $et_link = \Arlo\Utilities::get_absolute_url( self::get_et_link($GLOBALS['arlo_eventtemplate'],$link) );
 
@@ -1060,6 +1068,30 @@ class Events {
         $event_snippet["performer"] = $performers;
 
         return $event_snippet;
+    }
+
+    /**
+     * @see Arlo\Shortcodes\Events->event_date_formatter()
+     * @param  string $datetime
+     * @param  string $offset
+     * @param  integer $timezoneid
+     * @return string
+     */
+    private static function rich_snippet_time_format($datetime, $offset, $timezoneid){
+        $timezone = null;
+        $timezone_array = \Arlo_For_Wordpress::get_instance()->get_timezone_manager()->get_indexed_timezones($timezoneid);
+        if (!is_null($timezone_array) && !empty($timezone_array['windows_tz_id']) && !empty(\Arlo\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$timezone_array['windows_tz_id']])) {
+            $timezone = new \DateTimeZone(\Arlo\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$timezone_array['windows_tz_id']]);
+        } else {
+            try {
+                $timezone = new \DateTimeZone(str_replace(':', '', $offset));
+            } catch(\Exception $e) {
+                $timezone = new \DateTimeZone('UTC');
+            }
+        }
+
+        $time = new \DateTime($datetime, $timezone);
+        return $time->format(DATE_ISO8601);
     }
 
     private static function shortcode_no_event_text($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
