@@ -173,12 +173,13 @@ class Events {
 
                 unset($GLOBALS['arlo_venue_list_item']);
             }
+            if ($within_ul){ $output .= "</ul>"; }
+
 
             $arlo_event_id = \Arlo\Utilities::clean_string_url_parameter('arlo-event-id');
             if (!empty($arlo_event_id)){
                 $url = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
 
-                if ($within_ul){ $output .= "</ul>"; }
                 $output .= "<div class='arlo-single-show-wrapper'>
                             <a href='" . esc_url($url) . "' class='arlo-show-more arlo-button button'>
                                 " . __("Show More", "arlo-for-wordpress") . "
