@@ -122,6 +122,7 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-finish.php')
 //security whitelist
 require_once( plugin_dir_path( __FILE__ ) . 'includes/security/arlo-security-whitelist.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/security/arlo-wordfence.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/security/arlo-ithemes-security.php');
 
 // start the public plugin class
 require_once( plugin_dir_path( __FILE__ ) . 'public/class-arlo-for-wordpress.php' );
