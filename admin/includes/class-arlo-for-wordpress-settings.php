@@ -211,7 +211,20 @@ class Arlo_For_Wordpress_Settings {
 		// create API Endpoint field                
 		add_settings_field(
                         'arlo_platform_name', 
-                        '<label for="arlo_platform_name">'.__('Arlo domain', 'arlo-for-wordpress' ).'</label>', 
+						'<label for="arlo_platform_name">'.__('Arlo domain', 'arlo-for-wordpress' ).'</label>
+						<div id="arlo-connection-test">
+							<div class="arlo-loader"><div class="arlo-loading-icon"><div></div><div></div><div></div></div></div>
+							<div class="arlo-result">
+								<span class="arlo-result-success">
+									<i class="arlo-icons8-checkmark arlo-icons8 size-21 green"></i>
+									<span class="green">' . __('Connection success', 'arlo-for-wordpress' ) . '</span>
+								</span>
+								<span class="arlo-result-error">
+									<i class="arlo-icons8-cancel arlo-icons8 size-21 red"></i>
+									<span class="arlo-result-reason red"></span>
+								</span>
+							</div>
+						</div>', 
                         array($this, 'arlo_simple_input_callback'), 
                         $this->plugin_slug, 'arlo_general_section', 
                         array(
@@ -292,7 +305,7 @@ class Arlo_For_Wordpress_Settings {
                 
 		add_settings_field(
                         'arlo_import_callback_host', 
-                        '<label for="arlo_import_callback_host">'.__('Import callback host', 'arlo-for-wordpress' ).' <a href="http://developer.arlo.co/doc/wordpress/settings#import-callback-host" target="_blank"><i class="arlo-icons8 arlo-icons8-help-filled size-16"></i></a></label>', 
+                        '<label for="arlo_import_callback_host">'.__('Import callback host URL', 'arlo-for-wordpress' ).' <a href="http://developer.arlo.co/doc/wordpress/settings#import-callback-host" target="_blank"><i class="arlo-icons8 arlo-icons8-help-filled size-16"></i></a></label>', 
                         array($this, 'arlo_simple_input_callback'), 
                         $this->plugin_slug, 'arlo_general_section', 
                         array(

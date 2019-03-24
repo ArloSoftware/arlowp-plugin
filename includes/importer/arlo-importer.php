@@ -541,29 +541,30 @@ class Importer {
 	public function callback() {
 		try {
 			$callback_json = json_decode(utf8_encode(file_get_contents("php://input")));
+			if (!is_null($callback_json) && $callback_json->SnapshotType != ImportRequest::SNAPSHOT_TYPE_FOR_CONNECTIVITY_TEST) {
+				if (!empty($callback_json->Nonce) && 
+					($import = $this->validate_import_entry($callback_json->Nonce, $callback_json->RequestID)) !== false && !empty($callback_json->__jwe__)) {
 
-			if (!is_null($callback_json) && !empty($callback_json->Nonce) && 
-				($import = $this->validate_import_entry($callback_json->Nonce, $callback_json->RequestID)) !== false && !empty($callback_json->__jwe__)) {
+					$this->set_import_id($import->import_id);
+					$this->update_import_entry(['callback_json' => json_encode($callback_json) ]);
+					$response_json = json_decode($import->response_json);
 
-				$this->set_import_id($import->import_id);
-				$this->update_import_entry(['callback_json' => json_encode($callback_json) ]);
-				$response_json = json_decode($import->response_json);
-
-				//JWE decode
-				$decoded = preg_replace('/[\x00-\x1F\x7F]/', '', utf8_decode(Crypto::jwe_decrypt($callback_json->__jwe__, $response_json->Callback->EncryptedResponse->key->k)));
-				$decoded_json = json_decode($decoded);
-				if (!empty($decoded_json->SnapshotUri)) {
-					$this->update_import_entry(['callback_json' => $decoded]);
-					$this->kick_off_scheduler();
-				} else {
-					if (!empty($decoded_json->Error)) {
-						throw new \Exception($decoded_json->Error->Code . ': ' . $decoded_json->Error->Message);
+					//JWE decode
+					$decoded = preg_replace('/[\x00-\x1F\x7F]/', '', utf8_decode(Crypto::jwe_decrypt($callback_json->__jwe__, $response_json->Callback->EncryptedResponse->key->k)));
+					$decoded_json = json_decode($decoded);
+					if (!empty($decoded_json->SnapshotUri)) {
+						$this->update_import_entry(['callback_json' => $decoded]);
+						$this->kick_off_scheduler();
 					} else {
-						throw new \Exception('Error in the response for the snapshot request');
-					}
-				}	
-			} else {
-				throw new \Exception('no Nonce or the requested import is not valid');
+						if (!empty($decoded_json->Error)) {
+							throw new \Exception($decoded_json->Error->Code . ': ' . $decoded_json->Error->Message);
+						} else {
+							throw new \Exception('Error in the response for the snapshot request');
+						}
+					}	
+				} else {
+					throw new \Exception('no Nonce or the requested import is not valid');
+				}
 			}
 		} catch(\Exception $e) {
 			Logger::log($e->getMessagE(), (!empty($import->import_id)) ? $import->import_id : null);

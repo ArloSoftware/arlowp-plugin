@@ -540,6 +540,8 @@ class Arlo_For_Wordpress {
 		add_action( 'wp_ajax_arlo_start_scheduler', array($this, 'start_scheduler_callback'));
 		
 		add_action( 'wp_ajax_arlo_get_task_info', array($this, 'arlo_get_task_info_callback'));
+
+		add_action( 'wp_ajax_arlo_test_connectivity', array($this, 'arlo_test_connectivity'));
 		
 		add_action( 'wp_ajax_arlo_terminate_task', array($this, 'arlo_terminate_task_callback'));
 		
@@ -1799,6 +1801,20 @@ class Arlo_For_Wordpress {
 			
 			echo wp_json_encode($task);
 		}
+		
+		wp_die();
+	}
+
+	public function arlo_test_connectivity() {
+		$platform_name = filter_input(INPUT_POST, 'platformName', FILTER_SANITIZE_STRING);
+		$import_callback_host = filter_input(INPUT_POST, 'importCallbackHost', FILTER_SANITIZE_STRING);
+
+		$import_request = new ImportRequest($this->get_importer(), $this->get_dbl(), $this->get_message_handler(), null, 0, $this->get_api_client(), $this->get_scheduler(), $this->get_importing_parts());
+		$import_request->nonce = \Arlo\Utilities::GUIDv4(true, true);
+
+		$return_object = $import_request->test_callback($platform_name, $import_callback_host);
+		
+		echo wp_json_encode($return_object);
 		
 		wp_die();
 	}

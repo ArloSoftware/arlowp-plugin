@@ -315,6 +315,11 @@
 	width: 100%;
 }
 
+.arlo_general_section .arlo-label label {
+	display: inline-block;
+	width: auto;
+}
+
 .arlo_template_section label {
 	visibility: hidden;
 	height: 1px;
@@ -765,6 +770,80 @@ a.arlo-filter-section-toggle h2 {
 .arlo-select-page {
 	margin-bottom: 1em;
 }
+
+#arlo-connection-test {
+	display: inline-block;
+	margin-left: 1em;
+	vertical-align: middle;
+}
+
+#arlo-connection-test.loading .arlo-loading-icon {
+	display: inline-block;
+}
+
+#arlo-connection-test .arlo-result span > i {
+	vertical-align: middle;
+}
+#arlo-connection-test .arlo-result span > span {
+	font-weight: normal;
+}
+
+#arlo-connection-test .arlo-result,
+#arlo-connection-test .arlo-result .arlo-result-success,
+#arlo-connection-test .arlo-result .arlo-result-error {
+	display: none;
+}
+
+#arlo-connection-test.has-result .arlo-result {
+	display: block;
+}
+
+#arlo-connection-test.has-result.result-success .arlo-result .arlo-result-success,
+#arlo-connection-test.has-result.result-error .arlo-result .arlo-result-error {
+	display: block;
+}
+
+#arlo-connection-test.has-result.result-error .arlo-result .arlo-result-success,
+#arlo-connection-test.has-result.result-success .arlo-result .arlo-result-error {
+	display: none;
+}
+
+.arlo-loading-icon {
+	display: none;
+	position: relative;
+	width: 16px;
+	height: 16px;
+  }
+  .arlo-loading-icon div {
+	display: inline-block;
+	position: absolute;
+	left: 2px;
+	width: 4px;
+	background: #333333;
+	animation: arlo-loading-icon 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+  }
+  .arlo-loading-icon div:nth-child(1) {
+	left: 2px;
+	animation-delay: -0.24s;
+  }
+  .arlo-loading-icon div:nth-child(2) {
+	left: 8px;
+	animation-delay: -0.12s;
+  }
+  .arlo-loading-icon div:nth-child(3) {
+	left: 14px;
+	animation-delay: 0;
+  }
+  @keyframes arlo-loading-icon {
+	0% {
+	  top: 0px;
+	  height: 30px;
+	}
+	50%, 100% {
+	  top: 8px;
+	  height: 12px;
+	}
+  }
 
 /* media queries, these match the wordpress admin breakpoints as of WP 3.9 */
 

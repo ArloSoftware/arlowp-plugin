@@ -9,8 +9,9 @@ class ImportRequest extends BaseImporter  {
 	const schema_level = 100;
 	const FRAGMENT_MAX_BYTE_SIZE = 10485760;
 	const FRAGMENT_DEFAULT_BYTE_SIZE = 524288;	
+	const SNAPSHOT_TYPE_FOR_CONNECTIVITY_TEST = "ConnectionTest";
 
-	private $nonce;
+	public $nonce;
 
 	private $callback_action = 'arlo_import_callback';
 	
@@ -72,6 +73,13 @@ class ImportRequest extends BaseImporter  {
 		$this->is_finished = true;
 	}
 
+	public function test_callback($platform_name, $import_callback_host) {
+		$post_data = $this->generate_post_data($this->fragmentation, $import_callback_host);
+		$post_data->SnapshotType = self::SNAPSHOT_TYPE_FOR_CONNECTIVITY_TEST;
+
+		return $this->api_client->Snapshots()->request_test_callback($platform_name, $post_data);
+	}
+
 	private function check_fragment_byte_size() {
 		if (empty($this->fragment_size) || !is_numeric($this->fragment_size) ) {
 			$this->fragment_size = self::FRAGMENT_DEFAULT_BYTE_SIZE;
@@ -80,14 +88,14 @@ class ImportRequest extends BaseImporter  {
 		}
 	}
 
-	private function generate_post_data($fragmentation = false) {
+	private function generate_post_data($fragmentation = false, $callback_host = "") {
 		$data_obj = new \stdClass();
 
 		$data_obj->SchemaLevel = self::schema_level;
 		$data_obj->SnapshotType = $this->snapshot_type;
 		$data_obj->Query = $this->generate_query_object();
 		$data_obj->Result = $this->generate_result_object($fragmentation);
-		$data_obj->Callback = $this->generate_callback_object();
+		$data_obj->Callback = $this->generate_callback_object($callback_host);
 
 		return $data_obj;
 	}
@@ -116,17 +124,18 @@ class ImportRequest extends BaseImporter  {
 		return $data_obj;
 	}
 
-	private function generate_callback_object() {
+	private function generate_callback_object($callback_host) {
 		$data_obj = new \stdClass();
 
 		$data_obj->Uri = admin_url('admin-ajax.php') . '?action=' . $this->callback_action;
 		$data_obj->Nonce = $this->nonce;
 		$data_obj->EncryptedResponse = $this->generate_encryptedresponse_object();
+		$import_callback_host = !empty($callback_host) ? $callback_host : $settings['import_callback_host'];
 
 		$settings = get_option('arlo_settings');
-		if (!empty($settings['import_callback_host'])) {
+		if (!empty($import_callback_host)) {
 			$site_url = parse_url(get_option( 'siteurl' ));
-			$callback_url = parse_url($settings['import_callback_host']);
+			$callback_url = parse_url($import_callback_host);
 			
 			$search_url = $site_url["host"] . (!empty($site_url['port']) ? ':' . $site_url['port'] : '');
 			$replace_url = $callback_url["host"] . (!empty($callback_url['port']) ? ':' . $callback_url['port'] : '');

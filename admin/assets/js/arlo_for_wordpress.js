@@ -46,6 +46,18 @@ if (typeof (Arlo) === "undefined") {
 
 			me.initEvents();
 
+			$('#arlo_platform_name').on("keyup blur",
+				me.debounce(function() {
+					me.testPlatformConnectivity($('#arlo_platform_name').val(), $('#arlo_import_callback_host').val());
+				}, 400)
+			);
+
+			$('#arlo_import_callback_host').on("keyup blur",
+				me.debounce(function() {
+					me.testPlatformConnectivity($('#arlo_platform_name').val(), $('#arlo_import_callback_host').val());
+				}, 400)
+			);
+
 			me.showFilterGroupSettings($('#arlo-filter-settings').val());
 
 			$('#arlo-filter-settings').change(function() {
@@ -217,6 +229,34 @@ if (typeof (Arlo) === "undefined") {
 			if (taskPlaceholder.length > 0 && !(taskPlaceholder.hasClass('notice-success') || taskPlaceholder.hasClass('notice-error'))) {
 				$.post(me.ajaxUrl, data);
 			}
+		},
+		testPlatformConnectivity: function(platformName, importCallbackHost) {
+			var me = this,
+				data = {
+					action: 'arlo_test_connectivity',
+					platformName: platformName,
+					importCallbackHost: importCallbackHost
+				}
+
+			$('#arlo-connection-test').removeClass("has-result").removeClass("result-success").removeClass("result-error").addClass("loading");
+
+			$.post(me.ajaxUrl, data, function(data, textStatus, jqXHR) {
+				try {
+					data = JSON.parse(data);
+
+					$('#arlo-connection-test').removeClass("loading").addClass("has-result");
+					if (data.success) {
+						$('#arlo-connection-test').addClass("result-success");
+					} else {
+						$('#arlo-connection-test').find('.arlo-result-reason').text("");
+						$('#arlo-connection-test').addClass("result-error");
+						if (data.error) {
+							$('#arlo-connection-test').find('.arlo-result-reason').text(data.error);
+						}
+					}
+				} catch(e) {}
+
+			});
 		},
 		getTaskInfo: function(taskID) {
 			var me = this,
@@ -640,6 +680,20 @@ if (typeof (Arlo) === "undefined") {
 				}
 			
 			arloApiClient.getResources().getEventSearchResource().searchEvents(eventSearchOptions, callback);
+		},
+		debounce: function(func, wait, immediate) {
+			var timeout;
+			return function() {
+				var context = this, args = arguments;
+				var later = function() {
+					timeout = null;
+					if (!immediate) func.apply(context, args);
+				};
+				var callNow = immediate && !timeout;
+				clearTimeout(timeout);
+				timeout = setTimeout(later, wait);
+				if (callNow) func.apply(context, args);
+			};
 		}
 	}
 })(Arlo, jQuery);
