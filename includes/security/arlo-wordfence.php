@@ -36,7 +36,7 @@ class WordFence extends SecurityWhitelist {
     }
 
     protected function update_whitelist($ips = []) {
-        if (is_array($ips) || ips.count()) {
+        if (is_array($ips) || $ips.count()) {
             $sql = "
             UPDATE
                 " . $this->config_table . "
