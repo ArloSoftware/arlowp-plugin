@@ -120,8 +120,8 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-category-dep
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-finish.php');
 
 //security whitelist
-require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-security-whitelist.php');
-require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-wordfence.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/security/arlo-security-whitelist.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/security/arlo-wordfence.php');
 
 // start the public plugin class
 require_once( plugin_dir_path( __FILE__ ) . 'public/class-arlo-for-wordpress.php' );

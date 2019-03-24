@@ -14,7 +14,7 @@ use ArloAPI\Transports\Wordpress;
 use ArloAPI\Client;
 use Arlo\Utilities;
 use Arlo\Environment;
-use Arlo\WordFence;
+use Arlo\Security\WordFence;
 use Arlo\ThemeManager;
 use Arlo\TimeZoneManager;
 use Arlo\SystemRequirements;
@@ -872,6 +872,8 @@ class Arlo_For_Wordpress {
 
 		//set default themes
 		$this->set_default_theme();
+
+		$this->get_wordfence()->check_plugins_whitelist();
 
 		// must happen before adding pages
 		$this->set_default_options();

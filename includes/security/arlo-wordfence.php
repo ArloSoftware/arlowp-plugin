@@ -1,6 +1,6 @@
 <?php
 
-namespace Arlo;
+namespace Arlo\Security;
 
 use Arlo\Logger;
 
