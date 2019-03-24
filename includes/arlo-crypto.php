@@ -58,12 +58,12 @@ class Crypto {
 			throw new \Exception("Hmac validation failed");
 		}
 
-		//use mCrypt by default for retrocompatibility
+		//use mCrypt as fallback for retrocompatibility
 		$decrypted = '';
-		if (extension_loaded('mcrypt')) {
-			$decrypted = self::decrypt_with_mcrypt($iv, $ciphertext, $keys['enc'], $crypto_method);
-		} else {
+		if (extension_loaded('openssl')) {
 			$decrypted = self::decrypt_with_openssl($iv, $ciphertext, $keys['enc'], $crypto_method);
+		} else {
+			$decrypted = self::decrypt_with_mcrypt($iv, $ciphertext, $keys['enc'], $crypto_method);
 		}
 		return $decrypted;
 	}

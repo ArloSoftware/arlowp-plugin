@@ -156,16 +156,26 @@ class Arlo_For_Wordpress_Settings {
 
 			if ( array_key_exists('arlo-new-custom-shortcode', $_COOKIE) ) {
 				$custom_shortcode = $_COOKIE['arlo-new-custom-shortcode'];
+
+				// Remove all cookies... 
+				// Old code has setup where cookies are very temporary. JS deletes them too. 
 				unset( $_COOKIE['arlo-new-custom-shortcode'] );
 				setcookie('arlo-new-custom-shortcode', null, -1, '/', $domain);
+				unset($_COOKIE['arlo-nav-tab']);
+				unset($_COOKIE['arlo-vertical-tab']);
+				setcookie('arlo-nav-tab', null, -1, '/', $domain);
+				setcookie('arlo-vertical-tab', null, -1, '/', $domain);
 
 				//some shared hosting doesn't delete the cookie properly
 				if (!isset($_SESSION['arlo-new-custom-shortcode'])) {
 					$_SESSION['arlo-new-custom-shortcode'] = true;
 					wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages/' . $custom_shortcode) );
+					exit;
 				} else {
 					unset($_SESSION['arlo-new-custom-shortcode']);
 				}
+			} else if (isset($_SESSION['arlo-new-custom-shortcode'])){
+				unset($_SESSION['arlo-new-custom-shortcode']);
 			}
 
 			if ( array_key_exists('arlo-nav-tab', $_COOKIE) ) {
@@ -177,6 +187,7 @@ class Arlo_For_Wordpress_Settings {
 				if (!isset($_SESSION['arlo-nav-tab'])) {
 					$_SESSION['arlo-nav-tab'] = true;
 					wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#' . $nav_tab) );
+					exit;
 				} else {
 					unset($_SESSION['arlo-nav-tab']);
 				}
@@ -191,6 +202,7 @@ class Arlo_For_Wordpress_Settings {
 				if (!isset($_SESSION['arlo-vertical-tab'])) {
 					$_SESSION['arlo-vertical-tab'] = true;
 					wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages/' . $page) );
+					exit;
 				} else {
 					unset($_SESSION['arlo-vertical-tab']);
 				}
@@ -969,6 +981,30 @@ class Arlo_For_Wordpress_Settings {
 		<p><strong>If you are experiencing problems after an update, please deactivate and re-activate the plugin and re-synchronize the data.</strong></p>
 		
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/templateshortcodes/#arlo_breadcrumbs">[arlo_breadcrumbs]</a> shortcode</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_locationname">[arlo_venue_locationname]</a> shortcode</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_events_link">[arlo_venue_events_link]</a> shortcode</li>
+				<li>Event template page can now show a single event</li>
+				<li>Tested up to Wordpress 5.0</li>
+				<li>End date now uses correct timezone offset</li>
+				<li>Automatic navigation to new Page after creation</li>
+				<li>Timezone codes on Event template page</li>
+				<li>Fixed initial sync with platforms that have no Venues</li>
+				<li>Starter template Venue Schedule/Upcoming links now work</li>
+				<li>Next running date removes only current year</li>
+				<li>Preview button for all themes</li>
+				<li>Event list item now has option to no close unopened &lt;ul&gt; it expects.</li>
+				<li> - If you use any of the Starter templates we recommend updating your Event page to include `within_ul="false"` in the `<a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_list_item">[arlo_event_list_item]</a>` shortcode. If you have not customised you templates you can Reset your Starter theme.</li>
+				<li>Jazz Register button text is now visible on hover</li>
+				<li>Jazz search button aligment centered</li>
+				<li>Failed redirects 404 instead of 301</li>
+				<li>Check set_time_limit isn\'t disabled before use</li>
+			</ul>
+		</p>
+
+		<h4>Version 4.0</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">	  
 				<li>New WordPress <a href="https://wordpress.org/plugins/arlo-training-and-event-management-system/" target="_blank">minimum version requirement</a> of 4.7</li>

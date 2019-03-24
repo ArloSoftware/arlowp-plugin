@@ -1,4 +1,5 @@
 <ul class="arlo-codes">
+	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/templateshortcodes/#arlo_breadcrumbs" target="_blank">[arlo_breadcrumbs]</a></li>
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/presenterrelated#arlo_presenter_permalink" target="_blank">[arlo_presenter_permalink]</a></li>
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/presenterrelated#arlo_presenter_name" target="_blank">[arlo_presenter_name]</a></li>
 	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/presenterrelated#arlo_presenter_profile" target="_blank">[arlo_presenter_profile]</a></li>

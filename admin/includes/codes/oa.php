@@ -1,5 +1,6 @@
 <ul class="arlo-codes">
 	<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivitylistrelated#arlo_onlineactivites_filters" target="_blank">[arlo_onlineactivites_filters]</a></li>
+	<li><a href="http://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/templateshortcodes/#arlo_breadcrumbs" target="_blank">[arlo_breadcrumbs]</a></li>
 	<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/onlineactivitylistrelated#arlo_onlineactivites_list_item" target="_blank">[arlo_onlineactivites_list_item]</a>
 	
 		<ul>

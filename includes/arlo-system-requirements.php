@@ -70,11 +70,10 @@ class SystemRequirements {
 				'name' => 'OpenSSL or mCrypt enabled',
 				'expected_value' => 'OpenSSL',
 				'current_value' => function () {
-					if (extension_loaded('mcrypt')) {
-						return 'mCrypt';
-					}
-					elseif (extension_loaded('openssl')) {
+					if (extension_loaded('openssl')) {
 						return 'OpenSSL';
+					} else if (extension_loaded('mcrypt')) {
+						return 'mCrypt';
 					}
 					return 'None';
 				},
@@ -86,12 +85,11 @@ class SystemRequirements {
 				'name' => 'RIJNDAEL 128 available',
 				'expected_value' => 'Yes',
 				'current_value' => function () {
-					if (extension_loaded('mcrypt')) {
-						return (in_array(MCRYPT_RIJNDAEL_128, mcrypt_list_algorithms()) ? 'Yes' : 'No');
-					}
-					elseif (extension_loaded('openssl')) {
+					if (extension_loaded('openssl')) {
 						return (in_array('AES-256-CBC', openssl_get_cipher_methods())
 						     || in_array('aes-256-cbc', openssl_get_cipher_methods()) ? 'Yes' : 'No');
+					} else if (extension_loaded('mcrypt')) {
+						return (in_array(MCRYPT_RIJNDAEL_128, mcrypt_list_algorithms()) ? 'Yes' : 'No');
 					}
 					return 'N/A';
 				},
@@ -103,12 +101,11 @@ class SystemRequirements {
 				'name' => 'CBC mode available',
 				'expected_value' => 'Yes',
 				'current_value' => function () {
-					if (extension_loaded('mcrypt')) {
-						return (in_array(MCRYPT_MODE_CBC, mcrypt_list_modes()) ? 'Yes' : 'No');
-					}
-					elseif (extension_loaded('openssl')) {
+					if (extension_loaded('openssl')) {
 						return (in_array('AES-256-CBC', openssl_get_cipher_methods())
 						     || in_array('aes-256-cbc', openssl_get_cipher_methods()) ? 'Yes' : 'No');
+					} else if (extension_loaded('mcrypt')) {
+						return (in_array(MCRYPT_MODE_CBC, mcrypt_list_modes()) ? 'Yes' : 'No');
 					}
 					return 'N/A';
 				},
