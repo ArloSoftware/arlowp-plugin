@@ -2,6 +2,8 @@
 
 namespace Arlo\Security;
 
+use Arlo\Logger;
+
 abstract class SecurityWhitelist {
     const ARLO_IPS = ['52.36.235.221','52.51.185.255','52.18.103.242','13.54.120.42','13.54.47.103'];
 
