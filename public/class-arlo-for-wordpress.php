@@ -834,8 +834,8 @@ class Arlo_For_Wordpress {
 
 			if ($plugin_version != VersionHandler::VERSION) {
 				$plugin->get_version_handler()->run_update($plugin_version);
-				
 				$plugin->get_schema_manager()->check_db_schema();
+				$plugin->get_environment()->check_wordfence();
 			}
 		} else {
 			arlo_add_datamodel();
@@ -847,6 +847,8 @@ class Arlo_For_Wordpress {
 				update_option( 'arlo_plugin_disabled', 1 );
 				update_option( 'arlo_import_disabled', 1 );
 			} 
+
+			$plugin->get_environment()->check_wordfence();
 		}
 
 		//force the plugin to use new url structure
@@ -872,7 +874,7 @@ class Arlo_For_Wordpress {
 
 		// must happen before adding pages
 		$this->set_default_options();
-		
+
 		// run import every 15 minutes
 		Logger::log("Plugin activated");
 
@@ -1365,7 +1367,7 @@ class Arlo_For_Wordpress {
 			return $get_environment;
 		}
 		
-		$get_environment = new Environment();
+		$get_environment = new Environment($this, $this->get_dbl());
 		
 		$this->__set('get_environment', $get_environment);
 		
