@@ -14,6 +14,7 @@ use ArloAPI\Transports\Wordpress;
 use ArloAPI\Client;
 use Arlo\Utilities;
 use Arlo\Environment;
+use Arlo\WordFence;
 use Arlo\ThemeManager;
 use Arlo\TimeZoneManager;
 use Arlo\SystemRequirements;
@@ -835,7 +836,7 @@ class Arlo_For_Wordpress {
 			if ($plugin_version != VersionHandler::VERSION) {
 				$plugin->get_version_handler()->run_update($plugin_version);
 				$plugin->get_schema_manager()->check_db_schema();
-				$plugin->get_environment()->check_wordfence();
+				$plugin->get_wordfence()->check_plugins_whitelist();
 			}
 		} else {
 			arlo_add_datamodel();
@@ -848,7 +849,7 @@ class Arlo_For_Wordpress {
 				update_option( 'arlo_import_disabled', 1 );
 			} 
 
-			$plugin->get_environment()->check_wordfence();
+			$plugin->get_wordfence()->check_plugins_whitelist();
 		}
 
 		//force the plugin to use new url structure
@@ -1362,12 +1363,24 @@ class Arlo_For_Wordpress {
 		return $importing_parts;
 	}
 
+	public function get_wordfence() {
+		if($get_wordfence = $this->__get('get_wordfence')) {
+			return $get_wordfence;
+		}
+		
+		$get_wordfence = new WordFence($this, $this->get_dbl());
+		
+		$this->__set('get_wordfence', $get_wordfence);
+		
+		return $get_wordfence;
+	}	
+
 	public function get_environment() {
 		if($get_environment = $this->__get('get_environment')) {
 			return $get_environment;
 		}
 		
-		$get_environment = new Environment($this, $this->get_dbl());
+		$get_environment = new Environment();
 		
 		$this->__set('get_environment', $get_environment);
 		
