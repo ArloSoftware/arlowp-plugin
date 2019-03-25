@@ -19,6 +19,7 @@ class Templates {
 
             Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
                 $method_name = 'shortcode_' . str_replace('arlo_', '', $shortcode_name);
+                if (!is_array($atts) && empty($atts)) { $atts = []; }
                 return self::$method_name($content, $atts, $shortcode_name, $import_id);
             });
         } 
@@ -30,16 +31,19 @@ class Templates {
             switch($shortcode["type"]) {
                 case 'schedule':
                     Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
+                        if (!is_array($atts) && empty($atts)) { $atts = []; }
                         return self::shortcode_schedule($content = '', $atts, $shortcode_name, $import_id);
                     });
                     break;
                 case 'eventsearch':
                     Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
+                        if (!is_array($atts) && empty($atts)) { $atts = []; }
                         return self::shortcode_event_template_search_list($content = '', $atts, $shortcode_name, $import_id);
                     });
                     break;
                 default:
                     Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
+                        if (!is_array($atts) && empty($atts)) { $atts = []; }
                         return self::shortcode_event_template_list($content = '', $atts, $shortcode_name, $import_id);
                     });
                     break;            
@@ -329,9 +333,6 @@ class Templates {
         global $wpdb;
 
         if (isset($GLOBALS['show_only_at_bottom']) && $GLOBALS['show_only_at_bottom']) return;
-
-        // Temporary fix for $atts unset. Requires fix/checks at a larger scale.
-        if (!is_array($atts) && empty($atts)){ $atts = []; }
 
         $atts['limit'] = intval(isset(self::$event_template_atts['limit']) ? self::$event_template_atts['limit'] : isset($atts['limit']) && is_numeric($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
 

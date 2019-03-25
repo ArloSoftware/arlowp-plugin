@@ -14,14 +14,16 @@ class Venues {
 
             Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
                 $method_name = 'shortcode_' . str_replace('arlo_', '', $shortcode_name);
+                if (!is_array($atts) && empty($atts)) { $atts = []; }
                 return self::$method_name($content, $atts, $shortcode_name, $import_id);
             });
-        } 
+        }
 
         $custom_shortcodes = Shortcodes::get_custom_shortcodes('venues');
 
         foreach ($custom_shortcodes as $shortcode_name => $shortcode) {
             Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
+                if (!is_array($atts) && empty($atts)) { $atts = []; }
                 return self::shortcode_venue_list($content = '', $atts, $shortcode_name, $import_id);
             });
         }
