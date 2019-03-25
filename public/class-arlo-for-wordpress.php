@@ -881,9 +881,6 @@ class Arlo_For_Wordpress {
 		// must happen before adding pages
 		$this->set_default_options();
 
-		$this->get_wordfence()->check_plugins_whitelist();
-		$this->get_ithemessecurity()->check_plugins_whitelist();
-
 		// run import every 15 minutes
 		Logger::log("Plugin activated");
 
