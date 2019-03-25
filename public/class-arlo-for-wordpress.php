@@ -541,6 +541,8 @@ class Arlo_For_Wordpress {
 		add_action( 'wp_ajax_arlo_increment_review_notice_date', array($this, 'increment_review_notice_date'));
 
 		add_action( 'wp_ajax_arlo_turn_off_send_data', array($this, 'turn_off_send_data_callback'));
+
+		add_action( 'wp_ajax_arlo_add_ips_to_whitelist', array($this, 'add_ips_to_whitelist_callback'));
 		
 		add_action( 'wp_ajax_arlo_dismiss_message', array($this, 'dismiss_message_callback'));
 		
@@ -878,6 +880,9 @@ class Arlo_For_Wordpress {
 
 		// must happen before adding pages
 		$this->set_default_options();
+
+		$this->get_wordfence()->check_plugins_whitelist();
+		$this->get_ithemessecurity()->check_plugins_whitelist();
 
 		// run import every 15 minutes
 		Logger::log("Plugin activated");
@@ -1854,9 +1859,17 @@ class Arlo_For_Wordpress {
 
 		echo 0;
 		wp_die();
-	}		
+	}	
 	
+	public function add_ips_to_whitelist_callback() {	
+		$this->get_wordfence()->update_plugins_whitelist();
+		$this->get_ithemessecurity()->update_plugins_whitelist();
+		
+		echo 0;
+		wp_die();
+	}	
 	
+
 	public function dismissible_notice_callback() {
 		$id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_STRING);
 		if (!empty($id)) {

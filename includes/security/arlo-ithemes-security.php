@@ -15,6 +15,7 @@ class IThemesSecurity extends SecurityWhitelist {
         
         $this->plugin_file = self::PLUGIN_FILE;
         $this->minimum_version = self::MINIMUM_VERSION;
+        $this->plugin_name = 'iThemes Security';
     }
 
     protected function get_whitelisted_ips() {
@@ -39,14 +40,5 @@ class IThemesSecurity extends SecurityWhitelist {
 
             update_option($this->option_name, $settings);
         }
-    }
-
-    protected function raise_error_message() {
-        $message = [
-            '<p>' . __('Arlo for WordPress has detected that iThemes Security Security plugin is installed, but Arlo for WordPress wasn\'t be able to update the firewall rules.') . '</p>',
-            '<p>' . __('For more information, please visit our', 'arlo-for-wordpress') .' ' . sprintf(__('<a target="_blank" href="%s">Help Center</a>.', 'arlo-for-wordpress' ), 'https://support.arlo.co/hc/en-gb/articles/360001023963-Known-conflicts-with-other-WordPress-Plugins') . '</p>'
-        ];
-
-        $this->plugin->get_message_handler()->set_message('error', __('Couldn\'t update iThemes Security ' , 'arlo-for-wordpress' ), implode('', $message), true);
     }
 }
