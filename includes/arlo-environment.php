@@ -3,11 +3,13 @@
 namespace Arlo;
 
 use Arlo\Utilities;
+use Arlo\Logger;
 
 class Environment {
+    const time_limit = 20; 
+
     protected $memory_limit;
 
-    const time_limit = 20; 
     public $start_time;
 
     public function __construct() {

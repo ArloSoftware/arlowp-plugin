@@ -14,6 +14,8 @@ use ArloAPI\Transports\Wordpress;
 use ArloAPI\Client;
 use Arlo\Utilities;
 use Arlo\Environment;
+use Arlo\Security\WordFence;
+use Arlo\Security\IThemesSecurity;
 use Arlo\ThemeManager;
 use Arlo\TimeZoneManager;
 use Arlo\SystemRequirements;
@@ -507,6 +509,7 @@ class Arlo_For_Wordpress {
 		// cron actions
 		add_filter( 'cron_schedules', array( $this, 'add_cron_schedules' ) ); 
 		add_action( 'arlo_scheduler', array( $this, 'cron_scheduler' ) );
+		add_action( 'arlo_security_plugin_check', array( $this, 'security_plugin_check' ) );
 		
 		add_action( 'arlo_set_import', array( $this, 'cron_set_import' ) );
 		
@@ -528,7 +531,11 @@ class Arlo_For_Wordpress {
 		if ( ! wp_next_scheduled('arlo_set_import')) {
 			wp_schedule_event( time(), 'minutes_30', 'arlo_set_import' );
 		}
-		
+
+		//add security plugin's IP whitelist check
+		if ( ! wp_next_scheduled('arlo_security_plugin_check')) {
+			wp_schedule_event( time(), 'daily', 'arlo_security_plugin_check' );
+		}
 
 		// content and excerpt filters to hijack arlo registered post types
 		add_filter('the_content', 'arlo_the_content');
@@ -539,6 +546,8 @@ class Arlo_For_Wordpress {
 		add_action( 'wp_ajax_arlo_increment_review_notice_date', array($this, 'increment_review_notice_date'));
 
 		add_action( 'wp_ajax_arlo_turn_off_send_data', array($this, 'turn_off_send_data_callback'));
+
+		add_action( 'wp_ajax_arlo_add_ips_to_whitelist', array($this, 'add_ips_to_whitelist_callback'));
 		
 		add_action( 'wp_ajax_arlo_dismiss_message', array($this, 'dismiss_message_callback'));
 		
@@ -834,8 +843,8 @@ class Arlo_For_Wordpress {
 
 			if ($plugin_version != VersionHandler::VERSION) {
 				$plugin->get_version_handler()->run_update($plugin_version);
-				
 				$plugin->get_schema_manager()->check_db_schema();
+				$plugin->security_plugin_check();
 			}
 		} else {
 			arlo_add_datamodel();
@@ -847,6 +856,8 @@ class Arlo_For_Wordpress {
 				update_option( 'arlo_plugin_disabled', 1 );
 				update_option( 'arlo_import_disabled', 1 );
 			} 
+
+			$plugin->security_plugin_check();
 		}
 
 		//force the plugin to use new url structure
@@ -872,7 +883,7 @@ class Arlo_For_Wordpress {
 
 		// must happen before adding pages
 		$this->set_default_options();
-		
+
 		// run import every 15 minutes
 		Logger::log("Plugin activated");
 
@@ -1018,6 +1029,7 @@ class Arlo_For_Wordpress {
 		flush_rewrite_rules();
 		
 		wp_clear_scheduled_hook( 'arlo_scheduler' );
+		wp_clear_scheduled_hook( 'arlo_security_plugin_check' );
 		wp_clear_scheduled_hook( 'arlo_set_import' );
 		wp_clear_scheduled_hook( 'arlo_import' );
 		
@@ -1360,6 +1372,30 @@ class Arlo_For_Wordpress {
 		return $importing_parts;
 	}
 
+	public function get_wordfence() {
+		if($get_wordfence = $this->__get('get_wordfence')) {
+			return $get_wordfence;
+		}
+		
+		$get_wordfence = new WordFence($this, $this->get_dbl());
+		
+		$this->__set('get_wordfence', $get_wordfence);
+		
+		return $get_wordfence;
+	}	
+
+	public function get_ithemessecurity() {
+		if($get_ithemessecurity = $this->__get('get_ithemessecurity')) {
+			return $get_ithemessecurity;
+		}
+		
+		$get_ithemessecurity = new IThemesSecurity($this, $this->get_dbl());
+		
+		$this->__set('get_ithemessecurity', $get_ithemessecurity);
+		
+		return $get_ithemessecurity;
+	}
+
 	public function get_environment() {
 		if($get_environment = $this->__get('get_environment')) {
 			return $get_environment;
@@ -1525,6 +1561,13 @@ class Arlo_For_Wordpress {
 		}catch(\Exception $e){
 			var_dump($e);
 		}
+	}
+
+	public function security_plugin_check() {
+		$plugin = Arlo_For_Wordpress::get_instance();
+
+		$plugin->get_wordfence()->check_plugins_whitelist();
+		$plugin->get_ithemessecurity()->check_plugins_whitelist();
 	}
 	
 	public function clean_up_tasks() {
@@ -1824,9 +1867,17 @@ class Arlo_For_Wordpress {
 
 		echo 0;
 		wp_die();
-	}		
+	}	
 	
+	public function add_ips_to_whitelist_callback() {	
+		$this->get_wordfence()->update_plugins_whitelist();
+		$this->get_ithemessecurity()->update_plugins_whitelist();
+		
+		echo 0;
+		wp_die();
+	}	
 	
+
 	public function dismissible_notice_callback() {
 		$id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_STRING);
 		if (!empty($id)) {

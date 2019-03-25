@@ -581,6 +581,18 @@ if (typeof (Arlo) === "undefined") {
 				});
 			});	
 
+			//add Arlo's IP addresses to security plugins whitelist
+			$('#arlo_add_ips_to_whitelist').click(function() {
+				var el = $(this),
+					data = {
+						action: 'arlo_add_ips_to_whitelist'
+					}
+				
+				$.post(me.ajaxUrl, data, function() {
+					el.parentsUntil('.arlo-message').parent().find('.notice-dismiss').trigger('click');
+				});
+			});	
+
 			$(".theme-apply").click(function(e) {
 				var target = $(e.currentTarget),
 					message;
