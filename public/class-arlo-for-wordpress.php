@@ -509,6 +509,7 @@ class Arlo_For_Wordpress {
 		// cron actions
 		add_filter( 'cron_schedules', array( $this, 'add_cron_schedules' ) ); 
 		add_action( 'arlo_scheduler', array( $this, 'cron_scheduler' ) );
+		add_action( 'arlo_security_plugin_check', array( $this, 'security_plugin_check' ) );
 		
 		add_action( 'arlo_set_import', array( $this, 'cron_set_import' ) );
 		
@@ -530,7 +531,11 @@ class Arlo_For_Wordpress {
 		if ( ! wp_next_scheduled('arlo_set_import')) {
 			wp_schedule_event( time(), 'minutes_30', 'arlo_set_import' );
 		}
-		
+
+		//add security plugin's IP whitelist check
+		if ( ! wp_next_scheduled('arlo_security_plugin_check')) {
+			wp_schedule_event( time(), 'daily', 'arlo_security_plugin_check' );
+		}
 
 		// content and excerpt filters to hijack arlo registered post types
 		add_filter('the_content', 'arlo_the_content');
@@ -839,8 +844,7 @@ class Arlo_For_Wordpress {
 			if ($plugin_version != VersionHandler::VERSION) {
 				$plugin->get_version_handler()->run_update($plugin_version);
 				$plugin->get_schema_manager()->check_db_schema();
-				$plugin->get_wordfence()->check_plugins_whitelist();
-				$plugin->get_ithemessecurity()->check_plugins_whitelist();
+				$plugin->security_plugin_check();
 			}
 		} else {
 			arlo_add_datamodel();
@@ -853,8 +857,7 @@ class Arlo_For_Wordpress {
 				update_option( 'arlo_import_disabled', 1 );
 			} 
 
-			$plugin->get_wordfence()->check_plugins_whitelist();
-			$plugin->get_ithemessecurity()->check_plugins_whitelist();
+			$plugin->security_plugin_check();
 		}
 
 		//force the plugin to use new url structure
@@ -1026,6 +1029,7 @@ class Arlo_For_Wordpress {
 		flush_rewrite_rules();
 		
 		wp_clear_scheduled_hook( 'arlo_scheduler' );
+		wp_clear_scheduled_hook( 'arlo_security_plugin_check' );
 		wp_clear_scheduled_hook( 'arlo_set_import' );
 		wp_clear_scheduled_hook( 'arlo_import' );
 		
@@ -1557,6 +1561,13 @@ class Arlo_For_Wordpress {
 		}catch(\Exception $e){
 			var_dump($e);
 		}
+	}
+
+	public function security_plugin_check() {
+		$plugin = Arlo_For_Wordpress::get_instance();
+
+		$plugin->get_wordfence()->check_plugins_whitelist();
+		$plugin->get_ithemessecurity()->check_plugins_whitelist();
 	}
 	
 	public function clean_up_tasks() {
