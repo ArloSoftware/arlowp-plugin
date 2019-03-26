@@ -80,6 +80,10 @@ class VersionHandler {
 		if (version_compare($old_version, '4.1') < 0) {
 			$this->run_pre_data_update('4.1');
 		}
+
+		if (version_compare($old_version, '4.2') < 0) {
+			$this->run_pre_data_update('4.2');
+		}
 		
 		arlo_add_datamodel();	
 
@@ -326,6 +330,13 @@ class VersionHandler {
 				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_venues LIKE 'v_locationname'", 0, 0);
 				if (is_null($exists)) {
 					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_venues ADD v_locationname text NULL AFTER v_name");
+				}
+			break;
+
+			case '4.2':
+				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_venues LIKE 'v_region'", 0, 0);
+				if (is_null($exists)) {
+					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_venues ADD v_region varchar(5) NOT NULL AFTER v_post_id");
 				}
 			break;
 		}

@@ -2,6 +2,8 @@
 namespace Arlo\Shortcodes;
 
 class Venues {
+    public static $venue_list_item_atts = [];
+
     public static function init() {
         $class = new \ReflectionClass(__CLASS__);
 
@@ -29,11 +31,20 @@ class Venues {
         }
     }
 
+    private static function get_venue_atts($atts, $import_id) {
+        $new_atts = [];
+
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo_For_Wordpress::get_region_parameter', 'region');
+
+        return $new_atts;
+    }
+
     private static function shortcode_venue_list($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
 
         $template_name = Shortcodes::get_template_name($shortcode_name,'venue_list','venues');
 
+        self::$venue_list_item_atts = self::get_venue_atts($atts, $import_id);
 
         $templates = arlo_get_option('templates');
         $content = $templates[$template_name]['html'];
@@ -42,14 +53,22 @@ class Venues {
     
     private static function shortcode_venue_list_pagination($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $wpdb;   
+        $parameters = [];
         
         $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
+
+        $atts = array_merge($atts, self::$venue_list_item_atts);
 
         $t1 = "{$wpdb->prefix}arlo_venues";
         $t2 = "{$wpdb->prefix}posts";
 
-        $items = $wpdb->get_results(
-            "SELECT 
+        $arlo_region = !empty($atts['region']) ? $atts['region'] : null;
+        if (!empty($arlo_region)) {
+            $where .= ' AND v.v_region = %s';
+            $parameters[] = $arlo_region;
+        }   
+
+        $sql = "SELECT 
                 DISTINCT(v.v_arlo_id)
             FROM 
                 $t1 v 
@@ -59,14 +78,22 @@ class Venues {
                 v.v_post_id = post.ID
             WHERE 
                 post.post_type = 'arlo_venue'
+                $where
             AND
                 v.import_id = $import_id
             ORDER BY 
-                v.v_name ASC", ARRAY_A);
+                v.v_name ASC";
 
-        $num = $wpdb->num_rows;
+        $query = $wpdb->prepare($sql, $parameters);
 
-        return arlo_pagination($num,$limit);        
+        if ($query) {
+            $items = $wpdb->get_results($query, ARRAY_A);
+            $num = $wpdb->num_rows;
+    
+            return arlo_pagination($num,$limit); 
+        } else {
+            throw new \Exception("Couldn't prepapre SQL statement");
+        }
     }
     
     private static function shortcode_venue_list_item($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -74,7 +101,9 @@ class Venues {
             'link' => 'permalink'
         ), $atts, $shortcode_name, $import_id));
 
-        $items = self::get_venues($atts,$import_id);
+        $atts = array_merge($atts, self::$venue_list_item_atts);
+
+        $items = self::get_venues($atts, $import_id);
 
         $output = '';
 
@@ -104,8 +133,10 @@ class Venues {
         return $output;        
     }
 
-    private static function get_venues($atts,$import_id) {
+    private static function get_venues($atts, $import_id) {
         global $wpdb;
+
+        $parameters = [];
 
         $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
         $page = arlo_current_page();
@@ -114,26 +145,43 @@ class Venues {
         $t1 = "{$wpdb->prefix}arlo_venues";
         $t2 = "{$wpdb->prefix}posts";
 
-        return $wpdb->get_results(
-            "SELECT 
-                v.*, 
-                post.ID as post_id
-            FROM 
-                $t1 v 
-            LEFT JOIN 
-                $t2 post 
-            ON 
-                v.v_post_id = post.ID
-            WHERE 
-                post.post_type = 'arlo_venue'
-            AND
-                v.import_id = $import_id
-            GROUP BY
-                v_arlo_id
-            ORDER BY 
-                v.v_name ASC
-            LIMIT 
-                $offset, $limit", ARRAY_A);
+        $arlo_region = !empty($atts['region']) ? $atts['region'] : null;
+        if (!empty($arlo_region)) {
+            $where .= ' AND v.v_region = %s';
+            $parameters[] = $arlo_region;
+        }   
+
+        $sql = "SELECT 
+                    v.*, 
+                    post.ID as post_id
+                FROM 
+                    $t1 v 
+                LEFT JOIN 
+                    $t2 post 
+                ON 
+                    v.v_post_id = post.ID
+                WHERE 
+                    post.post_type = 'arlo_venue'
+                    $where
+                AND
+                    v.import_id = $import_id
+                GROUP BY
+                    v_arlo_id
+                ORDER BY 
+                    v.v_name ASC
+                LIMIT 
+                    %d, %d";
+
+        $parameters[] = $offset;
+        $parameters[] = $limit;
+
+        $query = $wpdb->prepare($sql, $parameters);
+
+        if ($query) {
+            return $wpdb->get_results($query, ARRAY_A);
+        } else {
+            throw new \Exception("Couldn't prepapre SQL statement");
+        }
     }
     
     private static function shortcode_venue_name($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -371,6 +419,10 @@ class Venues {
         $venue_snippet = self::get_venue_snippet($link);
 
         return Shortcodes::create_rich_snippet( json_encode($venue_snippet) ); 
+    }
+
+    private static function shortcode_venue_region_selector($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        return Shortcodes::create_region_selector("venue");
     }
 
     /**

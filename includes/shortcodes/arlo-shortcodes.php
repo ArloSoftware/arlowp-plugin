@@ -145,7 +145,7 @@ class Shortcodes {
 	public static function create_region_selector($page_name) {
 		global $post;
 		
-		$valid_page_names = ['upcoming', 'event', 'eventsearch', 'widget'];
+		$valid_page_names = ['upcoming', 'event', 'eventsearch', 'widget', 'venue'];
 		
 		$settings = get_option('arlo_settings');  
 		$regions = get_option('arlo_regions');  

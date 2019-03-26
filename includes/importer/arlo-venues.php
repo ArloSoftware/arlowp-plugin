@@ -37,8 +37,8 @@ class Venues extends BaseImporter {
 		if (is_numeric($post_id) && $post_id > 0) {
 			$query = $this->dbl->query( $this->dbl->prepare( 
 				"INSERT INTO " . $this->table_name . " 
-				(v_arlo_id, v_name, v_locationname, v_geodatapointlatitude, v_geodatapointlongitude, v_physicaladdressline1, v_physicaladdressline2, v_physicaladdressline3, v_physicaladdressline4, v_physicaladdresssuburb, v_physicaladdresscity, v_physicaladdressstate, v_physicaladdresspostcode, v_physicaladdresscountry, v_viewuri, v_facilityinfodirections, v_facilityinfoparking, v_post_name, v_post_id, import_id) 
-				VALUES ( %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, %s )
+				(v_arlo_id, v_name, v_locationname, v_geodatapointlatitude, v_geodatapointlongitude, v_physicaladdressline1, v_physicaladdressline2, v_physicaladdressline3, v_physicaladdressline4, v_physicaladdresssuburb, v_physicaladdresscity, v_physicaladdressstate, v_physicaladdresspostcode, v_physicaladdresscountry, v_viewuri, v_facilityinfodirections, v_facilityinfoparking, v_post_name, v_post_id, v_region, import_id) 
+				VALUES ( %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, %s, %s )
 				", 
 				$item->VenueID,
 				$item->Name,
@@ -59,6 +59,7 @@ class Venues extends BaseImporter {
 				@$item->FacilityInfo->Parking->Text,
 				$slug,
 				$post_id,
+				@$item->Region,
 				$this->import_id
 			) );
 							

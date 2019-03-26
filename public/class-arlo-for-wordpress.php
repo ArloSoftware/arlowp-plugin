@@ -137,7 +137,9 @@ class Arlo_For_Wordpress {
 		'venue' => array(
 			'slug' => 'venue',
 			'name' => 'Venues',
-			'singular_name' => 'Venue list'
+			'singular_name' => 'Venue list',
+			'regionalized' => true
+
 		),		
 		'presenter' => array(
 			'slug' => 'presenter',
