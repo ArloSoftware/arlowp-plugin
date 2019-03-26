@@ -1,4 +1,7 @@
 <div class="arlo" id="arlo">
+<div class="arlo-region-selector">
+  [arlo_venue_region_selector]
+</div>
 
 [arlo_venue_list_item]
 
