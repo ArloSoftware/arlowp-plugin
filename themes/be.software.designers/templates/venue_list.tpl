@@ -1,5 +1,5 @@
 <div class="arlo" id="arlo">
-
+    [arlo_venue_region_selector]
     <ul class="arlo-list venues">
         [arlo_venue_list_item]
             <li class="arlo-cf">

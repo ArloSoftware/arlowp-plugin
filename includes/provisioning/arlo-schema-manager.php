@@ -6,8 +6,8 @@ use Arlo\Logger;
 
 class SchemaManager {
 
-	const DB_SCHEMA_HASH = 'bd3433fc50d0f33591947e829b901f6483007777';
-	const DB_SCHEMA_VERSION = '4.1.0';
+	const DB_SCHEMA_HASH = '6b078248d72155d946cf11dc7085a4fd01a492e1';
+	const DB_SCHEMA_VERSION = '4.2.0';
 
 	/* database layer */
 	private $dbl;
@@ -283,10 +283,12 @@ class SchemaManager {
 			v_facilityinfoparking text NULL,
 			v_post_name varchar(255) NULL,
 			v_post_id int(10) unsigned DEFAULT NULL,
+			v_region varchar(5) NOT NULL,
 			import_id int(10) unsigned DEFAULT NULL,
 			PRIMARY KEY  (v_id),
 			KEY v_arlo_id (v_arlo_id),
-			KEY v_post_id (v_post_id))
+			KEY v_post_id (v_post_id),
+			KEY v_region (v_region))
 			CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";";
 
 		$this->dbl->sync_schema($sql);

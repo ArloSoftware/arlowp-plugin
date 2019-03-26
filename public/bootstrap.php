@@ -213,6 +213,7 @@ function arlo_register_custom_post_types() {
 				break;
 				case 'venue':
 					add_rewrite_rule('^' . $slug . '/page/([^/]*)/?','index.php?page_id=' . $page_id . '&paged=$matches[1]','top');
+					add_rewrite_rule('^' . $slug . '/region-([^/]*)/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&paged=$matches[4]','top');
 				break;
 			}
 		}
@@ -316,11 +317,14 @@ function arlo_register_custom_post_types() {
 				} else {
 					$slug = substr(substr(str_replace(get_home_url(), '', get_permalink($settings['post_types'][$arlo_page_ids[$page_id]]['posts_page'])), 0, -1), 1);	
 				}
+
+				$region_path = '/region-' . $selected_region;
 				
-				$location = str_replace($slug, $slug.'/region-' . $selected_region , $_SERVER['REQUEST_URI']);			
-				
-				wp_redirect(esc_url($location));
-				exit();				
+				if (strpos($_SERVER['REQUEST_URI'], $region_path) === false) {
+					$location = str_replace($slug, $slug.$region_path , $_SERVER['REQUEST_URI']);			
+					wp_redirect(esc_url($location));	
+					exit();	
+				}
 			} else {
 				setcookie("arlo-region", $selected_region, time()+60*60*24*30, '/', $domain);	
 			}
