@@ -79,6 +79,7 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-system-requirements.p
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-theme-manager.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-timezone-manager.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-redirect.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-sitemap-generator.php');
 	
 //include shortcodes
 require_once( plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-shortcodes.php');
