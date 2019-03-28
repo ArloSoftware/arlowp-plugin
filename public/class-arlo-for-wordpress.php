@@ -18,6 +18,7 @@ use Arlo\ThemeManager;
 use Arlo\TimeZoneManager;
 use Arlo\SystemRequirements;
 use Arlo\Redirect;
+use Arlo\SitemapGenerator;
 
 /**
  * Arlo for WordPress.
@@ -498,6 +499,9 @@ class Arlo_For_Wordpress {
 
 		// Add review notice
 		add_action( 'init', array( $this, 'arlo_add_review_message' ) );
+
+		// Register sitemaps
+		add_action( 'init', 'arlo_register_yoast_sitemap', 99 );
 
 		// Load public-facing style sheet and JavaScript.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
@@ -1316,6 +1320,18 @@ class Arlo_For_Wordpress {
 		$this->__set('scheduler', $scheduler);
 		
 		return $scheduler;
+	}
+
+	public function get_sitemap_generator() {
+		if($sitemap_generator = $this->__get('sitemap_generator')) {
+			return $sitemap_generator;
+		}
+		
+		$sitemap_generator = new SitemapGenerator($this, $this->get_dbl());
+		
+		$this->__set('sitemap_generator', $sitemap_generator);
+		
+		return $sitemap_generator;
 	}
 
 	public function get_theme_manager() {

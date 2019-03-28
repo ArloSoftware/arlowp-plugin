@@ -219,7 +219,7 @@ function arlo_register_custom_post_types() {
 
 		register_post_type('arlo_' . $id, $args);
 	}
-	
+
 	// these should possibly be in there own function?
 	add_rewrite_tag('%page_id%', '([^&]+)');
 	add_rewrite_tag('%arlo-region%', '([^&]+)');
@@ -659,4 +659,62 @@ function arlo_add_datamodel() {
 	$plugin->get_schema_manager()->install_schema();
 
 	// error_log("DB Hash after install_schema: " . $plugin->get_schema_manager()->create_db_schema_hash());
+}
+
+add_filter( 'wpseo_sitemap_index', function() {
+	$last_import_date = get_option('arlo_last_import');
+
+	if (!empty($last_import_date)) {
+		$date_string = str_replace(" ", "T", $last_import_date) . '+00:00';
+
+		return '
+		<sitemap>
+			<loc>' . site_url() .'/arlocatalogue-sitemap.xml</loc>
+			<lastmod>' . $date_string . '</lastmod>
+		</sitemap>
+		<sitemap>
+			<loc>' . site_url() .'/arloschedule-sitemap.xml</loc>
+			<lastmod>' . $date_string . '</lastmod>
+		</sitemap>
+		';
+	}
+
+
+	
+} );
+
+function arlo_register_yoast_sitemap() {
+	global $wpseo_sitemaps;
+	$last_import_date = get_option('arlo_last_import');
+
+	if ($wpseo_sitemaps && !empty($last_import_date)) {
+		$wpseo_sitemaps->register_sitemap( 'arlocatalogue', function () { 
+			arlo_set_yoast_sitemap('catalogue');
+		});
+
+		$wpseo_sitemaps->register_sitemap( 'arloschedule', function () {
+			arlo_set_yoast_sitemap('schedule');
+		});
+	}
+}
+
+function arlo_set_yoast_sitemap($type = '') {
+	global $wpseo_sitemaps;
+	$plugin = Arlo_For_Wordpress::get_instance();
+	$sitemap_generator = $plugin->get_sitemap_generator();	
+
+	switch ($type) {
+		case 'catalogue':
+			$sitemap = $sitemap_generator->generate_catalogue_sitemap();
+			break;
+		case 'shedule':
+			$sitemap = $sitemap_generator->generate_catalogue_sitemap();
+			break;
+	}
+
+	if (!empty($sitemap)) {
+		$wpseo_sitemaps->set_sitemap($sitemap);
+	} else {
+		$wpseo_sitemaps->bad_sitemap = true;
+	}
 }
