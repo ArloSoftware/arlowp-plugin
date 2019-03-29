@@ -63,11 +63,15 @@ class Snapshots extends Resource
 			} catch (\Exception $e) {}
 			
 			$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE); 
+			$curl_error = curl_error($ch);
+		} else {
+			$httpcode = 0;
+			$curl_error = 'cUrl is not available';
 		}
 
 		$return_object->success = substr($httpcode, 0, 1) == 2;
 		if ($httpcode < 200) {
-			$return_object->error = curl_error($ch);
+			$return_object->error = $curl_error;
 		} else {
 				if ($return_object->success) {
 					if (!($json_body->TestResult && $json_body->TestResult->Success)) {
