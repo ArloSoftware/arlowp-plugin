@@ -16,29 +16,35 @@ class SitemapGenerator {
 	}
 
 	public function generate_catalogue_sitemap() {
-        $post_types = arlo_get_option('post_types');
+		$post_types = arlo_get_option('post_types');
+		$page_filter_settings = get_option("arlo_page_filter_settings");
 
 		if (!empty($post_types['event']) && !empty($post_types['event']['posts_page'])) {
-			return $this->generate_category_sitemap(get_page_link($post_types['event']['posts_page']));
+			$ignored_categories = (isset($page_filter_settings['hiddenfilters']['events']['category']) ? $page_filter_settings['hiddenfilters']['events']['category'] : []);
+			$showonly_categories = (isset($page_filter_settings['showonlyfilters']['events']['category']) ? $page_filter_settings['showonlyfilters']['events']['category'] : []);
+			return $this->generate_category_sitemap(get_page_link($post_types['event']['posts_page']), $ignored_categories, $showonly_categories);
 		}
 	}
 
 	public function generate_schedule_sitemap() {
-        $post_types = arlo_get_option('post_types');
-
+		$post_types = arlo_get_option('post_types');
+		$page_filter_settings = get_option("arlo_page_filter_settings");
+		
 		if (!empty($post_types['schedule']) && !empty($post_types['schedule']['posts_page'])) {
-			return $this->generate_category_sitemap(get_page_link($post_types['schedule']['posts_page']));
+			$ignored_categories = (isset($page_filter_settings['hiddenfilters']['schedule']['category']) ? $page_filter_settings['hiddenfilters']['schedule']['category'] : []);
+			$showonly_categories = (isset($page_filter_settings['showonlyfilters']['schedule']['category']) ? $page_filter_settings['showonlyfilters']['schedule']['category'] : []);
+			return $this->generate_category_sitemap(get_page_link($post_types['schedule']['posts_page']), $ignored_categories, $showonly_categories);
 		}
 	}
 
-	private function generate_category_sitemap($page_link = '') {
+	private function generate_category_sitemap($page_link = '', $ignored_categories = [], $showonly_categories= []) {
 		$import_id = get_option('arlo_import_id');
 		$regions = get_option('arlo_regions');
 		$urls = [];
 
 		if (!empty($page_link)) {
 			$base_url = rtrim($page_link, "/");
-			$categories = CategoriesEntity::get([], null, $import_id);
+			$categories = CategoriesEntity::get([ 'ignored' => $ignored_categories, 'id' => array_values($showonly_categories)], null, $import_id);
 
 			if (is_array($regions) && count($regions)) {
 				foreach	($regions as $region_id => $region_label) {
