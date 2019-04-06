@@ -707,14 +707,14 @@ function arlo_set_yoast_sitemap($type = '') {
 		case 'catalogue':
 			$sitemap = $sitemap_generator->generate_catalogue_sitemap();
 			break;
-		case 'shedule':
-			$sitemap = $sitemap_generator->generate_catalogue_sitemap();
+		case 'schedule':
+			$sitemap = $sitemap_generator->generate_schedule_sitemap();
 			break;
 	}
 
 	if (!empty($sitemap)) {
 		$wpseo_sitemaps->set_sitemap($sitemap);
 	} else {
-		$wpseo_sitemaps->bad_sitemap = true;
+		$wpseo_sitemaps->set_bad_sitemap(true);
 	}
 }
