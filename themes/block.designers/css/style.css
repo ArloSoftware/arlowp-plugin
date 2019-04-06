@@ -385,9 +385,19 @@ body.arlo {
     margin-right: 0.5%;
 }
 
+.arlo#arlo .arlo-list.arlo-cols-3 > li:nth-of-type(3n) {
+    width: 34%;
+    margin-right: 0;
+}
+
 .arlo#arlo .arlo-list.arlo-cols-2 > li {
     width: 47.5%;
     margin-right: 2.5%;
+}
+
+.arlo#arlo .arlo-list.arlo-cols-2 > li:nth-of-type(2n) {
+    width: 50%;
+    margin-right: 0;
 }
 
 .arlo#arlo .arlo-list.arlo-cols-1 > li {
@@ -1609,3 +1619,21 @@ body.arlo {
   padding-top: 5px;
   margin-bottom: 5px;
 }
+
+@media (min-width: 750px) {
+    .arlo#arlo .arlo-list.events.arlo-cols-1 .arlo-date,
+    .arlo#arlo .arlo-list.events.arlo-cols-1 .arlo-event-duration {
+        float: left;
+        clear: none;
+        margin-right: 1em;
+    }
+
+    .arlo#arlo .arlo-list.events.arlo-cols-1 .arlo-event-details {
+        float: right;
+        clear: none;
+    }
+
+    .arlo#arlo .arlo-list.events.arlo-cols-1 .arlo-event-time {
+        border-bottom: none;
+    }
+} 
