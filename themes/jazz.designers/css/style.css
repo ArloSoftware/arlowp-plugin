@@ -348,9 +348,19 @@ body.arlo {
     margin-right: 0.5%;
 }
 
+.arlo#arlo .arlo-list.arlo-cols-3 > li:nth-of-type(3n) {
+    width: 34%;
+    margin-right: 0;
+}
+
 .arlo#arlo .arlo-list.arlo-cols-2 > li {
     width: 49.5%;
     margin-right: 0.5%;
+}
+
+.arlo#arlo .arlo-list.arlo-cols-2 > li:nth-of-type(2n) {
+    width: 50%;
+    margin-right: 0;
 }
 
 .arlo#arlo .arlo-list.arlo-cols-1 > li {
@@ -1425,4 +1435,15 @@ body.arlo {
   text-align: center;
   padding-top: 10px;
   margin-bottom: 5px;
+}
+
+@media (min-width: 750px) {
+    .arlo#arlo .arlo-list.events.arlo-cols-1 .arlo-event-head {
+        float: left;
+        border-bottom: none;
+    }
+    
+    .arlo#arlo .arlo-list.events.arlo-cols-1 .arlo-event-body {
+        float: right;
+    }
 }
