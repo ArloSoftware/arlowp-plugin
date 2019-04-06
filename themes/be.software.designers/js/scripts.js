@@ -16,8 +16,9 @@ jQuery(function($){
 
     var setNumberOfEventColumns = function (container) {
         // set number of event columns based on the container width
-        var $container = jQuery(container);
-        var $containerWidth = $container.width();
+        var $container = $(container),
+            $containerWidth = $container.width(),
+            events = $container.children("li.arlo-cf").length;
 
         $container.removeClass('arlo-cols-5 arlo-cols-4 arlo-cols-3 arlo-cols-2 arlo-cols-1');
 
@@ -25,11 +26,11 @@ jQuery(function($){
             $container.addClass('arlo-cols-5');
         } if ($containerWidth < 1600) {
             $container.addClass('arlo-cols-4');
-        } if ($containerWidth < 1200) {
+        } if ($containerWidth < 1200 || events == 3) {
             $container.addClass('arlo-cols-3');
-        } if ($containerWidth < 960) {
+        } if ($containerWidth < 760 || events == 2) {
             $container.addClass('arlo-cols-2');
-        } if ($containerWidth < 670) {
+        } if ($containerWidth < 670 || events == 1) {
             $container.addClass('arlo-cols-1');
         }
     }
