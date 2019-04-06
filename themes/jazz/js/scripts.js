@@ -59,7 +59,7 @@ jQuery(function($){
         // set number of event columns based on the container width
         var $container = $(container),
             $containerWidth = $container.width(),
-            events = $container.find(".arlo-event").length;
+            events = $container.children(".arlo-event").length;
 
         $container.removeClass('arlo-cols-5 arlo-cols-4 arlo-cols-3 arlo-cols-2 arlo-cols-1');
 
