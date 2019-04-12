@@ -46,20 +46,20 @@ class UpcomingEvents {
         self::$upcoming_list_item_atts = self::get_upcoming_atts($atts, $import_id);
 
 
-        \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Utilities::convert_string_to_int_array');
-        \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Utilities::convert_string_to_int_array', null, true);
+        self::$upcoming_list_item_atts = \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Utilities::convert_string_to_int_array');
+        self::$upcoming_list_item_atts = \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Utilities::convert_string_to_int_array', null, true);
 
-        \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id]);
-        \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id], true);
+        self::$upcoming_list_item_atts = \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id]);
+        self::$upcoming_list_item_atts = \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id], true);
 
-        \Arlo\Utilities::set_base_filter($template_name, 'eventtag', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id]);
-        \Arlo\Utilities::set_base_filter($template_name, 'eventtag', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id], true);
+        self::$upcoming_list_item_atts = \Arlo\Utilities::set_base_filter($template_name, 'eventtag', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id]);
+        self::$upcoming_list_item_atts = \Arlo\Utilities::set_base_filter($template_name, 'eventtag', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id], true);
 
-        \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Utilities::convert_string_to_int_array');
-        \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Utilities::convert_string_to_int_array', null, true);
+        self::$upcoming_list_item_atts = \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Utilities::convert_string_to_int_array');
+        self::$upcoming_list_item_atts = \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Utilities::convert_string_to_int_array', null, true);
 
-        \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Utilities::convert_string_to_string_array');
-        \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Utilities::convert_string_to_string_array', null, true);
+        self::$upcoming_list_item_atts = \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Utilities::convert_string_to_string_array');
+        self::$upcoming_list_item_atts = \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Utilities::convert_string_to_string_array', null, true);
 
         return do_shortcode($content);        
     }

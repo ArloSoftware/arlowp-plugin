@@ -224,11 +224,11 @@ class OnlineActivities {
 
         self::$oa_list_atts = self::get_oa_atts($atts, $import_id);
 
-        \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$oa_list_atts, '\Arlo\Utilities::convert_string_to_int_array');
-        \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$oa_list_atts, '\Arlo\Utilities::convert_string_to_int_array', null, true);       
+        self::$oa_list_atts = \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$oa_list_atts, '\Arlo\Utilities::convert_string_to_int_array');
+        self::$oa_list_atts = \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$oa_list_atts, '\Arlo\Utilities::convert_string_to_int_array', null, true);       
 
-        \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$oa_list_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id]);
-        \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$oa_list_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id], true);
+        self::$oa_list_atts = \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$oa_list_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id]);
+        self::$oa_list_atts = \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$oa_list_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id], true);
 
         return do_shortcode($content);        
     }

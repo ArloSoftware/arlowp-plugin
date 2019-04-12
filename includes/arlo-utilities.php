@@ -228,7 +228,7 @@ class Utilities {
         return [];
     }
 
-    public static function set_base_filter($template_name, $filter_name = '', $filter_settings = [], $atts = [], &$stored_atts = [], $callback = '', $callback_parameters = [], $is_hidden = false ) {
+    public static function set_base_filter($template_name, $filter_name = '', $filter_settings = [], $atts = [], $stored_atts = [], $callback = '', $callback_parameters = [], $is_hidden = false ) {
         $parameter = \Arlo\Utilities::clean_string_url_parameter('arlo-' . $filter_name);
         $filter_setting_section = ($is_hidden ? 'hiddenfilters' : 'showonlyfilters');
         $filter_setting_name = $filter_name;
@@ -258,6 +258,8 @@ class Utilities {
                 $stored_atts[$filter_name] = $GLOBALS['arlo_filter_base'][$filter_name];
             }
         }
+
+        return $stored_atts;
     }
 
     public static function call_user_func_with_callback($value, $callback = '', $callback_parameters = []) {
