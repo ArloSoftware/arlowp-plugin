@@ -50,8 +50,8 @@ class Categories {
             $page_type = \Arlo_For_Wordpress::get_current_page_arlo_type();
             $page_type = ($page_type == 'event' ? 'events' : $page_type);
 
-            $page_filter_settings = get_option("arlo_page_filter_settings");
-            $ignored_categories = (isset($page_filter_settings['hiddenfilters'][$page_type]['category']) ? $page_filter_settings['hiddenfilters'][$page_type]['category'] : []);
+            $base_category = \Arlo\Utilities::get_filter_keys_int_array('category', $atts, false);
+            $ignored_categories = \Arlo\Utilities::get_filter_keys_int_array('categoryhidden', $atts, false);
 
             foreach ($arlo_categories as $i => $arlo_category) {
                 if(!isset($atts['parent']) && $start_at == 0 && !empty($arlo_category)) {
@@ -64,6 +64,10 @@ class Categories {
                     
                     if($start_at == 0) {
                         $conditions = array('parent_id' => 0);
+                    }
+
+                    if (count($ignored_categories)) {
+                        $conditions['ignored'] = $ignored_categories;
                     }
 
                     $current = CategoriesEntity::get($conditions, 1, $import_id);
@@ -79,9 +83,9 @@ class Categories {
                             $start_at = $root[0]->c_arlo_id;
                         }
                     }
-                    
-                    $tree = CategoriesEntity::getTree($start_at, $depth, 0, $ignored_categories, $import_id);
 
+                    $tree = CategoriesEntity::getTree($start_at, $depth, 0, $ignored_categories, $import_id, $arlo_categories == $base_category);
+                    
                     $GLOBALS['arlo_categories_count'] = (empty($tree) ? 0 : count($tree));
                             
                     if(!empty($tree)) {		
