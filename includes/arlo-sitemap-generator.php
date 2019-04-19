@@ -3,6 +3,7 @@
 namespace Arlo;
 
 use Arlo\Entities\Categories as CategoriesEntity;
+use Arlo\Shortcodes\Templates;
 
 class SitemapGenerator {
 	private $plugin;
@@ -20,19 +21,15 @@ class SitemapGenerator {
 		$page_filter_settings = get_option("arlo_page_filter_settings");
 
 		if (!empty($post_types['event']) && !empty($post_types['event']['posts_page'])) {
-			$categories_settings_from_shortcode = $this->get_visible_and_hidden_categories_from_shortcode('arlo_event_template_list', $post_types['event']['posts_page']);
-			$ignored_categories = $categories_settings_from_shortcode['ignored_categories'];
-			$showonly_categories = $categories_settings_from_shortcode['showonly_categories'];
+			$shortcode_attributes = $this->get_shortcode_attributes('arlo_event_template_list', $post_types['event']['posts_page']);
 
-			if (!is_array($ignored_categories) || !count($ignored_categories)) {
-				$ignored_categories = (isset($page_filter_settings['hiddenfilters']['events']['category']) ? $page_filter_settings['hiddenfilters']['events']['category'] : []);
+			$content = \Arlo\Shortcodes\Templates::template_list_initializer("", $shortcode_attributes, "arlo_event_template_list", "", "events");
+			$showonly_categories = \Arlo\Utilities::get_filter_keys_int_array('category', $shortcode_attributes, false);
+			$ignored_categories = \Arlo\Utilities::get_filter_keys_int_array('categoryhidden', $shortcode_attributes, false);
+
+			if ($this->is_category_selector_visible($content)) {
+				return $this->generate_category_sitemap(get_page_link($post_types['event']['posts_page']), $ignored_categories, $showonly_categories);
 			}
-
-			if (!is_array($showonly_categories) || !count($showonly_categories)) {
-				$showonly_categories = (isset($page_filter_settings['showonlyfilters']['events']['category']) ? $page_filter_settings['showonlyfilters']['events']['category'] : []);
-			}
-
-			return $this->generate_category_sitemap(get_page_link($post_types['event']['posts_page']), $ignored_categories, $showonly_categories);
 		}
 	}
 
@@ -41,19 +38,15 @@ class SitemapGenerator {
 		$page_filter_settings = get_option("arlo_page_filter_settings");
 		
 		if (!empty($post_types['schedule']) && !empty($post_types['schedule']['posts_page'])) {
-			$categories_settings_from_shortcode = $this->get_visible_and_hidden_categories_from_shortcode('arlo_event_template_list', $post_types['schedule']['posts_page']);
-			$ignored_categories = $categories_settings_from_shortcode['ignored_categories'];
-			$showonly_categories = $categories_settings_from_shortcode['showonly_categories'];
+			$shortcode_attributes = $this->get_shortcode_attributes('arlo_schedule', $post_types['schedule']['posts_page']);
 
-			if (!is_array($ignored_categories) || !count($ignored_categories)) {
-				$ignored_categories = (isset($page_filter_settings['hiddenfilters']['schedule']['category']) ? $page_filter_settings['hiddenfilters']['schedule']['category'] : []);
-			}
+			\Arlo\Shortcodes\Templates::template_list_initializer("", $shortcode_attributes, "arlo_schedule", "", "schedule");
+			$showonly_categories = \Arlo\Utilities::get_filter_keys_int_array('category', $shortcode_attributes, false);
+			$ignored_categories = \Arlo\Utilities::get_filter_keys_int_array('categoryhidden', $shortcode_attributes, false);
 
-			if (!is_array($showonly_categories) || !count($showonly_categories)) {
-				$showonly_categories = (isset($page_filter_settings['showonlyfilters']['schedule']['category']) ? $page_filter_settings['showonlyfilters']['schedule']['category'] : []);
+			if ($this->is_category_selector_visible($content)) {
+				return $this->generate_category_sitemap(get_page_link($post_types['schedule']['posts_page']), $ignored_categories, $showonly_categories);
 			}
-			
-			return $this->generate_category_sitemap(get_page_link($post_types['schedule']['posts_page']), $ignored_categories, $showonly_categories);
 		}
 	}
 
@@ -76,35 +69,27 @@ class SitemapGenerator {
 		return $urlset . '</urlset>';
 	}
 
-	private function get_visible_and_hidden_categories_from_shortcode($shortcode = '', $post_id = 0) {
-		$showonly_categories = [];
-		$ignored_categories = [];
+	private function get_shortcode_attributes($shortcode = '', $post_id = 0) {
+		$shortcode_atts = [];
 
 		$content = get_post_field('post_content', $post_id);
 		preg_match_all("(\[(?:\[??[^\[]*?\]))", $content, $content_shortcodes);
-		$event_template_list_shortcode = array_filter($content_shortcodes[0], function($shortcode) {
-				return strpos($shortcode, $shortcode) !== false;
+		$event_template_list_shortcode = array_filter($content_shortcodes[0], function($s) use($shortcode) {
+				return strpos($s, $shortcode) !== false;
 		});
 		if (count($event_template_list_shortcode)) {
-			preg_match("#categoryhidden=[\"']?(\d)[\"']?#", $event_template_list_shortcode[0], $categoryhidden);
+			preg_match("#categoryhidden=[\"']?([\d\s\w,-]+)[\"']?#", $event_template_list_shortcode[0], $categoryhidden);
 			if (count($categoryhidden) == 2) {
-				$ignored_categories = array_map(function($value) {
-					return intval($value);
-				}, explode(",", $categoryhidden[1]));
+				$shortcode_atts['categoryhidden'] = $categoryhidden[1];
 			}
 
-			preg_match("#category=[\"']?([\d,\s]+)[\"']?#", $event_template_list_shortcode[0], $category);
+			preg_match("#category=[\"']?([\d\s\w,-]+)[\"']?#", $event_template_list_shortcode[0], $category);
 			if (count($category) == 2) {
-				$showonly_categories = array_map(function($value) {
-					return intval($value);
-				}, explode(",", $category[1]));
+				$shortcode_atts['category'] = $category[1];
 			}
 		}
 
-		return [
-			'ignored_categories' => $ignored_categories,
-			'showonly_categories' => $showonly_categories
-		];
+		return $shortcode_atts;
 	}
 
 	private function generate_category_sitemap($page_link = '', $ignored_categories = [], $showonly_categories= []) {
@@ -114,7 +99,8 @@ class SitemapGenerator {
 
 		if (!empty($page_link)) {
 			$base_url = rtrim($page_link, "/");
-			$categories = CategoriesEntity::get([ 'ignored' => $ignored_categories, 'id' => array_values($showonly_categories)], null, $import_id);
+			$categories = CategoriesEntity::get([ 'ignored' => $ignored_categories, 'id' => $showonly_categories], null, $import_id);
+			$categories = array_merge($categories, CategoriesEntity::get([ 'ignored' => $ignored_categories, 'parent_id' => $showonly_categories], null, $import_id));
 
 			if (is_array($regions) && count($regions)) {
 				foreach	($regions as $region_id => $region_label) {
@@ -149,5 +135,35 @@ class SitemapGenerator {
 
 	private function category_path($category) {
 		return $category->c_parent_id != 0 ? 'cat-' . esc_attr($category->c_slug) : '';
+	}
+
+	private function is_category_selector_visible($content) {
+		$arlo_filters_available = false;
+		$arlo_categories_available = false;
+
+		preg_match_all("(\[(?:\[??[^\[]*?\]))", $content, $content_shortcodes);
+
+		$categories_shortcode = array_filter($content_shortcodes[0], function($s){
+				return strpos($s, "arlo_categories") !== false;
+		});
+		if (count($categories_shortcode)) {
+			$arlo_categories_available = true;
+		}
+
+		$filters_shortcode = array_filter($content_shortcodes[0], function($s){
+			return strpos($s, "arlo_event_template_filters") !== false;
+		});
+		if (count($filters_shortcode)) {
+			preg_match("#filters=[\"']?([\w\s,]+)[\"']?#", array_pop($filters_shortcode), $filters);
+			if (count($filters) == 2) {
+				if (strpos($filters[2], "category")) {
+					$arlo_filters_available = true;
+				}
+			} else if (count($filters) == 0) {
+				$arlo_filters_available = true;
+			}
+		}
+
+		return $arlo_categories_available || $arlo_filters_available;
 	}
 }

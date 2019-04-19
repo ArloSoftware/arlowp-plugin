@@ -276,7 +276,7 @@ class Templates {
         return self::template_list_initializer($content, $atts, $shortcode_name, $import_id, $template_name);
     }
 
-    private static function template_list_initializer($content = '', $atts = [], $shortcode_name = '', $import_id = '', $template_name) {
+    public static function template_list_initializer($content = '', $atts = [], $shortcode_name = '', $import_id = '', $template_name) {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
 
         $filter_settings = get_option('arlo_page_filter_settings', []);        
