@@ -5,7 +5,10 @@ use Arlo\Entities\Categories as CategoriesEntity;
 use Arlo\Entities\Tags as TagsEntity;
 
 class UpcomingEvents {
+    /* Contains all the base filter atts + atts from URL */
     public static $upcoming_list_item_atts = [];
+
+    public static $base_filters = [];
 
     public static function init() {
         $class = new \ReflectionClass(__CLASS__);
@@ -42,24 +45,23 @@ class UpcomingEvents {
         $template_name = Shortcodes::get_template_name($shortcode_name,'upcoming_list','upcoming');
         $templates = arlo_get_option('templates');
         $content = $templates[$template_name]['html'];
-        
-        self::$upcoming_list_item_atts = self::get_upcoming_atts($atts, $import_id);
 
+        self::$base_filters = \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$base_filters, '\Arlo\Utilities::convert_string_to_int_array');
+        self::$base_filters = \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$base_filters, '\Arlo\Utilities::convert_string_to_int_array', null, true);
 
-        self::$upcoming_list_item_atts = \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Utilities::convert_string_to_int_array');
-        self::$upcoming_list_item_atts = \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Utilities::convert_string_to_int_array', null, true);
+        self::$base_filters = \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$base_filters, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id]);
+        self::$base_filters = \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$base_filters, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id], true);
 
-        self::$upcoming_list_item_atts = \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id]);
-        self::$upcoming_list_item_atts = \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id], true);
+        self::$base_filters = \Arlo\Utilities::set_base_filter($template_name, 'eventtag', $filter_settings, $atts, self::$base_filters, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id]);
+        self::$base_filters = \Arlo\Utilities::set_base_filter($template_name, 'eventtag', $filter_settings, $atts, self::$base_filters, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id], true);
 
-        self::$upcoming_list_item_atts = \Arlo\Utilities::set_base_filter($template_name, 'eventtag', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id]);
-        self::$upcoming_list_item_atts = \Arlo\Utilities::set_base_filter($template_name, 'eventtag', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id], true);
+        self::$base_filters = \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$base_filters, '\Arlo\Utilities::convert_string_to_int_array');
+        self::$base_filters = \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$base_filters, '\Arlo\Utilities::convert_string_to_int_array', null, true);
 
-        self::$upcoming_list_item_atts = \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Utilities::convert_string_to_int_array');
-        self::$upcoming_list_item_atts = \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Utilities::convert_string_to_int_array', null, true);
+        self::$base_filters = \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$base_filters, '\Arlo\Utilities::convert_string_to_string_array');
+        self::$base_filters = \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$base_filters, '\Arlo\Utilities::convert_string_to_string_array', null, true);
 
-        self::$upcoming_list_item_atts = \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Utilities::convert_string_to_string_array');
-        self::$upcoming_list_item_atts = \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$upcoming_list_item_atts, '\Arlo\Utilities::convert_string_to_string_array', null, true);
+        self::$upcoming_list_item_atts = array_merge(self::$base_filters, self::get_upcoming_atts($atts, $import_id));
 
         return do_shortcode($content);        
     }
@@ -245,16 +247,18 @@ class UpcomingEvents {
             $page_link = get_permalink(get_post($post));
         }
 
+        $combined_atts = array_merge(is_array($atts) ? $atts : [], self::$upcoming_list_item_atts);
+
         $filter_html = '<form class="arlo-filters" method="get" action="' . $page_link . '">';
 
         foreach(\Arlo_For_Wordpress::$available_filters['upcoming']['filters'] as $filter_key => $filter):
 
-            $att = (isset(self::$upcoming_list_item_atts[$filter_key]) && is_string(self::$upcoming_list_item_atts[$filter_key]) ? self::$upcoming_list_item_atts[$filter_key] : '');
-            
+            $att = (isset($combined_atts[$filter_key]) && is_string($combined_atts[$filter_key]) ? $combined_atts[$filter_key] : '');
+           
             if (!in_array($filter_key, $filters_array))
                 continue;
 
-            $items = Filters::get_filter_options($filter_key, $import_id);
+            $items = Filters::get_filter_options($filter_key, $import_id, self::$base_filters);
 
             $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'), 'generic', $att, 'upcoming');
         endforeach;

@@ -27,15 +27,15 @@ class Utilities {
 		return $now;    
     }
 
-    public static function get_filter_keys_string_array($name, $atts = []) {
-        $url_parameter = self::clean_string_url_parameter('arlo-'.$name);
+    public static function get_filter_keys_string_array($name, $atts = [], $check_url = true) {
+        $url_parameter = ($check_url ? self::clean_string_url_parameter('arlo-'.$name) : []);
         $global_att = self::get_shortcode_att_string_array($name, $atts);
         $by_page = self::get_filter_setting_string_array($name);
         return self::get_only_prioritised_filter_array($url_parameter, $global_att, $by_page);
     }
 
-    public static function get_filter_keys_int_array($name, $atts = []) {
-        $url_parameter = self::clean_int_url_parameter('arlo-'.$name);
+    public static function get_filter_keys_int_array($name, $atts = [], $check_url = true) {
+        $url_parameter = ($check_url ? self::clean_int_url_parameter('arlo-'.$name) : []);
         $global_att = self::get_shortcode_att_int_array($name, $atts);
         $by_page = self::get_filter_setting_int_array($name);
         return self::get_only_prioritised_filter_array($url_parameter, $global_att, $by_page);
@@ -234,7 +234,7 @@ class Utilities {
         $filter_setting_name = $filter_name;
         $filter_name = ($is_hidden ? $filter_name . 'hidden' : $filter_setting_name);
 
-        if (is_array($atts) && count($atts) && !empty($atts[$filter_name])) {
+        if (is_array($atts) && count($atts) && isset($atts[$filter_name])) {
             
             $value = $atts[$filter_name];
             
