@@ -4,15 +4,15 @@ namespace Arlo\Shortcodes;
 use Arlo\Entities\Categories as CategoriesEntity;
 
 class Filters {
-    public static function get_filter_options($filter, $import_id, $post_id = NULL) {
+    public static function get_filter_options($filter, $import_id, $atts = [], $post_id = NULL) {
         global $post, $wpdb;
         
         $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
         $join = [];
         $where = [];
 
-        $base_category = ((isset($GLOBALS['arlo_filter_base']['category']) && is_array($GLOBALS['arlo_filter_base']['category']) && count($GLOBALS['arlo_filter_base']['category'])) ? $GLOBALS['arlo_filter_base']['category'] : 0);
-        $exclude_category = ((isset($GLOBALS['arlo_filter_base']['categoryhidden']) && is_array($GLOBALS['arlo_filter_base']['categoryhidden']) && count($GLOBALS['arlo_filter_base']['categoryhidden'])) ? $GLOBALS['arlo_filter_base']['categoryhidden'] : 0);
+        $base_category = \Arlo\Utilities::get_filter_keys_int_array('category', $atts, false);
+        $exclude_category = \Arlo\Utilities::get_filter_keys_int_array('categoryhidden', $atts, false);
 
         switch ($filter) {
             case 'location':
@@ -23,6 +23,16 @@ class Filters {
                 if (!empty($arlo_region)) {
                     $where[] = " e.e_region = '" . esc_sql($arlo_region) . "'";
                 }
+
+                $show_only = \Arlo\Utilities::get_filter_keys_string_array('location', $atts, false);
+                if (count($show_only)) {
+                    $where[] = " e_locationname IN ('" . implode("','", array_map('esc_sql', $show_only)) . "') ";
+                }    
+                
+                $exclude = \Arlo\Utilities::get_filter_keys_string_array('locationhidden', $atts, false);
+                if (count($exclude)) {
+                    $where[] = " e_locationname NOT IN ('" . implode("','", array_map('esc_sql', $exclude)) . "') ";
+                }    
 
                 if (!empty($post_id) || $post_id === 0) {
                     $join['et'] = " LEFT JOIN 
@@ -193,12 +203,53 @@ class Filters {
                 return $states;
 
             case 'delivery':
-                return \Arlo_For_Wordpress::$delivery_labels;
+                $deliveries = \Arlo_For_Wordpress::$delivery_labels;
+                $filter_settings = get_option('arlo_filter_settings', []);
+
+                $show_only = \Arlo\Utilities::get_filter_keys_string_array('delivery', $atts, false);
+
+                if (count($show_only)) {
+                    $deliveries = array_filter($deliveries, function($delivery_key) use ($show_only) {
+                        return in_array($delivery_key, $show_only);
+                    }, ARRAY_FILTER_USE_KEY);    
+                }
+                
+                $exclude = \Arlo\Utilities::get_filter_keys_string_array('deliveryhidden', $atts, false);
+                if (isset($filter_settings['hiddenfilters']['generic']['delivery']) && count($filter_settings['hiddenfilters']['generic']['delivery'])) {
+                    $exclude = array_merge($exclude, $filter_settings['hiddenfilters']['generic']['delivery']);
+                }
+                if (count($exclude)) {
+                    $deliveries = array_filter($deliveries, function($delivery_key) use ($exclude) {
+                        return !in_array($delivery_key, $exclude);
+                    }, ARRAY_FILTER_USE_KEY);       
+                }
+
+                //change its label from the "General" settings page
+                foreach ($deliveries as $key => $del) {
+                    if (isset($filter_settings['generic']['delivery'][$key])) {
+                        $deliveries[$key] = $filter_settings['generic']['delivery'][$key];
+                    }
+                }
+                return $deliveries;
 
             case 'category':
                 return CategoriesEntity::get_flattened_category_list_for_filter($base_category, $exclude_category, $import_id);
 
             case 'eventtag':
+                $where = [
+                    " etag.import_id = $import_id "
+                ];
+
+                $show_only = \Arlo\Utilities::get_filter_keys_string_array('eventtag', $atts, false);
+                if (count($show_only)) {
+                    $where[] = " id IN ('" . implode("','", array_map('esc_sql', $show_only)) . "') ";
+                }    
+                
+                $exclude = \Arlo\Utilities::get_filter_keys_string_array('eventtaghidden', $atts, false);
+                if (count($exclude)) {
+                    $where[] = " id NOT IN ('" . implode("','", array_map('esc_sql', $exclude)) . "') ";
+                }
+
                 $items = $wpdb->get_results(
                     "SELECT DISTINCT
                         t.id,
@@ -212,7 +263,7 @@ class Filters {
                     AND
                         t.import_id = etag.import_id
                     WHERE 
-                        etag.import_id = $import_id
+                        " . implode(" AND ", $where) . "
                     ORDER BY tag", ARRAY_A);
 
                 $tags = array();
@@ -227,6 +278,20 @@ class Filters {
                 return $tags;
 
             case 'templatetag':
+                $where = [
+                    "ett.import_id = $import_id"
+                ];
+
+                $show_only = \Arlo\Utilities::get_filter_keys_string_array('templatetag', $atts, false);
+                if (count($show_only)) {
+                    $where[] = " id IN ('" . implode("','", array_map('esc_sql', $show_only)) . "') ";
+                }    
+                
+                $exclude = \Arlo\Utilities::get_filter_keys_string_array('templatetaghidden', $atts, false);
+                if (count($exclude)) {
+                    $where[] = " id NOT IN ('" . implode("','", array_map('esc_sql', $exclude)) . "') ";
+                }
+
                 $items = $wpdb->get_results(
                     "SELECT DISTINCT
                         t.id,
@@ -240,7 +305,7 @@ class Filters {
                     AND
                         t.import_id = ett.import_id
                     WHERE 
-                        ett.import_id = $import_id
+                        " . implode(" AND ", $where) . "
                     ORDER BY tag", ARRAY_A);
 
                 $tags = array();

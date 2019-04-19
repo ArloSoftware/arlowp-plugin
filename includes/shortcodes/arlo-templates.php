@@ -5,7 +5,10 @@ use Arlo\Entities\Categories as CategoriesEntity;
 use Arlo\Entities\Presenters as PresentersEntity;
 
 class Templates {
+    /* Contains all the base filter atts + atts from URL */
     public static $event_template_atts = [];
+
+    public static $base_filters = [];
 
     public static function init() {
         $class = new \ReflectionClass(__CLASS__);
@@ -281,19 +284,19 @@ class Templates {
         $templates = arlo_get_option('templates');
         $content = $templates[$template_name]['html'];
 
-        self::$event_template_atts = self::get_event_template_atts($atts, $import_id);
-
-        \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Utilities::convert_string_to_int_array');
-        \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Utilities::convert_string_to_int_array', null, true);
+        self::$base_filters = \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$base_filters, '\Arlo\Utilities::convert_string_to_int_array');
+        self::$base_filters = \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$base_filters, '\Arlo\Utilities::convert_string_to_int_array', null, true);
         
-        \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id]);
-        \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id], true);
+        self::$base_filters = \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$base_filters, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id]);
+        self::$base_filters = \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$base_filters, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id], true);
 
-        \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Utilities::convert_string_to_int_array');
-        \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Utilities::convert_string_to_int_array', null, true);
+        self::$base_filters = \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$base_filters, '\Arlo\Utilities::convert_string_to_int_array');
+        self::$base_filters = \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$base_filters, '\Arlo\Utilities::convert_string_to_int_array', null, true);
 
-        \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Utilities::convert_string_to_string_array');
-        \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Utilities::convert_string_to_string_array', null, true);        
+        self::$base_filters = \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$base_filters, '\Arlo\Utilities::convert_string_to_string_array');
+        self::$base_filters = \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$base_filters, '\Arlo\Utilities::convert_string_to_string_array', null, true);        
+
+        self::$event_template_atts = array_merge(self::$base_filters, self::get_event_template_atts($atts, $import_id));
 
         return $content;        
     }
@@ -707,17 +710,16 @@ class Templates {
 
         $filter_html = '';
         
-        $atts = is_array($atts) ? $atts : [];
-        $atts = array_merge($atts, self::$event_template_atts);
+        $combined_atts = array_merge(is_array($atts) ? $atts : [], self::$event_template_atts);
 
         foreach(\Arlo_For_Wordpress::$available_filters[$page_type == 'schedule' ? 'schedule' : 'template']['filters'] as $filter_key => $filter):
 
-            $att = (isset(self::$event_template_atts[$filter_key]) && is_string(self::$event_template_atts[$filter_key]) ? self::$event_template_atts[$filter_key] : '');
+            $att = (isset($combined_atts[$filter_key]) && is_string($combined_atts[$filter_key]) ? $combined_atts[$filter_key] : '');
 
             if (!in_array($filter_key, $filters_array))
                 continue;
 
-            $items = Filters::get_filter_options($filter_key, $import_id);
+            $items = Filters::get_filter_options($filter_key, $import_id, self::$base_filters);
 
             $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'), 'generic', $att, $filter_group);
 

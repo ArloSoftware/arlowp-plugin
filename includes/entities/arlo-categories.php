@@ -102,7 +102,7 @@ class Categories {
 		foreach($categories as $item) {		
 			$item->depth_level = $level;	
 			if($depth - 1 > $level) {
-				$item->children = self::getTree($item->c_arlo_id, $depth, $level+1, null, $import_id);
+				$item->children = self::getTree($item->c_arlo_id, $depth, $level+1, $ignored_categories, $import_id);
 			} else {
 				unset($item->children);
 			}
@@ -174,7 +174,7 @@ class Categories {
 		$cache_key = md5(serialize(func_get_args()));
                             
         if(!($cats = wp_cache_get($cache_key, 'ArloMergedCategoryList'))) {
-			if (is_array($categories)) {                    
+			if (is_array($categories) && count($categories)) {                    
                 $cats = [];
             
                 foreach ($categories as $cat_id) {
@@ -182,6 +182,9 @@ class Categories {
                     $cats = array_merge($cats, (is_array($cat_tree) ? $cat_tree : []));
                 }
             } else {
+				if (is_array($categories)) {
+					$categories = 0;
+				}
                 $cats = self::getTree($categories, 1, 0, null, $import_id);
                 if (!empty($cats)) {
                     $cats = self::getTree($cats[0]->c_arlo_id, 100, 0, null, $import_id);

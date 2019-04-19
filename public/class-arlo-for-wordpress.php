@@ -1212,8 +1212,8 @@ class Arlo_For_Wordpress {
 
 		//too early to call get_selected_categories()
 		$stored_atts = [];
-		\Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, [], $stored_atts, '\Arlo\Utilities::convert_string_to_int_array');
-		\Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, [], $stored_atts, '\Arlo\Utilities::convert_string_to_int_array', null, true);
+		$stored_atts = \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, [], $stored_atts, '\Arlo\Utilities::convert_string_to_int_array');
+		$stored_atts = \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, [], $stored_atts, '\Arlo\Utilities::convert_string_to_int_array', null, true);
 		$category_slug_or_array = \Arlo\Utilities::get_att_string('category', $stored_atts);
 
 		$category_id = 0;
