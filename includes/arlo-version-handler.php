@@ -816,6 +816,9 @@ class VersionHandler {
 				update_option('arlo_settings', $settings);
 			break;
 
+			case '4.1':
+				$this->plugin->change_setting('arlo_add_categories_to_sitemap', 1);
+			break;
 		}	
 	}
 

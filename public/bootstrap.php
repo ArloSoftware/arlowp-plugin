@@ -663,8 +663,9 @@ function arlo_add_datamodel() {
 
 add_filter( 'wpseo_sitemap_index', function() {
 	$last_import_date = get_option('arlo_last_import');
-
-	if (!empty($last_import_date)) {
+	$add_categories_to_sitemap = arlo_get_option('arlo_add_categories_to_sitemap', false);
+	
+	if (!empty($last_import_date) && $add_categories_to_sitemap) {
 		$date_string = str_replace(" ", "T", $last_import_date) . '+00:00';
 
 		return '

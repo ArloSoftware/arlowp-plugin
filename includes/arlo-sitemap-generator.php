@@ -16,6 +16,14 @@ class SitemapGenerator {
 		$this->generate_xml = $generate_xml === true;
 	}
 
+	public function seo_plugin_installed() {
+		return $this->is_yoast_installed();
+	}
+
+	private function is_yoast_installed() {
+		return $this->is_plugin_installed("wordpress-seo/wp-seo.php");
+	}
+
 	public function generate_catalogue_sitemap() {
 		$post_types = arlo_get_option('post_types');
 		$page_filter_settings = get_option("arlo_page_filter_settings");
@@ -166,4 +174,15 @@ class SitemapGenerator {
 
 		return ($arlo_categories_available || $arlo_filters_available) && $arlo_template_list_item_available;
 	}
+
+	private function is_plugin_installed($plugin_file) {
+        if ( ! function_exists( 'get_plugins' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+         $all_plugins = get_plugins();
+         if (array_key_exists($plugin_file, $all_plugins)) {
+			return true;
+        }
+         return false;
+    }
 }
