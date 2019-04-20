@@ -24,7 +24,10 @@ class Finish extends BaseImporter {
 			
 			$this->importer->set_tax_exempt_events($this->import_id);
 	        
-	        $this->message_handler->dismiss_by_type('import_error');
+			$this->message_handler->dismiss_by_type('import_error');
+			
+			//sitemap rebuild for Google XML sitemap plugin
+			do_action("sm_rebuild");
 
 			$this->is_finished = true;
         } else {

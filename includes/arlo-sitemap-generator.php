@@ -17,14 +17,18 @@ class SitemapGenerator {
 	}
 
 	public function seo_plugin_installed() {
-		return $this->is_yoast_installed();
+		return $this->is_yoast_installed() || $this->is_google_xml_sitemap_generator_installed();
+	}
+
+	private function is_google_xml_sitemap_generator_installed() {
+		return $this->is_plugin_installed("google-sitemap-generator/sitemap.php");
 	}
 
 	private function is_yoast_installed() {
 		return $this->is_plugin_installed("wordpress-seo/wp-seo.php");
 	}
 
-	public function generate_catalogue_sitemap() {
+	public function get_catalogue_sitemap_links() {
 		$post_types = arlo_get_option('post_types');
 		$page_filter_settings = get_option("arlo_page_filter_settings");
 
@@ -36,12 +40,18 @@ class SitemapGenerator {
 			$ignored_categories = \Arlo\Utilities::get_filter_keys_int_array('categoryhidden', $shortcode_attributes, false);
 
 			if ($this->is_category_selector_visible($content)) {
-				return $this->generate_category_sitemap(get_page_link($post_types['event']['posts_page']), $ignored_categories, $showonly_categories);
+				return $this->get_category_urls(get_page_link($post_types['event']['posts_page']), $ignored_categories, $showonly_categories);
 			}
 		}
+
+		return [];
 	}
 
-	public function generate_schedule_sitemap() {
+	public function generate_catalogue_sitemap($links = []) {
+		return $this->generate_category_sitemap($this->get_catalogue_sitemap_links());
+	}
+
+	public function get_schedule_sitemap_links() {
 		$post_types = arlo_get_option('post_types');
 		$page_filter_settings = get_option("arlo_page_filter_settings");
 		
@@ -53,9 +63,15 @@ class SitemapGenerator {
 			$ignored_categories = \Arlo\Utilities::get_filter_keys_int_array('categoryhidden', $shortcode_attributes, false);
 
 			if ($this->is_category_selector_visible($content)) {
-				return $this->generate_category_sitemap(get_page_link($post_types['schedule']['posts_page']), $ignored_categories, $showonly_categories);
+				return $this->get_category_urls(get_page_link($post_types['schedule']['posts_page']), $ignored_categories, $showonly_categories);
 			}
 		}
+
+		return [];
+	}
+
+	public function generate_schedule_sitemap($links = []) {
+		return $this->generate_category_sitemap($this->get_schedule_sitemap_links());
 	}
 
 	public function generate_sitemap_xml($links) {
@@ -100,7 +116,7 @@ class SitemapGenerator {
 		return $shortcode_atts;
 	}
 
-	private function generate_category_sitemap($page_link = '', $ignored_categories = [], $showonly_categories= []) {
+	private function get_category_urls($page_link = '', $ignored_categories = [], $showonly_categories= []) {
 		$import_id = get_option('arlo_import_id');
 		$regions = get_option('arlo_regions');
 		$urls = [];
@@ -119,6 +135,10 @@ class SitemapGenerator {
 			}
 		}
 
+		return $urls;
+	}
+
+	private function generate_category_sitemap($urls = []) {
 		if (count($urls)) {
 			$sitemap = $this->generate_xml ? $this->generate_sitemap_xml($urls) : $this->generate_sitemap_urlset($urls);
 
