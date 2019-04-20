@@ -140,30 +140,30 @@ class SitemapGenerator {
 	private function is_category_selector_visible($content) {
 		$arlo_filters_available = false;
 		$arlo_categories_available = false;
+		$arlo_template_list_item_available = false;
 
 		preg_match_all("(\[(?:\[??[^\[]*?\]))", $content, $content_shortcodes);
 
-		$categories_shortcode = array_filter($content_shortcodes[0], function($s){
-				return strpos($s, "arlo_categories") !== false;
-		});
-		if (count($categories_shortcode)) {
-			$arlo_categories_available = true;
-		}
-
-		$filters_shortcode = array_filter($content_shortcodes[0], function($s){
-			return strpos($s, "arlo_event_template_filters") !== false;
-		});
-		if (count($filters_shortcode)) {
-			preg_match("#filters=[\"']?([\w\s,]+)[\"']?#", array_pop($filters_shortcode), $filters);
-			if (count($filters) == 2) {
-				if (strpos($filters[2], "category")) {
+		if (count($content_shortcodes)) {
+			foreach($content_shortcodes[0] as $shortcode) {
+				if (strpos($shortcode, "arlo_categories") !== false) {
+					$arlo_categories_available = true;
+				} else if (strpos($shortcode, "arlo_event_template_filters") !== false || strpos($shortcode, "arlo_schedule_filters") !== false) {
 					$arlo_filters_available = true;
-				}
-			} else if (count($filters) == 0) {
-				$arlo_filters_available = true;
+					$filters_shortcode = $shortcode;
+				} else if (strpos($shortcode, "arlo_event_template_list_item") !== false) {
+					$arlo_template_list_item_available = true;
+				} 
 			}
 		}
+		
+		if ($arlo_filters_available) {
+			preg_match("#filters=[\"']?([\w\s,]+)[\"']?#", $filters_shortcode, $filters);
+			if (count($filters) == 2 && strpos($filters[2], "category") === false) {
+				$arlo_filters_available = false;
+			} 
+		}
 
-		return $arlo_categories_available || $arlo_filters_available;
+		return ($arlo_categories_available || $arlo_filters_available) && $arlo_template_list_item_available;
 	}
 }
