@@ -58,7 +58,7 @@ class SitemapGenerator {
 		if (!empty($post_types['schedule']) && !empty($post_types['schedule']['posts_page'])) {
 			$shortcode_attributes = $this->get_shortcode_attributes('arlo_schedule', $post_types['schedule']['posts_page']);
 
-			\Arlo\Shortcodes\Templates::template_list_initializer("", $shortcode_attributes, "arlo_schedule", "", "schedule");
+			$content = \Arlo\Shortcodes\Templates::template_list_initializer("", $shortcode_attributes, "arlo_schedule", "", "schedule");
 			$showonly_categories = \Arlo\Utilities::get_filter_keys_int_array('category', $shortcode_attributes, false);
 			$ignored_categories = \Arlo\Utilities::get_filter_keys_int_array('categoryhidden', $shortcode_attributes, false);
 
