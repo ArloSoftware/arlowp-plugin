@@ -966,7 +966,7 @@ class Arlo_For_Wordpress_Settings {
 	    echo '
 	    <h3>What\'s new in this release</h3>
 		<p><strong>If you are experiencing problems after an update, please deactivate and re-activate the plugin and re-synchronize the data.</strong></p>
-		
+
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">
@@ -988,6 +988,13 @@ class Arlo_For_Wordpress_Settings {
 				<li>Jazz search button aligment centered</li>
 				<li>Failed redirects 404 instead of 301</li>
 				<li>Check set_time_limit isn\'t disabled before use</li>
+			</ul>
+		</p>
+
+		<h4>Version 4.0.1</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">
+				<li>Tested up to WordPress version 5.2.2</li>
 			</ul>
 		</p>
 
