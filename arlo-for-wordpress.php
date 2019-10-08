@@ -119,6 +119,9 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-category-ite
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-category-depth.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-finish.php');
 
+// Cache Controller
+require_once(plugin_dir_path(__FILE__) . '/includes/arlo-cache-control.php');
+
 // start the public plugin class
 require_once( plugin_dir_path( __FILE__ ) . 'public/class-arlo-for-wordpress.php' );
 require_once( plugin_dir_path( __FILE__ ) . 'public/bootstrap.php' );
