@@ -1187,7 +1187,7 @@ class Events {
         
         $conditions = array(
             'template_id' => $GLOBALS['arlo_eventtemplate']['et_arlo_id'],
-            'e.e_startdatetime > NOW()' => null,
+            'UTC_TIMESTAMP() < CONVERT_TZ(e.e_startdatetime, e.e_startdatetimeoffset, "+00:00")' => NULL,
             'parent_id' => 0
         );
         
