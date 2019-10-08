@@ -279,6 +279,8 @@ function arlo_register_custom_post_types() {
 	
 	$page_obj = get_queried_object();
 	$page_type = '';
+
+	$cookie_time = time() + apply_filters('arlo_region_cookie_time', 60*60*24*30);
 			
 	if (!empty($page_obj)) {
 		$page_type = $page_obj->post_type;
@@ -309,7 +311,7 @@ function arlo_register_custom_post_types() {
 					$selected_region = reset($regions_keys);
 				}
 				
-				setcookie("arlo-region", $selected_region, time()+60*60*24*30, '/', $domain);	
+				setcookie("arlo-region", $selected_region, $cookie_time, '/', $domain);	
 				
 				if ($page_type == 'arlo_event') {
 					$slug = substr(substr(str_replace(get_home_url(), '', get_post_permalink($page_id)), 0, -1), 1);	
@@ -322,12 +324,12 @@ function arlo_register_custom_post_types() {
 				wp_redirect(esc_url($location));
 				exit();				
 			} else {
-				setcookie("arlo-region", $selected_region, time()+60*60*24*30, '/', $domain);	
+				setcookie("arlo-region", $selected_region, $cookie_time, '/', $domain);	
 			}
 		} else {
 			if (empty($_COOKIE['arlo-region'])) {
 				$regions_keys = array_keys($regions);
-				setcookie("arlo-region", reset($regions_keys), time()+60*60*24*30, '/', $domain);
+				setcookie("arlo-region", reset($regions_keys), $cookie_time, '/', $domain);
 				
 				//Some hosting has high level caching (caches the redirects) and no cookies are available which means it can stuck in a redirect loop
 				if (!empty($_COOKIE['arlo-region']))
