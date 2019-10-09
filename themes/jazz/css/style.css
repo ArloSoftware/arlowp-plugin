@@ -332,25 +332,27 @@ body.arlo {
     list-style: inherit;
 }
 
-.arlo#arlo .arlo-list.arlo-cols-5 > li {
-    width: 19.5%;
-    margin-right: 0.5%;
-    float: left;
-}
-
-.arlo#arlo .arlo-list.arlo-cols-4 > li {
-    width: 24.5%;
-    margin-right: 0.5%;
-}
-
-.arlo#arlo .arlo-list.arlo-cols-3 > li {
-    width: 32.5%;
-    margin-right: 0.5%;
-}
-
-.arlo#arlo .arlo-list.arlo-cols-2 > li {
-    width: 49.5%;
-    margin-right: 0.5%;
+@media (min-width: 550px){
+    .arlo#arlo .arlo-list.arlo-cols-5 > li {
+        width: 19.5%;
+        margin-right: 0.5%;
+        float: left;
+    }
+    
+    .arlo#arlo .arlo-list.arlo-cols-4 > li {
+        width: 24.5%;
+        margin-right: 0.5%;
+    }
+    
+    .arlo#arlo .arlo-list.arlo-cols-3 > li {
+        width: 32.5%;
+        margin-right: 0.5%;
+    }
+    
+    .arlo#arlo .arlo-list.arlo-cols-2 > li {
+        width: 49.5%;
+        margin-right: 0.5%;
+    }
 }
 
 .arlo#arlo .arlo-list.arlo-cols-1 > li {
@@ -819,6 +821,16 @@ body.arlo {
     font-size: 1em;
 }
 
+.arlo#arlo .arlo-register-private-interest {
+    padding: 1em 2em;
+    text-align: center;
+    font-size: 1em;
+}
+
+.arlo#arlo p.arlo-suggest-private-datelocation {
+    margin-bottom: 0.5em;
+}
+
 .arlo#arlo .arlo-places-remaining {
     font-weight: bold;
     display: block;
@@ -872,13 +884,13 @@ body.arlo {
     margin-bottom: 1em;
 }
 
-.arlo#arlo .arlo-next-running {
-    margin-top: 1em;
-}
-
 .arlo#arlo .arlo-next-running > a,
 .arlo#arlo .arlo-next-running > span  {
     margin-left: 0.5em;
+}
+
+.arlo#arlo .arlo-next-running {
+    margin-top: 1em;
 }
 
 .arlo#arlo .event-search .arlo-next-running a,
@@ -896,7 +908,6 @@ body.arlo {
 .arlo#arlo .arlo-search-button{
     vertical-align: unset;
 }
-
 @media (min-width: 550px) {
     .arlo#arlo .arlo-search-field,
     .arlo#arlo .arlo-search-button {
@@ -1390,7 +1401,7 @@ body.arlo {
 .arlo#arlo .arlo-list.event-search .arlo-next-running span,
 .arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a.arlo-register,
 .arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a.arlo-register:hover,
-.arlo#arlo .arlo-event-registration .arlo-register:hover,
+.arlo#arlo .arlo-oa-registration .arlo-register:hover,
 .arlo#arlo .arlo-oa-registration .arlo-register:hover,
 .arlo#arlo .arlo-single-show-wrapper .arlo-show-more,
 .arlo#arlo .arlo-single-show-wrapper .arlo-show-more:hover {
@@ -1440,4 +1451,15 @@ body.arlo {
   text-align: center;
   padding-top: 10px;
   margin-bottom: 5px;
+}
+
+@media (min-width: 750px) {
+    .arlo#arlo .arlo-list.events.arlo-cols-1 .arlo-event-head {
+        float: left;
+        border-bottom: none;
+    }
+    
+    .arlo#arlo .arlo-list.events.arlo-cols-1 .arlo-event-body {
+        float: right;
+    }
 }

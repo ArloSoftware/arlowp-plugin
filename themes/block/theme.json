@@ -1,5 +1,5 @@
 {
-    "version": 1.7,
+    "version": 1.8,
     "order": 9,
     "name": "Block",
     "description": "Design includes key information displayed within boxes",
