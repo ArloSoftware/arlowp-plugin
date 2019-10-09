@@ -369,25 +369,37 @@ body.arlo {
     border: none;
 }
 
-.arlo#arlo .arlo-list.arlo-cols-5 > li {
-    width: 19.5%;
-    margin-right: 0.5%;
-    float: left;
-}
+@media (min-width: 550px){
+    .arlo#arlo .arlo-list.arlo-cols-5 > li {
+        width: 19.5%;
+        margin-right: 0.5%;
+        float: left;
+    }
 
-.arlo#arlo .arlo-list.arlo-cols-4 > li {
-    width: 24.5%;
-    margin-right: 0.5%;
-}
+    .arlo#arlo .arlo-list.arlo-cols-4 > li {
+        width: 24.5%;
+        margin-right: 0.5%;
+    }
 
-.arlo#arlo .arlo-list.arlo-cols-3 > li {
-    width: 32.5%;
-    margin-right: 0.5%;
-}
+    .arlo#arlo .arlo-list.arlo-cols-3 > li {
+        width: 32.5%;
+        margin-right: 0.5%;
+    }
 
-.arlo#arlo .arlo-list.arlo-cols-2 > li {
-    width: 47.5%;
-    margin-right: 2.5%;
+    .arlo#arlo .arlo-list.arlo-cols-3 > li:nth-of-type(3n) {
+        width: 34%;
+        margin-right: 0;
+    }
+
+    .arlo#arlo .arlo-list.arlo-cols-2 > li {
+        width: 47.5%;
+        margin-right: 2.5%;
+    }
+
+    .arlo#arlo .arlo-list.arlo-cols-2 > li:nth-of-type(2n) {
+        width: 50%;
+        margin-right: 0;
+    }
 }
 
 .arlo#arlo .arlo-list.arlo-cols-1 > li {
@@ -505,6 +517,11 @@ body.arlo {
     border: 2px solid;
 }
 
+.arlo#arlo .arlo-next-running > a,
+.arlo#arlo .arlo-next-running > span  {
+    margin-left: 0.5em;
+}
+
 
 
 /* Catalogue */
@@ -569,11 +586,6 @@ body.arlo {
 .arlo#arlo .arlo-list.catalogue .arlo-next-running a.arlo-register,
 .arlo#arlo .arlo-list.schedule .arlo-next-running a.arlo-register {
     border: none;
-}
-
-.arlo#arlo .arlo-next-running > a,
-.arlo#arlo .arlo-next-running > span  {
-    margin-left: 0.5em;
 }
 
 
@@ -1304,6 +1316,22 @@ body.arlo {
     color: white;
 }
 
+.arlo#arlo .arlo-popup-modal .modal-header {
+    padding-bottom: 0px;
+}
+
+.arlo#arlo .arlo-popup-modal .modal-header h5 {
+    margin: 0px;
+}
+
+.arlo#arlo .arlo-popup-modal .modal-body {
+    padding-top: 0px;
+}
+
+.arlo .arlo-popup-modal .modal-header .close {
+    display: none;
+}
+
 .arlo .arlo_session {
     margin-top: .5em;
     padding-bottom: .5em;
@@ -1609,3 +1637,21 @@ body.arlo {
   padding-top: 5px;
   margin-bottom: 5px;
 }
+
+@media (min-width: 750px) {
+    .arlo#arlo .arlo-list.events.arlo-cols-1 .arlo-date,
+    .arlo#arlo .arlo-list.events.arlo-cols-1 .arlo-event-duration {
+        float: left;
+        clear: none;
+        margin-right: 1em;
+    }
+
+    .arlo#arlo .arlo-list.events.arlo-cols-1 .arlo-event-details {
+        float: right;
+        clear: none;
+    }
+
+    .arlo#arlo .arlo-list.events.arlo-cols-1 .arlo-event-time {
+        border-bottom: none;
+    }
+}  

@@ -693,25 +693,27 @@ body.arlo {
     border: none;
 }
 
-.arlo#arlo .arlo-list.arlo-cols-5 > li {
-    width: 18%;
-    margin-right: 2%;
-    float: left;
-}
+@media (min-width: 550px){
+    .arlo#arlo .arlo-list.arlo-cols-5 > li {
+        width: 18%;
+        margin-right: 2%;
+        float: left;
+    }
 
-.arlo#arlo .arlo-list.arlo-cols-4 > li {
-    width: 23%;
-    margin-right: 2%;
-}
+    .arlo#arlo .arlo-list.arlo-cols-4 > li {
+        width: 23%;
+        margin-right: 2%;
+    }
 
-.arlo#arlo .arlo-list.arlo-cols-3 > li {
-    width: 30%;
-    margin-right: 3%;
-}
+    .arlo#arlo .arlo-list.arlo-cols-3 > li {
+        width: 30%;
+        margin-right: 3%;
+    }
 
-.arlo#arlo .arlo-list.arlo-cols-2 > li {
-    width: 46%;
-    margin-right: 3%;
+    .arlo#arlo .arlo-list.arlo-cols-2 > li {
+        width: 46%;
+        margin-right: 3%;
+    }
 }
 
 .arlo#arlo .arlo-list.arlo-cols-1 > li {
