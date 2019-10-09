@@ -1006,7 +1006,20 @@ class Templates {
             )
             ';
             $parameters[] = '%' . $arlo_search . '%';
-            $parameters[] = '%' . $arlo_search . '%';
+
+            // We want search to allow for missing words in titles. 
+            // MySQL full text search functionality is not a guarantee on all hosts, even though it came out nearly 10 years ago. 
+            // with % on each side of the query we are already in a poorly optimized query, so a few more for accuracy is not that bad.
+            $words = explode(' ',  trim($arlo_search));
+            if (count($words) < 4 && count($words) > 1){
+                // Only do complex searches on 3 words or less to limit potential impact
+                $parameters[] = '%' . implode('%', $words) . '%';
+                // TODO In future it would be nice to score & sort these. See class-wp-query.php parse_search_order() for a WP core example.
+            } else {
+                $parameters[] = '%' . $arlo_search . '%';
+            }
+            
+            
             $parameters[] = '%' . $arlo_search . '%';
             
             $atts['show_child_elements'] = "true";
