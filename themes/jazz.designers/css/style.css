@@ -349,9 +349,19 @@ body.arlo {
         margin-right: 0.5%;
     }
     
+    .arlo#arlo .arlo-list.arlo-cols-3 > li:nth-of-type(3n) {
+        width: 34%;
+        margin-right: 0;
+    }
+    
     .arlo#arlo .arlo-list.arlo-cols-2 > li {
         width: 49.5%;
         margin-right: 0.5%;
+    }
+    
+    .arlo#arlo .arlo-list.arlo-cols-2 > li:nth-of-type(2n) {
+        width: 50%;
+        margin-right: 0;
     }
 }
 
