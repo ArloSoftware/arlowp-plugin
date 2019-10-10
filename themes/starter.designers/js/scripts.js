@@ -1,4 +1,4 @@
-jQuery(function($){ 
+jQuery(function ($) {
 
     var setNumberOfEventColumns = function (container) {
         // set number of event columns based on the container width
@@ -20,12 +20,12 @@ jQuery(function($){
         }
     }
 
-    $(window).resize(function() {
+    $(window).resize(function () {
         setNumberOfEventColumns('.arlo#arlo');
     });
 
 
-    var setNumberOfEvents = function() {
+    var setNumberOfEvents = function () {
         if ($('.arlo_event-template-default').length !== 0) {
             $('.arlo-template-events-list').removeClass('events-1 events-2 events-3 events-4');
 
@@ -58,7 +58,7 @@ jQuery(function($){
     }
 
 
-    $(document).ready(function() {
+    $(document).ready(function () {
         'use strict';
 
         setNumberOfEventColumns('.arlo#arlo');
@@ -66,23 +66,24 @@ jQuery(function($){
 
         setDiscountAndLimited('.arlo#arlo .scheduled-dates');
 
+
         // Animate in items
         function animateIn(className) {
-            var elementsInViewport = $(className).filter( function(index) {
+            var elementsInViewport = $(className).filter(function (index) {
                 return isElementInViewport(this);
             });
 
-            if ( elementsInViewport.length > 0 ) {
-                setTimeout(function() {
+            if (elementsInViewport.length > 0) {
+                setTimeout(function () {
                     $(className).addClass('is-in-viewport');
                 }, 200);
             }
         }
 
         function animateInItems() {
-            var classes = ['.link-item','.schedule-date','.event-card', '.scheduled-dates a'];
+            var classes = ['.link-item', '.schedule-date', '.event-card', '.scheduled-dates a'];
 
-            $.each(classes, function(i, className){
+            $.each(classes, function (i, className) {
                 animateIn(className);
             });
         }
@@ -117,7 +118,7 @@ jQuery(function($){
                 $('.arlo#arlo .event').height('auto');
                 $('.arlo#arlo .event .event-container').css('min-height', '0');
 
-                $('.arlo#arlo .event:not(.show-more-hidden), .arlo#arlo .event.show-more-visible').each(function(i,event) {
+                $('.arlo#arlo .event:not(.show-more-hidden), .arlo#arlo .event.show-more-visible').each(function (i, event) {
                     if ($(event).height() > highest) {
                         highest = $(event).height();
                     }
@@ -130,42 +131,42 @@ jQuery(function($){
 
         calculateEventHeights();
 
-        $('.arlo-show-more-link').click(function() {
-            setTimeout(calculateEventHeights,0);
+        $('.arlo-show-more-link').click(function () {
+            setTimeout(calculateEventHeights, 0);
         });
 
         function attachExpandEvents() {
 
             // collapsable elements
-            if ( !$('.arlo#arlo').hasClass('arlo-xs') ) {
+            if (!$('.arlo#arlo').hasClass('arlo-xs')) {
                 $('.arlo#arlo .event .event-container').off('click');
                 $('.arlo#arlo .event .event-container').off('focusout');
 
-                 $('.arlo#arlo .event .event-container').on({
-                  focusout: function(e) {
-                    $(this).closest('.event').removeClass('expanded');
-                  },
-                  click: function(e) {                    
-                    var eventItem = $(this).closest('.event');
-                    if ( eventItem.hasClass('expanded') ) {
-                        setTimeout(function() {
-                            eventItem.find('.event-container').focusout();
-                        }, 0);
-                    } else {
-                        eventItem.addClass('expanded');
+                $('.arlo#arlo .event .event-container').on({
+                    focusout: function (e) {
+                        $(this).closest('.event').removeClass('expanded');
+                    },
+                    click: function (e) {
+                        var eventItem = $(this).closest('.event');
+                        if (eventItem.hasClass('expanded')) {
+                            setTimeout(function () {
+                                eventItem.find('.event-container').focusout();
+                            }, 0);
+                        } else {
+                            eventItem.addClass('expanded');
+                        }
                     }
-                  }
                 });
             } else {
                 // Expand mobile
-                $('.arlo#arlo .event-content, .arlo#arlo .online-activity .btn-expand.mobile, .arlo#arlo .event .btn-expand.mobile, .arlo#arlo .template-details, .arlo#arlo .schedule-item').click(function(event) {
-                    expandMobile(event,this);
+                $('.arlo#arlo .event-content, .arlo#arlo .online-activity .btn-expand.mobile, .arlo#arlo .event .btn-expand.mobile, .arlo#arlo .template-details, .arlo#arlo .schedule-item').click(function (event) {
+                    expandMobile(event, this);
                 });
             }
 
             if ($('.arlo#arlo').width() > 768 && $('.arlo#arlo').width() < 992) {
-                $('.arlo#arlo .schedule-item').click(function(event) {
-                    expandMobile(event,this);
+                $('.arlo#arlo .schedule-item').click(function (event) {
+                    expandMobile(event, this);
                 });
             }
         }
@@ -173,7 +174,7 @@ jQuery(function($){
         attachExpandEvents();
 
 
-        function expandMobile(event,_this) {
+        function expandMobile(event, _this) {
             if (!$(event.target).is('a:not(.btn-expand), button')) {
                 if ($(event.target).closest('.schedule-date').length > 0) { return; };
                 event.preventDefault();
@@ -184,32 +185,32 @@ jQuery(function($){
         }
 
         // Event card
-        $('.arlo#arlo .event-card').hover(function() {
+        $('.arlo#arlo .event-card').hover(function () {
             $(this).addClass('hover');
         });
 
-        $('.arlo#arlo .event-card').mouseleave(function() {
+        $('.arlo#arlo .event-card').mouseleave(function () {
             $(this).removeClass('hover');
         });
 
-        $('.arlo#arlo .event-card').on('touchstart',function() {
+        $('.arlo#arlo .event-card').on('touchstart', function () {
             $(this).toggleClass('hover');
         });
 
 
-        $('.arlo#arlo .similar-course').click(function(event) {
+        $('.arlo#arlo .similar-course').click(function (event) {
             event.preventDefault();
             $(this).toggleClass('expanded');
         });
 
-        $('.event-card .btn-expand').click(function() {
+        $('.event-card .btn-expand').click(function () {
             $(this).closest('.event-card').toggleClass('expanded');
             $(this).closest('.event-card').find('.event-expandable').collapse('toggle');
         });
 
 
         // Sessions popups
-        $('.arlo#arlo .show-sessions-trigger').click(function(event) {
+        $('.arlo#arlo .show-sessions-trigger').click(function (event) {
             event.preventDefault();
             $(this).closest('.event').find('#sessions').modal();
         });
@@ -234,11 +235,21 @@ jQuery(function($){
 
         /**  emulates behaviour to be implemented later **/
 
-        $('.arlo#arlo .show-more-btn').click(function(event) {
+        $('.arlo#arlo .show-more-btn').click(function (event) {
             event.preventDefault();
             $('.arlo#arlo .show-more-hidden').addClass('show-more-visible');
-            $('.arlo#arlo .show-more-wrapper').attr('style','display: none !important');
+            $('.arlo#arlo .show-more-wrapper').attr('style', 'display: none !important');
             calculateEventHeights();
+        });
+
+        // Fix for if the category list el does not exist
+        $("#arlo.arlo .filter-toggle[data-toggle='collapse']").click(function () {
+            var $this = $(this);
+            if ($($this.attr('data-target')).length == 0 && !$this.hasClass('collapsed')) {
+                window.setTimeout(function () {
+                    $this.addClass('collapsed');
+                }, 100);
+            }
         });
 
     });
@@ -265,4 +276,4 @@ jQuery(function($){
         }
     }
 
- });
+});
