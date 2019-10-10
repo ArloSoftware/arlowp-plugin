@@ -242,6 +242,16 @@ jQuery(function($){
             calculateEventHeights();
         });
 
+        // Fix for if the category list el does not exist
+        $("#arlo.arlo .filter-toggle[data-toggle='collapse']").click(function(){
+            var $this = $(this);
+            if ($($this.attr('data-target')).length == 0 && !$this.hasClass('collapsed')){
+                window.setTimeout(function(){
+                    $this.addClass('collapsed');
+                }, 100);
+            }
+        });
+
     });
 
     function isElementInViewport(el) {
