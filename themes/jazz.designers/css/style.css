@@ -332,27 +332,25 @@ body.arlo {
     list-style: inherit;
 }
 
-@media (min-width: 550px){
-    .arlo#arlo .arlo-list.arlo-cols-5 > li {
-        width: 19.5%;
-        margin-right: 0.5%;
-        float: left;
-    }
-    
-    .arlo#arlo .arlo-list.arlo-cols-4 > li {
-        width: 24.5%;
-        margin-right: 0.5%;
-    }
-    
-    .arlo#arlo .arlo-list.arlo-cols-3 > li {
-        width: 32.5%;
-        margin-right: 0.5%;
-    }
-    
-    .arlo#arlo .arlo-list.arlo-cols-2 > li {
-        width: 49.5%;
-        margin-right: 0.5%;
-    }
+.arlo#arlo .arlo-list.arlo-cols-5 > li {
+    width: 19.5%;
+    margin-right: 0.5%;
+    float: left;
+}
+
+.arlo#arlo .arlo-list.arlo-cols-4 > li {
+    width: 24.5%;
+    margin-right: 0.5%;
+}
+
+.arlo#arlo .arlo-list.arlo-cols-3 > li {
+    width: 32.5%;
+    margin-right: 0.5%;
+}
+
+.arlo#arlo .arlo-list.arlo-cols-2 > li {
+    width: 49.5%;
+    margin-right: 0.5%;
 }
 
 .arlo#arlo .arlo-list.arlo-cols-1 > li {
@@ -1427,15 +1425,4 @@ body.arlo {
   text-align: center;
   padding-top: 10px;
   margin-bottom: 5px;
-}
-
-@media (min-width: 750px) {
-    .arlo#arlo .arlo-list.events.arlo-cols-1 .arlo-event-head {
-        float: left;
-        border-bottom: none;
-    }
-    
-    .arlo#arlo .arlo-list.events.arlo-cols-1 .arlo-event-body {
-        float: right;
-    }
 }
