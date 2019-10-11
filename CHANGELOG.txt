@@ -1,29 +1,46 @@
 == V4.1 ==
 
+Major changes
+------------------
+Upcoming events are now checked by time instead of by date.
+ - This means that events can be shown precisely until they start. Previously if an event was starting today, it would not show (depending on your timezone configuration)
+Search now uses keywords to find events by name (up to 3 keywords)
+ - Previously it only searched by exact phrases
+
 Enhancement
 ------------------
-New [arlo_event_template_breadcrumbs] shortcode
+New [arlo_breadcrumbs] shortcode
+ - This is a navigation feature for better traversal of nested categories and returning to the catalog from event pages
 New [arlo_venue_locationname] shortcode
 New [arlo_venue_events_link] shortcode
 Event template page can now show a single event
 Tested up to Wordpress 5.0
+Region cookie time is editable with filter arlo_region_cookie_time
+
+Important Bugfixes
+------------------
+End date now uses correct timezone offset
+Rich metadata snippets now include the event timezone
+Starter template Venue Schedule/Upcoming links now work
+Canonical URL now includes Region parameter (includes support for Yoast SEO)
+Extend cron_schedules array instead of replacing values
 
 Bugfixes
 ------------------
-End date now uses correct timezone offset
-Automatic navigation to new Page after creation
+Automatic navigation to new Shortcode Page after creation
 Timezone codes on Event template page
 Fixed initial sync with platforms that have no Venues
-Starter template Venue Schedule/Upcoming links now work
 Next running date removes only current year
 Preview button for all themes
-Event list item now has option to no close unopened <ul> it expects.
+Event list item now has option to no close unopened <ul> it expects
  - If you use any of the Starter templates we recommend updating your Event page to include `within_ul="false"` in the `[arlo_event_list_item]` shortcode. If you have not customised you templates you can Reset your Starter theme.
 Jazz Register button text is now visible on hover
 Jazz search button aligment centered
 Failed redirects 404 instead of 301
 Check set_time_limit isn't disabled before use
-
+Check that Shortcode attributes exist and is an array before usage
+Default to OpenSSL over mcrypt
+Hide filter button now does not get stuck if no filters are present
 
 == V4.0 ==
 

@@ -5,14 +5,14 @@ msgstr ""
 "Project-Id-Version: Arlo For WordPress v3.0.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/arlowp-plugin\n"
 "POT-Creation-Date: 2018-03-22 17:27+1300\n"
-"PO-Revision-Date: 2018-11-16 17:15+1300\n"
+"PO-Revision-Date: 2019-10-11 13:02+1300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: da_DK\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.1.1\n"
+"X-Generator: Poedit 2.2.4\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: admin/class-arlo-for-wordpress-admin.php:236
@@ -850,26 +850,20 @@ msgid "Event synchronisation error"
 msgstr ""
 
 #: public/class-arlo-for-wordpress.php:1714
-#, fuzzy
-#| msgid "Once every 15 minutes"
 msgid "Once every 5 minutes"
-msgstr "Hvert 15. minut"
+msgstr "Hvert 5. minut"
 
 #: public/class-arlo-for-wordpress.php:1718
 msgid "Once every 15 minutes"
 msgstr "Hvert 15. minut"
 
 #: public/class-arlo-for-wordpress.php:1722
-#, fuzzy
-#| msgid "Once every 15 minutes"
 msgid "Once every hour"
-msgstr "Hvert 15. minut"
+msgstr "Hvert 60. minut"
 
 #: public/class-arlo-for-wordpress.php:1726
-#, fuzzy
-#| msgid "Once every 15 minutes"
 msgid "Every 30 minutes"
-msgstr "Hvert 15. minut"
+msgstr "Hvert 30. minut"
 
 #: public/class-arlo-for-wordpress.php:1809
 msgid "The provided platform name does not exist."
