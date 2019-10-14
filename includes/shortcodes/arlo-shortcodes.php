@@ -36,6 +36,11 @@ class Shortcodes {
 			return $content;
 		});
 
+		// breadcrumbs
+		self::add('breadcrumbs', function($content = '', $atts, $shortcode_name, $import_id){
+			return self::shortcode_breadcrumbs($content, $atts, $shortcode_name, $import_id);
+		});
+
 		//powered by Arlo
 		self::add('powered_by', function ($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
        		return '<div class="arlo-powered-by"><a href="https://www.arlo.co/?utm_source=arlo%20client%20site&utm_medium=referral%20arlo%20powered%20by&utm_campaign=powered%20by" target="_blank">' .  sprintf(__('Powered by %s', 'arlo-for-wordpress'), '<img src="' . plugins_url("", __FILE__ ) . '/../../public/assets/img/Arlo-logo.svg" alt="Arlo training & Event Software">') . '</a></div>';
@@ -396,6 +401,81 @@ class Shortcodes {
 		
 		return $content;
 	}
+
+	/**
+     * Shortcode for event template / catalogue breadcrumbs
+     * @param  string $content
+     * @param  array  $atts
+     * @param  string $shortcode_name
+     * @param  integer $import_id
+     * @return string
+     */
+    private static function shortcode_breadcrumbs($content = '', $atts = [], $shortcode_name = '', $import_id = ''){
+        global $post;
+
+        $settings = get_option('arlo_settings');
+
+        $origin_txt = "";
+        $origin_url = "#";
+        $is_single = true;
+
+        foreach ($settings['post_types'] as $post_type => $config) {
+            if ($config['posts_page'] == $post->ID){
+                $is_single = false;
+                $origin_txt = $post->post_title;
+                $origin_url = get_page_link( $post );
+                break;
+            }
+        }
+        if ( $is_single && $post ){
+            $post_type = str_replace('arlo_', '', $post->post_type);
+            if (isset($settings['post_types'][$post_type])){
+                $origin_id = $settings['post_types'][$post_type]['posts_page'];
+                $origin_txt = get_the_title( $origin_id );
+                $origin_url = get_page_link( $origin_id );
+            }
+        }
+
+        // We have failed...
+        if ( empty( $origin_txt ) ){ return ''; }
+
+        $html = '<div class="arlo-breadcrumbs breadcrumbs">
+            <div class="outer">
+                <div class="inner">
+                    <ul>
+                        <li class="root">
+                            <a href="' . esc_url($origin_url) . '">' . esc_html($origin_txt) . '</a>
+                        </li>';
+
+        $arlo_category = \Arlo\Utilities::clean_string_url_parameter('arlo-category');
+        $cat_slug = (!empty($arlo_category) ? $arlo_category : '');
+        $cat = null;
+
+        if (!empty($cat_slug)){
+            $cat = \Arlo\Entities\Categories::get(array('slug' => $cat_slug), null, $import_id);
+
+            $tree = \Arlo\Entities\Categories::get_tree_from_child($cat->c_arlo_id, $import_id);
+            $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
+
+            foreach ($tree as $key => $currentCategory) {
+                $categoryUrl = $origin_url . (!empty($arlo_region) ? 'region-' . $arlo_region . '/' : '') . ($currentCategory->c_parent_id != 0 ? 'cat-' . esc_attr($currentCategory->c_slug) : '');
+                $html .= '<li>
+                    <a href="' . esc_url( user_trailingslashit( $categoryUrl ) ) . '">' . esc_html( $currentCategory->c_name ) . '</a>
+                </li>';
+            }
+        }
+
+        if ( $is_single && !empty( $post->post_title ) ) {
+            $html .= '<li class="current"><a href="#">'.esc_html($post->post_title).'</a></li>';
+        }
+
+        $html .= '</ul>
+                </div>
+            </div>
+        </div>';
+
+        return $html;
+    }
 
 	public static function get_advertised_offers($id, $id_field, $import_id) {
 		global $wpdb;

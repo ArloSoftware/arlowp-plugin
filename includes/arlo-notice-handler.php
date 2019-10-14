@@ -339,7 +339,7 @@ class NoticeHandler {
 					";
 					$venue = $this->dbl->get_results($sql, ARRAY_A);							
 					$venue_link = '';
-					if (count($event)) {
+					if (count($event) && count($venue)) {
 						$venue_link = sprintf('<a href="%s" target="_blank">%s</a>,',
 						get_post_permalink($venue[0]['ID']),
 						__('Venue information', 'arlo-for-wordpress' ));

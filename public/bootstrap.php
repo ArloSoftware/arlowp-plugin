@@ -186,14 +186,18 @@ function arlo_register_custom_post_types() {
 		if($page_id) {
 			switch($custom_type) {
 				case 'upcoming':
-					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(eventtag-([^/]*))?/?(presenter-([^/]*))?/?(templatetag-([^/]*))?/?(state-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-delivery=$matches[10]&arlo-eventtag=$matches[12]&arlo-presenter=$matches[14]&arlo-templatetag=$matches[16]&arlo-state=$matches[18]&paged=$matches[20]','top');
+					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(venue-([^/]*))?/?(delivery-([^/]*))?/?(eventtag-([^/]*))?/?(presenter-([^/]*))?/?(templatetag-([^/]*))?/?(state-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-venue=$matches[10]&arlo-delivery=$matches[12]&arlo-eventtag=$matches[14]&arlo-presenter=$matches[16]&arlo-templatetag=$matches[18]&arlo-state=$matches[20]&paged=$matches[22]','top');
 				break;
 				case 'oa':
 					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(oatag-([^/]*))?/?(page/([^/]*))?/?(templatetag-([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-oatag=$matches[6]&paged=$matches[8]&arlo-templatetag=$matches[10]','top');
 				break;			
 				case 'event':
+					// Base event rule with only event and region
 					add_rewrite_rule('^' . $slug . '/(\d+-[^/]*)+/?(region-([^/]*))?/?$','index.php?arlo_event=$matches[1]&arlo-region=$matches[3]','top');
+					// Events with location and state
 					add_rewrite_rule('^' . $slug . '/(\d+-[^/]*)+/?(region-([^/]*))?/?(location-([^/]*))?/?(state-([^/]*))?/?$','index.php?arlo_event=$matches[1]&arlo-region=$matches[3]&arlo-location=$matches[5]&arlo-state=$matches[7]','top');
+					// Events with Event ID
+					add_rewrite_rule('^' . $slug . '/(\d+-[^/]*)+/?(region-([^/]*))?/?(event-([^/]*))?/?$','index.php?arlo_event=$matches[1]&arlo-region=$matches[3]&arlo-event-id=$matches[5]','top');
 
 					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(templatetag-([^/]*))?/?(state-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-delivery=$matches[10]&arlo-templatetag=$matches[12]&arlo-state=$matches[14]&paged=$matches[16]','top');
 				break;
@@ -202,7 +206,7 @@ function arlo_register_custom_post_types() {
 					add_rewrite_rule('^' . $slug . '/?(region-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&paged=$matches[4]','top');
 				break;
 				case 'schedule':
-					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(templatetag-([^/]*))?/?(state-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-delivery=$matches[10]&arlo-templatetag=$matches[12]&arlo-state=$matches[14]&paged=$matches[16]','top');
+					add_rewrite_rule('^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(venue-([^/]*))?/?(delivery-([^/]*))?/?(templatetag-([^/]*))?/?(state-([^/]*))?/?(page/([^/]*))?','index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-venue=$matches[10]&arlo-delivery=$matches[12]&arlo-templatetag=$matches[14]&arlo-state=$matches[16]&paged=$matches[18]','top');
 				break;
 				case 'presenter':
 					add_rewrite_rule('^' . $slug . '/page/([^/]*)/?','index.php?page_id=' . $page_id . '&paged=$matches[1]','top');
@@ -222,6 +226,7 @@ function arlo_register_custom_post_types() {
 	add_rewrite_tag('%arlo-category%', '([^&]+)');
 	add_rewrite_tag('%arlo-month%', '([^&]+)');
 	add_rewrite_tag('%arlo-location%', '([^&]+)');
+	add_rewrite_tag('%arlo-venue%', '([^&]+)');
 	add_rewrite_tag('%arlo-state%', '([^&]+)');
 	add_rewrite_tag('%arlo-delivery%', '([^&]+)');
 	add_rewrite_tag('%arlo-eventtag%', '([^&]+)');
@@ -229,6 +234,7 @@ function arlo_register_custom_post_types() {
 	add_rewrite_tag('%arlo-presenter%', '([^&]+)');
 	add_rewrite_tag('%arlo-templatetag%', '([^&]+)');
 	add_rewrite_tag('%arlo-search%', '([^&]+)');
+	add_rewrite_tag('%arlo-event-id%', '([^&]+)');
 	add_rewrite_tag('%paged%', '([^&]+)');
 	
 	// flush cached rewrite rules if we've just updated the arlo settings
@@ -273,6 +279,8 @@ function arlo_register_custom_post_types() {
 	
 	$page_obj = get_queried_object();
 	$page_type = '';
+
+	$cookie_time = time() + apply_filters('arlo_region_cookie_time', 60*60*24*30);
 			
 	if (!empty($page_obj)) {
 		$page_type = $page_obj->post_type;
@@ -303,7 +311,7 @@ function arlo_register_custom_post_types() {
 					$selected_region = reset($regions_keys);
 				}
 				
-				setcookie("arlo-region", $selected_region, time()+60*60*24*30, '/', $domain);	
+				setcookie("arlo-region", $selected_region, $cookie_time, '/', $domain);	
 				
 				if ($page_type == 'arlo_event') {
 					$slug = substr(substr(str_replace(get_home_url(), '', get_post_permalink($page_id)), 0, -1), 1);	
@@ -316,12 +324,12 @@ function arlo_register_custom_post_types() {
 				wp_redirect(esc_url($location));
 				exit();				
 			} else {
-				setcookie("arlo-region", $selected_region, time()+60*60*24*30, '/', $domain);	
+				setcookie("arlo-region", $selected_region, $cookie_time, '/', $domain);	
 			}
 		} else {
 			if (empty($_COOKIE['arlo-region'])) {
 				$regions_keys = array_keys($regions);
-				setcookie("arlo-region", reset($regions_keys), time()+60*60*24*30, '/', $domain);
+				setcookie("arlo-region", reset($regions_keys), $cookie_time, '/', $domain);
 				
 				//Some hosting has high level caching (caches the redirects) and no cookies are available which means it can stuck in a redirect loop
 				if (!empty($_COOKIE['arlo-region']))
@@ -628,12 +636,29 @@ function arlo_get_post_by_name($name, $post_type='post') {
 	return false;
 }
 
+/**
+ * Check if current page is an Arlo Archive (Schedule/Upcoming/Presenters etc)
+ * @param  ID|WP_Post $post Current post
+ * @return bool
+ */
+function arlo_is_archive( $post = null ) {
+	$post = get_post( $post );
+	$settings = get_option('arlo_settings');
+
+	foreach($settings['post_types'] as $post_type => $config) {
+		if ($config['posts_page'] == $post->ID) {
+			return true;
+		}
+	}
+	return false;
+}
+
 function arlo_add_datamodel() {
 	$plugin = Arlo_For_Wordpress::get_instance();
 
-	//error_log("DB Hash before install_schema: " . $plugin->get_schema_manager()->create_db_schema_hash());
+	// error_log("DB Hash before install_schema: " . $plugin->get_schema_manager()->create_db_schema_hash());
 
 	$plugin->get_schema_manager()->install_schema();
 
-	//error_log("DB Hash after install_schema: " . $plugin->get_schema_manager()->create_db_schema_hash());
+	// error_log("DB Hash after install_schema: " . $plugin->get_schema_manager()->create_db_schema_hash());
 }

@@ -5,7 +5,7 @@
     "name": "Starter",
     "description": "Matches Arlo starter template",
     "forDesigners": false,
-    "demoUrl": "",
+    "demoUrl": "https://support.arlo.co/hc/en-gb/articles/360000311006",
     "externalResources": {
         "stylesheets": [
             "https://fonts.googleapis.com/css?family=Open+Sans:400,600,700",

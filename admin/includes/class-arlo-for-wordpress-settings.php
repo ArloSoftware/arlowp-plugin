@@ -156,16 +156,26 @@ class Arlo_For_Wordpress_Settings {
 
 			if ( array_key_exists('arlo-new-custom-shortcode', $_COOKIE) ) {
 				$custom_shortcode = $_COOKIE['arlo-new-custom-shortcode'];
+
+				// Remove all cookies... 
+				// Old code has setup where cookies are very temporary. JS deletes them too. 
 				unset( $_COOKIE['arlo-new-custom-shortcode'] );
 				setcookie('arlo-new-custom-shortcode', null, -1, '/', $domain);
+				unset($_COOKIE['arlo-nav-tab']);
+				unset($_COOKIE['arlo-vertical-tab']);
+				setcookie('arlo-nav-tab', null, -1, '/', $domain);
+				setcookie('arlo-vertical-tab', null, -1, '/', $domain);
 
 				//some shared hosting doesn't delete the cookie properly
 				if (!isset($_SESSION['arlo-new-custom-shortcode'])) {
 					$_SESSION['arlo-new-custom-shortcode'] = true;
 					wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages/' . $custom_shortcode) );
+					exit;
 				} else {
 					unset($_SESSION['arlo-new-custom-shortcode']);
 				}
+			} else if (isset($_SESSION['arlo-new-custom-shortcode'])){
+				unset($_SESSION['arlo-new-custom-shortcode']);
 			}
 
 			if ( array_key_exists('arlo-nav-tab', $_COOKIE) ) {
@@ -177,6 +187,7 @@ class Arlo_For_Wordpress_Settings {
 				if (!isset($_SESSION['arlo-nav-tab'])) {
 					$_SESSION['arlo-nav-tab'] = true;
 					wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#' . $nav_tab) );
+					exit;
 				} else {
 					unset($_SESSION['arlo-nav-tab']);
 				}
@@ -191,6 +202,7 @@ class Arlo_For_Wordpress_Settings {
 				if (!isset($_SESSION['arlo-vertical-tab'])) {
 					$_SESSION['arlo-vertical-tab'] = true;
 					wp_redirect( admin_url('admin.php?page=arlo-for-wordpress#pages/' . $page) );
+					exit;
 				} else {
 					unset($_SESSION['arlo-vertical-tab']);
 				}
@@ -954,7 +966,42 @@ class Arlo_For_Wordpress_Settings {
 	    echo '
 	    <h3>What\'s new in this release</h3>
 		<p><strong>If you are experiencing problems after an update, please deactivate and re-activate the plugin and re-synchronize the data.</strong></p>
-		
+
+		<h4>Version ' .  VersionHandler::VERSION . '</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">
+				<li>Upcoming events are now checked by time instead of by date.</li>
+				<li>- This means that events can be shown precisely until they start. Previously if an event was starting today, it would not show (depending on your timezone configuration)</li>
+				<li>Search now uses keywords to find events by name (up to 3 keywords)</li>
+				<li>- Previously it only searched by exact phrases</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/templateshortcodes/#arlo_breadcrumbs">[arlo_breadcrumbs]</a> shortcode</li>
+				<li>- This is a navigation feature for better traversal of nested categories and returning to the catalog from event pages</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_locationname">[arlo_venue_locationname]</a shortcode</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_events_link">[arlo_venue_events_link]</a> shortcode</li>
+				<li>Event template page can now show a single event</li>
+				<li>Region cookie time is editable with filter arlo_region_cookie_time</li>
+				<li>End date now uses correct timezone offset</li>
+				<li>Rich metadata snippets now include the event timezone</li>
+				<li>Starter template Venue Schedule/Upcoming links now work</li>
+				<li>Canonical URL now includes Region parameter (includes support for Yoast SEO)</li>
+				<li>Extend cron_schedules array instead of replacing values</li>
+				<li>Automatic navigation to new Shortcode Page after creation</li>
+				<li>Timezone codes on Event template page</li>
+				<li>Fixed initial sync with platforms that have no Venues</li>
+				<li>Next running date removes only current year</li>
+				<li>Preview button for all themes</li>
+				<li>Event list item now has option to no close unopened &lt;ul&gt; it expects</li>
+				<li>- If you use any of the Starter templates we recommend updating your Event page to include `within_ul="false"` in the `[arlo_event_list_item]` shortcode. If you have not customised you templates you can Reset your Starter theme.</li>
+				<li>Jazz Register button text is now visible on hover</li>
+				<li>Jazz search button aligment centered</li>
+				<li>Failed redirects 404 instead of 301</li>
+				<li>Check set_time_limit isn\'t disabled before use</li>
+				<li>Check that Shortcode attributes exist and is an array before usage</li>
+				<li>Default to OpenSSL over mcrypt</li>
+				<li>Hide filter button now does not get stuck if no filters are present</li>
+			</ul>
+		</p>
+
 		<h4>Version 4.0.1</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">
@@ -962,7 +1009,7 @@ class Arlo_For_Wordpress_Settings {
 			</ul>
 		</p>
 
-		<h4>Version ' .  VersionHandler::VERSION . '</h4>
+		<h4>Version 4.0</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">	  
 				<li>New WordPress <a href="https://wordpress.org/plugins/arlo-training-and-event-management-system/" target="_blank">minimum version requirement</a> of 4.7</li>
@@ -1132,13 +1179,13 @@ class Arlo_For_Wordpress_Settings {
 				</div>
 				<div class="arlo-theme-buttons">
 					<ul>
-					' . (!empty($theme_data->demoUrl) ? '<li><a href="' . $theme_data->demoUrl . '" target="_blank">' . __('Preview', 'arlo-for-wordpress' ) . '</a></li>' : '' ) . '
 					' . ($selected_theme_id == $theme_data->id ? '
 						<li class="arlo-theme-current">Current</li>
 					':'
 						<li><a class="theme-apply" href="' . wp_nonce_url(admin_url('admin.php?page=arlo-for-wordpress&apply-theme=' . urlencode($theme_data->id)), 'arlo-apply-theme-nonce') . '">' . __('Apply', 'arlo-for-wordpress') . '</a></li>
 					') .
 						( $theme_data->id != 'custom' ? '<li><a class="theme-apply theme-reset" href="' . wp_nonce_url(admin_url('admin.php?page=arlo-for-wordpress&apply-theme=' . urlencode($theme_data->id) . '&reset=1'), 'arlo-apply-theme-nonce') . '">' . ($selected_theme_id == $theme_data->id ? __('Reset', 'arlo-for-wordpress') : __('Apply & Reset', 'arlo-for-wordpress')) . '</a></li>' : '') . '
+					' . (!empty($theme_data->demoUrl) ? '<li><a href="' . $theme_data->demoUrl . '" target="_blank">' . __('Preview', 'arlo-for-wordpress' ) . '</a></li>' : '' ) . '
 					</ul>
 				</div>
 			</li>';

@@ -81,8 +81,9 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 					return '<div class="arlo-list-ellipsis">' . strip_tags($item->$column_name) . '</div>';
 				break;
 			case 'e_startdatetime':
+				return esc_html($item->e_startdatetime . " " . $item->e_starttimezoneabbr);
 			case 'e_finishdatetime':
-				return esc_html($item->$column_name . " " . $item->e_timezone);
+				return esc_html($item->e_finishdatetime . " " . $item->e_finishtimezoneabbr);
 			break;
 			case 'v_name':
 				$field = '';				
@@ -145,7 +146,8 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists  {
 			es.e_name,
 			es.e_startdatetime,
 			es.e_finishdatetime,
-			es.e_timezone,
+			es.e_starttimezoneabbr,
+			es.e_finishtimezoneabbr,
 			v.v_name,
 			es.e_locationname,
 			es.e_locationroomname,

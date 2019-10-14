@@ -6,8 +6,8 @@ use Arlo\Logger;
 
 class SchemaManager {
 
-	const DB_SCHEMA_HASH = '768ef238444a3043d42cf51e3e327fe674ebaefc';
-	const DB_SCHEMA_VERSION = '4.0.0';
+	const DB_SCHEMA_HASH = 'bd3433fc50d0f33591947e829b901f6483007777';
+	const DB_SCHEMA_VERSION = '4.1.0';
 
 	/* database layer */
 	private $dbl;
@@ -198,8 +198,10 @@ class SchemaManager {
 			e_name varchar(255) NULL,
 			e_startdatetime DATETIME NOT NULL,
 			e_finishdatetime DATETIME NULL,
-			e_datetimeoffset varchar(6) NULL,
-			e_timezone varchar(10) NULL,
+			e_startdatetimeoffset varchar(6) NOT NULL,
+			e_finishdatetimeoffset varchar(6) NULL,
+			e_starttimezoneabbr varchar(7) NOT NULL,
+			e_finishtimezoneabbr varchar(7) NULL,
 			e_timezone_id int(11) NULL,
 			v_id int(11) NULL,
 			e_locationname varchar(255) NULL,
@@ -264,6 +266,7 @@ class SchemaManager {
 			v_id int(11) NOT NULL AUTO_INCREMENT,
 			v_arlo_id int(11) NOT NULL,
 			v_name varchar(255) NULL,
+			v_locationname varchar(255) NULL,
 			v_geodatapointlatitude DECIMAL(10,6) NULL,
 			v_geodatapointlongitude DECIMAL(10,6) NULL,
 			v_physicaladdressline1 varchar(255) NULL,
@@ -469,6 +472,7 @@ class SchemaManager {
 			id int(11) NOT NULL,
 			name varchar(256) NOT NULL,
 			windows_tz_id varchar(256) NOT NULL,
+			utc_offset int(11) NOT NULL,
 			import_id int(10) unsigned NOT NULL,
 			PRIMARY KEY  (id, import_id)) 
 			CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";	

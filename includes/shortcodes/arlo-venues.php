@@ -14,14 +14,16 @@ class Venues {
 
             Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
                 $method_name = 'shortcode_' . str_replace('arlo_', '', $shortcode_name);
+                if (!is_array($atts) && empty($atts)) { $atts = []; }
                 return self::$method_name($content, $atts, $shortcode_name, $import_id);
             });
-        } 
+        }
 
         $custom_shortcodes = Shortcodes::get_custom_shortcodes('venues');
 
         foreach ($custom_shortcodes as $shortcode_name => $shortcode) {
             Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
+                if (!is_array($atts) && empty($atts)) { $atts = []; }
                 return self::shortcode_venue_list($content = '', $atts, $shortcode_name, $import_id);
             });
         }
@@ -369,6 +371,52 @@ class Venues {
         $venue_snippet = self::get_venue_snippet($link);
 
         return Shortcodes::create_rich_snippet( json_encode($venue_snippet) ); 
+    }
+
+    /**
+     * Output location name
+     * @param  string $content
+     * @param  array  $atts
+     * @param  string $shortcode_name
+     * @param  string $import_id
+     * @return string                 Location name
+     */
+    private static function shortcode_venue_locationname($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if(!isset($GLOBALS['arlo_venue_list_item']['v_locationname'])) return '';
+
+        return esc_html($GLOBALS['arlo_venue_list_item']['v_locationname']);
+    }
+
+    /**
+     * Output links to event lists, filtered by venue
+     * @param  string $content
+     * @param  array  $atts
+     * @param  string $shortcode_name
+     * @param  string $import_id
+     * @return string
+     */
+    private static function shortcode_venue_events_link($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if (empty($GLOBALS['arlo_venue_list_item']['v_arlo_id'])){ return ''; }
+
+        extract(shortcode_atts(array(
+            'link_page' => 'upcoming'
+        ), $atts, $shortcode_name, $import_id));
+
+        // Only two pages currently supported
+        if ($link_page != "upcoming" && $link_page != "schedule"){ return ''; }
+
+        $settings = get_option('arlo_settings');
+        $location_url = get_permalink($settings['post_types'][$link_page]['posts_page']);
+
+        if (!empty($location_url)){
+            $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
+            $location_url .= (!empty($arlo_region) ? 'region-' . $arlo_region . '/' : '');
+
+            $location_url .= "venue-" . urlencode($GLOBALS['arlo_venue_list_item']['v_arlo_id']) . '-' . urlencode($GLOBALS['arlo_venue_list_item']['v_name']) . '/';
+            return esc_url($location_url);
+        } else {
+            return '';
+        }
     }
 
     private static function get_venue_snippet($link) {

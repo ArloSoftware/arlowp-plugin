@@ -19,6 +19,7 @@ class UpcomingEvents {
 
             Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
                 $method_name = 'shortcode_' . str_replace('arlo_', '', $shortcode_name);
+                if (!is_array($atts) && empty($atts)) { $atts = []; }
                 return self::$method_name($content, $atts, $shortcode_name, $import_id);
             });
         }
@@ -27,6 +28,7 @@ class UpcomingEvents {
 
         foreach ($custom_shortcodes as $shortcode_name => $shortcode) {
             Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
+                if (!is_array($atts) && empty($atts)) { $atts = []; }                
                 return self::shortcode_upcoming_list($content = '', $atts, $shortcode_name, $import_id);
             });
         }
@@ -70,6 +72,7 @@ class UpcomingEvents {
 
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'location', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'locationhidden', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'venue', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'category', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'categoryhidden', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'search', $atts);
@@ -289,11 +292,13 @@ class UpcomingEvents {
         $t11 = "{$wpdb->prefix}arlo_eventtemplates_tags";
 
         $join = [];
-        $where = 'WHERE CURDATE() < DATE(e.e_startdatetime)  AND e.e_parent_arlo_id = 0 AND e.import_id = %d';
+        // We check that the event startdatetime with offset (converted to UTC) has not passed
+        $where = 'WHERE UTC_TIMESTAMP() < CONVERT_TZ(e.e_startdatetime, e.e_startdatetimeoffset, "+00:00") AND e.e_parent_arlo_id = 0 AND e.import_id = %d';
         $parameters[] = $import_id;
 
         $arlo_location = !empty($atts['location']) ? $atts['location'] : null;
         $arlo_locationhidden = !empty($atts['locationhidden']) ? $atts['locationhidden'] : null;
+        $arlo_venue = !empty($atts['venue']) ? $atts['venue'] : null;
         $arlo_state = !empty($atts['state']) ? $atts['state'] : null;
         $arlo_category = !empty($atts['category']) ? $atts['category'] : null;
         $arlo_categoryhidden = !empty($atts['categoryhidden']) ? $atts['categoryhidden'] : null;
@@ -331,6 +336,15 @@ class UpcomingEvents {
                 $parameters = array_merge($parameters, $arlo_locationhidden);    
             }
         endif;         
+        
+        if (!empty($arlo_venue)) {
+            $arlo_venue = \Arlo\Utilities::convert_string_to_int_array($arlo_venue);
+            if (!empty($arlo_venue)) {
+                if (!is_array($arlo_venue)) { $arlo_venue = [$arlo_venue]; }
+                $where .= " AND e.v_id IN (" . implode(',', array_map(function() {return "%s";}, $arlo_venue)) . ")";
+                $parameters = array_merge($parameters, $arlo_venue);
+            }
+        }
 
         if(!empty($arlo_templateid)) :
             $where .= ' AND e.et_arlo_id = %d';
@@ -490,8 +504,10 @@ class UpcomingEvents {
             e.e_name,
             e.e_startdatetime,
             e.e_finishdatetime,
-            e.e_datetimeoffset,
-            e.e_timezone,
+            e.e_startdatetimeoffset,
+            e.e_finishdatetimeoffset,
+            e.e_starttimezoneabbr,
+            e.e_finishtimezoneabbr,
             e.e_timezone_id,
             e.v_id,
             e.e_locationname,

@@ -3,7 +3,7 @@ Contributors: ArloSoftware, adamfentosi, gabrielarlo
 Tags: online registration, event registration, training management,  event management, event plugin, training company software, training calendar, training administration, training management software, training provider, solution, events calendar, wordpress events, event ticketing, wordpress lms, class registration, conference registration,  ticket, registration, event manager, training, booking, ticketing, courses, events, training, calendar, course management
 Requires at least: 4.7
 Tested up to: 5.2
-Stable tag: 4.0.1
+Stable tag: 4.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -181,6 +181,41 @@ The Arlo - Training and Event Management, and online registration plugin is only
 18. Admin - System requirements
 
 == Changelog ==
+
+= 4.1 =
+
+Upcoming events are now checked by time instead of by date.
+ - This means that events can be shown precisely until they start. Previously if an event was starting today, it would not show (depending on your timezone configuration)
+Search now uses keywords to find events by name (up to 3 keywords)
+ - Previously it only searched by exact phrases
+
+New [arlo_breadcrumbs] shortcode
+ - This is a navigation feature for better traversal of nested categories and returning to the catalog from event pages
+New [arlo_venue_locationname] shortcode
+New [arlo_venue_events_link] shortcode
+Event template page can now show a single event
+Region cookie time is editable with filter arlo_region_cookie_time
+
+End date now uses correct timezone offset
+Rich metadata snippets now include the event timezone
+Starter template Venue Schedule/Upcoming links now work
+Canonical URL now includes Region parameter (includes support for Yoast SEO)
+Extend cron_schedules array instead of replacing values
+
+Automatic navigation to new Shortcode Page after creation
+Timezone codes on Event template page
+Fixed initial sync with platforms that have no Venues
+Next running date removes only current year
+Preview button for all themes
+Event list item now has option to no close unopened <ul> it expects
+ - If you use any of the Starter templates we recommend updating your Event page to include `within_ul="false"` in the `[arlo_event_list_item]` shortcode. If you have not customised you templates you can Reset your Starter theme.
+Jazz Register button text is now visible on hover
+Jazz search button aligment centered
+Failed redirects 404 instead of 301
+Check set_time_limit isn't disabled before use
+Check that Shortcode attributes exist and is an array before usage
+Default to OpenSSL over mcrypt
+Hide filter button now does not get stuck if no filters are present
 
 = 4.0.1 =
 

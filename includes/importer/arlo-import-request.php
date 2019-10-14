@@ -20,10 +20,10 @@ class ImportRequest extends BaseImporter  {
 			'RegionID', 'Name',
 		],
 		'TimeZones' => [
-			'TimeZoneID', 'Name', 'WindowsTzID'
+			'TimeZoneID', 'Name', 'WindowsTzID', 'UtcOffset'
 		],
 		'Events' => [
-			'EventID', 'EventTemplateID', 'Name', 'Code', 'Description', 'Summary', 'StartDateTime', 'EndDateTime', 'TimeZoneID', 'TimeZone', 'Location', 'IsFull', 'PlacesRemaining', 'AdvertisedOffers', 'SessionsDescription', 'Presenters', 'Notice', 'ViewUri', 'RegistrationInfo', 'Provider', 'TemplateCode', 'Tags', 'Credits', 'Sessions.EventID', 'Sessions.Name', 'Sessions.Code', 'Sessions.Summary', 'Sessions.StartDateTime', 'Sessions.EndDateTime', 'Sessions.TimeZoneID', 'Sessions.TimeZone', 'Sessions.Location', 'Sessions.IsFull', 'Sessions.PlacesRemaining','Sessions.AdvertisedOffers', 'Sessions.Presenters', 'Sessions.Tags'
+			'EventID', 'EventTemplateID', 'Name', 'Code', 'Description', 'Summary', 'StartDateTime', 'EndDateTime', 'StartTimeZoneAbbr', 'EndTimeZoneAbbr', 'TimeZoneID', 'Location', 'IsFull', 'PlacesRemaining', 'AdvertisedOffers', 'SessionsDescription', 'Presenters', 'Notice', 'ViewUri', 'RegistrationInfo', 'Provider', 'TemplateCode', 'Tags', 'Credits', 'Sessions.EventID', 'Sessions.Name', 'Sessions.Code', 'Sessions.Summary', 'Sessions.StartDateTime', 'Sessions.EndDateTime', 'Sessions.StartTimeZoneAbbr', 'Sessions.EndTimeZoneAbbr', 'Sessions.TimeZoneID', 'Sessions.Location', 'Sessions.IsFull', 'Sessions.PlacesRemaining','Sessions.AdvertisedOffers', 'Sessions.Presenters', 'Sessions.Tags'
 		],
 		'Templates' => [
 			'TemplateID', 'Code', 'Name', 'Description', 'AdvertisedPresenters', 'AdvertisedDuration', 'BestAdvertisedOffers', 'ViewUri', 'RegisterInterestUri', 'RegisterPrivateInterestUri', 'Categories', 'Tags', 'Credits', 'Media',
@@ -35,7 +35,7 @@ class ImportRequest extends BaseImporter  {
 			'OnlineActivityID', 'TemplateID', 'Name', 'Code', 'DeliveryDescription', 'ViewUri', 'ReferenceTerms', 'Credits', 'RegistrationInfo', 'AdvertisedOffers', 'Tags',
 		],
 		'Venues' => [
-			'VenueID', 'Name', 'GeoData', 'PhysicalAddress', 'FacilityInfo', 'ViewUri',
+			'VenueID', 'Name', 'GeoData', 'PhysicalAddress', 'FacilityInfo', 'ViewUri', 'LocationName',
 		],
 		'Categories' => [
 			'CategoryID', 'ParentCategoryID', 'Name', 'SequenceIndex', 'Description', 'Footer',

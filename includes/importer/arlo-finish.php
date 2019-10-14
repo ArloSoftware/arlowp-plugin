@@ -3,6 +3,7 @@
 namespace Arlo\Importer;
 
 use Arlo\Logger;
+use Arlo\CacheControl;
 
 class Finish extends BaseImporter {
 
@@ -27,6 +28,8 @@ class Finish extends BaseImporter {
 	        $this->message_handler->dismiss_by_type('import_error');
 
 			$this->is_finished = true;
+
+			CacheControl::Clear();
         } else {
             Logger::log('Synchronization died because of a database LOCK, please wait 5 minutes and try again.', $this->import_id);
         }

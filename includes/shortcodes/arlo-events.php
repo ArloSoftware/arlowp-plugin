@@ -17,6 +17,7 @@ class Events {
 
             Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
                 $method_name = 'shortcode_' . str_replace('arlo_', '', $shortcode_name);
+                if (!is_array($atts) && empty($atts)) { $atts = []; }
                 return self::$method_name($content, $atts, $shortcode_name, $import_id);
             });
         }
@@ -140,6 +141,12 @@ class Events {
         $sql = self::generate_events_list_sql($atts, $import_id);
 
         $items = $wpdb->get_results($sql, ARRAY_A);
+
+        extract(shortcode_atts(array(
+            'show' => '',
+            'within_ul' => 'true'
+        ), $atts, $shortcode_name, $import_id));
+        $within_ul = filter_var($within_ul, FILTER_VALIDATE_BOOLEAN);
         
         $output = '';
         
@@ -157,14 +164,29 @@ class Events {
                     $GLOBALS['arlo_venue_list_item'] = \Arlo\Entities\Venues::get($conditions, null, null, $import_id);    
                 }
 
-                if (!empty($atts['show']) && $key == $atts['show']) {
-                    $output .= '</ul><ul class="arlo-list arlo-show-more-hidden events">';
+                if (!empty($show) && $key == $show) {
+                    if ($within_ul){ $output .= "</ul>"; }
+                    $output .= '<ul class="arlo-list arlo-show-more-hidden events">';
+                    if (!$within_ul){ $output .= "</ul>"; }
                 }
         
                 $output .= do_shortcode($content);
 
                 unset($GLOBALS['arlo_venue_list_item']);
-            }   
+            }
+            if ($within_ul){ $output .= "</ul>"; }
+
+
+            $arlo_event_id = \Arlo\Utilities::clean_string_url_parameter('arlo-event-id');
+            if (!empty($arlo_event_id)){
+                $url = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
+
+                $output .= "<div class='arlo-single-show-wrapper'>
+                            <a href='" . esc_url($url) . "' class='arlo-show-more arlo-button button'>
+                                " . __("Show More", "arlo-for-wordpress") . "
+                            </a>
+                    </div>";
+            }
         } 
         
         return $output;        
@@ -181,6 +203,7 @@ class Events {
         $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
         $arlo_location = \Arlo\Utilities::clean_string_url_parameter('arlo-location');
         $arlo_state = \Arlo\Utilities::clean_string_url_parameter('arlo-state');
+        $arlo_event_id = \Arlo\Utilities::clean_string_url_parameter('arlo-event-id');
         
         $t1 = "{$wpdb->prefix}arlo_eventtemplates";
         $t2 = "{$wpdb->prefix}arlo_events";
@@ -198,6 +221,11 @@ class Events {
             $where .= ' AND ' . $t2 .'.e_locationname = %s';
             $parameters[] = $arlo_location;
         };
+
+        if (!empty($arlo_event_id)){
+            $where .= ' AND ' . $t2 . '.e_arlo_id = %d';
+            $parameters[] = $arlo_event_id;
+        }
 
         if (!empty($arlo_state)) {
             $venues = \Arlo\Entities\Venues::get(['state' => $arlo_state], null, null, $import_id);
@@ -234,6 +262,7 @@ class Events {
                 $t1.et_post_id = $post->ID
             AND 
                 $t2.e_parent_arlo_id = 0
+            AND UTC_TIMESTAMP() < CONVERT_TZ($t2.e_startdatetime, $t2.e_startdatetimeoffset, '+00:00')
             $where
             GROUP BY 
                 e_arlo_id
@@ -312,8 +341,9 @@ class Events {
         if(!isset($GLOBALS['arlo_event_list_item']['e_startdatetime']) && !isset($GLOBALS['arlo_event_session_list_item']['e_startdatetime'])) return '';
 
         $event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
-        
-        return esc_html(self::event_date_formatter($atts, $event['e_startdatetime'], $event['e_datetimeoffset'], $event['e_isonline'], $event['e_timezone_id']));
+
+        $format = (!empty($atts['format']) ? $atts['format'] : '');
+        return esc_html(self::event_date_formatter($format, $event['e_startdatetime'], $event['e_startdatetimeoffset'], $event['e_starttimezoneabbr'], $event['e_timezone_id'], $event['e_isonline']));
     }
 
     private static function shortcode_event_end_date($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -321,7 +351,8 @@ class Events {
         
         $event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
 
-        return esc_html(self::event_date_formatter($atts, $event['e_finishdatetime'], $event['e_datetimeoffset'], $event['e_isonline'], $event['e_timezone_id']));
+        $format = (!empty($atts['format']) ? $atts['format'] : '');
+        return esc_html(self::event_date_formatter($format, $event['e_finishdatetime'], $event['e_finishdatetimeoffset'], $event['e_finishtimezoneabbr'], $event['e_timezone_id'], $event['e_isonline']));
     }
 
     private static function shortcode_event_dates($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -520,7 +551,10 @@ class Events {
                 e_locationvisible,
                 e_startdatetime,
                 e_finishdatetime,
-                e_datetimeoffset,
+                e_startdatetimeoffset,
+                e_finishdatetimeoffset,
+                e_starttimezoneabbr,
+                e_finishtimezoneabbr,
                 e_isonline,
                 e_timezone_id,
                 e_sessiondescription,
@@ -882,8 +916,16 @@ class Events {
         $event_snippet['@type'] = 'Event';
         $event_snippet['name'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'e_name');
 
-        $event_snippet['startDate'] = !empty($GLOBALS['arlo_event_list_item']['e_startdatetime']) ? date(DATE_ISO8601, strtotime($GLOBALS['arlo_event_list_item']['e_startdatetime'])) : '';
-        $event_snippet['endDate'] = !empty($GLOBALS['arlo_event_list_item']['e_startdatetime']) ? date(DATE_ISO8601, strtotime($GLOBALS['arlo_event_list_item']['e_finishdatetime'])) : '';
+        $event_snippet['startDate'] = Events::rich_snippet_time_format(
+            $GLOBALS['arlo_event_list_item']['e_startdatetime'],
+            $GLOBALS['arlo_event_list_item']['e_startdatetimeoffset'],
+            $GLOBALS['arlo_event_list_item']['e_timezone_id']
+        );
+        $event_snippet['endDate'] = Events::rich_snippet_time_format(
+            $GLOBALS['arlo_event_list_item']['e_finishdatetime'],
+            $GLOBALS['arlo_event_list_item']['e_finishdatetimeoffset'],
+            $GLOBALS['arlo_event_list_item']['e_timezone_id']
+        );
 
         $et_link = \Arlo\Utilities::get_absolute_url( self::get_et_link($GLOBALS['arlo_eventtemplate'],$link) );
 
@@ -1031,6 +1073,30 @@ class Events {
         return $event_snippet;
     }
 
+    /**
+     * @see Arlo\Shortcodes\Events->event_date_formatter()
+     * @param  string $datetime
+     * @param  string $offset
+     * @param  integer $timezoneid
+     * @return string
+     */
+    private static function rich_snippet_time_format($datetime, $offset, $timezoneid){
+        $timezone = null;
+        $timezone_array = \Arlo_For_Wordpress::get_instance()->get_timezone_manager()->get_indexed_timezones($timezoneid);
+        if (!is_null($timezone_array) && !empty($timezone_array['windows_tz_id']) && !empty(\Arlo\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$timezone_array['windows_tz_id']])) {
+            $timezone = new \DateTimeZone(\Arlo\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$timezone_array['windows_tz_id']]);
+        } else {
+            try {
+                $timezone = new \DateTimeZone(str_replace(':', '', $offset));
+            } catch(\Exception $e) {
+                $timezone = new \DateTimeZone('UTC');
+            }
+        }
+
+        $time = new \DateTime($datetime, $timezone);
+        return $time->format(DATE_ISO8601);
+    }
+
     private static function shortcode_no_event_text($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (!empty($GLOBALS['no_event_text'])) {
             return '<span class="arlo-no-results">' . $GLOBALS['no_event_text'] . '</span>';
@@ -1084,6 +1150,7 @@ class Events {
         $return = "";
 
         $arlo_location = \Arlo\Utilities::get_filter_keys_string_array('location');
+        $arlo_venue = \Arlo\Utilities::get_att_string('venue');
         $arlo_delivery = \Arlo\Utilities::get_filter_keys_int_array('delivery');
         $arlo_state = \Arlo\Utilities::clean_string_url_parameter('arlo-state');
 
@@ -1121,7 +1188,7 @@ class Events {
         
         $conditions = array(
             'template_id' => $GLOBALS['arlo_eventtemplate']['et_arlo_id'],
-            'e.e_startdatetime > NOW()' => null,
+            'UTC_TIMESTAMP() < CONVERT_TZ(e.e_startdatetime, e.e_startdatetimeoffset, "+00:00")' => NULL,
             'parent_id' => 0
         );
         
@@ -1139,6 +1206,14 @@ class Events {
         }
         else if (!empty($arlo_locationhidden)) {
             $conditions['e.e_locationname NOT IN ( %s )'] = $arlo_locationhidden;
+        }
+
+        if (!empty($arlo_venue)) {
+            $arlo_venue = \Arlo\Utilities::convert_string_to_int_array($arlo_venue);
+            if (!empty($arlo_venue)) {
+                if (!is_array($arlo_venue)) { $arlo_venue = [$arlo_venue]; }
+                $conditions["e.v_id IN ( %s )"] = $arlo_venue;
+            }
         }
 
         if(!empty($arlo_delivery)) {
@@ -1191,19 +1266,20 @@ class Events {
 
                 foreach ($events as $event) {
                     if (!empty($event->e_startdatetime)) {
+                        $dateFormat = $format;
                         if(date('y', strtotime($event->e_startdatetime)) == date('y') && $removeyear) {
-                            $format = trim(preg_replace('/\s+/', ' ', str_replace(["%Y", "%y", "Y", "y", "%g", "%G"], "", $format)));
+                            $dateFormat = trim(preg_replace('/\s+/', ' ', str_replace(["%Y", "%y", "Y", "y", "%g", "%G"], "", $dateFormat)));
                         }
                         
                         $location = $event->e_locationname;
 
-                        if ($format == 'period') {
-                            $startDay = self::event_date_formatter(['format' => 'j'], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
-                            $startMonth = self::event_date_formatter(['format' => 'M'], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
-                            $startYear = self::event_date_formatter(['format' => 'y'], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
-                            $finishDay = self::event_date_formatter(['format' => 'j'], $event->e_finishdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
-                            $finishMonth = self::event_date_formatter(['format' => 'M'], $event->e_finishdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
-                            $finishYear = self::event_date_formatter(['format' => 'y'], $event->e_finishdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
+                        if ($dateFormat == 'period') {
+                            $startDay = self::event_date_formatter('j', $event->e_startdatetime, $event->e_startdatetimeoffset, $event->e_starttimezoneabbr, $event->e_timezone_id, $event->e_isonline);
+                            $startMonth = self::event_date_formatter('M', $event->e_startdatetime, $event->e_startdatetimeoffset, $event->e_starttimezoneabbr, $event->e_timezone_id, $event->e_isonline);
+                            $startYear = self::event_date_formatter('y', $event->e_startdatetime, $event->e_startdatetimeoffset, $event->e_starttimezoneabbr, $event->e_timezone_id, $event->e_isonline);
+                            $finishDay = self::event_date_formatter('j', $event->e_finishdatetime, $event->e_finishdatetimeoffset, $event->e_finishtimezoneabbr, $event->e_timezone_id, $event->e_isonline);
+                            $finishMonth = self::event_date_formatter('M', $event->e_finishdatetime, $event->e_finishdatetimeoffset, $event->e_finishtimezoneabbr, $event->e_timezone_id, $event->e_isonline);
+                            $finishYear = self::event_date_formatter('y', $event->e_finishdatetime, $event->e_finishdatetimeoffset, $event->e_finishtimezoneabbr, $event->e_timezone_id, $event->e_isonline);
 
                             if (strcmp($startYear, $finishYear) != 0 || strcmp($startMonth, $finishMonth) != 0) {
                                 $date = sprintf("%s %s - %s %s", $startDay, $startMonth, $finishDay, $finishMonth);
@@ -1214,7 +1290,7 @@ class Events {
                                 $date = sprintf("%s %s", $startDay, $startMonth);
                             }
                         } else {
-                            $date = self::event_date_formatter(['format' => $format], $event->e_startdatetime, $event->e_datetimeoffset, $event->e_isonline, $event->e_timezone_id);
+                            $date = self::event_date_formatter($dateFormat, $event->e_startdatetime, $event->e_startdatetimeoffset, $event->e_starttimezoneabbr, $event->e_timezone_id, $event->e_isonline);
                         }
     
                         $display_text = str_replace(['{%date%}', '{%location%}'], [esc_html($date), esc_html($location)], $text);
@@ -1245,6 +1321,12 @@ class Events {
                                 }
                                 $link .= self::get_event_date_link($url, $buttonclass . $fullclass . $limitedclass . $discountclass, $display_text);
                                 break;
+                            case "single":
+                                $url = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
+                                if (substr($url, -1) != '/'){ $url .= '/'; }
+                                $url .= "event-" . $event->e_arlo_id . '/';
+                                $link .= self::get_event_date_link($url, $buttonclass . $fullclass . $limitedclass . $discountclass, $display_text);
+                                break;
                         }
     
                         $link .= ($layout == 'list' ? "</li>" : "");
@@ -1267,6 +1349,7 @@ class Events {
                     $href = '';
                     switch ($template_link) {
                         case "permalink":
+                        case "single":
                             $url = Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
                             $href = 'href="' . esc_url($url) . '"';
                             break;
@@ -1295,7 +1378,6 @@ class Events {
             
         return $return;
     }
-
 
     private static function get_event_date_link($url, $buttonclass, $display_text) {
         return sprintf('<a href="%s" class="%s">%s</a>', esc_attr($url), esc_attr($buttonclass), $display_text);
@@ -1326,11 +1408,10 @@ class Events {
     }
 
 
-    public static function event_date_formatter($atts, $date, $offset, $is_online = false, $timezoneid = null) {
+    public static function event_date_formatter($format, $date, $offset, $abbreviation, $timezoneid, $is_online) {
         $plugin = Arlo_For_Wordpress::get_instance();
         $timezone = $wp_timezone = $selected_timezone = null;
         $original_timezone = date_default_timezone_get();
-        $formatted_end_date = '';
         
         $timewithtz = str_replace(' ', 'T', $date) . $offset;
 
@@ -1356,10 +1437,14 @@ class Events {
 
         $selected_timezone = null;
 
-        if (!empty($GLOBALS['selected_timezone_names']))
+        if (!empty($GLOBALS['selected_timezone_names'])) {
             $selected_timezone = new \DateTimeZone($GLOBALS['selected_timezone_names']);
+        }
       
         if($is_online) {
+            if ($timezone instanceof \DateTimeZone && $selected_timezone instanceof \DateTimeZone && $timezone->getName() != $selected_timezone->getName()) {
+                $abbreviation = "";
+            }
             if (!empty($selected_timezone)) {
                 try {
                     $timezone = $selected_timezone;
@@ -1368,14 +1453,19 @@ class Events {
                 if (!is_null($timezone)) {
                     $date->setTimezone($timezone);
                     date_default_timezone_set($timezone->getName());
-                }   
+                }
             }
         }
 
-        $format = 'D g:i A';
+        if (empty($abbreviation)) {
+            $abbreviation = $date->format('T');
+        }
 
-        if(isset($atts['format'])) $format = $atts['format'];
-                    
+
+        if (empty($format)) {
+            $format = 'D g:i A';
+        }
+
         if (strpos($format, '%') === false) {
             $format = DateFormatter::date_format_to_strftime_format($format);
         }
@@ -1388,7 +1478,7 @@ class Events {
 
         if (!is_null($timezone) && ($timezone->getName() == $utc_timezone_name || (!is_null($wp_timezone) && $wp_timezone->getOffset($date) != $timezone->getOffset($date)) || !is_null($selected_timezone) || $is_online) && preg_match('[I|M]', $format) === 1 && preg_match('[Z|z]', $format) === 0) {
             $format .= " %Z";
-        }        
+        }
 
         if (strpos($format, '%Z')) {
             $format = str_replace('%Z', '{TZ_ABBREV}', $format); //T
@@ -1396,9 +1486,9 @@ class Events {
 
         if (strpos($format, '%z')) {
             $format = str_replace('%z', '{TZ_OFFSET}', $format); //P
-        }        
+        }
 
-        $date = str_replace(['{TZ_ABBREV}', '{TZ_OFFSET}'], [$date->format('T'), $date->format('P')], strftime($format, $date->getTimestamp()));
+        $date = str_replace(['{TZ_ABBREV}', '{TZ_OFFSET}'], [$abbreviation, $date->format('P')], strftime($format, $date->getTimestamp()));
 
         //if we haven't got timezone, we need to append the timezone abbrev
         if ($is_online && is_null($timezone) && (preg_match('[I|M]', $format) === 1) && !empty($offset)) {
@@ -1407,6 +1497,7 @@ class Events {
 
         date_default_timezone_set($original_timezone);
 
-        return $date . $formatted_end_date;
-    }  
+        return $date;
+    }
+
 }

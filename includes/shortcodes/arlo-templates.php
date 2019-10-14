@@ -19,6 +19,7 @@ class Templates {
 
             Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
                 $method_name = 'shortcode_' . str_replace('arlo_', '', $shortcode_name);
+                if (!is_array($atts) && empty($atts)) { $atts = []; }
                 return self::$method_name($content, $atts, $shortcode_name, $import_id);
             });
         } 
@@ -30,16 +31,19 @@ class Templates {
             switch($shortcode["type"]) {
                 case 'schedule':
                     Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
+                        if (!is_array($atts) && empty($atts)) { $atts = []; }
                         return self::shortcode_schedule($content = '', $atts, $shortcode_name, $import_id);
                     });
                     break;
                 case 'eventsearch':
                     Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
+                        if (!is_array($atts) && empty($atts)) { $atts = []; }
                         return self::shortcode_event_template_search_list($content = '', $atts, $shortcode_name, $import_id);
                     });
                     break;
                 default:
                     Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
+                        if (!is_array($atts) && empty($atts)) { $atts = []; }
                         return self::shortcode_event_template_list($content = '', $atts, $shortcode_name, $import_id);
                     });
                     break;            
@@ -312,6 +316,7 @@ class Templates {
 
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'location', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'locationhidden', $atts);
+        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'venue', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'category', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'categoryhidden', $atts);
         $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'search', $atts);
@@ -859,6 +864,7 @@ class Templates {
 
         $arlo_location = !empty($atts['location']) ? $atts['location'] : null;
         $arlo_locationhidden = !empty($atts['locationhidden']) ? $atts['locationhidden'] : null;
+        $arlo_venue = !empty($atts['venue']) ? $atts['venue'] : null;
         $arlo_state = !empty($atts['state']) ? $atts['state'] : null;
         $arlo_category = !empty($atts['category']) ? $atts['category'] : null;
         $arlo_categoryhidden = !empty($atts['categoryhidden']) ? $atts['categoryhidden'] : null;        
@@ -893,6 +899,15 @@ class Templates {
         if (!empty($arlo_locationhidden)) {    
             $where .= " AND e.e_locationname NOT IN (" . implode(',', array_map(function() {return "%s";}, $arlo_locationhidden)) . ")";                
             $parameters = array_merge($parameters, $arlo_locationhidden);    
+        }
+
+        if (!empty($arlo_venue)) {
+            $arlo_venue = \Arlo\Utilities::convert_string_to_int_array($arlo_venue);
+            if (!empty($arlo_venue)) {
+                if (!is_array($arlo_venue)) { $arlo_venue = [$arlo_venue]; }
+                $where .= " AND e.v_id IN (" . implode(',', array_map(function() {return "%s";}, $arlo_venue)) . ")";
+                $parameters = array_merge($parameters, $arlo_venue);
+            }
         }
 
         if(isset($arlo_delivery) || isset($arlo_deliveryhidden)) {
@@ -991,7 +1006,20 @@ class Templates {
             )
             ';
             $parameters[] = '%' . $arlo_search . '%';
-            $parameters[] = '%' . $arlo_search . '%';
+
+            // We want search to allow for missing words in titles. 
+            // MySQL full text search functionality is not a guarantee on all hosts, even though it came out nearly 10 years ago. 
+            // with % on each side of the query we are already in a poorly optimized query, so a few more for accuracy is not that bad.
+            $words = explode(' ',  trim($arlo_search));
+            if (count($words) < 4 && count($words) > 1){
+                // Only do complex searches on 3 words or less to limit potential impact
+                $parameters[] = '%' . implode('%', $words) . '%';
+                // TODO In future it would be nice to score & sort these. See class-wp-query.php parse_search_order() for a WP core example.
+            } else {
+                $parameters[] = '%' . $arlo_search . '%';
+            }
+            
+            
             $parameters[] = '%' . $arlo_search . '%';
             
             $atts['show_child_elements'] = "true";
