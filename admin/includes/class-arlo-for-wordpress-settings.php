@@ -970,24 +970,35 @@ class Arlo_For_Wordpress_Settings {
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">
+				<li>Upcoming events are now checked by time instead of by date.</li>
+				<li>- This means that events can be shown precisely until they start. Previously if an event was starting today, it would not show (depending on your timezone configuration)</li>
+				<li>Search now uses keywords to find events by name (up to 3 keywords)</li>
+				<li>- Previously it only searched by exact phrases</li>
 				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/templateshortcodes/#arlo_breadcrumbs">[arlo_breadcrumbs]</a> shortcode</li>
-				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_locationname">[arlo_venue_locationname]</a> shortcode</li>
+				<li>- This is a navigation feature for better traversal of nested categories and returning to the catalog from event pages</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_locationname">[arlo_venue_locationname]</a shortcode</li>
 				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_events_link">[arlo_venue_events_link]</a> shortcode</li>
 				<li>Event template page can now show a single event</li>
-				<li>Tested up to Wordpress 5.0</li>
+				<li>Region cookie time is editable with filter arlo_region_cookie_time</li>
 				<li>End date now uses correct timezone offset</li>
-				<li>Automatic navigation to new Page after creation</li>
+				<li>Rich metadata snippets now include the event timezone</li>
+				<li>Starter template Venue Schedule/Upcoming links now work</li>
+				<li>Canonical URL now includes Region parameter (includes support for Yoast SEO)</li>
+				<li>Extend cron_schedules array instead of replacing values</li>
+				<li>Automatic navigation to new Shortcode Page after creation</li>
 				<li>Timezone codes on Event template page</li>
 				<li>Fixed initial sync with platforms that have no Venues</li>
-				<li>Starter template Venue Schedule/Upcoming links now work</li>
 				<li>Next running date removes only current year</li>
 				<li>Preview button for all themes</li>
-				<li>Event list item now has option to no close unopened &lt;ul&gt; it expects.</li>
-				<li> - If you use any of the Starter templates we recommend updating your Event page to include `within_ul="false"` in the `<a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_list_item">[arlo_event_list_item]</a>` shortcode. If you have not customised you templates you can Reset your Starter theme.</li>
+				<li>Event list item now has option to no close unopened &lt;ul&gt; it expects</li>
+				<li>- If you use any of the Starter templates we recommend updating your Event page to include `within_ul="false"` in the `[arlo_event_list_item]` shortcode. If you have not customised you templates you can Reset your Starter theme.</li>
 				<li>Jazz Register button text is now visible on hover</li>
 				<li>Jazz search button aligment centered</li>
 				<li>Failed redirects 404 instead of 301</li>
 				<li>Check set_time_limit isn\'t disabled before use</li>
+				<li>Check that Shortcode attributes exist and is an array before usage</li>
+				<li>Default to OpenSSL over mcrypt</li>
+				<li>Hide filter button now does not get stuck if no filters are present</li>
 			</ul>
 		</p>
 

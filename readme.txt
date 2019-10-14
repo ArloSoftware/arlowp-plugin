@@ -194,7 +194,6 @@ New [arlo_breadcrumbs] shortcode
 New [arlo_venue_locationname] shortcode
 New [arlo_venue_events_link] shortcode
 Event template page can now show a single event
-Tested up to Wordpress 5.0
 Region cookie time is editable with filter arlo_region_cookie_time
 
 End date now uses correct timezone offset
