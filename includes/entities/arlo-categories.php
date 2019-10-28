@@ -57,7 +57,6 @@ class Categories {
 					} else {
 						$where[] = "c.c_parent_id = 0";
 					}
-					continue;
 				break;
 				
 				case 'ignored':
