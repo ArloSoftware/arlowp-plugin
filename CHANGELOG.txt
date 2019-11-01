@@ -1,3 +1,9 @@
+== v4.1.1 ==
+
+Bugfixes
+------------------
+Fix continue statement in switch
+
 == V4.1 ==
 
 Major changes

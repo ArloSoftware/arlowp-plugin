@@ -970,6 +970,13 @@ class Arlo_For_Wordpress_Settings {
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">
+				<li>Fix continue statement in switch.</li>
+			</ul>
+		</p>
+
+		<h4>Version 4.1</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">
 				<li>Upcoming events are now checked by time instead of by date.</li>
 				<li>- This means that events can be shown precisely until they start. Previously if an event was starting today, it would not show (depending on your timezone configuration)</li>
 				<li>Search now uses keywords to find events by name (up to 3 keywords)</li>
