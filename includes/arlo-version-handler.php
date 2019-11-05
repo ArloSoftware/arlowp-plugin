@@ -320,8 +320,14 @@ class VersionHandler {
 				if (is_null($exists)) {
 					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events ADD e_startdatetimeoffset varchar(6) NOT NULL AFTER e_finishdatetime");
 				}
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events DROP e_datetimeoffset;");
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events DROP e_timezone;");
+				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_events LIKE 'e_datetimeoffset'", 0, 0);
+				if (is_null($exists)) {
+					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events DROP e_datetimeoffset;");
+				}
+				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_events LIKE 'e_timezone'", 0, 0);
+				if (is_null($exists)) {
+					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events DROP e_timezone;");
+				}
 
 				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_venues LIKE 'v_locationname'", 0, 0);
 				if (is_null($exists)) {
