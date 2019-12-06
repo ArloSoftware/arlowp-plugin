@@ -645,6 +645,8 @@ function arlo_is_archive( $post = null ) {
 	$post = get_post( $post );
 	$settings = get_option('arlo_settings');
 
+	if (!$post){ return false; }
+
 	foreach($settings['post_types'] as $post_type => $config) {
 		if ($config['posts_page'] == $post->ID) {
 			return true;
