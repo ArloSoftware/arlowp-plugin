@@ -2066,7 +2066,7 @@ class Arlo_For_Wordpress {
 			$url .= '/search/' . wp_unslash(get_query_var('arlo-search'));
 		}
 
-		if (!empty(get_query_var('paged')) && is_numeric(get_query_var('paged'))) {
+		if (!empty(get_query_var('paged')) && is_numeric(get_query_var('paged')) && strpos($url, "/page/") === false) {
 			$url .= '/page/' . wp_unslash(get_query_var('paged'));
 		}
 

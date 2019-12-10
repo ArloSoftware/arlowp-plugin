@@ -1,3 +1,11 @@
+== v4.1.2 ==
+
+Bugfixes
+------------------
+Fix pagination canonical url.
+Fix 404 page notice errors.
+Fix table migration not checking current table state.
+
 == v4.1.1 ==
 
 Bugfixes
