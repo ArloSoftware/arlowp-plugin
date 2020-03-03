@@ -1,17 +1,17 @@
-=== Arlo training and event management system ===
+=== Arlo Training Management Software ===   
 Contributors: ArloSoftware, adamfentosi, gabrielarlo
-Tags: online registration, event registration, training management,  event management, event plugin, training company software, training calendar, training administration, training management software, training provider, solution, events calendar, wordpress events, event ticketing, wordpress lms, class registration, conference registration,  ticket, registration, event manager, training, booking, ticketing, courses, events, training, calendar, course management
+Tags: online registration, event registration, training management,  event management, course plugin, training company software, training calendar, training administration, training management software, training provider, solution, events calendar, wordpress events, wordpress lms, class registration, conference registration,  ticket, registration, event manager, training, booking, ticketing, courses, events, training, calendar, course management, course registration, wordpress courses, course calendar
 Requires at least: 4.7
 Tested up to: 5.2
 Stable tag: 4.1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Seamlessly integrate Arlo's market leading training and event management system into your website using the Arlo for WordPress plugin. 
+Seamlessly integrate Arlo's market leading training management system into your website using the Arlo for WordPress plugin. 
 
 == Description ==
 
-Arlo for WordPress helps you build great looking websites for promoting your events and courses. Offer website visitors an interactive and engaging experience with the ability to fully customise the look and feel. The plugin also comes with pre-built page themes providing flexibility for designers, and plug-and-play themes for the less savvy. [Read more](https://www.arlo.co/apps/wordpress-events-plugin?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) about creating beautiful looking training and event websites using Arlo for WordPress.
+Arlo for WordPress helps you build great looking websites for promoting your courses. Offer website visitors an interactive and engaging experience with the ability to fully customise the look and feel. The plugin also comes with pre-built page themes providing flexibility for designers, and plug-and-play themes for the less savvy. [Read more](https://www.arlo.co/apps/wordpress-events-plugin?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) about creating beautiful looking training websites using Arlo for WordPress.
 
 Pre-built plugin themes:
 
@@ -23,13 +23,13 @@ Pre-built plugin themes:
 * [Starter Hero](https://support.arlo.co/hc/en-gb/articles/360020232631?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
 
 
-= Event & Training Management Solution =
+= Training Management Solution =
 
-Arlo is a cloud based training and event management software designed to promote, sell and deliver your courses and events. Arlo will automate your manual processes and routine tasks by providing simple scheduling, online registration, automatic communication, custom reporting, payments & invoicing. Client records are kept updated within Arlo’s robust CRM.
+Arlo is a cloud based training management software designed to promote, sell and deliver your courses and events. Arlo will automate your manual processes and routine tasks by providing simple scheduling, online registration, automatic communication, custom reporting, payments & invoicing. Client records are kept updated within Arlo’s robust CRM.
 
-Course and event templates make recurring training and events easy to schedule. Automated communication mean registrants receive accurate and timely registration confirmation and reminders. Understanding your registrants is made easy through customisable application processes and registration forms.
+Course templates make recurring training easy to schedule. Automated communication mean registrants receive accurate and timely registration confirmation and reminders. Understanding your registrants is made easy through customisable application processes and registration forms.
 
-Arlo’s website integration promotes courses and events on your website keeping information up to date in real time with a seamless user experience. Arlo’s lead and campaign management tools allow promotion of courses and events by targeting specific market segments and monitoring demand. Delivering face to face, live online, private or public courses and event are all possible with Arlo. Manage certification, CPD points and use surveys to receive feedback and improve delivery. Arlo can be integrated with your other business applications managing the flow of data through your organisation.
+Arlo’s website integration promotes courses on your website keeping information up to date in real time with a seamless user experience. Arlo’s lead and campaign management tools allow promotion of courses by targeting specific market segments and monitoring demand. Delivering face to face, live online, private or public courses is all possible with Arlo. Manage certification, CPD points and use surveys to receive feedback and improve delivery. Arlo can be integrated with your other business applications managing the flow of data through your organisation.
 
 = Learning Management Solution (LMS) =
 
@@ -40,7 +40,7 @@ Arlo’s learning management solution allows you to include quizzes, SCORM objec
 = Key Features =
 
 * [Online registration](https://www.arlo.co/course-registration-software?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) - Accept online registrations and payments. Create simple forms for free events, complex forms for conferences, and everything between. Issue invoices, manage transfers, cancellations, and refunds. 
-* [Event Management & Course Management](https://www.arlo.co/course-management-software?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) - Manage all information and resources through Arlo: one place, online, and accessible wherever you are. Track tasks, record notes, send emails, print name labels, manage waiting lists, and more.
+* [Course Management](https://www.arlo.co/course-management-software?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) - Manage all information and resources through Arlo: one place, online, and accessible wherever you are. Track tasks, record notes, send emails, print name labels, manage waiting lists, and more.
 * [Website Integration](https://www.arlo.co/website-for-training-providers?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) - Use Arlo’s flexible website integration options to set your web designers free. Create beautiful looking training and event websites in WordPress.
 * [Learning Management System (LMS)](https://www.arlo.co/elearning-lms?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) - Offer live online learning, self-paced online learning, and blended learning using Arlo’s Learning Management System integration. Integrate [Moodle](https://www.arlo.co/apps/moodle-payment-plugin?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) and other LMS systems.
 * [Customer Relationship Management (CRM)](https://www.arlo.co/training-company-crm?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing) - Manage information about clients and registrants in one place. See course and event attendance history, view and send communication, track leads, manage key contacts, record notes, and assign tasks. If you already run a CRM like [Salesforce](https://www.arlo.co/apps/salesforce-event-management?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing), no problem, seamlessly integrate it with Arlo.
@@ -62,7 +62,7 @@ Arlo’s learning management solution allows you to include quizzes, SCORM objec
 * [Manage themes](https://support.arlo.co/hc/en-gb/articles/115002905863?utm_source=wordpress%20marketplace&utm_medium=referral%20organic&utm_campaign=wordpress%20marketplace%20listing)
 
 = Arlo WordPress integration - built for web developers! =
-Create beautiful and interactive training and event websites using the Arlo for WordPress plugin. Access an extensive library of WordPress Shortcodes, Templates, and Widgets, all designed specifically for web developer to make integration easy.  
+Create beautiful and interactive training websites using the Arlo for WordPress plugin. Access an extensive library of WordPress Shortcodes, Templates, and Widgets, all designed specifically for web developer to make integration easy.  
 
 Arlo for WordPress providers you with the building blocks to create great looking sites.
 
@@ -137,7 +137,7 @@ You can find all [Arlo for WordPress FAQ’s](https://support.arlo.co/hc/en-gb/a
 
 = Can I use my existing WordPress theme? =
 
-Yes! The Arlo Training and Event Management plugin works out-of-the-box with nearly every WordPress theme. But if you want to customize, you have to use a 3rd party plugin to add external css to your site.
+Yes! The Arlo Training Management plugin works out-of-the-box with nearly every WordPress theme. But if you want to customize, you have to use a 3rd party plugin to add external css to your site.
 
 = Can I use the plugin without an Arlo platform? =
 
