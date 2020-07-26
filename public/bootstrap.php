@@ -286,7 +286,8 @@ function arlo_register_custom_post_types() {
 		$page_type = $page_obj->post_type;
 		$page_id = $page_obj->ID;
 	}
-			
+
+	$arlo_page_ids = array();
 	foreach(Arlo_For_Wordpress::$post_types as $id => $arlo_post) {
 		if (isset($arlo_post['regionalized']) 
 			&& is_bool($arlo_post['regionalized']) 
