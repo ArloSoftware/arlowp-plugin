@@ -43,7 +43,7 @@ class SystemRequirements {
 					return Utilities::settingToMegabytes($memory_limit_setting);
 				},
 				'check' => function($current_value, $expected_value) {
-					return intval($current_value) >= intval($expected_value);
+					return intval($current_value) >= intval($expected_value) || intval($current_value) === -1;
 				}
 			],
 			[
