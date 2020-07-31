@@ -863,7 +863,7 @@ class Arlo_For_Wordpress_Settings {
 			<div class="arlo-filter-old-value">
 				<select name="arlo_settings[' . $setting_name . '][' . $filter_group . '][' . $filter_key . '][' . $settings_id . '][filteroldvalue]">
 					<option value="">Select an option</option>' .
-						implode($filter_options_array, '')
+						implode('', $filter_options_array)
 				. '</select>
 			</div>
 

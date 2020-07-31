@@ -93,7 +93,7 @@ class UpcomingEvents {
     private static function shortcode_upcoming_list_pagination($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $wpdb;
         
-        $atts['limit'] = intval(isset(self::$upcoming_list_item_atts['limit']) ? self::$upcoming_list_item_atts['limit'] : isset($atts['limit']) && is_numeric($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
+        $atts['limit'] = intval(isset(self::$upcoming_list_item_atts['limit']) ? self::$upcoming_list_item_atts['limit'] : (isset($atts['limit']) && is_numeric($atts['limit']) ? $atts['limit'] : get_option('posts_per_page')));
 
         $atts = array_merge($atts,self::$upcoming_list_item_atts);
 
