@@ -334,7 +334,7 @@ class Templates {
 
         if (isset($GLOBALS['show_only_at_bottom']) && $GLOBALS['show_only_at_bottom']) return;
 
-        $atts['limit'] = intval(isset(self::$event_template_atts['limit']) ? self::$event_template_atts['limit'] : isset($atts['limit']) && is_numeric($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
+        $atts['limit'] = intval(isset(self::$event_template_atts['limit']) ? self::$event_template_atts['limit'] : (isset($atts['limit']) && is_numeric($atts['limit']) ? $atts['limit'] : get_option('posts_per_page')));
 
         $atts = array_merge($atts,self::$event_template_atts);
 
@@ -352,7 +352,7 @@ class Templates {
 
         if (isset($GLOBALS['show_only_at_bottom']) && $GLOBALS['show_only_at_bottom']) return;
 
-        $atts['limit'] = intval(isset(self::$event_template_atts['limit']) ? self::$event_template_atts['limit'] : isset($atts['limit']) && is_numeric($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
+        $atts['limit'] = intval(isset(self::$event_template_atts['limit']) ? self::$event_template_atts['limit'] : (isset($atts['limit']) && is_numeric($atts['limit']) ? $atts['limit'] : get_option('posts_per_page')));
         
         $atts = array_merge($atts, self::$event_template_atts);
         

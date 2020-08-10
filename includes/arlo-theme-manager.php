@@ -58,7 +58,7 @@ class ThemeManager {
 
 		//sort based on the order value
 		usort($themes, function($obj1, $obj2) {
-			return ($obj1->order == $obj2->order ? 0 : ($obj1->order < $obj2->order) ? -1 : 1);
+			return ($obj1->order == $obj2->order ? 0 : (($obj1->order < $obj2->order) ? -1 : 1));
 		});
 
 		//need to recreate the array as an associated array because usort screws up

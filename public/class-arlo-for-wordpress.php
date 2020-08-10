@@ -781,10 +781,14 @@ class Arlo_For_Wordpress {
 	
 	public static function bulk_plugin_updater( $upgrader_object, $data ) {
 		if ($data['action'] == 'update' && $data['type'] == 'plugin' ) {
-			foreach($data['plugins'] as $each_plugin){
-				if (basename($each_plugin) == 'arlo-for-wordpress.php'){
-					Arlo_For_Wordpress::check_plugin_version();
+			if (!empty($data['plugins'])){
+				foreach($data['plugins'] as $each_plugin){
+					if (basename($each_plugin) == 'arlo-for-wordpress.php'){
+						Arlo_For_Wordpress::check_plugin_version();
+					}
 				}
+			} else if (empty($data['plugin']) && basename($each_plugin) == 'arlo-for-wordpress.php'){
+				Arlo_For_Wordpress::check_plugin_version();
 			}
 		}
 	}
@@ -2030,11 +2034,13 @@ class Arlo_For_Wordpress {
 
 		if (!empty(get_query_var('arlo-eventtag'))) {
 			$tag = get_query_var('arlo-eventtag');
-			if (is_numeric($eventtag)) {
-				$tag = self::get_tag_by_id($eventtag);
+			if (is_numeric($tag)) {
+				$tag = self::get_tag_by_id($tag);
 				if (!empty($tag['tag'])) {
 					$eventtag = $tag['tag'];
 				}
+			} else {
+				$eventtag = $tag;
 			}
 			$url .= '/eventtag-' . wp_unslash($eventtag);
 		}

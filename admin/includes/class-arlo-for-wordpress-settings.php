@@ -863,7 +863,7 @@ class Arlo_For_Wordpress_Settings {
 			<div class="arlo-filter-old-value">
 				<select name="arlo_settings[' . $setting_name . '][' . $filter_group . '][' . $filter_key . '][' . $settings_id . '][filteroldvalue]">
 					<option value="">Select an option</option>' .
-						implode($filter_options_array, '')
+						implode('', $filter_options_array)
 				. '</select>
 			</div>
 
@@ -968,6 +968,17 @@ class Arlo_For_Wordpress_Settings {
 		<p><strong>If you are experiencing problems after an update, please deactivate and re-activate the plugin and re-synchronize the data.</strong></p>
 
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">
+				<li>Bump version support</li>
+				<li>Fix HTTPS for Arlo Webinars</li>
+				<li>Fix for plugin upgrade warning</li>
+				<li>Fix for -1 memory limit</li>
+				<li>Fix for misconfiguration and unset array causing warning</li>
+			</ul>
+		</p>
+		
+		<h4>Version 4.1.2</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">
 				<li>Fix pagination canonical url.</li>
