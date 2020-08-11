@@ -1146,7 +1146,6 @@ class Arlo_For_Wordpress_Settings {
 				<li><a href="https://support.arlo.co/hc/en-gb/sections/202320663-Website-Integration-Information" target="_blank">General Arlo website integration documentation</a> - General documentation on Arlo website integration including checkout and registration page options, custom URLs and the Arlo web team’s services.   </li>
 				<li><a href="https://support.arlo.co/hc/en-gb/sections/202320703-WordPress-Plugin" target="_blank">Arlo for WordPress support  documentation</a> - Documentation on Arlo for WordPress plugin including the synchronisation between Arlo and WordPress, FAQ’s and troubleshooting.  </li>
 				<li><a href="https://support.arlo.co/hc/en-gb/sections/115000452543-WordPress-Control-Themes" target="_blank">Arlo for WordPress control themes</a> - Documentation on the available Arlo for WordPress control themes and customisation options.</li>
-				<li><a href="https://support.arlo.co/hc/en-gb/articles/115004910003-Website-WordPress-test-cases" target="_blank">Arlo for WordPress test plan</a> - Important test script to run through before your site goes live
 			</ul>
 		</p>
 		';
