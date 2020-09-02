@@ -990,7 +990,7 @@ class Arlo_For_Wordpress_Settings {
 				<li>- This means that events can be shown precisely until they start. Previously if an event was starting today, it would not show (depending on your timezone configuration)</li>
 				<li>Search now uses keywords to find events by name (up to 3 keywords)</li>
 				<li>- Previously it only searched by exact phrases</li>
-				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/templateshortcodes/#arlo_breadcrumbs">[arlo_breadcrumbs]</a> shortcode</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_breadcrumbs">[arlo_breadcrumbs]</a> shortcode</li>
 				<li>- This is a navigation feature for better traversal of nested categories and returning to the catalog from event pages</li>
 				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_locationname">[arlo_venue_locationname]</a shortcode</li>
 				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_events_link">[arlo_venue_events_link]</a> shortcode</li>
