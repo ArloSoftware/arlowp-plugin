@@ -970,6 +970,15 @@ class Arlo_For_Wordpress_Settings {
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">
+				<li>Actions for sync start and finish: arlo_import_starting and arlo_import_finished</li>
+				<li>Documentation Updates</li>
+				<li>Check that the Import Lock table exists when checking the sync lock</li>
+			</ul>
+		</p>
+
+		<h4>Version 4.1.3</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">
 				<li>Bump version support</li>
 				<li>Fix HTTPS for Arlo Webinars</li>
 				<li>Fix for plugin upgrade warning</li>
@@ -1001,7 +1010,7 @@ class Arlo_For_Wordpress_Settings {
 				<li>- This means that events can be shown precisely until they start. Previously if an event was starting today, it would not show (depending on your timezone configuration)</li>
 				<li>Search now uses keywords to find events by name (up to 3 keywords)</li>
 				<li>- Previously it only searched by exact phrases</li>
-				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/templateshortcodes/#arlo_breadcrumbs">[arlo_breadcrumbs]</a> shortcode</li>
+				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_breadcrumbs">[arlo_breadcrumbs]</a> shortcode</li>
 				<li>- This is a navigation feature for better traversal of nested categories and returning to the catalog from event pages</li>
 				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_locationname">[arlo_venue_locationname]</a shortcode</li>
 				<li>New <a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/venuerelated#arlo_venue_events_link">[arlo_venue_events_link]</a> shortcode</li>
@@ -1146,7 +1155,6 @@ class Arlo_For_Wordpress_Settings {
 				<li><a href="https://support.arlo.co/hc/en-gb/sections/202320663-Website-Integration-Information" target="_blank">General Arlo website integration documentation</a> - General documentation on Arlo website integration including checkout and registration page options, custom URLs and the Arlo web team’s services.   </li>
 				<li><a href="https://support.arlo.co/hc/en-gb/sections/202320703-WordPress-Plugin" target="_blank">Arlo for WordPress support  documentation</a> - Documentation on Arlo for WordPress plugin including the synchronisation between Arlo and WordPress, FAQ’s and troubleshooting.  </li>
 				<li><a href="https://support.arlo.co/hc/en-gb/sections/115000452543-WordPress-Control-Themes" target="_blank">Arlo for WordPress control themes</a> - Documentation on the available Arlo for WordPress control themes and customisation options.</li>
-				<li><a href="https://support.arlo.co/hc/en-gb/articles/115004910003-Website-WordPress-test-cases" target="_blank">Arlo for WordPress test plan</a> - Important test script to run through before your site goes live
 			</ul>
 		</p>
 		';

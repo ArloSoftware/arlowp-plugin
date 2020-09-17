@@ -29,6 +29,8 @@ class Finish extends BaseImporter {
 
 			$this->is_finished = true;
 
+			do_action('arlo_import_finished');
+
 			CacheControl::Clear();
         } else {
             Logger::log('Synchronization died because of a database LOCK, please wait 5 minutes and try again.', $this->import_id);
