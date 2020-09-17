@@ -1,3 +1,14 @@
+== v4.1.4 ==
+
+Enhancement
+------------------
+Actions for sync start and finish: arlo_import_starting and arlo_import_finished
+Documentation Updates
+
+Bugfixes
+------------------
+Check that the Import Lock table exists when checking the sync lock
+
 == v4.1.3 ==
 
 Enhancement

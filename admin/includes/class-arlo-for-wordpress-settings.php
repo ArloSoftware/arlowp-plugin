@@ -970,6 +970,15 @@ class Arlo_For_Wordpress_Settings {
 		<h4>Version ' .  VersionHandler::VERSION . '</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">
+				<li>Actions for sync start and finish: arlo_import_starting and arlo_import_finished</li>
+				<li>Documentation Updates</li>
+				<li>Check that the Import Lock table exists when checking the sync lock</li>
+			</ul>
+		</p>
+
+		<h4>Version 4.1.3</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">
 				<li>Bump version support</li>
 				<li>Fix HTTPS for Arlo Webinars</li>
 				<li>Fix for plugin upgrade warning</li>
