@@ -328,8 +328,18 @@ class Importer {
 
 			restore_error_handler();
 		} else {
-            Logger::log('Synchronization LOCK found, please wait 5 minutes and try again', $this->import_id);
-            $retval = false;
+			$retval = false;
+			/**
+			 * For some reason there have been multiple cases of our import lock table going missing. 
+			 * To resolve this, we will check for the table missing error and trigger DB rebuild.
+			 * It is likely another plugin, but its not unwise to simply handle it and move on.
+			 */
+			if ($this->check_import_lock_error()){
+				Logger::log("Synchronization LOCK table missing, triggering db schema check", $this->import_id);
+				\Arlo_For_Wordpress::get_instance()->check_db_schema();
+			} else {
+				Logger::log('Synchronization LOCK found, please wait 5 minutes and try again', $this->import_id);
+			}
         }
 
 		$this->clear_import_lock();
@@ -438,7 +448,14 @@ class Importer {
         }
     
         return false;
-    }	
+	}	
+	
+	private function check_import_lock_error(){
+		$tableMissingErr = "Table '{$this->dbl->wpdb->dbname}.{$this->dbl->prefix}arlo_import_lock' doesn't exist";
+		if ($this->dbl->last_error == $tableMissingErr){
+			return true;
+		} else { return false; }
+	}
 
 	private function run_import_task($import_task) {
 		$this->data_json = null;
