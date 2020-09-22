@@ -13,7 +13,7 @@
             "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
         ],
         "javascripts": [
-            "http://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.4/js/standalone/selectize.min.js",
+            "https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.4/js/standalone/selectize.min.js",
             "https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js",
             "https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.7.1/slick.min.js"
         ]
