@@ -124,7 +124,7 @@ class SchemaManager {
 		PRIMARY KEY  (task_id),
 		KEY task_status (task_status),
 		KEY task_priority (task_priority)
-		) CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . "";
+		) " . $this->dbl->charset_collate . "";
 
 		$this->dbl->sync_schema($sql);
 		
@@ -133,8 +133,7 @@ class SchemaManager {
 		data_task_id int(11) NOT NULL,
 		data_text text NOT NULL,
 		PRIMARY KEY  (data_task_id)
-		) CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";  
-		";
+		) " . $this->dbl->charset_collate . "";
 		
 		$this->dbl->sync_schema($sql);
 	}
@@ -163,7 +162,7 @@ class SchemaManager {
 			KEY et_post_id (et_post_id), 
 			KEY et_arlo_id (et_arlo_id),
 			KEY et_region (et_region))
-			CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";";
+			" . $this->dbl->charset_collate . "";
 
 		$this->dbl->sync_schema($sql);
 	}
@@ -182,7 +181,7 @@ class SchemaManager {
 			PRIMARY KEY  (cf_id),
 			KEY cf_order (cf_order),
 			KEY et_id (et_id))
-			CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";";
+			" . $this->dbl->charset_collate . "";
 
 		$this->dbl->sync_schema($sql);
 	}
@@ -229,7 +228,7 @@ class SchemaManager {
 			KEY e_region (e_region),
 			KEY e_is_taxexempt (e_is_taxexempt),
 			KEY v_id (v_id))
-			CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";";
+			" . $this->dbl->charset_collate . "";
 
 		$this->dbl->sync_schema($sql);
 	}
@@ -254,7 +253,7 @@ class SchemaManager {
 			PRIMARY KEY  (oa_id),
 			KEY oat_arlo_id (oat_arlo_id),
 			KEY oa_region (oa_region))
-			CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";";
+			" . $this->dbl->charset_collate . "";
 
 		$this->dbl->sync_schema($sql);
 	}
@@ -287,7 +286,7 @@ class SchemaManager {
 			PRIMARY KEY  (v_id),
 			KEY v_arlo_id (v_arlo_id),
 			KEY v_post_id (v_post_id))
-			CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";";
+			" . $this->dbl->charset_collate . "";
 
 		$this->dbl->sync_schema($sql);
 	}
@@ -313,7 +312,7 @@ class SchemaManager {
 			PRIMARY KEY  (p_id),
 			KEY p_arlo_id (p_arlo_id),
 			KEY p_post_id (p_post_id))
-			CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";";
+			" . $this->dbl->charset_collate . "";
 
 		$this->dbl->sync_schema($sql);
 	}
@@ -349,7 +348,7 @@ class SchemaManager {
 			KEY oa_id (oa_id),
 			KEY o_region (o_region),
 			KEY o_order (o_order))
-			CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";";
+			" . $this->dbl->charset_collate . "";
 		
 		$this->dbl->sync_schema($sql);
 	}
@@ -366,7 +365,7 @@ class SchemaManager {
 			KEY cf_order (p_order),
 			KEY fk_et_id_idx (et_id ASC),
 			KEY fk_p_id_idx (p_arlo_id ASC))
-			CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";";
+			" . $this->dbl->charset_collate . "";
 
 		$this->dbl->sync_schema($sql);
 	}
@@ -376,8 +375,7 @@ class SchemaManager {
 			id mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
 			tag varchar(255) NOT NULL,
 			import_id int(10) unsigned DEFAULT NULL,
-			PRIMARY KEY  (id))
-			CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . "";
+			PRIMARY KEY  (id)) " . $this->dbl->charset_collate . "";
 			
 		$this->dbl->sync_schema($sql);
 		
@@ -385,8 +383,7 @@ class SchemaManager {
 			e_id int(11) NOT NULL,
 			tag_id mediumint(8) unsigned NOT NULL,
 			import_id int(10) unsigned NOT NULL,
-			PRIMARY KEY  (e_id, tag_id, import_id))
-			CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . "";
+			PRIMARY KEY  (e_id, tag_id, import_id)) " . $this->dbl->charset_collate . "";
 			
 		$this->dbl->sync_schema($sql);  	
 		
@@ -394,8 +391,7 @@ class SchemaManager {
 			oa_id int(11) NOT NULL,
 			tag_id mediumint(8) unsigned NOT NULL,
 			import_id int(10) unsigned NOT NULL,
-			PRIMARY KEY  (oa_id, tag_id, import_id))
-			CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . "";
+			PRIMARY KEY  (oa_id, tag_id, import_id)) " . $this->dbl->charset_collate . "";
 			
 		$this->dbl->sync_schema($sql);	
 		
@@ -403,8 +399,7 @@ class SchemaManager {
 			et_id int(11) NOT NULL,
 			tag_id mediumint(8) unsigned NOT NULL,
 			import_id int(10) unsigned NOT NULL,
-			PRIMARY KEY  (et_id, tag_id, import_id))
-			CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . "";
+			PRIMARY KEY  (et_id, tag_id, import_id)) " . $this->dbl->charset_collate . "";
 
 		$this->dbl->sync_schema($sql);
 	}
@@ -420,7 +415,7 @@ class SchemaManager {
 			PRIMARY KEY  (e_id, p_arlo_id, import_id),		
 			KEY fk_e_id_idx (e_id ASC),
 			KEY fk_p_id_idx (p_arlo_id ASC))
-			CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";";
+			" . $this->dbl->charset_collate . "";
 
 		$this->dbl->sync_schema($sql);
 	}
@@ -443,7 +438,7 @@ class SchemaManager {
 			PRIMARY KEY  (c_id, import_id),
 			UNIQUE KEY c_arlo_id_key (c_arlo_id,import_id),
 			KEY c_parent_id (c_parent_id))
-			CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";";
+			" . $this->dbl->charset_collate . "";
 
 		$this->dbl->sync_schema($sql);
 	}
@@ -459,7 +454,7 @@ class SchemaManager {
 			PRIMARY KEY  (et_arlo_id, c_arlo_id, import_id),
 			KEY fk_et_id_idx (et_arlo_id ASC),
 			KEY fk_c_id_idx (c_arlo_id ASC))
-			CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";";
+			" . $this->dbl->charset_collate . "";
 
 		$this->dbl->sync_schema($sql);
 	}
@@ -474,9 +469,7 @@ class SchemaManager {
 			windows_tz_id varchar(256) NOT NULL,
 			utc_offset int(11) NOT NULL,
 			import_id int(10) unsigned NOT NULL,
-			PRIMARY KEY  (id, import_id)) 
-			CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";	
-		";
+			PRIMARY KEY  (id, import_id)) " . $this->dbl->charset_collate . ";";
 
 		$this->dbl->sync_schema($sql);
 	}
@@ -492,7 +485,7 @@ class SchemaManager {
 			successful tinyint(1) DEFAULT NULL,
 			PRIMARY KEY  (id),
 			KEY import_id (import_id)) 
-			CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";";
+			" . $this->dbl->charset_collate . "";
 
 		$this->dbl->sync_schema($sql);
 	}
@@ -504,7 +497,7 @@ class SchemaManager {
 			import_id int(10) unsigned NOT NULL,
 			lock_acquired DATETIME NOT NULL,
 			lock_expired DATETIME NOT NULL
-			) CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";";
+			) " . $this->dbl->charset_collate . "";
 		
 		$this->dbl->sync_schema($sql);
 	}
@@ -525,7 +518,7 @@ class SchemaManager {
 				modified datetime DEFAULT NULL COMMENT 'in UTC',
 				expired datetime NOT NULL COMMENT 'in UTC',
 				PRIMARY KEY  (id)
-			) CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";";
+			) " . $this->dbl->charset_collate . "";
 		
 		$this->dbl->sync_schema($sql);        
 	}
@@ -542,7 +535,7 @@ class SchemaManager {
 				created datetime NOT NULL,
 				modified datetime NULL DEFAULT NULL,
 				PRIMARY KEY  (id)
-			) CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";";
+			) " . $this->dbl->charset_collate . "";
 		
 		$this->dbl->sync_schema($sql);        
 	}
@@ -561,7 +554,7 @@ class SchemaManager {
 			created timestamp NULL DEFAULT NULL,
 			PRIMARY KEY (id),
 			KEY type (type))
-			CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";";
+			" . $this->dbl->charset_collate . "";
 
 		$this->dbl->sync_schema($sql);
 	}

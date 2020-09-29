@@ -10,8 +10,7 @@ class WPDatabaseLayer extends DatabaseLayer {
 		global $wpdb;
 
 		$this->wpdb = &$wpdb;
-		$this->charset = $this->wpdb->charset;
-		$this->collate = $this->wpdb->collate;
+		$this->charset_collate = $this->wpdb->get_charset_collate();
 		$this->prefix = $this->wpdb->prefix;
 	}
 

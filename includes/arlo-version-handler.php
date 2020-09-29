@@ -230,9 +230,8 @@ class VersionHandler {
 					name varchar(256) NOT NULL,
 					windows_tz_id varchar(256) NOT NULL,
 					import_id int(10) unsigned NOT NULL,
-					PRIMARY KEY  (id, import_id)) 
-					CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";
-				");
+					PRIMARY KEY  (id, import_id))
+					" . $this->dbl->charset_collate . ";");
 				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events ADD e_timezone_id INT(11) NULL AFTER e_timezone");
 			break;
 
@@ -283,9 +282,8 @@ class VersionHandler {
 					import_text LONGTEXT NULL DEFAULT NULL,
 					created datetime NOT NULL,
 					modified datetime NULL DEFAULT NULL,
-					PRIMARY KEY  (id)) 
-					CHARACTER SET " . $this->dbl->charset . (!empty($this->dbl->collate) ? " COLLATE=" . $this->dbl->collate  : "") . ";
-				");
+					PRIMARY KEY  (id))
+					" . $this->dbl->charset_collate . ";");
 			break;
 
 			case '4.0':
