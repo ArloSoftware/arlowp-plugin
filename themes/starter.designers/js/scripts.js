@@ -176,6 +176,7 @@ jQuery(function ($) {
 
         function expandMobile(event, _this) {
             if (!$(event.target).is('a:not(.btn-expand), button')) {
+                if ($(event.target).parent().is('a:not(.btn-expand)')) { return; };
                 if ($(event.target).closest('.schedule-date').length > 0) { return; };
                 event.preventDefault();
                 var eventItem = $(_this).closest('.event, .catalogue-item, .online-activity, .schedule-item');
