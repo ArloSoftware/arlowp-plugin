@@ -173,7 +173,6 @@ class Arlo_For_Wordpress_Admin {
 			
 			if ($screen->id == $this->plugin_screen_hook_suffix) {
 				wp_enqueue_style( $this->plugin_slug .'-codemirror', plugins_url( 'assets/css/libs/codemirror.css', __FILE__ ), array(), VersionHandler::VERSION );
-				wp_enqueue_style( $this->plugin_slug .'-jquery-ui', plugins_url( 'assets/css/libs/jquery-ui.min.css', __FILE__ ), array(), VersionHandler::VERSION );
 				wp_enqueue_style( $this->plugin_slug .'-fancybox', 'https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.0.47/jquery.fancybox.min.css', array(), '3.0.47' );
 			}
 		}
