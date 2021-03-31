@@ -22,14 +22,14 @@ class OnlineActivities extends BaseImporter {
 					", 
 					$item->OnlineActivityID,
 					$item->TemplateID,
-					@$item->Code,
+					!empty($item->Code) ? $item->Code : null,
 					$item->Name,
-					@$item->DeliveryDescription,
+					!empty($item->DeliveryDescription) ? $item->DeliveryDescription : null,
 					$item->ViewUri,
 					json_encode($item->ReferenceTerms),
 					(!empty($item->Credits) ? json_encode($item->Credits) : ''),
-					@$item->RegistrationInfo->RegisterMessage,
-					@$item->RegistrationInfo->RegisterUri,
+					!empty($item->RegistrationInfo) && !empty($item->RegistrationInfo->RegisterMessage) ? $item->RegistrationInfo->RegisterMessage : null,
+					!empty($item->RegistrationInfo) && !empty($item->RegistrationInfo->RegisterUri) ? $item->RegistrationInfo->RegisterUri : null,
 					(!empty($item->Region) ? $item->Region : ''),
 					$this->import_id
 				)

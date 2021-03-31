@@ -22,10 +22,10 @@ class Categories extends BaseImporter {
 			$item->CategoryID,
 			$item->Name,
 			$slug,
-			@$item->Description->Text,
-			@$item->Footer->Text,
-			@$item->SequenceIndex,
-			@$item->ParentCategoryID,
+			!empty($item->Description) && !empty($item->Description->Text) ? $item->Description->Text : null,
+			!empty($item->Footer) && !empty($item->Footer->Text) ? $item->Footer->Text : null,
+			!empty($item->SequenceIndex) ? $item->SequenceIndex : null,
+			!empty($item->ParentCategoryID) ? $item->ParentCategoryID : null,
 			$this->import_id
 		) );
 

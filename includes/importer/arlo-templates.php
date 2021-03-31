@@ -16,7 +16,9 @@ class Templates extends BaseImporter {
 
 	protected function save_entity($item) {
 		$this->slug = sanitize_title($item->TemplateID . ' ' . $item->Name);
-		$post_id = $this->save_update_wp_post($item->Name, @$item->Description->Summary);
+
+		$description_summary = !empty($item->Description) && !empty($item->Description->Summary) ? $item->Description->Summary : null;
+		$post_id = $this->save_update_wp_post($item->Name, $description_summary);
 
 		if ($post_id > 0) {
 			$query = $this->dbl->query(
@@ -26,10 +28,10 @@ class Templates extends BaseImporter {
 					VALUES ( %d, %s, %s, %s, %s, %s, %d, %s, %s, %s, %s, %s, %s, %s, %s) 
 					", 
 					$item->TemplateID,
-					@$item->Code,
+					!empty($item->Code) ? $item->Code : null,
 					$item->Name,
-					@$item->Description->Summary,
-					@$item->AdvertisedDuration,
+					$description_summary,
+					!empty($item->AdvertisedDuration) ? $item->AdvertisedDuration : null,
 					$this->slug,
 					$post_id,
 					$this->import_id,
@@ -159,10 +161,10 @@ class Templates extends BaseImporter {
 					VALUES ( %d, %s, %s, %s, %s, %s ) 
 					", 
 					$this->id,
-					@$content->FieldName,
-					@$content->Content->Text,
+					!empty($content->FieldName) ? $content->FieldName : null,
+					!empty($content->Content) && !empty($content->Content->Text) ? $content->Content->Text : null,
 					$index,
-					@$content->Content->ContentType,
+					!empty($content->Content) && !empty($content->Content->ContentType) ? $content->Content->ContentType : null,
 					$this->import_id
 				));
 				
