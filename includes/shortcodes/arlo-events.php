@@ -880,6 +880,7 @@ class Events {
         $course_snippet['name'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'e_name');
 
         $course_snippet['description'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'et_descriptionsummary');
+        $course_snippet['provider'] = self::get_rich_snippet_organizer();
 
         $et_link = \Arlo\Utilities::get_absolute_url( self::get_et_link($GLOBALS['arlo_eventtemplate'],$link) );
 
@@ -887,6 +888,13 @@ class Events {
         $course_snippet = Shortcodes::create_rich_snippet( json_encode($course_snippet) );
 
         return $event_snippet . $course_snippet;
+    }
+
+    private static function get_rich_snippet_organizer(){
+        return array(
+            '@type'=> 'Organization',
+            'name' =>  get_bloginfo( 'name' ),
+        );
     }
 
     private static function get_et_link($event_template,$link) {
@@ -915,6 +923,13 @@ class Events {
         $event_snippet['@context'] = 'http://schema.org';
         $event_snippet['@type'] = 'Event';
         $event_snippet['name'] = Shortcodes::get_rich_snippet_field($GLOBALS['arlo_event_list_item'],'e_name');
+        $event_snippet['organizer'] = self::get_rich_snippet_organizer();
+
+        if (!empty($GLOBALS['arlo_eventtemplate']['et_hero_image'])){
+            $event_snippet['image'] = $GLOBALS['arlo_eventtemplate']['et_hero_image'];
+        } else if (!empty($GLOBALS['arlo_eventtemplate']['et_list_image'])){
+            $event_snippet['image'] = $GLOBALS['arlo_eventtemplate']['et_list_image'];
+        }
 
         $event_snippet['startDate'] = Events::rich_snippet_time_format(
             $GLOBALS['arlo_event_list_item']['e_startdatetime'],
