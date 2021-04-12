@@ -1,3 +1,11 @@
+== v4.1.5 ==
+
+Bugfixes
+------------------
+Updated plugin for PHP 8
+Changed jQuery-UI dependancy to use WP supplied dependancy
+Fixed Starter Theme schedule page not linking to registration page
+
 == v4.1.4 ==
 
 Enhancement

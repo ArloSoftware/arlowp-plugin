@@ -967,7 +967,16 @@ class Arlo_For_Wordpress_Settings {
 	    <h3>What\'s new in this release</h3>
 		<p><strong>If you are experiencing problems after an update, please deactivate and re-activate the plugin and re-synchronize the data.</strong></p>
 
-		<h4>Version ' .  VersionHandler::VERSION . '</h4>
+		<h4>Version 4.1.5</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">
+				<li>Updated plugin for PHP 8</li>
+				<li>Changed jQuery-UI dependancy to use WP supplied dependancy</li>
+				<li>Fixed Starter Theme schedule page not linking to registration page</li>
+			</ul>
+		</p>
+
+		<h4>Version 4.1.4</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">
 				<li>Actions for sync start and finish: arlo_import_starting and arlo_import_finished</li>
