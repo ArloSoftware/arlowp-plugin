@@ -18,6 +18,7 @@ use Arlo\ThemeManager;
 use Arlo\TimeZoneManager;
 use Arlo\SystemRequirements;
 use Arlo\Redirect;
+use Arlo\SitemapGenerator;
 
 /**
  * Arlo for WordPress.
@@ -498,6 +499,10 @@ class Arlo_For_Wordpress {
 
 		// Add review notice
 		add_action( 'init', array( $this, 'arlo_add_review_message' ) );
+
+		// Register sitemaps
+		add_action( 'init', 'arlo_register_yoast_sitemap', 99 );
+		add_action( 'sm_buildmap', array( $this, 'arlo_register_google_xml_sitemap' ) );
 
 		// Load public-facing style sheet and JavaScript.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
@@ -1212,8 +1217,8 @@ class Arlo_For_Wordpress {
 
 		//too early to call get_selected_categories()
 		$stored_atts = [];
-		\Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, [], $stored_atts, '\Arlo\Utilities::convert_string_to_int_array');
-		\Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, [], $stored_atts, '\Arlo\Utilities::convert_string_to_int_array', null, true);
+		$stored_atts = \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, [], $stored_atts, '\Arlo\Utilities::convert_string_to_int_array');
+		$stored_atts = \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, [], $stored_atts, '\Arlo\Utilities::convert_string_to_int_array', null, true);
 		$category_slug_or_array = \Arlo\Utilities::get_att_string('category', $stored_atts);
 
 		$category_id = 0;
@@ -1320,6 +1325,18 @@ class Arlo_For_Wordpress {
 		$this->__set('scheduler', $scheduler);
 		
 		return $scheduler;
+	}
+
+	public function get_sitemap_generator() {
+		if($sitemap_generator = $this->__get('sitemap_generator')) {
+			return $sitemap_generator;
+		}
+		
+		$sitemap_generator = new SitemapGenerator($this, $this->get_dbl());
+		
+		$this->__set('sitemap_generator', $sitemap_generator);
+		
+		return $sitemap_generator;
 	}
 
 	public function get_theme_manager() {
@@ -2077,6 +2094,25 @@ class Arlo_For_Wordpress {
 		}
 
 		return $url;
+	}
+
+
+	function arlo_register_google_xml_sitemap() {
+		$add_categories_to_sitemap = arlo_get_option('arlo_add_categories_to_sitemap', false);
+
+		$generatorObject = &GoogleSitemapGenerator::GetInstance();
+		$urls = [];
+
+		$plugin = Arlo_For_Wordpress::get_instance();
+		$sitemap_generator = $plugin->get_sitemap_generator();	
+
+		if ($generatorObject != null && $add_categories_to_sitemap) {
+			$urls = array_merge($urls, $sitemap_generator->get_catalogue_sitemap_links(), $sitemap_generator->get_schedule_sitemap_links());
+
+			foreach ($urls as $url) {
+				$generatorObject->AddUrl($url);
+			}
+		} 
 	}
 }
 

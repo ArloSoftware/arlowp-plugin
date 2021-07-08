@@ -386,6 +386,17 @@ class Arlo_For_Wordpress_Settings {
 			'arlo_misc_section', 
 			['option_name' => 'keep_settings']);
 
+		$sitemap_generator = $plugin->get_sitemap_generator();
+		if ($sitemap_generator->seo_plugin_installed()) {
+			add_settings_field(
+				'arlo_add_categories_to_sitemap', 
+				'<label for="arlo_add_categories_to_sitemap">'.__('Add category pages to sitemap', 'arlo-for-wordpress' ).'</label>', 
+				array($this, 'arlo_checkbox_callback'), 
+				$this->plugin_slug, 
+				'arlo_misc_section', 
+				['option_name' => 'arlo_add_categories_to_sitemap']);
+		}
+
 		add_settings_field(
 			'arlo_fragmented_import_setting', 
 			'<label for="arlo_import_fragment_size">'.__('Import fragment size (in bytes, max 10 MB)', 'arlo-for-wordpress' ).'</label>', 

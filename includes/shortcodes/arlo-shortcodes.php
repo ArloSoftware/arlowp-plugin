@@ -150,7 +150,7 @@ class Shortcodes {
 		$settings = get_option('arlo_settings');  
 		$regions = get_option('arlo_regions');  
 		
-		if (!in_array($page_name, $valid_page_names) || !(is_array($regions) && count($regions))) return "";
+		if (!in_array($page_name, $valid_page_names) || !(is_array($regions) && count($regions) > 1)) return "";
 			
 		return self::create_filter('region', $regions, null, null, \Arlo_For_Wordpress::get_region_parameter());
 	}
@@ -158,13 +158,6 @@ class Shortcodes {
 	public static function create_filter($type, $items, $label, $group, $att_default=null, $page = '') {
 		if (count($items) == 0 || !is_array($items)) {
 			return '';
-		}
-
-		$filter_settings = get_option('arlo_filter_settings', []);
-		$page_filter_settings = get_option('arlo_page_filter_settings', []);
-
-		if (!empty($filter_settings[$group][$type][$label]) ) {
-			$label = $filter_settings[$group][$type][$label];
 		}
 
 		$urlParameter = \Arlo\Utilities::clean_string_url_parameter('arlo-' . $type);
@@ -186,35 +179,8 @@ class Shortcodes {
 				$item['id'] = $item['value'];
 			}
 
-			$option_label = '';
-			if (!empty($filter_settings[$group][$type][$item['id']])) {
-				$option_label = $filter_settings[$group][$type][$item['id']];
-			}
-			else if (!empty($filter_settings[$group][$type][$item['string']])) {
-				$option_label = $filter_settings[$group][$type][$item['string']];
-			}
-
-			$is_hidden = false;
-			if (!empty($filter_settings['hiddenfilters'][$group][$type])) {
-				$is_hidden = in_array($item['id'], $filter_settings['hiddenfilters'][$group][$type]);
-			}
-
-			if (!empty($page_filter_settings['hiddenfilters'][$page][$type])) {
-				$is_hidden = in_array($item['id'], $page_filter_settings['hiddenfilters'][$page][$type]);
-			}
-
-			$show_only = true;
-			if (!empty($page_filter_settings['showonlyfilters'][$page][$type])) {
-				$show_only = in_array($item['id'], $page_filter_settings['showonlyfilters'][$page][$type]);
-			}			
-
-			if (!$is_hidden && $show_only) {
-				$option_label = !empty($option_label) ? $option_label : $item['string'];
-
-                $selected = (strlen($selected_value) && strtolower($selected_value) == strtolower($item['value'])) ? ' selected="selected"' : '';
-
-				$options_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>' . esc_html($option_label) . '</option>';
-			}
+			$selected = (strlen($selected_value) && strtolower($selected_value) == strtolower($item['value'])) ? ' selected="selected"' : '';
+			$options_html .= '<option value="' . esc_attr($item['value']) . '"' . $selected.'>' . esc_html($item['string']) . '</option>';
 		}
 
 		if (strlen($options_html) == 0) {
