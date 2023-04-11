@@ -6,9 +6,7 @@
     "forDesigners": false,
     "demoUrl": "https://support.arlo.co/hc/en-gb/articles/115003325783",
     "externalResources": {
-        "stylesheets": [
-        	"https://fonts.googleapis.com/css?family=Open+Sans:400,600,700"
-        ],
+        "stylesheets": [],
         "javascripts": []
     },
     "images": [

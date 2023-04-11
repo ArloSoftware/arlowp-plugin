@@ -6,10 +6,7 @@
     "forDesigners": false,
     "demoUrl": "https://support.arlo.co/hc/en-gb/articles/115001600463-Jazz-WordPress-Theme",
     "externalResources": {
-        "stylesheets": [
-        	"https://fonts.googleapis.com/css?family=Montserrat",
-        	"https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700"
-        ],
+        "stylesheets": [],
         "javascripts": []
     },
     "images": [

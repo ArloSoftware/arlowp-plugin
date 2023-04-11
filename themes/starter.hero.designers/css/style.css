@@ -420,7 +420,7 @@
 .arlo#arlo .header .menu > li > a {
   position: relative;
   text-transform: uppercase;
-  font-family: 'Montserrat';
+  font-family: inherit;
   padding-right: 21px;
   display: block;
 }
@@ -448,7 +448,7 @@
 }
 .arlo#arlo .header .menu > li > a > span {
   font-size: 12px;
-  font-family: Arial;
+  font-family: inherit;
   color: inherit;
   opacity: 0.8;
   display: block;
@@ -619,7 +619,7 @@
 .arlo#arlo .header .menu > li > .classic ul > li a {
   color: #000;
   text-transform: uppercase;
-  font-family: 'Montserrat';
+  font-family: inherit;
   opacity: 0.5;
   font-size: 11px;
   line-height: 30px;
@@ -674,7 +674,7 @@
   color: #000;
   opacity: 0.5;
   text-transform: uppercase;
-  font-family: 'Montserrat';
+  font-family: inherit;
   line-height: 35px;
   font-size: 11px;
 }
@@ -717,7 +717,7 @@
 .arlo#arlo .header .menu > li > .mega .container ul.sub-menu > li a {
   color: #000;
   text-transform: uppercase;
-  font-family: 'Montserrat';
+  font-family: inherit;
   opacity: 0.5;
   font-size: 11px;
   line-height: 30px;
@@ -741,7 +741,7 @@
   color: #000;
   font-size: 12px;
   text-transform: uppercase;
-  font-family: 'Montserrat';
+  font-family: inherit;
   margin: 0;
   padding-bottom: 5px;
 }
@@ -3316,7 +3316,7 @@
   font-weight: normal;
   text-transform: uppercase;
   font-size: 13px;
-  font-family: 'Montserrat';
+  font-family: inherit;
   padding: 9px;
   background-color: #f0f0f0;
   border-color: #e6e6e6 !important;
@@ -3752,7 +3752,7 @@
   height: calc(100% - 50px);
 }
 .arlo#arlo .panel .panel-heading .panel-title {
-  font-family: 'Montserrat';
+  font-family: inherit;
   text-transform: uppercase;
   display: inline-block;
   letter-spacing: 0.02em;
@@ -3837,7 +3837,7 @@
   float: right;
 }
 .arlo#arlo .panel.panel-featured .panel-title h4 {
-  font-family: 'Montserrat';
+  font-family: inherit;
   font-size: 16px;
   text-transform: uppercase;
   color: #f0f0f0;
@@ -4075,7 +4075,7 @@
   padding-bottom: 10px;
 }
 .arlo#arlo .block-title {
-  font-family: 'Montserrat';
+  font-family: inherit;
   font-weight: 400;
   font-size: 15px;
   text-transform: uppercase;
@@ -4513,15 +4513,8 @@
 .arlo#arlo .font-arial.fs-11 {
   letter-spacing: 0.03em;
 }
-.arlo#arlo .font-montserrat {
-  font-family: 'Montserrat' !important;
-}
 .arlo#arlo .font-georgia {
   font-family: Georgia !important;
-}
-.arlo#arlo .font-open-sans {
-  font-family: 'Open Sans' !important;
-  font-weight: 300;
 }
 .arlo#arlo .font-heading {
   font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -4599,7 +4592,7 @@
 .arlo#arlo .button,
 .arlo#arlo .arlo-show-more-link,
 .arlo#arlo .arlo-no-results a {
-  font-family: "Open Sans", sans-serif;
+  font-family: inherit;
   font-size: 14px;
   font-weight: normal;
   letter-spacing: 0.01em;
@@ -6567,7 +6560,7 @@
   border-radius: 0;
   padding: 15px 20px;
   margin-right: 0;
-  font-family: 'Montserrat';
+  font-family: inherit;
   font-weight: 400;
   color: rgba(98, 98, 98, 0.7);
   font-size: 12px;
@@ -7126,7 +7119,7 @@
   background-color: #fff;
   background-image: none;
   border: 1px solid rgba(0, 0, 0, 0.07);
-  font-family: 'Open Sans', Arial, sans-serif;
+  font-family: inherit;
   -webkit-appearance: none;
   color: #2c2c2c;
   outline: 0;
@@ -7538,7 +7531,7 @@
   margin-bottom: 10px;
 }
 .arlo#arlo .form-group label:not(.error) {
-  font-family: 'Montserrat';
+  font-family: inherit;
   font-size: 11px;
   text-transform: uppercase;
   font-weight: 600;
@@ -7566,7 +7559,7 @@
 .arlo#arlo .form-group-default.required:after {
   color: #f55753;
   content: "*";
-  font-family: arial;
+  font-family: inherit;
   font-size: 20px;
   position: absolute;
   right: 15px;
@@ -8299,14 +8292,14 @@
   font-size: 14px;
   margin: 0;
   line-height: 22.7px;
-  font-family: arial;
+  font-family: inherit;
   letter-spacing: -0.006em;
   margin-top: -3px;
 }
 .arlo#arlo .card.share .card-header h6 {
   font-size: 12px;
   margin: 0;
-  font-family: arial;
+  font-family: inherit;
   opacity: .45;
 }
 .arlo#arlo .card.share .card-description {
@@ -8322,7 +8315,7 @@
   opacity: .45;
   display: block;
   font-size: 12px;
-  font-family: arial;
+  font-family: inherit;
 }
 .arlo#arlo .card.share .card-content {
   position: relative;
@@ -8382,7 +8375,7 @@
 .arlo#arlo .card.share .card-footer .time {
   float: left;
   opacity: .45;
-  font-family: arial;
+  font-family: inherit;
   margin-top: 1px;
 }
 .arlo#arlo .card.share .card-footer .reactions {
@@ -9655,7 +9648,7 @@
   transition: all 0.1s ease-in-out;
 }
 .arlo#arlo .error-number {
-  font-family: 'Montserrat';
+  font-family: inherit;
   font-size: 90px;
   line-height: 90px;
 }
@@ -10030,7 +10023,7 @@
 }
 .arlo#arlo .content p {
   font-size: 14px;
-  font-family: Arial;
+  font-family: inherit;
 }
 .arlo#arlo .demo-hero-5 {
   height: 500px;
@@ -10372,7 +10365,7 @@
 }
 .arlo#arlo .colour-demo .menu li a:not(.btn) {
   color: white;
-  font-family: 'Montserrat';
+  font-family: inherit;
   opacity: 0.5;
   text-transform: uppercase;
   font-size: 13px;
@@ -12411,7 +12404,7 @@
   }
   .arlo#arlo.arlo-sm .menu-content ul li a.search-toggle {
     padding: 10px 10px 10px 35px;
-    font-family: 'Montserrat';
+    font-family: inherit;
     position: absolute;
     bottom: 15px;
   }
@@ -13619,7 +13612,7 @@
     background-color: #fff;
     background-image: none;
     border: 1px solid rgba(0, 0, 0, 0.07);
-    font-family: 'Open Sans', Arial, sans-serif;
+    font-family: inherit;
     padding: 9px 12px;
     transition: all 0.12s ease;
     -webkit-box-shadow: none;

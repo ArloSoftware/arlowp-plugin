@@ -96,12 +96,12 @@
 .arlo .dark-tooltip,
 .arlo-widget-upcoming,
 .arlo-categories-widget {
-    font-family: Montserrat, Arial, sans-serif;
+    font-family: inherit;
 }
 
 .arlo#arlo .arlo-font2,
 .arlo-widget-upcoming .arlo-cal.arlo-left {
-    font-family: Open Sans Condensed, Arial, sans-serif;
+    font-family: inherit;
 }
 
 

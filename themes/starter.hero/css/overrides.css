@@ -3,7 +3,7 @@
 .tingle-modal.arlo  {
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
-  font-family: 'Open Sans', Arial, sans-serif;
+  font-family: inherit;
   font-weight: 300;
   letter-spacing: 0.01em;
   -webkit-font-smoothing: antialiased;
@@ -66,7 +66,7 @@
 .tingle-modal.arlo h5,
 .tingle-modal.arlo h6 {
   margin: 10px 0;
-  font-family: 'Open Sans', sans-serif;
+  font-family: inherit;
   -webkit-font-smoothing: antialiased;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
