@@ -1049,7 +1049,7 @@ class Arlo_For_Wordpress {
 	 */
 	public function enqueue_styles() {
 
-		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-tingle', '//cdnjs.cloudflare.com/ajax/libs/tingle/0.12.0/tingle.css', VersionHandler::VERSION );
+		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-tingle', plugins_url( '../public/custom-assets/tingle/tingle.css', __FILE__), VersionHandler::VERSION );
 
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css?20170424', __FILE__ ), array(), VersionHandler::VERSION );
 
@@ -1074,7 +1074,7 @@ class Arlo_For_Wordpress {
 			//external resources
 			if (isset($stored_themes_settings[$theme_id]->externalResources->stylesheets) && is_array($stored_themes_settings[$theme_id]->externalResources->stylesheets)) {
 				foreach ($stored_themes_settings[$theme_id]->externalResources->stylesheets as $key => $stylesheet) {
-					wp_enqueue_style( $this->plugin_slug . '-theme-external-stylesheet-' . $key, $stylesheet, [], VersionHandler::VERSION );
+					wp_enqueue_style( $this->plugin_slug . '-theme-external-stylesheet-' . $key, plugins_url( $stylesheet, __FILE__), [], VersionHandler::VERSION );
 				}
 			} 			
 		}
@@ -1258,14 +1258,17 @@ class Arlo_For_Wordpress {
 	 * @since    1.0.0
 	 */
 	public function enqueue_scripts() {
-		wp_enqueue_script( $this->plugin_slug . '-plugin-script-tingle', '//cdnjs.cloudflare.com/ajax/libs/tingle/0.12.0/tingle.min.js', VersionHandler::VERSION );
-
+		
+		wp_enqueue_script( $this->plugin_slug . '-plugin-script-tingle', plugins_url( '../public/custom-assets/tingle/tingle.min.js' , __FILE__), VersionHandler::VERSION );
+		
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script', plugins_url( 'assets/js/public.js?20170424', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION );
-
+		
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script-bootstrap-modals', plugins_url( 'assets/js/libs/bootstrap-modals.min.js?20171112', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION );
-
+		
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script-darktooltip', plugins_url( 'assets/js/libs/jquery.darktooltip.min.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION );
+		
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script-cookie', plugins_url( 'assets/js/libs/js.cookie.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION );
+		
 		wp_localize_script( $this->plugin_slug . '-plugin-script', 'objectL10n', array(
 			'showmoredates' => __( 'Show me more dates', 'arlo-for-wordpress' ),
 		) );
@@ -1288,7 +1291,7 @@ class Arlo_For_Wordpress {
 			//external resources
 			if (isset($stored_themes_settings[$theme_id]->externalResources->javascripts) && is_array($stored_themes_settings[$theme_id]->externalResources->javascripts)) {
 				foreach ($stored_themes_settings[$theme_id]->externalResources->javascripts as $key => $script) {
-					wp_enqueue_script( $this->plugin_slug . '-theme-external-script-' . $key, $script, [], VersionHandler::VERSION );
+					wp_enqueue_script( $this->plugin_slug . '-theme-external-script-' . $key, plugins_url( $script , __FILE__), [], VersionHandler::VERSION );
 				}
 			} 			
 		}

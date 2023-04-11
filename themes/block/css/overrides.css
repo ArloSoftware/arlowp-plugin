@@ -108,9 +108,9 @@
 .arlo .dark-tooltip,
 .arlo-widget-upcoming,
 .arlo-categories-widget {
-    font-family: Roboto, Arial, sans-serif;
+    font-family: inherit;
 }
 
 .arlo#arlo .arlo-font2 {
-    font-family: Roboto, Arial, sans-serif;
+    font-family: inherit;
 }

@@ -173,7 +173,7 @@ class Arlo_For_Wordpress_Admin {
 			
 			if ($screen->id == $this->plugin_screen_hook_suffix) {
 				wp_enqueue_style( $this->plugin_slug .'-codemirror', plugins_url( 'assets/css/libs/codemirror.css', __FILE__ ), array(), VersionHandler::VERSION );
-				wp_enqueue_style( $this->plugin_slug .'-fancybox', 'https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.0.47/jquery.fancybox.min.css', array(), '3.0.47' );
+				wp_enqueue_style( $this->plugin_slug . '-fancybox', plugins_url( '../public/custom-assets/fancybox/jquery.fancybox.min.css', __FILE__), array(), '3.0.47' );
 			}
 		}
 	}
@@ -205,7 +205,7 @@ class Arlo_For_Wordpress_Admin {
 			wp_enqueue_script( $this->plugin_slug . '-plugin-script-cookie', plugins_url( '../public/assets/js/libs/js.cookie.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION );
 			wp_enqueue_script( $this->plugin_slug . '-arlo-for-wordpress-script', plugins_url( 'assets/js/arlo_for_wordpress.js?20170424', __FILE__ ), array( 'jquery', 'jquery-ui-core', $this->plugin_slug . '-plugin-script-cookie' ), VersionHandler::VERSION, true );
 			wp_enqueue_script( $this->plugin_slug . '-admin-script', plugins_url( 'assets/js/admin.js?20170424', __FILE__ ), array( 'jquery'), VersionHandler::VERSION, true );
-			wp_enqueue_script( $this->plugin_slug . '-fancybox', 'https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.0.47/jquery.fancybox.min.js', array('jquery'), '3.3.7', true );
+			wp_enqueue_script( $this->plugin_slug . '-plugin-script-tingle', plugins_url( '../public/custom-assets/fancybox/jquery.fancybox.min.js' , __FILE__), array('jquery'), '3.3.7', true );
 		}
 	}
 

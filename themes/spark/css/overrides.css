@@ -95,12 +95,12 @@
 .arlo .dark-tooltip,
 .arlo-widget-upcoming,
 .arlo-categories-widget {
-    font-family: Open Sans, Arial, sans-serif;
+    font-family: inherit;
 }
 
 .arlo#arlo .arlo-font2,
 .arlo-widget-upcoming .arlo-cal.arlo-left {
-    font-family: Open Sans, Arial, sans-serif;
+    font-family: inherit;
 }
 
 /* Buttons */
