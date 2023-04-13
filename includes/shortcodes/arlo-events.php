@@ -262,7 +262,6 @@ class Events {
                 $t1.et_post_id = $post->ID
             AND 
                 $t2.e_parent_arlo_id = 0
-            AND UTC_TIMESTAMP() < CONVERT_TZ($t2.e_startdatetime, $t2.e_startdatetimeoffset, '+00:00')
             $where
             GROUP BY 
                 e_arlo_id
@@ -1188,7 +1187,6 @@ class Events {
         
         $conditions = array(
             'template_id' => $GLOBALS['arlo_eventtemplate']['et_arlo_id'],
-            'UTC_TIMESTAMP() < CONVERT_TZ(e.e_startdatetime, e.e_startdatetimeoffset, "+00:00")' => NULL,
             'parent_id' => 0
         );
         
