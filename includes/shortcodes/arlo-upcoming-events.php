@@ -292,8 +292,7 @@ class UpcomingEvents {
         $t11 = "{$wpdb->prefix}arlo_eventtemplates_tags";
 
         $join = [];
-        // We check that the event startdatetime with offset (converted to UTC) has not passed
-        $where = 'WHERE UTC_TIMESTAMP() < CONVERT_TZ(e.e_startdatetime, e.e_startdatetimeoffset, "+00:00") AND e.e_parent_arlo_id = 0 AND e.import_id = %d';
+        $where = 'WHERE e.e_parent_arlo_id = 0 AND e.import_id = %d';
         $parameters[] = $import_id;
 
         $arlo_location = !empty($atts['location']) ? $atts['location'] : null;
