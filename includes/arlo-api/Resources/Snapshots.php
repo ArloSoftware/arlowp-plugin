@@ -16,7 +16,7 @@ class Snapshots extends Resource
 		$this->apiPath .= 'requests/';
 		$this->__set('api_path', $this->apiPath);
 		
-		$results = $this->request(null, $post_data, true, false);
+		$results = $this->request(null, $post_data);
 		
 		return $results;
 	}
