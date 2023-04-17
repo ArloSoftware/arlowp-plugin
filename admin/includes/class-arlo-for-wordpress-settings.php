@@ -967,6 +967,13 @@ class Arlo_For_Wordpress_Settings {
 	    <h3>What\'s new in this release</h3>
 		<p><strong>If you are experiencing problems after an update, please deactivate and re-activate the plugin and re-synchronize the data.</strong></p>
 
+		<h4>Version 4.1.6</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">
+				<li>Update to use https instead of http for snapshots</li>
+			</ul>
+		</p>
+
 		<h4>Version 4.1.5</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">

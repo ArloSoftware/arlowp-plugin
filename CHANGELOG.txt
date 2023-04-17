@@ -1,3 +1,7 @@
+== v4.1.6 ==
+
+Update to use https instead of http for snapshots
+
 == v4.1.5 ==
 
 Bugfixes
