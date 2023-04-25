@@ -36,8 +36,9 @@ This repository contains the source code for the [Arlo for WordPress](https://wo
 To deploy a new release of the plugin, follow these steps:
 
 1. Create a release branch from the current `master` branch, e.g., `git checkout -b release/4.1.6 master`.
-1. Update the version number in the `readme.txt` file.
+1. Update the version number in the `readme.txt` file and include the changes made in the release.
 1. Update the `CHANGELOG.txt` file to include the changes made in the new release.
+1. Update the version number in `arlo-for-wordpress.php`.
 1. Update the `arlo-for-wordpress-settings.php` file to include the changes made in the new release.
 1. Update the version number in the `includes/arlo-version-handler.php` file.
 1. Commit your changes with a descriptive commit message.
