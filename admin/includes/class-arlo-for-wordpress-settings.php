@@ -967,6 +967,14 @@ class Arlo_For_Wordpress_Settings {
 	    <h3>What\'s new in this release</h3>
 		<p><strong>If you are experiencing problems after an update, please deactivate and re-activate the plugin and re-synchronize the data.</strong></p>
 
+		<h4>Version 4.2.0</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">
+				<li>Remove CDN References for GDPR</li>
+				<li>Show scheduled and upcoming events, fixes #451</li>
+			</ul>
+		</p>
+		
 		<h4>Version 4.1.6</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">
