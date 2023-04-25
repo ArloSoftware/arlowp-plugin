@@ -52,7 +52,7 @@ To deploy a new release of the plugin, follow these steps:
    - Write a title and release notes, including the changes made in the new release.
    - Click "Publish release."
 1. The GitHub Action will automatically deploy the plugin to the WordPress plugin repository upon creating the new release.
-
+1. To double check that the deployment has succeeded go to [Arlo for WordPress Plugin Page](https://wordpress.org/plugins/arlo-training-and-event-management-system/) and check the Version is updated, you may have to wait a few minutes and then do a hard refresh.
 ## Resources
 - [Arlo for WordPress Plugin Page](https://wordpress.org/plugins/arlo-training-and-event-management-system/)
 - [Arlo WordPress Plugin Documentation](https://developer.arlo.co/doc/wordpress/index)
