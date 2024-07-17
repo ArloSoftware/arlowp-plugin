@@ -46,11 +46,6 @@ class Shortcodes {
 			//updated by Peter for theme.z
        		return '<div class="arlo-powered-by"><a aria-label="Arlo Powered By" href="https://www.arlo.co/?utm_source=arlo%20client%20site&utm_medium=referral%20arlo%20powered%20by&utm_campaign=powered%20by" target="_blank">' .  sprintf(__('Powered by %s', 'arlo-for-wordpress'), '<img src="' . plugins_url("", __FILE__ ) . '/../../public/assets/img/Arlo-logo.svg" alt="Arlo training & Event Software">') . '</a></div>';
     	});
-
-		//updated by Peter for theme.z
-		self::add('wrap', function ($content = '', $atts = [], $shortcode_name= '', $import_id = '') {
-			return $content;
-		});
 	}
 
 	/*

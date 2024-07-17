@@ -37,6 +37,7 @@ jQuery(function($){
             'cat': 'arlo-filter-category',
             'location': 'arlo-filter-location',
             'delivery': 'arlo-filter-delivery',
+            'templatetag': 'arlo-filter-templatetag',
         };
         var page = $('#arlo-page').val();
         if (page[page.length-1] != '/') {
@@ -98,7 +99,10 @@ jQuery(function($){
                 var pagerHtml = $(html).find('.arlo-pager').html()
                 $(".arlo-pager").html(pagerHtml);
                 $(that).removeAttr('disabled');
-                initCategory($categoriesHtml.find('.arlo-btn-more-event'))
+                var $moreEvents = $categoriesHtml.find('.arlo-btn-more-event');
+                $moreEvents.each(function() {
+                    initCategory($(this))
+                })
                 if(!hasNextPage()) {
                     $(that).parent().hide(); //hide load more ,if there is no next link
                 }

@@ -279,7 +279,10 @@ class Templates {
         $filter_settings = get_option('arlo_page_filter_settings', []);        
         
         $templates = arlo_get_option('templates');
-        $content = $templates[$template_name]['html'];
+        //updated by Peter for theme.z
+        //TODO: remenber recover it
+        // $content = $templates[$template_name]['html'];
+        $content = arlo_get_template($template_name);
 
         self::$event_template_atts = self::get_event_template_atts($atts, $import_id);
 
@@ -603,6 +606,57 @@ class Templates {
         if(!isset($GLOBALS['arlo_eventtemplate']['et_viewuri'])) return '';
 
         return htmlentities($GLOBALS['arlo_eventtemplate']['et_viewuri'], ENT_QUOTES, "UTF-8");        
+    }
+
+    //updated by Peter for theme.z
+    private static function shortcode_event_template_presenters($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+
+        // merge and extract attributes
+        extract(shortcode_atts(array(
+            'layout' => '',
+            'link' => 'permalink'
+        ), $atts, $shortcode_name, $import_id));
+
+        $output = '';
+
+        if ($layout == 'list') {
+            $output .= '<ul class="arlo-list event-presenters">';
+        }
+
+        $e_id = isset($GLOBALS['arlo_eventtemplate']['et_arlo_id']) ? $GLOBALS['arlo_eventtemplate']['et_arlo_id'] : $GLOBALS['arlo_event_list_item']['et_arlo_id'];
+        $items = \Arlo\Entities\Presenters::get(['template_id' => $e_id], null, null, $import_id);
+
+        $presenters = array();
+
+        foreach($items as $item) {
+
+            switch($link) {
+                case 'yes':
+                case 'permalink': 
+                    $permalink = get_permalink(arlo_get_post_by_name($item['p_post_name'], 'arlo_presenter'));
+                    break;
+                case 'viewuri': 
+                    $permalink = $item['p_viewuri'];
+                    break;
+                case 'false':
+                    $permalink = '';
+                    break;
+                default: 
+                    $permalink = $link;
+            }
+
+            $presenter_name = htmlentities($item['p_firstname'], ENT_QUOTES, "UTF-8") . ' ' . htmlentities($item['p_lastname'], ENT_QUOTES, "UTF-8");
+
+            $presenters[] = ($layout == 'list' ? '<li>' : '') . (!empty($link) ? '<a href="' . $permalink . '">' . $presenter_name . '</a>' : $presenter_name) . ($layout == 'list' ? '<li>' : '');
+        }
+
+        $output .= implode(($layout == 'list' ? '' : ', '), $presenters);
+
+        if ($layout == 'list') {
+            $output .= '</ul>';
+        }
+
+        return $output;        
     }
 
     private static function shortcode_event_template_summary($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -1201,24 +1255,7 @@ class Templates {
                 //query cid first ,then 
                 $climit = intval($atts['climit']);
                 $coffset = ($page - 1) * $climit;
-                $csql = "
-                SELECT
-                    DISTINCT c.c_arlo_id
-                FROM 
-                    $t1 et 
-                " . implode("\n", $join) . "
-                LEFT JOIN $t2 post 
-                    ON et.et_post_id = post.ID 
-                LEFT JOIN $t3 etc
-                    ON etc.et_arlo_id = et.et_arlo_id AND etc.import_id = et.import_id
-                LEFT JOIN $t4 c
-                    ON c.c_arlo_id = etc.c_arlo_id AND c.import_id = etc.import_id
-                LEFT JOIN $t5 e
-                    ON e.et_arlo_id = et.et_arlo_id AND e.import_id = et.import_id
-                $where AND c.c_arlo_id is not null
-                $group 
-                $order
-                LIMIT $coffset,$climit ";
+                $csql = sprintf($sql_tpl, 'DISTINCT c.c_arlo_id' ,"$where AND c.c_arlo_id is not null" ,$group,$order, "LIMIT $coffset,$climit");
                 $cquery = $wpdb->prepare($csql, $parameters);
                 $categories = $wpdb->get_results($cquery, ARRAY_A);
                 //$where .= " AND c.c_arlo_id in ('". implode('\',\'', array_column($categories, 'c_arlo_id')) . "')";

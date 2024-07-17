@@ -83,7 +83,6 @@
                 padding: 0;
                 svg{
                     height: 60%;
-                    
                 }
             }
             &.gray{
@@ -353,6 +352,7 @@
                     padding-left: 20px;
                     background-color: var(--secondary-background-color);
                     transition: all 0.2s;
+                    font-weight: normal;
                     &.arlo-event-full,&.arlo-register{
                         background-color: var(--primary-theme-color);
                         &:hover{

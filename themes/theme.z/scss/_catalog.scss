@@ -126,7 +126,14 @@
                     flex-direction: row;
                     gap: 12px;
                 }
-                .arlo-event-filter{
+                #arlo-event-filter{
+                    display: flex;
+                    flex-direction: row;
+                    gap: 0.5em;
+                    flex-wrap: wrap;
+                    select{
+                        margin-right: 0;
+                    }
                     .arlo-filters-buttons{
                         display: none;
                     }
@@ -163,8 +170,8 @@
             }
             #arlo-event-filter{
                 display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                column-gap: 12px;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
                 width: 100%;
                 select{
                    width: 100%;

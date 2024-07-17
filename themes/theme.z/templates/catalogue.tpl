@@ -28,7 +28,7 @@
         <!-- <div class="arlo-catalog-filters-tags" role="listbox" aria-label="Please select the category">
             [arlo_categories  counts=" (%s)"]
         </div> -->
-        [arlo_event_template_filters  hidereset="true" buttonclass="arlo-button" wrap='<div class="arlo-catalog-filters-selects">%s</div>']
+        [arlo_event_template_filters filters="category,location,delivery,templatetag" hidereset="true" buttonclass="arlo-button" wrap='<div class="arlo-catalog-filters-selects">%s</div>']
     </div>
   
     <div class="arlo-catalog-category-wrppaer">
@@ -46,8 +46,7 @@
             <div>
                 <div class="arlo-events-item-cover">
                 [arlo_event_template_list_image alt_use_event_name="true"]
-                [arlo_event_start_date ashtml="true" format='<div class="arlo-events-item-cover-date"><p>%b</p><p>%m</p><p>%Y</p></div>']
-                    
+                [arlo_event_next_running ignore_resiter_link="true" template_link="none" removeyear="false" format_as_html="true" format='<div class="arlo-events-item-cover-date"><p>%b</p><p>%d</p><p>%Y</p></div>']
                 </div>
                 <div class="arlo-events-item-main">
                     [arlo_event_template_permalink wrap='<h3><a href="%s">'][arlo_event_template_name]</a></h3>
@@ -55,14 +54,14 @@
                     <hr />
                     [arlo_event_template_tags layout="list" wrapperclass="arlo-events-item-main-tags"]
                     <div class="arlo-events-item-main-info" role="rowgroup">
-                        <div role="row" aria-label="event location" ><i role="presentation" class="fa-solid fa-location-dot"></i><span>[arlo_event_location]</span></div>
-                        <div role="row" aria-label="event presenters"><i role="presentation" class="fa-solid fa-user"></i>[arlo_event_presenters wrap='<div class="arlo-event-presenters">%s</div>']</div>
+                        [arlo_event_location wrap='<div role="row" aria-label="event location" ><i role="presentation" class="fa-solid fa-location-dot"></i><span>%s</span></div>']
+                        [arlo_event_template_presenters wrap='<div role="row" aria-label="event presenters"><i role="presentation" class="fa-solid fa-user"></i><div class="arlo-event-presenters">%s</div></div>']
                         [arlo_event_template_advertised_duration wrap='<div role="row" aria-label="event time"><i class="fa-solid fa-clock"></i><span>%s</span></div>']
                         <div role="row" aria-label="event price"><i role="presentation" class="fa-solid fa-tag"></i>[arlo_event_price wrap="<span><strong>%s</strong></span>" showfrom="true"]</div>
                     </div>
                 </div>
             </div>
-            [arlo_event_next_running aftertext=' <i role="presentation" class="fa-solid fa-arrow-right"></i>' registertext='Register interest <i role="presentation" class="fa-solid fa-arrow-right"></i>' text='View upcoming dates <i class="fa-solid fa-arrow-right"></i>']
+            [arlo_event_next_running template_link="permalink" aftertext=' <i role="presentation" class="fa-solid fa-arrow-right"></i>' text='View upcoming dates']
           </div>
       [/arlo_event_template_list_item]
     </div>

@@ -997,6 +997,7 @@ template {
   padding-left: 20px;
   background-color: var(--secondary-background-color);
   transition: all 0.2s;
+  font-weight: normal;
 }
 .arlo .arlo-desktop .arlo-events-item > a.arlo-event-full, .arlo .arlo-desktop .arlo-events-item > a.arlo-register {
   background-color: var(--primary-theme-color);
@@ -1474,7 +1475,16 @@ template {
   flex-direction: row;
   gap: 12px;
 }
-.arlo .arlo-desktop .arlo-catalog-filters .arlo-event-filter .arlo-filters-buttons {
+.arlo .arlo-desktop .arlo-catalog-filters #arlo-event-filter {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5em;
+  flex-wrap: wrap;
+}
+.arlo .arlo-desktop .arlo-catalog-filters #arlo-event-filter select {
+  margin-right: 0;
+}
+.arlo .arlo-desktop .arlo-catalog-filters #arlo-event-filter .arlo-filters-buttons {
   display: none;
 }
 .arlo .arlo-desktop .arlo-catalog-category {
@@ -1502,9 +1512,8 @@ template {
 }
 .arlo .arlo-pad .arlo-catalog #arlo-event-filter {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  -moz-column-gap: 12px;
-       column-gap: 12px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
   width: 100%;
 }
 .arlo .arlo-pad .arlo-catalog #arlo-event-filter select {

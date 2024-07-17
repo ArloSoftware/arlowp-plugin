@@ -342,9 +342,7 @@ class Events {
         $event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
 
         $format = (!empty($atts['format']) ? $atts['format'] : '');
-        //updated by Tony for theme.z
-        $result = self::event_date_formatter($format, $event['e_startdatetime'], $event['e_startdatetimeoffset'], $event['e_starttimezoneabbr'], $event['e_timezone_id'], $event['e_isonline']);
-        return isset($atts['ashtml']) ? $result : esc_html($result);
+        return esc_html(self::event_date_formatter($format, $event['e_startdatetime'], $event['e_startdatetimeoffset'], $event['e_starttimezoneabbr'], $event['e_timezone_id'], $event['e_isonline']));
     }
 
     private static function shortcode_event_end_date($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -1173,12 +1171,16 @@ class Events {
             'buttonclass' => '',
             'dateclass' => '',
             'format' => 'd M y',
+            'format_as_html' => 'false', //added by Tony for theme.z
+            'ignore_resiter_link' => 'false',//added by Tony for theme.z ,output nothing if the result is register
             'layout' => '',
             'limit' => 1,
             'removeyear' => "true",
             'text' => '{%date%}',
             'template_link' => 'registerlink'
         ), $atts, $shortcode_name, $import_id));
+        //added by Tony for theme.z
+        $aftertext = isset($atts['aftertext']) ? $atts['aftertext']: '';
 
         if (strpos($format, '%') === false && strcmp($format, 'period') != 0) {
             $format = DateFormatter::date_format_to_strftime_format($format);
@@ -1246,13 +1248,13 @@ class Events {
         
         if($events_count == 0 && $oa_count == 0 && !empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) {
             //updated by Tony for Theme.Z
-            $return .= ($layout == 'list' ? "<li>" : "");
-            $reglabel = __('Register interest', 'arlo-for-wordpress');
-            if(isset($atts['registertext'])) {
-                $reglabel = $atts['registertext'];
+            //if we just want the date string
+            if($ignore_resiter_link != 'true') {
+                $return .= ($layout == 'list' ? "<li>" : "");
+                $reglabel = __('Register interest', 'arlo-for-wordpress') . $aftertext;
+                $return .= '<a href="' . esc_url($GLOBALS['arlo_eventtemplate']['et_registerinteresturi']) . '" title="' . __('Register interest', 'arlo-for-wordpress') . '" class="' . esc_attr($buttonclass) . '">' . $reglabel . '</a>';
+                $return .= ($layout == 'list' ? "</li>" : "");
             }
-            $return .= '<a href="' . esc_url($GLOBALS['arlo_eventtemplate']['et_registerinteresturi']) . '" title="' . __('Register interest', 'arlo-for-wordpress') . '" class="' . esc_attr($buttonclass) . '">' . $reglabel . '</a>';
-            $return .= ($layout == 'list' ? "</li>" : "");
         } else {
             if ($display_count && $events_count) {
                 $return .= ($layout == 'list' ? "<li>" : "");
@@ -1302,7 +1304,9 @@ class Events {
                             $date = self::event_date_formatter($dateFormat, $event->e_startdatetime, $event->e_startdatetimeoffset, $event->e_starttimezoneabbr, $event->e_timezone_id, $event->e_isonline);
                         }
     
-                        $display_text = str_replace(['{%date%}', '{%location%}'], [esc_html($date), esc_html($location)], $text);
+                        //updated by Tony for theme.z
+                        $datestr = $format_as_html == 'true' ? $date : esc_html($date);
+                        $display_text = str_replace(['{%date%}', '{%location%}'], [$datestr, esc_html($location)], $text . $aftertext);
 
                         $link = ($layout == 'list' ? "<li>" : "");
     
@@ -1339,7 +1343,7 @@ class Events {
                         }
     
                         $link .= ($layout == 'list' ? "</li>" : "");
-    
+
                         $return_links[] = $link;
                     }   
                 }   
@@ -1375,7 +1379,7 @@ class Events {
                             $href = 'href="' . esc_url($url) . '"';
                             break;
                     }
-                    $aftertext = isset($atts['aftertext']) ? $atts['aftertext']: '';
+                    
                     $return .= sprintf('<%s %s class="%s">%s'. $aftertext .'</%s>', $tag, $href, $class, $reference_terms['Singular'], $tag);
                 }
             }

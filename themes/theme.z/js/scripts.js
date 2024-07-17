@@ -121,7 +121,8 @@ jQuery(function($){
             var hasCategoryFilter = $("#arlo-filter-category").val()
             var hasDeliveryFfilter = $("#arlo-filter-delivery").val()
             var hasLoactionFilter = $("#arlo-filter-location").val()
-            if(hasCategoryFilter || hasDeliveryFfilter || hasLoactionFilter) {
+            var hasTagFilter = $("#arlo-filter-templatetag").val()
+            if(hasCategoryFilter || hasDeliveryFfilter || hasLoactionFilter || hasTagFilter) {
                 $(".arlo-catalog-mobild-filter").trigger('click')
             }
         }
