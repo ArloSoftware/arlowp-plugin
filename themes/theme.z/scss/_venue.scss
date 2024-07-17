@@ -1,0 +1,130 @@
+.arlo{
+    //venue page
+    &-venue{
+        display: flex;
+        flex-direction: column;
+        &-basic{
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            &-name{
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                &>h1{
+                    font-size: 40px;
+                    font-weight: 400;
+                }
+            }
+            &-address{
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                font-weight: 400;
+                &>h2{
+                    font-weight: 500;
+                    span{
+                        width: 36px;
+                        height: 36px;
+                        padding: 8px;
+                        box-sizing: border-box;
+                        border-radius: 4px;
+                        background-color: var(--primary-theme-color);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin-right: 12px;
+                    }
+                }
+                &>p{
+                    font-weight: 400;
+                    line-height: 24px;
+                }
+            }
+            .arlo-button{
+                margin-top: 24px;
+                width: 156px;
+            }
+        }
+        &-map{
+            height: 440px;
+            width: 100%;
+            margin-top: 48px;
+            border: none;
+        }
+        &-info{
+            display: flex;
+            flex-direction: row;
+            margin-top: 50px;
+            gap: 40px;
+            &>div{
+                flex: 1;
+            }
+        }
+        &-group{
+            display: flex;
+            flex-direction: column;
+            &:first-child{
+                position: relative;
+                &::after{
+                    content: ' ';
+                    height: 100%;
+                    width: 1px;
+                    background-color: var(--primary-card-border-color);
+                    position: absolute;
+                    right: -1px;
+                    top: 0;
+                }
+            }
+            &>h2{
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                font-size: 20px;
+                i{
+                    height: 30px;
+                    width: 30px;
+                    margin-right: 10px;
+                }
+            }
+            &>p{
+                margin-top: 28px;
+                font-size: 18px;
+            }
+        }
+
+
+
+        @media screen  and (max-width: 1200px) {
+            &-basic{
+                flex-direction: column;
+                gap: 48px;
+            }
+            &-info{
+                flex-direction: column;
+                gap: 48px;
+            }
+            &-group{
+                &:first-child{
+                    &::after{
+                        display: none;
+                    }
+                }
+            }
+        }
+
+        @media screen and  (max-width: 720px) {
+            &-basic{
+                gap: 32px;
+            }
+            &-map{
+                height: 240px;
+            }
+            &-group{
+                &>p{
+                    margin-top: 24px;
+                }
+            }
+        }
+    }
+}

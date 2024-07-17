@@ -1,0 +1,17 @@
+.arlo{
+    &-schedules{
+        display: flex;
+        flex-direction: column;
+        margin-top: 24px;
+        
+
+
+        @media screen  and (max-width: 1200px) {
+
+        }
+
+        @media screen and  (max-width: 720px) {
+
+        }
+    }
+}

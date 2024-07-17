@@ -43,8 +43,14 @@ class Shortcodes {
 
 		//powered by Arlo
 		self::add('powered_by', function ($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-       		return '<div class="arlo-powered-by"><a href="https://www.arlo.co/?utm_source=arlo%20client%20site&utm_medium=referral%20arlo%20powered%20by&utm_campaign=powered%20by" target="_blank">' .  sprintf(__('Powered by %s', 'arlo-for-wordpress'), '<img src="' . plugins_url("", __FILE__ ) . '/../../public/assets/img/Arlo-logo.svg" alt="Arlo training & Event Software">') . '</a></div>';
+			//updated by Peter for theme.z
+       		return '<div class="arlo-powered-by"><a aria-label="Arlo Powered By" href="https://www.arlo.co/?utm_source=arlo%20client%20site&utm_medium=referral%20arlo%20powered%20by&utm_campaign=powered%20by" target="_blank">' .  sprintf(__('Powered by %s', 'arlo-for-wordpress'), '<img src="' . plugins_url("", __FILE__ ) . '/../../public/assets/img/Arlo-logo.svg" alt="Arlo training & Event Software">') . '</a></div>';
     	});
+
+		//updated by Peter for theme.z
+		self::add('wrap', function ($content = '', $atts = [], $shortcode_name= '', $import_id = '') {
+			return $content;
+		});
 	}
 
 	/*
@@ -221,7 +227,9 @@ class Shortcodes {
 			return '';
 		}
 
-		$filter_html = '<select id="arlo-filter-' . esc_attr($type) . '" class="arlo-filter-' . esc_attr($type) . '" name="arlo-' . esc_attr($type) . '">';
+		$aria_label = $type;
+		if($type == 'delivery') $aria_label = 'delivery option';
+		$filter_html = '<select aria-placeholder="Select your ' . esc_attr($aria_label) . '" aria-label="Select your ' . esc_attr($aria_label) . '" id="arlo-filter-' . esc_attr($type) . '" class="arlo-filter-' . esc_attr($type) . '" name="arlo-' . esc_attr($type) . '">';
 		
 		if (!is_null($label))
 			$filter_html .= '<option value="">' . esc_html($label) . '</option>';

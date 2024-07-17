@@ -1,0 +1,120 @@
+.arlo{
+    //presenter
+    &-presenter{
+        display: flex;
+        flex-direction: column;
+        &-info{
+            display: flex;
+            flex-direction: row;
+            gap: 48px;
+            &-basic{
+                display: flex;
+                flex-direction: column;
+                &-avatar{
+                    padding: 20px;
+                    width: 368px;
+                    height: 368px;
+                    box-sizing: border-box;
+                    border: 1px solid var(--primary-card-border-color);
+                    box-shadow: 0px 0px 8px var(--primary-card-shadow-color);
+                    div{
+                        width: 100%;
+                        height: 100%;
+                        background-color: gray;
+                    }
+                }
+                &>div{
+                    display: flex;
+                    flex-direction: column;
+                    &>h1{
+                        font-size: 40px;
+                        margin-top: 32px;
+                        font-weight: 400;
+                    }
+                }
+                
+                &-social{
+                    margin-top: 24px;
+                    display: flex;
+                    flex-direction: row;
+                    gap: 16px;
+                    &>div{
+                        width: 44px;
+                        height: 44px;
+                        background-size: cover;
+                        background-position: center;
+                        background-color: gray;
+                    }
+                }
+            }
+            &-description{
+                flex: 1;
+                font-size: 16px;
+                &-content{
+                    line-height: 23px;
+                    margin: 8px 0;
+                    p{
+                        line-height: 23px;
+                        margin: 8px 0;
+                    }
+                }
+                &-section{
+                    font-size: 20px;
+                    color: var(--primary-light-text-color);
+                    margin: 48px 0 24px 0;
+                }
+            }
+        }
+        &-divider{
+            margin: 64px 0;
+            border: none;
+            border-bottom: 1px solid var(--primary-card-border-color);
+        }
+        &-events{
+            display: flex;
+            flex-direction: column;
+            .arlo-events {
+                display: unset;
+                &-item{
+                    width: 100%;
+                }
+            }
+            &>h1{
+                font-size: 32px;
+                margin-bottom: 32px;
+                font-weight: 500;
+            }
+        }
+
+
+        .swiper-slide{
+            width: 382px;
+        }
+
+        @media screen  and (max-width: 1200px) {
+            &-info{
+                flex-direction: column;
+                &-basic{
+                    flex-direction: row;
+                    align-items: center;
+                    gap: 48px;
+                }
+            }
+            &-events{
+                .arlo-events{
+                    &-item{
+                        width: 318px;
+                    }
+                }
+            }
+
+            .swiper-slide{
+                width: 318px;
+            }
+        }
+
+        @media screen and  (max-width: 720px) {
+
+        }
+    }
+}

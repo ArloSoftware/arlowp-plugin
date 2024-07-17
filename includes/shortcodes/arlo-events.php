@@ -311,11 +311,11 @@ class Events {
         $conditions = array(
             'id' => $event['v_id']
         );
-
         switch ($link) {
             case 'permalink': 
                 if(!($event['e_isonline'] || $event['v_id'] == 0 || $event['e_locationvisible'] == 0)) {
                     $venue = \Arlo\Entities\Venues::get($conditions, null, null, $import_id);
+                    
                     $permalink = get_permalink(arlo_get_post_by_name($venue['v_post_name'], 'arlo_venue'));
                 }                   
             break;
@@ -328,7 +328,7 @@ class Events {
                 $permalink = $link;
             break;
         }
-
+        
         if (!empty($permalink)) {
             $location = '<a href="'.$permalink.'">'.$location.'</a>';    
         }
@@ -342,7 +342,9 @@ class Events {
         $event = !empty($GLOBALS['arlo_event_session_list_item']) ? $GLOBALS['arlo_event_session_list_item'] : $GLOBALS['arlo_event_list_item'];
 
         $format = (!empty($atts['format']) ? $atts['format'] : '');
-        return esc_html(self::event_date_formatter($format, $event['e_startdatetime'], $event['e_startdatetimeoffset'], $event['e_starttimezoneabbr'], $event['e_timezone_id'], $event['e_isonline']));
+        //updated by Tony for theme.z
+        $result = self::event_date_formatter($format, $event['e_startdatetime'], $event['e_startdatetimeoffset'], $event['e_starttimezoneabbr'], $event['e_timezone_id'], $event['e_isonline']);
+        return isset($atts['ashtml']) ? $result : esc_html($result);
     }
 
     private static function shortcode_event_end_date($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -1098,7 +1100,11 @@ class Events {
 
     private static function shortcode_no_event_text($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (!empty($GLOBALS['no_event_text'])) {
-            return '<span class="arlo-no-results">' . $GLOBALS['no_event_text'] . '</span>';
+            //updated by Tony for theme.z
+            $before = isset($atts['before']) ? $atts['before'] : "";
+            $after = isset($atts['after']) ? $atts['after'] : "";
+            $text = '<span class="arlo-no-results">' . $GLOBALS['no_event_text'] . '</span>';
+            return $before . $text . $after;
         }        
     }
 
@@ -1239,8 +1245,13 @@ class Events {
         }
         
         if($events_count == 0 && $oa_count == 0 && !empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) {
+            //updated by Tony for Theme.Z
             $return .= ($layout == 'list' ? "<li>" : "");
-            $return .= '<a href="' . esc_url($GLOBALS['arlo_eventtemplate']['et_registerinteresturi']) . '" title="' . __('Register interest', 'arlo-for-wordpress') . '" class="' . esc_attr($buttonclass) . '">' . __('Register interest', 'arlo-for-wordpress') . '</a>';
+            $reglabel = __('Register interest', 'arlo-for-wordpress');
+            if(isset($atts['registertext'])) {
+                $reglabel = $atts['registertext'];
+            }
+            $return .= '<a href="' . esc_url($GLOBALS['arlo_eventtemplate']['et_registerinteresturi']) . '" title="' . __('Register interest', 'arlo-for-wordpress') . '" class="' . esc_attr($buttonclass) . '">' . $reglabel . '</a>';
             $return .= ($layout == 'list' ? "</li>" : "");
         } else {
             if ($display_count && $events_count) {
@@ -1364,8 +1375,8 @@ class Events {
                             $href = 'href="' . esc_url($url) . '"';
                             break;
                     }
-    
-                    $return .= sprintf('<%s %s class="%s">%s</%s>', $tag, $href, $class, $reference_terms['Singular'], $tag);
+                    $aftertext = isset($atts['aftertext']) ? $atts['aftertext']: '';
+                    $return .= sprintf('<%s %s class="%s">%s'. $aftertext .'</%s>', $tag, $href, $class, $reference_terms['Singular'], $tag);
                 }
             }
         }

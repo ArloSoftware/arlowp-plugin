@@ -1,0 +1,88 @@
+.arlo{
+    &-activities{
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 24px;
+        &-filter{
+            margin-bottom: 48px;
+        }
+        &-item{
+            border: 1px solid var(--primary-card-border-color);
+            box-shadow: 0px 0px 8px var(--primary-card-shadow-color);
+            width: 32%;
+            padding: 20px;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-sizing: border-box;
+            &>div:first-child{
+                display: flex;
+                flex-direction: column;
+            }
+            &-title{
+                font-size: 20px;
+                margin-bottom: 10px;
+                color: var(--primary-text-color);
+                font-weight: 500;
+            }
+            &-desc{
+                font-size: 18px;
+                margin-bottom: 10px;
+                color: var(--primary-text-color);
+                font-size: 15px;
+                font-weight: 400;
+            }
+            &-note{
+                margin: 16px 0;
+                color: #050B1A;
+                font-weight: 500;
+            }
+            &-tags{
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-top: 16px;
+                span{
+                    padding: 6px 12px;
+                    background-color: #fff4ed;
+                    border: 1px solid #F79256;
+                    color: #F79256;
+                    border-radius: 6px;
+                }
+            }
+            hr{
+                border: none;
+                border-bottom: 1px solid var(--primary-card-border-color);
+                margin-bottom: 17px;
+                margin-top: 24px;
+            }
+            &-btns{
+                display: flex;
+                gap: 10px;
+            }
+        }
+
+
+        @media screen  and (max-width: 1200px) {
+            &-item{
+                width: 348px;
+            }
+        }
+
+        @media screen and  (max-width: 720px) {
+            &-item{
+                width: 100%;
+                min-height: unset;
+                &-btns{
+                    flex-direction: column;
+                }
+                .arlo-button{
+                    width: 100%;
+                }
+            }
+        }
+    }
+}

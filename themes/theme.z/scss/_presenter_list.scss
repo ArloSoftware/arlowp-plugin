@@ -1,0 +1,61 @@
+@import './functions';
+
+.arlo{
+    //presenter-list
+    .arlo-presenters{
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+        &-item{
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0px 0px 8px var(--primary-card-shadow-color);
+            border: 1px solid var(--primary-card-border-color);
+            box-sizing: border-box;
+            &-avatar{
+                height: 242px;
+                width: 100%;
+                background-color: gray;
+                background-size: cover;
+                background-position: center;
+            }
+            &>h1{
+                font-size: 20px;
+                text-align: center;
+                margin: 24px 0;
+            }
+            .arlo-button{
+                width: 132px;
+                margin: 0 auto;
+            }
+        }
+
+        @media screen  and (max-width: 1200px) {
+            grid-template-columns: repeat(3, 1fr);
+            &-item{
+                &-avatar{
+                    height: 184px;
+                }
+            }
+        }
+
+        @media screen and  (max-width: 720px) {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            &-item{
+                &-avatar{
+                    height: 142px;
+                }
+                &>h1{
+                    margin: 16px 0;
+                    font-size: 16px;
+                    font-weight: 500;
+                }
+            }
+        }
+    }
+}
