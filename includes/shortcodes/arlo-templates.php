@@ -605,57 +605,6 @@ class Templates {
         return htmlentities($GLOBALS['arlo_eventtemplate']['et_viewuri'], ENT_QUOTES, "UTF-8");        
     }
 
-    //updated by Peter for theme.z
-    private static function shortcode_event_template_presenters($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-
-        // merge and extract attributes
-        extract(shortcode_atts(array(
-            'layout' => '',
-            'link' => 'permalink'
-        ), $atts, $shortcode_name, $import_id));
-
-        $output = '';
-
-        if ($layout == 'list') {
-            $output .= '<ul class="arlo-list event-presenters">';
-        }
-
-        $e_id = isset($GLOBALS['arlo_eventtemplate']['et_arlo_id']) ? $GLOBALS['arlo_eventtemplate']['et_arlo_id'] : $GLOBALS['arlo_event_list_item']['et_arlo_id'];
-        $items = \Arlo\Entities\Presenters::get(['template_id' => $e_id], null, null, $import_id);
-
-        $presenters = array();
-
-        foreach($items as $item) {
-
-            switch($link) {
-                case 'yes':
-                case 'permalink': 
-                    $permalink = get_permalink(arlo_get_post_by_name($item['p_post_name'], 'arlo_presenter'));
-                    break;
-                case 'viewuri': 
-                    $permalink = $item['p_viewuri'];
-                    break;
-                case 'false':
-                    $permalink = '';
-                    break;
-                default: 
-                    $permalink = $link;
-            }
-
-            $presenter_name = htmlentities($item['p_firstname'], ENT_QUOTES, "UTF-8") . ' ' . htmlentities($item['p_lastname'], ENT_QUOTES, "UTF-8");
-
-            $presenters[] = ($layout == 'list' ? '<li>' : '') . (!empty($link) ? '<a href="' . $permalink . '">' . $presenter_name . '</a>' : $presenter_name) . ($layout == 'list' ? '<li>' : '');
-        }
-
-        $output .= implode(($layout == 'list' ? '' : ', '), $presenters);
-
-        if ($layout == 'list') {
-            $output .= '</ul>';
-        }
-
-        return $output;        
-    }
-
     private static function shortcode_event_template_summary($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_eventtemplate']['et_descriptionsummary'])) return '';
         //added ny Tony for theme.z

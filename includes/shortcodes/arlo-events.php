@@ -1348,6 +1348,22 @@ class Events {
                                     $link .= '<span class="' . esc_attr($dateclass) . '">' . $display_text . '</span>';
                                 }
                                 break;
+                            case "presenterlist": //added by Tony for theme.z, if we need next running event's presenters, use this value
+                                $link .= '<ul class="arlo-list event-presenters">';
+                                $items = \Arlo\Entities\Presenters::get(['e_id' => $event->e_id], null, null, $import_id);
+                                $presenters = array();
+                                foreach($items as $item) {
+                                    $permalink = get_permalink(arlo_get_post_by_name($item['p_post_name'], 'arlo_presenter'));
+                                    $presenter_name = htmlentities($item['p_firstname'], ENT_QUOTES, "UTF-8") . ' ' . htmlentities($item['p_lastname'], ENT_QUOTES, "UTF-8");
+                                    $presenters[] = ($layout == 'list' ? '<li>' : '') . (!empty($link) ? '<a href="' . $permalink . '">' . $presenter_name . '</a>' : $presenter_name) . ($layout == 'list' ? '<li>' : '');
+                                }
+                                $link .= implode(($layout == 'list' ? '' : ', '), $presenters);
+
+                                if ($layout == 'list') {
+                                    $output .= '</ul>';
+                                }
+                                break;
+
                         }
     
                         $link .= ($layout == 'list' ? "</li>" : "");
@@ -1359,8 +1375,8 @@ class Events {
                 $return .= implode(($layout == 'list' ? "" : ", "), $return_links);
             } 
             
-            //show only, if there is no events or delivery filter set to "OA"
-            if (($events_count == 0 || (count($arlo_delivery) == 1 && $arlo_delivery[0] == 99)) && $oa_count) {
+            //show only, if there is no events or delivery filter set to "OA" ,updated by Tony for theme.z template_link != presenterlist,if it's presenterlist,just show nothing.
+            if (($events_count == 0 || (count($arlo_delivery) == 1 && $arlo_delivery[0] == 99)) && $oa_count && $template_link != 'presenterlist') {
                 $reference_terms = json_decode($oa->oa_reference_terms, true);
                 $buttonclass = 'arlo-register';
 
