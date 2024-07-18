@@ -279,10 +279,7 @@ class Templates {
         $filter_settings = get_option('arlo_page_filter_settings', []);        
         
         $templates = arlo_get_option('templates');
-        //updated by Peter for theme.z
-        //TODO: remenber recover it
-        // $content = $templates[$template_name]['html'];
-        $content = arlo_get_template($template_name);
+        $content = $templates[$template_name]['html'];
 
         self::$event_template_atts = self::get_event_template_atts($atts, $import_id);
 

@@ -54,7 +54,7 @@
                     <hr />
                     [arlo_event_template_tags layout="list" wrapperclass="arlo-events-item-main-tags"]
                     <div class="arlo-events-item-main-info" role="rowgroup">
-                        [arlo_event_location wrap='<div role="row" aria-label="event location" ><i role="presentation" class="fa-solid fa-location-dot"></i><span>%s</span></div>']
+                        [arlo_event_next_running ignore_resiter_link="true" template_link="locationlink" wrap='<div role="row" aria-label="event location" ><i role="presentation" class="fa-solid fa-location-dot"></i><span>%s</span></div>' text='{%location%}']
                         [arlo_event_template_presenters wrap='<div role="row" aria-label="event presenters"><i role="presentation" class="fa-solid fa-user"></i><div class="arlo-event-presenters">%s</div></div>']
                         [arlo_event_template_advertised_duration wrap='<div role="row" aria-label="event time"><i class="fa-solid fa-clock"></i><span>%s</span></div>']
                         <div role="row" aria-label="event price"><i role="presentation" class="fa-solid fa-tag"></i>[arlo_event_price wrap="<span><strong>%s</strong></span>" showfrom="true"]</div>

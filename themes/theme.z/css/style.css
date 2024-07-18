@@ -984,6 +984,7 @@ template {
 }
 .arlo .arlo-desktop .arlo-events-item-main-info > div span, .arlo .arlo-desktop .arlo-events-item-main-info > div a {
   font-size: 15px;
+  font-weight: normal;
 }
 .arlo .arlo-desktop .arlo-events-item-main-info > div .arlo-event-presenters {
   line-height: 20px;

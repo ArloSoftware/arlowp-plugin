@@ -1172,7 +1172,7 @@ class Events {
             'dateclass' => '',
             'format' => 'd M y',
             'format_as_html' => 'false', //added by Tony for theme.z
-            'ignore_resiter_link' => 'false',//added by Tony for theme.z ,output nothing if the result is register
+            'ignore_resiter_link' => 'false',//added by Tony for theme.z ,output nothing if the result is register, e.g ,when we just want the date or location info. we don't want the default register url to be rendered in page
             'layout' => '',
             'limit' => 1,
             'removeyear' => "true",
@@ -1340,6 +1340,14 @@ class Events {
                                 $url .= "event-" . $event->e_arlo_id . '/';
                                 $link .= self::get_event_date_link($url, $buttonclass . $fullclass . $limitedclass . $discountclass, $display_text);
                                 break;
+                            case "locationlink": //added by Tony for theme.z ,if we need link the location string to venue detail page ,should use this value;
+                                $url = self::get_next_running_location($event, $import_id);
+                                if($url) { //this line is copied from [shortcode_event_location]
+                                    $link .= self::get_event_date_link($url, $buttonclass . $fullclass . $limitedclass . $discountclass, $display_text);
+                                } else {
+                                    $link .= '<span class="' . esc_attr($dateclass) . '">' . $display_text . '</span>';
+                                }
+                                break;
                         }
     
                         $link .= ($layout == 'list' ? "</li>" : "");
@@ -1378,6 +1386,9 @@ class Events {
                             $url = $oa->oa_registeruri;
                             $href = 'href="' . esc_url($url) . '"';
                             break;
+                        case "locationlink": //added by Tony for theme.z ,if we need link the location string to venue detail page ,should use this value;
+                            $tag = 'span';
+                            break;
                     }
                     
                     $return .= sprintf('<%s %s class="%s">%s'. $aftertext .'</%s>', $tag, $href, $class, $reference_terms['Singular'], $tag);
@@ -1394,6 +1405,21 @@ class Events {
 
     private static function get_event_date_link($url, $buttonclass, $display_text) {
         return sprintf('<a href="%s" class="%s">%s</a>', esc_attr($url), esc_attr($buttonclass), $display_text);
+    }
+
+    //added by Tony for theme.z
+    private static function get_next_running_location($event, $import_id) {
+        if(!($event->e_isonline || $event->v_id == 0 || $event->e_locationvisible == 0)) { //this line is copied from [shortcode_event_location]
+            $conditions = array(
+                'id' => $event->v_id
+            );
+            $venue = \Arlo\Entities\Venues::get($conditions, null, null, $import_id);
+            if($venue != null) {
+                $permalink = get_permalink(arlo_get_post_by_name($venue['v_post_name'], 'arlo_venue'));
+                return $permalink;
+            }
+        }
+        return '';
     }
 
 
