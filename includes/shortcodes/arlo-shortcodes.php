@@ -224,7 +224,8 @@ class Shortcodes {
 
 		$aria_label = $type;
 		if($type == 'delivery') $aria_label = 'delivery option';
-		$filter_html = '<select aria-placeholder="Select your ' . esc_attr($aria_label) . '" aria-label="Select your ' . esc_attr($aria_label) . '" id="arlo-filter-' . esc_attr($type) . '" class="arlo-filter-' . esc_attr($type) . '" name="arlo-' . esc_attr($type) . '">';
+		//updated by Peter for theme.z
+		$filter_html = '<select aria-label="Select your ' . esc_attr($aria_label) . '" id="arlo-filter-' . esc_attr($type) . '" class="arlo-filter-' . esc_attr($type) . '" name="arlo-' . esc_attr($type) . '">';
 		
 		if (!is_null($label))
 			$filter_html .= '<option value="">' . esc_html($label) . '</option>';

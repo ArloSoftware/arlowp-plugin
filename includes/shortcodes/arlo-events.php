@@ -1349,7 +1349,7 @@ class Events {
                                 }
                                 break;
                             case "presenterlist": //added by Tony for theme.z, if we need next running event's presenters, use this value
-                                $link .= '<ul class="arlo-list event-presenters">';
+                                $link .= '<p class="arlo-list event-presenters">';
                                 $items = \Arlo\Entities\Presenters::get(['e_id' => $event->e_id], null, null, $import_id);
                                 $presenters = array();
                                 foreach($items as $item) {
@@ -1360,7 +1360,7 @@ class Events {
                                 $link .= implode(($layout == 'list' ? '' : ', '), $presenters);
 
                                 if ($layout == 'list') {
-                                    $output .= '</ul>';
+                                    $output .= '</p>';
                                 }
                                 break;
 
