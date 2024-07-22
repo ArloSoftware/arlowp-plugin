@@ -13,10 +13,14 @@
     --secondary-background-color-hover: #333333;//hover color
     --secondary-background-text-color: white; //text color above the secondary background color
 
-    --primary-tag-color: #F79256;//tag element's border and text color
+    --primary-tag-color: #B3460E;//tag element's border and text color
     --primary-tag-background-color: #F792561A;//tag element's background color
 
     --arlo-discount-bg-color: #E2671E;//discount info box's background color
+
+    &-powered-by{
+        opacity: 1;
+    }
 
     &-wrapper{
         *{

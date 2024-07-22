@@ -673,9 +673,12 @@ template {
   --secondary-background-color: #555555;
   --secondary-background-color-hover: #333333;
   --secondary-background-text-color: white;
-  --primary-tag-color: #F79256;
+  --primary-tag-color: #B3460E;
   --primary-tag-background-color: #F792561A;
   --arlo-discount-bg-color: #E2671E;
+}
+.arlo-powered-by {
+  opacity: 1;
 }
 .arlo-wrapper * {
   margin: 0;
@@ -1418,6 +1421,8 @@ template {
   display: none;
   transition: all 0.2s;
   align-items: center;
+  width: -moz-fit-content;
+  width: fit-content;
   gap: 8px;
 }
 .arlo .arlo-desktop .arlo-catalog-moreheader:hover {

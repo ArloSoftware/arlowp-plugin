@@ -66,6 +66,7 @@
                 display: none;
                 transition: all 0.2s;
                 align-items: center;
+                width: fit-content;
                 gap: 8px;
                 &:hover{
                     color: var(--primary-theme-color);

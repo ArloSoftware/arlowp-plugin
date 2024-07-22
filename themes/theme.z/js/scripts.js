@@ -53,7 +53,8 @@ jQuery(function($){
         if($catalogheader.length > 0) {
             var more = catalogheaderDefaultHegith < $catalogheader.get(0).scrollHeight;
             if(more) {
-                $(".arlo-catalog-moreheader").css('display', 'inline-flex')
+                $(".arlo-catalog-moreheader").show()
+                $(".arlo-catalog-moreheader").data('showing', 'false')
             } else {
                 $(".arlo-catalog-moreheader").hide();
             }
@@ -64,17 +65,19 @@ jQuery(function($){
     (function catalogPage() {
         resetCatalogSeeMore();
         $(".arlo-catalog-moreheader").click(function() {
-            var height = $(".arlo-catalog-header").height()
-            if(height != catalogheaderDefaultHegith) {
+            var showing = $(this).data('showing')
+            if(showing === 'true') {
                 $(".arlo-catalog-header").css('height', catalogheaderDefaultHegith + 'px')
                 $('.arlo-catalog-moreheader .fa-plus').show()
                 $('.arlo-catalog-moreheader .fa-minus').hide()
                 $('.arlo-catalog-moreheader span').text('See more')
+                $(this).data('showing', 'false')
             }else {
                 $(".arlo-catalog-header").css('height', 'auto')
                 $('.arlo-catalog-moreheader .fa-plus').hide()
                 $('.arlo-catalog-moreheader .fa-minus').show()
                 $('.arlo-catalog-moreheader span').text('See less')
+                $(this).data('showing', 'true')
             }
         })
         //navbar
