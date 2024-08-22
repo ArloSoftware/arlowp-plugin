@@ -17,7 +17,7 @@ class OnlineActivities {
         foreach ($shortcodes as $shortcode) {
             $shortcode_name = str_replace('shortcode_', '', $shortcode->name);
 
-            Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
+            Shortcodes::add($shortcode_name, function($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
                 $method_name = 'shortcode_' . str_replace('arlo_', '', $shortcode_name);
                 if (!is_array($atts) && empty($atts)) { $atts = []; }
                 return self::$method_name($content, $atts, $shortcode_name, $import_id);

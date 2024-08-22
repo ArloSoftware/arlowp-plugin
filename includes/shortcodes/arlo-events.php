@@ -1473,20 +1473,26 @@ class Events {
         try {
             $wp_timezone = new \DateTimeZone(get_option('timezone_string'));
         } catch (\Exception $e) {}
-
+        $format_abbreviation = '';
         if (!is_null($timezone) && ($timezone->getName() == $utc_timezone_name || (!is_null($wp_timezone) && $wp_timezone->getOffset($date) != $timezone->getOffset($date)) || !is_null($selected_timezone) || $is_online) && preg_match('[I|M]', $format) === 1 && preg_match('[Z|z]', $format) === 0) {
-            $format .= " %Z";
+            $format .= " %Z";            
         }
 
         if (strpos($format, '%Z')) {
-            $format = str_replace('%Z', '{TZ_ABBREV}', $format); //T
+            $format = str_replace('%Z', '', $format); //T
+            $format_abbreviation = '{TZ_ABBREV}';
         }
 
         if (strpos($format, '%z')) {
-            $format = str_replace('%z', '{TZ_OFFSET}', $format); //P
+            $format = str_replace('%z', '', $format); //P
+            $format_abbreviation = '{TZ_OFFSET}';
         }
+        $format_array = array("%"=>"","a"=>"D","A"=>"l","d"=>"d","e"=>"j","u"=>"N","w"=>"w","U"=>"W","V"=>"W","W"=>"W","b"=>"M","B"=>"F","h"=>"M","m"=>"m","C"=>"y","g"=>"y","G"=>"Y","y"=>"y","Y"=>"Y","H"=>"H","k"=>"G","I"=>"h","l"=>"g","M"=>"i","p"=>"A","P"=>"a","r"=>"h:i:s A","R"=>"H:i","S"=>"s","T"=>"H:i:s","X"=>"","z"=>"","Z"=>"","c"=>"","D"=>"m/d/y","F"=>"m/d/y","s"=>"U","x"=>"");
+        $format = strtr($format,$format_array);
 
-        $date = str_replace(['{TZ_ABBREV}', '{TZ_OFFSET}'], [$abbreviation, $date->format('P')], strftime($format, $date->getTimestamp()));
+        $date->setTimezone(new \DateTimeZone($timezone->getName()));
+
+        $date = str_replace(['{TZ_ABBREV}', '{TZ_OFFSET}'], [$abbreviation, $date->format('P')], date($format, $date->getTimestamp()).$format_abbreviation);
 
         //if we haven't got timezone, we need to append the timezone abbrev
         if ($is_online && is_null($timezone) && (preg_match('[I|M]', $format) === 1) && !empty($offset)) {

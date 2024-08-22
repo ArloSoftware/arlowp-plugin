@@ -11,8 +11,10 @@ use Arlo\Entities\Categories;
 class Redirect {
 
     public static function object_post_redirect() {
-        $object_post_type = filter_input(INPUT_GET, 'object_post_type', FILTER_SANITIZE_STRING);
-        $arlo_id = filter_input(INPUT_GET, 'arlo_id', FILTER_SANITIZE_STRING);
+        //$object_post_type = filter_input(INPUT_GET, 'object_post_type', FILTER_SANITIZE_STRING);
+        $object_post_type = self::filter_string_polyfill(INPUT_GET, 'object_post_type');
+        
+        $arlo_id = self::filter_string_polyfill(INPUT_GET, 'arlo_id');
 
         if (!empty($object_post_type) && !empty($arlo_id)) {
             switch($object_post_type) {
@@ -36,13 +38,22 @@ class Redirect {
         }
     }
 
+    /* ADDED BY MALHAR */
+	public static function filter_string_polyfill($input, $input_name)
+	{
+			$string = filter_input($input, $input_name, FILTER_DEFAULT);
+			$str = preg_replace('/\x00|<[^>]*>?/', '', $string?$string:'');
+			return str_replace(["'", '"'], ['&#39;', '&#34;'], $str);
+	}
+	/* END ADDED BY MALHAR */
+
 
     // Private event are not available on the pub api so they are missing from wordpress - on purpose
     // But the Arlo platform still have a link that redirects to the hypothetical wordpress page
     // So we redirect back to the Arlo website
     private static function private_event_redirect($arlo_id) {
-        $e = filter_input(INPUT_GET, 'e', FILTER_SANITIZE_STRING);
-        $t = filter_input(INPUT_GET, 't', FILTER_SANITIZE_STRING);
+        $e = self::filter_string_polyfill(INPUT_GET, 'e');
+        $t = self::filter_string_polyfill(INPUT_GET, 't');
 
         if (!empty($e) || !empty($t)) {
             $settings = get_option('arlo_settings');

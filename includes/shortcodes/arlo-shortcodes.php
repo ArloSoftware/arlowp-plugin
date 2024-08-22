@@ -16,28 +16,28 @@ class Shortcodes {
 		UpcomingEvents::init();
 
 		// group devider
-		self::add('group_divider', function($content = '', $atts, $shortcode_name, $import_id){
+		self::add('group_divider', function($content = '', $atts = [], $shortcode_name = '', $import_id = ''){
 			if(isset($GLOBALS['arlo_event_list_item']['show_divider'])) return $GLOBALS['arlo_event_list_item']['show_divider'];
 			if(isset($GLOBALS['arlo_oa_list_item']['show_divider'])) return $GLOBALS['arlo_oa_list_item']['show_divider'];
 		});
 
 		// timezones
-		self::add('timezones', function($content = '', $atts, $shortcode_name, $import_id){
+		self::add('timezones', function($content = '', $atts = [], $shortcode_name = '', $import_id = ''){
 			return self::shortcode_timezones($content, $atts, $shortcode_name, $import_id);	
 		});
 
 		// search_field
-		self::add('search_field', function($content = '', $atts, $shortcode_name, $import_id){
+		self::add('search_field', function($content = '', $atts = [], $shortcode_name = '', $import_id = ''){
 			return self::shortcode_search_field($content, $atts, $shortcode_name, $import_id);	
 		});
 
 		// label
-		self::add('label', function($content = '', $atts, $shortcode_name, $import_id){
+		self::add('label', function($content = '', $atts = [], $shortcode_name = '', $import_id = ''){
 			return $content;
 		});
 
 		// breadcrumbs
-		self::add('breadcrumbs', function($content = '', $atts, $shortcode_name, $import_id){
+		self::add('breadcrumbs', function($content = '', $atts = [], $shortcode_name = '', $import_id = ''){
 			return self::shortcode_breadcrumbs($content, $atts, $shortcode_name, $import_id);
 		});
 
@@ -87,7 +87,7 @@ class Shortcodes {
 	    
 	    // assign the passed function to a filter
 	    // all shortcodes are run through filters to allow external manipulation if required, however we also need a means of running the passed function
-	    add_filter('arlo_shortcode_content_' . $shortcode_name, function($content='', $atts, $shortcode_name, $import_id='') use($closure) {
+	    add_filter('arlo_shortcode_content_' . $shortcode_name, function($content='', $atts = [], $shortcode_name = '', $import_id='') use($closure) {
 			$plugin = Arlo_For_Wordpress::get_instance();
 			$import_id = $plugin->get_importer()->get_current_import_id();
 
@@ -379,8 +379,8 @@ class Shortcodes {
 			}
 
 			$timezone_windows_tz_id = $timezone['windows_tz_id'];
+			$timezone_get =  self::filter_string_polyfill(INPUT_GET, 'timezone');
 
-			$timezone_get = filter_input(INPUT_GET, 'timezone', FILTER_SANITIZE_STRING);
 
 			if ( (!empty($timezone_get) && $timezone_get == $timezone_id) || (empty($timezone_get) && isset($timezone_id) && $timezone_id == $items[0]['e_timezone_id']) ) {
 				$selected = true;
@@ -401,6 +401,15 @@ class Shortcodes {
 		
 		return $content;
 	}
+
+	/* ADDED BY MALHAR */
+	public static function filter_string_polyfill($input, $input_name)
+	{
+					$string = filter_input($input, $input_name, FILTER_DEFAULT);
+					$str = preg_replace('/\x00|<[^>]*>?/', '', $string?$string:'');
+					return str_replace(["'", '"'], ['&#39;', '&#34;'], $str);
+	}
+	/* END ADDED BY MALHAR */
 
 	/**
      * Shortcode for event template / catalogue breadcrumbs

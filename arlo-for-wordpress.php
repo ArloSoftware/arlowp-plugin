@@ -12,7 +12,7 @@
  * @copyright 2018 Arlo
  *
  * @wordpress-plugin
- * Plugin Name:       Arlo
+ * Plugin Name:       Arlo Updated
  * Description:       Connect your WordPress to Arlo
  * Version:           4.2.0
  * Author:            Arlo

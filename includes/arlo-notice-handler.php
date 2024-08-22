@@ -105,10 +105,19 @@ class NoticeHandler {
 	public function dismiss_user_notice($notice_key = '') {
 		if (!empty($notice_key) && in_array($notice_key, \Arlo_For_Wordpress::$dismissible_notices)) {
 			$user = wp_get_current_user();
-			$id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_STRING);
+			$id = filter_string_polyfill(INPUT_POST, 'id');
 			update_user_meta($user->ID, $id, 0);
 		}
 	}
+
+	/* ADDED BY MALHAR */
+  public function filter_string_polyfill($input, $input_name)
+  {
+          $string = filter_input($input, $input_name, FILTER_DEFAULT);
+          $str = preg_replace('/\x00|<[^>]*>?/', '', $string?$string:'');
+          return str_replace(["'", '"'], ['&#39;', '&#34;'], $str);
+  }
+  /* END ADDED BY MALHAR */
 	
 	public function connected_platform_notice() {
 		if (strtolower($this->settings['platform_name']) === \Arlo_For_Wordpress::DEFAULT_PLATFORM) {

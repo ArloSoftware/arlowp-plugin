@@ -3,7 +3,7 @@
 namespace Arlo;
 
 use Arlo\Utilities;
-
+#[\AllowDynamicProperties]
 class VersionHandler {
 	const VERSION = '4.2.0';
 
