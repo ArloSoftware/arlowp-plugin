@@ -1,0 +1,1428 @@
+/*  Theme3 - Jazz
+    Overrides all theme styles
+*/
+
+/*
+color1: #f46f72;
+color2: #f8f8f8;
+color3: #383838;
+color4: #f9b3b3;
+*/
+
+
+/* Normalize.css */
+
+body.arlo {
+    margin: 0;
+}
+
+.arlo#arlo article,
+.arlo#arlo aside,
+.arlo#arlo details,
+.arlo#arlo figcaption,
+.arlo#arlo figure,
+.arlo#arlo footer,
+.arlo#arlo header,
+.arlo#arlo main,
+.arlo#arlo menu,
+.arlo#arlo nav,
+.arlo#arlo section,
+.arlo#arlo summary {
+    display: block;
+}
+
+.arlo#arlo audio,
+.arlo#arlo canvas,
+.arlo#arlo progress,
+.arlo#arlo video {
+    display: inline-block;
+}
+
+.arlo#arlo audio:not([controls]) {
+    display: none;
+    height: 0;
+}
+
+.arlo#arlo progress {
+    vertical-align: baseline;
+}
+
+.arlo#arlo template,
+.arlo#arlo [hidden] {
+    display: none;
+}
+
+.arlo#arlo a {
+    background-color: transparent;
+    /* 1 */
+    -webkit-text-decoration-skip: objects;
+    /* 2 */
+}
+
+.arlo#arlo a:active,
+.arlo#arlo a:hover {
+    outline-width: 0;
+}
+
+.arlo#arlo abbr[title] {
+    border-bottom: none;
+    /* 1 */
+    text-decoration: underline;
+    /* 2 */
+    text-decoration: underline dotted;
+    /* 2 */
+}
+
+.arlo#arlo b,
+.arlo#arlo strong {
+    font-weight: inherit;
+}
+
+.arlo#arlo b,
+.arlo#arlo strong {
+    font-weight: bolder;
+}
+
+.arlo#arlo code,
+.arlo#arlo kbd,
+.arlo#arlo samp {
+    font-family: monospace, monospace;
+    font-size: 1em;
+}
+
+.arlo#arlo dfn {
+    font-style: italic;
+}
+
+.arlo#arlo mark {
+    background-color: #ff0;
+    color: #000;
+}
+
+.arlo#arlo small {
+    font-size: 80%;
+}
+
+.arlo#arlo sub,
+.arlo#arlo sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+}
+
+.arlo#arlo sub {
+    bottom: -0.25em;
+}
+
+.arlo#arlo sup {
+    top: -0.5em;
+}
+
+.arlo#arlo img {
+    border-style: none;
+}
+
+.arlo#arlo svg:not(:root) {
+    overflow: hidden;
+}
+
+.arlo#arlo figure {
+    margin: 1.5em 40px;
+}
+
+.arlo#arlo hr {
+    box-sizing: content-box;
+    /* 1 */
+    height: 0;
+    /* 1 */
+    overflow: visible;
+    /* 2 */
+}
+
+.arlo#arlo pre {
+    font-family: monospace, monospace;
+    font-size: 1em;
+}
+
+.arlo#arlo button,
+.arlo#arlo input,
+.arlo#arlo optgroup,
+.arlo#arlo select,
+.arlo#arlo textarea {
+    font: inherit;
+    /* 1 */
+    margin: 0;
+    /* 2 */
+}
+
+.arlo#arlo button {
+    overflow: visible;
+}
+
+.arlo#arlo button,
+.arlo#arlo select {
+    /* 1 */
+    text-transform: none;
+}
+
+.arlo#arlo button,
+.arlo#arlo html [type="button"],
+.arlo#arlo [type="reset"],
+.arlo#arlo [type="submit"] {
+    -webkit-appearance: button;
+    /* 2 */
+}
+
+.arlo#arlo button,
+.arlo#arlo [type="button"],
+.arlo#arlo [type="reset"],
+.arlo#arlo [type="submit"] {
+    /**
+     * Remove the inner border and padding in Firefox.
+     */
+    /**
+     * Restore the focus styles unset by the previous rule.
+     */
+}
+
+.arlo#arlo button::-moz-focus-inner,
+.arlo#arlo [type="button"]::-moz-focus-inner,
+.arlo#arlo [type="reset"]::-moz-focus-inner,
+.arlo#arlo [type="submit"]::-moz-focus-inner {
+    border-style: none;
+    padding: 0;
+}
+
+.arlo#arlo button:-moz-focusring,
+.arlo#arlo [type="button"]:-moz-focusring,
+.arlo#arlo [type="reset"]:-moz-focusring,
+.arlo#arlo [type="submit"]:-moz-focusring {
+    outline: 1px dotted ButtonText;
+}
+
+.arlo#arlo input {
+    overflow: visible;
+}
+
+.arlo#arlo [type="checkbox"],
+.arlo#arlo [type="radio"] {
+    box-sizing: border-box;
+    /* 1 */
+    padding: 0;
+    /* 2 */
+}
+
+.arlo#arlo [type="number"]::-webkit-inner-spin-button,
+.arlo#arlo [type="number"]::-webkit-outer-spin-button {
+    height: auto;
+}
+
+.arlo#arlo [type="search"] {
+    -webkit-appearance: textfield;
+    /* 1 */
+    outline-offset: -2px;
+    /* 2 */
+    /**
+     * Remove the inner padding and cancel buttons in Chrome and Safari on OS X.
+     */
+}
+
+.arlo#arlo [type="search"]::-webkit-search-cancel-button,
+.arlo#arlo [type="search"]::-webkit-search-decoration {
+    -webkit-appearance: none;
+}
+
+.arlo::-webkit-input-placeholder {
+    color: inherit;
+    opacity: 0.54;
+}
+
+.arlo::-webkit-file-upload-button {
+    -webkit-appearance: button;
+    /* 1 */
+    font: inherit;
+    /* 2 */
+}
+
+.arlo#arlo fieldset {
+    border: 1px solid #c0c0c0;
+    margin: 0 2px;
+    padding: 0.35em 0.625em 0.75em;
+}
+
+.arlo#arlo legend {
+    box-sizing: border-box;
+    /* 1 */
+    display: table;
+    /* 1 */
+    max-width: 100%;
+    /* 1 */
+    white-space: normal;
+    /* 1 */
+    color: inherit;
+    /* 2 */
+    padding: 0;
+    /* 3 */
+}
+
+.arlo#arlo optgroup {
+    font-weight: bold;
+}
+
+.arlo#arlo textarea {
+    overflow: auto;
+}
+
+
+
+/* Custom resets */
+
+.arlo#arlo * {
+    box-sizing: border-box;
+}
+
+.arlo#arlo h1,
+.arlo#arlo h2,
+.arlo#arlo h3,
+.arlo#arlo h4,
+.arlo#arlo h5,
+.arlo#arlo h6,
+.arlo#arlo p {
+    clear: none;
+}
+
+.arlo#arlo img {
+    max-width: 100%;
+}
+
+
+
+/* Fonts */
+
+.arlo#arlo .fa {
+    font: normal normal normal 14px/1 FontAwesome;
+}
+
+
+
+/* All lists */
+
+.arlo#arlo .arlo-list,
+.arlo#arlo .arlo-category-list,
+.arlo#arlo .arlo-event-credits,
+.arlo#arlo .arlo-event-template-credits,
+.arlo#arlo .arlo-event_tags-list,
+.arlo#arlo .presenter-events,
+.arlo#arlo .arlo-address-list,
+.arlo-categories-widget ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.arlo#arlo .arlo-list li,
+.arlo#arlo .arlo-category-list li,
+.arlo#arlo .arlo-event-credits li,
+.arlo#arlo .arlo-event-template-credits li,
+.arlo#arlo .arlo-event_tags-list li,
+.arlo#arlo .presenter-events li,
+.arlo#arlo .arlo-address-list li,
+.arlo-categories-widget li {
+    list-style: inherit;
+}
+
+.arlo#arlo .arlo-list.arlo-cols-5 > li {
+    width: 19.5%;
+    margin-right: 0.5%;
+    float: left;
+}
+
+.arlo#arlo .arlo-list.arlo-cols-4 > li {
+    width: 24.5%;
+    margin-right: 0.5%;
+}
+
+.arlo#arlo .arlo-list.arlo-cols-3 > li {
+    width: 32.5%;
+    margin-right: 0.5%;
+}
+
+.arlo#arlo .arlo-list.arlo-cols-2 > li {
+    width: 49.5%;
+    margin-right: 0.5%;
+}
+
+.arlo#arlo .arlo-list.arlo-cols-1 > li {
+    width: 100%;
+}
+
+
+
+
+/* Buttons */
+
+.arlo#arlo .arlo-button,
+.arlo#arlo .button,
+.arlo#arlo .arlo-list.catalogue .arlo-next-running a,
+.arlo#arlo .arlo-list.catalogue .arlo-next-running span,
+.arlo#arlo .arlo-list.event-search .arlo-next-running a,
+.arlo#arlo .arlo-list.event-search .arlo-next-running span,
+.arlo#arlo .arlo-list.schedule .arlo-next-running a,
+.arlo#arlo .arlo-list.schedule .arlo-next-running span,
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a,
+.arlo#arlo a.prev.page-numbers,
+.arlo#arlo a.next.page-numbers,
+.arlo#arlo .arlo-category-list a,
+.arlo#arlo select,
+.arlo#arlo select:focus,
+.arlo#arlo .arlo-filters-buttons a,
+.arlo#arlo a.arlo-show-more-link,
+.arlo#arlo .arlo-social-media a {
+    padding: .5em 1em;
+    display: block;
+    border-radius: 6px;
+    text-align: center;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+    font-weight: 600;
+    margin-right: 0;
+    height: auto;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    border: none;
+    box-shadow: none;
+    line-height: 1.5;
+}
+
+@media (min-width: 550px) {
+    .arlo#arlo .arlo-button,
+    .arlo#arlo .button,
+    .arlo#arlo .arlo-list.catalogue .arlo-next-running a,
+    .arlo#arlo .arlo-list.catalogue .arlo-next-running span,
+    .arlo#arlo .arlo-list.schedule .arlo-next-running a,
+    .arlo#arlo .arlo-list.schedule .arlo-next-running span,
+    .arlo#arlo .arlo-list.event-search .arlo-next-running a,
+    .arlo#arlo .arlo-list.event-search .arlo-next-running span,
+    .arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a,
+    .arlo#arlo a.prev.page-numbers,
+    .arlo#arlo a.next.page-numbers,
+    .arlo#arlo .arlo-category-list a,
+    .arlo#arlo select,
+    .arlo#arlo .arlo-filters-buttons a,
+    .arlo#arlo a.arlo-show-more-link,
+    .arlo#arlo .arlo-social-media a {
+        display: inline-block;
+    }
+}
+
+.arlo#arlo .arlo-button:after,
+.arlo#arlo .button:after,
+.arlo#arlo .arlo-list.catalogue .arlo-next-running a:after,
+.arlo#arlo .arlo-list.schedule .arlo-next-running a:after,
+.arlo#arlo .prev.page-numbers:after,
+.arlo#arlo .next.page-numbers:after,
+.arlo#arlo .arlo-category-list a:after,
+.arlo#arlo .arlo-show-more-link:after,
+.arlo#arlo .arlo-social-media a:after,
+.arlo#arlo .arlo-list.event-search .arlo-next-running a:after,
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a:after,
+.arlo#arlo .arlo-list.event-search .arlo-next-running a:after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 0;
+    z-index: 1;
+    -webkit-transition: width .3s;
+    -moz-transition: width .3s;
+    transition: width .3s;
+    background: rgba(0,0,0,.05);
+}
+
+.arlo#arlo .arlo-button:hover,
+.arlo#arlo .button:hover,
+.arlo#arlo .arlo-list.catalogue .arlo-next-running a:hover,
+.arlo#arlo .arlo-list.catalogue .arlo-next-running span:hover,
+.arlo#arlo .arlo-list.schedule .arlo-next-running a:hover,
+.arlo#arlo .arlo-list.schedule .arlo-next-running span:hover,
+.arlo#arlo .arlo-list.event-search .arlo-next-running a:hover,
+.arlo#arlo .arlo-list.event-search .arlo-next-running span:hover,
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a:hover,
+.arlo#arlo a.prev.page-numbers:hover,
+.arlo#arlo a.next.page-numbers:hover,
+.arlo#arlo .arlo-category-list a:hover,
+.arlo#arlo select:hover,
+.arlo#arlo .arlo-filters-buttons a:hover,
+.arlo#arlo a.arlo-show-more-link:hover,
+.arlo#arlo .arlo-social-media a:hover {
+    text-decoration: none;
+}
+
+.arlo#arlo .arlo-button:hover:after,
+.arlo#arlo .button:hover:after,
+.arlo#arlo .arlo-list.catalogue .arlo-next-running a:hover:after,
+.arlo#arlo .arlo-list.schedule .arlo-next-running a:hover:after,
+.arlo#arlo .prev.page-numbers:hover:after,
+.arlo#arlo .next.page-numbers:hover:after,
+.arlo#arlo .arlo-category-list a:hover:after,
+.arlo#arlo .arlo-show-more-link:hover:after,
+.arlo#arlo .arlo-social-media a:hover:after,
+.arlo#arlo .arlo-list.event-search .arlo-next-running a:hover:after,
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a:hover:after,
+.arlo#arlo .arlo-list.event-search .arlo-next-running a:hover:after {
+    width: 100%;
+}
+
+
+
+/* Catalogue */
+
+.arlo#arlo .arlo-list.catalogue .arlo-cf {
+   overflow: auto;
+}
+
+.arlo#arlo .arlo-list.catalogue .arlo-cf.arlo-catalogue-event,
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates tr,
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates tr td:first-of-type {
+   border-left: 2px solid;
+   -webkit-transition: all .2s ease-in-out;
+   transition: all .2s ease-in-out;
+   margin-bottom: 1px;
+}
+
+.arlo#arlo .arlo-list.catalogue .arlo-cf.arlo-catalogue-event:hover,
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates tr:hover,
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates tr:hover td:first-of-type {
+    border-left-width: 7px;
+    background-color: #f1f1f1;
+}
+
+.arlo#arlo .arlo-list.catalogue .arlo-cf.arlo-group-divider {
+   background-color: transparent;
+   margin-top: 1em;
+}
+
+.arlo#arlo .arlo-list.catalogue .arlo-cf.arlo-group-divider h2 {
+    font-weight: bold;
+}
+
+.arlo#arlo .arlo-list.catalogue .arlo-cf .arlo-catalogue-column,
+.arlo#arlo .arlo-suggest-template-container tr td {
+    padding: .5em 1em;
+}
+
+.arlo#arlo .arlo-category-list li a {
+    display: block;
+    margin-bottom: .5em;
+}
+
+@media (min-width: 750px) {
+    .arlo#arlo .arlo-list.catalogue .arlo-cf .arlo-catalogue-column  {
+        float: left;
+    }
+
+    .arlo#arlo .arlo-list.catalogue .arlo-cf .arlo-catalogue-details {
+        width: 80%;
+    }
+
+    .arlo#arlo .arlo-list.catalogue .arlo-cf .arlo-catalogue-column.arlo-event-name {
+        width: 80%;
+    }
+
+    .arlo#arlo .arlo-list.catalogue .arlo-cf .arlo-catalogue-column.arlo-template-details {
+        width: 20%;
+    }
+
+    .arlo#arlo .arlo-list.catalogue .arlo-cf .arlo-catalogue-column.arlo-next-running {
+        width: 20%;
+    }
+
+    .arlo#arlo .arlo-category-list li {
+        display: inline-block;
+        margin-right:  .5em;
+    }
+}
+
+@media (min-width: 550px) {
+    .arlo#arlo .arlo-list.catalogue .arlo-cf .arlo-catalogue-details {
+        width: 70%;
+        float: left;
+    }
+
+    .arlo#arlo .arlo-list.catalogue .arlo-cf .arlo-catalogue-column.arlo-next-running {
+        text-align: right;
+        float: right;
+        width: 30%;
+    }
+
+}
+
+.arlo#arlo .arlo-list.catalogue .arlo-next-running a,
+.arlo#arlo .arlo-category-list a {
+    background-color: white;
+}
+
+.arlo#arlo .arlo-category-footer {
+    margin: 2em 0;
+}
+
+.arlo#arlo .arlo-category-header {
+    margin-bottom: 2em;
+}
+
+.arlo#arlo .arlo-list.catalogue .arlo-offers,
+.arlo#arlo .arlo-list.schedule .arlo-offers,
+.arlo#arlo .arlo-list.schedule .arlo-duration {
+    opacity: .5;
+}
+
+
+
+/* Upcoming events list */
+
+.arlo#arlo .arlo-list.upcoming > li {
+    margin-bottom: 3em;
+    padding: 0;
+    border: none;
+}
+
+.arlo#arlo .arlo-cal {
+    width: 60px;
+    float: left;
+    border-right: 2px solid transparent;
+    font-weight: bold;
+    text-align: center;
+    line-height: 1;
+    font-size: 1.4em;
+    padding: 1em .25em;
+}
+
+.arlo#arlo .arlo-event-details {
+    max-width: none;
+}
+
+.arlo#arlo .arlo-event-registration {
+    text-align: left;
+}
+
+.arlo#arlo .upcoming .arlo-cal .arlo-day {
+    font-size: 2em;
+}
+
+.arlo#arlo .upcoming .arlo-event-info {
+    margin-left: 75px;
+}
+
+@media (min-width: 550px) {
+    .arlo#arlo .arlo-cal {
+        width: 90px;
+        font-size: 2em;
+    }
+
+    .arlo#arlo .upcoming .arlo-event-info {
+        margin-left: 115px;
+    }
+}
+
+.arlo#arlo .upcoming .arlo-event-name,
+.arlo#arlo .arlo-online-activities .arlo-event-name {
+    margin-top: 0;
+}
+
+.arlo#arlo .upcoming .arlo-event-subhead {
+    margin-bottom: .5em;
+}
+
+.arlo#arlo .upcoming .arlo-event-subhead > div {
+    display: inline-block;
+    margin-right: 1em;
+    font-weight: bold;
+}
+
+.arlo#arlo .upcoming .arlo-event-notice {
+    margin-bottom: .5em;
+}
+
+.arlo#arlo .upcoming .arlo-template-summary {
+    margin-bottom: .5em;
+}
+
+.arlo#arlo .upcoming .arlo-offers {
+    font-size: 1.3em;
+    font-weight: bold;
+    margin-bottom: 1em;
+}
+
+.arlo#arlo .upcoming .arlo-offers .arlo-price-tax {
+    font-size: .8em;
+}
+
+.arlo#arlo .upcoming .arlo-cf.arlo-group-divider,
+.arlo#arlo .arlo-online-activities .arlo-cf.arlo-group-divider {
+    margin-bottom: .75em;
+    margin-top: 1em;
+    font-weight: bold;
+    padding: 0;
+}
+
+.arlo#arlo .upcoming .arlo-event-full,
+.arlo#arlo .upcoming .arlo-places-remaining {
+    display: inline-block;
+    font-weight: bold;
+    margin-bottom: .5em;
+    font-size: 1em;
+}
+
+.arlo#arlo .upcoming .arlo-places-remaining {
+    margin-top: .5em;
+}
+
+@media (min-width: 550px) {
+    .arlo#arlo .upcoming .arlo-event-full,
+    .arlo#arlo .upcoming .arlo-places-remaining {
+        vertical-align: top;
+        margin-top: .5em;
+        margin-bottom: 0;
+    }
+
+    .arlo#arlo .upcoming .arlo-places-remaining {
+        margin-left: 1em;
+    }
+
+    .arlo#arlo .upcoming .arlo-event-full {
+        margin-right: 1em;
+    }
+}
+
+
+
+/* Event template */
+
+.arlo#arlo .arlo-list.events {
+    margin-bottom: 1.5em;
+    width: 100%;
+    clear: both;
+}
+
+.arlo#arlo .arlo-list.events .arlo-event {
+    display: inline-block;
+    vertical-align: top;
+    margin-bottom: .5em;
+    padding: 0;
+    border: none;
+}
+
+.arlo#arlo .arlo-list.template-online-activities .arlo-online-activity,
+.arlo#arlo .arlo-list.events .arlo-event {
+    -webkit-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out;
+}
+
+.arlo#arlo .arlo-list.events .arlo-event:hover,
+.arlo#arlo .arlo-list.template-online-activities .arlo-online-activity:hover {
+    -webkit-transform: translateY(-5px);
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+.arlo#arlo .arlo-list.template-online-activities .arlo-online-activity {
+    clear: both;
+    width: 100%;
+    padding: 1.5em 1.8em;
+    line-height: 1.8;
+    margin: .5em 0;
+}
+
+.arlo#arlo .arlo-list.template-online-activities .arlo-online-activity h3 {
+    margin-top: 0;
+    padding-top: 0;
+    margin-bottom: .3em;
+    line-height: 1;
+}
+
+.arlo#arlo .arlo-template-head {
+    text-align: center;
+    margin: 2em 0;
+}
+
+.arlo#arlo .arlo-event-head,
+.arlo#arlo .arlo-event-body  {
+    padding: 1.2em 1.5em;
+}
+
+.arlo#arlo .arlo-event-head {
+    border-bottom: 2px solid white;
+}
+
+.arlo#arlo .arlo-event-body {
+    line-height: 2;
+}
+
+.arlo#arlo .arlo-event-head .arlo-date {
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.arlo#arlo .arlo-list.events .arlo-event-registration,
+.arlo#arlo .arlo-list.events .arlo-oa-registration {
+    margin-top: 1em;
+    text-align: left;
+}
+
+.arlo#arlo .arlo-event_tags-list > li {
+    display: inline-block;
+    padding: .4em .7em;
+    border-radius: 5px;
+    font-weight: bold;
+    margin-right: .3em;
+    margin-bottom: .3em;
+    line-height: 1;
+    background-color: white;
+}
+
+.arlo#arlo .arlo-suggest,
+.arlo#arlo .arlo-content-fields {
+    clear: both;
+}
+
+.arlo#arlo .arlo-suggest {
+    text-align: center;
+    padding: .5em 1em;
+}
+
+.arlo#arlo .arlo-suggest-private-datelocation {
+    text-align: center;
+    padding: .5em 1em;
+    clear: both;
+    background-color: #f8f8f8;
+}
+
+.arlo#arlo .arlo-content-field {
+    margin-bottom: 3em;
+}
+
+.arlo#arlo .arlo-event-offers {
+    font-weight: bold;
+}
+
+.arlo#arlo .replaced {
+    text-decoration: line-through;
+}
+
+.arlo#arlo .arlo-no-results {
+    padding: 1em 2em;
+    text-align: center;
+    font-size: 1em;
+}
+
+.arlo#arlo .arlo-register-private-interest {
+    padding: 1em 2em;
+    text-align: center;
+    font-size: 1em;
+}
+
+.arlo#arlo p.arlo-suggest-private-datelocation {
+    margin-bottom: 0.5em;
+}
+
+.arlo#arlo .arlo-places-remaining {
+    font-weight: bold;
+    display: block;
+}
+
+.arlo#arlo .arlo-show-more-link-container {
+    text-align: center;
+    margin-bottom: 1em;
+    clear: both;
+}
+
+.arlo#arlo .button.arlo-waiting-list {
+    background-color: white;
+}
+
+.arlo#arlo .arlo-tooltip-button {
+    font-weight: bold;
+    text-align: left;
+}
+
+.arlo#arlo .arlo-event .arlo-event-full {
+    display: block;
+}
+
+.arlo#arlo .arlo-timezone-toggle {
+    float: right;
+}
+.arlo#arlo .arlo-timezone-selector {
+    float: right;
+}
+
+
+
+/* Event search list */
+
+.arlo#arlo .event-search {
+    margin-bottom: 1em;
+}
+
+.arlo#arlo .arlo-search {
+    margin-bottom: 1em;
+}
+
+.arlo#arlo input.arlo-search-field,
+.arlo#arlo input.arlo-search-field:focus {
+    padding: 1em;
+    background-color: transparent;
+}
+
+.arlo#arlo .event-search > li {
+    margin-bottom: 1em;
+}
+
+.arlo#arlo .arlo-next-running > a,
+.arlo#arlo .arlo-next-running > span  {
+    margin-left: 0.5em;
+}
+
+.arlo#arlo .arlo-next-running {
+    margin-top: 1em;
+}
+
+.arlo#arlo .event-search .arlo-next-running a,
+.arlo#arlo .event-search .arlo-next-running span,
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a {
+    font-size: .9em;
+    padding: .5em .8em;
+}
+
+.arlo#arlo .arlo-search-field,
+.arlo#arlo .arlo-search-button {
+    width: 100%;
+}
+
+@media (min-width: 550px) {
+    .arlo#arlo .arlo-search-field,
+    .arlo#arlo .arlo-search-button {
+        display: inline-block;
+    }
+
+    .arlo#arlo .arlo-search-field {
+        width: 79%;
+    }
+
+    .arlo#arlo .arlo-search-button {
+        width: 20%;
+    }
+}
+
+@media (min-width: 750px) {
+    .arlo#arlo .arlo-search-field {
+        width: 84%;
+    }
+
+    .arlo#arlo .arlo-search-button {
+        width: 15%;
+    }
+}
+
+.arlo#arlo .event-search .arlo-offers {
+    margin-top: .5em;
+}
+
+
+
+/* Venue and presenter lists */
+
+.arlo#arlo .venues,
+.arlo#arlo .presenters {
+    margin-bottom: 2em;
+}
+
+.arlo#arlo .venues .arlo-cf,
+.arlo#arlo .presenters .arlo-cf {
+    border-bottom-width: 1px;
+    border-bottom-style: solid; 
+    padding-bottom: 2.5em;
+}
+
+.arlo#arlo .presenter-events li {
+    width: 320px;
+    vertical-align: top;
+    float: left;
+    min-height: 170px;
+    padding: 1em 1.5em;
+    margin-right: 2px;
+    margin-bottom: 2px;
+    font-weight: bold;
+    font-size: 1.2em;
+    max-width: 100%;
+}
+
+@media (min-width: 550px) {
+    .arlo#arlo .arlo-social-media a {
+        margin-right: .5em;
+    }
+}
+
+
+
+/* Sessions tooltips */
+
+.arlo .dark-tooltip {
+    padding: 1em;
+}
+
+.arlo .dark-tooltip h5,
+.arlo .dark-tooltip h6 {
+    margin: 0;
+}
+
+.arlo .dark-tooltip h5 {
+    font-size: 1.4em;
+}
+
+.arlo .arlo_session {
+    margin-top: .5em;
+    padding-bottom: .5em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.arlo .arlo_session:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+}
+
+
+
+/* Filters */
+
+.arlo#arlo .arlo-filters {
+    overflow: auto;
+    margin-bottom: 1em;
+}
+
+.arlo#arlo select,
+.arlo#arlo .arlo-filters-buttons,
+.arlo#arlo .arlo-filters-buttons a {
+    width: 100%;
+}
+
+@media (min-width: 750px) {
+    .arlo#arlo select,
+    .arlo#arlo .arlo-filters-buttons,
+    .arlo#arlo .arlo-filters-buttons a {
+        width: auto;
+    }
+
+    .arlo#arlo select,
+    .arlo#arlo select:focus {
+        margin-right: .5em;
+    }
+}
+
+.arlo#arlo select {
+    border: none;
+    margin-bottom: .5em;
+}
+
+.arlo#arlo .arlo-filters-buttons {
+    display: inline-block;
+    margin-top: 0;
+}
+
+.arlo#arlo select,
+.arlo#arlo .arlo-filters-buttons {
+    float: left;
+}
+
+.arlo#arlo select.arlo-filter-region {
+    float: none;
+}
+
+
+.arlo#arlo .arlo-region-selector {
+    border: solid 1px transparent;
+    margin: 1em 0px;
+}
+
+.arlo#arlo .arlo-region-selector select.arlo-filter-region {
+    min-width: 400px;
+}
+
+.arlo#arlo .arlo-event-template-filters .arlo-filters {
+    float: left;
+}
+
+.arlo#arlo .arlo-timezone-selector {
+    float: right;
+    margin-top: .5em;
+    margin-bottom: 1em;
+}
+
+.arlo#arlo .arlo-timezone-selector p {
+  display: inline-block;
+  padding: 0px 10px;
+}
+
+.arlo#arlo .arlo-timezone-selector form {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+
+
+/* Pagination */
+
+.arlo#arlo .arlo-pagination {
+    overflow: auto;
+}
+
+.arlo#arlo .page-numbers.prev,
+.arlo#arlo .page-numbers.next {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.arlo#arlo .page-numbers {
+    display: inline-block;
+}
+
+@media (min-width: 550px) {
+    .arlo#arlo .page-numbers {
+        float: left;
+    }
+
+    .arlo#arlo .page-numbers.prev,
+    .arlo#arlo .page-numbers.next {
+        margin-top: .1em;
+        margin-bottom: .1em;
+    }
+}
+
+@media (min-width: 750px) {
+    .arlo#arlo .page-numbers.prev {
+        margin-right: 1em;
+    }
+
+    .arlo#arlo .page-numbers.next {
+        margin-left: 1em;
+    }
+}
+
+.arlo#arlo .page-numbers:not(.next):not(.prev) {
+    margin: .5em;
+    font-weight: bold;
+}
+
+
+
+/* Upcoming events list widget */
+
+.arlo-widget-upcoming > li {
+    padding: 0;
+    margin-bottom: 1em;
+}
+
+.arlo-widget-upcoming > li p {
+    font-weight: bold;
+}
+
+.arlo-widget-upcoming > li p:last-child {
+    font-weight: normal;
+}
+
+.arlo-widget-upcoming .arlo-cal.arlo-left {
+    width: 24%;
+    font-weight: bold;
+    padding: .75em 0;
+    border-right: 2px solid transparent;
+}
+
+.arlo-widget-upcoming .arlo-cal-month,
+.arlo-widget-upcoming .arlo-cal-day {
+    width: 100%;
+}
+
+.arlo-widget-upcoming .arlo-cal-month {
+    padding: 0;
+    border: none;
+    line-height: 1;
+    background-color: transparent;
+    font-size: 1.1em;
+}
+
+.arlo-widget-upcoming .arlo-cal-day {
+    border: none;
+    font-size: 2.5em;
+    padding: 0;
+    line-height: 1;
+    margin-top: .2em;
+}
+
+
+
+/* Category list widget */
+
+.arlo-categories-widget li {
+    border-bottom: 0;
+    padding: 0;
+    font-weight: bold;
+    margin-bottom: .5em;
+}
+
+.arlo-categories-widget li a {
+    display: block;
+    padding: .3em .8em;
+    border-bottom: none;
+    margin-bottom: 0;
+    border-left: 2px solid transparent;
+    -webkit-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out;
+}
+
+.arlo-categories-widget li a:hover {
+    border-left-width: 4px;
+}
+
+
+
+/* Online activities list */
+
+.arlo#arlo .arlo-online-activities .arlo-online-activity {
+    margin-bottom: 3em;
+}
+
+.arlo#arlo .arlo-online-activities .arlo-online-activity .arlo-reference-term {
+    border-left-width: 2px;
+    border-left-style: solid;
+    display:inline-block;
+    padding: .3em 1em;
+    margin-bottom: .5em;
+}
+
+.arlo#arlo .arlo-online-activities .arlo-online-activity .arlo-event-offers {
+    margin-bottom: 1em;
+}
+
+#arlo.arlo .arlo-online-activities .arlo-cf.arlo-group-divider {
+    margin-bottom: 0;
+}
+
+
+
+
+/* Schedule */
+
+#arlo.arlo .schedule .arlo-schedule-event {
+    border-bottom-width: 2px;
+    border-bottom-style: solid;
+    padding: 1em 0;
+}
+
+#arlo.arlo .schedule .arlo-next-running {
+    margin-top: 0;
+    color: transparent;
+}
+
+#arlo.arlo .schedule .arlo-group-divider {
+    margin-top: 2em;
+}
+
+#arlo.arlo .schedule .arlo-template-name {
+    font-weight: bold;
+}
+
+@media (min-width: 750px) {
+    #arlo.arlo .schedule .arlo-schedule-event {
+        padding: .3em 0;
+    }
+
+    #arlo.arlo .schedule .arlo-schedule-column {
+        float: left;
+        min-height: 1px;
+        padding: .2em;
+    }
+
+    #arlo.arlo .schedule .arlo-event-name {
+        width: 40%;
+    }
+
+    #arlo.arlo .schedule .arlo-duration {
+        width: 15%;
+    }
+
+    #arlo.arlo .schedule .arlo-template-details {
+        width: 15%;
+    }
+
+    #arlo.arlo .schedule .arlo-next-running {
+        width: 30%;
+        text-align: right;
+    }
+
+}
+
+
+
+
+/* Colours */
+
+.arlo#arlo .arlo-color1,
+.arlo#arlo a:hover,
+.arlo#arlo a.arlo-template-name,
+.arlo#arlo a.arlo-template-name:hover,
+.arlo#arlo .page-numbers:not(.next):not(.prev):hover,
+.arlo#arlo .page-numbers.current:not(.next):not(.prev),
+.arlo#arlo .upcoming .arlo-places-remaining,
+.arlo#arlo .button.arlo-waiting-list:hover,
+.arlo#arlo .arlo-event_tags-list > li,
+.arlo#arlo .arlo-event-offers .discount,
+.arlo#arlo .arlo-social-media a:hover,
+.arlo-widget-upcoming a:hover,
+.arlo-categories-widget li a:hover,
+.arlo#arlo a,
+.arlo#arlo a.next.page-numbers:hover, 
+.arlo#arlo .arlo-list.event-search .arlo-next-running a:hover,
+.arlo#arlo .arlo-list.catalogue .arlo-next-running a:hover,
+.arlo#arlo .upcoming .arlo-event-name a:hover {
+    color: #f97070;
+}
+
+.arlo#arlo .arlo-background-color1,
+.arlo#arlo .arlo-list.catalogue .arlo-next-running a.arlo-register,
+.arlo#arlo .arlo-category-list a,
+.arlo#arlo .button.arlo-register,
+.arlo#arlo .arlo-button,
+.arlo#arlo .arlo-list.event-search .arlo-next-running a.arlo-register,
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a.arlo-register,
+.arlo#arlo .arlo-list.schedule .arlo-next-running a.arlo-register {
+    background-color: #f97070;
+}
+
+.arlo#arlo .arlo-border-color1,
+.arlo#arlo .arlo-list.catalogue .arlo-cf.arlo-catalogue-event,
+.arlo-categories-widget li a,
+.arlo-widget-upcoming .arlo-cal.arlo-left,
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates tr,
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates tr td:first-of-type {
+    border-left-color: #f97070;
+    border-right-color: #f97070;
+    border-top-color: #f97070;
+    border-bottom-color: #f97070;
+}
+
+.arlo#arlo .arlo-color2 {
+    color: #f8f8f8;
+}
+
+.arlo#arlo .arlo-background-color2,
+.arlo#arlo .prev.page-numbers,
+.arlo#arlo .next.page-numbers,
+.arlo#arlo select,
+.arlo#arlo .arlo-list.schedule .arlo-next-running a,
+.arlo#arlo .upcoming .button.arlo-waiting-list,
+.arlo#arlo .presenter-events li,
+.arlo#arlo .arlo-social-media a,
+.arlo-widget-upcoming .arlo-cal.arlo-left,
+.arlo-categories-widget li a,
+.arlo#arlo .arlo-list.event-search .arlo-next-running a {
+    background-color: #f8f8f8;
+}
+
+.arlo#arlo .arlo-border-color2 {
+    border-color: #f8f8f8;
+}
+
+.arlo#arlo,
+.arlo#arlo .arlo-list.catalogue .arlo-next-running a,
+.arlo#arlo .arlo-category-list a,
+.arlo#arlo .arlo-color3,
+.arlo#arlo .button.arlo-waiting-list,
+.arlo#arlo .arlo-social-media a,
+.arlo-widget-upcoming .arlo-cal-month,
+.arlo-widget-upcoming a,
+.arlo-categories-widget a,
+.arlo#arlo a.next.page-numbers, 
+.arlo#arlo .arlo-list.event-search .arlo-next-running a,
+.arlo#arlo .upcoming .arlo-event-name a,
+.arlo#arlo select,
+#arlo.arlo .schedule .arlo-template-name {
+    color: #383838;
+}
+
+.arlo#arlo .arlo-background-color3,
+.arlo#arlo .arlo-filters-buttons a,
+.arlo#arlo .arlo-list.catalogue .arlo-next-running span,
+.arlo#arlo .arlo-list.event-search .arlo-next-running span,
+.arlo#arlo .arlo-list.schedule .arlo-next-running span,
+.arlo#arlo .arlo-show-more-link {
+    background-color: #383838;
+}
+
+.arlo#arlo .arlo-button,
+.arlo#arlo .button,
+.arlo#arlo .arlo-list.catalogue .arlo-next-running a.arlo-register,
+.arlo#arlo .arlo-list.catalogue .arlo-next-running span,
+.arlo#arlo .arlo-list.schedule .arlo-next-running a.arlo-register,
+.arlo#arlo .arlo-list.schedule .arlo-next-running span,
+.arlo#arlo .arlo-category-list a,
+.arlo#arlo .arlo-filters-buttons a,
+.arlo#arlo .button.arlo-register:hover,
+.arlo#arlo .arlo-show-more-link,
+.arlo#arlo .arlo-show-more-link:hover,
+.arlo#arlo .arlo-list.event-search .arlo-next-running a.arlo-register,
+.arlo#arlo .arlo-list.event-search .arlo-next-running a.arlo-register:hover,
+.arlo#arlo .arlo-list.event-search .arlo-next-running span,
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a.arlo-register,
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link a.arlo-register:hover,
+.arlo#arlo .arlo-oa-registration .arlo-register:hover {
+    color: white;
+}
+
+.arlo#arlo .arlo-color4 {
+    color: #f9b3b3;
+}
+
+.arlo#arlo .arlo-background-color4 {
+    color: #f9b3b3;
+}
+
+
+/* Suggest templates */
+
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates tr td,
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates tr td:first-of-type {
+    border-bottom: 1px solid white;
+}
+
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates tr td:first-of-type {
+    border-left-width: 2px;
+}
+
+.arlo#arlo .arlo-suggest-template-container .arlo-suggest-templates .arlo-suggest-template-event-link {
+    text-align: right;
+}
+
+.arlo-breadcrumbs ul{
+    list-style: none;
+    padding-left: 0;
+    margin: 1em 0;
+}
+.arlo-breadcrumbs li{
+    display: inline-block;
+}
+.arlo-breadcrumbs li:not(:last-child)::after{
+    content: '>';
+    padding-left: 3px;
+    padding-right: 5px;
+}
+
+.arlo-single-show-wrapper{
+  clear: both;
+  text-align: center;
+  padding-top: 10px;
+  margin-bottom: 5px;
+}

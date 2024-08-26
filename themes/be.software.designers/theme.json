@@ -1,0 +1,17 @@
+{
+    "version": 1.6,
+    "order": 11,
+    "name": "Be Software",
+    "description": "Designed specifically for <a href=\"http://themes.muffingroup.com/be/software/\" target=\"_blank\">Be Software</a> WordPress theme ",
+    "demoUrl": "https://support.arlo.co/hc/en-gb/articles/115001645886",
+    "forDesigners": true,
+    "externalResources": {
+        "stylesheets": [
+            "/custom-assets/font-awesome-4.7.0/css/font-awesome.min.css"
+        ],
+        "javascripts": []
+    },
+    "images": [
+        "/images/image1.jpg"
+    ]
+}

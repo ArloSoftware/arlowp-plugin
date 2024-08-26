@@ -1,0 +1,42 @@
+@font-face {
+    font-family: 'Arlo--Theme2';
+    src: url('../fonts/Arlo--Theme2.eot?eyq22b');
+    src: url('../fonts/Arlo--Theme2.eot?eyq22b#iefix') format('embedded-opentype'), url('../fonts/Arlo--Theme2.ttf?eyq22b') format('truetype'), url('../fonts/Arlo--Theme2.woff?eyq22b') format('woff'), url('../fonts/Arlo--Theme2.svg?eyq22b#Arlo--Theme2') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.icons8-price-tag:before,
+.icons8-marker:before,
+.icons8-gender-neutral-user:before,
+.icons8-clock:before,
+.icons8-department:before,
+.icons8-facebook:before,
+.icons8-linkedin:before,
+.icons8-twitter:before {
+    display: inline-block;
+    /* use !important to prevent issues with browser extensions that change fonts */
+    font-family: 'Arlo--Theme2' !important;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    line-height: 1;
+    text-transform: none;
+    text-decoration: inherit;
+    text-rendering: optimizeLegibility;
+
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-smoothing: antialiased;
+}
+
+.icons8-price-tag:before { content: "\f101"; }
+.icons8-marker:before { content: "\f118"; }
+.icons8-gender-neutral-user:before { content: "\f108"; }
+.icons8-clock:before { content: "\f12d"; }
+.icons8-department:before { content: "\f10e"; }
+.icons8-facebook:before { content: "\f120"; }
+.icons8-linkedin:before { content: "\f124"; }
+.icons8-twitter:before { content: "\f122"; }

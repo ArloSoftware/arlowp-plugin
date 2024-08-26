@@ -1,0 +1,14 @@
+{
+    "version": 1.4,
+    "order": 12,
+    "name": "Custom",
+    "icon": "icons8-design",
+    "description": "Your custom theme",
+    "forDesigners": true,
+    "demoUrl": "",
+    "externalResources": {
+        "stylesheets": [
+        ],
+        "javascripts": []
+    }
+}

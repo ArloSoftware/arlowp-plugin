@@ -1,0 +1,15 @@
+{
+    "version": 1.6,
+    "order": 6,
+    "name": "Jazz",
+    "description": "Simple design that can be used on wide variety of websites",
+    "forDesigners": true,
+    "demoUrl": "",
+    "externalResources": {
+        "stylesheets": [],
+        "javascripts": []
+    },
+    "images": [
+        "/images/image1.jpg"
+    ]
+}

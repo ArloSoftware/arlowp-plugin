@@ -1,0 +1,22 @@
+{
+    "version": 1.1,
+    "order": 2,
+    "icon": "icons8-grid-2",
+    "name": "Starter",
+    "description": "Matches Arlo starter template",
+    "forDesigners": true,
+    "demoUrl": "",
+    "externalResources": {
+        "stylesheets": [
+            "/custom-assets/font-awesome-4.7.0/css/font-awesome.min.css"
+        ],
+        "javascripts": [
+            "/custom-assets/selectize.min.js",
+            "/custom-assets/bootstrap.min.js",
+            "/custom-assets/slick-1.7.1/slick.min.js"
+        ]
+    },
+    "images": [
+        "/images/starter2.png"
+    ]
+}

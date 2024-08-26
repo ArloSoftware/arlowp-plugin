@@ -1,0 +1,69 @@
+/*
+ * Icon Font Arlo-Web-Controls
+ * Made with love by Icons8 [ https://icons8.com/ ] using FontCustom [ https://github.com/FontCustom/fontcustom ]
+ *
+ * Contacts:
+ *    [ https://icons8.com/contact ]
+ *
+ * Follow Icon8 on
+ *    Twitter [ https://twitter.com/icons_8 ]
+ *    Facebook [ https://www.facebook.com/Icons8 ]
+ *    Google+ [ https://plus.google.com/+Icons8 ]
+ *    GitHub [ https://github.com/icons8 ]
+ */
+
+
+@font-face {
+  font-family: "Arlo-Web-Controls";
+  src: url("../fonts/Arlo-Web-Controls_d185c78287fd8ffe1bcb186bd6f85301.eot");
+  src: url("../fonts/Arlo-Web-Controls_d185c78287fd8ffe1bcb186bd6f85301.eot?#iefix") format("embedded-opentype"),
+       url("../fonts/Arlo-Web-Controls_d185c78287fd8ffe1bcb186bd6f85301.woff2") format("woff2"),
+       url("../fonts/Arlo-Web-Controls_d185c78287fd8ffe1bcb186bd6f85301.woff") format("woff"),
+       url("../fonts/Arlo-Web-Controls_d185c78287fd8ffe1bcb186bd6f85301.ttf") format("truetype"),
+       url("../fonts/Arlo-Web-Controls_d185c78287fd8ffe1bcb186bd6f85301.svg#Arlo-Web-Controls") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  @font-face {
+    font-family: "Arlo-Web-Controls";
+    src: url("../fonts/Arlo-Web-Controls_d185c78287fd8ffe1bcb186bd6f85301.svg#Arlo-Web-Controls") format("svg");
+  }
+}
+
+[data-icons8]:before { content: attr(data-icons8); }
+
+.icons8, [data-icons8]:before,
+.icons8-classroom:before,
+.icons8-date:before,
+.icons8-headset:before,
+.icons8-home:before,
+.icons8-search:before,
+.icons8-timetable:before,
+.icons8-training:before,
+.icons8-tv-show:before,
+.icons8-user-groups:before {
+  display: inline-block;
+  font-family: "Arlo-Web-Controls";
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  line-height: 1;
+  text-decoration: inherit;
+  text-rendering: optimizeLegibility;
+  text-transform: none;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-smoothing: antialiased;
+}
+
+.icons8-classroom:before { content: "\f102"; }
+.icons8-date:before { content: "\f107"; }
+.icons8-headset:before { content: "\f103"; }
+.icons8-home:before { content: "\f104"; }
+.icons8-search:before { content: "\f105"; }
+.icons8-timetable:before { content: "\f106"; }
+.icons8-training:before { content: "\f101"; }
+.icons8-tv-show:before { content: "\f109"; }
+.icons8-user-groups:before { content: "\f100"; }

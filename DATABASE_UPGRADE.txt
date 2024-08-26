@@ -1,0 +1,39 @@
+-- == V2.08 ==
+CREATE TABLE `wp_arlo_timezones` (`id` tinyint(3) unsigned NOT NULL, `name` varchar(256) NOT NULL, `active` datetime NOT NULL, PRIMARY KEY (id)) CHARACTER SET utf8 COLLATE=utf8_general_ci;	
+CREATE TABLE IF NOT EXISTS `wp_arlo_timezones_olson` (`timezone_id` int(11) NOT NULL,`olson_name` varchar(255) NOT NULL, `active` datetime NOT NULL, PRIMARY KEY (`timezone_id`,`olson_name`)) CHARACTER SET utf8 COLLATE=utf8_general_ci;
+ALTER TABLE  `wp_arlo_events` ADD  `e_timezone_id` TINYINT UNSIGNED NOT NULL AFTER  `e_timezone`
+
+-- == V2.07 ==
+ALTER TABLE  `wp_arlo_eventtemplates_categories` ADD  `et_order` SMALLINT UNSIGNED NOT NULL DEFAULT  '0' AFTER  `c_arlo_id`
+ALTER TABLE  `wp_arlo_categories` ADD  `c_depth_level` TINYINT UNSIGNED NOT NULL DEFAULT  '0' AFTER  `c_order`
+ALTER TABLE  `wp_arlo_categories` CHANGE  `c_order`  `c_order` BIGINT NULL DEFAULT NULL
+
+-- == V2.06 ==
+ALTER TABLE `wp_arlo_events` ADD `e_providerwebsite` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `e_providerorganisation`;
+
+-- == V2.05 ==
+ALTER TABLE  `wp_arlo_categories` ADD  `c_template_num` SMALLINT UNSIGNED NOT NULL DEFAULT '0' AFTER  `c_footer`;
+
+ALTER TABLE  `wp_arlo_categories` ADD UNIQUE (`c_arlo_id`);
+ALTER TABLE  `wp_arlo_categories` ADD INDEX (`c_parent_id`);
+ALTER TABLE  `wp_arlo_contentfields` ADD INDEX (  `cf_order` );
+ALTER TABLE  `wp_arlo_contentfields` ADD INDEX (  `et_id` );
+ALTER TABLE  `wp_arlo_events` ADD INDEX (  `et_arlo_id` );
+ALTER TABLE  `wp_arlo_events` ADD INDEX (  `e_arlo_id` );
+ALTER TABLE  `wp_arlo_events` ADD INDEX (  `v_id` );
+ALTER TABLE  `wp_arlo_events_presenters` ADD INDEX (  `p_order` );
+ALTER TABLE  `wp_arlo_events_presenters` DROP INDEX  `uk_events_presenters` , ADD PRIMARY KEY (  `e_arlo_id` ,  `p_arlo_id` );
+ALTER TABLE  `wp_arlo_eventtemplates` ADD INDEX (  `et_arlo_id` );
+ALTER TABLE  `wp_arlo_eventtemplates_categories` DROP INDEX  `uk_eventtemplates_categories` , ADD PRIMARY KEY (  `et_arlo_id` ,  `c_arlo_id` );
+ALTER TABLE  `wp_arlo_eventtemplates_presenters` DROP INDEX  `uk_eventtemplates_presenters` , ADD PRIMARY KEY (  `et_arlo_id` ,  `p_arlo_id` );
+ALTER TABLE  `wp_arlo_offers` ADD INDEX (  `o_arlo_id` );
+ALTER TABLE  `wp_arlo_offers` ADD INDEX (  `et_id` );
+ALTER TABLE  `wp_arlo_offers` ADD INDEX (  `e_id` );
+ALTER TABLE  `wp_arlo_offers` ADD INDEX (  `o_order` );
+ALTER TABLE  `wp_arlo_presenters` ADD INDEX (  `p_arlo_id` );
+ALTER TABLE  `wp_arlo_venues` ADD INDEX (  `v_arlo_id` );
+
+-- == V2.01 ==
+
+ALTER TABLE `wp_arlo_events` ADD `e_locationvisible` TINYINT(1) NOT NULL DEFAULT '0' AFTER `e_locationroomname`;
+ALTER TABLE `wp_arlo_events` ADD `e_providerorganisation` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `e_registeruri`;

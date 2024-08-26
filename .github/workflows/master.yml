@@ -1,0 +1,36 @@
+name: Build Master
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Create Build Archive (git archive)
+      run: |
+        git archive --format=zip --output arlo-training-and-event-management-system.zip -9 HEAD
+    - name: Generate Version Number
+      id: next_version
+      uses: anothrNick/github-tag-action@1.61.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        WITH_V: true
+        DEFAULT_BUMP: minor
+        DRY_RUN: true
+        RELEASE_BRANCHES: ^$
+        PRERELEASE: true
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        files: arlo-training-and-event-management-system.zip
+        tag_name: ${{ steps.next_version.outputs.new_tag }}
+        name: Version ${{ steps.next_version.outputs.new_tag }}
+        prerelease: true

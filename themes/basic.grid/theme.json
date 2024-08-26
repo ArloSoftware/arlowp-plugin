@@ -1,0 +1,14 @@
+{
+    "version": 1.6,
+    "order": 14,
+    "icon": "icons8-grid-2",
+    "name": "Basic Grid",
+    "description": "Minimum styling to allow you to easily customize pages",
+    "forDesigners": true,
+    "demoUrl": "https://support.arlo.co/hc/en-gb/articles/115001646746-Basic-grid-WordPress-theme",
+    "externalResources": {
+        "stylesheets": [
+        ],
+        "javascripts": []
+    }
+}

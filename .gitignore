@@ -1,0 +1,7 @@
+/nbproject/private/
+/public/assets/css/custom.css
+/vendor
+/composer*
+/import
+/includes/arlo-generated-static-arrays.php
+.vscode

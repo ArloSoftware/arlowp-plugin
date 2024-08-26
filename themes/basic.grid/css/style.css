@@ -1,0 +1,433 @@
+.arlo .arlo-list,
+.arlo .arlo-list > li,
+.arlo-category-list,
+.arlo-category-list li,
+.arlo .arlo-event-credits,
+.arlo .arlo-event-credits li,
+.arlo .arlo-event-template-credits,
+.arlo .arlo-event-template-credits li {
+	list-style-type: none;
+	list-style: none;
+	margin-left: 0;
+	padding-left: 0;
+}
+
+.arlo .arlo-list:last-child {
+	margin-bottom: 0;
+}
+
+.arlo .arlo-list.events > li,
+.arlo .arlo-list.template-online-activities > li,
+.arlo .arlo-list.upcoming > li.arlo-event,
+.arlo .arlo-list.arlo-online-activities > li {
+	border: 1px solid #ccc;
+	margin-bottom: 1em;
+	margin-left: 0px;
+	padding: 1em;
+}
+
+.arlo .arlo-list.events > li:last-child, 
+.arlo .arlo-list.template-online-activities > li:last-child, 
+.arlo .arlo-list.upcoming > li:last-child {
+	margin-bottom: 0;
+}
+
+.arlo .arlo-list.venues > li, 
+.arlo .arlo-list.presenters > li {
+	margin-bottom: 1em;
+}
+
+.arlo .arlo-cal {
+	text-align: center;
+	background-color: #fff;
+}
+
+.arlo .arlo-cal.arlo-left {
+	margin-right: 1em;
+	max-width: 24%;
+}
+
+.arlo .arlo-cal-month {
+	background-color: #f04124;
+	border: 1px solid #f04124;
+	color: #fff;
+	display: block;
+	font-weight: 600;
+	width: 50px;
+}
+
+.arlo .arlo-cal-day {
+	border: 1px solid #ccc;
+	border-top: 0;
+	display: inline-block;
+	font-size: 1.5em;
+	width: 50px;
+	padding: 6px 0px;
+}
+
+.arlo .arlo-onlineactivity .arlo-oa-credits {
+	margin-left: 1em;
+	list-style: none;
+}
+
+.arlo .arlo-event-details {
+	max-width: 50%;
+}
+
+.widget .arlo-cal-month {
+	font-size: 0.75em;
+}
+
+.widget .arlo-cal-day {
+	font-size: 1.5em;
+}
+
+.arlo .arlo-event-registration {
+	text-align: right;
+}
+
+.arlo .arlo-event-registration > span {
+	display: block;
+	font-size: 0.75em;
+}
+
+.arlo .arlo-event-registration > a, .arlo-event-registration > span {
+	margin-bottom: 0.5em;
+}
+
+.arlo .arlo-event-full {
+	font-weight: 600;
+}
+
+.arlo .arlo-event-location,
+.arlo .arlo-event-provider,
+.arlo .arlo-event-presenters,
+.arlo .arlo-event-notice,
+.arlo .arlo-event-session-description,
+.arlo .arlo-event-time {
+	display: block;
+}
+
+.arlo .arlo-event-offers .replaced {
+	margin-right: 1em;
+	text-decoration: line-through;
+}
+
+.arlo .arlo-event-offers .discount {
+	color: red;
+}
+
+.arlo .arlo-address-list {
+	list-style-type: none;
+	margin-left: 0;
+	padding-left: 0;
+}
+
+.arlo-widget-upcoming {
+	padding-left: 0px;
+}
+
+.arlo-widget-upcoming > li {
+	margin-bottom: 0.75em;
+}
+
+.arlo-widget-upcoming > li p {
+	margin: 0px;
+}
+
+.arlo ul.page-numbers {
+	list-style-type: none;
+	margin: 1em 0;
+	padding-left: 0;
+	text-align: center;
+}
+
+.arlo ul.page-numbers li {
+	display: inline-block;
+	margin: 0 0.25em;
+}
+
+.arlo .arlo-filters {
+	margin: 0.5em 0 1em 0;
+}
+
+.arlo .arlo-filters-buttons {
+	display:inline-block;
+	margin-top: 0;
+}
+
+.arlo .arlo-filters select {
+	width: 100%;
+	margin-bottom: 0.5em;
+}
+
+.arlo .arlo-filters select, 
+.arlo .arlo-filters .arlo-button {
+	margin-right: 0.5em;
+}
+
+.arlo .arlo-filters .arlo-button {
+	font-size: 0.75em;
+}
+
+.arlo .arlo-timezone-selector {
+	margin: 0.5em 0 1em 0;
+}
+
+.arlo .arlo-timezone-selector p {
+	margin: 0px;
+}
+
+@media (min-width: 550px) {
+
+	.arlo .arlo-filters-buttons {
+		margin-top: 0.5em;
+	}
+
+	.arlo .arlo-filters select {
+		margin-bottom: 0;
+		width: auto;
+	}
+
+	.arlo .arlo-filters .arlo-button {
+		margin-bottom: 0;
+	}
+}
+
+
+/* utility classes */
+
+.arlo .text-overflow-ellipsis {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.arlo .arlo-left {
+	float: left;
+}
+
+.arlo .arlo-right {
+	float: right;
+}
+
+.arlo .arlo-cf:before, 
+.arlo .arlo-cf:after {
+	content: " "; /* 1 */
+	display: table; /* 2 */
+}
+
+.arlo .arlo-cf:after {
+	clear: both;
+}
+
+.arlo .arlo-clear-both {
+	clear: both;
+}
+
+.arlo-categories-widget ul ul {
+	margin-left: 1em;
+}
+
+.arlo .arlo-show-more:after {
+    clear: both;
+}
+.arlo .arlo-show-more-hidden {
+    display: none;
+}
+
+.arlo .arlo-timezone-toggle select {
+	margin-right: 0.5em;
+}
+.arlo .arlo-timezone-selector select {
+	margin-right: 0.5em;
+}
+
+.arlo table.arlo-no-results td {
+	text-align: center;
+}
+
+.arlo table.arlo_suggest_templates {
+	width: 100%;
+}
+
+.arlo p.arlo-no-results {
+	padding: 1em;
+	text-align: center;
+	background-color: #f3f3f3;
+	font-size: 0.8em;
+}
+
+/* Tooltip */
+
+.arlo .arlo-tooltip-html {
+	display: none;
+}
+
+.arlo .arlo-tooltip-button {
+	font-weight: 700;
+	cursor: pointer;
+	display: inline-block;
+}
+
+/* BOXED LAYOUT OVERRIDE */
+
+
+/* event with dates */
+
+.arlo .arlo-boxed .arlo-template-head {
+    padding: 12px 0;
+    margin-bottom: 12px;
+}
+
+.arlo .arlo .arlo-boxed .arlo-list.events,
+.arlo .arlo-boxed .arlo-list.upcoming {
+    margin-left: 0px;
+}
+
+.arlo .arlo-boxed .arlo-list.template-online-activities .arlo-cf,
+.arlo .arlo-boxed .arlo-list.events .arlo-cf,
+.arlo .arlo-boxed .arlo-list.upcoming .arlo-cf,
+.arlo .arlo-boxed .arlo-list.arlo-online-activities .arlo-cf  {
+    border: 1px solid #dcdcdc;
+    border-radius: 2px;
+    margin-right: 12px;
+    width: 100%;
+}
+
+@media (min-width: 550px) {
+	.arlo .arlo-boxed .arlo-list.template-online-activities .arlo-cf,
+	.arlo .arlo-boxed .arlo-list.events .arlo-cf,
+	.arlo .arlo-boxed .arlo-list.upcoming .arlo-cf,
+	.arlo .arlo-boxed .arlo-list.arlo-online-activities .arlo-cf {
+	    width: 47%;
+	    float: left;
+	}
+}
+
+.arlo .arlo-boxed .arlo-list.upcoming .arlo-cf.arlo-group-divider,
+.arlo .arlo-boxed .arlo-list.arlo-online-activities .arlo-cf.arlo-group-divider {
+    float: none;
+    border: none;
+    font-weight: 600;
+    font-size: 22px;
+    margin-bottom: 1em;
+    clear: both;
+    padding-left: 0;
+}
+
+.arlo .arlo-boxed .arlo-event-details {
+    width: 100%;
+    max-width: 100%;
+}
+
+
+.arlo .arlo-boxed .arlo-template-summary {
+    height: 6em;
+    line-height: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical; 
+    overflow: hidden;
+}
+
+.arlo .arlo-boxed .arlo-template-summary h5 {
+    padding-bottom: 0px;
+}
+
+.arlo .arlo-boxed .arlo-ellipsis {    
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;  
+}
+
+.arlo .arlo-boxed .arlo-cal {
+    text-align: left;
+}
+
+.arlo .arlo-boxed .arlo-event-headline {
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.arlo .arlo-boxed .arlo-event-offers .amount {
+    font-weight: 600;
+}
+
+.arlo .arlo-boxed .arlo-event-registration {
+    text-align: left;
+    margin-top: 12px;
+}
+
+.arlo .arlo-boxed .arlo-event-registration .arlo-button {
+    float: left;
+}
+
+.arlo .arlo-boxed .arlo-event-registration span {
+    display: block;
+    float: right;
+    font-size: 0.9em;
+    padding-top: 6px;
+    width: 49%;
+    text-align: right;
+}
+
+.arlo .arlo-boxed .arlo-suggest {
+    padding: 12px 0;
+}
+
+.arlo .arlo-boxed .arlo-suggest .arlo-register-interest {
+    text-align: center;
+}
+
+.arlo .arlo-register {
+	margin-right: 0.5em;
+}
+
+
+.arlo .arlo-boxed .arlo-show-more-link-container {
+    border: none;
+    border-bottom: 2px solid #f4f4f4;
+    position: relative;
+    height: 20px;
+    margin-bottom: 25px;
+    clear: both;
+}
+
+.arlo .arlo-boxed .arlo-show-more-link {
+    position: absolute;
+    left: 50%;
+    background-color: #f4f4f4;
+    border: 6px solid #f4f4f4;
+    outline: 6px solid #fff;
+    top: 0px;
+}
+
+.arlo .arlo-boxed .arlo-show-more-link-container:before,
+.arlo .arlo-boxed .arlo-show-more-link-container:after{
+    clear: both;
+}
+
+.arlo .arlo-boxed .arlo-show-more-link:hover{
+    outline: 6px solid #fff;
+}
+
+.arlo-breadcrumbs ul{
+	list-style: none;
+	padding-left: 0;
+	margin: 1em 0;
+}
+.arlo-breadcrumbs li{
+	display: inline-block;
+}
+.arlo-breadcrumbs li:not(:last-child)::after{
+	content: '>';
+	padding-left: 3px;
+	padding-right: 5px;
+}
+
+.arlo-single-show-wrapper{
+  clear: both;
+  padding-top: 10px;
+  margin-bottom: 5px;
+}

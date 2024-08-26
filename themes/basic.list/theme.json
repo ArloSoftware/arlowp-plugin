@@ -1,0 +1,14 @@
+{
+    "version": 1.6,
+    "order": 13,
+    "icon": "icons8-grid-3",
+    "name": "Basic List",
+    "description": "Minimum styling to allow you to easily customize the pages",
+    "forDesigners": true,
+    "demoUrl": "https://support.arlo.co/hc/en-gb/articles/115001601263",
+    "externalResources": {
+        "stylesheets": [
+        ],
+        "javascripts": []
+    }
+}

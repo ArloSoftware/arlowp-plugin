@@ -1,0 +1,15 @@
+{
+    "version": 1.6,
+    "order": 7,
+    "name": "Spark",
+    "description": "Simple design that can be used on wide variety of websites",
+    "forDesigners": false,
+    "demoUrl": "https://support.arlo.co/hc/en-gb/articles/115003325783",
+    "externalResources": {
+        "stylesheets": [],
+        "javascripts": []
+    },
+    "images": [
+        "/images/image1.png"
+    ]
+}

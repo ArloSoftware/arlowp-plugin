@@ -1,0 +1,141 @@
+
+@font-face {
+  font-family: "Arlo-Website---iOS";
+  src: url("../icons8/Arlo-Website---iOS_70d5ea805b42b17ec1e843c786148aab.eot");
+  src: url("../icons8/Arlo-Website---iOS_70d5ea805b42b17ec1e843c786148aab.eot?#iefix") format("embedded-opentype"),
+       url("../icons8/Arlo-Website---iOS_70d5ea805b42b17ec1e843c786148aab.woff2") format("woff2"),
+       url("../icons8/Arlo-Website---iOS_70d5ea805b42b17ec1e843c786148aab.woff") format("woff"),
+       url("../icons8/Arlo-Website---iOS_70d5ea805b42b17ec1e843c786148aab.ttf") format("truetype"),
+       url("../icons8/Arlo-Website---iOS_70d5ea805b42b17ec1e843c786148aab.svg#Arlo-Website---iOS") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  @font-face {
+    font-family: "Arlo-Website---iOS";
+    src: url("../icons8/Arlo-Website---iOS_70d5ea805b42b17ec1e843c786148aab.svg#Arlo-Website---iOS") format("svg");
+  }
+}
+
+[data-icons8]:before { content: attr(data-icons8); }
+
+.arlo-icons8, [data-icons8]:before,
+.arlo-icons8-apartment:before,
+.arlo-icons8-arlo-logo-for-font:before,
+.arlo-icons8-cancel:before,
+.arlo-icons8-cancel-2:before,
+.arlo-icons8-checked-checkbox-2:before,
+.arlo-icons8-checked-checkbox-2-filled:before,
+.arlo-icons8-checkmark:before,
+.arlo-icons8-circled-play:before,
+.arlo-icons8-classroom:before,
+.arlo-icons8-coffee-maker:before,
+.arlo-icons8-coffee-to-go:before,
+.arlo-icons8-cup:before,
+.arlo-icons8-curriculum:before,
+.arlo-icons8-department:before,
+.arlo-icons8-design:before,
+.arlo-icons8-diploma:before,
+.arlo-icons8-diploma-1:before,
+.arlo-icons8-diploma-2:before,
+.arlo-icons8-embassy:before,
+.arlo-icons8-grid-2:before,
+.arlo-icons8-grid-3:before,
+.arlo-icons8-headset:before,
+.arlo-icons8-help:before,
+.arlo-icons8-help-filled:before,
+.arlo-icons8-home:before,
+.arlo-icons8-info:before,
+.arlo-icons8-info-filled:before,
+.arlo-icons8-java-coffee-cup-logo:before,
+.arlo-icons8-map-marker:before,
+.arlo-icons8-marker:before,
+.arlo-icons8-minus:before,
+.arlo-icons8-mouse:before,
+.arlo-icons8-play:before,
+.arlo-icons8-plus:before,
+.arlo-icons8-private:before,
+.arlo-icons8-search:before,
+.arlo-icons8-toggle-off:before,
+.arlo-icons8-toggle-off-filled:before,
+.arlo-icons8-tv:before,
+.arlo-icons8-tv-show:before,
+.arlo-icons8-unchecked-checkbox:before,
+.arlo-icons8-us-dollar:before,
+.arlo-icons8-us-dollar-2:before,
+.arlo-icons8-user-groups:before,
+.arlo-icons8-video-paylist:before {
+  display: inline-block;
+  font-family: "Arlo-Website---iOS";
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  line-height: 1;
+  text-decoration: inherit;
+  text-rendering: optimizeLegibility;
+  text-transform: none;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-smoothing: antialiased;
+}
+
+.arlo-icons8-apartment:before { content: "\f103"; }
+.arlo-icons8-arlo-logo-for-font:before { content: "\f11a"; }
+.arlo-icons8-cancel:before { content: "\f120"; }
+.arlo-icons8-cancel-2:before { content: "\f121"; }
+.arlo-icons8-checked-checkbox-2:before { content: "\f114"; }
+.arlo-icons8-checked-checkbox-2-filled:before { content: "\f118"; }
+.arlo-icons8-checkmark:before { content: "\f122"; }
+.arlo-icons8-circled-play:before { content: "\f12e"; }
+.arlo-icons8-classroom:before { content: "\f10f"; }
+.arlo-icons8-coffee-maker:before { content: "\f11e"; }
+.arlo-icons8-coffee-to-go:before { content: "\f11d"; }
+.arlo-icons8-cup:before { content: "\f11f"; }
+.arlo-icons8-curriculum:before { content: "\f10c"; }
+.arlo-icons8-department:before { content: "\f10e"; }
+.arlo-icons8-design:before { content: "\f127"; }
+.arlo-icons8-diploma:before { content: "\f10b"; }
+.arlo-icons8-diploma-1:before { content: "\f109"; }
+.arlo-icons8-diploma-2:before { content: "\f10a"; }
+.arlo-icons8-embassy:before { content: "\f10d"; }
+.arlo-icons8-grid-2:before { content: "\f124"; }
+.arlo-icons8-grid-3:before { content: "\f125"; }
+.arlo-icons8-headset:before { content: "\f102"; }
+.arlo-icons8-help:before { content: "\f129"; }
+.arlo-icons8-help-filled:before { content: "\f12a"; }
+.arlo-icons8-home:before { content: "\f104"; }
+.arlo-icons8-info:before { content: "\f12b"; }
+.arlo-icons8-info-filled:before { content: "\f12c"; }
+.arlo-icons8-java-coffee-cup-logo:before { content: "\f11c"; }
+.arlo-icons8-map-marker:before { content: "\f108"; }
+.arlo-icons8-marker:before { content: "\f107"; }
+.arlo-icons8-minus:before { content: "\f101"; }
+.arlo-icons8-mouse:before { content: "\f106"; }
+.arlo-icons8-play:before { content: "\f11b"; }
+.arlo-icons8-plus:before { content: "\f100"; }
+.arlo-icons8-private:before { content: "\f105"; }
+.arlo-icons8-search:before { content: "\f119"; }
+.arlo-icons8-toggle-off:before { content: "\f116"; }
+.arlo-icons8-toggle-off-filled:before { content: "\f117"; }
+.arlo-icons8-tv:before { content: "\f112"; }
+.arlo-icons8-tv-show:before { content: "\f111"; }
+.arlo-icons8-unchecked-checkbox:before { content: "\f115"; }
+.arlo-icons8-us-dollar:before { content: "\f12f"; }
+.arlo-icons8-us-dollar-2:before { content: "\f130"; }
+.arlo-icons8-user-groups:before { content: "\f113"; }
+.arlo-icons8-video-paylist:before { content: "\f110"; }
+
+.arlo-icons8.size-16 { font-size: 16px; }
+
+.arlo-icons8.size-21 { font-size: 21px; }
+      
+.arlo-icons8.size-24 { font-size: 24px; }
+
+.arlo-icons8.size-36 { font-size: 36px; }
+
+.arlo-icons8.size-48 { font-size: 48px; }
+
+.arlo-icons8.size-60 { font-size: 60px; }
+
+.arlo-icons8.size-72 { font-size: 72px; }

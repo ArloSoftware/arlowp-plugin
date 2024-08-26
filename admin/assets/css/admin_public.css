@@ -1,0 +1,61 @@
+#toplevel_page_arlo-for-wordpress .wp-menu-image {
+	background: transparent url(../img/icon-20x20.png) no-repeat center;
+	opacity: .6;
+	filter: alpha(opacity=60);	
+}
+
+#toplevel_page_arlo-for-wordpress:hover .wp-menu-image {
+	background: transparent url(../img/icon-20x20-blue.png) no-repeat center;
+	opacity: 1;
+	filter: alpha(opacity=100);	
+}
+
+.arlo-yellow {
+	color: #ffd20d;
+}
+
+.arlo-middle {
+	vertical-align: middle;
+}
+
+a .arlo-icons8 {
+	text-decoration: none;
+}
+
+
+.notice.review {
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    border: #86bd8e 1px solid;
+    background-color: #e6f0e8;
+    padding-bottom: 1em;
+}
+
+.notice.review p {
+	color: #25522c;
+}
+
+.notice.review a {
+	color: #2b8b34;
+}
+
+.notice.review .arlo-review-option {
+	display: inline-block;
+	margin: 0 .5em;
+}
+
+.notice.review .arlo-review-option:first-child {
+	margin-left: 0;
+}
+
+.notice.review .arlo-review-option:last-child {
+	margin-right: 0;
+}
+
+.arlo-logo {
+	background: url(../img/arlo-logo.png) no-repeat center;
+    width: 48px;
+    height: 48px;
+    background-size: 48px;
+    display: block;
+}

@@ -1,0 +1,116 @@
+/* Custom resets */
+
+.arlo#arlo,
+.arlo .dark-tooltip,
+.arlo-widget-upcoming,
+.arlo-categories-widget {
+    font-size: 16px;
+    font-weight: normal;
+    padding: 1em 0;
+    line-height: 1.5;
+    font-style: normal;
+    letter-spacing: 0;
+    text-transform: none;
+    word-wrap: break-word;
+}
+
+.arlo#arlo *,
+.arlo .dark-tooltip *,
+.arlo-widget-upcoming *,
+.arlo-categories-widget * {
+    font-size: inherit;
+    font-family: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    border: none;
+    font-style: inherit;
+    color: inherit;
+    box-shadow: none;
+    border: none;
+    background-image: none;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    word-wrap: inherit;
+}
+
+.arlo#arlo a,
+.arlo#arlo a:hover {
+    text-decoration: none;
+    -webkit-transition: color .3s;
+    -moz-transition: color .3s;
+    transition: color .3s;
+}
+
+.arlo#arlo a:hover {
+    border-bottom: 1px solid;
+}
+
+.arlo#arlo h1,
+.arlo#arlo h2,
+.arlo#arlo h3,
+.arlo#arlo h4,
+.arlo#arlo h5,
+.arlo#arlo h6,
+.arlo#arlo p {
+    margin: 1em 0 .5em;
+    padding: 0;
+}
+
+.arlo#arlo h1,
+.arlo#arlo h2,
+.arlo#arlo h3,
+.arlo#arlo h4,
+.arlo#arlo h5,
+.arlo#arlo h6 {
+    font-weight: bold;
+}
+
+.arlo#arlo h1 {
+    font-size: 2.8em;
+}
+
+.arlo#arlo h2 {
+    font-size: 2.5em;
+}
+
+.arlo#arlo h3 {
+    font-size: 2em;
+}
+
+.arlo#arlo h4 {
+    font-size: 1.7em;
+}
+
+.arlo#arlo h5 {
+    font-size: 1.5em;
+}
+
+.arlo#arlo h6 {
+    font-size: 1.2em;
+}
+
+.arlo#arlo .arlo-online-activity h4,
+.arlo#arlo .arlo-schedule-event .arlo-template-name h5 {
+    margin-top: 0;
+}
+
+.arlo#arlo .schedule .arlo-cf.arlo-group-divider:first-child,
+.arlo#arlo .schedule .arlo-cf.arlo-group-divider:first-child h3 {
+    margin-top: 0;
+}
+
+
+
+/* Fonts */
+
+.arlo#arlo,
+.arlo#arlo .arlo-font1,
+.arlo .dark-tooltip,
+.arlo-widget-upcoming,
+.arlo-categories-widget {
+    font-family: inherit;
+}
+
+.arlo#arlo .arlo-font2 {
+    font-family: inherit;
+}

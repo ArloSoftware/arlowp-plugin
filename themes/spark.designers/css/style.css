@@ -1,0 +1,1685 @@
+/*  Theme 2  */
+
+
+/* Normalize.css */
+
+body.arlo {
+    margin: 0;
+}
+
+.arlo#arlo article,
+.arlo#arlo aside,
+.arlo#arlo details,
+.arlo#arlo figcaption,
+.arlo#arlo figure,
+.arlo#arlo footer,
+.arlo#arlo header,
+.arlo#arlo main,
+.arlo#arlo menu,
+.arlo#arlo nav,
+.arlo#arlo section,
+.arlo#arlo summary {
+    display: block;
+}
+
+.arlo#arlo audio,
+.arlo#arlo canvas,
+.arlo#arlo progress,
+.arlo#arlo video {
+    display: inline-block;
+}
+
+.arlo#arlo audio:not([controls]) {
+    display: none;
+    height: 0;
+}
+
+.arlo#arlo progress {
+    vertical-align: baseline;
+}
+
+.arlo#arlo template,
+.arlo#arlo [hidden] {
+    display: none;
+}
+
+.arlo#arlo a {
+    background-color: transparent;
+    /* 1 */
+    -webkit-text-decoration-skip: objects;
+    /* 2 */
+}
+
+.arlo#arlo a:active,
+.arlo#arlo a:hover {
+    outline-width: 0;
+}
+
+.arlo#arlo abbr[title] {
+    border-bottom: none;
+    /* 1 */
+    text-decoration: underline;
+    /* 2 */
+    text-decoration: underline dotted;
+    /* 2 */
+}
+
+.arlo#arlo b,
+.arlo#arlo strong {
+    font-weight: inherit;
+}
+
+.arlo#arlo b,
+.arlo#arlo strong {
+    font-weight: bolder;
+}
+
+.arlo#arlo code,
+.arlo#arlo kbd,
+.arlo#arlo samp {
+    font-family: monospace, monospace;
+    font-size: 1em;
+}
+
+.arlo#arlo dfn {
+    font-style: italic;
+}
+
+.arlo#arlo mark {
+    background-color: #ff0;
+    color: #000;
+}
+
+.arlo#arlo small {
+    font-size: 80%;
+}
+
+.arlo#arlo sub,
+.arlo#arlo sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+}
+
+.arlo#arlo sub {
+    bottom: -0.25em;
+}
+
+.arlo#arlo sup {
+    top: -0.5em;
+}
+
+.arlo#arlo img {
+    border-style: none;
+}
+
+.arlo#arlo svg:not(:root) {
+    overflow: hidden;
+}
+
+.arlo#arlo figure {
+    margin: 1.5em 40px;
+}
+
+.arlo#arlo hr {
+    box-sizing: content-box;
+    /* 1 */
+    height: 0;
+    /* 1 */
+    overflow: visible;
+    /* 2 */
+}
+
+.arlo#arlo pre {
+    font-family: monospace, monospace;
+    font-size: 1em;
+}
+
+.arlo#arlo button,
+.arlo#arlo input,
+.arlo#arlo optgroup,
+.arlo#arlo select,
+.arlo#arlo textarea {
+    font: inherit;
+    /* 1 */
+    margin: 0;
+    /* 2 */
+}
+
+.arlo#arlo button {
+    overflow: visible;
+}
+
+.arlo#arlo button,
+.arlo#arlo select {
+    /* 1 */
+    text-transform: none;
+}
+
+.arlo#arlo button,
+.arlo#arlo html [type="button"],
+.arlo#arlo [type="reset"],
+.arlo#arlo [type="submit"] {
+    -webkit-appearance: button;
+    /* 2 */
+}
+
+.arlo#arlo button,
+.arlo#arlo [type="button"],
+.arlo#arlo [type="reset"],
+.arlo#arlo [type="submit"] {
+    /**
+     * Remove the inner border and padding in Firefox.
+     */
+    /**
+     * Restore the focus styles unset by the previous rule.
+     */
+}
+
+.arlo#arlo button::-moz-focus-inner,
+.arlo#arlo [type="button"]::-moz-focus-inner,
+.arlo#arlo [type="reset"]::-moz-focus-inner,
+.arlo#arlo [type="submit"]::-moz-focus-inner {
+    border-style: none;
+    padding: 0;
+}
+
+.arlo#arlo button:-moz-focusring,
+.arlo#arlo [type="button"]:-moz-focusring,
+.arlo#arlo [type="reset"]:-moz-focusring,
+.arlo#arlo [type="submit"]:-moz-focusring {
+    outline: 1px dotted ButtonText;
+}
+
+.arlo#arlo input {
+    overflow: visible;
+}
+
+.arlo#arlo [type="checkbox"],
+.arlo#arlo [type="radio"] {
+    box-sizing: border-box;
+    /* 1 */
+    padding: 0;
+    /* 2 */
+}
+
+.arlo#arlo [type="number"]::-webkit-inner-spin-button,
+.arlo#arlo [type="number"]::-webkit-outer-spin-button {
+    height: auto;
+}
+
+.arlo#arlo [type="search"] {
+    -webkit-appearance: textfield;
+    /* 1 */
+    outline-offset: -2px;
+    /* 2 */
+    /**
+     * Remove the inner padding and cancel buttons in Chrome and Safari on OS X.
+     */
+}
+
+.arlo#arlo [type="search"]::-webkit-search-cancel-button,
+.arlo#arlo [type="search"]::-webkit-search-decoration {
+    -webkit-appearance: none;
+}
+
+.arlo::-webkit-input-placeholder {
+    color: inherit;
+    opacity: 0.54;
+}
+
+.arlo::-webkit-file-upload-button {
+    -webkit-appearance: button;
+    /* 1 */
+    font: inherit;
+    /* 2 */
+}
+
+.arlo#arlo fieldset {
+    border: 1px solid #c0c0c0;
+    margin: 0 2px;
+    padding: 0.35em 0.625em 0.75em;
+}
+
+.arlo#arlo legend {
+    box-sizing: border-box;
+    /* 1 */
+    display: table;
+    /* 1 */
+    max-width: 100%;
+    /* 1 */
+    white-space: normal;
+    /* 1 */
+    color: inherit;
+    /* 2 */
+    padding: 0;
+    /* 3 */
+}
+
+.arlo#arlo optgroup {
+    font-weight: bold;
+}
+
+.arlo#arlo textarea {
+    overflow: auto;
+}
+
+
+/* Custom resets */
+
+.arlo#arlo h1,
+.arlo#arlo h2,
+.arlo#arlo h3,
+.arlo#arlo h4,
+.arlo#arlo h5,
+.arlo#arlo h6 {
+    clear: none;
+}
+
+.arlo#arlo * {
+    box-sizing: border-box;
+    word-break: break-word;
+}
+
+.arlo#arlo img {
+    max-width: 100%;
+}
+
+.arlo#arlo button,
+.arlo#arlo .button {
+    border-radius: 0;
+}
+
+.arlo#arlo label {
+    display: block;
+}
+
+
+/* Colours */
+
+
+/* Colour 1 */
+
+
+/* Main colour used for texts and headlines. Default: dark gray */
+
+.arlo#arlo,
+.arlo#arlo .arlo-color1,
+.arlo#arlo .arlo-next-running,
+.arlo#arlo .arlo-button:hover,
+.arlo#arlo .arlo-filters .arlo-filters-buttons a:hover,
+.arlo#arlo .arlo-next-running>a:hover,
+.arlo-widget-upcoming .arlo-cal-day,
+.arlo#arlo .arlo-event-offers .replaced+.discount * {
+    color: #666666;
+}
+
+.arlo#arlo .arlo-background-color1,
+.arlo#arlo .arlo-next-running a,
+.arlo#arlo .arlo-button {
+    background-color: #666666;
+}
+
+.arlo#arlo .arlo-border-color1,
+.arlo#arlo .arlo-button:hover,
+.arlo#arlo .arlo-filters .arlo-filters-buttons a:hover,
+.arlo#arlo .arlo-next-running>a:hover {
+    border-color: #666666;
+}
+
+
+/* Colour 2 */
+
+
+/* Secondary colour used for buttons, hovers. Default: orange */
+
+.arlo#arlo .arlo-color2,
+.arlo#arlo .arlo-tooltip-button,
+.arlo#arlo .arlo-suggest a,
+.arlo#arlo .arlo-no-results a,
+.arlo#arlo .arlo-register-private-interest a,
+.arlo#arlo .arlo-suggest-private-datelocation a,
+.arlo .dark-tooltip h6,
+.arlo#arlo .arlo-event-offers .discount,
+.arlo#arlo .arlo-event-offers .discount *,
+.arlo#arlo .arlo-event-offers .replaced .amount,
+.arlo#arlo a:hover,
+.arlo#arlo .arlo-category-list li a:hover,
+.arlo#arlo .arlo-event-registration>p>a,
+.arlo#arlo .arlo-pagination .page-numbers:hover,
+.arlo#arlo .arlo-pagination .page-numbers.next:hover,
+.arlo#arlo .arlo-pagination .page-numbers.prev:hover,
+.arlo#arlo .arlo-event-name a:hover,
+.arlo#arlo .arlo-event-provider a:hover,
+.arlo#arlo .arlo-event-location a:hover,
+.arlo#arlo .arlo-list.catalogue .arlo-template-name a:hover,
+.arlo#arlo ul.arlo-list.venues .arlo-venue-name a:hover,
+.arlo#arlo .arlo-event-presenters a:hover,
+.arlo#arlo ul.presenter-events>li a:hover,
+.arlo#arlo .arlo-event-registration>a:hover,
+.arlo#arlo .arlo-event-registration>a.arlo-waiting-list:hover,
+.arlo#arlo .arlo-buttons .arlo-event-registration>a:hover,
+.arlo#arlo .arlo-filters .arlo-filters-buttons a:hover,
+.arlo#arlo .arlo-show-more-link:hover,
+.arlo#arlo .arlo-oa-registration>a:hover,
+.arlo#arlo .arlo-next-running a.arlo-register:hover,
+.arlo#arlo .arlo-suggest-template-event-link a,
+.arlo#arlo .arlo-suggest-templates a:hover,
+.arlo#arlo ul.arlo-list.venues .arlo-venue-info-link a,
+.arlo#arlo ul.arlo-list.presenters .arlo-presenter-info-link a,
+.arlo#arlo ul.presenter-events>li a,
+.arlo-categories-widget .arlo-category-list li a:hover,
+.arlo-list.arlo-widget-upcoming a:hover {
+    color: #ff7033;
+}
+
+.arlo#arlo .arlo-background-color2,
+.arlo#arlo .arlo-event-registration>a,
+.arlo#arlo .arlo-filters .arlo-filters-buttons a,
+.arlo#arlo .arlo-oa-registration>a,
+.arlo#arlo .arlo-register,
+.arlo#arlo .arlo-next-running a.arlo-register,
+.arlo#arlo .arlo-search-button,
+.arlo#arlo .arlo-show-more-link {
+    background-color: #ff7033;
+}
+
+.arlo#arlo .arlo-border-color2,
+.arlo#arlo .arlo-cal,
+.arlo#arlo .arlo-search-field,
+.arlo#arlo .arlo-search-button,
+.arlo#arlo .arlo-list .arlo-group-divider,
+.arlo#arlo .arlo-category-list li a:hover,
+.arlo#arlo .arlo-event-registration>a:hover,
+.arlo#arlo .arlo-event-registration>a.arlo-waiting-list:hover,
+.arlo#arlo .arlo-buttons .arlo-event-registration>a:hover,
+.arlo#arlo .arlo-filters .arlo-filters-buttons a:hover,
+.arlo#arlo .arlo-show-more-link:hover,
+.arlo#arlo .arlo-oa-registration>a:hover,
+.arlo#arlo .arlo-next-running a.arlo-register:hover,
+.arlo#arlo .arlo-register:hover,
+.arlo-widget-upcoming>li:hover .arlo-cal.arlo-left {
+    border-color: #ff7033;
+}
+
+
+/* Colour 3 */
+
+
+/* Light colour used for backgrounds. Default: light gray */
+
+.arlo#arlo .arlo-color3 {
+    color: #e6e6e6;
+}
+
+.arlo#arlo .arlo-background-color3,
+.arlo#arlo select,
+.arlo#arlo .arlo-category-list li a,
+.arlo#arlo p.arlo-no-results,
+.arlo#arlo .arlo-next-running span,
+.arlo#arlo .arlo-pagination .page-numbers.current {
+    background-color: #e6e6e6;
+}
+
+.arlo#arlo .arlo-event-registration>a.arlo-waiting-list,
+.arlo#arlo .arlo-pagination .page-numbers {
+    border-color: #e6e6e6;
+}
+
+.arlo#arlo .arlo-register-private-interest,
+.arlo#arlo .arlo-suggest-private-datelocation {
+    background-color: #e6e6e6;
+}
+
+
+/* Colour 4 */
+
+
+/* Highlight colour used for important imformation. Default: yellow */
+
+.arlo#arlo .arlo-color4,
+.arlo#arlo .arlo-event-provider a,
+.arlo#arlo .arlo-event-location a,
+.arlo#arlo .arlo-event-presenters a,
+.arlo#arlo .arlo-places-remaining,
+.arlo#arlo .arlo-event-full,
+.arlo#arlo .arlo-presenter-details a {
+    color: #f2d300;
+}
+
+
+/* Colour 5 */
+
+
+/* Light colour used for general links. Default: light blue */
+
+.arlo#arlo .arlo-color5,
+.arlo#arlo .arlo-presenter-content a,
+.arlo#arlo .arlo-venue-content a,
+.arlo#arlo .arlo-presenter-details a,
+.arlo#arlo .arlo-venue-details a,
+.arlo#arlo .arlo-content-field a {
+    color: #7582d0;
+}
+
+
+/* Colour 6 */
+
+
+/* Contrast colour used for button texts with dark backgrounds. Default: white */
+
+.arlo#arlo .arlo-button,
+.arlo#arlo .arlo-filters .arlo-filters-buttons a,
+.arlo#arlo .arlo-buttons .arlo-event-registration>a,
+.arlo#arlo .arlo-buttons .arlo-event-registration p,
+.arlo#arlo .arlo-search-button,
+.arlo#arlo .arlo-search-button:hover,
+.arlo#arlo .arlo-next-running a,
+.arlo#arlo .arlo-next-running span,
+.arlo#arlo .arlo-event-registration>a,
+.arlo#arlo .arlo-show-more-link,
+.arlo#arlo .arlo-oa-registration>a {
+    color: white;
+}
+
+
+/* Colour 7 */
+
+
+/* Light colour used for secondary texts. Default: gray */
+
+.arlo#arlo .arlo-color7,
+.arlo#arlo ul.upcoming .arlo-event-provider,
+.arlo#arlo ul.upcoming .arlo-event-time,
+.arlo#arlo ul.upcoming .arlo-event-location,
+.arlo#arlo ul.upcoming .arlo-event-presenters,
+.arlo#arlo .arlo-next-running span,
+.arlo#arlo .arlo-event-registration>a.arlo-waiting-list,
+.arlo#arlo .arlo-list.catalogue .arlo-next-running p,
+.arlo#arlo .arlo-list.catalogue .arlo-advertised-duration span,
+.arlo#arlo .arlo-list.catalogue .arlo-advertised-price span,
+.arlo#arlo .arlo-list.catalogue .arlo-offers span,
+.arlo#arlo .arlo-reference-term,
+.arlo-categories-widget .arlo-category-list li ul {
+    color: #ababab;
+}
+
+
+/* Transparent Background*/
+
+.arlo#arlo .arlo-search-field,
+.arlo#arlo .arlo-list .arlo-group-divider,
+.arlo#arlo .arlo-button:not(.arlo-search-button):hover,
+.arlo#arlo .arlo-filters .arlo-filters-buttons a:hover,
+.arlo#arlo .arlo-category-list li a:hover,
+.arlo#arlo .arlo-next-running>a:hover,
+.arlo#arlo .arlo-show-more-link:hover,
+.arlo#arlo .arlo-oa-registration>a:hover,
+.arlo#arlo .arlo-event-registration>a.arlo-waiting-list,
+.arlo#arlo .arlo-event-registration>a:hover,
+.arlo#arlo .arlo-suggest-templates a,
+.arlo#arlo .arlo-buttons .arlo-event-registration>a:hover,
+.arlo#arlo .arlo-filters .arlo-filters-buttons a:hover,
+.arlo#arlo .arlo-next-running a.arlo-register:hover {
+    background-color: transparent;
+}
+
+
+/* Buttons */
+
+.arlo#arlo .arlo-button,
+.arlo#arlo .arlo-buttons .arlo-event-registration>a,
+.arlo#arlo .arlo-buttons .arlo-event-registration p,
+.arlo#arlo .arlo-filters .arlo-filters-buttons a,
+.arlo#arlo .arlo-pagination .page-numbers.next,
+.arlo#arlo .arlo-pagination .page-numbers.prev,
+.arlo#arlo .arlo-category-list li a,
+.arlo#arlo .arlo-next-running a,
+.arlo#arlo .arlo-next-running span,
+.arlo#arlo .arlo-event-registration>a,
+.arlo#arlo .arlo-show-more-link,
+.arlo#arlo .arlo-oa-registration>a,
+.arlo#arlo select {
+    display: inline-block;
+    padding: 8px 20px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    font-size: 1em;
+    width: auto;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    border: 2px solid transparent;
+    font-weight: 600;
+}
+
+.arlo#arlo.arlo-xs .arlo-button,
+.arlo#arlo.arlo-xs .arlo-buttons .arlo-event-registration>a,
+.arlo#arlo.arlo-xs .arlo-buttons .arlo-event-registration p,
+.arlo#arlo.arlo-xs .arlo-filters .arlo-filters-buttons a,
+.arlo#arlo.arlo-xs .arlo-pagination .page-numbers.next,
+.arlo#arlo.arlo-xs .arlo-pagination .page-numbers.prev,
+.arlo#arlo.arlo-xs .arlo-event-registration>a,
+.arlo#arlo.arlo-xs .arlo-show-more-link,
+.arlo#arlo.arlo-xs .arlo-oa-registration>a,
+.arlo#arlo.arlo-xs .arlo-next-running>a,
+.arlo#arlo.arlo-xs .arlo-next-running span,
+.arlo#arlo.arlo-xs select {
+    display: block;
+    width: 100%;
+}
+
+.arlo#arlo .arlo-button:active,
+.arlo#arlo .arlo-buttons .arlo-event-registration>a:active,
+.arlo#arlo .arlo-filters .arlo-filters-buttons a:active,
+.arlo#arlo .arlo-category-list li a:active,
+.arlo#arlo .arlo-next-running>a:active,
+.arlo#arlo .arlo-show-more-link:active,
+.arlo#arlo .arlo-oa-registration>a:active,
+.arlo#arlo .arlo-event-registration>a:active,
+.arlo#arlo .arlo-filters .arlo-filters-buttons a:active,
+.arlo#arlo .arlo-oa-registration>a:active,
+.arlo#arlo .arlo-next-running a.arlo-register:active {
+    opacity: .5;
+}
+
+
+/* Filters */
+
+.arlo#arlo .arlo-filters {
+    display: inline-block;
+    overflow: auto;
+    margin: 0;
+}
+
+.arlo#arlo .arlo-filters select {
+    float: left;
+    width: auto;
+    min-width: 200px;
+    height: auto;
+    margin-right: 5px;
+    margin-bottom: .5em;
+    border: none;
+}
+
+.arlo#arlo select.arlo-filter-region {
+    float: left;
+    width: auto;
+    min-width: 200px;
+    height: auto;
+    margin-right: 5px;
+    margin-bottom: .5em;
+    border: none;
+}
+
+.arlo#arlo .arlo-filter-region-search select.arlo-filter-region {
+    float: none;
+    margin-bottom: 2em;
+}
+
+.arlo#arlo .arlo-catalogue-filters .arlo-categories {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.arlo#arlo .arlo-timezone-toggle {
+    display: inline-block;
+    max-width: 100%;
+    vertical-align: top;
+}
+.arlo#arlo .arlo-timezone-selector {
+    display: inline-block;
+    max-width: 100%;
+    vertical-align: top;
+}
+
+.arlo#arlo.arlo-sm .arlo-filters select {
+    width: 100%;
+    min-width: 100%;
+}
+
+.arlo#arlo.arlo-sm select.arlo-filter-region {
+    width: 100%;
+    min-width: 100%;
+}
+
+
+.arlo#arlo .arlo-event-template-filters {
+    display: inline-block;
+    width: 100%;
+}
+
+.arlo#arlo .arlo-region-selector {
+    margin: 1em 0px;
+}
+
+.arlo#arlo .arlo-region-selector select.arlo-filter-region {
+    float: none;
+    min-width: 400px;
+}
+
+.arlo#arlo .arlo-event-template-filters .arlo-filters {
+    float: left;
+}
+
+.arlo#arlo .arlo-timezone-selector {
+    float: right;
+}
+
+.arlo#arlo .arlo-timezone-selector p {
+  display: inline-block;
+  padding: 0 10px;
+}
+
+.arlo#arlo .arlo-timezone-selector form {
+  display: inline-block;
+}
+
+
+/* Utility classes */
+
+.arlo#arlo .arlo-banner p,
+.arlo#arlo .arlo-banner h1 {
+    margin: 0;
+}
+
+.arlo#arlo .arlo-banner h1 {
+    margin-bottom: .5em;
+}
+
+.arlo#arlo .arlo-banner img {
+    display: inline-block;
+}
+
+.arlo#arlo .arlo-left {
+    float: left;
+    max-width: 100%;
+    width: 70%;
+}
+
+.arlo#arlo .arlo-right {
+    float: right;
+    max-width: 100%;
+    width: 30%;
+}
+
+.arlo#arlo.arlo-md .arlo-left,
+.arlo#arlo.arlo-md .arlo-right {
+    float: none;
+    width: 100%;
+}
+
+
+/* Pagination */
+
+.arlo#arlo .arlo-pagination {
+    margin-top: 50px;
+    text-align: center;
+    clear: both;
+}
+
+.arlo#arlo .arlo-pagination .page-numbers {
+    padding: .2em .6em;
+    border: 2px solid #e6e6e6;
+    vertical-align: middle;
+    margin-bottom: .5em;
+}
+
+.arlo#arlo .arlo-pagination .page-numbers:hover {
+    font-weight: 600;
+}
+
+.arlo#arlo .arlo-pagination .page-numbers.current {
+    font-weight: 700;
+}
+
+.arlo#arlo .arlo-pagination .page-numbers,
+.arlo#arlo .arlo-pagination .page-numbers.next,
+.arlo#arlo .arlo-pagination .page-numbers.prev {
+    float: none;
+    display: inline-block;
+}
+
+.arlo#arlo .arlo-pagination .page-numbers.next,
+.arlo#arlo .arlo-pagination .page-numbers.prev {
+    font-weight: bold;
+    border-radius: 0;
+}
+
+.arlo#arlo .arlo-pagination .page-numbers.next {
+    margin-left: 1em;
+}
+
+.arlo#arlo .arlo-pagination .page-numbers.prev {
+    margin-right: 1em;
+}
+
+.arlo#arlo.arlo-sm .arlo-pagination .page-numbers.next,
+.arlo#arlo.arlo-sm .arlo-pagination .page-numbers.prev {
+    margin: .5em 0;
+}
+
+
+/* All lists */
+
+.arlo#arlo ul.arlo-list,
+.arlo#arlo ul.arlo-category-list,
+.arlo#arlo ul.presenter-events,
+.arlo-categories-widget ul.arlo-category-list {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.arlo#arlo ul.arlo-list>li,
+.arlo#arlo ul.presenter-events>li,
+.arlo-categories-widget ul.arlo-category-list li {
+    list-style: none;
+    background-image: none;
+    display: block;
+}
+
+.arlo#arlo .arlo-list.upcoming>li,
+.arlo#arlo .arlo-list.catalogue>li,
+.arlo#arlo .arlo-list.events>li,
+.arlo#arlo .arlo-list.arlo-online-activities>li,
+.arlo#arlo .arlo-list.venues>li,
+.arlo#arlo .arlo-list.presenters>li,
+.arlo#arlo ul.schedule>li {
+    margin: 0;
+    padding: 50px 1em;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-top: 1px solid #e6e6e6;
+}
+
+.arlo#arlo .arlo-list.upcoming>li:nth-child(2n),
+.arlo#arlo .arlo-list.catalogue>li:nth-of-type(2n),
+.arlo#arlo .arlo-list.events>li:nth-child(2n),
+.arlo#arlo .arlo-list.arlo-online-activities>li:nth-child(2n),
+.arlo#arlo .arlo-list.venues>li:nth-child(2n),
+.arlo#arlo .arlo-list.presenters>li:nth-child(2n),
+.arlo#arlo .arlo-suggest-templates li:nth-child(2n),
+.arlo#arlo ul.presenter-events>li:nth-child(2n),
+.arlo#arlo ul.schedule>li:nth-child(2n) {
+    background: #fafafa;
+}
+
+.arlo#arlo ul.arlo-list:not(.arlo-show-more-hidden)>li:first-child {
+    border-top: none;
+}
+
+
+/* Upcoming Events List */
+
+.arlo#arlo ul.arlo-list.upcoming {
+    margin-top: 2.5em;
+    clear: both;
+}
+
+.arlo#arlo ul.arlo-list.upcoming>li {
+    padding-bottom: 50px;
+    overflow: auto;
+    height: auto !important;
+}
+
+.arlo#arlo .arlo-cal {
+    text-align: center;
+    width: 130px;
+    float: left;
+    padding: 14px;
+    border-width: 4px;
+    border-style: solid;
+    margin-left: .2em;
+    font-size: 32px;
+}
+
+.arlo#arlo .arlo-cal .arlo-day {
+    opacity: 1;
+    font-weight: 600;
+    font-size: 2em;
+    line-height: 1;
+}
+
+.arlo#arlo .arlo-cal .arlo-month {
+    font-size: .5em;
+    line-height: 1;
+    text-transform: uppercase;
+    padding: .1em 0;
+    opacity: .6;
+}
+
+.arlo#arlo .arlo-event-details {
+    margin-left: 170px;
+    max-width: none;
+    overflow: hidden;
+}
+
+.arlo#arlo .arlo-event-details h2 {
+    margin-top: 0;
+}
+
+.arlo#arlo .arlo-event-name {
+    margin-top: 0;
+    margin-bottom: .5em;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.arlo#arlo.arlo-md .arlo-cal {
+    width: 100px;
+    font-size: 24px;
+}
+
+.arlo#arlo.arlo-md .arlo-event-details {
+    margin-left: 120px;
+}
+
+.arlo#arlo.arlo-xs .arlo-cal {
+    float: none;
+    margin: 0 auto 20px;
+}
+
+.arlo#arlo.arlo-xs .arlo-event-details {
+    margin-left: 0;
+    overflow: visible;
+}
+
+.arlo#arlo.arlo-xs .arlo-event-details .arlo-event-notice {
+    clear: both;
+}
+
+.arlo#arlo.arlo-xs .arlo-event-details .arlo-template-summary {
+    clear: both;
+}
+
+.arlo#arlo .upcoming .arlo-event-provider,
+.arlo#arlo .upcoming .arlo-event-location,
+.arlo#arlo .upcoming .arlo-event-time {
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.arlo#arlo .arlo-registration .arlo-event-registration>p {
+    padding: 0;
+    margin: 0;
+}
+
+.arlo#arlo i[class^='icons8-'] {
+    margin-right: .3em;
+    vertical-align: inherit;
+}
+
+.arlo#arlo ul.arlo-event-offers {
+    margin: .4em 0;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.arlo#arlo .arlo-event-offers .discount {
+    font-weight: 600;
+}
+
+.arlo#arlo .arlo-event-offers .arlo-price-tax {
+    font-size: .8em;
+}
+
+.arlo#arlo .arlo-event-offers .replaced {
+    margin-right: .5em;
+}
+
+.arlo#arlo .arlo-event-notice {
+    margin: .5em 0;
+}
+
+.arlo#arlo .arlo-template-summary {
+    margin: .5em 0;
+}
+
+.arlo#arlo .arlo-tooltip-button {
+    font-weight: 600;
+    text-align: left;
+    display: inline-block;
+}
+
+
+/* Sessions tooltips */
+
+.arlo .dark-tooltip {
+    padding: 1em;
+}
+
+.arlo .dark-tooltip h5,
+.arlo .dark-tooltip h6 {
+    margin: 0;
+}
+
+.arlo .dark-tooltip h5 {
+    font-size: 1.4em;
+}
+
+.arlo .dark-tooltip h6 {
+    font-weight: 600;
+}
+
+.arlo .arlo_session {
+    margin-top: .5em;
+    padding-bottom: .5em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.arlo .arlo_session:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+}
+
+.arlo#arlo .arlo-places-remaining,
+.arlo#arlo .arlo-event-full {
+    display: block;
+    margin-bottom: .5em;
+    font-size: 1em;
+    text-align: right;
+    text-transform: uppercase;
+}
+
+.arlo#arlo.arlo-md .arlo-places-remaining,
+.arlo#arlo.arlo-md .arlo-event-full {
+    text-align: left;
+}
+
+.arlo#arlo.arlo-md .arlo-event-info,
+.arlo#arlo.arlo-md .arlo-registration {
+    float: none;
+    width: 100%;
+}
+
+.arlo#arlo.arlo-md .arlo-registration {
+    margin-top: 1em;
+}
+
+.arlo#arlo.arlo-md .arlo-registration .arlo-event-offers {
+    margin-top: .5em;
+    text-align: left;
+}
+
+.arlo#arlo.arlo-md .arlo-registration .arlo-event-registration {
+    text-align: left;
+}
+
+.arlo#arlo.arlo-xs .arlo-places-remaining,
+.arlo#arlo.arlo-xs .arlo-event-full {
+    text-align: center;
+}
+
+
+
+/* Catalogue */
+
+.arlo#arlo .arlo-category-header-wrapper {
+    margin-bottom: 1em;
+}
+
+.arlo#arlo .arlo-catalogue-filters,
+.arlo#arlo .arlo-category-list li {
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.arlo#arlo .arlo-category-list li {
+    margin-bottom: .5em;
+}
+
+.arlo#arlo .arlo-categories .arlo-category-list .arlo-category-list {
+    display: none;
+}
+
+.arlo#arlo.arlo-sm .arlo-filters,
+.arlo#arlo.arlo-sm .arlo-catalogue-filters,
+.arlo#arlo.arlo-sm .arlo-catalogue-filters .arlo-categories,
+.arlo#arlo.arlo-sm .arlo-category-list,
+.arlo#arlo.arlo-sm .arlo-catalogue-filters .arlo-category-list li,
+.arlo#arlo.arlo-sm .arlo-catalogue-filters .arlo-category-list a {
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+
+.arlo#arlo .arlo-filters-buttons {
+    display: none;
+}
+
+.arlo#arlo .arlo-category-list li a {
+    padding: 8px 14px;
+    background-image: none;
+    font-size: 0.9em;
+}
+
+.arlo#arlo .arlo-category-list li a {
+    color: inherit;
+    background-image: none;
+}
+
+.arlo#arlo .arlo-list.catalogue {
+    margin-top: 1em;
+}
+
+.arlo#arlo .arlo-list .arlo-group-divider {
+    width: 100%;
+    float: none;
+    clear: both;
+    padding-top: 2em;
+    box-shadow: none;
+    padding: 0;
+    margin: 2em 0 0;
+    width: 100%;
+    border-top: none;
+    border-bottom-width: 4px;
+    border-bottom-style: solid;
+}
+
+.arlo#arlo .arlo-list .arlo-group-divider h2 {
+    margin-bottom: 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 2em;
+}
+
+
+.arlo#arlo .arlo-list.catalogue .arlo-template-name {
+    margin-top: 0;
+    font-weight: 700;
+    line-height: 1.2em;
+}
+
+.arlo#arlo .arlo-list.catalogue .arlo-next-running,
+.arlo#arlo .arlo-list.catalogue .arlo-next-running p {
+    font-weight: 600;
+    text-align: right;
+    text-transform: uppercase;
+}
+
+.arlo#arlo .arlo-list.catalogue .arlo-next-running>a,
+.arlo#arlo .arlo-list.catalogue .arlo-next-running>span {
+    display: inline-block;
+    width: auto;
+    vertical-align: middle;
+}
+
+.arlo#arlo.arlo-md .arlo-list.catalogue .arlo-next-running>label {
+    display: inline-block;
+    margin-right: .5em;
+    vertical-align: middle;
+}
+
+.arlo#arlo.arlo-xs .arlo-list.catalogue .arlo-next-running {
+    margin-top: 1em;
+}
+
+.arlo#arlo.arlo-xs .arlo-list.catalogue .arlo-next-running>label {
+    margin-right: 0;
+}
+
+.arlo#arlo.arlo-xs .arlo-list.catalogue .arlo-next-running,
+.arlo#arlo.arlo-xs .arlo-list.catalogue .arlo-next-running>a,
+.arlo#arlo.arlo-xs .arlo-list.catalogue .arlo-next-running>span {
+    width: 100%;
+    text-align: center;
+}
+
+.arlo#arlo .arlo-list.catalogue .arlo-summary {
+    margin: .5em 0;
+}
+
+.arlo#arlo .arlo-list.catalogue .arlo-advertised-duration,
+.arlo#arlo .arlo-list.catalogue .arlo-advertised-price,
+.arlo#arlo .arlo-list.catalogue .arlo-offers {
+    margin-right: 20px;
+    font-weight: 600;
+}
+
+.arlo#arlo .arlo-list.catalogue .arlo-duration .fa {
+    margin-right: 5px;
+}
+
+
+.arlo#arlo .arlo-next-running > a,
+.arlo#arlo .arlo-next-running > span  {
+    margin-left: 0.5em;
+}
+
+.arlo#arlo .arlo-next-running span {
+    cursor: inherit;
+    background-image: none;
+}
+
+.arlo#arlo .arlo-category-footer {
+    text-align: center;
+    margin-top: 1em;
+}
+
+.arlo#arlo .arlo-category-footer ul {
+    list-style-position: inside;
+}
+
+
+/* Schedule */
+
+.arlo#arlo .schedule .arlo-schedule-event {
+    padding: 1em;
+}
+
+.arlo#arlo .schedule .arlo-offers {
+    font-weight: bold;
+}
+
+
+.arlo#arlo .schedule .arlo-next-running {
+    color: transparent;
+}
+
+@media (min-width: 750px) {
+    .arlo#arlo .schedule .arlo-schedule-event {
+        padding: .5em;
+    }
+    
+    .arlo#arlo .schedule .arlo-schedule-column {
+        float: left;
+        padding: .2em;
+    }
+
+    .arlo#arlo .schedule .arlo-event-name {
+        width: 50%;
+    }
+
+    .arlo#arlo .schedule .arlo-price {
+        width: 20%;
+    }
+
+    .arlo#arlo .schedule .arlo-next-running {
+        width: 30%;
+        text-align: right;
+    }
+}
+
+
+
+
+
+/* Event template */
+
+.arlo#arlo .arlo-event-template-summary {
+    text-align: center;
+    margin-top: 1em;
+}
+
+.arlo#arlo .arlo-event-registration {
+    clear: both;
+    margin-top: 0;
+    font-weight: 600;
+}
+
+.arlo#arlo .arlo-event .arlo-event-registration,
+.arlo#arlo .arlo-event .arlo-places-remaining,
+.arlo#arlo .arlo-event .arlo-event-full {
+    text-align: left;
+}
+
+.arlo#arlo ul.arlo-list.events {
+    width: 100%;
+    padding-top: 1em;
+}
+
+
+.arlo#arlo ul.arlo-list.events > li {
+    float: left;
+    width: 49.5%;
+    margin: 5px .25%;
+    border: none;
+    background-color: #fafafa;
+}
+
+.arlo#arlo.arlo-md ul.arlo-list.events > li {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.arlo#arlo .arlo-onlineactivity {
+    padding: 1.2em;
+    margin-bottom: 1.3em;
+    overflow: auto;
+    background-color: white;
+}
+
+.arlo#arlo ul.arlo-list.online-activities li.arlo-onlineactivity {
+    border: 4px solid #e6e6e6;
+}
+
+.arlo#arlo ul.arlo-list.events>li h4,
+.arlo#arlo .arlo-onlineactivity h4 {
+    margin-top: 0;
+}
+
+.arlo#arlo .arlo-show-more-link-container {
+    text-align: center;
+    margin: 1em 0;
+    clear: both;
+}
+
+.arlo#arlo .arlo-suggest {
+    text-align: center;
+    padding: .5em;
+    clear: both;
+}
+
+.arlo#arlo .arlo-suggest-private-datelocation {
+    text-align: center;
+    padding: .5em;
+    clear: both;
+}
+
+.arlo#arlo .arlo-content-fields {
+    margin-top: 2em;
+}
+
+.arlo#arlo p.arlo-no-results {
+    text-align: center;
+    padding: 1em;
+    font-size: 1em;
+}
+
+.arlo#arlo p.arlo-register-private-interest {
+    text-align: center;
+    padding: 1em;
+    font-size: 1em;
+}
+
+.arlo#arlo .arlo-suggest a,
+.arlo#arlo .arlo-register-private-interest a,
+.arlo#arlo .arlo-suggest-private-datelocation a,
+.arlo#arlo .arlo-no-results a {
+    font-weight: 600;
+}
+
+.arlo#arlo .arlo-suggest a:hover,
+.arlo#arlo .arlo-register-private-interest a:hover,
+.arlo#arlo .arlo-suggest-private-datelocation a:hover,
+.arlo#arlo .arlo-no-results a:hover {
+    text-decoration: underline;
+}
+
+.arlo#arlo .arlo-list.online-activities {
+    clear: both;
+    margin-top: 2em;
+}
+
+.arlo#arlo .arlo-oa-info {
+    width: 65%;
+}
+
+.arlo#arlo.arlo-md .arlo-oa-info {
+    float: none;
+    width: 100%;
+}
+
+.arlo#arlo .arlo-onlineactivity .arlo-registration {
+    margin-top: 0;
+    text-align: right;
+}
+
+.arlo#arlo.arlo-md .arlo-onlineactivity .arlo-registration {
+    text-align: left;
+}
+
+.arlo#arlo .arlo-event-registration .button,
+.arlo#arlo .arlo-oa-registration .button {
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: .5em;
+    border-radius: 0;
+    letter-spacing: 1px;
+}
+
+.arlo#arlo.arlo-xs .arlo-list.events .arlo-event-details {
+    float: left;
+    width: 100%;
+}
+
+
+/* Suggest templates */
+
+.arlo#arlo .arlo-suggest-templates {
+    margin-left: 0;
+    padding-left: 0;
+    background-color: #f5f5f5;
+}
+
+.arlo#arlo .arlo-suggest-templates li {
+    position: relative;
+    padding: 1em;
+    list-style: none;
+}
+
+.arlo#arlo .arlo-suggest-template-name {
+    float: left;
+    width: 65%;
+    padding: 0;
+    font-weight: 600;
+}
+
+.arlo#arlo .arlo-suggest-template-event-link {
+    float: left;
+    width: 35%;
+    text-align: right;
+}
+
+.arlo#arlo .arlo-suggest-template-event-link a {
+    display: inline-block;
+    padding: 0;
+    border: none;
+    text-align: left;
+    font-weight: 600;
+}
+
+.arlo#arlo .arlo-suggest-template-event-link a:hover {
+    text-decoration: underline;
+}
+
+.arlo#arlo.arlo-sm .arlo-suggest-template-name,
+.arlo#arlo.arlo-sm .arlo-suggest-template-event-link {
+    float: none;
+    width: 100%;
+}
+
+.arlo#arlo.arlo-sm .arlo-suggest-template-event-link {
+    text-align: left;
+}
+
+
+
+/* Event search list */
+
+.arlo#arlo .arlo-search {
+    margin-bottom: 2em;
+    overflow: hidden;
+}
+
+.arlo#arlo .arlo-search-field,
+.arlo#arlo .arlo-search-button {
+    display: inline-block;
+    float: left;
+    border-width: 2px;
+    border-style: solid;
+    height: 41px;
+}
+
+.arlo#arlo .arlo-search-field {
+    width: 84%;
+    padding: 8px 20px;
+    margin-bottom: 10px;
+}
+
+.arlo#arlo .arlo-search-button {
+    width: 16%;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 0;
+    font-weight: 600;
+    line-height: 1.5em;
+}
+
+.arlo#arlo .arlo-search-button:hover {
+    opacity: .8;
+}
+
+.arlo#arlo.arlo-md .arlo-search-field {
+    width: 75%;
+}
+
+.arlo#arlo.arlo-md .arlo-search-button {
+    width: 25%;
+}
+
+.arlo#arlo.arlo-sm .arlo-search-field,
+.arlo#arlo.arlo-sm .arlo-search-button {
+    display: block;
+    width: 100%;
+}
+
+.arlo#arlo .arlo-list.event-search .arlo-next-running {
+    display: inline-block;
+    width: auto;
+    clear: none;
+    text-align: left;
+}
+
+.arlo#arlo .arlo-list.event-search .arlo-offers {
+    margin-bottom: 1em;
+}
+
+.arlo#arlo .arlo-list.event-search .arlo-next-running {
+    font-size: 0;
+}
+
+.arlo#arlo .arlo-list.event-search .arlo-next-running span,
+.arlo#arlo .arlo-list.event-search .arlo-next-running a {
+    font-size: 14px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+}
+
+.arlo#arlo.arlo-xs .arlo-list.event-search .arlo-next-running {
+    width: 100%;
+}
+
+.arlo#arlo.arlo-xs .arlo-list.event-search .arlo-next-running label {
+    text-align: center;
+}
+
+.arlo#arlo.arlo-xs .arlo-list.event-search .arlo-next-running span,
+.arlo#arlo.arlo-xs .arlo-list.event-search .arlo-next-running a {
+    display: inline-block;
+    width: 100%;
+    margin-left: 0;
+}
+
+
+/* Venue list and Presenter list */
+
+.arlo#arlo .arlo-venue-listitem {
+    text-align: center;
+}
+
+.arlo#arlo ul.arlo-list .arlo-presenters-list-header {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.arlo#arlo .arlo-presenter-content {
+    margin: 1.5em 0;
+}
+
+.arlo#arlo ul.arlo-list.venues .arlo-venue-name,
+.arlo#arlo ul.arlo-list.presenters .arlo-presenter-name {
+    margin-top: 0;
+    margin-bottom: 0;
+    font-weight: 700;
+}
+
+.arlo#arlo ul.arlo-list.venues .arlo-venue-info-link,
+.arlo#arlo ul.arlo-list.presenters .arlo-presenter-info-link {
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+
+/* Venue */
+
+.arlo#arlo .arlo-venue-details {
+    margin-top: 2em;
+}
+
+.arlo#arlo .arlo-venue-details h4 {
+    font-weight: 600;
+}
+
+.arlo#arlo .arlo-venue-map img {
+    width: 100%;
+}
+
+
+/* Presenter */
+
+.arlo#arlo .arlo-presenter-details {
+    margin-top: 2em;
+}
+
+.arlo#arlo .arlo-presenter-details h4 {
+    font-weight: 600;
+}
+
+.arlo#arlo ul.presenter-events>li {
+    padding: 1em;
+    background: #f5f5f5;
+    border-bottom: 1px solid #e6e6e6;
+    letter-spacing: 1px;
+}
+
+.arlo#arlo .arlo-social-links {
+    margin-bottom: 2em;
+}
+
+.arlo#arlo .arlo-social-links a {
+    display: inline-block;
+    text-decoration: none;
+    margin-right: .5em;
+}
+
+.arlo#arlo .arlo-social-links a img {
+    -webkit-transition: opacity 0.3s;
+    -moz-transition: opacity 0.3s;
+    transition: opacity 0.3s;
+}
+
+.arlo#arlo .arlo-social-links a img:hover {
+    opacity: .6;
+}
+
+
+/* Onlne Activity */
+
+.arlo#arlo .arlo-online-activity .arlo-template-name {
+    margin-top: 0;
+    font-weight: 700;
+    line-height: 1.2em;
+}
+
+.arlo#arlo .arlo-online-activity .arlo-right {
+    text-align: right;
+}
+
+.arlo#arlo.arlo-md .arlo-online-activity .arlo-right {
+    text-align: left;
+}
+
+.arlo#arlo .arlo-reference-term {
+    margin: .5em 0;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+
+/* Upcoming events list widget */
+
+.arlo-list.arlo-widget-upcoming > li {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding: .5em 0;
+}
+
+.arlo-widget-upcoming>li p {
+    font-weight: bold;
+}
+
+.arlo-widget-upcoming>li p:last-child {
+    font-weight: normal;
+}
+
+.arlo-widget-upcoming .arlo-cal.arlo-left {
+    width: 24%;
+    padding: 10px 5px;
+    border: 4px solid #e6e6e6;
+    transition: border-color .3s;
+}
+
+.arlo-widget-upcoming .arlo-cal-month,
+.arlo-widget-upcoming .arlo-cal-day {
+    width: 100%;
+    background-color: transparent;
+    padding: 0;
+    line-height: 1;
+}
+
+.arlo-widget-upcoming .arlo-cal-month {
+    border: none;
+    font-size: 13px;
+    text-transform: uppercase;
+}
+
+.arlo-widget-upcoming .arlo-cal-day {
+    background-color: white;
+    border: none;
+    font-size: 1.8em;
+    font-weight: 700;
+}
+
+
+/* Category list widget */
+
+.arlo-categories-widget .arlo-category-list li {
+    border-bottom: 0;
+    padding: 0;
+    font-weight: bold;
+}
+
+.arlo-categories-widget .arlo-category-list li a {
+    display: block;
+    padding: .3em .8em;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    margin-bottom: 0;
+}
+
+.arlo-categories-widget .arlo-category-list li ul {
+    padding-left: 1em;
+}
+
+.arlo-categories-widget .arlo-category-list li ul a {
+    font-weight: 600;
+}
+
+.arlo-breadcrumbs ul{
+    list-style: none;
+    padding-left: 0;
+    margin: 1em 0;
+}
+.arlo-breadcrumbs li{
+    display: inline-block;
+}
+.arlo-breadcrumbs li:not(:last-child)::after{
+    content: '>';
+    padding-left: 3px;
+    padding-right: 5px;
+}
+
+.arlo-single-show-wrapper{
+  clear: both;
+  text-align: center;
+  padding-top: 10px;
+  margin-bottom: 5px;
+}

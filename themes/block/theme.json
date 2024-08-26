@@ -1,0 +1,17 @@
+{
+    "version": 1.7,
+    "order": 9,
+    "name": "Block",
+    "description": "Design includes key information displayed within boxes",
+    "forDesigners": false,
+    "demoUrl": "https://support.arlo.co/hc/en-gb/articles/115001797703",
+    "externalResources": {
+        "stylesheets": [
+            ""
+        ],
+        "javascripts": []
+    },
+    "images": [
+        "/images/block1.png"
+    ]
+}
