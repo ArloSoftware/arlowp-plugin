@@ -1,0 +1,147 @@
+.arlo {
+    .arlo-desktop .arlo {
+
+
+        .arlo-schedules {
+            display: flex;
+            flex-direction: column;
+            margin-top: 24px;
+            gap: 24px;
+
+            .arlo-event-next-running {
+                list-style: none;
+                list-style-position: inside;
+                padding-inline-start: 0;
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            &-item {
+                background-color: var(--primary-blank-bg-color);
+                &-basic {
+                    &-title {
+                        line-height: 26px;
+                        a {
+                            text-decoration: none;
+                            &:hover{
+                                color: var(--primary-theme-color);
+                            }
+                        }
+                    }
+                }
+
+                .arlo-events-item-main{
+                    &-info{
+                        gap: 8px;
+                        &>div{
+                            svg{
+                                margin-right: 8px;
+                            }
+                        }
+                    }
+                }
+
+                &-dates {
+                    &-desc {
+                        &:has(span) {
+                            display: none;
+                        }
+                    }
+
+                    &-more {
+                        width: fit-content;
+                        a {
+                            height: auto;
+                            display: flex;
+                            gap: 8px;
+                            align-items: center;
+                            color: var(--primary-text-color);
+                            text-decoration: none;
+                            transition: all 0.2s;
+                            font-weight: normal;
+                            margin-top: 24px;
+                            &:hover {
+                                color: var(--primary-theme-color);
+                                svg {
+                                    transition: all 0.2s;
+                                    transform: translateX(4px);
+                                }
+                            }
+                        }
+                    }
+
+                    &-items {
+                        justify-content: start;
+
+                        .arlo-register {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            min-width: 120px;
+                            border-radius: 6px;
+                            box-sizing: border-box;
+                            padding: 8px 16px;
+                            background-color: var(--primary-theme-color);
+                            color: var(--primary-light-text-color);
+                            text-align: center;
+                            cursor: pointer;
+                            position: relative;
+                            font-weight: 300;
+                            font-size: 14px;
+                            text-decoration: none;
+                            &:hover {
+                                background-color: var(--primary-theme-color-hover);
+                            }
+                        }
+
+
+                        &-item {
+                            text-decoration: none;
+
+                            @extend .arlo-register;
+
+                            &.arlo-single-register {
+                                background-color: var(--secondary-background-text-color);
+                                border: 1px solid var(--primary-theme-color);
+                                color: var(--primary-theme-color);
+                                &:hover{
+                                    color: var(--primary-light-text-color);
+                                    background-color: var(--primary-theme-color);
+                                }
+                            }
+
+                            .arlo-discount {
+                                display: none;
+                            }
+
+                            &.arlo-event-discount {
+                                .arlo-discount {
+                                    display: block;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        .arlo-pad .arlo {
+            .arlo-schedules {
+                display: flex;
+                flex-direction: column;
+                margin-top: 24px;
+            }
+        }
+
+        .arlo-mobile .arlo {
+            .arlo-schedules {
+                display: flex;
+                flex-direction: column;
+                margin-top: 24px;
+
+            }
+        }
+    }
+}

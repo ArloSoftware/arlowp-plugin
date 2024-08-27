@@ -1,0 +1,15 @@
+{
+    "version": 1.6,
+    "order": 15,
+    "name": "Theme Z",
+    "description": "Theme Z",
+    "forDesigners": false,
+    "demoUrl": "https://support.arlo.co/hc/en-gb/articles/115001600463-Jazz-WordPress-Theme",
+    "externalResources": {
+        "stylesheets": [],
+        "javascripts": []
+    },
+    "images": [
+        "/images/image1.png"
+    ]
+}

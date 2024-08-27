@@ -155,9 +155,12 @@ class UpcomingEvents {
         $items = $wpdb->get_results($sql, ARRAY_A);
 
         if(empty($items)) :
-        
+            //updated by Tony for theme.z
+            $before = isset($atts['noevent_before']) ? $atts['noevent_before'] : "";
+            $after = isset($atts['noevent_after']) ? $atts['noevent_after'] : "";
+
             $no_event_text = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', 'arlo-for-wordpress');
-            $output = '<p class="arlo-no-results">' . esc_html($no_event_text) . '</p>';
+            $output = $before . '<p class="arlo-no-results">' . esc_html($no_event_text) . '</p>' . $after;
             
         else :
             $previous = null;
@@ -230,7 +233,8 @@ class UpcomingEvents {
         extract(shortcode_atts(array(
             'filters'   => 'category,month,location,delivery',
             'resettext' => __('Reset', 'arlo-for-wordpress'),
-            'buttonclass'   => 'button'
+            'buttonclass'   => 'button',
+            'labeltype' => 'default'
         ), $atts, $shortcode_name, $import_id));
 
         $filters_array = explode(',',$filters);
@@ -255,8 +259,11 @@ class UpcomingEvents {
                 continue;
 
             $items = Filters::get_filter_options($filter_key, $import_id);
-
-            $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'), 'generic', $att, 'upcoming');
+            $label_dict = \Arlo_For_Wordpress::$filter_labels;
+            if($labeltype == 'v1') {
+                $label_dict = \Arlo_For_Wordpress::$filter_labels_v1;
+            }
+            $filter_html .= Shortcodes::create_filter($filter_key, $items, __($label_dict[$filter_key], 'arlo-for-wordpress'), 'generic', $att, 'upcoming', $atts);
         endforeach;
 
         $filter_html .= '<div class="arlo-filters-buttons"><input type="hidden" id="arlo-page" value="' .  $page_link . '"> ';    

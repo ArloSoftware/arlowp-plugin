@@ -106,7 +106,6 @@ class Events {
 		$group = " GROUP BY e.e_id";
 
 		$query = $wpdb->prepare($query.implode("\n", $join).$where.$group.$order, $parameters);
-	
 		if ($query) {
 			return (!empty($limit)) ? $wpdb->get_results($query.$limit) : $wpdb->get_row($query);
 		} else {
