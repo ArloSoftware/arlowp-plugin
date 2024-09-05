@@ -27,6 +27,9 @@
                         border: 0;
                         background-color: whitesmoke;
                     }
+                    .arlo-map-placeholder{
+                        object-fit: cover;
+                    }
                 }
                 &-address{
                     margin-bottom: 24px;

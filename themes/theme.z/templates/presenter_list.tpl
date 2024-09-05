@@ -4,7 +4,7 @@
 		[arlo_presenter_list_item limit="8"]
 			<div class="arlo-presenters-item" role="listitem">
 				<div class="arlo-presenters-item-inner">
-					[arlo_presenter_profile_avatar wrap='<img src="%s" alt="presenter image" />']
+					[arlo_presenter_profile_avatar placeholder="themes/theme.z/images/noimage.jpg" wrap='<img src="%s" alt="presenter image" />']
 					
 				</div>
 				<div class="arlo-presenters-item-footer">

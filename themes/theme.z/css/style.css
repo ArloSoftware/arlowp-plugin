@@ -2580,6 +2580,10 @@ template {
   border: 0;
   background-color: whitesmoke;
 }
+.arlo .arlo-desktop .arlo-venue-list-item > div:first-child .arlo-map-placeholder {
+  -o-object-fit: cover;
+     object-fit: cover;
+}
 .arlo .arlo-desktop .arlo-venue-list-item-address {
   margin-bottom: 24px;
 }

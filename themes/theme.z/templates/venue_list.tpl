@@ -3,7 +3,7 @@
     [arlo_venue_list_item limit="6"]
         <div class="arlo-venue-list-item" role="listitem">
             <div>
-                [arlo_venue_map placeholder="themes/theme.z/images/map_placeholder.png"]
+                [arlo_venue_map placeholder="themes/theme.z/images/nomap.jpg"]
                 <div class="arlo-venue-list-item-address">
                     <h2 class="arlo-venue-list-item-address-name">[arlo_venue_permalink wrap="<a href='%s'>"][arlo_venue_name]</a></h2>
                     <div class="arlo-venue-list-item-address-detail">
