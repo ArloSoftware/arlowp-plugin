@@ -1,3 +1,8 @@
+
+== v4.2.1 ==
+
+Testing the workflow.
+
 == v4.2.0 ==
 
 Remove CDN References for GDPR

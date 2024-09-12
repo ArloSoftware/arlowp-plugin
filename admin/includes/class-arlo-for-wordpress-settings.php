@@ -104,13 +104,9 @@ class Arlo_For_Wordpress_Settings {
 
 
 
-			//$apply_theme = filter_input(INPUT_GET, 'apply-theme', FILTER_SANITIZE_STRING);
-			$apply_theme = $this->filter_string_polyfill(INPUT_GET, 'apply-theme');
-			//$wpnonce = filter_input(INPUT_GET, '_wpnonce', FILTER_SANITIZE_STRING);
-			$wpnonce = $this->filter_string_polyfill(INPUT_GET, '_wpnonce');
-			
-			//$reset = filter_input(INPUT_GET, 'reset', FILTER_SANITIZE_STRING);
-			$reset = $this->filter_string_polyfill(INPUT_GET, 'reset');
+			$apply_theme = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'apply-theme');
+			$wpnonce = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, '_wpnonce');			
+			$reset = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'reset');
 
 			if (!empty($apply_theme) && !empty($wpnonce) && wp_verify_nonce($wpnonce, 'arlo-apply-theme-nonce')) {
 				$theme_id = $apply_theme;
@@ -151,8 +147,7 @@ class Arlo_For_Wordpress_Settings {
 			$urlparts = parse_url(site_url());
 			$domain = $urlparts['host'];
 
-			//$delete_shortcode = filter_input(INPUT_GET, 'delete-shortcode', FILTER_SANITIZE_STRING);
-			$delete_shortcode = $this->filter_string_polyfill(INPUT_GET, 'delete-shortcode', FILTER_DEFAULT);
+			$delete_shortcode = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'delete-shortcode', FILTER_DEFAULT);
 			
 
 			if (!empty($delete_shortcode) && !empty($wpnonce) && wp_verify_nonce($wpnonce, 'arlo-delete-shortcode-nonce')) {
@@ -470,15 +465,6 @@ class Arlo_For_Wordpress_Settings {
 		add_settings_section('arlo_systemrequirements_section',  __('System requirements', 'arlo-for-wordpress' ), null, 'arlo-for-wordpress' );
 		add_settings_field( 'arlo_systemrequirements', null, array($this, 'arlo_systemrequirements_callback'), $this->plugin_slug, 'arlo_systemrequirements_section', array('id'=>'systemrequirements') );
 	}
-
-	/* ADDED BY MALHAR */
-	function filter_string_polyfill($input, $input_name)
-	{
-			$string = filter_input($input, $input_name, FILTER_DEFAULT);
-			$str = preg_replace('/\x00|<[^>]*>?/', '', $string?$string:'');
-			return str_replace(["'", '"'], ['&#39;', '&#34;'], $str);
-	}
-	/* END ADDED BY MALHAR */
 
 	/*
 	 *
@@ -984,6 +970,14 @@ class Arlo_For_Wordpress_Settings {
 	    echo '
 	    <h3>What\'s new in this release</h3>
 		<p><strong>If you are experiencing problems after an update, please deactivate and re-activate the plugin and re-synchronize the data.</strong></p>
+
+		<h4>Version 4.2.1</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">
+				<li>Testing list item nr 1</li>
+				<li>Testing list item nr 2</li>
+			</ul>
+		</p>
 
 		<h4>Version 4.2.0</h4>
 		<p>

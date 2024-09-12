@@ -514,15 +514,6 @@ function arlo_pagination($num, $limit=null) {
 	));
 }
 
-/* ADDED BY MALHAR */
-function filter_string_polyfill($input, $input_name)
-{
-				$string = filter_input($input, $input_name, FILTER_DEFAULT);
-				$str = preg_replace('/\x00|<[^>]*>?/', '', $string?$string:'');
-				return str_replace(["'", '"'], ['&#39;', '&#34;'], $str);
-}
-/* END ADDED BY MALHAR */
-
 /**
  * Detect the current page from WordPress variables
  *
@@ -534,7 +525,7 @@ function arlo_current_page() {
 	$page = 0;
 
 	//not sure why we watch that one first
-	$paged = filter_string_polyfill(INPUT_GET, 'paged');
+	$paged = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'paged');
 	if (!empty($paged)) {
 		$page = intval($paged);
 	}

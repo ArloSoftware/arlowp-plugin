@@ -12,11 +12,11 @@ class Redirect {
 
     public static function object_post_redirect() {
         //$object_post_type = filter_input(INPUT_GET, 'object_post_type', FILTER_SANITIZE_STRING);
-        $object_post_type = self::filter_string_polyfill(INPUT_GET, 'object_post_type');
+        $object_post_type = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'object_post_type');
         
-        $arlo_id = self::filter_string_polyfill(INPUT_GET, 'arlo_id');
+        $arlo_id = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'arlo_id');
 
-        if (!empty($object_post_type) && !empty($arlo_id)) {
+        if (!empty($object_post_type) && !empty($arlo_id) && is_numeric($arlo_id)) {
             switch($object_post_type) {
                 case 'event':
                     self::private_event_redirect($arlo_id);   // potential redirect
@@ -38,22 +38,12 @@ class Redirect {
         }
     }
 
-    /* ADDED BY MALHAR */
-	public static function filter_string_polyfill($input, $input_name)
-	{
-			$string = filter_input($input, $input_name, FILTER_DEFAULT);
-			$str = preg_replace('/\x00|<[^>]*>?/', '', $string?$string:'');
-			return str_replace(["'", '"'], ['&#39;', '&#34;'], $str);
-	}
-	/* END ADDED BY MALHAR */
-
-
     // Private event are not available on the pub api so they are missing from wordpress - on purpose
     // But the Arlo platform still have a link that redirects to the hypothetical wordpress page
     // So we redirect back to the Arlo website
     private static function private_event_redirect($arlo_id) {
-        $e = self::filter_string_polyfill(INPUT_GET, 'e');
-        $t = self::filter_string_polyfill(INPUT_GET, 't');
+        $e = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'e');
+        $t = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 't');
 
         if (!empty($e) || !empty($t)) {
             $settings = get_option('arlo_settings');
@@ -63,7 +53,7 @@ class Redirect {
                 // assuming containing a dot means specified dns
                 $platform_url = (strpos($platform_name, '.') ? $platform_name : $platform_name . '.arlo.co');
 
-                $redirect_url = 'http://' . $platform_url . '/events/' . $arlo_id . '-fake-redirect-url?' . (!empty($e) ? 'e=' . $e : (!empty($t) ? 't=' . $t : ''));
+                $redirect_url = 'https://' . $platform_url . '/events/' . rawurlencode($arlo_id) . '-fake-redirect-url?' . (!empty($e) ? 'e=' . rawurlencode($e) : (!empty($t) ? 't=' . rawurlencode($t) : ''));
                 wp_redirect($redirect_url, 301);
                 exit;
             }

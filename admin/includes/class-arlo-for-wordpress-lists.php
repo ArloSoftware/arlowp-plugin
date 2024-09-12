@@ -102,8 +102,8 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	}
 	
 	private function init_sql_variables() {
-		$order = filter_string_polyfill(INPUT_GET, 'order');
-		$paged = filter_string_polyfill(INPUT_GET, 'paged');
+		$order = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'order');
+		$paged = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'paged');
 
 		$this->orderby = $this->get_orderby_columnname();
 		$this->order = (!empty($order) && in_array(strtolower($order), ['asc','desc']) ? $order : '');
@@ -113,7 +113,7 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	}
 	
 	private function get_orderby_columnname() {
-		$orderby = filter_string_polyfill(INPUT_GET, 'orderby');
+		$orderby = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'orderby');
 		$columns = $this->_column_headers[2];
 				
 		if (!empty($orderby)) {
@@ -125,15 +125,6 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 		
 		return '';
 	}
-
-	/* ADDED BY MALHAR */
-	public function filter_string_polyfill($input, $input_name)
-	{
-					$string = filter_input($input, $input_name, FILTER_DEFAULT);
-					$str = preg_replace('/\x00|<[^>]*>?/', '', $string?$string:'');
-					return str_replace(["'", '"'], ['&#39;', '&#34;'], $str);
-	}
-	/* END ADDED BY MALHAR */
 	
 	public function get_title() {
 		return get_admin_page_title();
@@ -158,11 +149,11 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	private function get_sql_search_where_array() {
 		$where = array();
 
-		$s = filter_string_polyfill(INPUT_GET, 's');
-		$et_id = filter_string_polyfill(INPUT_GET, 'et_id');
-		$ep_e_id = filter_string_polyfill(INPUT_GET, 'ep_e_id');
-		$v_e_id = filter_string_polyfill(INPUT_GET, 'v_e_id');
-		$e_parent_id = filter_string_polyfill(INPUT_GET, 'e_parent_id');
+		$s = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 's');
+		$et_id = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'et_id');
+		$ep_e_id = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'ep_e_id');
+		$v_e_id = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'v_e_id');
+		$e_parent_id = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'e_parent_id');
 
 		if (!empty($s)) {
 			$search_fields = $this->get_searchable_fields();

@@ -25,7 +25,7 @@ class Arlo_For_Wordpress_OnlineActivities extends Arlo_For_Wordpress_Lists  {
 	public function get_title() {
 		$title = parent::get_title();
 
-		$et_id = filter_string_polyfill(INPUT_GET, 'et_id');
+		$et_id = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'et_id');
 		
 		if (!empty($et_id) && !empty(self::$filter_column_mapping['et_id']) && intval($et_id > 0) && !empty($this->items[0]->et_name)) {
 			$title .= ' for template: ' . $this->items[0]->et_name;
@@ -33,15 +33,6 @@ class Arlo_For_Wordpress_OnlineActivities extends Arlo_For_Wordpress_Lists  {
 		
 		return $title;
 	}	
-
-	/* ADDED BY MALHAR */
-  public function filter_string_polyfill($input, $input_name)
-  {
-          $string = filter_input($input, $input_name, FILTER_DEFAULT);
-          $str = preg_replace('/\x00|<[^>]*>?/', '', $string?$string:'');
-          return str_replace(["'", '"'], ['&#39;', '&#34;'], $str);
-  }
-  /* END ADDED BY MALHAR */
 		
 	public function set_table_name() {
 		$this->table_name = $this->wpdb->prefix . self::TABLENAME . ' AS oa';

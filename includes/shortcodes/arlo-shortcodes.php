@@ -379,7 +379,7 @@ class Shortcodes {
 			}
 
 			$timezone_windows_tz_id = $timezone['windows_tz_id'];
-			$timezone_get =  self::filter_string_polyfill(INPUT_GET, 'timezone');
+			$timezone_get =  \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'timezone');
 
 
 			if ( (!empty($timezone_get) && $timezone_get == $timezone_id) || (empty($timezone_get) && isset($timezone_id) && $timezone_id == $items[0]['e_timezone_id']) ) {
@@ -401,15 +401,6 @@ class Shortcodes {
 		
 		return $content;
 	}
-
-	/* ADDED BY MALHAR */
-	public static function filter_string_polyfill($input, $input_name)
-	{
-					$string = filter_input($input, $input_name, FILTER_DEFAULT);
-					$str = preg_replace('/\x00|<[^>]*>?/', '', $string?$string:'');
-					return str_replace(["'", '"'], ['&#39;', '&#34;'], $str);
-	}
-	/* END ADDED BY MALHAR */
 
 	/**
      * Shortcode for event template / catalogue breadcrumbs
