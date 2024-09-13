@@ -971,11 +971,11 @@ class Arlo_For_Wordpress_Settings {
 	    <h3>What\'s new in this release</h3>
 		<p><strong>If you are experiencing problems after an update, please deactivate and re-activate the plugin and re-synchronize the data.</strong></p>
 
-		<h4>Version 4.2.1</h4>
+		<h4>Version 4.3.0</h4>
 		<p>
 			<ul class="arlo-whatsnew-list">
-				<li>Testing list item nr 1</li>
-				<li>Testing list item nr 2</li>
+				<li>Support for PHP ></li>
+				<li>Support for WordPress 6.6</li>
 			</ul>
 		</p>
 
