@@ -180,16 +180,23 @@ class Presenters {
     private static function shortcode_presenter_profile_avatar($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         $placeholder = isset($atts['placeholder']) ? $atts['placeholder'] : 'themes/theme.z/images/presenter_placeholder.png';
         $placeholder = ARLO_PLUGIN_ROOT_URL . $placeholder;
-        if(!isset($GLOBALS['arlo_presenter_list_item']['p_profile'])) return  $placeholder;
-        $profile = $GLOBALS['arlo_presenter_list_item']['p_profile'];
-        preg_match_all('/<img[^>]+src="([^"]+)"[^>]*>/i', $profile, $matches);
-        if(count($matches) > 0) {
-            $images = $matches[1];
-            if(count($images) > 0) {
-                return $images[0];
-            } 
-        }
-        return $placeholder;
+        $cls = "noimage";
+        if(isset($GLOBALS['arlo_presenter_list_item']['p_profile'])){
+            $profile = $GLOBALS['arlo_presenter_list_item']['p_profile'];
+            preg_match_all('/<img[^>]+src="([^"]+)"[^>]*>/i', $profile, $matches);
+            if(count($matches) > 0) {
+                $images = $matches[1];
+                if(count($images) > 0) {
+                    $placeholder = $images[0];
+                    $cls = "";
+                } 
+            }
+        } 
+        
+        $first_name = $GLOBALS['arlo_presenter_list_item']['p_firstname'];
+        $last_name = $GLOBALS['arlo_presenter_list_item']['p_lastname'];
+        
+        return "<img class='$cls' src='" . esc_url($placeholder) ."' alt='" . esc_attr($first_name . ' ' . $last_name)  . "' />";
     }
     
     private static function shortcode_presenter_qualifications($content = '', $atts = [], $shortcode_name = '', $import_id = '') {

@@ -3,7 +3,7 @@
   <div class="arlo-presenter-info">
       <div class="arlo-presenter-info-basic">
           <div class="arlo-presenter-info-basic-avatar">
-              [arlo_presenter_profile_avatar wrap='<img src="%s" alt="presenter feature image" />']
+              [arlo_presenter_profile_avatar placeholder="themes/theme.z/images/noimage.jpg"]
           </div>
           <div>
               <h1>[arlo_presenter_name]</h1>

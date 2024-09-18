@@ -22,6 +22,10 @@
                             height: 100%;
                             background-color: gray;
                         }
+                        img.noimage{
+                            height: 100%;
+                            object-fit: cover;
+                        }
                     }
                     &>div{
                         display: flex;

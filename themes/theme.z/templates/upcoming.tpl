@@ -8,7 +8,7 @@
 		<div class="arlo-upcoming-filter-wrapper">
 			<div class="arlo-upcoming-filter">
 				<h2>Filter courses</h2>
-				[arlo_upcoming_event_filters showlabel="true" filtertext='Filter' resettext="" labeltype="v1" filters='month,delivery,category,location,templatetag']
+				[arlo_upcoming_event_filters showlabel="true" filtertext='Filter' labeltype="v1" filters='month,delivery,category,location,templatetag']
 			</div>
 		</div>
 		<div class="arlo-upcoming-result">
@@ -16,9 +16,9 @@
 				[arlo_upcoming_list_item limit="6" noevent_before='<div class="arlo-not-found">' noevent_after='<a href="">Enquire about a course you are interested in.</a></div>']
 					<div class="arlo-upcoming-result-events-item" role="listitem">
 						<div class="arlo-upcoming-result-events-item-date">
-							<p>[arlo_event_dates hidesameentry="true" connectwith="-" startdateformat="%b" enddateformat="%b"]</p>
-							<p>[arlo_event_dates hidesameentry="true" connectwith="-" startdateformat="%d" enddateformat="%d"]</p>
-							<p>[arlo_event_dates hidesameentry="true" connectwith="-" startdateformat="%Y" enddateformat="%Y"]</p>
+							<div>[arlo_event_dates hidesameentry="true" connectwith="-" startdateformat="%b" enddateformat="%b"]</div>
+							<div>[arlo_event_dates hidesameentry="true" connectwith="-" startdateformat="%d" enddateformat="%d"]</div>
+							<div>[arlo_event_dates hidesameentry="true" connectwith="-" startdateformat="%Y" enddateformat="%Y"]</div>
 						</div>
 						<div class="arlo-upcoming-result-events-item-title">
 							<h2>[arlo_event_template_permalink wrap='<a href="%s">'][arlo_event_template_name]</a></h2>

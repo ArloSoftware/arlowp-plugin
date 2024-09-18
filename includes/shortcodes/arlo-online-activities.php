@@ -183,7 +183,8 @@ class OnlineActivities {
         $registration = '<div class="arlo-oa-registration">';
         // test if there is a register uri string, if so display the button
         if(!is_null($registeruri) && $registeruri != '') {
-            $registration .= '<a class="' . $class . ' arlo-register" href="'. esc_url($registeruri) . '" target="_blank">' . __($registermessage, 'arlo-for-wordpress') . '</a>';
+            $linktext = __($registermessage, 'arlo-for-wordpress');
+            $registration .= '<a aria-label="' . esc_attr($linktext . ', opens in new tab') . '" class="' . $class . ' arlo-register" href="'. esc_url($registeruri) . '" target="_blank">' . $linktext . '</a>';
         } else {
             $registration .= $registermessage;
         }

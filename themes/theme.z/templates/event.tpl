@@ -53,7 +53,7 @@
     [/arlo_no_event_in_region]
     [arlo_content_field_item]
       <div class="arlo-event-section">
-        [arlo_content_field_name wrap='<div class="arlo-event-section-title"><p>%s</p></div>']
+        [arlo_content_field_name wrap='<div class="arlo-event-section-title"><p role="heading">%s</p></div>']
         [arlo_content_field_text wrap='<div class="arlo-event-section-content"><hr /><p>%s</p></div>']
       </div>
     [/arlo_content_field_item]

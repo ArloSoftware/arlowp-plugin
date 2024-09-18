@@ -1,6 +1,6 @@
 <div id="arloapp" class="arlo-desktop">
     <div class="arlo-wrapper arlo-event-search">
-        <form class="arlo-event-search-form">
+        <form class="arlo-event-search-form" role="search">
             <h1>Search courses</h1>
             <div class="arlo-event-search-form-fields">
                 [arlo_search_field placeholder="Keywords search" buttonclass="arlo-button" showbutton="true" buttontext='Search']

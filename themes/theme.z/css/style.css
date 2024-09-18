@@ -2814,6 +2814,7 @@ template {
 .arlo .arlo-desktop .arlo-presenters-item img {
   width: 100%;
   height: 240px;
+  min-height: 125px;
   -o-object-fit: cover;
      object-fit: cover;
 }
@@ -2875,6 +2876,11 @@ template {
   width: 100%;
   height: 100%;
   background-color: gray;
+}
+.arlo .arlo-desktop .arlo-presenter-info-basic-avatar img.noimage {
+  height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
 }
 .arlo .arlo-desktop .arlo-presenter-info-basic > div {
   display: flex;
@@ -3112,13 +3118,13 @@ template {
   background-color: var(--primary-theme-color);
   color: var(--primary-light-text-color);
 }
-.arlo .arlo-desktop .arlo-upcoming-result-events-item-date p {
+.arlo .arlo-desktop .arlo-upcoming-result-events-item-date div {
   font-size: 15px;
   line-height: 20px;
   font-weight: 400;
   text-transform: uppercase;
 }
-.arlo .arlo-desktop .arlo-upcoming-result-events-item-date p:nth-child(2) {
+.arlo .arlo-desktop .arlo-upcoming-result-events-item-date div:nth-child(2) {
   font-size: 23px;
   line-height: 30px;
   font-weight: 500;

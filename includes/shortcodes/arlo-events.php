@@ -445,8 +445,9 @@ class Events {
         $registration .= (($isfull) ? '<span class="arlo-event-full">' . __('Event is full', 'arlo-for-wordpress') . '</span>' : '');
         // test if there is a register uri string, if so display the button
         if(!is_null($registeruri) && $registeruri != '') {
-            $registration .= '<a class="' . esc_attr($isfull ? $fullclass : $class) . ' ' . (($isfull) ? 'arlo-waiting-list' : 'arlo-register') . '" href="'. esc_url($registeruri) . '" target="_blank">';
-            $registration .= (($isfull) ? __('Join waiting list', 'arlo-for-wordpress') : __($registermessage, 'arlo-for-wordpress')) . '</a>';
+            $linktext = (($isfull) ? __('Join waiting list', 'arlo-for-wordpress') : __($registermessage, 'arlo-for-wordpress'));
+            $registration .= '<a aria-label="' . esc_attr($linktext . ', opens in a new tab') .'" class="' . esc_attr($isfull ? $fullclass : $class) . ' ' . (($isfull) ? 'arlo-waiting-list' : 'arlo-register') . '" href="'. esc_url($registeruri) . '" target="_blank">';
+            $registration .= $linktext . '</a>';
         } else {
             $registration .= $registermessage;
         }

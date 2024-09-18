@@ -265,8 +265,8 @@ class Shortcodes {
 			return '';
 		}
 
-		//updated by Peter for theme.z
-		$filter_html = '<select aria-label="Select your ' . esc_attr($label) . '" id="arlo-filter-' . esc_attr($type) . '" class="arlo-filter-' . esc_attr($type) . '" name="arlo-' . esc_attr($type) . '">';
+		//updated by Peter for theme.z, this will trigger form submit action
+		$filter_html = '<select role="button" aria-label="Select your ' . esc_attr($label) . '" id="arlo-filter-' . esc_attr($type) . '" class="arlo-filter-' . esc_attr($type) . '" name="arlo-' . esc_attr($type) . '">';
 		
 		if (!is_null($label))
 			$filter_html .= '<option value="">' . esc_html($label) . '</option>';
@@ -351,7 +351,7 @@ class Shortcodes {
 			
 			return '
 			<form class="arlo-search" action="'.site_url().'/'.$slug.'/">
-				<input type="text" class="arlo-search-field ' . esc_attr($inputclass) . '" placeholder="'. esc_attr($placeholder) .'" name="arlo-search" value="' . esc_attr($search_term) . '">
+				<input type="text" class="arlo-search-field ' . esc_attr($inputclass) . '" placeholder="'. esc_attr($placeholder) .'" aria-label="' . esc_attr($placeholder) .'" name="arlo-search" value="' . esc_attr($search_term) . '">
 				' . ($showbutton == "true" ? '<input type="submit" class="arlo-search-button ' . esc_attr($buttonclass) . '" value="' . esc_attr($buttontext) . '">' : '') . '
 			</form>
 			';	
