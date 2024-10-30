@@ -26,7 +26,13 @@
 						</div>
 						<div class="arlo-upcoming-result-events-item-info">
 							<div class="arlo-upcoming-result-events-item-info-basic">
-								[arlo_event_location wrap='<div><i class="fa-solid fa-location-dot"></i>%s</div>']
+								[arlo_condition_return param='Online' shortcode_value='arlo_event_location' cond="contains" return_content="true"]
+									[arlo_event_location wrap='<div><i class="fa-solid fa-desktop"></i>%s</div>']
+								[/arlo_condition_return]
+								[arlo_condition_return param='Online' shortcode_value='arlo_event_location' cond="ncontains" return_content="true"]
+									[arlo_event_location wrap='<div><i class="fa-solid fa-location-dot"></i>%s</div>']
+								[/arlo_condition_return]
+
 								<div><i class="fa-solid fa-clock"></i>[arlo_event_duration showweek="true" wrap="%s " after=","][arlo_event_start_date format="%I:%M %p"] - [arlo_event_end_date format="%I:%M %p"]</div>
 								[arlo_event_session_list_item layout="popup" wrap='<div aria-label="event sessions arlo-first" ><i class="fa-solid fa-clock"></i><span>%s</span></div>']
 									<div class="session-row">

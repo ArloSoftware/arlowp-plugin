@@ -176,7 +176,11 @@
                                         background-size: cover;
                                         margin-right: 10px;
                                         position: relative;
-                                        top: 5px;
+                                        top: 3px;
+                                    }
+                                    a:hover{
+                                        text-decoration: none;
+                                        color: var(--primary-theme-color);
                                     }
     
                                 }

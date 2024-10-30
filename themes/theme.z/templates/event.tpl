@@ -97,7 +97,13 @@
                   </div>
                 </div>
                 <div class="arlo-event-list-items-item-info">
-                  [arlo_event_location wrap='<div aria-label="event location" class="arlo-mobile-only arlo-first" ><i class="fa-solid fa-location-dot"></i><span>%s</span></div>']
+                  [arlo_condition_return_level1 param='Online' shortcode_value='arlo_event_location' cond="equal" return_content="true"]
+                    [arlo_event_location wrap='<div aria-label="event location" class="arlo-mobile-only arlo-first" ><i class="fa-solid fa-desktop"></i><span>%s</span></div>'][/arlo_event_location]
+                  [/arlo_condition_return_level1]
+                  [arlo_condition_return_level1  param='Online' shortcode_value='arlo_event_location' cond="nequal" return_content="true"]
+                    [arlo_event_location wrap='<div aria-label="event location" class="arlo-mobile-only arlo-first" ><i class="fa-solid fa-location-dot"></i><span>%s</span></div>'][/arlo_event_location]
+                  [/arlo_condition_return_level1]
+
                   [arlo_event_offers wrap='<div aria-label="event offers"  class="arlo-event-offer-wrapper arlo-mobile-only arlo-mobile-offer"><i class="fa-solid fa-tag"></i><div>%s</div></div>']
 
                   [arlo_event_session_list_item layout="popup" wrap='<div aria-label="event sessions arlo-first" ><i class="fa-solid fa-clock"></i><span>%s</span></div>']
@@ -113,7 +119,14 @@
                       </div>
                     </div>
                   [/arlo_event_session_list_item]
-                  [arlo_event_location wrap='<div aria-label="event location" class="arlo-non-mobile-only" ><i class="fa-solid fa-location-dot"></i><span>%s</span></div>']
+
+                  [arlo_condition_return_level1 param='Online' shortcode_value='arlo_event_location' cond="equal" return_content="true"]
+                    [arlo_event_location wrap='<div aria-label="event location" class="arlo-non-mobile-only" ><i class="fa-solid fa-desktop"></i><span>%s</span></div>'][/arlo_event_location]
+                  [/arlo_condition_return_level1]
+                  [arlo_condition_return_level1  param='Online' shortcode_value='arlo_event_location' cond="nequal" return_content="true"]
+                    [arlo_event_location wrap='<div aria-label="event location" class="arlo-non-mobile-only" ><i class="fa-solid fa-location-dot"></i><span>%s</span></div>'][/arlo_event_location]
+                  [/arlo_condition_return_level1]
+
                   [arlo_event_presenters wrap='<div aria-label="event presenters"><i class="fa-solid fa-user"></i><div class="arlo-event-presenters">%s</div></div>']
                   [arlo_event_notice wrap='<div aria-label="event special course note" class="arlo-non-mobile-only" ><i class="fa-solid fa-circle-info"></i><span>%s</span></div>']
                   [arlo_event_offers wrap='<div aria-label="event offers"  class="arlo-event-offer-wrapper arlo-non-mobile-only"><i class="fa-solid fa-tag"></i><div>%s</div></div>']

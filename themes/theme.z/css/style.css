@@ -563,7 +563,6 @@
   flex-direction: column;
   box-shadow: 0px 0px 8px var(--primary-card-shadow-color);
   border: 1px solid var(--primary-card-border-color);
-  min-height: 693px;
   justify-content: space-between;
   box-sizing: border-box;
   background-color: white;
@@ -674,6 +673,10 @@
 .arlo .arlo-desktop .arlo-events-item-main-info > div span, .arlo .arlo-desktop .arlo-events-item-main-info > div a {
   font-size: 15px;
   font-weight: normal;
+}
+.arlo .arlo-desktop .arlo-events-item-main-info > div a:hover {
+  color: var(--primary-theme-color);
+  text-decoration: none;
 }
 .arlo .arlo-desktop .arlo-events-item-main-info > div .arlo-event-presenters {
   line-height: 20px;
@@ -1383,7 +1386,7 @@
 .arlo .arlo-desktop .arlo-tags.arlo-template_tags-list.outline li {
   color: var(--primary-light-text-color);
   background-color: transparent;
-  border-color: var(--primary-light-text-color);
+  border: 1px solid var(--primary-light-text-color);
 }
 .arlo .arlo-desktop .arlo-event {
   display: flex;
@@ -1586,7 +1589,6 @@
 }
 .arlo .arlo-desktop .arlo-event-list-items-item {
   width: 100%;
-  min-height: 444px;
 }
 .arlo .arlo-desktop .arlo-event-list-items-item-bg {
   box-shadow: 0px 0px 8px var(--primary-card-shadow-color);
@@ -1662,6 +1664,10 @@
   display: inline-block;
   position: relative;
   top: 5px;
+}
+.arlo .arlo-desktop .arlo-event-list-items-item-info > div a:hover {
+  color: var(--primary-theme-color);
+  text-decoration: none;
 }
 .arlo .arlo-desktop .arlo-event-list-items-item-info .arlo-event-offers {
   display: flex;
@@ -2227,7 +2233,6 @@
   border: 1px solid var(--primary-card-border-color);
   box-shadow: 0px 0px 8px var(--primary-card-shadow-color);
   padding: 20px;
-  min-height: 531px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -2567,6 +2572,26 @@
   background-position: center;
   background-color: gray;
 }
+.arlo .arlo-desktop .arlo-presenter-info-basic-social .arlo-social-twitter:hover {
+  background-color: #1DA1F2;
+  border-color: #1DA1F2;
+  color: white;
+}
+.arlo .arlo-desktop .arlo-presenter-info-basic-social .arlo-social-linkedin:hover {
+  background-color: #0A66C2;
+  border-color: #0A66C2;
+  color: white;
+}
+.arlo .arlo-desktop .arlo-presenter-info-basic-social .arlo-social-facebook:hover {
+  background-color: #3B5998;
+  border-color: #3B5998;
+  color: white;
+}
+.arlo .arlo-desktop .arlo-presenter-info-basic-social .arlo-social-link:hover {
+  background-color: #0372CC;
+  border-color: #0372CC;
+  color: white;
+}
 .arlo .arlo-desktop .arlo-presenter-info-description {
   flex: 1;
   font-size: 16px;
@@ -2844,7 +2869,11 @@
   background-size: cover;
   margin-right: 10px;
   position: relative;
-  top: 5px;
+  top: 3px;
+}
+.arlo .arlo-desktop .arlo-upcoming-result-events-item-info-basic > div a:hover {
+  text-decoration: none;
+  color: var(--primary-theme-color);
 }
 .arlo .arlo-desktop .arlo-upcoming-result-events-item-info-basic .arlo-offers {
   display: flex;
@@ -3172,6 +3201,9 @@
 }
 .arlo .arlo-desktop .arlo-activities-item-title a {
   text-decoration: none;
+}
+.arlo .arlo-desktop .arlo-activities-item-title a:hover {
+  color: var(--primary-theme-color);
 }
 .arlo .arlo-desktop .arlo-activities-item-desc {
   font-size: 18px;

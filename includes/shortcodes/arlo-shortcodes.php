@@ -48,46 +48,65 @@ class Shortcodes {
     	});
 
 		//updated by Peter for theme.z
-		self::add('condition_return', function ($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-			extract(shortcode_atts(array(
-				'param' => '',
-				'shortcode_value' => '',
-				'cond'  => 'equal',
-				'true'  => '',
-				'false' => '',
-				'return_content' => 'false',
-			),
-				$atts,
-				$shortcode_name
-			));
+		for($i = 0; $i < 5; $i++) {
+			$alias = '_level' . $i;
+			if($i == 0) $alias =  "";
+			self::add('condition_return' . $alias, function ($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+				extract(shortcode_atts(array(
+					'param' => '',
+					'shortcode_value' => '',
+					'cond'  => 'equal',
+					'true'  => '',
+					'false' => '',
+					'return_content' => 'false',
+				),
+					$atts,
+					$shortcode_name
+				));
 
-			$c = trim(do_shortcode('['.$shortcode_value.']'));
-			$rt = '';
-			switch ($cond) {
-				case 'large_than':
-					if (is_numeric($c) && (int)$c > (int)$param) {
-						$rt = $return_content === 'true' ? $content : $true;
-					} else {
-						$rt = $false;
-					}
-					break;
-				case 'nequal':
-					if ($c == $param) {
-						$rt = $false;
-					} else {
-						$rt = $return_content === 'true' ? $content : $true;
-					}
-					break;
-				case 'equal':
-				default:
-					if ($c == $param) {
-						$rt = $return_content === 'true' ? $content : $true;
-					} else {
-						$rt = $false;
-					}
-			}
-			return do_shortcode($rt);
-		});
+				$c = trim(do_shortcode('['.$shortcode_value.']'));
+				$rt = '';
+				switch ($cond) {
+					case 'large_than':
+						if (is_numeric($c) && (int)$c > (int)$param) {
+							$rt = $return_content === 'true' ? $content : $true;
+						} else {
+							$rt = $false;
+						}
+						break;
+					case 'nequal':
+						if ($c == $param) {
+							$rt = $false;
+						} else {
+							$rt = $return_content === 'true' ? $content : $true;
+						}
+						break;
+					case 'contains':
+						if (strpos($c, $param) !== false) {
+							$rt = $return_content === 'true' ? $content : $true;
+						} else {
+							$rt = $false;
+						}
+						break;
+					case 'ncontains':
+						if (strpos($c, $param) === false) {
+							$rt = $return_content === 'true' ? $content : $true;
+						} else {
+							$rt = $false;
+						}
+						break;
+					case 'equal':
+					default:
+						if ($c == $param) {
+							$rt = $return_content === 'true' ? $content : $true;
+						} else {
+							$rt = $false;
+						}
+				}
+				return do_shortcode($rt);
+			});
+		}
+
 	}
 
 	/*
