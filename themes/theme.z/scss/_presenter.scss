@@ -1,0 +1,211 @@
+.arlo{
+    .arlo-desktop .arlo {
+        &-presenter{
+            display: flex;
+            flex-direction: column;
+            &-info{
+                display: flex;
+                flex-direction: row;
+                gap: 48px;
+                &-basic{
+                    display: flex;
+                    flex-direction: column;
+                    &-avatar{
+                        padding: 20px;
+                        width: 368px;
+                        height: 368px;
+                        box-sizing: border-box;
+                        border: 1px solid var(--primary-card-border-color);
+                        box-shadow: 0px 0px 8px var(--primary-card-shadow-color);
+                        div{
+                            width: 100%;
+                            height: 100%;
+                            background-color: gray;
+                        }
+                        img.noimage{
+                            height: 100%;
+                            object-fit: cover;
+                        }
+                    }
+                    &>div{
+                        display: flex;
+                        flex-direction: column;
+                        &>h1{
+                            font-size: 40px;
+                            margin-top: 32px;
+                            font-weight: 400;
+                        }
+                    }
+                    
+                    &-social{
+                        margin-top: 24px;
+                        display: flex;
+                        flex-direction: row;
+                        gap: 16px;
+                        &>div{
+                            width: 44px;
+                            height: 44px;
+                            background-size: cover;
+                            background-position: center;
+                            background-color: gray;
+                        }
+                        .arlo-social-twitter:hover{
+                            background-color: #1DA1F2;
+                            border-color: #1DA1F2;
+                            color: white;
+                        }
+                        .arlo-social-linkedin:hover{
+                            background-color: #0A66C2;
+                            border-color: #0A66C2;
+                            color: white;
+                        }
+                        .arlo-social-facebook:hover{
+                            background-color:#3B5998;
+                            border-color: #3B5998;
+                            color: white;
+                        }
+                        .arlo-social-link:hover{
+                            background-color:#0372CC;
+                            border-color: #0372CC;
+                            color: white;
+                        }
+                    }
+                }
+                &-description{
+                    flex: 1;
+                    font-size: 16px;
+                    &-content{
+                        line-height: 23px;
+                        margin: 8px 0;
+                        p{
+                            line-height: 23px;
+                            margin: 8px 0;
+                        }
+                        img{
+                            &:first-child {
+                                display: none;
+                            }
+                        }
+                    }
+                    &-section{
+                        font-size: 20px;
+                        margin: 48px 0 24px 0;
+                    }
+                }
+            }
+            &-divider{
+                margin: 64px 0;
+                border: none;
+                border-bottom: 1px solid var(--primary-card-border-color);
+            }
+            &-events{
+                display: flex;
+                flex-direction: column;
+                .arlo-events {
+                    display: unset;
+                    &-item{
+                        width: 100%;
+                    }
+                }
+                &>h2{
+                    font-size: 32px;
+                    margin-bottom: 32px;
+                    font-weight: 500;
+                }
+            }
+    
+    
+            .swiper-slide{
+                width: 382px;
+            }
+        }
+    }
+  
+
+    
+    .arlo-pad  .arlo {
+        &-presenter{
+            &-info{
+                flex-direction: column;
+                &-basic{
+                    flex-direction: row;
+                    align-items: center;
+                    gap: 48px;
+                    &-avatar{
+                        width: 280px;
+                        height: 280px;
+                    }
+                    &>div{
+                        &>h1{
+                            font-size: 32px;
+                            line-height: 38px;
+                            margin-top: 0;
+                        }
+                    }
+                }
+            }
+            &-events{
+                &>h2{
+                    font-size: 28px;
+                }
+                .arlo-events{
+                    &-item{
+                        width: 318px;
+                    }
+                }
+            }
+
+            .swiper-slide{
+                width: 318px;
+            }
+        }
+    }
+
+    .arlo-mobile  .arlo {
+        &-presenter{
+            &-info{
+                flex-direction: column;
+                gap: 32px;
+                &-basic{
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 16px;
+                    &-avatar{
+                        width: 100%;
+                        height: auto;
+                    }
+                    &-social{
+                        margin-top: 16px;
+                    }
+                    &>div{
+                        &>h1{
+                            margin-top: 0;
+                            font-size: 28px;
+                        }
+                    }
+                }
+                &-description{
+                    &-section{
+                        margin: 32px 0 24px 0;
+                    }
+                }
+            }
+            &-divider{
+                margin: 48px 0;
+            }
+            &-events{
+                &>h2{
+                    font-size: 24px;
+                }
+                .arlo-events{
+                    &-item{
+                    }
+                }
+            }
+
+            .swiper-slide{
+                width: 318px;
+            }
+        }
+    }
+}

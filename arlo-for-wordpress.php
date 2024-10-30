@@ -33,7 +33,7 @@
 define('ARLO_PLUGIN_PREFIX', 'arlo'); 
 define('ARLO_PLUGIN_NAME', 'Arlo');
 define('ARLO_PLUGIN_DIR', plugin_dir_path( __FILE__ ));
-
+define('ARLO_PLUGIN_ROOT_URL', plugin_dir_url( __FILE__ ));
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
 	die;

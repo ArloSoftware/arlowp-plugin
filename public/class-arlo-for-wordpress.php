@@ -476,6 +476,17 @@ class Arlo_For_Wordpress {
         'presenter' => 'All presenters',
         'oatag' => 'All tags'
     );
+	public static $filter_labels_v1 = array(
+        'category' => 'Categories',
+        'delivery' => 'Delivery Methods',
+        'month' => 'Months',
+        'location' => 'Locations',
+        'state' => 'States',
+        'eventtag' => 'Event Tags',
+        'templatetag' => 'Template Tags',
+        'presenter' => 'Presenters',
+        'oatag' => 'Tags'
+    );
 
 
 	/**

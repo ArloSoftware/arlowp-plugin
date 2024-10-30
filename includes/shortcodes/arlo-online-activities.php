@@ -183,7 +183,8 @@ class OnlineActivities {
         $registration = '<div class="arlo-oa-registration">';
         // test if there is a register uri string, if so display the button
         if(!is_null($registeruri) && $registeruri != '') {
-            $registration .= '<a class="' . $class . ' arlo-register" href="'. esc_url($registeruri) . '" target="_blank">' . __($registermessage, 'arlo-for-wordpress') . '</a>';
+            $linktext = __($registermessage, 'arlo-for-wordpress');
+            $registration .= '<a aria-label="' . esc_attr($linktext . ', opens in new tab') . '" class="' . $class . ' arlo-register" href="'. esc_url($registeruri) . '" target="_blank">' . $linktext . '</a>';
         } else {
             $registration .= $registermessage;
         }
@@ -277,8 +278,12 @@ class OnlineActivities {
         $atts = array_merge($atts, self::$oa_list_atts);
 
         if(empty($items)) :
+            //updated by Tony for theme.z
+            $before = isset($atts['noevent_before']) ? $atts['noevent_before'] : "";
+            $after = isset($atts['noevent_after']) ? $atts['noevent_after'] : "";
+
             $no_event_text = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No online activities to show', 'arlo-for-wordpress');
-            $output = '<p class="arlo-no-results">' . esc_html($no_event_text) . '</p>';
+            $output = $before . '<p class="arlo-no-results">' . esc_html($no_event_text) . '</p>' . $after;
             
         else :
             $previous = null;
@@ -419,10 +424,18 @@ class OnlineActivities {
         $field_list = '
             oa.oa_id
         ';
+        //Added by Tony for theme.z ,if it's not grouped by category, need distinct, because item may have multiple categories
+        if(isset($atts['group']) && $atts['group'] == 'none') {
+            $field_list = '
+                distinct
+                oa.oa_id
+            ';
+        }
 
         $limit_field = $order = '';
 
         if (!$for_pagination) {
+            //Updated by Tony ,add et.et_arlo_id in field list
             $field_list = '
                 oa.oa_id,
                 oa.oa_arlo_id,
@@ -443,9 +456,36 @@ class OnlineActivities {
                 et.et_registerinteresturi, 
                 et.et_region,
                 et.et_viewuri,
+                et.et_arlo_id, 
                 c.c_arlo_id,
                 c.c_name
             ';
+            //added by Tony for theme.z
+            if(isset($atts['group']) && $atts['group'] == 'none') {
+                $field_list = '
+                    distinct
+                    oa.oa_id,
+                    oa.oa_arlo_id,
+                    oa.oat_arlo_id,
+                    oa.oa_code,
+                    oa.oa_reference_terms,
+                    oa.oa_credits,
+                    oa.oa_name,
+                    oa.oa_delivery_description,
+                    oa.oa_viewuri,
+                    oa.oa_registermessage,
+                    oa.oa_registeruri,
+                    et.et_id,
+                    et.et_name, 
+                    et.et_post_name, 
+                    et.et_post_id,
+                    et.et_descriptionsummary, 
+                    et.et_registerinteresturi, 
+                    et.et_region,
+                    et.et_viewuri,
+                    et.et_arlo_id
+                ';
+            }
 
             $limit_field = "
             LIMIT 
@@ -465,7 +505,7 @@ class OnlineActivities {
         }
 
         $sql = 
-            "SELECT 
+            "SELECT
             $field_list
             FROM 
                 $t1 oa
@@ -493,7 +533,6 @@ class OnlineActivities {
             $order
             $limit_field
             ";
-
 
         return $wpdb->prepare($sql, $parameters);
     }  

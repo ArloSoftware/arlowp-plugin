@@ -175,6 +175,29 @@ class Presenters {
 
         return $GLOBALS['arlo_presenter_list_item']['p_profile'];        
     }
+
+    //added by Tony for theme.z
+    private static function shortcode_presenter_profile_avatar($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        $placeholder = isset($atts['placeholder']) ? $atts['placeholder'] : 'themes/theme.z/images/presenter_placeholder.png';
+        $placeholder = ARLO_PLUGIN_ROOT_URL . $placeholder;
+        $cls = "noimage";
+        if(isset($GLOBALS['arlo_presenter_list_item']['p_profile'])){
+            $profile = $GLOBALS['arlo_presenter_list_item']['p_profile'];
+            preg_match_all('/<img[^>]+src="([^"]+)"[^>]*>/i', $profile, $matches);
+            if(count($matches) > 0) {
+                $images = $matches[1];
+                if(count($images) > 0) {
+                    $placeholder = $images[0];
+                    $cls = "";
+                } 
+            }
+        } 
+        
+        $first_name = $GLOBALS['arlo_presenter_list_item']['p_firstname'];
+        $last_name = $GLOBALS['arlo_presenter_list_item']['p_lastname'];
+        
+        return "<img class='$cls' src='" . esc_url($placeholder) ."' alt='" . esc_attr($first_name . ' ' . $last_name)  . "' />";
+    }
     
     private static function shortcode_presenter_qualifications($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_presenter_list_item']['p_qualifications'])) return '';
@@ -245,7 +268,6 @@ class Presenters {
         // else return a tag with the link text
         } else {
             $link = '<a href="';
-
             switch($network) {
                 case "facebook":
                     if(!$fb_id) return '';
@@ -260,8 +282,8 @@ class Presenters {
                     $link .= $tw_link . $tw_id;
                     break;
             }
-
-            $link .= '" class="arlo-social-'.$network.'">'.$linktext.'</a>';
+            $extracls = isset($atts['linkclass']) ? esc_attr($atts['linkclass']) : '';
+            $link .= '" aria-label="' . $network . '" class="arlo-social-'.$network.' ' . $extracls . '">'.$linktext.'</a>';
 
         }
 
@@ -330,4 +352,47 @@ class Presenters {
         return $events;        
 
     }        
+
+    //added by Tony , this function is a enhancedment of shortcode_presenter_events_list, can render complex html given in content
+    private static function shortcode_presenter_events_list_advanced($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        global $wpdb;
+        global $post, $wpdb;
+        $slug = get_post( $post )->post_name;
+
+        $slug_a = explode('-', $slug);
+        $p_id = $slug_a[0];
+
+        $t1 = "{$wpdb->prefix}arlo_eventtemplates";
+        $t2 = "{$wpdb->prefix}arlo_events";
+        $t3 = "{$wpdb->prefix}arlo_events_presenters";
+
+        $items = $wpdb->get_results(
+            "SELECT 
+                et.*, e.e_is_taxexempt, e.e_locationname, e.v_id, e.e_locationvisible, e.e_isonline, e.e_startdatetime
+            FROM  $t1 et
+            LEFT JOIN  $t2 e ON e.et_arlo_id = et.et_arlo_id AND e.import_id = et.import_id
+            INNER JOIN  $t3 exp  ON exp.e_id = e.e_id AND exp.import_id = e.import_id
+            WHERE 
+                exp.p_arlo_id = $p_id 
+            AND 
+                e_parent_arlo_id = 0
+            AND
+                e.import_id = $import_id
+            GROUP BY 
+                et.et_name
+            ORDER BY 
+                et.et_name ASC", ARRAY_A);
+
+        $events = '';
+        if($wpdb->num_rows > 0) {
+            foreach($items as $item) {
+                $GLOBALS['arlo_eventtemplate'] = $item;
+                $GLOBALS['arlo_event_list_item'] = $item;
+                $events .= do_shortcode($content);;
+
+            }
+        }
+        return $events;        
+
+    }
 }

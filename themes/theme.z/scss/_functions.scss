@@ -1,0 +1,6 @@
+$width: 428 - 48; //design
+@function to-vw($px) {
+  @return #{calc($px/$width) * 100vw};
+}
+
+

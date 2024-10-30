@@ -1,0 +1,73 @@
+.tingle-modal-box{
+    width: 720px;
+    height: auto;
+    max-width: 90%;
+    margin: auto;
+}
+.tingle-modal-box__content{
+    padding: 0;
+    height: 670px;
+    *{
+        font-family: "Poppins", sans-serif;
+    }
+    .arlo-sessions-popup-header{
+        background-color: var(--primary-theme-color);
+        display: flex;
+        align-items: center;
+        padding-left: 32px;
+        height: 60px;
+        justify-content: space-between;
+        h2{
+            font-size: 20px;
+            color: var(--primary-light-text-color);
+            margin: 0;
+        }
+        span{
+            height: 100%;
+            width: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #ffffff33;
+            cursor: pointer;
+            svg{
+                width: 16px;
+                height: auto;
+                color: white;
+            }
+        }
+    }
+    .arlo-sessions-popup-inner{
+        padding: 24px 32px;
+        overflow-y: auto;
+        height: 610px;
+        display: flex;
+        flex-direction: column;
+        gap: 42px;
+    }
+
+    .session-row{
+        .session-name{
+            font-size: 18px;
+            margin-bottom: 16px;
+        }
+        .session-time{
+            &>div{
+                display: flex;
+                flex-direction: row;
+                align-items: flex-start;
+                gap: 10px;
+                svg{
+                    position: relative;
+                    top: 4px;
+                }
+                .event-presenters{
+                    margin-top: 0;
+                }
+            }
+        }
+    }
+}
+.tingle-modal__close,.tingle-modal-box__footer{
+    display: none;
+}
