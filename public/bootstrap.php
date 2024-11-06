@@ -525,7 +525,7 @@ function arlo_current_page() {
 	$page = 0;
 
 	//not sure why we watch that one first
-	$paged = filter_input(INPUT_GET, 'paged', FILTER_SANITIZE_STRING);
+	$paged = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'paged');
 	if (!empty($paged)) {
 		$page = intval($paged);
 	}

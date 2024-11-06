@@ -1,7 +1,7 @@
 <?php
 
 namespace Arlo;
-
+#[\AllowDynamicProperties]
 class Scheduler {
 
 	const MAX_SLEEP_BETWEEN_TASKS = 15;	
