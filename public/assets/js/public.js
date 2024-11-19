@@ -170,7 +170,6 @@
     
 	function initRegionChanger() {
 		uriRegion = getUriRegion();
-		console.log("ASDF");
 		$(".arlo-filter-region").bind("change", function () {
 			changeRegion(uriRegion, $(this).val());
 		});		
