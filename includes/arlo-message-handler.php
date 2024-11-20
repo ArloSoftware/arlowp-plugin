@@ -15,7 +15,7 @@ class MessageHandler {
 	public function get_message_by_type_count($type = null, $count_dismissed = false) {		
 		$count_dismissed = (isset($count_dismissed) && $count_dismissed ? true : false );
 		$type = (!empty($type) ? $type : null);
-		
+		$parameters = [];
 		$where = ['1'];
 		
 		if (!$count_dismissed) {
@@ -23,7 +23,8 @@ class MessageHandler {
 		}
 		
 		if (!is_null($type)) {
-			$where[] = " type = '" . esc_sql($type) ."'";
+			$where[] = " type = '%s'";
+			$parameters[] = $type;
 		}
 	
 		$sql = '
@@ -34,8 +35,9 @@ class MessageHandler {
 		WHERE 
 			' . (implode(' AND ', $where)) . '
 		';
-		
-		$result = $this->dbl->get_results($sql); 
+		$query = $this->dbl->prepare($sql, $parameters);
+
+		$result = $this->dbl->get_results($query); 
 				
 		return $result[0]->num;
 	}
@@ -123,7 +125,7 @@ class MessageHandler {
 	public function get_messages($type = null, $global = false) {
 		$global = (isset($global) && is_bool($global) ? $global : null );
 		$type = (!empty($type) ? $type : null);
-		
+		$parameters = [];
 		$where = [' dismissed IS NULL '];
 		
 		if (is_bool($global)) {
@@ -131,7 +133,8 @@ class MessageHandler {
 		}
 		
 		if (!is_null($type)) {
-			$where[] = " type = '" . esc_sql($type) ."'";
+			$where[] = " type = '%s'";
+			$parameters[] =  $type;
 		}		
 		
 		$sql = '
@@ -147,7 +150,9 @@ class MessageHandler {
 			' . (implode(' AND ', $where)) . '
 		';
 
-		$items = $this->dbl->get_results($sql);
+		$query = $this->dbl->prepare($sql, $parameters);
+
+		$items = $this->dbl->get_results($query);
 		array_map(function($item) {
 			$item->is_dismissable = true;
 		}, $items); 

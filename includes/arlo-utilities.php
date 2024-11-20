@@ -95,14 +95,22 @@ class Utilities {
         return (is_numeric($to_be_converted) ? intval($to_be_converted) : null);
     }
 
+    /* ADDED BY MALHAR */
+	public static function filter_string_polyfill($input, $input_name)
+	{
+			$string = filter_input($input, $input_name, FILTER_DEFAULT);
+			$str = preg_replace('/\x00|<[^>]*>?/', '', $string?$string:'');
+			return str_replace(["'", '"'], ['&#39;', '&#34;'], $str);
+	}
+	/* END ADDED BY MALHAR */
 
     public static function clean_string_url_parameter($parameter_name) {
-        $parameter_value = filter_input(INPUT_GET, $parameter_name, FILTER_SANITIZE_STRING);
+        $parameter_value =  self::filter_string_polyfill(INPUT_GET, $parameter_name);
         return !empty($parameter_value) ? wp_unslash($parameter_value) : wp_unslash(urldecode(get_query_var($parameter_name)));
     }
 
     public static function clean_int_url_parameter($parameter_name) {
-        $parameter_value = filter_input(INPUT_GET, $parameter_name, FILTER_SANITIZE_STRING);
+        $parameter_value =  self::filter_string_polyfill(INPUT_GET, $parameter_name);
         if (!empty($parameter_value)) {
             return intval($parameter_value);
         } else {

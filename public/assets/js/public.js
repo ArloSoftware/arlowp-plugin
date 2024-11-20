@@ -32,7 +32,7 @@
 
         $('.arlo-event-filters > select').change(function() {
 			var page = $('#arlo-page').val();
-
+					
         	if (page[page.length-1] != '/') {
         		page = page + '/';
         	}
@@ -170,7 +170,6 @@
     
 	function initRegionChanger() {
 		uriRegion = getUriRegion();
-		
 		$(".arlo-filter-region").bind("change", function () {
 			changeRegion(uriRegion, $(this).val());
 		});		
