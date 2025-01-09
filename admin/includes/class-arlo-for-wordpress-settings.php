@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Arlo For Wordpress
  *
@@ -15,13 +16,13 @@
  use Arlo\SystemRequirements;
  use Arlo\Utilities;
  use Arlo\Importer\ImportRequest;
-
+ #[\AllowDynamicProperties]
 class Arlo_For_Wordpress_Settings {
 
 	public function __construct() {
 		
 		if (!session_id()) {
-			session_start();
+			session_start(['read_and_close' => true]);
 		}
 				
 		// allocates the wp-options option key value pair that will store the plugin settings
@@ -101,9 +102,11 @@ class Arlo_For_Wordpress_Settings {
 				exit;
 			}
 
-			$apply_theme = filter_input(INPUT_GET, 'apply-theme', FILTER_SANITIZE_STRING);
-			$wpnonce = filter_input(INPUT_GET, '_wpnonce', FILTER_SANITIZE_STRING);
-			$reset = filter_input(INPUT_GET, 'reset', FILTER_SANITIZE_STRING);
+
+
+			$apply_theme = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'apply-theme');
+			$wpnonce = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, '_wpnonce');			
+			$reset = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'reset');
 
 			if (!empty($apply_theme) && !empty($wpnonce) && wp_verify_nonce($wpnonce, 'arlo-apply-theme-nonce')) {
 				$theme_id = $apply_theme;
@@ -144,7 +147,8 @@ class Arlo_For_Wordpress_Settings {
 			$urlparts = parse_url(site_url());
 			$domain = $urlparts['host'];
 
-			$delete_shortcode = filter_input(INPUT_GET, 'delete-shortcode', FILTER_SANITIZE_STRING);
+			$delete_shortcode = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'delete-shortcode', FILTER_DEFAULT);
+			
 
 			if (!empty($delete_shortcode) && !empty($wpnonce) && wp_verify_nonce($wpnonce, 'arlo-delete-shortcode-nonce')) {
 				unset( $_COOKIE['arlo-vertical-tab'] );
@@ -181,7 +185,7 @@ class Arlo_For_Wordpress_Settings {
 			if ( array_key_exists('arlo-nav-tab', $_COOKIE) ) {
 				$nav_tab = $_COOKIE['arlo-nav-tab'];
 				unset( $_COOKIE['arlo-nav-tab'] );
-				setcookie('arlo-nav-tab', null, -1, '/', $domain);
+				setcookie('arlo-nav-tab', '', -1, '/', $domain);
 
 				//some shared hosting doesn't delete the cookie properly
 				if (!isset($_SESSION['arlo-nav-tab'])) {
@@ -966,6 +970,14 @@ class Arlo_For_Wordpress_Settings {
 	    echo '
 	    <h3>What\'s new in this release</h3>
 		<p><strong>If you are experiencing problems after an update, please deactivate and re-activate the plugin and re-synchronize the data.</strong></p>
+
+		<h4>Version 4.3.0</h4>
+		<p>
+			<ul class="arlo-whatsnew-list">
+				<li>Support for PHP ></li>
+				<li>Support for WordPress 6.6</li>
+			</ul>
+		</p>
 
 		<h4>Version 4.2.0</h4>
 		<p>

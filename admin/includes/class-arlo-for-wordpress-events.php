@@ -25,7 +25,7 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 	public function get_title() {
 		$title = parent::get_title();
 		
-		$et_id = filter_input(INPUT_GET, 'et_id', FILTER_SANITIZE_STRING);
+		$et_id = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'et_id');
 		if (!empty($et_id) && !empty(self::$filter_column_mapping['et_id']) && intval($et_id > 0) && !empty($this->items[0]->et_name)) {
 			$title .= ' for template: ' . $this->items[0]->et_name;
 		}
@@ -112,13 +112,18 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 					 $timewithtz = str_replace(' ', 'T', $item->$column_name) . $item->{$column_name.'offset'};
 					 
         			 $date = new \DateTime($timewithtz);
-
+							 
 					 $timezone = new \DateTimeZone(\Arlo\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$this->timezones[$item->e_timezone_id]['windows_tz_id']]);
-					 
+					 //Old function URL - https://www.php.net/manual/en/function.strftime.php - This function is deprecated from PHP 8.1
+					 //New function URL - https://www.php.net/manual/en/datetime.format.php
+					 //I am actually converting time from using strftime function to new datetime function so it convert same time format.
 					 if ($timezone != null) {
             			$date->setTimezone($timezone);
 
-						return strftime("%Y-%m-%d %H:%M:%S", $date->getTimestamp() + $date->getOffset()) . " " . $date->format("T");
+									$format_array = array("%"=>"","a"=>"D","A"=>"l","d"=>"d","e"=>"j","u"=>"N","w"=>"w","U"=>"W","V"=>"W","W"=>"W","b"=>"M","B"=>"F","h"=>"M","m"=>"m","C"=>"y","g"=>"y","G"=>"Y","y"=>"y","Y"=>"Y","H"=>"H","k"=>"G","I"=>"h","l"=>"g","M"=>"i","p"=>"A","P"=>"a","r"=>"h:i:s A","R"=>"H:i","S"=>"s","T"=>"H:i:s","X"=>"","z"=>"","Z"=>"","c"=>"","D"=>"m/d/y","F"=>"m/d/y","s"=>"U","x"=>"");
+									$format = strtr("%Y-%m-%d %H:%M:%S",$format_array);									
+
+						return date($format, $date->getTimestamp()) . " " . $date->format("T");
 					 }
 				}
 

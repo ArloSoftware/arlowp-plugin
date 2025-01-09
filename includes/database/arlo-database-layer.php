@@ -1,7 +1,7 @@
 <?php
 
 namespace Arlo\Database;
-
+#[\AllowDynamicProperties]
 /* This class is an abstraction of the WPDB, to make the unit testing easier */
 
 abstract class DatabaseLayer {

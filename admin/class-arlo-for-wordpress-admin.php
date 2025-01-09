@@ -25,7 +25,7 @@
 use Arlo\VersionHandler;
 use Arlo\Importer\ImportRequest;
 use Arlo\ThemeManager;
-
+#[\AllowDynamicProperties]
 class Arlo_For_Wordpress_Admin {
 
 	/**

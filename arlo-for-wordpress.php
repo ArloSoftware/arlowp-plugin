@@ -14,7 +14,7 @@
  * @wordpress-plugin
  * Plugin Name:       Arlo
  * Description:       Connect your WordPress to Arlo
- * Version:           4.2.0
+ * Version:           4.3.0
  * Author:            Arlo
  * Author URI:        https://arlo.co
  * Text Domain:       arlo-for-wordpress

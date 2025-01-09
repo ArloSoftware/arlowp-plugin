@@ -14,7 +14,7 @@ class Categories {
         foreach ($shortcodes as $shortcode) {
             $shortcode_name = str_replace('shortcode_', '', $shortcode->name);
 
-            Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
+            Shortcodes::add($shortcode_name, function($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
                 $method_name = 'shortcode_' . str_replace('arlo_', '', $shortcode_name);
                 if (!is_array($atts) && empty($atts)) { $atts = []; }
                 return self::$method_name($content, $atts, $shortcode_name, $import_id);
@@ -148,7 +148,7 @@ class Categories {
         return htmlentities($category->c_name, ENT_QUOTES, "UTF-8");
     }
 
-    private static function shortcode_category_header($content = '', $atts, $shortcode_name, $import_id = '') {
+    private static function shortcode_category_header($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         $selected_categories = self::get_selected_categories();
         $arlo_category = array_shift($selected_categories);
         
@@ -163,7 +163,7 @@ class Categories {
         return $category->c_header;
     } 
 
-    private static function shortcode_category_footer ($content = '', $atts, $shortcode_name, $import_id = ''){
+    private static function shortcode_category_footer ($content = '', $atts = [], $shortcode_name = '', $import_id = ''){
         $selected_categories = self::get_selected_categories();
         $arlo_category = array_shift($selected_categories);
         

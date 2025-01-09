@@ -63,8 +63,8 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 	}
 	
 	private function init_sql_variables() {
-		$order = filter_input(INPUT_GET, 'order', FILTER_SANITIZE_STRING);
-		$paged = filter_input(INPUT_GET, 'paged', FILTER_SANITIZE_STRING);
+		$order = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'order');
+		$paged = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'paged');
 
 		$this->orderby = $this->get_orderby_columnname();
 		$this->order = (!empty($order) && in_array(strtolower($order), ['asc','desc']) ? $order : 'desc');
@@ -74,7 +74,7 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 	}
 	
 	private function get_orderby_columnname() {
-		$orderby = filter_input(INPUT_GET, 'orderby', FILTER_SANITIZE_STRING);
+		$orderby = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'orderby');
 		$orderby = (!empty($orderby) ? $orderby : 'id');
 		$columns = $this->_column_headers[2];
 				
@@ -111,7 +111,7 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 	private function get_sql_search_where_array() {
 		$where = array();
 
-		$s = filter_input(INPUT_GET, 's', FILTER_SANITIZE_STRING);
+		$s = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 's');
 
 		if (!empty($s)) {
 			$search_fields = $this->get_searchable_fields();
@@ -129,7 +129,7 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 		}
 		
 		return !empty($where) ? $where : '1';
-	}			
+	}		
 
 	public function get_sql_query() {
 		$where = $this->get_sql_where_expression();

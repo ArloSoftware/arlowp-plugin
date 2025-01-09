@@ -98,7 +98,7 @@ class Filters {
 
                 for ($x = $currentMonth; $x < $currentMonth + 12; $x++) {
                     $date = mktime(0, 0, 0, $x, 1);
-                    $months[$x]['string'] = strftime('%B', $date);
+                    $months[$x]['string'] = date('F', $date);
                     $months[$x]['value'] = date('Ym01', $date) . ':' . date('Ymt', $date);
 
                 }

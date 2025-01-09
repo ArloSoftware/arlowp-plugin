@@ -1797,7 +1797,7 @@ class Arlo_For_Wordpress {
 	
 	
 	public function arlo_terminate_task_callback() {
-		$task_id_string = filter_input(INPUT_POST, 'taskID', FILTER_SANITIZE_STRING);
+		$task_id_string = \Arlo\Utilities::filter_string_polyfill(INPUT_POST, 'taskID');
 		$task_id = intval($task_id_string);
 		if ($task_id > 0) {
 			
@@ -1814,7 +1814,7 @@ class Arlo_For_Wordpress {
 	
 	
 	public function arlo_get_task_info_callback() {
-		$task_id_string = filter_input(INPUT_POST, 'taskID', FILTER_SANITIZE_STRING);
+		$task_id_string = \Arlo\Utilities::filter_string_polyfill(INPUT_POST, 'taskID');
 		$task_id = intval($task_id_string);
 		if ($task_id > 0) {
 			$task = $this->get_scheduler()->get_tasks(null, null, $task_id);
@@ -1826,7 +1826,7 @@ class Arlo_For_Wordpress {
 	}
 	
 	public function dismiss_message_callback() {
-		$id_string = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_STRING);
+		$id_string = \Arlo\Utilities::filter_string_polyfill(INPUT_POST, 'id');
 		$id = intval($id_string);
 		
 		if ($id > 0) {			
@@ -1846,14 +1846,14 @@ class Arlo_For_Wordpress {
 	
 	
 	public function dismissible_notice_callback() {
-		$id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_STRING);
+		$id = \Arlo\Utilities::filter_string_polyfill(INPUT_POST, 'id');
 		if (!empty($id)) {
 			$this->get_notice_handler()->dismiss_user_notice($id);
 		}		
 		
 		echo 0;
 		wp_die();
-	}	
+	}
 
 	public function change_setting($setting_name, $value) {
 		$settings = get_option('arlo_settings');

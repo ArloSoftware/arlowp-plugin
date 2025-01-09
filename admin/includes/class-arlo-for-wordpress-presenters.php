@@ -29,7 +29,7 @@ class Arlo_For_Wordpress_Presenters extends Arlo_For_Wordpress_Lists  {
 	public function get_title() {
 		$title = parent::get_title();
 
-		$ep_e_id = filter_input(INPUT_GET, 'ep_e_id', FILTER_SANITIZE_STRING);
+		$ep_e_id = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'ep_e_id');
 		
 		if (!empty($ep_e_id) && !empty(self::$filter_column_mapping['ep_e_id']) && intval($ep_e_id > 0) && !empty($this->items[0]->e_name)) {
 			$title .= ' for event: ' . $this->items[0]->e_name;
