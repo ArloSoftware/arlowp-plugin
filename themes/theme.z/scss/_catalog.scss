@@ -1,0 +1,279 @@
+.arlo{
+    .arlo-desktop .arlo {
+        //catalog
+        &-category-list{
+            margin-top: 32px;
+            display: flex;
+            flex-direction: row;
+            padding-left: 0;
+            list-style: none;
+            gap: 12px;
+            flex-wrap: wrap;
+            &>li{
+                &>a{
+                    background-color: var(--primary-light-bg-color);
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 10px 15px;
+                    color: black;
+                    cursor: pointer;
+                    border-radius: 3px;
+                    line-height: 21px;
+                    border: 1px solid #999999;
+                    border-radius: 6px;
+                    box-sizing: border-box;
+                    text-decoration: none;
+                }
+            }
+        }
+        &-events-item{
+            &.hide{
+                display: none;
+            }
+        }
+        &-catalog {
+            &-header{
+                height: 46px;
+                line-height: 23px;
+                overflow: hidden;
+                font-size: 16px;
+                &.arlo-showmore{
+                    height: auto;
+                }
+            }
+            &-footer{
+                font-size: 16px;
+                padding: 32px 0;
+                border-top: 1px solid var(--primary-card-border-color);
+                margin-top: 64px;
+            }
+            &-region{
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: flex-start;
+                margin-bottom: 24px;
+                min-height: 56px;
+                &>span,h1{
+                    font-size: 40px;
+                }
+            }
+            &-moreheader{
+                font-size: 15px;
+                margin-top: 24px;
+                cursor: pointer;
+                display: none;
+                transition: all 0.2s;
+                align-items: center;
+                width: fit-content;
+                gap: 8px;
+                &:hover{
+                    color: var(--primary-theme-color);
+                }
+                .fa-minus{
+                    display: none;
+                }
+            }
+            &-filters{
+                margin-top: 64px;
+                &-nav{
+                    background-color: var(--primary-light-bg-color);
+                    height: auto;
+                    display: flex;
+                    flex-direction: row;
+                    width: 100%;
+                    overflow-x: auto;
+                    padding: 1px 0;
+                    span{
+                        background-color: var(--primary-theme-color);
+                        display: inline-block;
+                        line-height: 21px;
+                        color: var(--primary-light-text-color);
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        padding: 12px 16px;
+                        font-size: 15px;
+                        cursor: pointer;
+                        flex-shrink: 0;
+                        font-weight: 500;
+                        position: relative;
+                        z-index: 1;
+                        &:last-child{
+                            cursor: initial;
+                            background-color: transparent;
+                            color: var(--primary-text-color);
+                        }
+                    }
+                    .arlo-triangle{
+                        flex-shrink: 0;
+                        position: relative;
+                        z-index: 0;
+                        &:last-of-type {
+                            background-color: transparent;
+                        }
+                    }
+                }
+                &-tags{
+                    margin-top: 32px;
+                    span{
+                        
+                    }
+                }
+                &-selects{
+                    margin-top: 32px;
+                    display: flex;
+                    flex-direction: row;
+                    gap: 12px;
+                }
+                #arlo-event-filter{
+                    display: flex;
+                    flex-direction: row;
+                    gap: 0.5em;
+                    flex-wrap: wrap;
+                    select{
+                        margin-right: 0;
+                    }
+                    .arlo-filters-buttons{
+                        display: none;
+                    }
+                }
+            }
+            &-category{
+                margin-top: 48px;
+                &-wrapper{
+                    display: flex;
+                    flex-direction: column;
+                    gap: 48px;
+                }
+                &>h2{
+                    font-size: 28px;
+                    border-left: 4px solid var(--primary-theme-color);
+                    padding-left: 8px;
+                    font-weight: 500;
+                }
+                .arlo-events{
+                    margin-top: 25px;
+                }
+            }
+        }
+    }
+    .arlo-pad  .arlo {
+        &-catalog {
+            &-region{
+                &>span,h1{
+                    font-size: 32px;
+                }
+            }
+            &-header{
+                height: 71px;
+            }
+            #arlo-event-filter{
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                width: 100%;
+                select{
+                   width: 100%;
+                   min-width: unset;
+                   margin-right: 0;
+                }
+            }
+        }
+    }
+
+    .arlo-mobile  .arlo {
+        &-catalog {
+            .arlo-filter-mobile{
+                margin-top: 32px;
+            }
+            &-header{
+                height: 95px;
+            }
+            &-region{
+                flex-direction: column-reverse;
+                gap: 32px;
+                &>span{
+                    font-size: 28px;
+                }
+                &>select{
+                    width: 100%;
+                }
+                &>span,h1{
+                    font-size: 28px;
+                }
+            }
+            &-moreheader{
+                margin-top: 16px;
+            }
+            #arlo-event-filter{
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                width: 100%;
+            }
+            &-filters{
+                display: none;
+                margin-top: 24px;
+                &-nav{
+                    span{
+                        background-color: unset;
+                        color: var(--primary-theme-color);
+                        padding: 12px;
+                        &:first-child{
+                            padding-left: 16px;
+                        }
+                    }
+                    .arlo-triangle{
+                        background: unset;
+                        &::before{
+                            display: none;
+                        }
+                        &::after{
+                            left: unset;
+                            top: unset;
+                            display: flex;
+                            align-items: center;
+                            height: 100%;
+                            transform: unset;
+                            content: '>';
+                            background: unset;
+                            width: auto;
+                        }
+                    }
+                }
+                &-tags{
+                    margin-top: 24px;
+                    span,li{
+                        width: 100%;
+                        text-align: center;
+                        a{
+                            display: block;
+                            text-align: center;
+                        }
+                    }
+                }
+                &-selects{
+                    margin-top: 24px;
+                    select{
+                        width: 100%;
+                        margin-bottom: 0;
+                    }
+                }
+            }
+            &-category-wrppaer{
+                margin-top: 32px;
+            }
+            &-category{
+                margin-top: 32px;
+            }
+        }
+        &-category-list{
+            margin-top: 0;
+        }
+        .arlo-filter-location{
+            margin-bottom: 0;
+        }
+    }
+}

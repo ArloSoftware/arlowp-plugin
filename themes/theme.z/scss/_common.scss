@@ -1,0 +1,843 @@
+.arlo{
+    --primary-theme-color: #0372CC; //primary color of the theme
+    --primary-theme-color-hover: #074F89; //primary hover color
+    --primary-light-text-color: white; //text color above the --primary-theme-color
+    --primary-text-color: #333333; //main normal text color
+    --primary-blank-bg-color: white;
+
+    --primary-light-bg-color: #F1F1F1;//another background color,it's used in event search for now.
+
+    --primary-card-shadow-color: #0000001A;//card element's boxshadow color
+    --primary-card-border-color: #E1E1E1;//card element's border color
+
+    --secondary-background-color: #555555;//secondary theme color
+    --secondary-background-color-hover: #333333;//hover color
+    --secondary-background-text-color: white; //text color above the secondary background color
+
+    --primary-tag-color: #B3460E;//tag element's border and text color
+    --primary-tag-background-color: #F792561A;//tag element's background color
+
+    --arlo-discount-bg-color: #BE5519;//discount info box's background color
+    --arlo-image-placeholder-bg-color: rgb(235, 235, 235);
+
+    &-powered-by{
+        opacity: 1;
+    }
+
+    &-wrapper{
+        *{
+            margin: 0;
+        }
+    }
+    .arlo-desktop {
+        .arlo-wrapper{
+            max-width: 1200px;
+            margin: 0 auto;
+            color: var(--primary-text-color);
+            *{
+                font-family: "Poppins", sans-serif;
+                &:focus{
+                    outline-width: 2px;
+                    outline-style: solid;
+                }
+            }
+            &.full{
+                width: 100%;
+                max-width: unset;
+            }
+        }
+    
+        
+        a{
+            color: var(--primary-text-color);
+            transition: all 0.2s;
+        }
+        select{
+            min-height: 40px;
+            border-radius: 3px;
+            min-width: 240px;
+            border: 1px solid #999999;
+            border-radius: 6px;
+            color: var(--primary-text-color);
+            padding: 10px 15px;
+            box-sizing: border-box;
+            font-size: 15px;
+            -webkit-appearance: none;
+            background-image: url(data:image/svg+xml;base64,PHN2ZyBmaWxsPSdibGFjaycgaGVpZ2h0PScyNCcgdmlld0JveD0nMCAwIDI0IDI0JyB3aWR0aD0nMjQnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zyc+PHBhdGggZD0nTTcgMTBsNSA1IDUtNXonLz48cGF0aCBkPSdNMCAwaDI0djI0SDB6JyBmaWxsPSdub25lJy8+PC9zdmc+);
+            background-repeat: no-repeat;
+            background-position-x: 100%;
+            background-position-y: 50%;
+        }
+        input{
+            border: 1px solid #999999;
+            border-radius: 6px;
+            padding: 15px 24px;
+        }
+    
+        .arlo-icon-wrapper{
+            color: var(--primary-light-text-color);
+            width: 36px;
+            height: 36px;
+            padding: 8px;
+            box-sizing: border-box;
+            border-radius: 4px;
+            background-color: var(--primary-theme-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            &.outline{
+                background-color: transparent;
+                color:  var(--primary-theme-color);
+                border:1px solid var(--primary-theme-color);
+                padding: 0;
+                svg{
+                    height: 60%;
+                }
+            }
+            &.gray{
+                border-color: var(--secondary-background-color);
+                color: var(--primary-text-color);
+            }
+            &.large{
+                width: 40px;
+                height: 40px;
+                svg{
+                    height: 15px;
+                }
+            }
+            &.nomargin{
+                margin-right: 0;
+            }
+            .fa-xmark{
+                display: none;
+            }
+        }
+    
+        .arlo-main{
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .arlo-button{
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: auto;
+            padding: 9px 19px;
+            border-radius: 5px;
+            font-size: 16px;
+            text-decoration: none;
+            background-color: var(--primary-theme-color);
+            color: var(--primary-light-text-color);
+            border: 1px solid var(--primary-theme-color);
+            box-sizing: border-box;
+            transition: all 0.2s;
+            min-height: 44px;
+            cursor: pointer;
+            &.arlo-gray{
+                background-color: var(--secondary-background-color);
+                border: 1px solid var(--secondary-background-color);
+                color: var(--secondary-background-text-color);
+                &:hover{
+                    background-color: var(--secondary-background-color-hover);
+                    border-color: var(--secondary-background-color-hover);
+                }
+            }
+            &.outline{
+                color: var(--primary-theme-color);
+                border: 1px solid var(--primary-theme-color);
+                background-color: transparent;
+                &:hover{
+                    background-color: var(--primary-theme-color);
+                    color: var(--primary-light-text-color);
+                }
+            }
+            &.outline-reverse{
+                color: var(--primary-light-text-color);
+                border: 1px solid var(--primary-blank-bg-color);
+                &:hover{
+                    background-color: var(--primary-blank-bg-color);
+                    color: var(--primary-theme-color);
+                    border-color: var(--primary-blank-bg-color);
+                }
+            }
+            &:hover{
+                background-color: var(--primary-theme-color-hover);
+                border-color: var(--primary-theme-color-hover);
+            }
+        }
+        .arlo-align-center-row{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 25px auto 0 auto;
+            .arlo-button{
+                min-width: 160px;
+            }
+        }
+    
+        .arlo-form-control {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            margin-bottom: 24px;
+            width: 100%;
+            &>label{
+                font-size: 16px;
+                margin-bottom: 12px;
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+                align-items: center;
+                i{
+                    display: inline-block;
+                    width: 15px;
+                    height: 15px;
+                    background-size: cover;
+                    background-position: center;
+                    cursor: pointer;
+                    background-color: gray;
+                }
+            }
+            &-input{
+                &.checkbox{
+                    display: flex;
+                    align-items: center;
+                    flex-direction: column;
+                    gap: 8px;
+                    label{
+                        display: block;
+                        font-size: 14px;
+                        display: flex;
+                        flex-direction: row;
+                        align-items: center;
+                        width: 100%;
+                        &.active{
+                            color: var(--primary-theme-color);
+                        }
+                    }
+                    input{
+                        width: 16px;
+                        height: 16px;
+                        margin-right: 8px;
+                        
+                    }
+                }
+            }
+        }
+    
+        .arlo-tags {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            gap: 8px;
+            margin-top: 24px;
+            span{
+                border-radius: 3px;
+                height: 20px;
+                line-height: 20px;
+                font-size: 14px;
+                padding: 6px 12px;
+                background: var(--primary-tag-background-color) 0% 0% no-repeat padding-box;
+                border: 1px solid var(--primary-tag-color);
+                border-radius: 6px;
+                color: var(--primary-tag-color);
+            }
+        }
+    
+        .arlo-events {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 26px;
+            &-item{
+                display: flex;
+                width: 100%;
+                flex-direction: column;
+                box-shadow: 0px 0px 8px var(--primary-card-shadow-color);
+                border: 1px solid var(--primary-card-border-color);
+                justify-content: space-between;
+                box-sizing: border-box;
+                background-color: white;
+                &>div{
+                    &:first-child{
+                        display: flex;
+                        flex-direction: column;
+                        min-height: 0;
+                    }
+                }
+                &-cover{
+                    height: 220px;
+                    position: relative;
+                    background-color: rgb(231, 231, 231);
+                    img{
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                    }
+                    &-date{
+                        position: absolute;
+                        bottom: 0;
+                        left: 20px;
+                        width: 72px;
+                        background-color: var(--primary-theme-color);
+                        display: flex;
+                        align-items: center;
+                        flex-direction: column;
+                        justify-content: center;
+                        padding-top: 12px;
+                        padding-bottom: 12px;
+                        p{
+                            margin: 0;
+                            color: white;
+                            font-size: 15px;
+                            line-height: 20px;
+                            &:nth-child(2) {
+                                font-size: 24px;
+                                font-weight: 600;
+                                line-height: 30px;
+                            }
+                        }
+                    }
+                }
+                &-main{
+                    padding: 20px;
+                    &>h3{
+                        font-size: 20px;
+                        margin: 0 0 0 0;
+                        font-weight: 500;
+                        a{
+                            text-decoration: none;
+                            &:hover{
+                                color: var(--primary-theme-color);
+                            }
+                        }
+                    }
+                    &>p{
+                        font-size: 15px;
+                        margin: 8px 0 0 0;
+                        line-height: 20px;
+                    }
+                    &-tags{
+                        display: flex;
+                        flex-direction: row;
+                        flex-wrap: wrap;
+                        justify-content: flex-start;
+                        gap: 8px;
+                        margin-top: 24px;
+                        list-style: none;
+                        padding: 0;
+                        span,li{
+                            border-radius: 3px;
+                            height: 20px;
+                            line-height: 20px;
+                            font-size: 14px;
+                            padding: 6px 12px;
+                            background: var(--primary-tag-background-color) 0% 0% no-repeat padding-box;
+                            border: 1px solid var(--primary-tag-color);
+                            border-radius: 6px;
+                            color: var(--primary-tag-color);
+                        }
+                    }
+                    &>hr{
+                        border: none;
+                        border-top: 1px solid var(--primary-card-border-color);
+                        margin-top: 16px;
+                    }
+                    &-info{
+                        margin-top: 24px;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 8px;
+                        &>div{
+                            display: flex;
+                            flex-direction: row;
+                            align-items: flex-start;
+                            i,svg{
+                                width: 20px;
+                                margin-right: 12px;
+                                flex-shrink: 0;
+                                position: relative;
+                                top: 3px;
+                            }
+                            span, a{
+                                font-size: 15px;
+                                font-weight: normal;
+                            }
+                            a:hover{
+                                color: var(--primary-theme-color);
+                                text-decoration: none;
+                            }
+                            .arlo-event-presenters{
+                                line-height: 20px;
+                            }
+                        }
+                    }
+                    
+                }
+                &>a{
+                    height: 53px;
+                    display: flex;
+                    align-items: center;
+                    color: white;
+                    text-decoration: none;
+                    padding-left: 20px;
+                    background-color: var(--secondary-background-color);
+                    transition: all 0.2s;
+                    font-weight: normal;
+                    &.arlo-event-full,&.arlo-register{
+                        background-color: var(--primary-theme-color);
+                        &:hover{
+                            background-color: var(--primary-theme-color-hover);
+                            svg{
+                                transform: translateX(5px);
+                            }
+                        }
+                    }
+                    svg{
+                        margin-left: 8px;
+                        position: relative;
+                        transition: all 0.2s;
+                    }
+                    &:hover{
+                        background-color: var(--secondary-background-color-hover);
+                        svg{
+                            transform: translateX(5px);
+                        }
+                    }
+                }
+            }
+        }
+        
+    
+        .arlo-schedules{
+            display: flex;
+            flex-direction: column;
+            margin-top: 24px;
+            &-item{
+                width: 100%;
+                display: flex;
+                flex-direction: row;
+                padding: 20px;
+                box-shadow: 0px 0px 8px var(--primary-card-shadow-color);
+                border: 1px solid var(--primary-card-border-color);
+                gap: 32px;
+                box-sizing: border-box;
+                &-basic{
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    &-title{
+                        font-size: 20px;
+                        color: var(--primary-text-color);
+                        font-weight: 500;
+                    }
+                    &-desc{
+                        margin-top: 8px;
+                        font-size: 15px;
+                        color: var(--primary-text-color);
+                        padding-right: 32px;
+
+                        display: -webkit-box;
+                        -webkit-box-orient: vertical;
+                        overflow: hidden;
+                        -webkit-line-clamp: 3;
+                    }
+                    .arlo-tags {
+                        margin-top: 30px;
+                    }
+                    &-info{
+                        display: flex;
+                        flex-direction: column;
+                        align-items: flex-start;
+                        justify-content: flex-start;
+                        margin-top: 24px;
+                        gap: 8px;
+                        &>div{
+                            display: flex;
+                            flex-direction: row;
+                            align-items: flex-start;
+                            i{
+                                height: 16px;
+                                width: 16px;
+                                background-size: cover;
+                                background-position: center;
+                                margin-right: 12px;
+                                background-color: gray;
+                                flex-shrink: 0;
+                            }
+                            span{
+                                font-size: 15px;
+                            }
+                        }
+                    }
+    
+                    position: relative;
+                    &::after{
+                        content:  ' ';
+                        width: 1px ;
+                        height: 100%;
+                        background-color: var(--primary-card-border-color);
+                        position: absolute;
+                        right: 0;
+                        top: 0;
+                    }
+                    .arlo-template_tags-list{
+                        margin-top: 30px;
+                    }
+                }
+                &-dates{
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    &-desc{
+                        font-size: 16px;
+                        line-height: 24px;
+                        margin-bottom: 8px;
+                        color: var(--primary-text-color);
+                    }
+                    &-items{
+                        display: flex;
+                        flex-direction: row;
+                        flex-wrap: wrap;
+                        gap: 8px;
+                        &-item{
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            min-width: 120px;
+                            border-radius: 6px;
+                            box-sizing: border-box;
+                            padding: 8px 16px;
+                            background-color: var(--primary-theme-color);
+                            color: var(--primary-light-text-color);
+                            text-align: center;
+                            cursor: pointer;
+                            position: relative;
+                            font-weight: 300;
+                            font-size: 14px;
+                            line-height: 18px;
+                            .arlo-discount{
+                                position: absolute;
+                                top: -10px;
+                                height: auto;
+                                width: auto;
+                                padding: 0px 8px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                background-color: var(--arlo-discount-bg-color);
+                                color: white;
+                                font-size: 10px;
+                                line-height: 16px;
+                                border: 1px solid white;
+                                right: 10px;
+                                border-radius: 4px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    
+        .arlo-not-found{
+            margin: 64px 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 8px;
+            background-color: rgba(3, 114, 204, 0.1);
+            color: var(--primary-text-color);
+            box-sizing: border-box;
+            width: 100%;
+            &>span,&>p{
+                line-height: 25px;
+                height: 25px;
+                background-color: transparent;
+                font-size: 15px;
+            }
+            .arlo-no-results{
+                font-size: 18px;
+                text-align: left;
+                padding: 0;
+            }
+            &>a{
+                color: var(--primary-text-color);
+                line-height: 21px;
+                font-size: 15px;
+            }
+        }
+    
+    
+        .arlo-pager{
+            display: none;
+        }
+    
+        .arlo-sessions{
+            display: flex;
+            flex-direction: column;
+            gap: 48px;
+            padding: 20px;
+            &-popup-component{
+                display: none;
+            }
+            &-mask{
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 1000;
+                background-color: black;
+                opacity: 0.7;
+            }
+            &-popup-content{
+                width: 720px;
+                position: fixed;
+                top: 160px;
+                margin-left: -360px;
+                left: 50%;
+                background-color: white;
+                z-index: 1001;
+            }
+            &-popup-header{
+                height: 60px;
+                color: var(--primary-light-text-color);
+                display: flex;
+                background-color: var(--primary-theme-color);
+                align-items: center;
+                justify-content: space-between;
+                h2{
+                    font-size: 20px;
+                    padding-left: 32px;
+                    height: 100%;
+                    flex: 1;
+                    display: flex;
+                    align-items: center;
+                }
+                span{
+                    background-color: white;
+                    color: white;
+                    display: inline-block;
+                    height: 100%;
+                    width: 60px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    opacity: 0.2;
+                    cursor: pointer;
+                }
+            }
+            &-item{
+                display: flex;
+                flex-direction: column;
+                &-title{
+                    font-size: 18px;
+                    margin-bottom: 16px;
+                }
+                &-info{
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                    &>div{
+                        display: flex;
+                        flex-direction: row;
+                        font-size: 15px;
+                        >i{
+                            display: inline-block;
+                            width: 16px;
+                            height: 16px;
+                            background-color: gray;
+                            margin-right: 8px;
+                        }
+                    }
+                }
+            }
+        }
+    
+        .arlo-filter-mobile{
+            display: none;
+        }
+    
+    
+        .arlo-triangle{
+            width: 13px;
+            height: 45px;
+            overflow: hidden;
+            position: relative;
+            background: var(--primary-theme-color);
+            &:before, &:after {
+                content: "";
+                width: 20px;
+                height: 20px;
+                position: absolute;
+                transform: scaleY(1.9) translate(30%, -30px) rotate(45deg);
+            }
+            &:before {
+                left: -17px;
+                top: 70px;
+                background-color: #ffffff;
+            }
+            &:after {
+                left: -19px;
+                top: 70px;
+                background-color:  var(--primary-theme-color);
+            }
+        }
+
+        .arlo-mobile-only{
+            display: none !important;
+        }
+        
+    }
+
+    .arlo-pad  {
+        .arlo-wrapper {
+            max-width: 720px;
+            &.full{
+                padding: 0;
+            }
+        }
+        .arlo-events{
+            grid-template-columns: repeat(2, 1fr);
+            &-item{
+                width: 346px;
+            }
+        }
+        .arlo-align-center-row{
+            margin: 25px auto 48px auto;
+        }
+        .arlo-schedules{
+            &-item{
+                flex-direction: column;
+                gap: 24px;
+                &-basic{
+                    padding-bottom: 24px;
+                    &::after{
+                        height: 1px;
+                        width: 100%;
+                        bottom: 0;
+                        left: 0;
+                        top: unset;
+                    }
+                    &-desc{
+                        padding-right: 0;
+                    }
+                }
+                &-dates{
+                    &-desc{
+                        &:has(.arlo-schedules-item-dates-desc-normal){
+                            display: none;
+                        }
+                        &-normal{
+                            display: none;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .arlo-mobile {
+        .arlo-wrapper{
+            max-width: 100%;
+            padding-left: 24px;
+            padding-right: 24px;
+        }
+        .arlo-mobile-only{
+            display: flex !important;
+        }
+        .arlo-non-mobile-only{
+            display: none !important;
+        }
+        .arlo-events{
+            display: flex;
+            flex-direction: column;
+            
+            &-item{
+                width: 100%;
+                height: auto;
+                min-height: unset;
+                &-cover{
+                    height: 200px;
+                }
+                &-main{
+                    &>p,&>hr{
+                        display: none;
+                    }
+                    &-tags{
+                        margin-top: 16px;
+                    }
+                    &-info{
+                        margin-top: 16px;
+                        &>div{
+                            i,svg{
+                                height: 16px;
+                                margin-right: 10px;
+                                top: 4px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        .arlo-align-center-row{
+            margin: 25px 0 32px 0;
+            .arlo-button{
+                width: 100%;
+            }
+            &.arlo-mobile-padding{
+                padding: 0 24px;
+            }
+        }
+        .arlo-filter-mobile{
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            span{
+                margin-right: 8px;
+                font-size: 14px;
+            }
+        }
+
+        .arlo-schedules{
+            &-item{
+                width: 100%;
+                gap: 16px;
+                &-basic{
+                    padding-bottom: 16px;
+                    &::after{
+                        height: 1px;
+                        width: 100%;
+                        bottom: 0;
+                        left: 0;
+                        top: unset;
+                    }
+                    &-desc{
+                        display: none;
+                    }
+                    .arlo-template_tags-list{
+                        margin-top: 16px;
+                    }
+                    .arlo-events-item-main-info{
+                        margin-top: 16px;
+                    }
+                }
+                &-dates{
+                    &-items{
+                        &-item{
+                            line-height: 20px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.wp-site-blocks .arlo-powered-by{
+    font-size: 11px !important;
+}

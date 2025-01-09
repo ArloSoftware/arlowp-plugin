@@ -43,8 +43,70 @@ class Shortcodes {
 
 		//powered by Arlo
 		self::add('powered_by', function ($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-       		return '<div class="arlo-powered-by"><a href="https://www.arlo.co/?utm_source=arlo%20client%20site&utm_medium=referral%20arlo%20powered%20by&utm_campaign=powered%20by" target="_blank">' .  sprintf(__('Powered by %s', 'arlo-for-wordpress'), '<img src="' . plugins_url("", __FILE__ ) . '/../../public/assets/img/Arlo-logo.svg" alt="Arlo training & Event Software">') . '</a></div>';
+			//updated by Peter for theme.z
+       		return '<div class="arlo-powered-by"><a aria-label="Arlo Powered By" href="https://www.arlo.co/?utm_source=arlo%20client%20site&utm_medium=referral%20arlo%20powered%20by&utm_campaign=powered%20by" target="_blank">' .  sprintf(__('Powered by %s', 'arlo-for-wordpress'), '<img src="' . plugins_url("", __FILE__ ) . '/../../public/assets/img/Arlo-logo.svg" alt="Arlo training & Event Software">') . '</a></div>';
     	});
+
+		//updated by Peter for theme.z
+		for($i = 0; $i < 5; $i++) {
+			$alias = '_level' . $i;
+			if($i == 0) $alias =  "";
+			self::add('condition_return' . $alias, function ($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+				extract(shortcode_atts(array(
+					'param' => '',
+					'shortcode_value' => '',
+					'cond'  => 'equal',
+					'true'  => '',
+					'false' => '',
+					'return_content' => 'false',
+				),
+					$atts,
+					$shortcode_name
+				));
+
+				$c = trim(do_shortcode('['.$shortcode_value.']'));
+				$rt = '';
+				switch ($cond) {
+					case 'large_than':
+						if (is_numeric($c) && (int)$c > (int)$param) {
+							$rt = $return_content === 'true' ? $content : $true;
+						} else {
+							$rt = $false;
+						}
+						break;
+					case 'nequal':
+						if ($c == $param) {
+							$rt = $false;
+						} else {
+							$rt = $return_content === 'true' ? $content : $true;
+						}
+						break;
+					case 'contains':
+						if (strpos($c, $param) !== false) {
+							$rt = $return_content === 'true' ? $content : $true;
+						} else {
+							$rt = $false;
+						}
+						break;
+					case 'ncontains':
+						if (strpos($c, $param) === false) {
+							$rt = $return_content === 'true' ? $content : $true;
+						} else {
+							$rt = $false;
+						}
+						break;
+					case 'equal':
+					default:
+						if ($c == $param) {
+							$rt = $return_content === 'true' ? $content : $true;
+						} else {
+							$rt = $false;
+						}
+				}
+				return do_shortcode($rt);
+			});
+		}
+
 	}
 
 	/*
@@ -142,7 +204,7 @@ class Shortcodes {
 		return do_shortcode($content);
     }
 
-	public static function create_region_selector($page_name) {
+	public static function create_region_selector($page_name, $atts = []) {
 		global $post;
 		
 		$valid_page_names = ['upcoming', 'event', 'eventsearch', 'widget'];
@@ -151,11 +213,12 @@ class Shortcodes {
 		$regions = get_option('arlo_regions');  
 		
 		if (!in_array($page_name, $valid_page_names) || !(is_array($regions) && count($regions))) return "";
+		
 			
 		return self::create_filter('region', $regions, null, null, \Arlo_For_Wordpress::get_region_parameter());
 	}
 
-	public static function create_filter($type, $items, $label, $group, $att_default=null, $page = '') {
+	public static function create_filter($type, $items, $label, $group, $att_default=null, $page = '', $tplatts = null) {
 		if (count($items) == 0 || !is_array($items)) {
 			return '';
 		}
@@ -221,7 +284,8 @@ class Shortcodes {
 			return '';
 		}
 
-		$filter_html = '<select id="arlo-filter-' . esc_attr($type) . '" class="arlo-filter-' . esc_attr($type) . '" name="arlo-' . esc_attr($type) . '">';
+		//updated by Peter for theme.z, this will trigger form submit action
+		$filter_html = '<select role="button" aria-label="Select your ' . esc_attr($label) . '" id="arlo-filter-' . esc_attr($type) . '" class="arlo-filter-' . esc_attr($type) . '" name="arlo-' . esc_attr($type) . '">';
 		
 		if (!is_null($label))
 			$filter_html .= '<option value="">' . esc_html($label) . '</option>';
@@ -229,6 +293,10 @@ class Shortcodes {
 		$filter_html .= $options_html;
 
 		$filter_html .= '</select>';
+		//added by Tony for theme.z
+		if($tplatts != null && isset($tplatts['showlabel'])) {
+			$filter_html = '<label for="arlo-filter-' . esc_attr($type) . '">' . $label . '</label>' . $filter_html;
+		}
 
 		return $filter_html;
 	}
@@ -302,7 +370,7 @@ class Shortcodes {
 			
 			return '
 			<form class="arlo-search" action="'.site_url().'/'.$slug.'/">
-				<input type="text" class="arlo-search-field ' . esc_attr($inputclass) . '" placeholder="'. esc_attr($placeholder) .'" name="arlo-search" value="' . esc_attr($search_term) . '">
+				<input type="text" class="arlo-search-field ' . esc_attr($inputclass) . '" placeholder="'. esc_attr($placeholder) .'" aria-label="' . esc_attr($placeholder) .'" name="arlo-search" value="' . esc_attr($search_term) . '">
 				' . ($showbutton == "true" ? '<input type="submit" class="arlo-search-button ' . esc_attr($buttonclass) . '" value="' . esc_attr($buttontext) . '">' : '') . '
 			</form>
 			';	

@@ -178,14 +178,20 @@ class Venues {
     }
     
     private static function shortcode_venue_map($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        $placeholder = isset($atts['placeholder']) ? $atts['placeholder'] : null;  //Added by Tony for theme.z
+
         $settings = get_option('arlo_settings');
         
         $api_key = (!empty($settings['googlemaps_api_key']) ? $settings['googlemaps_api_key'] : '');
         if (empty($api_key) && strtolower($settings['platform_name']) == \Arlo_For_Wordpress::DEFAULT_PLATFORM) {
             $api_key = \Arlo_For_Wordpress::GOOGLE_MAPS_API_KEY;
         }
-
+        $name = $GLOBALS['arlo_venue_list_item']['v_name'];
         if (empty($api_key)) {
+            //Added by Tony for theme.z
+            if($placeholder != null) {
+                return "<img class='arlo-map-placeholder' src='". esc_url(ARLO_PLUGIN_ROOT_URL . $placeholder) ."' alt='" . esc_html($name) . "' />";
+            }
             return;
         }
         
@@ -197,7 +203,6 @@ class Venues {
             'type'      => 'dynamic'
         ), $atts, $shortcode_name, $import_id));
 
-        $name = $GLOBALS['arlo_venue_list_item']['v_name'];
         $lat = $GLOBALS['arlo_venue_list_item']['v_geodatapointlatitude'];
         $long = $GLOBALS['arlo_venue_list_item']['v_geodatapointlongitude'];
 
@@ -231,11 +236,17 @@ class Venues {
                     $map .= ' frameborder="0" style="border:0"';
 
                     $map .= ' alt="' . esc_attr(sprintf(__('Map of %s', 'arlo-for-wordpress'), $name)) . '"'; 
+                    $map .= ' title="' . esc_attr(sprintf(__('Map of %s', 'arlo-for-wordpress'), $name)) . '"'; //added by Tony ,add titel attribute for WCAG
                     $map .= ' allowfullscreen></iframe>';
                 break;
             }
 
             return $map;
+        }
+
+        //Added by Tony for theme.z
+        if($placeholder != null) {
+            return "<img class='arlo-map-placeholder' src='". esc_url(ARLO_PLUGIN_ROOT_URL . $placeholder) ."' alt='" . esc_html($name) . "' />";
         }
     }
     
@@ -251,6 +262,11 @@ class Venues {
         
         $items = str_replace(' ', '', $items);
         $items = explode(',', $items);
+
+        //added by Tony for theme.z ,special item: locale
+        if(count($items) > 0 &&  $items[0] === 'locale') {
+            $items = array('suburb' , 'city', 'state', 'post_code');
+        }
         
         //consrtuct array
         $address = array(
@@ -495,4 +511,14 @@ class Venues {
         return $venue_snippet;
     }
 
+    //added by Tony for theme.z
+    private static function shortcode_venue_direction($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        $lat = $GLOBALS['arlo_venue_list_item']['v_geodatapointlatitude'];
+        $long = $GLOBALS['arlo_venue_list_item']['v_geodatapointlongitude'];
+        $query = self::get_map_query();
+        if($lat != 0 || $long != 0) {
+            $url = "https://www.google.com/maps/dir//$query/@$lat,$long";
+            return $url;
+        }
+    }
 }

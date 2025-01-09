@@ -339,11 +339,12 @@ class Templates {
         $atts = array_merge($atts,self::$event_template_atts);
 
         $sql = self::generate_list_sql($atts, $import_id, true);
-
         $items = $wpdb->get_results($sql, ARRAY_A);
-
         $num = $wpdb->num_rows;
-
+        //added by Tony for theme.z
+        if(isset($atts['climit'])) {
+            $atts['limit'] = intval($atts['climit']);
+        }
         return arlo_pagination($num, $atts['limit']);        
     }
 
@@ -384,9 +385,8 @@ class Templates {
         $atts = array_merge($atts, self::$event_template_atts);
 
         $sql = self::generate_list_sql($atts, $import_id);
-
         $items = $wpdb->get_results($sql, ARRAY_A);
-
+        
         if(empty($items)) :
             if (!(isset($atts['show_only_at_bottom']) && $atts['show_only_at_bottom'] == "true" && isset($GLOBALS['arlo_categories_count']) && $GLOBALS['arlo_categories_count'])) :
                 $GLOBALS['no_event_text'] = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', 'arlo-for-wordpress');
@@ -398,13 +398,35 @@ class Templates {
             $previous = null;
 
             $snippet_list_items = array();
-
+            
+            $eventcount_by_group = 0;
+            
             foreach($items as $key => $item) {
                 if(isset($atts['group'])) {
                     switch($atts['group']) {
                         case 'category':
                             if(is_null($previous) || $item['c_id'] != $previous['c_id']) {
                                 $item['show_divider'] = $item['c_name'];
+                                //This item is the first event of category ,Added by Tony for theme.z
+                                if(isset($atts['group_header'])) {
+                                    if($previous != null) {
+                                        //Added by Tony for theme.z
+                                        if(isset($atts['events_after'])) {
+                                            $output .= sprintf($atts['events_after'], esc_attr($previous['c_slug']));
+                                        }
+                                        if(isset($atts['category_after'])) {
+                                            $output .= $atts['category_after'];
+                                        }
+                                    }
+                                    if(isset($atts['category_before'])) {
+                                        $output .= $atts['category_before'];
+                                    }
+                                    $output .= sprintf($atts['group_header'], $item['c_name']);
+                                    if(isset($atts['events_before'])) {
+                                        $output .= $atts['events_before'];
+                                    }
+                                }
+                                $eventcount_by_group = 0;
                             }
                         break;
                         case 'alpha':
@@ -414,10 +436,12 @@ class Templates {
                         break;
                     }
                 }
-                
+                $eventcount_by_group += 1;
+
                 $GLOBALS['arlo_eventtemplate'] = $item;
                 $GLOBALS['arlo_event_list_item'] = $item;
 
+                
                 $output .= do_shortcode($content);
 
                 $list_item_snippet = array();
@@ -431,13 +455,24 @@ class Templates {
                 unset($GLOBALS['arlo_event_list_item']);
 
                 $previous = $item;
+                
             }
 
             $item_list = array();
             $item_list['@type'] = 'ItemList';
             $item_list['itemListElement'] = $snippet_list_items;
 
+            
+
             $output .= Shortcodes::create_rich_snippet( json_encode($item_list) );
+
+            //Added by Tony for theme.z
+            if(isset($atts['events_after']) && $previous != null) {
+                $output .= sprintf($atts['events_after'], esc_attr($previous['c_slug']));
+            }
+            if(isset($atts['category_after'])) {
+                $output .= $atts['category_after'];
+            }
 
         endif;
 
@@ -446,7 +481,7 @@ class Templates {
 
     private static function shortcode_event_template_tags($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_eventtemplate']['et_arlo_id'])) return '';
-        
+        $wrapper_class = isset($atts['wrapperclass']) ? $atts['wrapperclass'] : ''; //added by Tony for theme.z
         global $wpdb;
         $output = '';
         $tags = [];
@@ -481,7 +516,7 @@ class Templates {
         if (count($tags)) {
             switch($layout) {
                 case 'list':
-                    $output = '<ul class="arlo-template_tags-list">';
+                    $output = '<ul class="arlo-template_tags-list ' . $wrapper_class . '">';
                     
                     foreach($tags as $tag) {
                         $output .= '<li>' . htmlentities($tag, ENT_QUOTES, "UTF-8") . '</li>';
@@ -570,8 +605,17 @@ class Templates {
 
     private static function shortcode_event_template_summary($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_eventtemplate']['et_descriptionsummary'])) return '';
-
-        return esc_html($GLOBALS['arlo_eventtemplate']['et_descriptionsummary']);
+        //added ny Tony for theme.z
+        $text = $GLOBALS['arlo_eventtemplate']['et_descriptionsummary'];
+        if(isset($atts['digest'])) {
+            $length = intval($atts['digest']);
+            if(mb_strlen($text) <= $length) {
+                return esc_html($text);
+            } else {
+                return mb_substr($text, 0, $length) . '...';
+            }
+        }
+        return esc_html($text);
     }
 
     private static function shortcode_event_template_advertised_duration($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -632,15 +676,31 @@ class Templates {
         $presenters = PresentersEntity::get(['template_id' => $GLOBALS['arlo_eventtemplate']['et_arlo_id']], null, null, $import_id);
         if (empty($presenters)) return;
 
-        $presenters_fullnames = array_map(function($presenter) {
-            return $presenter['p_firstname'] . ' ' . $presenter['p_lastname'];
-        }, $presenters);
+        $format = isset($atts['format']) ? $atts['format'] : 'text';
 
-        //one presenter occurrence per region (p_viewuri) - we would need a region on presenter too
-        $presenters_fullnames = array_unique($presenters_fullnames);
-
-        $output = implode(', ', $presenters_fullnames);
-        return esc_html($output);
+        if($format == "text") {
+            $presenters_fullnames = array_map(function($presenter) {
+                return $presenter['p_firstname'] . ' ' . $presenter['p_lastname'];
+            }, $presenters);
+    
+            //one presenter occurrence per region (p_viewuri) - we would need a region on presenter too
+            $presenters_fullnames = array_unique($presenters_fullnames);
+    
+            $output = implode(', ', $presenters_fullnames);
+            return esc_html($output);
+        } else {
+            $output = '';
+            foreach($presenters as $presenter) {
+                $permalink = get_permalink(arlo_get_post_by_name($presenter['p_post_name'], 'arlo_presenter'));
+                $fullname = $presenter['p_firstname'] . ' ' . $presenter['p_lastname'];
+                if($output != '') {
+                    $output .= ", ";
+                }
+                $output .= "<a href='$permalink'>$fullname</a>";
+            }
+            return $output;
+        }
+       
     }
     
     private static function shortcode_event_template_credits($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -725,11 +785,17 @@ class Templates {
             
         // category select
         if (!empty($filter_html)) {
+
+            //updated by Tony for theme.z
+            $reset_style = "";
+            if(isset($atts['hidereset'])) {
+                $reset_style = "display: none";
+            }
             return '
             <form id="arlo-event-filter" class="arlo-filters" method="get" action="'. $page_link .'">
                 ' . $filter_html .'
                 <div class="arlo-filters-buttons"><input type="hidden" id="arlo-page" value="' . $page_link . '">
-                    <a href="' . $page_link . '" class="' . esc_attr($buttonclass) . '">' . htmlentities($resettext, ENT_QUOTES, "UTF-8") . '</a>
+                    <a role="button" style="' . $reset_style . '" href="' . $page_link . '" class="' . esc_attr($buttonclass) . '">' . htmlentities($resettext, ENT_QUOTES, "UTF-8") . '</a>
                 </div>
             </form>
             ';
@@ -766,7 +832,7 @@ class Templates {
     }
 
     private static function shortcode_template_region_selector ($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        return Shortcodes::create_region_selector("event");
+        return Shortcodes::create_region_selector("event", $atts);
     }
 
     private static function shortcode_template_search_region_selector ($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -817,15 +883,49 @@ class Templates {
 
         $url = $GLOBALS['arlo_eventtemplate']['et_hero_image'];
         $filename = basename($url);
+        
+        //added by Tony for theme.z
+        if(isset($atts['alt_use_event_name'])) {
+            $event_name = "";
+            if(isset($GLOBALS['arlo_eventtemplate']['et_name'])) {
+                $event_name = esc_attr($GLOBALS['arlo_eventtemplate']['et_name'], ENT_QUOTES, "UTF-8"); 
+            }
+            $filename = $event_name;
+        }
+
         return '<img src="' . esc_attr($url) . '" alt="' . esc_attr($filename) . '">';
     }
 
     private static function shortcode_event_template_list_image($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (empty($GLOBALS['arlo_eventtemplate']['et_list_image'])) return;
 
+
         $url = $GLOBALS['arlo_eventtemplate']['et_list_image'];
         $filename = basename($url);
+        //added by Tony for theme.z
+        if(isset($atts['alt_use_event_name'])) {
+            $event_name = "";
+            if(isset($GLOBALS['arlo_eventtemplate']['et_name'])) {
+                $event_name = esc_attr($GLOBALS['arlo_eventtemplate']['et_name'], ENT_QUOTES, "UTF-8"); 
+            }
+            $filename = $event_name;
+        }
         return '<img src="' . esc_attr($url) . '" alt="' . esc_attr($filename) . '">';
+    }
+
+    //updated by Peter for theme.z
+    private static function shortcode_event_template_list_image_src($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if (empty($GLOBALS['arlo_eventtemplate']['et_list_image'])) return '';
+
+        extract(shortcode_atts(array(
+			'urldecode'	=> 'false'
+		), $atts, $shortcode_name));
+
+        if($urldecode = 'true') {
+            return urldecode($GLOBALS['arlo_eventtemplate']['et_list_image']);
+        }
+
+        return $GLOBALS['arlo_eventtemplate']['et_list_image'];
     }
 
 
@@ -840,6 +940,7 @@ class Templates {
         $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
         $page = arlo_current_page();
         $offset = ($page - 1) * $limit;
+        $group_by_category = isset($atts['climit']); //added by Tony for theme.z
 
         $parameters = [];
         $additional_fields = [];
@@ -1084,7 +1185,26 @@ class Templates {
                 $group = 'GROUP BY et.et_arlo_id';
             break;
         }
-
+        //added by Tony 
+        $categories = array(); 
+        $sql_tpl = "
+            SELECT
+                %s 
+            FROM 
+                $t1 et 
+            " . implode("\n", $join) . "
+            LEFT JOIN $t2 post 
+                ON et.et_post_id = post.ID 
+            LEFT JOIN $t3 etc
+                ON etc.et_arlo_id = et.et_arlo_id AND etc.import_id = et.import_id
+            LEFT JOIN $t4 c
+                ON c.c_arlo_id = etc.c_arlo_id AND c.import_id = etc.import_id
+            LEFT JOIN $t5 e
+                ON e.et_arlo_id = et.et_arlo_id AND e.import_id = et.import_id
+            %s 
+            %s 
+            %s
+            %s";
         if (!$for_pagination) {
             //ordering
             switch ($att_group) {
@@ -1097,33 +1217,67 @@ class Templates {
             }
             
             $limit_field = " LIMIT $offset,$limit ";
+            //updated by Tony for theme.z ,add e_locationname + v_id + e_locationvisible + e_isonline + e.e_startdatetime
+            $field_list = "et.*, post.ID as post_id, etc.c_arlo_id, c.*, e.e_is_taxexempt, e.e_locationname, e.v_id, e.e_locationvisible, e.e_isonline, e.e_startdatetime" . ($additional_fields ? ' ,' . implode(' ,', $additional_fields) : '');
 
-            $field_list = "et.*, post.ID as post_id, etc.c_arlo_id, c.*, e.e_is_taxexempt" . ($additional_fields ? ' ,' . implode(' ,', $additional_fields) : '');
+            //added by Tony for theme.z
+            if($group_by_category) {
+                $climit = intval($atts['climit']);
+                $coffset = ($page - 1) * $climit;
+                $csql = sprintf($sql_tpl, 'DISTINCT c.c_arlo_id' ,"$where" ,$group,$order, "LIMIT $coffset,$climit");
+                
+                $cquery = $wpdb->prepare($csql, $parameters);
+                $categories = $wpdb->get_results($cquery, ARRAY_A);
+                //$where .= " AND c.c_arlo_id in ('". implode('\',\'', array_column($categories, 'c_arlo_id')) . "')";
+                $limit_field = "";
+            }
         } else {
             $field_list = "et.et_id";
+            //added by Tony for theme.z
+            if($group_by_category) {
+                $field_list = 'DISTINCT c.c_arlo_id';
+            }
+        }
+        
+        if(!$group_by_category ) {
+            $sql = sprintf($sql_tpl, $field_list ,$where,$group,$order, $limit_field);
+        }  else {
+            //added by Tony for theme.z
+            if($for_pagination || count($categories) == 0) {
+                $sql = sprintf($sql_tpl, $field_list ,$where,$group,$order, $limit_field);
+            } else {
+                $sql = "";
+                $parameters_all = array();
+                foreach($categories as $category) {
+                    if($sql != "") {
+                        $sql .= "
+                            UNION
+                        ";
+                    }
+                    //for event
+                    $limitval = $limit + 1;
+                    $limit_field = " LIMIT " . ($limit + 1);
+                    if(isset($_GET['pagefor']) && isset($_GET['epage'])) {
+                        $event_page = intval($_GET['epage']);
+                        $offset = ($event_page - 1) * $limit;
+                        $limit_field = " LIMIT $offset, ". $limitval;
+                    }
+                    $category_id_where = " AND c.c_arlo_id = " . $category['c_arlo_id'];
+                    if($category['c_arlo_id'] == null ) {
+                        $category_id_where = " AND c.c_arlo_id is null";
+                    }
+                    $sql .= "(" . sprintf($sql_tpl, $field_list ,$where . $category_id_where ,$group,$order, $limit_field ) . ")";
+                    $parameters_all = array_merge($parameters_all,$parameters);
+                   
+                }
+                $parameters= $parameters_all;
+            }
+            
         }
 
-        $sql = "
-        SELECT
-            $field_list 
-        FROM 
-            $t1 et 
-        " . implode("\n", $join) . "
-        LEFT JOIN $t2 post 
-            ON et.et_post_id = post.ID 
-        LEFT JOIN $t3 etc
-            ON etc.et_arlo_id = et.et_arlo_id AND etc.import_id = et.import_id
-        LEFT JOIN $t4 c
-            ON c.c_arlo_id = etc.c_arlo_id AND c.import_id = etc.import_id
-        LEFT JOIN $t5 e
-            ON e.et_arlo_id = et.et_arlo_id AND e.import_id = et.import_id
-        $where 
-        $group 
-        $order
-        $limit_field";
-
-        $query = $wpdb->prepare($sql, $parameters);
         
+        $query = $wpdb->prepare($sql, $parameters);
+
         if ($query) {
             return $query;
         } else {
@@ -1179,6 +1333,18 @@ class Templates {
 
         $query = $wpdb->prepare($sql, $parameters);
         return $query;
+    }
+
+    //added by Tony for theme.z
+    private static function shortcode_no_event_in_region($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        $tp = $GLOBALS['arlo_eventtemplate'];
+        if($tp == null) {
+            if($content === '') {
+                $content = "This course is not available in the selected region.";
+            }
+            return do_shortcode($content);
+        }
+        return "";
     }
 
 }

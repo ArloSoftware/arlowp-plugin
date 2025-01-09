@@ -46,7 +46,6 @@ class Categories {
             if (count($arlo_categories) > 1) {
                 $title = str_replace('%s','', $title);
             }
-
             $page_type = \Arlo_For_Wordpress::get_current_page_arlo_type();
             $page_type = ($page_type == 'event' ? 'events' : $page_type);
 
@@ -72,6 +71,7 @@ class Categories {
                 }
                 
                 if ($depth > 0) {
+                    
                     if ($start_at == 0) {
                         $root = CategoriesEntity::getTree($start_at, 1, 0, $ignored_categories, $import_id);
                                 
@@ -95,7 +95,45 @@ class Categories {
         return $return;
     }
 
-    private static function shortcode_category_title($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+    //added by Tony for theme.z
+    private static function shortcode_category_breadcrumb($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        $return = '';
+
+        $divider = isset($atts['divider']) ? $atts['divider'] : '';
+        $wrap = isset($atts['item']) ? $atts['item'] : '%s';
+
+        $selected_categories = self::get_selected_categories();
+       
+        $items = CategoriesEntity::get(array(),null,$import_id);
+        $dict = array(); 
+        $current = null;
+        $index = 0;
+        foreach($items as $item) {
+            $dict[$item->c_arlo_id] = $item;
+            if(count($selected_categories) > 0 and $selected_categories[0] == $item->c_arlo_id) {
+                $return = str_replace(['{slug}', '{label}'], [$item->c_slug,$item->c_name], $wrap) ;
+                $current = $item;
+            } else if(count($selected_categories) > 0 and $selected_categories[0] == 0 and $item->c_parent_id == 0) {
+                $return = str_replace(['{slug}', '{label}'], [$item->c_slug,$item->c_name], $wrap) ;
+            }
+        }
+        while($current != null) {
+            if(array_key_exists($current->c_parent_id, $dict)) {
+                $current = $dict[$current->c_parent_id];
+                $return = str_replace(
+                    ['{slug}', '{label}'],
+                    [$current->c_slug,  $current->c_name],
+                    $wrap
+                ) . $divider . $return;
+            } else {
+                $current = null;
+            }
+        }
+
+        return $return;
+    }
+
+    private static function shortcode_category_title($content = '', $atts, $shortcode_name, $import_id = '') {
         $selected_categories = self::get_selected_categories();
         $arlo_category = array_shift($selected_categories);
         

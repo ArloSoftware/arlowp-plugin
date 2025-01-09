@@ -1,0 +1,94 @@
+.arlo{
+    .arlo-desktop .arlo {
+        //venue list
+        &-venue-list{
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 48px;
+            &-item{
+                width: 100%;
+                box-sizing: border-box;
+                border: 1px solid var(--primary-card-border-color);
+                box-shadow: 0px 0px 8px var(--primary-card-shadow-color);
+                padding: 20px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                background-color: var(--primary-blank-bg-color);
+                
+                &>div:first-child{
+                    display: flex;
+                    flex-direction: column;
+                    &>iframe,.arlo-map-placeholder{
+                        width: 100%;
+                        height: 260px;
+                        border: 0;
+                        background-color: whitesmoke;
+                    }
+                    .arlo-map-placeholder{
+                        object-fit: cover;
+                    }
+                }
+                &-address{
+                    margin-bottom: 24px;
+                    &-name{
+                        line-height: 26px;
+                        margin-top: 24px;
+                        font-size: 20px;
+                        font-weight: 500;
+                        a{
+                            text-decoration: none;
+                        }
+                    }
+                    &-detail{
+                        margin-top: 16px;
+                        padding-left: 20px;
+                        font-size: 16px;
+                        position: relative;
+                        svg,i{
+                            position: absolute;
+                            left: 0;
+                            top: 3px;
+                        }
+                        p{
+                            font-size: 16px;
+                            line-height: 24px;
+                        }
+
+                    }
+                }
+                .arlo-button{
+                    width: 132px;
+                }
+            }
+        }
+    }
+    
+    .arlo-pad  .arlo {
+        &-venue-list{
+            grid-template-columns: repeat(1, 1fr);
+        }
+    }
+
+    .arlo-mobile  .arlo {
+        &-venue-list{
+            padding: 0 24px;
+            margin-bottom: 32px;
+            &-item{
+                &>div:first-child{
+                    iframe,.arlo-map-placeholder{
+                        height: 260px;
+                    }
+                }
+            }
+            &-more{
+                padding: 0 24px;
+                .arlo-align-center-row{
+                    margin-top: 0;
+                }
+            }
+            
+        }
+    }
+}
