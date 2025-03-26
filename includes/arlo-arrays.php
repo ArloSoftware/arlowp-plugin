@@ -30,7 +30,7 @@ class Arrays {
 		'US Eastern Standard Time' => 'America/New_York',
 		'Venezuela Standard Time' => 'America/Caracas',
 		'Paraguay Standard Time' => 'America/Asuncion',
-		'Atlantic Standard Time' => 'Asia/Riyadh',
+		'Atlantic Standard Time' => 'America/Halifax',
 		'Central Brazilian Standard Time' => 'America/Cuiaba',
 		'SA Western Standard Time' => 'America/Manaus',
 		'Pacific SA Standard Time' => 'America/Santiago',

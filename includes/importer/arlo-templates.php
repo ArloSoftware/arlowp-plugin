@@ -7,7 +7,7 @@ use Arlo\Logger;
 class Templates extends BaseImporter {
 
 	private $slug;
-
+	
 	public function __construct($importer, $dbl, $message_handler, $data, $iteration = 0, $api_client = null, $scheduler = null, $importing_parts = null) {
 		parent::__construct($importer, $dbl, $message_handler, $data, $iteration, $api_client, $scheduler, $importing_parts);
 
@@ -82,7 +82,7 @@ class Templates extends BaseImporter {
 	}
 
 	private function save_update_wp_post($title, $content = '') {
-		
+		global $wpdb;
 		// create associated custom post, if it dosen't exist
 		$post_config_array = array(
 			'post_title'    => $title,
@@ -99,7 +99,8 @@ class Templates extends BaseImporter {
 			$post_id = wp_insert_post($post_config_array, true);						
 		} else {
 			$post_config_array['ID'] = $post->ID;
-			$post_id = wp_update_post($post_config_array);
+			$post_id = $post->ID;
+			$wpdb->update($this->dbl->prefix .'posts', $post_config_array, array('id'=>$post_id));
 		}
 
 		return $post_id;

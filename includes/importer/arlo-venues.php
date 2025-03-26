@@ -13,6 +13,7 @@ class Venues extends BaseImporter {
 	}
 
 	protected function save_entity($item) {
+		global $wpdb;
 		$slug = sanitize_title($item->VenueID . ' ' . $item->Name);
 
 		// create associated custom post, if it dosen't exist
@@ -31,7 +32,8 @@ class Venues extends BaseImporter {
 			$post_id = wp_insert_post($post_config_array);
 		} else {
 			$post_config_array['ID'] = $post->ID;
-			$post_id = wp_update_post($post_config_array);
+			$post_id = $post->ID;
+			$wpdb->update($this->dbl->prefix .'posts', $post_config_array, array('id'=>$post_id));
 		}
 
 		if (is_numeric($post_id) && $post_id > 0) {
@@ -63,6 +65,7 @@ class Venues extends BaseImporter {
 			) );
 							
 			if ($query === false) {
+				
 				throw new \Exception('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query);
 			}
 		} else {
