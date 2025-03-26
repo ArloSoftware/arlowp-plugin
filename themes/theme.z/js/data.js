@@ -122,7 +122,7 @@ jQuery(function($){
         var $eventList = $(el).parent().prev();
         var more = $eventList.find('.arlo-schedules-item').length > 3
         if (more) {
-            $eventList.find('.arlo-schedules-item:last').remove();
+            //$eventList.find('.arlo-schedules-item:last').remove();
         } else {
             $(el).parent().hide();
         }

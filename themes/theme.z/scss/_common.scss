@@ -27,6 +27,11 @@
     &-wrapper{
         *{
             margin: 0;
+            ul, ol{
+                padding-left: 0px;
+                list-style-position: inside;
+                font-size: inherit;
+            }
         }
     }
     .arlo-desktop {
@@ -35,7 +40,7 @@
             margin: 0 auto;
             color: var(--primary-text-color);
             *{
-                font-family: "Poppins", sans-serif;
+                font-family: inherit;
                 &:focus{
                     outline-width: 2px;
                     outline-style: solid;
@@ -236,7 +241,6 @@
             margin-top: 24px;
             span{
                 border-radius: 3px;
-                height: 20px;
                 line-height: 20px;
                 font-size: 14px;
                 padding: 6px 12px;
@@ -330,8 +334,6 @@
                         padding: 0;
                         span,li{
                             border-radius: 3px;
-                            height: 20px;
-                            line-height: 20px;
                             font-size: 14px;
                             padding: 6px 12px;
                             background: var(--primary-tag-background-color) 0% 0% no-repeat padding-box;
@@ -745,6 +747,7 @@
             max-width: 100%;
             padding-left: 24px;
             padding-right: 24px;
+            font-size: inherit;
         }
         .arlo-mobile-only{
             display: flex !important;
