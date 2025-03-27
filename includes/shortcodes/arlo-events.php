@@ -1624,13 +1624,24 @@ class Events {
         //Old function URL - https://www.php.net/manual/en/function.strftime.php - This function is deprecated from PHP 8.1
         //New function URL - https://www.php.net/manual/en/datetime.format.php
         //I am actually converting time from using strftime function to new datetime function so it convert same time format.
+
+        preg_match_all('/%\w/', $format, $matches_date);
+
+        $date_str_to_format = '';
+        if (count($matches_date[0]) > 0) {
+            $date_str_to_format = implode(' ', $matches_date[0]);
+            $format = preg_replace('/%\w/', '%s', $format);
+        }
+
         $format_array = array("%"=>"","a"=>"D","A"=>"l","d"=>"d","e"=>"j","u"=>"N","w"=>"w","U"=>"W","V"=>"W","W"=>"W","b"=>"M","B"=>"F","h"=>"M","m"=>"m","C"=>"y","g"=>"y","G"=>"Y","y"=>"y","Y"=>"Y","H"=>"H","k"=>"G","I"=>"h","l"=>"g","M"=>"i","p"=>"A","P"=>"a","r"=>"h:i:s A","R"=>"H:i","S"=>"s","T"=>"H:i:s","X"=>"","z"=>"","Z"=>"","c"=>"","D"=>"m/d/y","F"=>"m/d/y","s"=>"U","x"=>"");
-        $format = strtr($format,$format_array);
+        $date_str_to_format = strtr($date_str_to_format, $format_array);
 
         $date->setTimezone(new \DateTimeZone($timezone->getName()));
 
-        $date = str_replace(['{TZ_ABBREV}', '{TZ_OFFSET}'], [$abbreviation, $date->format('P')], date($format, $date->getTimestamp()).$format_abbreviation);
+        $date = str_replace(['{TZ_ABBREV}', '{TZ_OFFSET}'], [$abbreviation, $date->format('P')], date($date_str_to_format, $date->getTimestamp()).$format_abbreviation);
 
+        $date = sprintf($format, ...explode(' ', $date));
+        
         //if we haven't got timezone, we need to append the timezone abbrev
         if ($is_online && is_null($timezone) && (preg_match('[I|M]', $format) === 1) && !empty($offset)) {
             $date .=  " (" . $offset . ")";
