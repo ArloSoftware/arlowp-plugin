@@ -1,8 +1,8 @@
 <?php
 
-namespace Arlo;
+namespace ArloTraining;
 
-use Arlo\Utilities;
+use ArloTraining\Utilities;
 
 class Environment {
     protected $memory_limit;
@@ -11,15 +11,20 @@ class Environment {
     public $start_time;
 
     public function __construct() {
-		ini_set('max_execution_time', 3000);
-
-        $disabled_functions = array_map('trim', explode(',', ini_get('disable_functions')));
-
-        if (!in_array('set_time_limit', $disabled_functions)){
-    		set_time_limit(3000);
-        }
-
         $this->memory_limit = $this->get_memory_limit();
+    }
+    //set time limit temporarily, set it back then.
+    public function arlo_set_time_limit($time) {
+        $original_time_limit = ini_get('max_execution_time');
+        $disabled_functions = array_map('trim', explode(',', ini_get('disable_functions')));
+        if ( ! in_array( 'ini_set', $disabled_functions, true ) ) {
+            // phpcs:ignore WordPress.PHP.IniSet.max_execution_time_Disallowed, Squiz.PHP.DiscouragedFunctions.Discouraged -- Best-effort attempt to extend execution time on hosts where changing max_execution_time is allowed; set_time_limit() below resets the timer when available.
+            ini_set( 'max_execution_time', $time );
+        }
+        if ( ! in_array( 'set_time_limit', $disabled_functions, true ) ) {
+            set_time_limit($time); // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged -- Required for long-running import processes. Even if it might not be 100% successful, it's worth a try.
+        }
+        return $original_time_limit;
     }
 
     public function check_viable_execution_environment() {

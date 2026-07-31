@@ -1,15 +1,15 @@
 <?php
 
-namespace Arlo;
+namespace ArloTraining;
 
-use Arlo\Utilities;
+use ArloTraining\Utilities;
 
 class SystemRequirements {
 	public static function get_system_requirements() {
 		return [
 			[
 				'name' => 'PHP version',
-				'expected_value' => '5.5',
+				'expected_value' => '7.4',
 				'current_value' => function () {
 					if (!defined('PHP_MAJOR_VERSION') || !defined('PHP_MINOR_VERSION') || !defined('PHP_RELEASE_VERSION')) {
 						return 'Unknown';
@@ -23,7 +23,7 @@ class SystemRequirements {
 			],
 			[
 				'name' => 'WordPress version',
-				'expected_value' => '4.7',
+				'expected_value' => '7.0',
 				'current_value' => function () {
 					if (!isset($GLOBALS['wp_version'])) {
 						return 'Unknown';

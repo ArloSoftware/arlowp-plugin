@@ -1,95 +1,104 @@
 <?php
-
-namespace Arlo;
+namespace ArloTraining;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 #[\AllowDynamicProperties]
 class Scheduler {
 
 	const MAX_SLEEP_BETWEEN_TASKS = 15;	
 	
 	private $max_simultaneous_task = 1;
-	private $table = '';
-	private $table_data = '';
 	private $plugin;
-	private $dbl;
 	
-	public function __construct($plugin, $dbl) {
-		$this->dbl = &$dbl; 		
-		$this->table = $this->dbl->prefix . 'arlo_async_tasks';
-		$this->tabledata = $this->dbl->prefix . 'arlo_async_task_data';
+	public function __construct($plugin) {
 		$this->plugin = $plugin;
 	}
 	
-	private function get_running_tasks_count() {		
-		$sql = "
+	private function get_running_tasks_count() {
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- SQL is static and safe. No caching needed for import process , low-frequency operations with high-frequency data updates. Direct database query is required for custom table.
+		$result = $wpdb->get_results("
 		SELECT 
 			COUNT(1) AS num
 		FROM
-			{$this->table}
+			{$wpdb->prefix}arlo_async_tasks
 		WHERE
 			task_status = 2
-		";
-		
-		$result = $this->dbl->get_results($sql); 
+		"); 
 				
 		return $result[0]->num;
 	}
 	
-	private function get_running_paused_tasks_count() {		
-		$sql = "
+	private function get_running_paused_tasks_count() {
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- SQL is static and safe. No caching needed for data import process, low-frequency operations with high-frequency data updates. Direct database query is required for custom table.
+		$result = $wpdb->get_results("
 		SELECT 
 			COUNT(1) AS num
 		FROM
-			{$this->table}
+			{$wpdb->prefix}arlo_async_tasks
 		WHERE
 			task_status IN (1,2)
-		";
-		
-		$result = $this->dbl->get_results($sql); 
+		"); 
 				
 		return $result[0]->num;
 	}
 	
 	
 	public function set_task($task = '', $priority = 0) {
+		global $wpdb;
 		if (empty($task)) return false;
 		$utc_date = gmdate("Y-m-d H:i:s");
 	
-		$sql = "
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Import related queries do not need caching. Direct database query is required for custom table.
+		$query = $wpdb->query($wpdb->prepare("
 		INSERT INTO
-			{$this->table} (task_priority, task_task, task_created)
+			{$wpdb->prefix}arlo_async_tasks (task_priority, task_task, task_created)
 		VALUES
 			(%d, %s, %s)
-		";
-		
-		$query = $this->dbl->query($this->dbl->prepare($sql, $priority, $task, $utc_date));
+		", $priority, $task, $utc_date));
 		
 		if ($query) {
-			return $this->dbl->insert_id;
+			return $wpdb->insert_id;
 		} else {
 			return false;
 		}
 	}	
 	
 	public function update_task($task_id = 0, $task_status = null, $task_status_text = '') {
-		$task_status = (is_null($task_status) ? 'task_status' : intval($task_status));
-		$task_status_text = (empty($task_status_text) ? 'task_status_text' : "'" . $this->dbl->_real_escape($task_status_text) . "'");
+		global $wpdb;
+		$task_status = (is_null($task_status) ? 'task_status' : intval($task_status)); //actually task_stauts will never be null.
+		$no_status_text = empty($task_status_text);
+		$task_status_text = ($no_status_text ? 'task_status_text' :  $task_status_text);
 		$utc_date = gmdate("Y-m-d H:i:s"); 
-	
+		
+		$parameter = [$task_status];
+
+		$task_status_text_sql = $no_status_text ? '' : 'task_status_text = %s,';
+		if(!$no_status_text) {
+			$parameter[] = $task_status_text;
+		}
+		$parameter[] = $utc_date;
+		$parameter[] = intval($task_id);
+		
 		$sql = "
 		UPDATE 	
-			{$this->table}
+			{$wpdb->prefix}arlo_async_tasks
 		SET
-			task_status = {$task_status},
-			task_status_text = {$task_status_text},
-			task_modified = '{$utc_date}'
+			task_status = %d,
+			$task_status_text_sql
+			task_modified = %s
 		WHERE
-			task_id = " . (intval($task_id)) . "
+			task_id = %d
 		";
 
-		$query = $this->dbl->query($sql);		
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- The SQL statement is dynamically constructed and parameters are prepared here. Import related queries do not need caching. Direct database query is required for custom table. No caching needed for data import process
+		$query = $wpdb->query(Utilities::prepare_sql($sql, $parameter));
 	}
 	
-	public function update_task_data($task_id, $data = array(), $overwrite_data = false) {	
+	public function update_task_data($task_id, $data = array(), $overwrite_data = false) {
+		global $wpdb;
 		if (!$overwrite_data) {
 			$task = $this->get_task_data($task_id);
 			
@@ -98,16 +107,16 @@ class Scheduler {
 		}		
 		$data = json_encode($data);
 
-		$sql = "
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- No caching needed for data import process, low-frequency operations with high-frequency data updates. Direct database query is required for custom table.
+		$query = $wpdb->query($wpdb->prepare("
 		INSERT INTO
-			{$this->tabledata}
+			{$wpdb->prefix}arlo_async_task_data
 		SET
 			data_task_id = %d,
-			data_text = '%s'
+			data_text = %s
 		ON DUPLICATE KEY UPDATE 
-			data_text = '%s'
-		";
-		$query = $this->dbl->query($this->dbl->prepare($sql, $task_id, $data, $data));		
+			data_text = %s
+		", $task_id, $data, $data));		
 	}
 
 	public function check_empty_slot_for_task() {
@@ -139,6 +148,34 @@ class Scheduler {
 		return $this->get_tasks(1);
 	}
 
+	public function has_failed_scheduled_import_since($utc_date): bool {
+		global $wpdb;
+
+		$utc_date = is_scalar($utc_date) ? trim((string) $utc_date) : '';
+		if ($utc_date === '') {
+			return false;
+		}
+
+		$sql = "
+		SELECT
+			COUNT(1)
+		FROM
+			{$wpdb->prefix}arlo_async_tasks
+		WHERE
+			task_task = %s
+		AND
+			task_priority = %d
+		AND
+			task_status = %d
+		AND
+			COALESCE(task_modified, task_created) > %s
+		";
+
+		$result = $wpdb->get_var($wpdb->prepare($sql, 'import', 0, 3, $utc_date)); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- $sql is a static parameterised string; import task state must be read directly from the async task table.
+
+		return intval($result) > 0;
+	}
+
 	
 	public function get_next_immediate_tasks() {
 		if ($this->get_running_paused_tasks_count() == 0) {
@@ -152,11 +189,12 @@ class Scheduler {
 	}
 	
 	public function get_tasks($status = null, $priority = null, $task_id = null, $limit = null, $task_data_text = '') {
+		global $wpdb;
 		$task_id = (isset($task_id) && is_numeric($task_id) ? $task_id : null);
 		$status = (isset($status) && is_numeric($status) ? [$status] : (is_array($status) ? array_filter($status, function($numeric) { return is_numeric($numeric);} ) : null));
 		$priority = (isset($priority) && is_numeric($priority) ? $priority : null);
 		$limit = (isset($limit) && is_numeric($limit) ? $limit : null);
-		$task_data_text = (!empty($task_data_text) ? $this->dbl->_real_escape($task_data_text) : null);
+		$task_data_text = (!empty($task_data_text) ? $task_data_text : null);
 		
 		$sql = "
 		SELECT
@@ -168,23 +206,43 @@ class Scheduler {
 			task_modified,
 			data_text AS task_data_text
 		FROM
-			{$this->table}
+			{$wpdb->prefix}arlo_async_tasks
 		LEFT JOIN 
-			{$this->tabledata}
+			{$wpdb->prefix}arlo_async_task_data
 		ON
 			data_task_id = task_id
 		WHERE 	
 			1
-			".(!is_null($status) ? "AND task_status IN (" . implode(",", $status) . ")" : "") . "
-			".(!is_null($priority) ? "AND task_priority = " . $priority : "") . "
-			".(!is_null($task_id) ? "AND task_id = " . $task_id : "") . "
-			".(!is_null($task_data_text) ? "AND data_text like '%" . $task_data_text . "%'" : "") . "
+			".(!is_null($status) ? "AND task_status IN (" . implode(',', array_map(function() {return "%d";}, $status)) . ")" : "") . "
+			".(!is_null($priority) ? "AND task_priority = %d" : "") . "
+			".(!is_null($task_id) ? "AND task_id = %d" : "") . "
+			".(!is_null($task_data_text) ? "AND data_text like %s" : "") . "
 		ORDER BY
 			task_priority,
 			task_created
-		" . (!is_null($limit) ? "LIMIT " . $limit : "");
+		" . (!is_null($limit) ? "LIMIT %d" : "");
 
-		return $this->dbl->get_results($sql);
+		$parameter = [];
+		if(!is_null($status)) {
+			$parameter = array_merge($parameter, $status);
+		}
+		if(!is_null($priority)) {
+			$parameter[] = $priority;
+		}
+		if(!is_null($task_id)) {
+			$parameter[] = $task_id;
+		}
+		if(!is_null($task_data_text)) {
+			$parameter[] = '%' . $task_data_text . '%';
+		}
+		if(!is_null($limit)) {
+			$parameter[] = $limit;
+		}
+
+		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- SQL is dynamically constructed and parameters are prepared here. Import related queries do not need caching. Direct database query is required for custom table.
+		$result = $wpdb->get_results(Utilities::prepare_sql($sql, $parameter));
+		
+		return $result;
 	}
 		
 	public function delete_running_tasks() {
@@ -196,6 +254,7 @@ class Scheduler {
 	}
 	
 	private function delete_tasks($status = null, $priority = null, $task_id = null, $limit = null) {
+		global $wpdb;
 		$task_id = (isset($task_id) && is_numeric($task_id) ? $task_id : null);
 		$status = (isset($status) && is_numeric($status) ? [$status] : (is_array($status) ? $status : null));
 		$priority = (isset($priority) && is_numeric($priority) ? $priority : null);
@@ -203,19 +262,34 @@ class Scheduler {
 		
 		$sql = "
 		DELETE tasks, tasks_data FROM
-			{$this->table} AS tasks
+			{$wpdb->prefix}arlo_async_tasks AS tasks
 		LEFT JOIN 
-			{$this->tabledata} AS tasks_data
+			{$wpdb->prefix}arlo_async_task_data AS tasks_data
 		ON
 			data_task_id = task_id
 		WHERE 	
 			1
-			".(!is_null($status) ? "AND task_status IN (" . implode(",", $status) . ")" : "") . "
-			".(!is_null($priority) ? "AND task_priority = " . $priority : "") . "
-			".(!is_null($task_id) ? "AND task_id = " . $task_id : "") . "
-		" . (!is_null($limit) ? "LIMIT " . $limit : "");
-				
-		return $this->dbl->get_results($sql);
+			".(!is_null($status) ? "AND task_status IN (" . implode(',', array_map(function() {return "%d";}, $status)) . ")" : "") . "
+			".(!is_null($priority) ? "AND task_priority = %d" : "") . "
+			".(!is_null($task_id) ? "AND task_id = %d" : "") . "
+		" . (!is_null($limit) ? "LIMIT %d" : "");
+		
+		$parameter = [];
+		if(!is_null($status)) {
+			$parameter = array_merge($parameter, $status);
+		}
+		if(!is_null($priority)) {
+			$parameter[] = $priority;
+		}
+		if(!is_null($task_id)) {
+			$parameter[] = $task_id;
+		}
+		if(!is_null($limit)) {
+			$parameter[] = $limit;
+		}
+
+		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- SQL is dynamically constructed and parameters are prepared here. Import related queries do not need caching. Direct database query is required for custom table
+		return $wpdb->get_results(Utilities::prepare_sql($sql, $parameter));
 	}
 	
 	public function run_task($task_id = null) {
@@ -228,23 +302,23 @@ class Scheduler {
 	}
 	
 	public function terminate_all_immediate_task($task_id) {
+		global $wpdb;
 		$task_id = (isset($task_id) && is_numeric($task_id) ? $task_id : null);
 		
 		if ($task_id > 0) {
-			$sql = "
+			//TODO: we should query this from the database, but now we have only import as an async task
+			$this->unlock_process("import");
+			
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- SQL is static and safe. No caching needed for import process , low-frequency operations with high-frequency data updates. Direct database query is required for custom table
+			return $wpdb->query($wpdb->prepare("
 			UPDATE
-				{$this->table} AS tasks
+				{$wpdb->prefix}arlo_async_tasks AS tasks
 			SET
 				task_status = 4, 
 				task_status_text = 'Import is terminated by the user'
 			WHERE 
-				task_id >= {$task_id}
-			";
-
-			//TODO: we should query this from the database, but now we have only import as an async task
-			$this->unlock_process("import");
-			
-			return $this->dbl->query($sql);
+				task_id >= %d
+			", $task_id));
 		}
 		
 		return false;
@@ -345,7 +419,7 @@ class Scheduler {
 		} while(!$success && ++$tries < $limit);
 
 		if (!$success && isset($error_message) && $tries >= $limit) {
-			throw new \Arlo\SchedulerException('Kick off scheduler error: ' . (is_array($error_message) ? implode(', ', $error_message) : $error_message));
+			throw new \ArloTraining\SchedulerException(esc_html('Kick off scheduler error: ' . (is_array($error_message) ? implode(', ', $error_message) : $error_message)));
 		}
 	}
 
@@ -356,7 +430,6 @@ class Scheduler {
 
 		return array(
 			'action' => 'arlo_run_scheduler',
-			'nonce'  => wp_create_nonce( 'arlo_import' ),
 		);
 	}
 
@@ -376,7 +449,9 @@ class Scheduler {
 		return array(
 			'timeout'   => 0.01,
 			'blocking'  => false,
+			'body'      => array( 'nonce' => wp_create_nonce( 'arlo_import' ) ),
 			'cookies'   => $_COOKIE,
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			'sslverify' => apply_filters( 'https_local_ssl_verify', false ),
 		);
 	}

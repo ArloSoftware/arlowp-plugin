@@ -1,8 +1,9 @@
 <?php
-namespace Arlo\Shortcodes;
+namespace ArloTraining\Shortcodes;
 
-use Arlo\Entities\Categories as CategoriesEntity;
-use Arlo\Entities\Presenters as PresentersEntity;
+use ArloTraining\Entities\Categories as CategoriesEntity;
+use ArloTraining\Entities\Presenters as PresentersEntity;
+use ArloTraining\CacheControl;
 
 class Templates {
     public static $event_template_atts = [];
@@ -17,7 +18,7 @@ class Templates {
         foreach ($shortcodes as $shortcode) {
             $shortcode_name = str_replace('shortcode_', '', $shortcode->name);
 
-            Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
+            Shortcodes::add($shortcode_name, function($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
                 $method_name = 'shortcode_' . str_replace('arlo_', '', $shortcode_name);
                 if (!is_array($atts) && empty($atts)) { $atts = []; }
                 return self::$method_name($content, $atts, $shortcode_name, $import_id);
@@ -30,21 +31,21 @@ class Templates {
         foreach ($custom_shortcodes as $shortcode_name => $shortcode) {
             switch($shortcode["type"]) {
                 case 'schedule':
-                    Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
+                    Shortcodes::add($shortcode_name, function($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
                         if (!is_array($atts) && empty($atts)) { $atts = []; }
-                        return self::shortcode_schedule($content = '', $atts, $shortcode_name, $import_id);
+                        return self::shortcode_schedule($content, $atts, $shortcode_name, $import_id);
                     });
                     break;
                 case 'eventsearch':
-                    Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
+                    Shortcodes::add($shortcode_name, function($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
                         if (!is_array($atts) && empty($atts)) { $atts = []; }
-                        return self::shortcode_event_template_search_list($content = '', $atts, $shortcode_name, $import_id);
+                        return self::shortcode_event_template_search_list($content, $atts, $shortcode_name, $import_id);
                     });
                     break;
                 default:
-                    Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
+                    Shortcodes::add($shortcode_name, function($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
                         if (!is_array($atts) && empty($atts)) { $atts = []; }
-                        return self::shortcode_event_template_list($content = '', $atts, $shortcode_name, $import_id);
+                        return self::shortcode_event_template_list($content, $atts, $shortcode_name, $import_id);
                     });
                     break;            
             }
@@ -52,13 +53,14 @@ class Templates {
     }
     
     private static function shortcode_suggest_templates($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        global $wpdb, $wp_query;
+        global $wpdb;
         if (empty($GLOBALS['arlo_eventtemplate']['et_arlo_id'])) return '';
 
-        $settings = get_option('arlo_settings');  
         $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
 
         $join = [];
+        $join_parameters = array();
+        $where_parameters = array();
 
         extract(shortcode_atts(array(
             'limit'	=> 5,
@@ -80,15 +82,19 @@ class Templates {
                             LEFT JOIN 
                                 {$wpdb->prefix}arlo_tags AS t
                             ON
-                                ett.tag_id = t.id AND t.import_id = " . $import_id . "
+                                ett.tag_id = t.id AND t.import_id = %d
                             WHERE
-                                t.tag LIKE '" . esc_sql($tagprefix) . "%'
+                                t.tag LIKE %s
                             AND
-                                ett.import_id = " . $import_id . "
+                                ett.import_id = %d
                             AND
-                                ett.et_id = {$GLOBALS['arlo_eventtemplate']['et_id']}
+                                ett.et_id = %d
                             )
                 ";
+                $where_parameters[] = $import_id;
+                $where_parameters[] = $tagprefix . '%';
+                $where_parameters[] = $import_id;
+                $where_parameters[] = $GLOBALS['arlo_eventtemplate']['et_id'];
                 
                 $join['t'] = "		
                 LEFT JOIN 
@@ -107,11 +113,14 @@ class Templates {
                             FROM 
                                 {$wpdb->prefix}arlo_eventtemplates_categories AS ecc
                             WHERE
-                                ecc.import_id = " . $import_id . "
+                                ecc.import_id = %d
                             AND
-                                ecc.et_arlo_id = {$GLOBALS['arlo_eventtemplate']['et_arlo_id']}
+                                ecc.et_arlo_id = %d
                             )
-                ";		
+                ";
+                $where_parameters[] = $import_id;
+                $where_parameters[] = $GLOBALS['arlo_eventtemplate']['et_arlo_id'];
+
             
                 $join['c'] = "
                 LEFT JOIN 
@@ -136,8 +145,11 @@ class Templates {
         } 
         
         if (!empty($arlo_region) && $regionalized === "true") {
-            $where .= ' AND et.et_region = "' . esc_sql($arlo_region) . '"';
+            $where .= ' AND et.et_region = %s';
+            $where_parameters[] = $arlo_region ;
         }	
+
+        $parameters = array();
         
         $sql = "
             SELECT 
@@ -154,9 +166,9 @@ class Templates {
                 {$wpdb->prefix}arlo_eventtemplates AS et
             " . implode("\n", $join) ."
             WHERE 
-                et.import_id = " . $import_id . "
+                et.import_id = %d
             AND
-                et.et_arlo_id != {$GLOBALS['arlo_eventtemplate']['et_arlo_id']}
+                et.et_arlo_id != %d
             AND
                 {$where}
             GROUP BY
@@ -164,10 +176,18 @@ class Templates {
             ORDER BY 
                 RAND()
             LIMIT 
-                $limit";
+                %d";
+        $parameters = array_merge($parameters, $join_parameters);
+        $parameters[] = $import_id;
+        $parameters[] = $GLOBALS['arlo_eventtemplate']['et_arlo_id'];
+        $parameters = array_merge($parameters, $where_parameters);
+        $parameters[] = $limit;
 
                 
-        $items = $wpdb->get_results($sql, ARRAY_A);
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The SQL statement is dynamically constructed and parameters are prepared here.
+        $sql = $wpdb->prepare($sql, $parameters);
+        
+        $items = CacheControl::fetch_results($sql, ARRAY_A);
             
         $output = '';
         if(!empty($items)) :
@@ -184,14 +204,14 @@ class Templates {
     private static function shortcode_content_field_name($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_content_field_item']['cf_fieldname'])) return '';
 
-        return htmlentities($GLOBALS['arlo_content_field_item']['cf_fieldname'], ENT_QUOTES, "UTF-8");        
+        return esc_html($GLOBALS['arlo_content_field_item']['cf_fieldname']);        
     }
     
 
     private static function shortcode_content_field_text($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
 	    if(!isset($GLOBALS['arlo_content_field_item']['cf_text'])) return '';
 
-    	return wpautop($GLOBALS['arlo_content_field_item']['cf_text']);
+    	return wp_kses_post(wpautop($GLOBALS['arlo_content_field_item']['cf_text']));
     }
 
     private static function shortcode_content_field_item($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -204,45 +224,58 @@ class Templates {
         ), $atts, $shortcode_name, $import_id));
         
         $where_fields = null;
+
+        $parameters = [];
         
         if (strtolower($fields) != 'all') {
             $where_fields = explode(',', $fields);
-            $where_fields = array_map(function($field) {
-                return '"' . trim(esc_sql($field)) . '"';
-            }, $where_fields);
         }
         
-        $t1 = "{$wpdb->prefix}arlo_eventtemplates";
-        $t2 = "{$wpdb->prefix}arlo_contentfields";	
+        if(!empty($arlo_region)) {
+            $parameters[] = $arlo_region ;
+        }
 
         if (!empty($GLOBALS['arlo_event_list_item']['et_id'])) {
-            $where = $t1 . ".et_id = " . $GLOBALS['arlo_event_list_item']['et_id'];
+            $where = "{$wpdb->prefix}arlo_eventtemplates.et_id = %d";
+            $parameters[] = $GLOBALS['arlo_event_list_item']['et_id'];
         } else {
-            $where = $t1 . ".et_post_id = " . $post->ID;
+            $where = "{$wpdb->prefix}arlo_eventtemplates.et_post_id = %d";
+            $parameters[] = $post->ID;
         }
+
+        if(is_array($where_fields) && count($where_fields) > 0) {
+            $where .= " AND cf_fieldname IN (" . implode(',', array_map(function() {return "%s";}, $where_fields)) . ") ";
+            $parameters = array_merge($parameters, $where_fields);
+        }
+
+        $where .= " AND {$wpdb->prefix}arlo_eventtemplates.import_id = %d ";
+        $where .= " AND {$wpdb->prefix}arlo_contentfields.import_id = %d ";
+
+        $parameters[] = $import_id;
+        $parameters[] = $import_id;
                 
         $sql = "
         SELECT 
-            $t2.cf_fieldname, 
-            $t2.cf_text 
+            {$wpdb->prefix}arlo_contentfields.cf_fieldname, 
+            {$wpdb->prefix}arlo_contentfields.cf_text 
         FROM 
-            $t1 
+            {$wpdb->prefix}arlo_eventtemplates 
         INNER JOIN 
-            $t2
+            {$wpdb->prefix}arlo_contentfields
         ON 
-            $t1.et_id = $t2.et_id
-        " . (!empty($arlo_region) ? " AND $t1.et_region = '" . esc_sql($arlo_region) . "'" : "" ) . "
+            {$wpdb->prefix}arlo_eventtemplates.et_id = {$wpdb->prefix}arlo_contentfields.et_id
+        " . (!empty($arlo_region) ? " AND {$wpdb->prefix}arlo_eventtemplates.et_region = %s" : "" ) . "
         WHERE 
             " . $where . "
-            " . (is_array($where_fields) && count($where_fields) > 0 ? " AND cf_fieldname IN (" . implode(',', $where_fields) . ") " : "") . "
-        AND 
-            $t1.import_id = $import_id
-        AND
-            $t2.import_id = $import_id
         ORDER BY 
-            $t2.cf_order";
+            {$wpdb->prefix}arlo_contentfields.cf_order";
+
+        
                     
-        $items = $wpdb->get_results($sql, ARRAY_A);
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The SQL statement is dynamically constructed and parameters are prepared here.
+        $sql = $wpdb->prepare($sql, $parameters);
+        
+        $items = CacheControl::fetch_results($sql, ARRAY_A);
 
         $output = '';
 
@@ -273,7 +306,7 @@ class Templates {
         return self::template_list_initializer($content, $atts, $shortcode_name, $import_id, $template_name);
     }
 
-    private static function template_list_initializer($content = '', $atts = [], $shortcode_name = '', $import_id = '', $template_name) {
+    private static function template_list_initializer($content = '', $atts = [], $shortcode_name = '', $import_id = '', $template_name = '') {
         if (get_option('arlo_plugin_disabled', '0') == '1') return;
 
         $filter_settings = get_option('arlo_page_filter_settings', []);        
@@ -283,17 +316,17 @@ class Templates {
 
         self::$event_template_atts = self::get_event_template_atts($atts, $import_id);
 
-        \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Utilities::convert_string_to_int_array');
-        \Arlo\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Utilities::convert_string_to_int_array', null, true);
+        \ArloTraining\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$event_template_atts, '\ArloTraining\Utilities::convert_string_to_int_array');
+        \ArloTraining\Utilities::set_base_filter($template_name, 'category', $filter_settings, $atts, self::$event_template_atts, '\ArloTraining\Utilities::convert_string_to_int_array', null, true);
         
-        \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id]);
-        \Arlo\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Entities\Tags::get_tag_ids_by_tag', [$import_id], true);
+        \ArloTraining\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$event_template_atts, '\ArloTraining\Entities\Tags::get_tag_ids_by_tag', [$import_id]);
+        \ArloTraining\Utilities::set_base_filter($template_name, 'templatetag', $filter_settings, $atts, self::$event_template_atts, '\ArloTraining\Entities\Tags::get_tag_ids_by_tag', [$import_id], true);
 
-        \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Utilities::convert_string_to_int_array');
-        \Arlo\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Utilities::convert_string_to_int_array', null, true);
+        \ArloTraining\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$event_template_atts, '\ArloTraining\Utilities::convert_string_to_int_array');
+        \ArloTraining\Utilities::set_base_filter($template_name, 'delivery', $filter_settings, $atts, self::$event_template_atts, '\ArloTraining\Utilities::convert_string_to_int_array', null, true);
 
-        \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Utilities::convert_string_to_string_array');
-        \Arlo\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$event_template_atts, '\Arlo\Utilities::convert_string_to_string_array', null, true);        
+        \ArloTraining\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$event_template_atts, '\ArloTraining\Utilities::convert_string_to_string_array');
+        \ArloTraining\Utilities::set_base_filter($template_name, 'location', $filter_settings, $atts, self::$event_template_atts, '\ArloTraining\Utilities::convert_string_to_string_array', null, true);        
 
         return $content;        
     }
@@ -312,19 +345,19 @@ class Templates {
     private static function get_event_template_atts($atts, $import_id) {
         $new_atts = [];
 
-        $templatetag = \Arlo\Entities\Tags::get_tag_ids_by_tag(\Arlo\Utilities::get_att_string('templatetag', $atts), $import_id);        
+        $templatetag = \ArloTraining\Entities\Tags::get_tag_ids_by_tag(\ArloTraining\Utilities::get_att_string('templatetag', $atts), $import_id);        
 
-        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'location', $atts);
-        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'locationhidden', $atts);
-        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'venue', $atts);
-        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'category', $atts);
-        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'categoryhidden', $atts);
-        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'search', $atts);
-        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_int', 'delivery', $atts);
-        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_int', 'deliveryhidden', $atts);        
-        $new_atts = \Arlo\Utilities::process_att($new_atts, null, 'templatetag', $atts, $templatetag);        
-        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo\Utilities::get_att_string', 'state', $atts);
-        $new_atts = \Arlo\Utilities::process_att($new_atts, '\Arlo_For_Wordpress::get_region_parameter', 'region');
+        $new_atts = \ArloTraining\Utilities::process_att($new_atts, '\ArloTraining\Utilities::get_att_string', 'location', $atts);
+        $new_atts = \ArloTraining\Utilities::process_att($new_atts, '\ArloTraining\Utilities::get_att_string', 'locationhidden', $atts);
+        $new_atts = \ArloTraining\Utilities::process_att($new_atts, '\ArloTraining\Utilities::get_att_string', 'venue', $atts);
+        $new_atts = \ArloTraining\Utilities::process_att($new_atts, '\ArloTraining\Utilities::get_att_string', 'category', $atts);
+        $new_atts = \ArloTraining\Utilities::process_att($new_atts, '\ArloTraining\Utilities::get_att_string', 'categoryhidden', $atts);
+        $new_atts = \ArloTraining\Utilities::process_att($new_atts, '\ArloTraining\Utilities::get_att_string', 'search', $atts);
+        $new_atts = \ArloTraining\Utilities::process_att($new_atts, '\ArloTraining\Utilities::get_att_int', 'delivery', $atts);
+        $new_atts = \ArloTraining\Utilities::process_att($new_atts, '\ArloTraining\Utilities::get_att_int', 'deliveryhidden', $atts);        
+        $new_atts = \ArloTraining\Utilities::process_att($new_atts, null, 'templatetag', $atts, $templatetag);        
+        $new_atts = \ArloTraining\Utilities::process_att($new_atts, '\ArloTraining\Utilities::get_att_string', 'state', $atts);
+        $new_atts = \ArloTraining\Utilities::process_att($new_atts, '\Arlo_For_Wordpress::get_region_parameter', 'region');
 
         return $new_atts;
     }
@@ -332,16 +365,16 @@ class Templates {
     private static function shortcode_event_template_list_pagination($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $wpdb;
 
-        if (isset($GLOBALS['show_only_at_bottom']) && $GLOBALS['show_only_at_bottom']) return;
+        if (isset($GLOBALS['arlo_show_only_at_bottom']) && $GLOBALS['arlo_show_only_at_bottom']) return;
 
         $atts['limit'] = intval(isset(self::$event_template_atts['limit']) ? self::$event_template_atts['limit'] : (isset($atts['limit']) && is_numeric($atts['limit']) ? $atts['limit'] : get_option('posts_per_page')));
 
         $atts = array_merge($atts,self::$event_template_atts);
 
         $sql = self::generate_list_sql($atts, $import_id, true);
-        $items = $wpdb->get_results($sql, ARRAY_A);
-        $num = $wpdb->num_rows;
-        //added by Tony for theme.z
+        
+        $items = CacheControl::fetch_results($sql, ARRAY_A);
+        $num = is_array($items) ? count($items) : 0;
         if(isset($atts['climit'])) {
             $atts['limit'] = intval($atts['climit']);
         }
@@ -351,17 +384,17 @@ class Templates {
     private static function shortcode_schedule_pagination($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $wpdb;
 
-        if (isset($GLOBALS['show_only_at_bottom']) && $GLOBALS['show_only_at_bottom']) return;
+        if (isset($GLOBALS['arlo_show_only_at_bottom']) && $GLOBALS['arlo_show_only_at_bottom']) return;
 
         $atts['limit'] = intval(isset(self::$event_template_atts['limit']) ? self::$event_template_atts['limit'] : (isset($atts['limit']) && is_numeric($atts['limit']) ? $atts['limit'] : get_option('posts_per_page')));
         
         $atts = array_merge($atts, self::$event_template_atts);
         
         $sql = self::generate_list_sql($atts, $import_id, true);
+        
+        $items = CacheControl::fetch_results($sql, ARRAY_A);
 
-        $items = $wpdb->get_results($sql, ARRAY_A);
-
-        $num = $wpdb->num_rows;
+        $num = is_array($items) ? count($items) : 0;
 
         return arlo_pagination($num, $atts['limit']);        
     }
@@ -384,16 +417,23 @@ class Templates {
 
         $atts = array_merge($atts, self::$event_template_atts);
 
-        $sql = self::generate_list_sql($atts, $import_id);
-        $items = $wpdb->get_results($sql, ARRAY_A);
+        $requested_event_page_number = null;
+        $requested_page_target = \ArloTraining\Utilities::filter_string_polyfill( INPUT_GET, 'pagefor' );
+        $requested_event_page_raw = \ArloTraining\Utilities::clean_int_url_parameter( 'epage' );
+        if ( $requested_page_target === 'event' && $requested_event_page_raw !== null ) {
+            $requested_event_page_number = max( 1, (int) $requested_event_page_raw );
+        }
+
+        $sql = self::generate_list_sql($atts, $import_id, false, $requested_event_page_number);
+        $items = CacheControl::fetch_results($sql, ARRAY_A);
         
         if(empty($items)) :
             if (!(isset($atts['show_only_at_bottom']) && $atts['show_only_at_bottom'] == "true" && isset($GLOBALS['arlo_categories_count']) && $GLOBALS['arlo_categories_count'])) :
-                $GLOBALS['no_event_text'] = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', 'arlo-for-wordpress');
+                $GLOBALS['arlo_no_event_text'] = !empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', 'arlo-training-and-event-management-system');
             endif;
         else :
                 
-            $output = $GLOBALS['no_event_text'] = '';			
+            $output = $GLOBALS['arlo_no_event_text'] = '';			
             
             $previous = null;
 
@@ -407,23 +447,21 @@ class Templates {
                         case 'category':
                             if(is_null($previous) || $item['c_id'] != $previous['c_id']) {
                                 $item['show_divider'] = $item['c_name'];
-                                //This item is the first event of category ,Added by Tony for theme.z
                                 if(isset($atts['group_header'])) {
                                     if($previous != null) {
-                                        //Added by Tony for theme.z
                                         if(isset($atts['events_after'])) {
-                                            $output .= sprintf($atts['events_after'], esc_attr($previous['c_slug']));
+                                            $output .= sprintf(wp_kses_post($atts['events_after']), esc_attr($previous['c_slug']));
                                         }
                                         if(isset($atts['category_after'])) {
-                                            $output .= $atts['category_after'];
+                                            $output .= wp_kses_post($atts['category_after']);
                                         }
                                     }
                                     if(isset($atts['category_before'])) {
-                                        $output .= $atts['category_before'];
+                                        $output .= wp_kses_post($atts['category_before']);
                                     }
-                                    $output .= sprintf($atts['group_header'], $item['c_name']);
+                                    $output .= sprintf(wp_kses_post($atts['group_header']), esc_html($item['c_name']));
                                     if(isset($atts['events_before'])) {
-                                        $output .= $atts['events_before'];
+                                        $output .= wp_kses_post($atts['events_before']);
                                     }
                                 }
                                 $eventcount_by_group = 0;
@@ -464,14 +502,13 @@ class Templates {
 
             
 
-            $output .= Shortcodes::create_rich_snippet( json_encode($item_list) );
+            $output .= Shortcodes::create_rich_snippet( $item_list );
 
-            //Added by Tony for theme.z
             if(isset($atts['events_after']) && $previous != null) {
-                $output .= sprintf($atts['events_after'], esc_attr($previous['c_slug']));
+                $output .= sprintf(wp_kses_post($atts['events_after']), esc_attr($previous['c_slug']));
             }
             if(isset($atts['category_after'])) {
-                $output .= $atts['category_after'];
+                $output .= wp_kses_post($atts['category_after']);
             }
 
         endif;
@@ -481,7 +518,7 @@ class Templates {
 
     private static function shortcode_event_template_tags($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_eventtemplate']['et_arlo_id'])) return '';
-        $wrapper_class = isset($atts['wrapperclass']) ? $atts['wrapperclass'] : ''; //added by Tony for theme.z
+        $wrapper_class = isset($atts['wrapperclass']) ? $atts['wrapperclass'] : '';
         global $wpdb;
         $output = '';
         $tags = [];
@@ -491,8 +528,8 @@ class Templates {
             'layout' => '',
             'prefix' => 'arlo-',
         ), $atts, $shortcode_name, $import_id));
-        
-        $items = $wpdb->get_results("
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        $sql_tags = $wpdb->prepare("
             SELECT 
                 tag
             FROM 
@@ -502,12 +539,14 @@ class Templates {
             ON
                 tag_id = id
             WHERE
-                ett.et_id = {$GLOBALS['arlo_eventtemplate']['et_id']}
+                ett.et_id = %d
             AND	
-                t.import_id = " . $import_id . "
+                t.import_id = %d
             AND
-                ett.import_id = " . $import_id . "
-            ", ARRAY_A);	
+                ett.import_id = %d
+            ", $GLOBALS['arlo_eventtemplate']['et_id'],$import_id,$import_id);
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.PreparedSQL.NotPrepared
+            $items = CacheControl::fetch_results($sql_tags, ARRAY_A);
         
         foreach ($items as $t) {
             $tags[] = $t['tag'];
@@ -516,10 +555,10 @@ class Templates {
         if (count($tags)) {
             switch($layout) {
                 case 'list':
-                    $output = '<ul class="arlo-template_tags-list ' . $wrapper_class . '">';
+                    $output = '<ul class="' . esc_attr('arlo-template_tags-list ' . $wrapper_class). '">';
                     
                     foreach($tags as $tag) {
-                        $output .= '<li>' . htmlentities($tag, ENT_QUOTES, "UTF-8") . '</li>';
+                        $output .= '<li>' . esc_html($tag) . '</li>';
                     }
                     
                     $output .= '</ul>';
@@ -529,7 +568,7 @@ class Templates {
                 
                     $classes = [];
                     foreach($tags as $tag) {
-                        $classes[] = htmlentities(sanitize_title($prefix . $tag), ENT_QUOTES, "UTF-8");
+                        $classes[] = esc_attr(sanitize_title($prefix . $tag));
                     }
                     
                     $output = implode(' ', $classes);
@@ -537,7 +576,7 @@ class Templates {
                 break;
             
                 default:	
-                    $output = '<div class="arlo-template_tags-list">' . implode(', ', array_map(function($tag) { return htmlentities($tag, ENT_QUOTES, "UTF-8"); }, $tags)) . '</div>';
+                    $output = '<div class="arlo-template_tags-list">' . implode(', ', array_map(function($tag) { return esc_html($tag); }, $tags)) . '</div>';
                 break;
             }	
         }
@@ -550,28 +589,28 @@ class Templates {
         
         $output = '';
         
-        if (!empty($GLOBALS['no_event']) && !empty($GLOBALS['no_onlineactivity'])) {
-            $no_event_text = '';
+        if (!empty($GLOBALS['arlo_no_event']) && !empty($GLOBALS['arlo_no_onlineactivity'])) {
+            $arlo_no_event_text = '';
 
             if (!empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi'])) {
-                $no_event_text = !empty($settings['noeventontemplate_text']) ? $settings['noeventontemplate_text'] : __('Interested in attending? Have a suggestion about running this event near you?', 'arlo-for-wordpress');
-                $no_event_text .= '<br /><a href="' . esc_url($GLOBALS['arlo_eventtemplate']['et_registerinteresturi']) . '">' . __('Register your interest now', 'arlo-for-wordpress') . '</a>';
+                $arlo_no_event_text = !empty($settings['noeventontemplate_text']) ? esc_html($settings['noeventontemplate_text']) : esc_html__('Interested in attending? Have a suggestion about running this event near you?', 'arlo-training-and-event-management-system');
+                $arlo_no_event_text .= '<br /><a href="' . esc_url($GLOBALS['arlo_eventtemplate']['et_registerinteresturi']) . '">' . esc_html__('Register your interest now', 'arlo-training-and-event-management-system') . '</a>';
             } else {
-                $no_event_text = (!empty($settings['noevent_text']) ? $settings['noevent_text'] : __('No events to show', 'arlo-for-wordpress'));
+                $arlo_no_event_text = (!empty($settings['noevent_text']) ? esc_html($settings['noevent_text']) : esc_html__('No events to show', 'arlo-training-and-event-management-system'));
             }
             
-            $output = '<p class="arlo-no-results">' . $no_event_text . '</p>';	
+            $output = '<p class="arlo-no-results">' . $arlo_no_event_text . '</p>';	
         }
 
         return $output;
     }
 
     private static function shortcode_event_template_register_private_interest($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        if (empty($GLOBALS['no_event']) || empty($GLOBALS['arlo_eventtemplate']['et_registerprivateinteresturi'])) return;
+        if (empty($GLOBALS['arlo_no_event']) || empty($GLOBALS['arlo_eventtemplate']['et_registerprivateinteresturi'])) return;
 
         // merge and extract attributes
         extract(shortcode_atts(array(
-            'text' => __('Want to run this event in-house? %s Enquire about running this event in-house %s', 'arlo-for-wordpress')
+            'text' => str_replace('|','%s',esc_html__('Want to run this event in-house? | Enquire about running this event in-house |', 'arlo-training-and-event-management-system'))
         ), $atts, $shortcode_name, $import_id));
 
         $link = Shortcodes::build_custom_link($text, $GLOBALS['arlo_eventtemplate']['et_registerprivateinteresturi'], 'arlo-register-private-interest-link');
@@ -584,35 +623,37 @@ class Templates {
     private static function shortcode_event_template_code($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_eventtemplate']['et_code'])) return '';
         
-        return htmlentities($GLOBALS['arlo_eventtemplate']['et_code'], ENT_QUOTES, "UTF-8");        
+        return esc_html($GLOBALS['arlo_eventtemplate']['et_code']);        
     }
 
     private static function shortcode_event_template_name($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_eventtemplate']['et_name'])) return '';
 
-        return htmlentities($GLOBALS['arlo_eventtemplate']['et_name'], ENT_QUOTES, "UTF-8");        
+        return esc_html($GLOBALS['arlo_eventtemplate']['et_name']);        
     }
 
     private static function shortcode_event_template_permalink($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        return Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']);
+        if(!isset($GLOBALS['arlo_eventtemplate']['et_post_name'])) return '';
+
+        return esc_url(Shortcodes::get_template_permalink($GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region']));
     }
 
     private static function shortcode_event_template_link($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_eventtemplate']['et_viewuri'])) return '';
 
-        return htmlentities($GLOBALS['arlo_eventtemplate']['et_viewuri'], ENT_QUOTES, "UTF-8");        
+        return esc_url($GLOBALS['arlo_eventtemplate']['et_viewuri']);
     }
 
     private static function shortcode_event_template_summary($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_eventtemplate']['et_descriptionsummary'])) return '';
-        //added ny Tony for theme.z
         $text = $GLOBALS['arlo_eventtemplate']['et_descriptionsummary'];
-        if(isset($atts['digest'])) {
-            $length = intval($atts['digest']);
-            if(mb_strlen($text) <= $length) {
-                return esc_html($text);
-            } else {
-                return mb_substr($text, 0, $length) . '...';
+        if(isset($atts['digest']) && is_scalar($atts['digest'])) {
+            $length = filter_var(trim((string) $atts['digest']), FILTER_VALIDATE_INT);
+            if ($length === 0) {
+                return '';
+            }
+            if($length > 0 && mb_strlen($text) > $length) {
+                return esc_html(mb_substr($text, 0, $length)) . '...';
             }
         }
         return esc_html($text);
@@ -636,15 +677,14 @@ class Templates {
         $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
         
         $sql = self::generate_bestoffer_list_sql($GLOBALS['arlo_eventtemplate']['et_arlo_id'], $arlo_region, 2, $import_id);
-
-        $offers = $wpdb->get_results($sql, OBJECT);
+        $offers = CacheControl::fetch_results($sql, OBJECT);
         if (empty($offers)) return;
         $offer = $offers[0];
         if (empty($offer)) return;
 
         //price setting and free text
         $settings = get_option('arlo_settings');
-        $free_text = (isset($settings['free_text'])) ? $settings['free_text'] : __('Free', 'arlo-for-wordpress');
+        $free_text = (isset($settings['free_text'])) ? $settings['free_text'] : esc_html__('Free', 'arlo-training-and-event-management-system');
         $exclgst = (isset($settings['price_setting']) && $settings['price_setting'] === ARLO_PLUGIN_PREFIX . '-exclgst');
 
         if ($offer->o_offeramounttaxexclusive == 0) {
@@ -653,15 +693,17 @@ class Templates {
 
         $fromtext = '';
         if (strtolower($showfrom) === "true" && count($offers) > 1) {
-            $fromtext = __('From', 'arlo-for-wordpress') . ' ';
+            $fromtext = __('From', 'arlo-training-and-event-management-system') . ' ';
         }
 
         $taxsuffix = '';
         if (strtolower($showtaxsuffix) === "true" && !$offer->e_is_taxexempt) {
             if ($exclgst) {
-                $taxsuffix = ' ' . sprintf(__('excl. %s', 'arlo-for-wordpress'), $offer->o_taxrateshortcode);
+                /* translators: %s: tax rate */
+                $taxsuffix = ' ' . sprintf(__('excl. %s', 'arlo-training-and-event-management-system'), $offer->o_taxrateshortcode);
             } else {
-                $taxsuffix = ' ' . sprintf(__('incl. %s', 'arlo-for-wordpress'), $offer->o_taxrateshortcode);
+                /* translators: %s: tax rate */
+                $taxsuffix = ' ' . sprintf(__('incl. %s', 'arlo-training-and-event-management-system'), $offer->o_taxrateshortcode);
             }
         }
 
@@ -696,7 +738,7 @@ class Templates {
                 if($output != '') {
                     $output .= ", ";
                 }
-                $output .= "<a href='$permalink'>$fullname</a>";
+                $output .= "<a href='" . esc_url($permalink) . "'>" . esc_html($fullname) . "</a>";
             }
             return $output;
         }
@@ -711,6 +753,7 @@ class Templates {
             'layout' => 'list',
             'text' => '{%label%}: {%points%}'
         ), $atts, $shortcode_name, $import_id));
+        $text = wp_kses_post($text);
 
         $credits = json_decode($GLOBALS['arlo_eventtemplate']['et_credits']);
         if (empty($credits) || !is_array($credits)) return;
@@ -723,6 +766,7 @@ class Templates {
                     if (!empty($credit->Type) && !empty($credit->Value)) {
                         $credit_type = esc_html($credit->Type);
                         $credit_value = esc_html($credit->Value);
+
                         $html = '<li>' . $text . '</li>';
                         $html = str_replace('{%label%}', $credit_type, $html);
                         $html = str_replace('{%points%}', $credit_value, $html);
@@ -730,6 +774,11 @@ class Templates {
                     }
                 }
                 $output .= '</ul>';
+
+                // wp_kses_post is applied after substitution because {%token%} placeholders are
+                // position-agnostic — they may appear in element content or attribute values —
+                // so esc_url/esc_attr cannot be chosen upfront (the token position is unknown).
+                $output = wp_kses_post($output);
             break;
         }
         return $output;
@@ -744,24 +793,22 @@ class Templates {
     }
 
     private static function generate_template_filters_form($atts, $shortcode_name, $import_id, $default_page = 'event') {
-        global $post, $wpdb;
+        global $post;
 
         extract(shortcode_atts(array(
             'filters'   => 'category,location,delivery',
-            'resettext' => __('Reset', 'arlo-for-wordpress'),
+            'resettext' => esc_html__('Reset', 'arlo-training-and-event-management-system'),
             'buttonclass'   => 'button'
         ), $atts, $shortcode_name, $import_id));
         
         $filters_array = explode(',',$filters);
-        
-        $settings = get_option('arlo_settings');
 
         $page_type = \Arlo_For_Wordpress::get_current_page_arlo_type($default_page);        
         $filter_group = $page_type == 'event' ? 'events' : $page_type;
+        $page_id = \Arlo_For_Wordpress::get_posts_page_id( $page_type );
 
-        if (!empty($settings['post_types'][$page_type]['posts_page'])) {
-            $page_link = get_permalink(get_post($settings['post_types'][$page_type]['posts_page']));
-        } else {
+        $page_link = $page_id > 0 ? get_permalink( $page_id ) : '';
+        if ( empty( $page_link ) ) {
             $page_link = get_permalink(get_post($post));
         }
 
@@ -779,23 +826,22 @@ class Templates {
 
             $items = Filters::get_filter_options($filter_key, $import_id);
 
-            $filter_html .= Shortcodes::create_filter($filter_key, $items, __(\Arlo_For_Wordpress::$filter_labels[$filter_key], 'arlo-for-wordpress'), 'generic', $att, $filter_group);
+            $filter_html .= Shortcodes::create_filter($filter_key, $items, \Arlo_For_Wordpress::$filter_labels[$filter_key], 'generic', $att, $filter_group);
 
         endforeach; 
             
         // category select
         if (!empty($filter_html)) {
 
-            //updated by Tony for theme.z
             $reset_style = "";
             if(isset($atts['hidereset'])) {
                 $reset_style = "display: none";
             }
             return '
-            <form id="arlo-event-filter" class="arlo-filters" method="get" action="'. $page_link .'">
+            <form id="arlo-event-filter" class="arlo-filters" method="get" action="'. esc_url($page_link) .'">
                 ' . $filter_html .'
-                <div class="arlo-filters-buttons"><input type="hidden" id="arlo-page" value="' . $page_link . '">
-                    <a role="button" style="' . $reset_style . '" href="' . $page_link . '" class="' . esc_attr($buttonclass) . '">' . htmlentities($resettext, ENT_QUOTES, "UTF-8") . '</a>
+                <div class="arlo-filters-buttons"><input type="hidden" id="arlo-page" value="' . esc_url($page_link) . '">
+                    <a role="button" style="' . esc_attr($reset_style) . '" href="' . esc_url($page_link) . '" class="' . esc_attr($buttonclass) . '">' . esc_html($resettext) . '</a>
                 </div>
             </form>
             ';
@@ -804,11 +850,11 @@ class Templates {
 
     private static function shortcode_suggest_datelocation($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         global $post;
-        if (!empty($GLOBALS['no_event']) || empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi']) || $post->post_type != 'arlo_event') return;
+        if (!empty($GLOBALS['arlo_no_event']) || empty($GLOBALS['arlo_eventtemplate']['et_registerinteresturi']) || $post->post_type != 'arlo_event') return;
 
         // merge and extract attributes
         extract(shortcode_atts(array(
-            'text' => __('None of these dates work for you? %s Suggest another date & time %s', 'arlo-for-wordpress')
+            'text' => str_replace("|","%s",esc_html__('None of these dates work for you? | Suggest another date & time |', 'arlo-training-and-event-management-system'))
         ), $atts, $shortcode_name, $import_id));
 
         $link = Shortcodes::build_custom_link($text, $GLOBALS['arlo_eventtemplate']['et_registerinteresturi'], 'arlo-register-interest');
@@ -817,11 +863,11 @@ class Templates {
     }
 
     private static function shortcode_suggest_private_datelocation($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        if (!empty($GLOBALS['no_event']) || empty($GLOBALS['arlo_eventtemplate']['et_registerprivateinteresturi'])) return;
+        if (!empty($GLOBALS['arlo_no_event']) || empty($GLOBALS['arlo_eventtemplate']['et_registerprivateinteresturi'])) return;
 
         // merge and extract attributes
         extract(shortcode_atts(array(
-            'text' => __('Want to run this event in-house? %s Enquire about running this event in-house %s', 'arlo-for-wordpress')
+            'text' => str_replace('|','%s',esc_html__('Want to run this event in-house? | Enquire about running this event in-house |', 'arlo-training-and-event-management-system'))
         ), $atts, $shortcode_name, $import_id));
 
         $link = Shortcodes::build_custom_link($text, $GLOBALS['arlo_eventtemplate']['et_registerprivateinteresturi'], 'arlo-suggest-private-datelocation-link');
@@ -841,7 +887,7 @@ class Templates {
 
     private static function shortcode_event_template_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         $et_snippet = self::get_rich_snippet_data($atts,$import_id,$shortcode_name);
-        return Shortcodes::create_rich_snippet( json_encode($et_snippet) );
+        return Shortcodes::create_rich_snippet( $et_snippet );
     }
 
     private static function get_rich_snippet_data($atts,$import_id,$shortcode_name) {
@@ -866,7 +912,7 @@ class Templates {
                 break;
             }
 
-            $et_link = \Arlo\Utilities::get_absolute_url($et_link);
+            $et_link = \ArloTraining\Utilities::get_absolute_url($et_link);
 
             $event_template_snippet['url'] = $et_link;
 
@@ -884,16 +930,15 @@ class Templates {
         $url = $GLOBALS['arlo_eventtemplate']['et_hero_image'];
         $filename = basename($url);
         
-        //added by Tony for theme.z
         if(isset($atts['alt_use_event_name'])) {
             $event_name = "";
             if(isset($GLOBALS['arlo_eventtemplate']['et_name'])) {
-                $event_name = esc_attr($GLOBALS['arlo_eventtemplate']['et_name'], ENT_QUOTES, "UTF-8"); 
+                $event_name = $GLOBALS['arlo_eventtemplate']['et_name'];
             }
             $filename = $event_name;
         }
 
-        return '<img src="' . esc_attr($url) . '" alt="' . esc_attr($filename) . '">';
+        return '<img src="' . esc_url($url) . '" alt="' . esc_attr($filename) . '">';
     }
 
     private static function shortcode_event_template_list_image($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -902,18 +947,16 @@ class Templates {
 
         $url = $GLOBALS['arlo_eventtemplate']['et_list_image'];
         $filename = basename($url);
-        //added by Tony for theme.z
         if(isset($atts['alt_use_event_name'])) {
             $event_name = "";
             if(isset($GLOBALS['arlo_eventtemplate']['et_name'])) {
-                $event_name = esc_attr($GLOBALS['arlo_eventtemplate']['et_name'], ENT_QUOTES, "UTF-8"); 
+                $event_name = $GLOBALS['arlo_eventtemplate']['et_name'];
             }
             $filename = $event_name;
         }
-        return '<img src="' . esc_attr($url) . '" alt="' . esc_attr($filename) . '">';
+        return '<img src="' . esc_url($url) . '" alt="' . esc_attr($filename) . '">';
     }
 
-    //updated by Peter for theme.z
     private static function shortcode_event_template_list_image_src($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if (empty($GLOBALS['arlo_eventtemplate']['et_list_image'])) return '';
 
@@ -921,39 +964,34 @@ class Templates {
 			'urldecode'	=> 'false'
 		), $atts, $shortcode_name));
 
-        if($urldecode = 'true') {
-            return urldecode($GLOBALS['arlo_eventtemplate']['et_list_image']);
+        if($urldecode == 'true') {
+            return esc_url(urldecode($GLOBALS['arlo_eventtemplate']['et_list_image']));
         }
 
-        return $GLOBALS['arlo_eventtemplate']['et_list_image'];
+        return esc_url($GLOBALS['arlo_eventtemplate']['et_list_image']);
     }
 
 
-    private static function generate_list_sql($atts, $import_id, $for_pagination = false) {
+    private static function generate_list_sql($atts, $import_id, $for_pagination = false, $requested_event_page_number = null) {
         global $wpdb;
+
+        if ( ! is_int( $requested_event_page_number ) || $requested_event_page_number < 1 ) {
+            $requested_event_page_number = null;
+        }
        
         if (isset($atts['show_only_at_bottom']) && $atts['show_only_at_bottom'] == "true" && isset($GLOBALS['arlo_categories_count']) && $GLOBALS['arlo_categories_count']) {
-            $GLOBALS['show_only_at_bottom'] = true;
+            $GLOBALS['arlo_show_only_at_bottom'] = true;
             return;
         } 
 
         $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
         $page = arlo_current_page();
         $offset = ($page - 1) * $limit;
-        $group_by_category = isset($atts['climit']); //added by Tony for theme.z
+        $group_by_category = isset($atts['climit']);
 
         $parameters = [];
         $additional_fields = [];
 
-        $t1 = "{$wpdb->prefix}arlo_eventtemplates";
-        $t2 = "{$wpdb->prefix}posts";
-        $t3 = "{$wpdb->prefix}arlo_eventtemplates_categories";
-        $t4 = "{$wpdb->prefix}arlo_categories";
-        $t5 = "{$wpdb->prefix}arlo_events";
-        $t6 = "{$wpdb->prefix}arlo_eventtemplates_tags";
-        $t7 = "{$wpdb->prefix}arlo_tags";
-        $t8 = "{$wpdb->prefix}arlo_onlineactivities";
-            
         $where = "WHERE post.post_type = 'arlo_event' AND et.import_id = %d";
         $parameters[] = $import_id;
 
@@ -973,7 +1011,7 @@ class Templates {
         $arlo_deliveryhidden = isset($atts['deliveryhidden']) ? $atts['deliveryhidden'] : null;        
         $arlo_templatetag = !empty($atts['templatetag']) ? $atts['templatetag'] : null;
         $arlo_templatetaghidden = isset($atts['templatetaghidden']) ? $atts['templatetaghidden'] : null;        
-        $arlo_search = !empty($atts['search']) ? $atts['search'] : null;
+        $arlo_search = !empty($atts['search']) && is_scalar($atts['search']) ? (string) $atts['search'] : null;
         $arlo_region = !empty($atts['region']) ? $atts['region'] : null;
 
         if (isset($arlo_delivery) && !is_array($arlo_delivery) && strlen($arlo_delivery) && is_numeric($arlo_delivery)) {
@@ -1003,7 +1041,7 @@ class Templates {
         }
 
         if (!empty($arlo_venue)) {
-            $arlo_venue = \Arlo\Utilities::convert_string_to_int_array($arlo_venue);
+            $arlo_venue = \ArloTraining\Utilities::convert_string_to_int_array($arlo_venue);
             if (!empty($arlo_venue)) {
                 if (!is_array($arlo_venue)) { $arlo_venue = [$arlo_venue]; }
                 $where .= " AND e.v_id IN (" . implode(',', array_map(function() {return "%s";}, $arlo_venue)) . ")";
@@ -1023,7 +1061,7 @@ class Templates {
                             $where .= " AND e.e_parent_arlo_id = 0 ";
                         break;
                         case 99: 
-                            $join['oa'] = " LEFT JOIN $t8 AS oa ON oa.oat_arlo_id = et.et_arlo_id AND oa.import_id = et.import_id ";
+                            $join['oa'] = " LEFT JOIN {$wpdb->prefix}arlo_onlineactivities AS oa ON oa.oat_arlo_id = et.et_arlo_id AND oa.import_id = et.import_id ";
                             $where .= (count($arlo_delivery) > 1 ? ' OR ' : ' AND ') . ' oa_id IS NOT NULL ';
                         break;        
                     } 
@@ -1033,7 +1071,7 @@ class Templates {
             }
 
             if (isset($arlo_deliveryhidden)) {            
-                $join['oa'] = " LEFT JOIN $t8 AS oa ON oa.oat_arlo_id = et.et_arlo_id AND oa.import_id = et.import_id ";
+                $join['oa'] = " LEFT JOIN {$wpdb->prefix}arlo_onlineactivities AS oa ON oa.oat_arlo_id = et.et_arlo_id AND oa.import_id = et.import_id ";
                 foreach ($arlo_deliveryhidden as $delivery) {
                     switch ($delivery) {
                         case 0:
@@ -1052,16 +1090,16 @@ class Templates {
         }
 
         if(!empty($arlo_state)) :                
-            $join['ce']  = " LEFT JOIN $t5 ce ON e.e_arlo_id = ce.e_parent_arlo_id AND e.import_id = ce.import_id ";
+            $join['ce']  = " LEFT JOIN {$wpdb->prefix}arlo_events ce ON e.e_arlo_id = ce.e_parent_arlo_id AND e.import_id = ce.import_id ";
 
-            $venues = \Arlo\Entities\Venues::get(['state' => $arlo_state], null, null, $import_id);
+            $venues = \ArloTraining\Entities\Venues::get(['state' => $arlo_state], null, null, $import_id);
 
             if(is_array($venues) && count($venues) > 1) {
                 $venues = array_map(function ($venue) {
                     return $venue['v_arlo_id'];
                 }, $venues);
                 
-                $GLOBALS['state_filter_venues'] = $venues;
+                $GLOBALS['arlo_state_filter_venues'] = $venues;
 
                 $ids_string = implode(',', array_map(function() {return "%d";}, $venues));
                 $where .= " AND (ce.v_id IN (" . $ids_string . ") OR e.v_id IN (" . $ids_string . "))";
@@ -1083,7 +1121,7 @@ class Templates {
         if(!empty($arlo_templatetag) || !empty($arlo_templatetaghidden)) :
 
             if (!empty($arlo_templatetag)) {
-                $join['ett'] = " LEFT JOIN $t6 AS ett ON et.et_id = ett.et_id AND ett.import_id = et.import_id ";
+                $join['ett'] = " LEFT JOIN {$wpdb->prefix}arlo_eventtemplates_tags AS ett ON et.et_id = ett.et_id AND ett.import_id = et.import_id ";
 
                 $where .= " AND ett.tag_id IN (" . implode(',', array_map(function() {return "%d";}, $arlo_templatetag)) . ")";
                 $parameters = array_merge($parameters, $arlo_templatetag);    
@@ -1091,12 +1129,13 @@ class Templates {
             
             if (!empty($arlo_templatetaghidden)) {
                 $tag_id_substitutes = implode(', ', array_map(function() {return "%d";}, $arlo_templatetaghidden));
-                $where .= " AND NOT EXISTS( SELECT tag_id FROM $t6 WHERE tag_id IN ($tag_id_substitutes) AND et.et_id = et_id AND import_id = et.import_id )";
+                $where .= " AND NOT EXISTS( SELECT tag_id FROM {$wpdb->prefix}arlo_eventtemplates_tags WHERE tag_id IN ($tag_id_substitutes) AND et.et_id = et_id AND import_id = et.import_id )";
                 $parameters = array_merge($parameters, $arlo_templatetaghidden);
             }
         endif;
 
         if (!empty($arlo_search)) {
+            $arlo_search_like = $wpdb->esc_like($arlo_search);
             $where .= '
             AND (
                     et_code like %s
@@ -1106,7 +1145,7 @@ class Templates {
                     et_descriptionsummary like %s
             )
             ';
-            $parameters[] = '%' . $arlo_search . '%';
+            $parameters[] = '%' . $arlo_search_like . '%';
 
             // We want search to allow for missing words in titles. 
             // MySQL full text search functionality is not a guarantee on all hosts, even though it came out nearly 10 years ago. 
@@ -1114,14 +1153,14 @@ class Templates {
             $words = explode(' ',  trim($arlo_search));
             if (count($words) < 4 && count($words) > 1){
                 // Only do complex searches on 3 words or less to limit potential impact
-                $parameters[] = '%' . implode('%', $words) . '%';
+                $parameters[] = '%' . implode('%', array_map([$wpdb, 'esc_like'], $words)) . '%';
                 // TODO In future it would be nice to score & sort these. See class-wp-query.php parse_search_order() for a WP core example.
             } else {
-                $parameters[] = '%' . $arlo_search . '%';
+                $parameters[] = '%' . $arlo_search_like . '%';
             }
             
             
-            $parameters[] = '%' . $arlo_search . '%';
+            $parameters[] = '%' . $arlo_search_like . '%';
             
             $atts['show_child_elements'] = "true";
         }	
@@ -1131,10 +1170,10 @@ class Templates {
             $parameters[] = $arlo_region;
         }		
         
-        $GLOBALS['show_child_elements'] = false;
+        $GLOBALS['arlo_show_child_elements'] = false;
         if(!empty($arlo_category) || !empty($arlo_categoryhidden)) {
-            $arlo_category = \Arlo\Utilities::convert_string_to_int_array($arlo_category);
-            $arlo_categoryhidden = \Arlo\Utilities::convert_string_to_int_array($arlo_categoryhidden);
+            $arlo_category = \ArloTraining\Utilities::convert_string_to_int_array($arlo_category);
+            $arlo_categoryhidden = \ArloTraining\Utilities::convert_string_to_int_array($arlo_categoryhidden);
 
             $where .= ' AND (';
 
@@ -1158,8 +1197,8 @@ class Templates {
                 }
             }
             
-            if ((isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true") || (isset($GLOBALS['show_child_elements']) && $GLOBALS['show_child_elements'])) {
-                $GLOBALS['show_child_elements'] = true;
+            if ((isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true") || (isset($GLOBALS['arlo_show_child_elements']) && $GLOBALS['arlo_show_child_elements'])) {
+                $GLOBALS['arlo_show_child_elements'] = true;
 
                 $categories_flatten_list = CategoriesEntity::get_flattened_category_list_for_filter($arlo_category, $arlo_categoryhidden, $import_id);
                     
@@ -1171,7 +1210,7 @@ class Templates {
             
             $where .= ')';
         } else if (!(isset($atts['show_child_elements']) && $atts['show_child_elements'] == "true")) {
-            $where .= ' AND (c.c_parent_id = (SELECT c_arlo_id FROM ' . $t4 . ' WHERE c_parent_id = 0 AND import_id = %d) OR c.c_parent_id IS NULL)';
+            $where .= " AND (c.c_parent_id = (SELECT c_arlo_id FROM {$wpdb->prefix}arlo_categories WHERE c_parent_id = 0 AND import_id = %d) OR c.c_parent_id IS NULL)";
             $parameters[] = $import_id;
         }
 
@@ -1185,21 +1224,20 @@ class Templates {
                 $group = 'GROUP BY et.et_arlo_id';
             break;
         }
-        //added by Tony 
         $categories = array(); 
         $sql_tpl = "
             SELECT
                 %s 
             FROM 
-                $t1 et 
+                {$wpdb->prefix}arlo_eventtemplates et 
             " . implode("\n", $join) . "
-            LEFT JOIN $t2 post 
+            LEFT JOIN {$wpdb->posts} post 
                 ON et.et_post_id = post.ID 
-            LEFT JOIN $t3 etc
+            LEFT JOIN {$wpdb->prefix}arlo_eventtemplates_categories etc
                 ON etc.et_arlo_id = et.et_arlo_id AND etc.import_id = et.import_id
-            LEFT JOIN $t4 c
+            LEFT JOIN {$wpdb->prefix}arlo_categories c
                 ON c.c_arlo_id = etc.c_arlo_id AND c.import_id = etc.import_id
-            LEFT JOIN $t5 e
+            LEFT JOIN {$wpdb->prefix}arlo_events e
                 ON e.et_arlo_id = et.et_arlo_id AND e.import_id = et.import_id
             %s 
             %s 
@@ -1216,24 +1254,28 @@ class Templates {
                 break;
             }
             
-            $limit_field = " LIMIT $offset,$limit ";
-            //updated by Tony for theme.z ,add e_locationname + v_id + e_locationvisible + e_isonline + e.e_startdatetime
+            
             $field_list = "et.*, post.ID as post_id, etc.c_arlo_id, c.*, e.e_is_taxexempt, e.e_locationname, e.v_id, e.e_locationvisible, e.e_isonline, e.e_startdatetime" . ($additional_fields ? ' ,' . implode(' ,', $additional_fields) : '');
 
-            //added by Tony for theme.z
             if($group_by_category) {
                 $climit = intval($atts['climit']);
                 $coffset = ($page - 1) * $climit;
-                $csql = sprintf($sql_tpl, 'DISTINCT c.c_arlo_id' ,"$where" ,$group,$order, "LIMIT $coffset,$climit");
-                
-                $cquery = $wpdb->prepare($csql, $parameters);
-                $categories = $wpdb->get_results($cquery, ARRAY_A);
+                $csql = sprintf($sql_tpl, 'DISTINCT c.c_arlo_id' ,"$where" ,$group,$order, "LIMIT %d,%d");
+                $cparameter = array_merge([],$parameters);
+                $cparameter[] = $coffset;
+                $cparameter[] = $climit;
+                // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The SQL statement is dynamically constructed and parameters are prepared here.
+                $cquery = $wpdb->prepare($csql, $cparameter);
+                $categories = CacheControl::fetch_results($cquery, ARRAY_A);
                 //$where .= " AND c.c_arlo_id in ('". implode('\',\'', array_column($categories, 'c_arlo_id')) . "')";
                 $limit_field = "";
+            } else {
+                $limit_field = " LIMIT %d,%d ";
+                $parameters[] = $offset;
+                $parameters[] = $limit;
             }
         } else {
             $field_list = "et.et_id";
-            //added by Tony for theme.z
             if($group_by_category) {
                 $field_list = 'DISTINCT c.c_arlo_id';
             }
@@ -1242,40 +1284,49 @@ class Templates {
         if(!$group_by_category ) {
             $sql = sprintf($sql_tpl, $field_list ,$where,$group,$order, $limit_field);
         }  else {
-            //added by Tony for theme.z
             if($for_pagination || count($categories) == 0) {
                 $sql = sprintf($sql_tpl, $field_list ,$where,$group,$order, $limit_field);
             } else {
                 $sql = "";
                 $parameters_all = array();
                 foreach($categories as $category) {
+                    $cateogry_parameters = array();
                     if($sql != "") {
                         $sql .= "
                             UNION
                         ";
                     }
-                    //for event
-                    $limitval = $limit + 1;
-                    $limit_field = " LIMIT " . ($limit + 1);
-                    if(isset($_GET['pagefor']) && isset($_GET['epage'])) {
-                        $event_page = intval($_GET['epage']);
-                        $offset = ($event_page - 1) * $limit;
-                        $limit_field = " LIMIT $offset, ". $limitval;
-                    }
-                    $category_id_where = " AND c.c_arlo_id = " . $category['c_arlo_id'];
+
                     if($category['c_arlo_id'] == null ) {
                         $category_id_where = " AND c.c_arlo_id is null";
+                    } else {
+                        $category_id_where = " AND c.c_arlo_id = %d" ;
+                        $cateogry_parameters[] = $category['c_arlo_id'];
                     }
+
+                    //for event
+                    $limitval = $limit + 1;
+                    
+                    if ( $requested_event_page_number !== null ) {
+                        $offset = ($requested_event_page_number - 1) * $limit;
+                        $limit_field = " LIMIT %d, %d";
+                        $cateogry_parameters[] = $offset;
+                        $cateogry_parameters[] = $limitval;
+                    } else {
+                        $limit_field = " LIMIT %d";
+                        $cateogry_parameters[] = $limitval;
+                    }
+                    
                     $sql .= "(" . sprintf($sql_tpl, $field_list ,$where . $category_id_where ,$group,$order, $limit_field ) . ")";
-                    $parameters_all = array_merge($parameters_all,$parameters);
-                   
+                    $parameters_all = array_merge($parameters_all,$parameters,$cateogry_parameters);
                 }
-                $parameters= $parameters_all;
+                $parameters = $parameters_all;
             }
             
         }
 
-        
+
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The SQL statement is dynamically constructed and parameters are prepared here.
         $query = $wpdb->prepare($sql, $parameters);
 
         if ($query) {
@@ -1288,11 +1339,6 @@ class Templates {
     private static function generate_bestoffer_list_sql($template_id, $region, $limit, $import_id) {
         global $wpdb;
 
-        $t1 = "{$wpdb->prefix}arlo_offers";
-        $t2 = "{$wpdb->prefix}arlo_eventtemplates";
-        $t3 = "{$wpdb->prefix}arlo_events";
-        $t4 = "{$wpdb->prefix}arlo_onlineactivities";
-
         $parameters = [];
 
         $sql = "
@@ -1304,12 +1350,12 @@ class Templates {
             o.o_taxrateshortcode,
             e.e_is_taxexempt
         FROM 
-            $t1 o
-        LEFT JOIN $t2 et
+            {$wpdb->prefix}arlo_offers o
+        LEFT JOIN {$wpdb->prefix}arlo_eventtemplates et
             ON et.et_id = o.et_id AND et.import_id = o.import_id
-        LEFT JOIN $t3 e
+        LEFT JOIN {$wpdb->prefix}arlo_events e
             ON e.e_id = o.e_id AND e.import_id = o.import_id
-        LEFT JOIN $t4 oa
+        LEFT JOIN {$wpdb->prefix}arlo_onlineactivities oa
             ON oa.oa_id = o.oa_id AND e.import_id = o.import_id
         WHERE o.import_id = %d
             AND (et.et_arlo_id = %d OR e.et_arlo_id = %d OR oa.oat_arlo_id = %d)";
@@ -1331,16 +1377,16 @@ class Templates {
 
         $parameters[] = $limit;
 
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The SQL statement is dynamically constructed and parameters are prepared here.
         $query = $wpdb->prepare($sql, $parameters);
         return $query;
     }
 
-    //added by Tony for theme.z
     private static function shortcode_no_event_in_region($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         $tp = $GLOBALS['arlo_eventtemplate'];
         if($tp == null) {
             if($content === '') {
-                $content = "This course is not available in the selected region.";
+                $content = esc_html__( 'This course is not available in the selected region.', 'arlo-training-and-event-management-system' );
             }
             return do_shortcode($content);
         }

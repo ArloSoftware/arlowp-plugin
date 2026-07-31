@@ -1,18 +1,17 @@
 <?php
 
-namespace Arlo\Importer;
+namespace ArloTraining\Importer;
 
-use Arlo\Logger;
+use ArloTraining\Logger;
 
 class Venues extends BaseImporter {
 
-	public function __construct($importer, $dbl, $message_handler, $data, $iteration = 0, $api_client = null, $scheduler = null, $importing_parts = null) {
-		parent::__construct($importer, $dbl, $message_handler, $data, $iteration, $api_client, $scheduler, $importing_parts);
-
-		$this->table_name = $this->dbl->prefix . 'arlo_venues';
+	public function __construct($importer, $message_handler, $data, $iteration = 0, $api_client = null, $scheduler = null, $importing_parts = null) {
+		parent::__construct($importer, $message_handler, $data, $iteration, $api_client, $scheduler, $importing_parts);
 	}
 
 	protected function save_entity($item) {
+		global $wpdb;
 		$slug = sanitize_title($item->VenueID . ' ' . $item->Name);
 
 		// create associated custom post, if it dosen't exist
@@ -31,15 +30,17 @@ class Venues extends BaseImporter {
 			$post_id = wp_insert_post($post_config_array);
 		} else {
 			$post_config_array['ID'] = $post->ID;
-			$post_id = wp_update_post($post_config_array);
+			$post_id = $post->ID;
+			$wpdb->update($wpdb->prefix .'posts', $post_config_array, array('id' => $post_id)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Import updates the associated post record directly and cache is cleared after import.
 		}
 
 		if (is_numeric($post_id) && $post_id > 0) {
-			$query = $this->dbl->query( $this->dbl->prepare( 
-				"INSERT INTO " . $this->table_name . " 
-				(v_arlo_id, v_name, v_locationname, v_geodatapointlatitude, v_geodatapointlongitude, v_physicaladdressline1, v_physicaladdressline2, v_physicaladdressline3, v_physicaladdressline4, v_physicaladdresssuburb, v_physicaladdresscity, v_physicaladdressstate, v_physicaladdresspostcode, v_physicaladdresscountry, v_viewuri, v_facilityinfodirections, v_facilityinfoparking, v_post_name, v_post_id, import_id) 
-				VALUES ( %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, %s )
-				", 
+			// we'll clear cache after the import process finishes
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching  -- Direct database query is required. No cache needed for the insert operation in data import process. Cache will be reset after the import process done.
+            $query = $wpdb->query( $wpdb->prepare( "INSERT INTO {$wpdb->prefix}arlo_venues 
+                (v_arlo_id, v_name, v_locationname, v_geodatapointlatitude, v_geodatapointlongitude, v_physicaladdressline1, v_physicaladdressline2, v_physicaladdressline3, v_physicaladdressline4, v_physicaladdresssuburb, v_physicaladdresscity, v_physicaladdressstate, v_physicaladdresspostcode, v_physicaladdresscountry, v_viewuri, v_facilityinfodirections, v_facilityinfoparking, v_post_name, v_post_id, import_id) 
+                VALUES ( %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, %s )
+                ", 
 				$item->VenueID,
 				$item->Name,
 				$item->LocationName,
@@ -61,12 +62,12 @@ class Venues extends BaseImporter {
 				$post_id,
 				$this->import_id
 			) );
-							
+			
 			if ($query === false) {
-				throw new \Exception('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query);
+				throw new \Exception('SQL error: ' . $wpdb->last_error); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message is caught by the import pipeline, written to the Arlo log table via Logger, and escaped with esc_html() at admin render time.
 			}
 		} else {
-			throw new \Exception('Venue post creation error: ' . $slug);
+			throw new \Exception('Venue post creation error: ' . $slug); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message is caught by the import pipeline, written to the Arlo log table via Logger, and escaped with esc_html() at admin render time.
 		}
 	}
 }

@@ -1,9 +1,16 @@
 <?php
 
-namespace Arlo\Entities;
+namespace ArloTraining\Entities;
+
+use ArloTraining\CacheControl;
+use Exception;
 
 class Offers {
 	static function get($conditions = array(), $order = array(), $limit = null, $import_id = null) {
+		if (!is_null($limit) && (!is_numeric($limit) || $limit <= 0)){
+			throw new Exception('Limit must be a positive integer or null');
+		}
+
 		global $wpdb;
 	
 		$query = "SELECT o.* FROM {$wpdb->prefix}arlo_offers AS o";
@@ -83,15 +90,17 @@ class Offers {
 		
 		// order
 		if(!empty($order)) {
-			$order = ' ORDER BY ' . implode(', ', $order);
+			$order = ' ORDER BY ' . implode(', ', $order);//ReviewNote, the value in $order is string literals defined in PHP, no parameter there.
 		}
 		
-		$join = implode("\n", $join);
+		$join = implode("\n", $join); //ReviewNote, the value in $join is string literals, no parameter there.
 
-		$query = $wpdb->prepare($query.$join.$where.$order, $parameters);
+		$query = $wpdb->prepare($query.$join.$where.$order, $parameters);// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The SQL statement is dynamically constructed and parameters are prepared here.
 
 		if ($query) {
-			return ($limit != 1) ? $wpdb->get_results($query) : $wpdb->get_row($query);
+			return ($limit != 1) 
+				? CacheControl::fetch_results($query)
+				: CacheControl::fetch_row($query);
 		} else {
 			throw new \Exception("Couldn't prepare the SQL statement");
 		}

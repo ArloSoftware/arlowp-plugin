@@ -72,7 +72,18 @@
 }
 
 .arlo-event-registration {
-	text-align: right;
+	text-align: center;
+}
+
+.arlo-event-registration:not(:has(.arlo-button)){
+	position:relative;
+	top:-10px;
+	font-size: 15px;
+}
+.arlo-mobile .arlo-event-registration:not(:has(.arlo-button)){
+	position:unset;
+	top:0;
+	font-size: 15px;
 }
 
 .arlo-event-registration > span {

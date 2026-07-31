@@ -101,7 +101,7 @@ Unordered list:
 * something else
 * third thing
 
-Here's a link to [WordPress](http://wordpress.org/ "Your favorite software") and one to [Markdown's Syntax Documentation][markdown syntax].
+Here's a link to [WordPress](https://wordpress.org/ "Your favorite software") and one to [Markdown's Syntax Documentation][markdown syntax].
 Titles are optional, naturally.
 
 [markdown syntax]: http://daringfireball.net/projects/markdown/syntax

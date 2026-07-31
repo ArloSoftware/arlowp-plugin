@@ -5,14 +5,15 @@ msgstr ""
 "Project-Id-Version: Arlo For WordPress v3.0.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/arlowp-plugin\n"
 "POT-Creation-Date: 2018-03-22 17:27+1300\n"
-"PO-Revision-Date: 2019-10-11 13:02+1300\n"
-"Last-Translator: \n"
+"PO-Revision-Date: 2019-10-11 13:00+1300\n"
+"Last-Translator: Adam Fentosi <fentosi.adam@gmail.com>\n"
 "Language-Team: \n"
-"Language: da_DK\n"
+"Language: en_US\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 2.2.4\n"
+"X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: admin/class-arlo-for-wordpress-admin.php:236
@@ -27,7 +28,7 @@ msgstr ""
 #: admin/class-arlo-for-wordpress-admin.php:273
 #: admin/includes/class-arlo-for-wordpress-events.php:20
 msgid "Events"
-msgstr "Kurser"
+msgstr ""
 
 #: admin/class-arlo-for-wordpress-admin.php:274
 msgid "Online Activities"
@@ -42,17 +43,17 @@ msgstr ""
 #: admin/includes/class-arlo-for-wordpress-sessions.php:20
 #: includes/shortcodes/arlo-events.php:498
 msgid "Sessions"
-msgstr "Hold"
+msgstr ""
 
 #: admin/class-arlo-for-wordpress-admin.php:277
 #: admin/includes/class-arlo-for-wordpress-presenters.php:20
 msgid "Presenters"
-msgstr "Instruktører"
+msgstr ""
 
 #: admin/class-arlo-for-wordpress-admin.php:278
 #: admin/includes/class-arlo-for-wordpress-venues.php:20
 msgid "Venues"
-msgstr "Lokationer"
+msgstr ""
 
 #: admin/class-arlo-for-wordpress-admin.php:279
 msgid "Logs"
@@ -73,13 +74,13 @@ msgstr ""
 #: admin/includes/class-arlo-for-wordpress-events.php:19
 #: includes/arlo-notice-handler.php:294
 msgid "Event"
-msgstr "Kursus"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-events.php:41
 #: admin/includes/class-arlo-for-wordpress-onlineactivities.php:41
 #: admin/includes/class-arlo-for-wordpress-templates.php:31
 msgid "Code"
-msgstr "Kode"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-events.php:42
 #: admin/includes/class-arlo-for-wordpress-onlineactivities.php:42
@@ -87,55 +88,53 @@ msgstr "Kode"
 #: admin/includes/class-arlo-for-wordpress-sessions.php:42
 #: admin/includes/class-arlo-for-wordpress-templates.php:32
 msgid "Name"
-msgstr "Navn"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-events.php:43
 #: admin/includes/class-arlo-for-wordpress-sessions.php:43
 msgid "Start date"
-msgstr "Start dato"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-events.php:44
 #: admin/includes/class-arlo-for-wordpress-sessions.php:44
 msgid "Finish date"
-msgstr "Slut dato"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-events.php:45
 #: admin/includes/class-arlo-for-wordpress-sessions.php:45
 #: admin/includes/class-arlo-for-wordpress-venues.php:41
 msgid "Venue name"
-msgstr "Lokationsnavn"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-events.php:46
 #: admin/includes/class-arlo-for-wordpress-sessions.php:46
 msgid "Summary"
-msgstr "Kort beskrivelse"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-events.php:47
 #: admin/includes/class-arlo-for-wordpress-sessions.php:47
 #: admin/includes/class-arlo-for-wordpress-templates.php:33
 msgid "Description"
-msgstr "Beskrivelse"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-events.php:48
 msgid "Notice"
-msgstr "Bemærk"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-events.php:49
 msgid "Num. of sessions"
-msgstr "Antal sessions"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-events.php:50
 #: admin/includes/class-arlo-for-wordpress-onlineactivities.php:44
 #: admin/includes/class-arlo-for-wordpress-sessions.php:48
 #: admin/includes/class-arlo-for-wordpress-templates.php:36
 msgid "Regions"
-msgstr "Kommuner"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-loglist.php:35
-#, fuzzy
-#| msgid "Country"
 msgid "Log entry"
-msgstr "Land"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-loglist.php:36
 msgid "Log entries"
@@ -154,9 +153,8 @@ msgid "Message"
 msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-loglist.php:187
-#, fuzzy
 msgid "Created date"
-msgstr "Start dato"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-onlineactivities.php:19
 msgid "Online activity"
@@ -171,22 +169,20 @@ msgid "Delivery desc."
 msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-presenters.php:19
-#, fuzzy
-#| msgid "Presenter"
 msgid "Presenter"
-msgstr "Instruktør"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-presenters.php:42
 msgid "Profile"
-msgstr "Profil"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-presenters.php:43
 msgid "Qualifications"
-msgstr "Kvalifikationer"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-presenters.php:44
 msgid "Interests"
-msgstr "Interesser"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-presenters.php:45
 msgid "Twitter"
@@ -202,18 +198,18 @@ msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-sessions.php:19
 msgid "Session"
-msgstr "Hold"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-sessions.php:41
 msgid "Event code"
-msgstr "Kursuskode"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-settings.php:203
 msgid "General Settings"
 msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-settings.php:208
-msgid "Arlo domain"
+msgid "Arlo platform URL"
 msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-settings.php:223
@@ -222,33 +218,33 @@ msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-settings.php:227
 msgid "Synchronize now"
-msgstr "Synkroniser nu"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-settings.php:234
 msgid "Price shown"
-msgstr "Vist pris"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-settings.php:240
 msgid "\"Free\" text"
-msgstr "\"Gratis\" tekst"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-settings.php:246
 #: includes/shortcodes/arlo-events.php:687
 #: includes/shortcodes/arlo-shortcodes.php:474
 #: includes/shortcodes/arlo-upcoming-events.php:208
 msgid "Free"
-msgstr "Gratis"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-settings.php:253
 msgid "\"No events to show\" text"
-msgstr "Der er ingen kursusdatoer"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-settings.php:259
 #: includes/shortcodes/arlo-templates.php:394
 #: includes/shortcodes/arlo-templates.php:527
 #: includes/shortcodes/arlo-upcoming-events.php:152
 msgid "No events to show"
-msgstr "Ingen kurser at finde her"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-settings.php:266
 msgid "No event on a template text"
@@ -256,13 +252,9 @@ msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-settings.php:272
 #: includes/shortcodes/arlo-templates.php:524
-#, fuzzy
-#| msgid ""
-#| "Interested in attending? Have a suggestion about running this course near "
-#| "you?"
 msgid ""
 "Interested in attending? Have a suggestion about running this event near you?"
-msgstr "Hør om dette kursus kan holdes som firma-kursus hos dig"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-settings.php:278
 msgid "GoogleMaps API Key"
@@ -310,10 +302,8 @@ msgid "System requirements"
 msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-settings.php:503
-#, fuzzy
-#| msgid "Venue name"
 msgid "Rename"
-msgstr "Lokationsnavn"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-settings.php:504
 msgid "Exclude"
@@ -322,7 +312,7 @@ msgstr ""
 #: admin/includes/class-arlo-for-wordpress-settings.php:600
 #, php-format
 msgid "%s page"
-msgstr "%s side"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-settings.php:612
 #: admin/includes/class-arlo-for-wordpress-settings.php:695
@@ -330,10 +320,8 @@ msgid "Shortcode type"
 msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-settings.php:614
-#, fuzzy
-#| msgid "%s page"
 msgid "page"
-msgstr "%s side"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-settings.php:642
 msgid "Host page"
@@ -347,10 +335,9 @@ msgid ""
 msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-settings.php:664
-#, fuzzy, php-format
-#| msgid "%s page"
+#, php-format
 msgid "%s page "
-msgstr "%s side"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-settings.php:679
 msgid "Page filtered by "
@@ -422,11 +409,11 @@ msgstr ""
 #: admin/includes/class-arlo-for-wordpress-templates.php:66
 #: includes/shortcodes/arlo-events.php:1105
 msgid "Register interest"
-msgstr "Skriv dig op som interesseret til dette kursus"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-templates.php:35
 msgid "Num. of events"
-msgstr "Antal kurser"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-templates.php:74
 msgid "OA"
@@ -434,31 +421,31 @@ msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-venues.php:19
 msgid "Venue"
-msgstr "Lokation"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-venues.php:42
 msgid "Address"
-msgstr "Adresse"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-venues.php:43
 msgid "City"
-msgstr "By"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-venues.php:44
 msgid "Postcode"
-msgstr "Postnr."
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-venues.php:45
 msgid "Country"
-msgstr "Land"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-venues.php:46
 msgid "Directions"
-msgstr "Rutevejledning"
+msgstr ""
 
 #: admin/includes/class-arlo-for-wordpress-venues.php:47
 msgid "Parking"
-msgstr "Parkering"
+msgstr ""
 
 #: admin/views/admin.php:37
 msgid "API help text"
@@ -478,7 +465,7 @@ msgstr ""
 
 #: admin/views/list.php:25 includes/shortcodes/arlo-shortcodes.php:288
 msgid "Search"
-msgstr "Søg"
+msgstr ""
 
 #: includes/arlo-notice-handler.php:126
 msgid ""
@@ -583,38 +570,28 @@ msgstr ""
 
 #: includes/arlo-notice-handler.php:319
 msgid "Presenter profile"
-msgstr "Instruktør-profil"
+msgstr ""
 
 #: includes/arlo-notice-handler.php:344
 msgid "Venue information"
-msgstr "Info om lokationen"
+msgstr ""
 
 #: includes/arlo-notice-handler.php:349
 msgid "Start editing your new pages"
 msgstr ""
 
 #: includes/arlo-notice-handler.php:350
-#, fuzzy, php-format
-#| msgid ""
-#| "View <a href=\"%s\" target=\"_blank\">%s</a>, <a href=\"%s\" target="
-#| "\"_blank\">%s</a>, <a href=\"%s\" target=\"_blank\">%s</a>, <a href=\"%s"
-#| "\" target=\"_blank\">%s</a>, <a href=\"%s\" target=\"_blank\">%s</a>, <a "
-#| "href=\"%s\" target=\"_blank\">%s</a> or <a href=\"%s\" target=\"_blank\">"
-#| "%s</a> pages"
+#, php-format
 msgid ""
 "View %s <a href=\"%s\" target=\"_blank\">%s</a>, <a href=\"%s\" target="
 "\"_blank\">%s</a>, <a href=\"%s\" target=\"_blank\">%s</a>, %s <a href=\"%s"
 "\" target=\"_blank\">%s</a> %s or <a href=\"%s\" target=\"_blank\">%s</a> "
 "pages"
 msgstr ""
-"Vis <a href=\"%s\" target=\"_blank\">%s</a>, <a href=\"%s\" target=\"_blank"
-"\">%s</a>, <a href=\"%s\" target=\"_blank\">%s</a>, <a href=\"%s\" target="
-"\"_blank\">%s</a>, <a href=\"%s\" target=\"_blank\">%s</a>, <a href=\"%s\" "
-"target=\"_blank\">%s</a> or <a href=\"%s\" target=\"_blank\">%s</a> sider"
 
 #: includes/arlo-notice-handler.php:353
 msgid "Catalogue"
-msgstr "Kursuskatalog"
+msgstr ""
 
 #: includes/arlo-notice-handler.php:355
 msgid "Schedule"
@@ -622,11 +599,11 @@ msgstr ""
 
 #: includes/arlo-notice-handler.php:360
 msgid "Presenters list"
-msgstr "Liste over instruktører"
+msgstr ""
 
 #: includes/arlo-notice-handler.php:363
 msgid "Venues list"
-msgstr "Liste over lokationer"
+msgstr ""
 
 #: includes/arlo-notice-handler.php:364
 msgid ""
@@ -708,64 +685,62 @@ msgstr ""
 
 #: includes/shortcodes/arlo-events.php:396
 msgid "Event is full"
-msgstr "Kurset er fyldt"
+msgstr ""
 
 #: includes/shortcodes/arlo-events.php:400
 msgid "Join waiting list"
-msgstr "Skriv dig på ventelisten"
+msgstr ""
 
 #: includes/shortcodes/arlo-events.php:406
 #, php-format
 msgid "%d place remaining"
 msgid_plural "%d places remaining"
-msgstr[0] "%d plads tilbage"
-msgstr[1] "%d pladser tilbage"
+msgstr[0] ""
+msgstr[1] ""
 
 #: includes/shortcodes/arlo-events.php:497
 msgid "Session information"
-msgstr "Hold-info"
+msgstr ""
 
 #: includes/shortcodes/arlo-events.php:619
 msgid "1 day"
-msgstr "1 dag"
+msgstr ""
 
 #: includes/shortcodes/arlo-events.php:627
 #, php-format
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] "%d time"
-msgstr[1] "%d timer"
+msgstr[0] ""
+msgstr[1] ""
 
 #: includes/shortcodes/arlo-events.php:635
 #, php-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] "%d minut"
-msgstr[1] "%d minutter"
+msgstr[0] ""
+msgstr[1] ""
 
 #: includes/shortcodes/arlo-events.php:645
 #, php-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] "%d dag"
-msgstr[1] "%d dage"
+msgstr[0] ""
+msgstr[1] ""
 
 #: includes/shortcodes/arlo-events.php:652
 #, php-format
 msgid "%d week"
 msgid_plural "%d weeks"
-msgstr[0] "%d uge"
-msgstr[1] "%d uger"
+msgstr[0] ""
+msgstr[1] ""
 
 #: includes/shortcodes/arlo-events.php:781
 msgid "From"
-msgstr "Fra"
+msgstr ""
 
 #: includes/shortcodes/arlo-online-activities.php:278
-#, fuzzy
-#| msgid "No events to show"
 msgid "No online activities to show"
-msgstr "Ingen kurser at finde her"
+msgstr ""
 
 #: includes/shortcodes/arlo-shortcodes.php:41
 #, php-format
@@ -784,35 +759,32 @@ msgstr ""
 #: includes/shortcodes/arlo-shortcodes.php:517
 #, php-format
 msgid "excl. %s"
-msgstr "ekskl. %s"
+msgstr ""
 
 #: includes/shortcodes/arlo-shortcodes.php:502
 #: includes/shortcodes/arlo-shortcodes.php:517
 #, php-format
 msgid "incl. %s"
-msgstr "inkl. %s"
+msgstr ""
 
 #: includes/shortcodes/arlo-templates.php:525
-#, fuzzy
-#| msgid "Register interest"
 msgid "Register your interest now"
-msgstr "Skriv dig op som interesseret til dette kursus"
+msgstr ""
 
 #: includes/shortcodes/arlo-templates.php:636
 #, php-format
 msgid "None of these dates work for you? %s Suggest another date & time %s"
 msgstr ""
-"Er der ingen af disse datoer som passer dig? %s Foreslå en anden dato %s"
 
 #: includes/shortcodes/arlo-upcoming-events.php:214
 #, php-format
 msgid " excl. %s"
-msgstr " ekskl. %s"
+msgstr ""
 
 #: includes/shortcodes/arlo-upcoming-events.php:214
 #, php-format
 msgid " incl. %s"
-msgstr " inkl. %s"
+msgstr ""
 
 #: includes/shortcodes/arlo-venues.php:214
 #: includes/shortcodes/arlo-venues.php:228
@@ -822,7 +794,7 @@ msgstr ""
 
 #: public/class-arlo-for-wordpress.php:1259
 msgid "Show me more dates"
-msgstr "Vis flere datoer"
+msgstr ""
 
 #: public/class-arlo-for-wordpress.php:1481
 msgid ""
@@ -840,10 +812,8 @@ msgid "View diagnostic logs"
 msgstr ""
 
 #: public/class-arlo-for-wordpress.php:1482
-#, fuzzy
-#| msgid "Venue information"
 msgid "for more information."
-msgstr "Info om lokationen"
+msgstr ""
 
 #: public/class-arlo-for-wordpress.php:1485
 msgid "Event synchronisation error"
@@ -851,19 +821,19 @@ msgstr ""
 
 #: public/class-arlo-for-wordpress.php:1714
 msgid "Once every 5 minutes"
-msgstr "Hvert 5. minut"
+msgstr ""
 
 #: public/class-arlo-for-wordpress.php:1718
 msgid "Once every 15 minutes"
-msgstr "Hvert 15. minut"
+msgstr ""
 
 #: public/class-arlo-for-wordpress.php:1722
 msgid "Once every hour"
-msgstr "Hvert 60. minut"
+msgstr ""
 
 #: public/class-arlo-for-wordpress.php:1726
 msgid "Every 30 minutes"
-msgstr "Hvert 30. minut"
+msgstr ""
 
 #: public/class-arlo-for-wordpress.php:1809
 msgid "The provided platform name does not exist."
@@ -871,22 +841,22 @@ msgstr ""
 
 #: widgets/categories-widget/class-arlo-for-wordpress-categories-widget.php:57
 msgid "Arlo Categories"
-msgstr "Kategorier"
+msgstr ""
 
 #: widgets/categories-widget/class-arlo-for-wordpress-categories-widget.php:60
 msgid "Display Categories."
-msgstr "Vis kategorier"
+msgstr ""
 
 #: widgets/categories-widget/views/admin.php:3
 #: widgets/region-selector/views/admin.php:3
 #: widgets/search-widget/views/admin.php:3
 #: widgets/upcoming-widget/views/admin.php:22
 msgid "Title"
-msgstr "Titel"
+msgstr ""
 
 #: widgets/categories-widget/views/admin.php:7
 msgid "Depth"
-msgstr "Dybde"
+msgstr ""
 
 #: widgets/categories-widget/views/admin.php:9
 msgid ""
@@ -906,11 +876,11 @@ msgstr ""
 
 #: widgets/categories-widget/views/widget.php:10
 msgid "Categories"
-msgstr "Kategorier"
+msgstr ""
 
 #: widgets/categories-widget/views/widget.php:25
 msgid "No categories to display."
-msgstr "Der er ingen kategorier at vise"
+msgstr ""
 
 #: widgets/region-selector/class-arlo-for-wordpress-region-selector.php:57
 #: widgets/region-selector/class-arlo-for-wordpress-region-selector.php:60
@@ -918,31 +888,29 @@ msgid "Arlo region selector"
 msgstr ""
 
 #: widgets/region-selector/views/widget.php:5
-#, fuzzy
-#| msgid "Regions"
 msgid "Region selector"
-msgstr "Kommuner"
+msgstr ""
 
 #: widgets/search-widget/class-arlo-for-wordpress-search-widget.php:57
 #: widgets/search-widget/class-arlo-for-wordpress-search-widget.php:60
 msgid "Arlo event search"
-msgstr "Alro kursus-søgning"
+msgstr ""
 
 #: widgets/search-widget/views/widget.php:5
 msgid "Event search"
-msgstr "Kursus-søgning"
+msgstr ""
 
 #: widgets/upcoming-widget/class-arlo-for-wordpress-upcoming-widget.php:59
 msgid "Arlo Upcoming Events"
-msgstr "Kurser i kommende fremtid"
+msgstr ""
 
 #: widgets/upcoming-widget/class-arlo-for-wordpress-upcoming-widget.php:62
 msgid "Display Upcoming Events."
-msgstr "Vis kurser i nærmeste fremtid"
+msgstr ""
 
 #: widgets/upcoming-widget/views/admin.php:26
 msgid "Number of events to show"
-msgstr "Antal kurser der skal vises"
+msgstr ""
 
 #: widgets/upcoming-widget/views/admin.php:30
 msgid "Filter by event tag"
@@ -958,7 +926,7 @@ msgstr ""
 
 #: widgets/upcoming-widget/views/widget.php:5
 msgid "Upcoming event"
-msgstr "Nært forekommende kursus"
+msgstr ""
 
 #. Plugin Name of the plugin/theme
 #. Author of the plugin/theme
@@ -976,33 +944,3 @@ msgstr ""
 #. Author URI of the plugin/theme
 msgid "https://arlo.co"
 msgstr ""
-
-#~ msgid "No scheduled event"
-#~ msgstr "Ingen kurser at finde her"
-
-#~ msgid "All locations"
-#~ msgstr "Alle lokationer"
-
-#~ msgid "All categories"
-#~ msgstr "Alle kategorier"
-
-#~ msgid "All delivery options"
-#~ msgstr "Alle typer"
-
-#~ msgid "All months"
-#~ msgstr "Alle måneder"
-
-#~ msgid "No upcoming events found"
-#~ msgstr "Ingen nært forekommende kurser fundet"
-
-#~ msgid "Upcoming Events"
-#~ msgstr "Kurser i nærmeste fremtid"
-
-#~ msgid "Locations"
-#~ msgstr "Lokationer"
-
-#~ msgid "Suggest another date/location"
-#~ msgstr "Foreslå en anden dato eller lokation"
-
-#~ msgid "Register"
-#~ msgstr "Tilmeld"

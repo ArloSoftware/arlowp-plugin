@@ -8,7 +8,9 @@ if (typeof (Arlo) === "undefined") {
 	Arlo.ArloForWordPress = function(config) {
 		$.extend(this, config);
 
-		this.tabIDs = document.location.hash.replace('#', '').split('/');
+		this.tabIDs = document.location.hash.replace('#', '').split('/').map(function(id) {
+			return (id && /^[a-zA-Z0-9_-]+$/.test(id)) ? id : undefined;
+		});
 	}
 
 	Arlo.ArloForWordPress.prototype = {
@@ -22,40 +24,128 @@ if (typeof (Arlo) === "undefined") {
 		templates: null,
 		immediateTaskIDs: [],
 		runningTaskIDs: [],
+		/**
+		 * Maps each list-page template key to the entity detail-page tab whose base
+		 * URL is a sub-route under the list page's host-page assignment.
+		 *
+		 * Detail tabs (Event, Presenter, Venue) represent WP custom post type records
+		 * (arlo_event / arlo_presenter / arlo_venue). They have no host-page dropdown
+		 * of their own, so when a list host page changes, the dependent detail tab's
+		 * slug row must cascade-update to reflect the new base path.
+		 */
+		slugDependents: { events: 'event', presenters: 'presenter', venues: 'venue' },
 		init: function() {
 			var me = this;
 
-			$('.arlo_pages_section .' + me.selectedTemplate).show();
+			try {
+				$('.arlo_pages_section .arlo-' + me.getDefaultVerticalTab()).show();
 
-			$('#arlo-settings').attr('novalidate','novalidate');
-			$('.arlo-section').hide();
+				$('#arlo-settings').attr('novalidate','novalidate');
+				$('.arlo-section').hide();
 
-			me.initTabNavigation();
+				me.initTabNavigation();
 
-			me.checkTasks();
-			me.showNavTab(me.tabIDs[0]);
+				me.checkTasks();
 
-			if (typeof me.tabIDs[1] !== 'undefined') {
-				me.showVerticalNavTab(me.tabIDs[1]);
+				// Initialise shortcode-check state before showing any tab so that
+				// showVerticalNavTab can safely call checkPanelOnFirstVisit.
+				me.initShortcodeChecks();
+
+				// When there is no hash in the URL (e.g. after a form-save POST/redirect),
+				// fall back to the saved tab cookie. If only the legacy vertical cookie is
+				// present, treat it as a Pages sub-tab selection.
+				var savedTab = me.getSavedTabParts();
+				var initialTab = me.tabIDs[0] || savedTab[0];
+				var initialVerticalTab = me.tabIDs[1] || savedTab[1];
+				me.showNavTab(initialTab, initialVerticalTab);
+
+				me.initRegionFields();
+				me.initFilterSettingsFields();
+				me.initDeploymentModeField();
+				me.getLastImportLog();
+
+				me.initEvents();
+
+				me.showFilterGroupSettings($('#arlo-filter-settings').val());
+
+				$('#arlo-filter-settings').change(function() {
+					me.showFilterGroupSettings($(this).val());
+				});
+
+				me.cleanupLegacyTabCookies();
+			} catch (e) {
+				console.error(e);
+				$('.arlo-section, p.submit').show();
+			} finally {
+				$('.arlo-sections-wrap').removeClass('arlo-initializing');
 			}
 
-			me.initRegionFields();
-			me.initFilterSettingsFields();
+		},
+		sanitizeTabID: function(id) {
+			return (id && /^[a-zA-Z0-9_-]+$/.test(id)) ? id : '';
+		},
+		getSavedTabParts: function() {
+			var me = this;
+			var currentTab = Cookies.get('arlo-current-tab');
+			var savedTab = currentTab ? currentTab.split('/').map(function(id) {
+				return me.sanitizeTabID(id);
+			}) : [];
 
-			me.getLastImportLog();
+			if (savedTab[0]) {
+				return savedTab;
+			}
 
-			me.initEvents();
+			var legacyMainTab = me.sanitizeTabID(Cookies.get('arlo-nav-tab'));
+			var legacyVerticalTab = me.sanitizeTabID(Cookies.get('arlo-vertical-tab'));
 
-			me.showFilterGroupSettings($('#arlo-filter-settings').val());
+			if (!legacyMainTab && legacyVerticalTab) {
+				legacyMainTab = 'pages';
+			}
 
-			$('#arlo-filter-settings').change(function() {
-				me.showFilterGroupSettings($(this).val());
+			return [legacyMainTab, legacyVerticalTab];
+		},
+		getDefaultVerticalTab: function() {
+			var me = this;
+			var defaultTab = '';
+
+			$('.arlo_pages_section .nav-tab').each(function() {
+				var elementID = $(this).attr('id') || '';
+				var candidateTab = me.sanitizeTabID(elementID.split('-').pop());
+
+				if (candidateTab && candidateTab !== 'new_custom') {
+					defaultTab = candidateTab;
+					return false;
+				}
 			});
 
-			//clear cookies
-			Cookies.remove("arlo-vertical-tab", { path: '/' });
-			Cookies.remove("arlo-nav-tab", { path: '/' });
+			return defaultTab || me.sanitizeTabID((me.selectedTemplate || '').replace(/^arlo-/, ''));
 		},
+		resolveVerticalTab: function(tabID) {
+			var me = this;
+			var verticalTab = me.sanitizeTabID(tabID);
+
+			if (verticalTab && $('.arlo_pages_section .arlo-' + verticalTab).length > 0) {
+				return verticalTab;
+			}
+
+			return me.getDefaultVerticalTab();
+		},
+		persistCurrentTab: function(tabID, verticalTab) {
+			var cookieValue = tabID;
+
+			if (verticalTab) {
+				cookieValue += '/' + verticalTab;
+			}
+
+			Cookies.set('arlo-current-tab', cookieValue, { path: '/', expires: 7 });
+		},
+		cleanupLegacyTabCookies: function() {
+			['arlo-nav-tab', 'arlo-vertical-tab'].forEach(function(name) {
+				Cookies.remove(name, { path: '/' });
+				Cookies.remove(name, { path: '/', domain: window.location.hostname });
+			});
+		},
+
 		initRegionFields: function() {
 			var me = this;
 
@@ -63,8 +153,7 @@ if (typeof (Arlo) === "undefined") {
 				placeholder: "arlo-region-highlight",
 				update: me.reNumberRegions
 			});
-			$( "#arlo-regions" ).disableSelection();	
-			
+			$( "#arlo-regions" ).disableSelection();			
 			$('#arlo-regions').on('click', 'li .arlo-icons8-minus', function () {
 				$(this).parentsUntil("li").parent().remove();
 				if ($('#arlo-regions > li').length === 0) {
@@ -140,16 +229,7 @@ if (typeof (Arlo) === "undefined") {
 			}
 		},
 		initCodeMirror: function() {
-			var me = this;
-			if (me.editor === null) {			
-				me.editor = CodeMirror.fromTextArea( 
-					document.getElementById( "arlo_customcss" ), 
-					{
-						lineNumbers: true, 
-						lineWrapping: true
-					}
-				);
-			}
+			
 		},
 		reNumberRegions: function() {
 			$("#arlo-regions li .arlo-order-number").each(function(index) {				
@@ -180,7 +260,7 @@ if (typeof (Arlo) === "undefined") {
 		},
 		createTaskPlaceholder: function(taskID) {
 			var me = this,
-				header = $('.arlo-wrap > h2'),
+				header = $('.arlo-wrap .arlo-page-header'),
 				content = $("<div>").addClass("notice arlo-task").attr("id", "arlo-task-" + taskID).html("<p>Background task: <span class='desc'></span></p>"),
 				taskPlaceholder;
 
@@ -210,7 +290,8 @@ if (typeof (Arlo) === "undefined") {
 			var me = this,
 				data = {
 					action: 'arlo_terminate_task',
-					taskID: taskID
+					taskID: taskID,
+					nonce: admin_ajax_var.nonce
 				},
 				taskPlaceholder = $("#arlo-task-" + taskID);
 			
@@ -222,7 +303,8 @@ if (typeof (Arlo) === "undefined") {
 			var me = this,
 				data = {
 					action: 'arlo_get_task_info',
-					taskID: taskID
+					taskID: taskID,
+					nonce: admin_ajax_var.nonce
 				},
 				taskPlaceholder = $("#arlo-task-" + taskID);
 						
@@ -236,7 +318,7 @@ if (typeof (Arlo) === "undefined") {
 					if (response[0] != null) {
 						task = response[0];
 						if (task.task_id == taskID) {							
-							taskPlaceholder.find(".desc").html(task.task_status_text);
+							taskPlaceholder.find(".desc").text(task.task_status_text);
 														
 							switch(task.task_status) {
 								case "0":
@@ -254,14 +336,14 @@ if (typeof (Arlo) === "undefined") {
 
 										me.getLastImportLog(function(response) {
 											if (response.successful == 1) {
-												$('.arlo-last-sync-date').fadeOut().html(response.last_import + ' UTC').fadeIn();
+												$('.arlo-last-sync-date').fadeOut().text(response.last_import + ' UTC').fadeIn();
 												
 												//dismiss only, if the sync is not terminated by the user
 												if (task.task_status_text.indexOf('terminate') == -1) {
 													$('.toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message.arlo-import_error .notice-dismiss').trigger('click');
 												}
 											} else {
-												taskPlaceholder.find(".desc").after(": <span>" + response.message + "</span>");
+												taskPlaceholder.find(".desc").after($('<span>').text(': ' + response.message));
 											}
 										}, task.task_status == 4);
 									}
@@ -285,7 +367,8 @@ if (typeof (Arlo) === "undefined") {
 		kickOffScheduler: function() {
 			var me = this,
 				data = {
-					action: 'arlo_start_scheduler'
+					action: 'arlo_start_scheduler',
+					nonce: admin_ajax_var.nonce
 				}
 				
 			$.post(me.ajaxUrl, data);
@@ -322,23 +405,28 @@ if (typeof (Arlo) === "undefined") {
 		},
 		showVerticalNavTab:function (tabID) {
 			var me = this;
+			var verticalTab = me.resolveVerticalTab(tabID);
 
-			if (tabID !== 'new_custom') {
-				Cookies.set("arlo-vertical-tab", tabID, { path: '/', domain: window.location.hostname, expires: 7 });
+			if (verticalTab === 'new_custom') {
+				me.persistCurrentTab('pages');
+			} else {
+				me.persistCurrentTab('pages', verticalTab);
 			}
 
 			$('.arlo_pages_section .arlo-field-wrap').hide();
 			$('.arlo_pages_section .nav-tab').removeClass('nav-tab-active');
-
-			if ($('.arlo-' + tabID).length == 0) {
-				tabID = me.selectedTemplate;
-			}
 			
-			$('.arlo_pages_section .arlo-' + tabID).show();
-			$('.arlo-' + tabID + ' .' + me.pluginSlug + '-pages-' + tabID).addClass('nav-tab-active');			
+			$('.arlo_pages_section .arlo-' + verticalTab).show();
+			$('.arlo-' + verticalTab + ' .' + me.pluginSlug + '-pages-' + verticalTab).addClass('nav-tab-active');
+
+			// Lazy shortcode check: only fires the first time this panel is opened.
+			me.checkPanelOnFirstVisit(verticalTab);
 		},
-		showNavTab: function(tabID) {
+		showNavTab: function(tabID, requestedVerticalTab) {
 			var me = this;
+			var verticalTab = null;
+			tabID = me.sanitizeTabID(tabID);
+			requestedVerticalTab = me.sanitizeTabID(requestedVerticalTab);
 
 			$('.arlo-section').hide();
 			$('.nav-tab-wrapper.main-tab .nav-tab').removeClass('nav-tab-active');
@@ -349,33 +437,35 @@ if (typeof (Arlo) === "undefined") {
 
 			$('.arlo_' + tabID + '_section').show();
 			$('#' + me.pluginSlug + '-tab-' + tabID).addClass('nav-tab-active');
-			
-			Cookies.remove("arlo-vertical-tab", { path: '/' });
-			Cookies.set("arlo-nav-tab", tabID, { path: '/', domain: window.location.hostname, expires: 7 });
 
 			switch (tabID) {
 				case 'customcss':
+					me.persistCurrentTab(tabID);
 					me.initCodeMirror();
 				break;
 				
 				case 'pages':
-					if (typeof(me.tabIDs[1]) === 'undefined') {
-						document.location.hash += '/event';
-						me.showVerticalNavTab('event');
-					} else {
-						me.showVerticalNavTab(me.tabIDs[1]);
-					}
-					
+					verticalTab = me.resolveVerticalTab(requestedVerticalTab);
+					me.showVerticalNavTab(verticalTab);
+				break;
+
+				default:
+					me.persistCurrentTab(tabID);
 				break;
 			}
-			
-			setTimeout(function() {document.location.hash = tabID},1);
+
+			// Include the vertical segment in the hash so a refresh on #pages/oa
+			// returns to #pages/oa rather than losing the vertical tab.
+			setTimeout(function() {
+				document.location.hash = verticalTab ? tabID + '/' + verticalTab : tabID;
+			}, 1);
 
 		},
 		getLastImportLog: function (callback, successful) {
 			var me = this,
 				data = {
-					action: 'arlo_get_last_import_log'
+					action: 'arlo_get_last_import_log',
+					nonce: admin_ajax_var.nonce
 				};
 			
 			if (successful) {
@@ -395,7 +485,7 @@ if (typeof (Arlo) === "undefined") {
 			//go to the pages section
 			$('.arlo-pages-setup').click(function() {
 				tabIDs = ['pages','events'];
-				me.showNavTab(tabIDs[0]);
+				me.showNavTab(tabIDs[0], tabIDs[1]);
 				me.markPageSetupError();
 				scrollTo(0,jQuery('#arlo-settings').offset().top)
 			});
@@ -407,12 +497,18 @@ if (typeof (Arlo) === "undefined") {
 				scrollTo(0,jQuery('#arlo-settings').offset().top)
 			});				
 			
-			//remove error from the select
+			//remove error from the select; also trigger shortcode presence check
 			$('.arlo-page-select > select').change(function() {
 				if ($(this).val() == '' || $(this).val() == '0') {
 					$(this).addClass('arlo-error');
 				} else {
 					$(this).removeClass('arlo-error');
+				}
+				var $sel       = $(this);
+				var panelId    = $sel.closest('.arlo-field-wrap[id]').attr('id');
+				var templateId = panelId ? panelId.replace('arlo-', '') : '';
+				if ( templateId ) {
+					me.checkPageShortcode( $sel, templateId );
 				}
 			});
 
@@ -441,6 +537,384 @@ if (typeof (Arlo) === "undefined") {
 				var tabID = $(this).attr('id').split('-').pop();
 				me.showVerticalNavTab(tabID);
 			});
+		},
+		/**
+		 * Initialise shortcode-check state. Checks are deferred until each panel
+		 * is first opened — see checkPanelOnFirstVisit().
+		 */
+		initShortcodeChecks: function() {
+			var me = this;
+			me.rowState      = {};
+			me.checkedPanels = {};
+		},
+		/**
+		 * Fire the host-page shortcode check for a panel the first time it is
+		 * opened. Subsequent visits to the same panel are no-ops.
+		 *
+		 * @param {string} templateId  Vertical-tab / panel key (e.g. "events").
+		 */
+		checkPanelOnFirstVisit: function( templateId ) {
+			var me = this;
+			if ( !me.checkedPanels ) { me.checkedPanels = {}; }
+			if ( me.checkedPanels[ templateId ] ) { return; }
+			me.checkedPanels[ templateId ] = true;
+			var $select = $( '#arlo-' + templateId + ' .arlo-page-select > select' );
+			if ( $select.length && parseInt( $select.val(), 10 ) > 0 ) {
+				me.checkPageShortcode( $select, templateId );
+			}
+		},
+		/**
+		 * Fire a debounced AJAX check for a single host-page dropdown row.
+		 * Cancels any pending debounce timer and aborts any in-flight request
+		 * for the same row before starting a new one.
+		 *
+		 * @param {jQuery} $select    The host-page <select> element.
+		 * @param {string} templateId Template key (e.g. "events", "my_short_code").
+		 */
+		checkPageShortcode: function( $select, templateId ) {
+			var me         = this;
+			var currentVal = parseInt( $select.val(), 10 );
+
+			if ( !me.rowState ) {
+				me.rowState = {};
+			}
+			if ( !me.rowState[ templateId ] ) {
+				me.rowState[ templateId ] = { debounceTimer: null, activeXhr: null };
+			}
+			var state = me.rowState[ templateId ];
+
+			clearTimeout( state.debounceTimer );
+			state.debounceTimer = null;
+
+			if ( state.activeXhr ) {
+				state.activeXhr.abort();
+				state.activeXhr = null;
+			}
+
+			if ( currentVal <= 0 ) {
+				me.renderShortcodeIndicator( $select, 'remove', null );
+				me.renderUrlSlugRow( $select, templateId, null, null, null );
+				var detailIdClear = me.slugDependents[ templateId ];
+				if ( detailIdClear ) { me.updateDetailPageSlugRow( detailIdClear, null ); }
+				return;
+			}
+
+			me.renderShortcodeIndicator( $select, 'checking', null );
+
+			state.debounceTimer = setTimeout( function() {
+				var capturedPostId = parseInt( $select.val(), 10 );
+				state.activeXhr = $.post( me.ajaxUrl, {
+					action:      'arlo_check_page_shortcode',
+					nonce:       admin_ajax_var.nonce,
+					post_id:     capturedPostId,
+					template_id: templateId
+				} )
+				.done( function( response ) {
+					state.activeXhr = null;
+					if ( parseInt( $select.val(), 10 ) !== capturedPostId ) {
+						// Stale response - a newer selection is already in flight.
+						return;
+					}
+					var detailIdDone = me.slugDependents[ templateId ];
+					if ( response === null || typeof response !== 'object' ) {
+						me.renderUrlSlugRow( $select, templateId, null, null, null );
+						if ( detailIdDone ) { me.updateDetailPageSlugRow( detailIdDone, null, null ); }
+						me.renderShortcodeIndicator( $select, null, 'request_failed', null, null );
+						return;
+					}
+					if ( true !== response.success ) {
+						me.renderUrlSlugRow( $select, templateId, null, null, null );
+						if ( detailIdDone ) { me.updateDetailPageSlugRow( detailIdDone, null, null ); }
+						if ( response.data && response.data.code ) {
+							me.renderShortcodeIndicator( $select, null, response.data.code, null, null );
+							return;
+						}
+						me.renderShortcodeIndicator( $select, null, 'request_failed', null, null );
+						return;
+					}
+					me.renderShortcodeIndicator( $select, response.data.shortcode_exists, response.data.reason, response.data.shortcode, response.data.post_id );
+					me.renderUrlSlugRow(
+						$select, templateId,
+						response.data.post_slug   || null,
+						response.data.post_status || null,
+						response.data.post_id     || null
+					);
+					if ( detailIdDone ) {
+						me.updateDetailPageSlugRow( detailIdDone, response.data.post_slug || null, response.data.post_status || null );
+					}
+				} )
+					.fail( function( xhr, status ) {
+					if ( 'abort' === status ) { return; }
+					state.activeXhr = null;
+					if ( parseInt( $select.val(), 10 ) !== capturedPostId ) {
+						return;
+					}
+					// Hide slug row on any non-stale, non-aborted request failure.
+					me.renderUrlSlugRow( $select, templateId, null, null, null );
+					var detailIdFail = me.slugDependents[ templateId ];
+					if ( detailIdFail ) { me.updateDetailPageSlugRow( detailIdFail, null, null ); }
+					if ( xhr && xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.code ) {
+						me.renderShortcodeIndicator( $select, null, xhr.responseJSON.data.code, null, null );
+						return;
+					}
+					me.renderShortcodeIndicator( $select, null, 'request_failed', null, null );
+				} );
+			}, 300 );
+		},
+		getShortcodeCheckReasonText: function( reason ) {
+			switch ( reason ) {
+				case 'post_not_found':
+					return 'Selected page no longer exists';
+				case 'not_publishable':
+					return 'Selected page is not published';
+				case 'unsupported_post_type':
+					return 'Selected content is not a page';
+				case 'page_builder':
+				case 'scan_unavailable':
+					return 'Shortcode check unavailable - page content may be managed outside the editor';
+				case 'invalid_post_id':
+					return 'Selected page is invalid';
+				case 'unknown_template':
+					return 'Shortcode check unavailable for this page type';
+				case 'request_failed':
+					return 'Shortcode check failed \u2014 please try again';
+				default:
+					return '';
+			}
+		},
+		/**
+		 * @param {jQuery}                              $select   Host-page <select>.
+		 * @param {true|false|null|'checking'|'remove'} state
+		 * @param {string|null}                         reason    Reason code for unknown/unsupported states.
+		 * @param {string|null}                         shortcode Expected shortcode tag, e.g. '[arlo_event_template_list]'
+		 * @param {number|null}                         postId    WordPress post ID, used for the "Edit page" link.
+		 */
+		renderShortcodeIndicator: function( $select, state, reason, shortcode, postId ) {
+			var me         = this;
+			var $panel      = $select.closest('.arlo-field-wrap[id]');
+			var $existing   = $panel.find('.arlo-sc-check');
+			var $pageSelect = $panel.find('.arlo-page-select');
+
+			if ( 'remove' === state ) {
+				$existing.remove();
+				return;
+			}
+
+			var $indicator = $existing.length ? $existing : $('<span class="arlo-sc-check"></span>');
+			$indicator.removeClass( 'arlo-sc-check--checking arlo-sc-check--valid arlo-sc-check--invalid arlo-sc-check--unknown' );
+			$indicator.removeAttr( 'title' );
+			$indicator.removeAttr( 'aria-label' );
+			$indicator.removeAttr( 'role' );
+			$indicator.empty(); // clear content from any previous --invalid state
+
+			if ( 'checking' === state ) {
+				$indicator.addClass( 'arlo-sc-check--checking' )
+					.attr( 'aria-label', 'Checking for shortcode' )
+					.attr( 'role', 'img' );
+			} else if ( true === state ) {
+				$indicator.addClass( 'arlo-sc-check--valid' );
+				$indicator.attr( 'title', 'Page contains expected shortcode' )
+					.attr( 'aria-label', 'Page contains expected shortcode' )
+					.attr( 'role', 'img' );
+			} else if ( false === state ) {
+				$indicator.addClass( 'arlo-sc-check--invalid' );
+				// Build message with DOM API — no HTML injection of response data.
+				var $icon = $( '<span class="dashicons dashicons-warning" aria-hidden="true"></span>' );
+				var $msg  = $( '<span class="arlo-sc-check__msg"></span>' );
+				var $code = $( '<code></code>' ).text( shortcode || '' );
+				$msg.append(
+					document.createTextNode( 'Shortcode ' ),
+					$code,
+					document.createTextNode( ' was not found on this page.' ),
+					$( '<br>' ),
+					document.createTextNode( 'Content may not render correctly.' )
+				);
+				var $links      = $( '<span class="arlo-sc-check__links"></span>' );
+				var panelId     = $select.closest( '.arlo-field-wrap[id]' ).attr( 'id' );
+				var templateId  = panelId ? panelId.replace( 'arlo-', '' ) : '';
+				if ( postId ) {
+					var adminBase = me.ajaxUrl.replace( /admin-ajax\.php.*$/, '' );
+					var $editLink = $( '<a class="arlo-sc-check__link" target="_blank" rel="noopener noreferrer"></a>' )
+						.attr( 'href', adminBase + 'post.php?post=' + parseInt( postId, 10 ) + '&action=edit' )
+						.text( 'Edit page' );
+					$links.append( $editLink );
+				}
+				var $checkLink = $( '<a class="arlo-sc-check__link" href="#"></a>' ).text( 'Check again' );
+				$checkLink.on( 'click', function( e ) {
+					e.preventDefault();
+					me.checkPageShortcode( $select, templateId );
+				} );
+				$links.append( $checkLink );
+				$msg.append( $links );
+				$indicator.append( $icon, $msg );
+			} else {
+				// null - indeterminate; show tooltip from reason code.
+				$indicator.addClass( 'arlo-sc-check--unknown' );
+				var reasonText = me.getShortcodeCheckReasonText( reason );
+				if ( reasonText ) {
+					$indicator.attr( 'title', reasonText )
+						.attr( 'aria-label', reasonText )
+						.attr( 'role', 'img' );
+				}
+			}
+
+			if ( !$existing.length ) {
+				$pageSelect.after( $indicator );
+			}
+		},
+		/**
+		 * Update the URL slug row for a regular (host-page) template tab.
+		 *
+		 * View/Preview URLs are constructed locally from window.location and ajaxUrl
+		 * rather than from JSON to avoid consuming domain-bearing URLs from the response.
+		 *
+		 * @param {jQuery}      $select    Host-page <select> element.
+		 * @param {string}      templateId Template key e.g. 'events'.
+		 * @param {string|null} postSlug   Root-relative path e.g. '/events/' or null.
+		 * @param {string|null} postStatus WP post_status or null.
+		 * @param {number|null} postId     WP post ID.
+		 */
+		renderUrlSlugRow: function( $select, templateId, postSlug, postStatus, postId ) {
+			var me      = this;
+			var $panel  = $select.closest( '.arlo-field-wrap[id]' );
+			var $row    = $panel.find( '.arlo-url-slug-row' );
+			var $field  = $row.find( '.arlo-url-slug-field' );
+
+			var showableStatuses = [ 'publish', 'draft', 'future', 'pending' ];
+			var isVisible = postSlug && postStatus && showableStatuses.indexOf( postStatus ) !== -1;
+
+			if ( ! isVisible ) {
+				$row.addClass( 'arlo-url-slug-row--hidden' );
+				return;
+			}
+
+			$row.removeClass( 'arlo-url-slug-row--hidden' );
+			$row.find( '.arlo-url-slug' ).text( postSlug );
+
+			var originalSlug = $field.data( 'originalSlug' ) || '';
+			var isChanged    = ( postSlug !== originalSlug );
+
+			// (Updated) badge
+			$row.find( '.arlo-url-slug-updated' ).toggle( isChanged );
+
+			// Private badge — visible when the page is assigned but not yet published
+			$row.find( '.arlo-url-slug-private' ).toggle(
+				[ 'draft', 'future', 'pending' ].indexOf( postStatus ) !== -1
+			);
+
+			// Links — rebuild every time; clear first
+			var $links = $row.find( '.arlo-url-slug-links' );
+			$links.empty();
+
+			if ( ! isChanged ) {
+				// Construct URLs from trusted browser/ajaxUrl sources — NOT from JSON.
+				var adminBase = me.ajaxUrl.replace( /admin-ajax\.php.*$/, '' );
+
+				// Guard: only use postSlug in a URL if it is genuinely root-relative.
+				var slugIsSafe = postSlug && /^\//.test( postSlug );
+
+				if ( postStatus === 'publish' && slugIsSafe ) {
+					$links.append(
+						$( '<a class="arlo-sc-check__link" target="_blank" rel="noopener noreferrer"></a>' )
+							.attr( 'href', window.location.origin + postSlug )
+							.text( 'View page' )
+					);
+				} else if ( [ 'draft', 'future', 'pending' ].indexOf( postStatus ) !== -1 && postId ) {
+					// home_url_path is the path component of get_home_url(), normalised to
+					// end with '/'. On standard installs it is '/'; on WP-in-directory
+					// installs (core files in /wp/, site at /) it correctly reflects home.
+					var homePath = ( admin_ajax_var.home_url_path || '/' );
+					$links.append(
+						$( '<a class="arlo-sc-check__link" target="_blank" rel="noopener noreferrer"></a>' )
+							.attr( 'href', window.location.origin + homePath + '?page_id=' + parseInt( postId, 10 ) + '&preview=true' )
+							.text( 'Preview page' )
+					);
+				}
+				if ( postId ) {
+					$links.append(
+						$( '<a class="arlo-sc-check__link" target="_blank" rel="noopener noreferrer"></a>' )
+							.attr( 'href', adminBase + 'post.php?post=' + parseInt( postId, 10 ) + '&action=edit' )
+							.text( 'Edit page' )
+					);
+				}
+			}
+			// If isChanged: no links emitted (links already cleared above)
+		},
+		/**
+		 * Refresh the URL slug row on an entity detail-page tab (event/presenter/venue).
+		 *
+		 * Detail tabs represent individual WP custom post type records (arlo_event,
+		 * arlo_presenter, arlo_venue). They have no host-page dropdown of their own —
+		 * their URLs are always sub-routes under the corresponding list page. This
+		 * function is called whenever the parent list page's host-page assignment changes.
+		 *
+		 * @param {string}           detailId       Template key: 'event', 'presenter', 'venue'.
+		 * @param {string|null}      listPageSlug   Root-relative slug of the list page, or null.
+		 * @param {string|undefined} listPageStatus WP post_status of the list page, or undefined
+		 *                                          when the "(None)" option was selected.
+		 */
+		updateDetailPageSlugRow: function( detailId, listPageSlug, listPageStatus ) {
+			// Detail-page tab rows use id="arlo-url-slug-detail-{id}". Scope to the panel
+			// class rather than the ID so this works even if the DOM is re-rendered.
+			var $detailPanel = $( '.arlo_pages_section .arlo-' + detailId );
+			var $row         = $detailPanel.find( '.arlo-url-slug-row' );
+			var $field        = $row.find( '.arlo-url-slug-field' );
+
+			// When called without a listPageStatus argument (undefined) the dropdown
+			// was set to "(None)" — post_id is 0, no page is assigned at all.
+			// Show the fallback /arlo/... pattern so the row stays informative.
+			//
+			// When listPageStatus is anything else (null or a real status string) the
+			// call came from an AJAX response where a page IS assigned but the slug
+			// is unavailable (private, trash, non-page type, draft without slug yet,
+			// or deleted post). Hide the row rather than guessing.
+			var noPageAssigned = ( typeof listPageStatus === 'undefined' );
+
+			if ( ! listPageSlug ) {
+				if ( noPageAssigned ) {
+					var fallback = $field.data( 'fallbackSlug' ) || '';
+					var suffix   = $field.data( 'slugSuffix' )   || '';
+					var newSlug  = fallback.replace( /\/$/, '' ) + suffix;
+					$row.removeClass( 'arlo-url-slug-row--hidden' );
+					$row.find( '.arlo-url-slug' ).text( newSlug );
+					var originalSlug = $field.data( 'originalSlug' ) || '';
+					$row.find( '.arlo-url-slug-updated' ).toggle( newSlug !== originalSlug );
+					$row.find( '.arlo-url-slug-private' ).hide();
+				} else {
+					$row.addClass( 'arlo-url-slug-row--hidden' );
+				}
+				return;
+			}
+
+			// Query-string slugs (plain permalinks) cannot have a path suffix appended.
+			if ( listPageSlug.indexOf( '?' ) !== -1 || listPageSlug.indexOf( '#' ) !== -1 ) {
+				$row.addClass( 'arlo-url-slug-row--hidden' );
+				return;
+			}
+			var suffix  = $field.data( 'slugSuffix' ) || '';
+			var newSlug = listPageSlug.replace( /\/$/, '' ) + suffix;
+
+			$row.removeClass( 'arlo-url-slug-row--hidden' );
+			$row.find( '.arlo-url-slug' ).text( newSlug );
+
+			var originalSlug = $field.data( 'originalSlug' ) || '';
+			$row.find( '.arlo-url-slug-updated' ).toggle( newSlug !== originalSlug );
+
+			// Private badge — show when the list page is assigned but not yet published.
+			$row.find( '.arlo-url-slug-private' ).toggle(
+				!! listPageStatus && listPageStatus !== 'publish'
+			);
+
+			// Detail pages have no links — nothing to manage there.
+		},
+		initDeploymentModeField: function() {
+			var $sel = $('#arlo_deployment_mode');
+			var $hint = $sel.siblings('.arlo-deployment-mode-hint');
+			if ($sel.length && $hint.length) {
+				$sel.on('change', function() {
+					$hint.toggle($sel.val() === 'non_production');
+				});
+			}
 		},
 		initEvents: function() {
 			var me = this;		
@@ -533,7 +1007,8 @@ if (typeof (Arlo) === "undefined") {
 				if (id != null) {
 					var data = {
 						action: 'arlo_dismiss_message',
-						id: id
+						id: id,
+						nonce: admin_ajax_var.nonce
 					}
 					
 					$.post(me.ajaxUrl, data);
@@ -553,7 +1028,8 @@ if (typeof (Arlo) === "undefined") {
 				if (id != null) {
 					var data = {
 						action: 'arlo_dismissible_notice',
-						id: id
+						id: id,
+						nonce: admin_ajax_var.nonce
 					}
 					
 					$.post(me.ajaxUrl, data);
@@ -562,7 +1038,8 @@ if (typeof (Arlo) === "undefined") {
 
 			$('.toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-ask-later').click(function() {
 				var data = {
-					action: 'arlo_increment_review_notice_date'
+					action: 'arlo_increment_review_notice_date',
+					nonce: admin_ajax_var.nonce
 				}
 				
 				$.post(me.ajaxUrl, data);
@@ -572,7 +1049,8 @@ if (typeof (Arlo) === "undefined") {
 			$('#arlo_turn_off_send_data').click(function() {
 				var el = $(this),
 					data = {
-						action: 'arlo_turn_off_send_data'
+						action: 'arlo_turn_off_send_data',
+						nonce: admin_ajax_var.nonce
 					}
 				
 				$.post(me.ajaxUrl, data, function() {
@@ -605,41 +1083,6 @@ if (typeof (Arlo) === "undefined") {
 				$(this).closest('.arlo-filter-settings').toggleClass('filter-section-expanded');
 			});
 
-		},
-		getEventsForWebinar: function() {
-			var me = this,
-				arloApiClient = new me.apiClient.ApiClient({
-					platformID: "presentations"
-				}),
-				eventSearchOptions = {
-					fields: ['ViewUri', 'RegistrationInfo', 'StartDateTime'],
-					filter: { templateCode: 'LEAR1'},
-					top: 1
-				},
-				loadAPIResultsSuccess = function(data) {				
-					if (data.Items != null && data.Count == 1) {
-						var item = data.Items[0];
-						var date = item.StartDateTime.substr(0,10);
-						var time = item.StartDateTime.substr(11,5);
-						
-						$('#webinar_date').html(date + ' ' + time + ' NZDT');
-						
-						$('#webinar_template_url').attr('href', item.ViewUri);
-						
-						$('.webinar_url').attr('href', item.RegistrationInfo.RegisterUri);
-					} else {
-						$(".arlo-webinar").html('or <a href="https://www.arlo.co/contact" target="_blank">Contact us!</a>');
-					}				
-
-					$('#arlo-webinar-admin-notice').fadeIn();					
-				},loadAPIResultsError = function(error) {
-					console.log(error);
-				},callback = {
-					success: loadAPIResultsSuccess,
-					error: loadAPIResultsError
-				}
-			
-			arloApiClient.getResources().getEventSearchResource().searchEvents(eventSearchOptions, callback);
 		}
 	}
 })(Arlo, jQuery);

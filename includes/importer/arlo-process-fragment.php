@@ -1,9 +1,9 @@
 <?php
 
-namespace Arlo\Importer;
+namespace ArloTraining\Importer;
 
-use Arlo\Logger;
-use Arlo\Utilities;
+use ArloTraining\Logger;
+use ArloTraining\Utilities;
 
 class ProcessFragment extends BaseImporter {
 
@@ -106,16 +106,17 @@ class ProcessFragment extends BaseImporter {
 			throw new \Exception("Import Error: the import \"fragment\" part cannot be found");
 		}
 		if (empty($item->import_text)) {
-			throw new \Exception("Import Error: the content of the fragment import part is empty");
+			throw new \Exception("Import Error: the content of the fragment import part is empty"); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message is caught by the import pipeline, written to the Arlo log table via Logger, and escaped with esc_html() at admin render time.
 		}
 
 		$this->data_json = json_decode($item->import_text);
 
 		if (is_null($this->data_json)) {
-			throw new \Exception("JSON error: " . json_last_error_msg());
+			throw new \Exception("JSON error: " . json_last_error_msg()); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message is caught by the import pipeline, written to the Arlo log table via Logger, and escaped with esc_html() at admin render time.
 		}
 	}
 	public function run() {
+		global $wpdb;
 		$import_task = $this->current_task;
 
 		$this->data_json = null;
@@ -123,9 +124,9 @@ class ProcessFragment extends BaseImporter {
 			$this->get_data_json();
 		}
 
-		$class_name = "Arlo\Importer\\" . $import_task;
+		$class_name = "ArloTraining\Importer\\" . $import_task;
 
-		$this->current_task_class = new $class_name($this->importer, $this->dbl, $this->message_handler, (!empty($this->data_json->$import_task) ? $this->data_json->$import_task : null), $this->current_task_iteration, $this->api_client, $this->scheduler, $this->importing_parts);		
+		$this->current_task_class = new $class_name($this->importer, $this->message_handler, (!empty($this->data_json->$import_task) ? $this->data_json->$import_task : null), $this->current_task_iteration, $this->api_client, $this->scheduler, $this->importing_parts);		
 		
 		if (!empty($this->data_json->$import_task) || in_array($import_task, $this->irregular_tasks)) {			
 			//we need to do some special setup for different tasks
@@ -146,7 +147,7 @@ class ProcessFragment extends BaseImporter {
 				$this->current_task_class->run();
 				$this->current_task_retry--;
 			} catch (\Exception $e) {
-				throw new \Exception($e->getMessage());
+				throw new \Exception($e->getMessage()); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message is caught by the import pipeline, written to the Arlo log table via Logger, and escaped with esc_html() at admin render time.
 			}
 			
 		} else {

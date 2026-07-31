@@ -1,29 +1,27 @@
 <?php
 
-namespace Arlo\Importer;
+namespace ArloTraining\Importer;
 
-use Arlo\Logger;
+use ArloTraining\Logger;
 
 class Templates extends BaseImporter {
 
 	private $slug;
 
-	public function __construct($importer, $dbl, $message_handler, $data, $iteration = 0, $api_client = null, $scheduler = null, $importing_parts = null) {
-		parent::__construct($importer, $dbl, $message_handler, $data, $iteration, $api_client, $scheduler, $importing_parts);
-
-		$this->table_name = $this->dbl->prefix . 'arlo_eventtemplates';
+	public function __construct($importer, $message_handler, $data, $iteration = 0, $api_client = null, $scheduler = null, $importing_parts = null) {
+		parent::__construct($importer, $message_handler, $data, $iteration, $api_client, $scheduler, $importing_parts);
 	}
 
 	protected function save_entity($item) {
+		global $wpdb;
 		$this->slug = sanitize_title($item->TemplateID . ' ' . $item->Name);
 
 		$description_summary = !empty($item->Description) && !empty($item->Description->Summary) ? $item->Description->Summary : null;
 		$post_id = $this->save_update_wp_post($item->Name, $description_summary);
 
 		if ($post_id > 0) {
-			$query = $this->dbl->query(
-				$this->dbl->prepare( 
-					"INSERT INTO " . $this->table_name ." 
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching  -- Direct database query is required. No cache needed for the insert operation in data import process. Cache will be reset after the import process done.
+			$query = $wpdb->query($wpdb->prepare( "INSERT INTO {$wpdb->prefix}arlo_eventtemplates 
 					(et_arlo_id, et_code, et_name, et_descriptionsummary, et_advertised_duration, et_post_name, et_post_id, import_id, et_registerinteresturi, et_registerprivateinteresturi, et_credits, et_viewuri, et_hero_image, et_list_image, et_region) 
 					VALUES ( %d, %s, %s, %s, %s, %s, %d, %s, %s, %s, %s, %s, %s, %s, %s) 
 					", 
@@ -46,14 +44,14 @@ class Templates extends BaseImporter {
 			);
 
 			if ($query === false) {
-				throw new \Exception('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query);
+				throw new \Exception('SQL error: ' . $wpdb->last_error); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message is caught by the import pipeline, written to the Arlo log table via Logger, and escaped with esc_html() at admin render time.
 			}
 			
 		} else {
-			throw new \Exception('WP Post creation error ' . $this->slug);
+			throw new \Exception('WP Post creation error ' . $this->slug); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message is caught by the import pipeline, written to the Arlo log table via Logger, and escaped with esc_html() at admin render time.
 		}
 		
-		$this->id = $this->dbl->insert_id;
+		$this->id = $wpdb->insert_id;
 
 		//tags
 		if (isset($item->Tags) && !empty($item->Tags)) {
@@ -82,7 +80,7 @@ class Templates extends BaseImporter {
 	}
 
 	private function save_update_wp_post($title, $content = '') {
-		
+		global $wpdb;
 		// create associated custom post, if it dosen't exist
 		$post_config_array = array(
 			'post_title'    => $title,
@@ -94,49 +92,52 @@ class Templates extends BaseImporter {
 		);					
 		
 		$post = arlo_get_post_by_name($this->slug, 'arlo_event');
-		
-		if(!$post) {					
-			$post_id = wp_insert_post($post_config_array, true);						
-		} else {
-			$post_config_array['ID'] = $post->ID;
-			$post_id = wp_update_post($post_config_array);
-		}
+
+        if(!$post) {
+            $post_id = wp_insert_post($post_config_array, true);
+        } else {
+            $post_config_array['ID'] = $post->ID;
+            $post_id = $post->ID;
+            $wpdb->update($wpdb->prefix .'posts', $post_config_array, array('id' => $post_id)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Import updates the associated post record directly and cache is cleared after import.
+        }
 
 		return $post_id;
 	} 	
 
 	private function save_categories($categories, $template_id) {
+		global $wpdb;
 		if (empty($template_id) || !is_numeric($template_id)) throw new \Exception('No templateID given: ' . __CLASS__ . '::' . __FUNCTION__);
 
 		if(!empty($categories) && is_array($categories)) {
 			foreach($categories as $index => $category) {
-				$query = $this->dbl->query( $this->dbl->prepare( 
-					"REPLACE INTO " . $this->dbl->prefix . "arlo_eventtemplates_categories 
-					(et_arlo_id, c_arlo_id, import_id) 
-					VALUES ( %d, %d, %s ) 
-					", 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- No cache needed for the insert operation in data import process. Direct database query is required for custom table.
+                $query = $wpdb->query( $wpdb->prepare( "REPLACE INTO {$wpdb->prefix}arlo_eventtemplates_categories 
+                    (et_arlo_id, c_arlo_id, import_id) 
+                    VALUES ( %d, %d, %s ) 
+                    ", 
 					$template_id,
 					$category->CategoryID,
 					$this->import_id
 				) );
 												
 				if ($query === false) {
-					Logger::log('SQL error: ' . $this->dbl->last_error , $this->import_id);
+					Logger::log('SQL error: ' . $wpdb->last_error , $this->import_id);
 				}
 			}
 		}
 	}
 
 	private function save_advertised_presenters($advertised_presenters = []) {
+		global $wpdb;
 		if (empty($this->id)) throw new \Exception('No templateID given: ' . __CLASS__ . '::' . __FUNCTION__);
 
 		if(!empty($advertised_presenters) && is_array($advertised_presenters)) {
 			foreach($advertised_presenters as $index => $presenter) {
-				$query = $this->dbl->query( $this->dbl->prepare( 
-					"INSERT INTO " . $this->dbl->prefix . "arlo_eventtemplates_presenters 
-					(et_id, p_arlo_id, p_order, import_id) 
-					VALUES ( %d, %d, %d, %s ) 
-					", 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- No cache needed for the insert operation in data import process. Direct database query is required for custom table.
+                $query = $wpdb->query( $wpdb->prepare( "INSERT INTO {$wpdb->prefix}arlo_eventtemplates_presenters 
+                    (et_id, p_arlo_id, p_order, import_id) 
+                    VALUES ( %d, %d, %d, %s ) 
+                    ", 
 					$this->id,
 					$presenter->PresenterID,
 					$index,
@@ -144,19 +145,20 @@ class Templates extends BaseImporter {
 				) );
 												
 				if ($query === false) {
-					throw new \Exception('SQL error: ' . $this->dbl->last_error );
+					throw new \Exception('SQL error: ' . $wpdb->last_error); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message is caught by the import pipeline, written to the Arlo log table via Logger, and escaped with esc_html() at admin render time.
 				}
 			}
 		}		
 	}
 
 	private function save_content_fields($content_fields = []) {
+		global $wpdb;
 		if (empty($this->id)) throw new \Exception('No templateID given: ' . __CLASS__ . '::' . __FUNCTION__);
 
 		if (!empty($content_fields) && is_array($content_fields)) {
 			foreach($content_fields as $index => $content) {
-				$query = $this->dbl->query( $this->dbl->prepare( 
-					"INSERT INTO " . $this->dbl->prefix . "arlo_contentfields 
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct database query is required. No cache needed for the insert operation in data import process.
+				$query = $wpdb->query( $wpdb->prepare( "INSERT INTO {$wpdb->prefix}arlo_contentfields 
 					(et_id, cf_fieldname, cf_text, cf_order, e_contenttype, import_id) 
 					VALUES ( %d, %s, %s, %s, %s, %s ) 
 					", 
@@ -169,7 +171,7 @@ class Templates extends BaseImporter {
 				));
 				
 				if ($query === false) {
-					throw new \Exception('SQL error: ' . $this->dbl->last_error );
+					throw new \Exception('SQL error: ' . $wpdb->last_error); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message is caught by the import pipeline, written to the Arlo log table via Logger, and escaped with esc_html() at admin render time.
 				}
 			}		
 		}

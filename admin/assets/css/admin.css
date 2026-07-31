@@ -3,10 +3,13 @@
 /* Plugin Prefix is specified in arlo-for-wordpress.php */
 
 
-#adminmenu .toplevel_page_arlo-for-wordpress.current a.current .wp-menu-image {
-	opacity: 1;
-	filter: alpha(opacity=100);
-	background: transparent url(../img/icon-20x20.png) no-repeat center;
+.arlo-changelog-content {
+	height: 40em;
+	padding: 1em;
+	overflow: auto;
+	margin: 1em;
+	border: 1px solid #cccccc;
+	font-family: monospace;
 }
 
 .arlo-whatsnew-list {
@@ -42,6 +45,35 @@
 
 .arlo-error:not(.arlo-message) {
 	border: 1px solid red;
+}
+
+.js .arlo-sections-wrap.arlo-initializing .arlo-section,
+.js .arlo-sections-wrap.arlo-initializing p.submit {
+	display: none;
+}
+
+.js .arlo-sections-wrap.arlo-initializing .nav-tab-wrapper.main-tab {
+	visibility: hidden;
+}
+
+.arlo-init-spinner {
+	display: none;
+	padding: 2em 0;
+	text-align: center;
+}
+
+.js .arlo-sections-wrap.arlo-initializing .arlo-init-spinner {
+	display: block;
+}
+
+.arlo-init-spinner__icon {
+	display: inline-block;
+	width: 28px;
+	height: 28px;
+	border: 3px solid rgba(0, 115, 170, 0.25);
+	border-top-color: #0073aa;
+	border-radius: 50%;
+	animation: arlo-sc-spin 0.7s linear infinite;
 }
 
 .arlo-section {
@@ -103,6 +135,159 @@
 	display: none;
 }
 
+.arlo-page-select--hidden {
+	display: none;
+}
+
+/* Block wrapper that contains a .arlo-label + .arlo-field float pair as a single self-clearing row */
+.arlo-row {
+	display: flow-root;
+	margin-bottom: 0.75em;
+}
+
+/* Host-page field: flex row so the indicator sits beside the dropdown and wraps cleanly on narrow viewports */
+.arlo-sc-host-field {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.25em 0.75em;
+}
+
+.arlo-sc-host-field > p {
+	flex: 0 0 100%; /* no-published-pages help paragraph takes full width */
+}
+
+.arlo-sc-host-field .arlo-sc-check {
+	flex: 0 0 auto; /* don't stretch — only the invalid state (text) is allowed to grow */
+}
+
+.arlo-sc-host-field .arlo-sc-check--invalid {
+	flex: 1 1 auto; /* invalid message can use remaining row space and wrap below dropdown */
+}
+
+/* Shortcode validation indicator — shown adjacent to the host-page dropdown */
+.arlo-sc-check {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.arlo-sc-check--checking {
+	display: inline-block;
+	width: 14px;
+	height: 14px;
+	border: 2px solid rgba(0, 115, 170, 0.25);
+	border-top-color: #0073aa;
+	border-radius: 50%;
+	animation: arlo-sc-spin 0.7s linear infinite;
+	vertical-align: middle;
+}
+
+.arlo-sc-check--valid::before {
+	font-family: dashicons;
+	font-size: 20px;
+	font-style: normal;
+	speak: never;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	content: '\f147'; /* dashicons-yes */
+	color: #46b450;
+}
+
+/* --invalid uses JS-injected dashicons span + message text; no ::before needed */
+.arlo-sc-check--invalid {
+	display: inline-flex;
+	align-items: flex-start;
+	gap: 0.3em;
+	max-width: 100%;
+}
+
+.arlo-sc-check--invalid .dashicons {
+	color: #dba617;
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+	flex-shrink: 0;
+	line-height: 1.2;
+}
+
+.arlo-sc-check__msg {
+	font-size: 13px;
+	line-height: 1.5;
+	color: #3c3c3c;
+}
+
+.arlo-sc-check__msg code {
+	background: transparent;
+	font-size: inherit;
+	padding: 0;
+}
+
+.arlo-sc-check__links {
+	display: inline;
+	margin-left: 1em;
+}
+
+.arlo-sc-check__link {
+	margin-right: 1em;
+	font-size: 13px;
+}
+
+.arlo-sc-check--unknown {
+	cursor: help;
+}
+
+.arlo-sc-check--unknown::before {
+	content: '\2014'; /* em dash */
+	color: #aaa;
+	font-size: 14px;
+}
+
+/* URL / slug row ─────────────────────────────────────────────── */
+
+.arlo-url-slug-row--hidden {
+	display: none;
+}
+
+/* Flex row: slug code + links/badge sit inline and wrap on narrow viewports */
+.arlo-url-slug-field {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.25em 0;
+}
+
+/* Base URL prefix — dim/muted, contextual only */
+.arlo-url-base {
+	color: #999;
+	font-size: 13px;
+	font-family: monospace;
+}
+
+/* Slug path — inherits WP admin <code> defaults (grey background, padding) for emphasis */
+.arlo-url-slug {
+	font-size: 13px;
+}
+
+/* Links inherit .arlo-sc-check__link spacing (margin-right + font-size already defined) */
+.arlo-url-slug-links {
+	display: inline;
+	margin-left: 0.75em;
+}
+
+/* Private badge — reuses .arlo-badge.arlo-badge-neutral from admin_public.css */
+.arlo-url-slug-private {
+	margin-right: 0.5em;
+}
+
+/* (Updated) badge — reuses .arlo-badge.arlo-badge-outline from admin_public.css */
+.arlo-url-slug-updated {
+	margin-left: 0.75em;
+}
+
+@keyframes arlo-sc-spin {
+	to { transform: rotate(360deg); }
+}
+
 .arlo-check + .arlo-label {
 	width: auto;
 	float: left;
@@ -149,13 +334,18 @@
 	margin-top: 1em;
 }
 
+.arlo-platform-url-wrap {
+	display: flex;
+	align-items: center;
+}
+
 .arlo-domain {
 	line-height: 27px;
 }
 
 #arlo_platform_name {
-	width: 50%;
-	float: left;
+	width: 15em;
+	float: none;
 	margin: 0 5px;
 }
 
@@ -307,11 +497,13 @@
 }
 
 /* label font size and weight is based on WP 3.9 admin styles, though not using those styles directly as the label would need to be in a table header cell, urgh */
-.arlo-label label {
-	display: block;
+.arlo-label {
 	font-size: 14px;
 	font-weight: 600;
 	line-height: 29px;
+}
+.arlo-label label {
+	display: block;
 	width: 100%;
 }
 
@@ -368,15 +560,28 @@ table.arlo-welcome td.logo {
 	display: inline-block;
 }
 
-.notice.arlo-connected-message {
-	background: none;
-	-webkit-box-shadow: none;
-	box-shadow: none;
-	border: none;
+/* --- Platform status field (settings General tab) --- */
+.arlo-platform-status {
+	line-height: 2;
 }
 
-.arlo-connected-message .arlo-block {
-	margin-left: 1em;
+.arlo-status-badges {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	column-gap: 1em;
+	row-gap: 0.2em;
+	margin-bottom: 0.2em;
+}
+
+.arlo-status-badges .arlo-badge,
+.arlo-status-badges a {
+	margin-right: 0;
+}
+
+.arlo-status-last-sync {
+	color: #646970;
+	font-size: 0.9em;
 }
 
 /* clearing for divs containing floated elements */
@@ -452,7 +657,8 @@ table.arlo-welcome td.logo {
 
 .arlo-template-table .arlo-template-field .wp-editor-wrap {
 	float: left;
-	width: 68%;
+	width: calc(100% - 22em - 3em);
+	margin-right: 3em;
 }
 
 .arlo-template-table .arlo-template-field .wp-editor-wrap .wp-editor-wrap {
@@ -460,8 +666,17 @@ table.arlo-welcome td.logo {
 }
 
 .arlo-template-table .arlo-template-field .arlo-shortcodes {
-	float: right;
-	width: 28%;
+	float: left;
+	box-sizing: border-box;
+	width: 22em;
+	max-height: 40em;
+	overflow-y: auto;
+	border: 1px solid #cccccc;
+	padding: 1em;
+}
+
+.arlo-template-table .arlo-template-field .arlo-shortcodes h3 {
+	margin-top: 0;
 }
 
 .arlo-template-table .arlo-template-field .arlo-shortcodes h4 {
@@ -710,10 +925,6 @@ table.arlo-welcome td.logo {
 	font-size: 0.95em;
 }
 
-#arlo-webinar-admin-notice {
-	display: none;
-}
-
 a .arlo-icons8 {
 	text-decoration: none;
 }
@@ -806,7 +1017,28 @@ a.arlo-filter-section-toggle h2 {
 	}	
 }
 
+@media screen and (max-width: 1100px) {
+	.arlo-template-table .arlo-template-field .arlo-shortcodes {
+		display: none;
+	}
+	.arlo-template-table .arlo-template-field .wp-editor-wrap {
+		width: 100%;
+		margin-right: 0;
+	}
+}
+
 
 @media only screen and (min-width: 901px) {
 	
+}
+
+/* Restore list styling inside Arlo admin notices (WP admin resets ul/li). */
+.arlo-message ul {
+	list-style: disc;
+	margin: 0.4em 0 1.5em 1.8em;
+	padding: 0;
+}
+
+.arlo-message ul li {
+	margin: 0.15em 0;
 }

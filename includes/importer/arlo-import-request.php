@@ -1,9 +1,8 @@
 <?php
 
-namespace Arlo\Importer;
+namespace ArloTraining\Importer;
 
-use Arlo\Logger;
-use Arlo\Utilities;
+use ArloTraining\API\Transports\Transport;
 
 class ImportRequest extends BaseImporter  {
 	const schema_level = 100;
@@ -52,26 +51,64 @@ class ImportRequest extends BaseImporter  {
 	protected function save_entity($item) {}
 
 	public function run() {
+		if (!$this->api_client) {
+			throw new \ArloTraining\SchedulerException(
+				'Platform name is not configured. Please set it under Arlo Settings → General.'
+			);
+		}
+
 		do_action('arlo_import_starting');
 
-		$this->nonce = \Arlo\Utilities::GUIDv4(true, true);
-
-		$this->importer->set_import_entry($this->nonce);
+		$this->nonce = SnapshotHandler::generate_nonce();
+		$platform_hostname = $this->get_platform_hostname();
 
 		$this->check_fragment_byte_size();
+		$snapshot_request_post_data = $this->generate_post_data($this->fragmentation);
 
-		$retval = $this->api_client->Snapshots()->request_import($this->generate_post_data($this->fragmentation));
+		$import_id = $this->importer->set_import_entry($this->nonce);
 
-		if (!empty($retval->RequestID)) {
+		try {
+			$snapshot_request_response = $this->api_client->Snapshots()->request_import($snapshot_request_post_data);
+
+			if (!is_object($snapshot_request_response) || empty($snapshot_request_response->RequestID)) {
+				throw new \ArloTraining\PlatformAccessHttpException('Snapshot request returned no RequestID');
+			}
+
+			$snapshot_request_response->ArloMetadata = (object) [
+				'PlatformHostname' => $platform_hostname,
+			];
 			$data = [
-					'request_id' => $retval->RequestID,
-					'response_json' => json_encode($retval),
+					'request_id' => $snapshot_request_response->RequestID,
+					'response_json' => json_encode($snapshot_request_response),
 				];
- 
+
 			$this->importer->update_import_entry($data);
+		} catch (\Throwable $e) {
+			try {
+				$this->importer->delete_import_entry($import_id);
+			} catch (\Throwable $delete_exception) {
+				// Best-effort teardown only: preserve the original request/update failure
+				// so platform-access errors still propagate with their real type/message
+				// even when deleting the transient import row also fails.
+			}
+			throw $e;
 		}
 
 		$this->is_finished = true;
+	}
+
+	private function get_platform_hostname() {
+		$platform_name = $this->api_client->platform_name;
+		if (!is_scalar($platform_name)) {
+			throw new \ArloTraining\SchedulerException('Platform name is invalid. Please check it under Arlo Settings → General.');
+		}
+
+		$platform_name = strtolower(trim((string) $platform_name));
+		if (!preg_match('/^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/i', $platform_name) || strlen($platform_name) > 63) {
+			throw new \ArloTraining\SchedulerException('Platform name is invalid. Please check it under Arlo Settings → General.');
+		}
+
+		return $platform_name . Transport::PLATFORM_DOMAIN;
 	}
 
 	private function check_fragment_byte_size() {
@@ -127,13 +164,27 @@ class ImportRequest extends BaseImporter  {
 
 		$settings = get_option('arlo_settings');
 		if (!empty($settings['import_callback_host'])) {
-			$site_url = parse_url(get_option( 'siteurl' ));
-			$callback_url = parse_url($settings['import_callback_host']);
-			
+			$import_callback_host = $settings['import_callback_host'];
+			if (strpos($import_callback_host, '://') === false) {
+				$import_callback_host = 'https://' . $import_callback_host;
+			}
+			$scheme = strtolower((string) wp_parse_url($import_callback_host, PHP_URL_SCHEME));
+			if (!in_array($scheme, array('http', 'https'), true)) {
+				throw new \ArloTraining\SchedulerException('Import callback host is invalid: unsupported scheme "' . esc_html($scheme) . '". Please correct the Import callback host setting.');
+			}
+			$site_url = wp_parse_url(get_option( 'siteurl' ));
+			$callback_url = wp_parse_url($import_callback_host);
+
+			if (empty($site_url['host']) || empty($callback_url['host'])) {
+				throw new \ArloTraining\SchedulerException('Import callback host could not be parsed. Please check the Import callback host setting.');
+			}
+
 			$search_url = $site_url["host"] . (!empty($site_url['port']) ? ':' . $site_url['port'] : '');
 			$replace_url = $callback_url["host"] . (!empty($callback_url['port']) ? ':' . $callback_url['port'] : '');
 
-			$data_obj->Uri = str_replace($search_url, $replace_url, $data_obj->Uri);
+			if (!empty($search_url) && !empty($replace_url)) {
+				$data_obj->Uri = str_replace($search_url, $replace_url, $data_obj->Uri);
+			}
 		}
 
 		return $data_obj;

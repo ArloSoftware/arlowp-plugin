@@ -8,27 +8,28 @@
 			if (id != null) {
 				var data = {
 					action: 'arlo_dismiss_message',
-					id: id
-				}
-				
+					id: id,
+					nonce: admin_ajax_var.nonce
+				};
 				jQuery.post(ajaxurl, data);
 			}
-		})		
-	});
-
-	$('.notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-dismiss-custom, .notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-ask-later').click(function(e) {
-		e.preventDefault();
-		$(this).closest('.arlo-message').fadeOut(function() {
-			$(this).closest('.arlo-message').remove();
 		});
-	});
 
-	$('.notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-ask-later').click(function() {
-		var data = {
-			action: 'arlo_increment_review_notice_date'
-		}
-		
-		$.post(ajaxurl, data);
+		$('.notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-dismiss-custom, .notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-ask-later').click(function(e) {
+			e.preventDefault();
+			$(this).closest('.arlo-message').fadeOut(function() {
+				$(this).closest('.arlo-message').remove();
+			});
+		});
+
+		$('.notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-ask-later').click(function() {
+			var data = {
+				action: 'arlo_increment_review_notice_date',
+				nonce: admin_ajax_var.nonce
+			}
+			
+			$.post(ajaxurl, data);
+		});
 	});
 
 }(jQuery));

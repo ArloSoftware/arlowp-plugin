@@ -1,7 +1,11 @@
 <?php
-namespace Arlo\Shortcodes;
+namespace ArloTraining\Shortcodes;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 use Arlo_For_Wordpress;
+use ArloTraining\CacheControl;
 
 class Shortcodes {
 	public static function init() {
@@ -15,10 +19,10 @@ class Shortcodes {
 		Events::init();
 		UpcomingEvents::init();
 
-		// group devider
+		// group divider
 		self::add('group_divider', function($content = '', $atts = [], $shortcode_name = '', $import_id = ''){
-			if(isset($GLOBALS['arlo_event_list_item']['show_divider'])) return $GLOBALS['arlo_event_list_item']['show_divider'];
-			if(isset($GLOBALS['arlo_oa_list_item']['show_divider'])) return $GLOBALS['arlo_oa_list_item']['show_divider'];
+			if(isset($GLOBALS['arlo_event_list_item']['show_divider'])) return esc_html($GLOBALS['arlo_event_list_item']['show_divider']);
+			if(isset($GLOBALS['arlo_oa_list_item']['show_divider'])) return esc_html($GLOBALS['arlo_oa_list_item']['show_divider']);
 		});
 
 		// timezones
@@ -43,11 +47,10 @@ class Shortcodes {
 
 		//powered by Arlo
 		self::add('powered_by', function ($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-			//updated by Peter for theme.z
-       		return '<div class="arlo-powered-by"><a aria-label="Arlo Powered By" href="https://www.arlo.co/?utm_source=arlo%20client%20site&utm_medium=referral%20arlo%20powered%20by&utm_campaign=powered%20by" target="_blank">' .  sprintf(__('Powered by %s', 'arlo-for-wordpress'), '<img src="' . plugins_url("", __FILE__ ) . '/../../public/assets/img/Arlo-logo.svg" alt="Arlo training & Event Software">') . '</a></div>';
+       		return '<div class="arlo-powered-by"><a aria-label="Arlo Powered By" href="https://www.arlo.co/?utm_source=arlo%20client%20site&utm_medium=referral%20arlo%20powered%20by&utm_campaign=powered%20by" target="_blank">' .  
+					esc_html__('Powered by ', 'arlo-training-and-event-management-system') . '<img src="' . esc_url(plugins_url("", __FILE__ ) . '/../../public/assets/img/Arlo-logo.svg') . '" alt="Arlo training & Event Software">' . '</a></div>';
     	});
 
-		//updated by Peter for theme.z
 		for($i = 0; $i < 5; $i++) {
 			$alias = '_level' . $i;
 			if($i == 0) $alias =  "";
@@ -64,7 +67,7 @@ class Shortcodes {
 					$shortcode_name
 				));
 
-				$c = trim(do_shortcode('['.$shortcode_value.']'));
+				$c = trim((string) do_shortcode('['.$shortcode_value.']'));
 				$rt = '';
 				switch ($cond) {
 					case 'large_than':
@@ -103,7 +106,8 @@ class Shortcodes {
 							$rt = $false;
 						}
 				}
-				return do_shortcode($rt);
+
+				return do_shortcode(wp_kses_post($rt));
 			});
 		}
 
@@ -111,7 +115,7 @@ class Shortcodes {
 
 	/*
 	public static function autoload_shortcodes($class_name) {
-		$class = new \ReflectionClass("\Arlo\Shortcodes\\" . $class_name);
+		$class = new \ReflectionClass("\ArloTraining\Shortcodes\\" . $class_name);
 		$methods = $class->getMethods();
 
 		foreach ($methods as $method) {
@@ -143,7 +147,7 @@ class Shortcodes {
 	    $shortcode_name = 'arlo_' . $name;
 	
 	    // add the shortcode
-	    add_shortcode($shortcode_name, array('\Arlo\Shortcodes\Shortcodes', 'the_shortcode'));
+	    add_shortcode($shortcode_name, array('\ArloTraining\Shortcodes\Shortcodes', 'the_shortcode'));
 	     
 	    $closure = new \ReflectionFunction($function);
 	    
@@ -171,6 +175,7 @@ class Shortcodes {
 		// need to decide ordering - currently makes sense to process the specific filter first
 		$content = apply_filters('arlo_shortcode_content_'.$shortcode_name, $content, $atts, $shortcode_name);
 		$content = apply_filters('arlo_shortcode_content', $content, $atts, $shortcode_name);
+		$content = (string) $content;
 
 		if ($decode_quotes_in_shortcodes === 'true') {
 			if (preg_match('/\[(?:[^\/])(?:[^\]\[]*)(?:&quot;|&apos;)(?:[^\]\[]*)\]/', $content) === 1) {
@@ -186,19 +191,19 @@ class Shortcodes {
 			//strip html, if neccessary 
 			if ($strip_html !== 'false') {
 				if ($strip_html == 'true') {
-					$content = strip_tags($content);
+					$content = wp_strip_all_tags($content);
 				} else {
-					$content = strip_tags($content, $strip_html);
+					$content = wp_strip_all_tags($content, $strip_html);
 				}
 			}
 			
 			// prepend label
             if (!empty($label)) {
-                $content = '<label>' . $label . '</label> ' . $content;
+                $content = '<label>' . wp_kses_post($label) . '</label> ' . $content;
             }
 			
 			// wrap content			
-			$content = sprintf($wrap, $content);                        
+			$content = sprintf(wp_kses_post($wrap), $content);                        
 		}
 
 		return do_shortcode($content);
@@ -230,7 +235,7 @@ class Shortcodes {
 			$label = $filter_settings[$group][$type][$label];
 		}
 
-		$urlParameter = \Arlo\Utilities::clean_string_url_parameter('arlo-' . $type);
+		$urlParameter = \ArloTraining\Utilities::clean_string_url_parameter('arlo-' . $type);
 
 		$selected_value = !empty($urlParameter) || $urlParameter == "0" ? $urlParameter : (!empty($att_default) || $att_default == "0" ? $att_default : '');
 
@@ -284,8 +289,16 @@ class Shortcodes {
 			return '';
 		}
 
-		//updated by Peter for theme.z, this will trigger form submit action
-		$filter_html = '<select role="button" aria-label="Select your ' . esc_attr($label) . '" id="arlo-filter-' . esc_attr($type) . '" class="arlo-filter-' . esc_attr($type) . '" name="arlo-' . esc_attr($type) . '">';
+		$stock_label = ! empty( \Arlo_For_Wordpress::$filter_labels[ $type ] ) ? \Arlo_For_Wordpress::$filter_labels[ $type ] : '';
+		$aria_label = ! empty( \Arlo_For_Wordpress::$filter_labels_v1[ $type ] ) ? \Arlo_For_Wordpress::$filter_labels_v1[ $type ] : $label;
+		if ( ! empty( $label ) && $label !== $stock_label ) {
+			$aria_label = $label;
+		}
+		$filter_html = '<select'
+			. ( ! empty( $aria_label ) ? ' aria-label="' . esc_attr( $aria_label ) . '"' : '' )
+			. ' id="' . esc_attr( "arlo-filter-$type" ) . '"'
+			. ' class="' . esc_attr( "arlo-filter-$type" ) . '"'
+			. ' name="' . esc_attr( "arlo-$type" ) . '">';
 		
 		if (!is_null($label))
 			$filter_html .= '<option value="">' . esc_html($label) . '</option>';
@@ -293,16 +306,19 @@ class Shortcodes {
 		$filter_html .= $options_html;
 
 		$filter_html .= '</select>';
-		//added by Tony for theme.z
 		if($tplatts != null && isset($tplatts['showlabel'])) {
-			$filter_html = '<label for="arlo-filter-' . esc_attr($type) . '">' . $label . '</label>' . $filter_html;
+			$filter_html = '<label for="'.esc_attr("arlo-filter-$type").'">' . esc_html($label) . '</label>' . $filter_html;
 		}
 
 		return $filter_html;
 	}
 
-	public static function create_rich_snippet($content) {
-		return '<script type="application/ld+json">' . $content . '</script>';
+	public static function create_rich_snippet($data) {
+		$encoded = wp_json_encode( $data, JSON_HEX_TAG );
+		if ( false === $encoded ) {
+			return '';
+		}
+		return '<script type="application/ld+json">' . $encoded . '</script>';
 	}
 
     public static function get_performer($presenter, $link) {
@@ -321,12 +337,12 @@ class Shortcodes {
             break;
         }
 
-        $p_link = \Arlo\Utilities::get_absolute_url($p_link);
+        $p_link = \ArloTraining\Utilities::get_absolute_url($p_link);
 
         $performer["url"] = $p_link;
 
         if (!empty($presenter["p_profile"])) {
-        	$performer["description"] = strip_tags( $presenter["p_profile"] );
+        	$performer["description"] = wp_strip_all_tags( $presenter["p_profile"] );
         }
 
         $same_as = array();
@@ -351,30 +367,42 @@ class Shortcodes {
     }
 
 	private static function shortcode_search_field($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-		global $post, $wpdb;
 
 		extract(shortcode_atts(array(
 			'showbutton' => "true",
 			'buttonclass' => '',
 			'inputclass' => '',
-			'placeholder' => __('Search for an event', 'arlo-for-wordpress'),
-            'buttontext'	=> __('Search', 'arlo-for-wordpress'),
+			'placeholder' => esc_html__('Search for an event', 'arlo-training-and-event-management-system'),
+            'buttontext'	=> esc_html__('Search', 'arlo-training-and-event-management-system'),
         ), $atts, $shortcode_name, $import_id));
 
-		$settings = get_option('arlo_settings');
-		if (!empty($settings['post_types']['eventsearch']['posts_page'])) {
+		$eventsearch_page_id = \Arlo_For_Wordpress::get_posts_page_id( 'eventsearch' );
+		$search_url = $eventsearch_page_id > 0 ? (string) get_permalink( $eventsearch_page_id ) : '';
 
-			$slug = get_post($settings['post_types']['eventsearch']['posts_page'])->post_name;
-				
-			$search_term = \Arlo\Utilities::clean_string_url_parameter('arlo-search');
-			
-			return '
-			<form class="arlo-search" action="'.site_url().'/'.$slug.'/">
-				<input type="text" class="arlo-search-field ' . esc_attr($inputclass) . '" placeholder="'. esc_attr($placeholder) .'" aria-label="' . esc_attr($placeholder) .'" name="arlo-search" value="' . esc_attr($search_term) . '">
-				' . ($showbutton == "true" ? '<input type="submit" class="arlo-search-button ' . esc_attr($buttonclass) . '" value="' . esc_attr($buttontext) . '">' : '') . '
-			</form>
-			';	
+		if ( empty( $search_url ) ) {
+			// The configured host-page ID is broken (page deleted or permalink unresolvable).
+			// If WP has already resolved the real event-search page, submit back to that
+			// current page instead of hiding the form completely.
+			$search_page = \Arlo_For_Wordpress::get_current_page_if_contains_shortcode( 'arlo_event_template_search_list' );
+			if ( ! $search_page ) {
+				return '';
+			}
+
+			$search_url = get_permalink( $search_page );
+			if ( empty( $search_url ) ) {
+				return '';
+			}
 		}
+
+		$search_term = \ArloTraining\Utilities::clean_string_url_parameter('arlo-search');
+		
+		return '
+		<form class="arlo-search" action="'. esc_url( $search_url ) . '">
+			' . wp_nonce_field("arlo-search-widget", "arlo-nonce", true, false) /* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_nonce_field() returns trusted core-generated HTML */ .'
+			<input type="text" class="' . esc_attr("arlo-search-field $inputclass") . '" placeholder="'. esc_attr($placeholder) .'" aria-label="' . esc_attr($placeholder) .'" name="arlo-search" value="' . esc_attr($search_term) . '">
+			' . ($showbutton == "true" ? '<input type="submit" class="'.esc_attr("arlo-search-button $buttonclass") . '" value="' . esc_attr($buttontext) . '">' : '') . '
+		</form>
+		';
 	}	
 
 	private static function shortcode_timezones($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -385,49 +413,74 @@ class Shortcodes {
 		// eventtemplate page using Post ID
 		if($post->post_type === 'arlo_event') {
 			// find out if we have any online events
-			$t1 = "{$wpdb->prefix}arlo_eventtemplates";
-			$t2 = "{$wpdb->prefix}arlo_events";
+
+			$where = "";
+			$parameters = array();
 			
-			$items = $wpdb->get_results("
+			$parameters[] = $post->ID;
+			$parameters[] = $import_id;
+
+			if(!empty($arlo_region)) {
+				$where .= " AND {$wpdb->prefix}arlo_events.e_region = %s";
+				$parameters[] = $arlo_region;
+			}
+			
+			$sql = "
 				SELECT 
-					$t2.e_isonline, 
-					$t2.e_timezone_id 
+					{$wpdb->prefix}arlo_events.e_isonline, 
+					{$wpdb->prefix}arlo_events.e_timezone_id 
 				FROM 
-					$t2
+					{$wpdb->prefix}arlo_events
 				LEFT JOIN 
-					$t1
+					{$wpdb->prefix}arlo_eventtemplates
 				ON 
-					$t2.et_arlo_id = $t1.et_arlo_id 
+					{$wpdb->prefix}arlo_events.et_arlo_id = {$wpdb->prefix}arlo_eventtemplates.et_arlo_id 
 				AND 
-					$t2.e_isonline = 1 
+					{$wpdb->prefix}arlo_events.e_isonline = 1 
 				AND 
-					$t2.e_parent_arlo_id = 0
+					{$wpdb->prefix}arlo_events.e_parent_arlo_id = 0
 				AND
-					$t1.import_id = $t2.import_id
+					{$wpdb->prefix}arlo_eventtemplates.import_id = {$wpdb->prefix}arlo_events.import_id
 				WHERE 
-					$t1.et_post_id = $post->ID
+					{$wpdb->prefix}arlo_eventtemplates.et_post_id = %d
 				AND 
-					$t2.import_id = $import_id
-				" . (empty($arlo_region) ? "" : " AND $t2.e_region = '" . esc_sql($arlo_region) . "'") . "
-				", ARRAY_A);
+					{$wpdb->prefix}arlo_events.import_id = %d
+				" . $where;
+			
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The SQL statement is dynamically constructed and parameters are prepared here.
+			$sql = $wpdb->prepare($sql, $parameters);
+            $items = CacheControl::fetch_results($sql, ARRAY_A);
 		}
 		else {
-			$t1 = "{$wpdb->prefix}arlo_events";
+
+			$where = "";
+			$parameters = array();
 			
-			$items = $wpdb->get_results("
+			$parameters[] = $import_id;
+
+			if(!empty($arlo_region)) {
+				$where .= " AND {$wpdb->prefix}arlo_events.e_region = %s";
+				$parameters[] = $arlo_region;
+			}
+			
+			$sql = "
 				SELECT 
-					$t1.e_isonline, 
-					$t1.e_timezone_id 
+					{$wpdb->prefix}arlo_events.e_isonline, 
+					{$wpdb->prefix}arlo_events.e_timezone_id 
 				FROM 
-					$t1
+					{$wpdb->prefix}arlo_events
 				WHERE 
-					$t1.e_isonline = 1 
+					{$wpdb->prefix}arlo_events.e_isonline = 1 
 				AND 
-					$t1.e_parent_arlo_id = 0
+					{$wpdb->prefix}arlo_events.e_parent_arlo_id = 0
 				AND 
-					$t1.import_id = $import_id
-				" . (empty($arlo_region) ? "" : " AND $t1.e_region = '" . esc_sql($arlo_region) . "'") . "
-				", ARRAY_A);
+					{$wpdb->prefix}arlo_events.import_id = %d
+				" . $where . " 
+				";
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The SQL statement is dynamically constructed and parameters are prepared here.
+			$sql = $wpdb->prepare($sql, $parameters);
+            
+            $items = CacheControl::fetch_results($sql, ARRAY_A);
 		}
 		
 		if(empty($items)) {
@@ -435,7 +488,7 @@ class Shortcodes {
 		}
 		
 		$content = '<form method="GET" class="arlo-timezone">';
-		$content .= '<select name="timezone"><option value="">' . __('Select a time zone', 'arlo-for-wordpress') . '</option>';
+		$content .= '<select name="timezone"><option value="">' . esc_html__('Select a time zone', 'arlo-training-and-event-management-system') . '</option>';
 
 		$plugin = Arlo_For_Wordpress::get_instance();
 		$timezones = $plugin->get_timezone_manager()->get_indexed_timezones();
@@ -447,15 +500,15 @@ class Shortcodes {
 			}
 
 			$timezone_windows_tz_id = $timezone['windows_tz_id'];
-			$timezone_get =  \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'timezone');
+			$timezone_get =  \ArloTraining\Utilities::filter_string_polyfill(INPUT_GET, 'timezone');
 
 
 			if ( (!empty($timezone_get) && $timezone_get == $timezone_id) || (empty($timezone_get) && isset($timezone_id) && $timezone_id == $items[0]['e_timezone_id']) ) {
 				$selected = true;
 				//get PHP timezones
-				$GLOBALS['selected_timezone_names'] = null;
+				$GLOBALS['arlo_selected_timezone_names'] = null;
 				if (!is_null($timezone_windows_tz_id)) {
-					$GLOBALS['selected_timezone_names'] = \Arlo\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$timezone_windows_tz_id];
+					$GLOBALS['arlo_selected_timezone_names'] = \ArloTraining\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$timezone_windows_tz_id];
 				}
 			}
 			
@@ -481,13 +534,13 @@ class Shortcodes {
     private static function shortcode_breadcrumbs($content = '', $atts = [], $shortcode_name = '', $import_id = ''){
         global $post;
 
-        $settings = get_option('arlo_settings');
+        $post_types_settings = \Arlo_For_Wordpress::get_post_types_settings();
 
         $origin_txt = "";
         $origin_url = "#";
         $is_single = true;
 
-        foreach ($settings['post_types'] as $post_type => $config) {
+        foreach ($post_types_settings as $post_type => $config) {
             if ($config['posts_page'] == $post->ID){
                 $is_single = false;
                 $origin_txt = $post->post_title;
@@ -497,10 +550,14 @@ class Shortcodes {
         }
         if ( $is_single && $post ){
             $post_type = str_replace('arlo_', '', $post->post_type);
-            if (isset($settings['post_types'][$post_type])){
-                $origin_id = $settings['post_types'][$post_type]['posts_page'];
-                $origin_txt = get_the_title( $origin_id );
-                $origin_url = get_page_link( $origin_id );
+            if (isset($post_types_settings[$post_type])){
+                $origin_id = $post_types_settings[$post_type]['posts_page'];
+				$origin_title = get_the_title( $origin_id );
+				$origin_link = get_page_link( $origin_id );
+				if ( ! empty( $origin_title ) && ! empty( $origin_link ) ) {
+					$origin_txt = $origin_title;
+					$origin_url = $origin_link;
+				}
             }
         }
 
@@ -515,18 +572,24 @@ class Shortcodes {
                             <a href="' . esc_url($origin_url) . '">' . esc_html($origin_txt) . '</a>
                         </li>';
 
-        $arlo_category = \Arlo\Utilities::clean_string_url_parameter('arlo-category');
+        $arlo_category = \ArloTraining\Utilities::clean_string_url_parameter('arlo-category');
         $cat_slug = (!empty($arlo_category) ? $arlo_category : '');
         $cat = null;
 
         if (!empty($cat_slug)){
-            $cat = \Arlo\Entities\Categories::get(array('slug' => $cat_slug), null, $import_id);
+            $cat = \ArloTraining\Entities\Categories::get(array('slug' => $cat_slug), null, $import_id);
 
-            $tree = \Arlo\Entities\Categories::get_tree_from_child($cat->c_arlo_id, $import_id);
+            if (!$cat) {
+                $cat_slug = '';
+            }
+        }
+
+        if (!empty($cat_slug) && $cat) {
+            $tree = \ArloTraining\Entities\Categories::get_tree_from_child($cat->c_arlo_id, $import_id);
             $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
 
             foreach ($tree as $key => $currentCategory) {
-                $categoryUrl = $origin_url . (!empty($arlo_region) ? 'region-' . $arlo_region . '/' : '') . ($currentCategory->c_parent_id != 0 ? 'cat-' . esc_attr($currentCategory->c_slug) : '');
+                $categoryUrl = $origin_url . (!empty($arlo_region) ? 'region-' . rawurlencode( $arlo_region ) . '/' : '') . ($currentCategory->c_parent_id != 0 ? 'cat-' . $currentCategory->c_slug : '');
                 $html .= '<li>
                     <a href="' . esc_url( user_trailingslashit( $categoryUrl ) ) . '">' . esc_html( $currentCategory->c_name ) . '</a>
                 </li>';
@@ -550,12 +613,7 @@ class Shortcodes {
                
         $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
 
-        $cache_key = md5( serialize( array( $id => $id_field ) ) );
-        $cache_category = 'ArloOffers';
-
-        if($cached = wp_cache_get($cache_key, $cache_category)) {
-            return $cached;
-        }
+		$parameters = array();
 
         $sql = "
         SELECT 
@@ -578,22 +636,31 @@ class Shortcodes {
             offer.import_id = replaced_by.import_id
         AND 
             offer.$id_field = replaced_by.$id_field	
-        " . (!empty($arlo_region) ? " AND replaced_by.o_region = '" . esc_sql($arlo_region) . "'" : "") . "
+        " . (!empty($arlo_region) ? " AND replaced_by.o_region = %s" : "") . "
         WHERE 
             offer.o_replaces = 0 
         AND
-            offer.import_id = $import_id
+            offer.import_id = %d
         AND 
-            offer.$id_field = $id
-        " . (!empty($arlo_region) ? " AND offer.o_region = '" . esc_sql($arlo_region) . "'" : "") . "		
+            offer.$id_field = %d
+        " . (!empty($arlo_region) ? " AND offer.o_region = %s" : "") . "		
         ORDER BY 
             offer.o_order";
 
-        $offers = $wpdb->get_results($sql, ARRAY_A);
+		if(!empty($arlo_region)) {
+			$parameters[] = $arlo_region;
+		}
+		$parameters[] = $import_id;
+		$parameters[] = $id;
+		if(!empty($arlo_region)) {
+			$parameters[] = $arlo_region;
+		}
 
-        wp_cache_add( $cache_key, $offers, $cache_category, 30 );
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The SQL statement is dynamically constructed and parameters are prepared here.
+        $prepared_sql = $wpdb->prepare($sql, $parameters);
+        $cached = CacheControl::fetch_results($prepared_sql, ARRAY_A);
 
-        return $offers;
+        return $cached;
 	}
 
 	public static function get_offers_snippet_data($id, $id_field, $import_id, $price_field) {
@@ -630,9 +697,7 @@ class Shortcodes {
         $regions = get_option('arlo_regions');	
         
         $arlo_region = get_query_var('arlo-region', '');
-        $arlo_region = (!empty($arlo_region) && is_array($regions) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
-
-        $t1 = "{$wpdb->prefix}arlo_offers";
+        $arlo_region = (!empty($arlo_region) && is_array($regions) && \ArloTraining\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');	
         
         $offers_array = self::get_advertised_offers($id, $id_field, $import_id);
 
@@ -640,7 +705,7 @@ class Shortcodes {
 		
         $settings = get_option('arlo_settings');  
         $price_setting = (isset($settings['price_setting']) && $is_tax_exempt != true ? esc_attr($settings['price_setting']) : ARLO_PLUGIN_PREFIX . '-exclgst');
-		$free_text = (isset($settings['free_text']) ? esc_attr($settings['free_text']) : __('Free', 'arlo-for-wordpress'));
+		$free_text = (isset($settings['free_text']) ? esc_attr($settings['free_text']) : esc_html__('Free', 'arlo-training-and-event-management-system'));
 
 		if (empty($offers_array)) { return ''; }
 		
@@ -664,11 +729,12 @@ class Shortcodes {
             }
             $offers .= '>';
             // display label if there is one
-            $offers .= (!is_null($o_label) || $o_label != '') ? $o_label.' ':'';
+            $offers .= (!is_null($o_label) || $o_label != '') ? esc_html($o_label) . ' ' : '';
             if($amount > 0) {
                 $offers .= '<span class="amount">' . esc_html($famount) . '</span> ';
                 // only include the excl. tax if the offer is not replaced and not tax exempt
-                $offers .= $replaced ? '' : (!$is_tax_exempt ? '<span class="arlo-price-tax">' . esc_html(($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode) : sprintf(__('incl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode))) . '</span>'  : '');
+				/* translators: %s: tax */
+                $offers .= $replaced ? '' : (!$is_tax_exempt ? '<span class="arlo-price-tax">' . esc_html(($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', 'arlo-training-and-event-management-system'), $o_taxrateshortcode) : sprintf(__('incl. %s', 'arlo-training-and-event-management-system'), $o_taxrateshortcode))) . '</span>'  : '');
             } else {
                 $offers .= '<span class="amount free">' . esc_html($free_text) . '</span> ';
             }
@@ -680,10 +746,11 @@ class Shortcodes {
                 
                 // display replacement offer label if there is one
                 $offers .= (!is_null($replacement_label) || $replacement_label != '') ? esc_html($replacement_label) . ' ' : '';
-				$offers .= '<span class="amount">' . ($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $replacement_formatted_amount_taxexclusive : $replacement_formatted_amount_taxinclusive) . '</span>';
+				$offers .= '<span class="amount">' . esc_html( $price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? $replacement_formatted_amount_taxexclusive : $replacement_formatted_amount_taxinclusive ) . '</span>';
 				
 				if (!$is_tax_exempt) {
-					$offers.= '<span class="arlo-price-tax">' . esc_html(($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode) : sprintf(__('incl. %s', 'arlo-for-wordpress'), $o_taxrateshortcode))) . '</span>';
+					/* translators: %s: tax */
+					$offers.= '<span class="arlo-price-tax">' . esc_html(($price_setting == ARLO_PLUGIN_PREFIX . '-exclgst' ? sprintf(__('excl. %s', 'arlo-training-and-event-management-system'), $o_taxrateshortcode) : sprintf(__('incl. %s', 'arlo-training-and-event-management-system'), $o_taxrateshortcode))) . '</span>';
 				}
 
                 // display replacement offer message if there is one
@@ -717,11 +784,11 @@ class Shortcodes {
             $arlo_region = $region;
         } else {
             $arlo_region = get_query_var('arlo-region', '');
-            $arlo_region = (!empty($arlo_region) && is_array($regions) && \Arlo\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+            $arlo_region = (!empty($arlo_region) && is_array($regions) && \ArloTraining\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
         }
 
         if (!empty($arlo_region)) {
-            $region_link_suffix = 'region-' . $arlo_region . '/';
+            $region_link_suffix = 'region-' . rawurlencode( $arlo_region ) . '/';
         }
         
         $et_id = arlo_get_post_by_name($post_name, 'arlo_event');
@@ -733,7 +800,7 @@ class Shortcodes {
     public static function get_custom_shortcodes($type) {
     	$shortcodes = array();
 
-    	foreach(\Arlo_For_Wordpress::$templates as $shortcode_name => $shortcode) {
+    	foreach(\Arlo_For_Wordpress::get_templates() as $shortcode_name => $shortcode) {
     		if ( isset($shortcode["type"]) ) {
     			if (is_string($type) && $shortcode["type"] == $type ) {
     				$shortcodes[$shortcode_name] = $shortcode;

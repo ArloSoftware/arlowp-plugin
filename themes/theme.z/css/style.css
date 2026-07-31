@@ -1411,7 +1411,6 @@
 }
 .arlo .arlo-desktop .arlo-event-basic-cover {
   flex: 1;
-  background-color: gray;
   background-size: cover;
   background-position: center;
 }
@@ -2539,6 +2538,7 @@
   box-sizing: border-box;
   border: 1px solid var(--primary-card-border-color);
   box-shadow: 0px 0px 8px var(--primary-card-shadow-color);
+  overflow: hidden;
 }
 .arlo .arlo-desktop .arlo-presenter-info-basic-avatar div {
   width: 100%;
@@ -2549,6 +2549,11 @@
   height: 100%;
   -o-object-fit: cover;
      object-fit: cover;
+}
+.arlo .arlo-desktop .arlo-presenter-info-basic-avatar img {
+  height: 100%;
+  -o-object-fit: contain;
+     object-fit: contain;
 }
 .arlo .arlo-desktop .arlo-presenter-info-basic > div {
   display: flex;

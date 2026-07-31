@@ -8,31 +8,34 @@
  * @link      https://arlo.co
  * @copyright 2018 Arlo
  */
- 
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+} 
 if(!class_exists('WP_List_Table')){
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
-use Arlo\VersionHandler;
+use ArloTraining\VersionHandler;
+use ArloTraining\CacheControl;
 
 class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	public $singular;
 	public $plural;
-	public $table_name;
 
-	protected $wpdb;	
 	protected $platform_name;
 	protected $platform_url;
 	protected $order;
 	protected $orderby;
 	protected $paged;
+	protected $version;
 	protected $import_id;
 	protected $plugin_slug;
 	protected $timezones;
 	
 	protected static $filter_column_mapping = array(
 		'et_id' => 'et.et_arlo_id',
-		'ep_e_id' => 'ep.e_arlo_id',
+		'ep_e_id' => 'e.e_arlo_id',
 		'v_e_id' => 'e.e_arlo_id',
 		'e_parent_id' => 'es.e_parent_arlo_id',
 	);	
@@ -45,7 +48,6 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 		$this->_column_headers = array($this->get_columns(), $this->get_hidden_columns(), $this->get_sortable_columns());
 		
 		$this->init_sql_variables();
-		$this->set_table_name();
 
 		parent::__construct( [
 			'singular' => $this->singular,
@@ -67,7 +69,6 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 
 		$this->plugin_slug = $plugin->plugin_slug;
 		$this->version = VersionHandler::VERSION;	
-		$this->wpdb = &$wpdb;
 
 		$this->platform_name = $settings['platform_name'];	
 		$this->platform_url = strpos($this->platform_name, '.') !== false ? $this->platform_name : $this->platform_name . '.arlo.co';
@@ -79,20 +80,19 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	private function get_timezones() {
 		global $wpdb;
 		$timezones = [];
-
-		$sql = "
+		$sql = $wpdb->prepare("
 		SELECT
 			id,
 			name,
 			windows_tz_id
 		FROM
-			" . $wpdb->prefix . "arlo_timezones
+			{$wpdb->prefix}arlo_timezones
 		WHERE
-			import_id = " . $this->import_id . "
+			import_id = %d
 		ORDER BY name		
-		";
-
-		$items = $wpdb->get_results($sql, ARRAY_A);
+		", $this->import_id);
+		
+		$items = CacheControl::fetch_results($sql, ARRAY_A);
 
 		foreach ($items as $timezone) {
 			$timezones[$timezone['id']] = $timezone;
@@ -102,8 +102,8 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	}
 	
 	private function init_sql_variables() {
-		$order = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'order');
-		$paged = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'paged');
+		$order = \ArloTraining\Utilities::filter_string_polyfill(INPUT_GET, 'order');
+		$paged = \ArloTraining\Utilities::filter_string_polyfill(INPUT_GET, 'paged');
 
 		$this->orderby = $this->get_orderby_columnname();
 		$this->order = (!empty($order) && in_array(strtolower($order), ['asc','desc']) ? $order : '');
@@ -113,7 +113,7 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	}
 	
 	private function get_orderby_columnname() {
-		$orderby = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'orderby');
+		$orderby = \ArloTraining\Utilities::filter_string_polyfill(INPUT_GET, 'orderby');
 		$columns = $this->_column_headers[2];
 				
 		if (!empty($orderby)) {
@@ -135,77 +135,111 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 	}	
 	
 	private function get_num_rows() {	
+		global $wpdb;
 		$sql = $this->get_sql_query();
-
-		$result = $this->wpdb->get_results($sql);
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$result = CacheControl::fetch_results($sql);
 				
-		return $this->wpdb->num_rows;
+		return count($result);
+	}
+
+	protected function get_total_items_count() {
+		return $this->get_num_rows();
 	}
 	
 	protected function get_sql_where_array() {
-		return ["import_id = " . $this->import_id];
+		$where = ["import_id = %d" ];
+		$parameter = [$this->import_id];
+		return array(
+			'where' => $where,
+			'parameter' => $parameter
+		);
 	}
 	
 	private function get_sql_search_where_array() {
-		$where = array();
+		global $wpdb;
+		$search_where = array();
+		$search_parameter = array();
+		$filter_where = array();
+		$filter_parameter = array();
 
-		$s = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 's');
-		$et_id = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'et_id');
-		$ep_e_id = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'ep_e_id');
-		$v_e_id = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'v_e_id');
-		$e_parent_id = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'e_parent_id');
+		$s = \ArloTraining\Utilities::filter_string_polyfill(INPUT_GET, 's');
+		$et_id = \ArloTraining\Utilities::filter_string_polyfill(INPUT_GET, 'et_id');
+		$ep_e_id = \ArloTraining\Utilities::filter_string_polyfill(INPUT_GET, 'ep_e_id');
+		$v_e_id = \ArloTraining\Utilities::filter_string_polyfill(INPUT_GET, 'v_e_id');
+		$e_parent_id = \ArloTraining\Utilities::filter_string_polyfill(INPUT_GET, 'e_parent_id');
 
 		if (!empty($s)) {
 			$search_fields = $this->get_searchable_fields();
 			foreach ($search_fields as $field) {
-				$where[] = $field . " LIKE '%" . esc_sql(wp_unslash($s)) . "%'";
+				$search_where[] = $field . " LIKE %s";
+				$search_parameter[] = '%' . $wpdb->esc_like( wp_unslash( $s ) ) . '%';
 			}
 		}
 		
-		if (!empty($et_id) && !empty(self::$filter_column_mapping['et_id']) && intval($et_id > 0)) {
-			$where[] = self::$filter_column_mapping['et_id'] .' = ' . intval($et_id);
+		if (!empty($et_id) && !empty(self::$filter_column_mapping['et_id']) && intval($et_id) > 0) {
+			$filter_where[] = self::$filter_column_mapping['et_id'] .' = %d' ;
+			$filter_parameter[] = intval($et_id);
 		}
 		
-		if (!empty($ep_e_id) && !empty(self::$filter_column_mapping['ep_e_id']) && intval($ep_e_id > 0)) {
-			$where[] = self::$filter_column_mapping['ep_e_id'] .' = ' . intval($ep_e_id);
+		if (!empty($ep_e_id) && !empty(self::$filter_column_mapping['ep_e_id']) && intval($ep_e_id) > 0) {
+			$filter_where[] = self::$filter_column_mapping['ep_e_id'] .' = %d' ;
+			$filter_parameter[] = intval($ep_e_id);
 		}
 
-		if (!empty($v_e_id) && !empty(self::$filter_column_mapping['v_e_id']) && intval($v_e_id > 0)) {
-			$where[] = self::$filter_column_mapping['v_e_id'] .' = ' . intval($v_e_id);
+		if (!empty($v_e_id) && !empty(self::$filter_column_mapping['v_e_id']) && intval($v_e_id) > 0) {
+			$filter_where[] = self::$filter_column_mapping['v_e_id'] .' = %d';
+			$filter_parameter[] = intval($v_e_id);
 		}
 
-		if (!empty($e_parent_id) && !empty(self::$filter_column_mapping['e_parent_id']) && intval($e_parent_id > 0)) {
-			$where[] = self::$filter_column_mapping['e_parent_id'] .' = ' . intval($e_parent_id);
+		if (!empty($e_parent_id) && !empty(self::$filter_column_mapping['e_parent_id']) && intval($e_parent_id) > 0) {
+			$filter_where[] = self::$filter_column_mapping['e_parent_id'] .' = %d';
+			$filter_parameter[] = intval($e_parent_id);
 		}
-	
 
-		return $where;	
+		return array(
+			'search_where'     => $search_where,
+			'search_parameter' => $search_parameter,
+			'filter_where'     => $filter_where,
+			'filter_parameter' => $filter_parameter,
+		);	
 	}
 	
 	protected function get_sql_where_expression() {
-		$where = $this->get_sql_where_array();
-		$where = implode(" AND ", $where);
-		
-		$search_where = $this->get_sql_search_where_array();
-		if (count($search_where)) {
-			$where .= " AND (" . implode(" OR ", $search_where) . ")";
+		$search = $this->get_sql_where_array();
+		$where = implode(" AND ", $search['where']);
+		$parameter = $search['parameter'];
+
+		$searchsql = $this->get_sql_search_where_array();
+
+		if (count($searchsql['filter_where'])) {
+			$where .= " AND " . implode(" AND ", $searchsql['filter_where']);
+			$parameter = array_merge($parameter, $searchsql['filter_parameter']);
+		}
+
+		if (count($searchsql['search_where'])) {
+			$where .= " AND (" . implode(" OR ", $searchsql['search_where']) . ")";
+			$parameter = array_merge($parameter, $searchsql['search_parameter']);
 		}
 		
-		return !empty($where) ? $where : '1';
+		return array(
+			'where' => !empty($where) ? $where : '1',
+			'parameter' => $parameter,
+		);
 	}	
 		
 	public function prepare_items() {
-        
+        global $wpdb;
 		$sql = $this->get_sql_query();
 		
 		if (!empty($this->orderby)) {
 			$sql .= ' ORDER BY ' . $this->orderby . ' ' . $this->order;
 		}		
-		
+
 		$limit = ($this->paged-1) * self::PERPAGE;
-		$sql .= ' LIMIT ' . $limit . ',' . self::PERPAGE;
+		$sql .= ' LIMIT %d,%d';
 		
-		$num = $this->get_num_rows();
+		$num = $this->get_total_items_count();
 				
 		$this->set_pagination_args( array(
 			"total_items" => $num,
@@ -213,17 +247,14 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table  {
 			"per_page" => self::PERPAGE,
       	));		
       	
-      	$items = $this->wpdb->get_results($sql);
+      	// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The SQL statement is dynamically constructed and parameters are prepared here.
+      	$items = CacheControl::fetch_results($wpdb->prepare($sql,$limit,self::PERPAGE));
       			
 		$this->items = $items;		
 	}	
 	
 	protected function get_searchable_fields() {
 		die( 'function Arlo_For_Wordpress_Lists::get_searchable_fields() must be over-ridden in a sub-class.' );
-	}	
-	
-	public function set_table_name() {
-		die( 'function Arlo_For_Wordpress_Lists::set_table_name() must be over-ridden in a sub-class.' );
 	}	
 	
 	public function get_columns() {
