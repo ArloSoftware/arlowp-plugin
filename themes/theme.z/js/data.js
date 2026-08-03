@@ -21,8 +21,7 @@ jQuery(function($){
             if(hasNextPage()) {
                 $.get(getNextPageLink(), function(html) {
                     //update pager
-                    var pagerHtml = $(html).find('.arlo-pager').html()
-                    $(".arlo-pager").html(pagerHtml);
+                    $(".arlo-pager").empty().append($(html).find('.arlo-pager').children().clone());
                     $morebtn.removeAttr('disabled');
                     //handle response html
                     resolve(html) 
@@ -39,7 +38,7 @@ jQuery(function($){
         initLoadMoreButton($morebtn);
         $morebtn.click(function() {
             loadMore($morebtn).then(function(html) {
-                var $newlist = $($(html).find('.' + listcls).html())
+                var $newlist = $(html).find('.' + listcls).children().clone();
                 $("." + listcls).append($newlist);
                 then && then($newlist);
             });
@@ -89,7 +88,6 @@ jQuery(function($){
         if (urlParams.length > 0) {
             url += '?' + urlParams.join('&');
         }
-        console.log(url);
         $.get(url, function(html) {
             var $eventItems =$(html).find(eventsSelector);
             var $eventList = $button.parent().prev();
@@ -134,10 +132,9 @@ jQuery(function($){
         var that = this
         if(hasNextPage()) {
             $.get(getNextPageLink(), function(html) {
-                var $categoriesHtml = $($(html).find('.arlo-catalog-category-wrppaer').html());
+                var $categoriesHtml = $(html).find('.arlo-catalog-category-wrppaer').children().clone();
                 $('.arlo-catalog-category-wrppaer').append($categoriesHtml);
-                var pagerHtml = $(html).find('.arlo-pager').html()
-                $(".arlo-pager").html(pagerHtml);
+                $(".arlo-pager").empty().append($(html).find('.arlo-pager').children().clone());
                 $(that).removeAttr('disabled');
                 var $moreEvents = $categoriesHtml.find('.arlo-btn-more-event');
                 $moreEvents.each(function() {

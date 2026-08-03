@@ -1,12 +1,14 @@
 <?php
 
-namespace ArloAPI\Resources;
-
+namespace ArloTraining\API\Resources;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 // load main Transport class for extending
 require_once 'Resource.php';
 
 // now use it
-use ArloAPI\Resources\Resource;
+use ArloTraining\API\Resources\Resource;
 
 class WPLogError extends Resource
 {
@@ -25,7 +27,7 @@ class WPLogError extends Resource
 		$this->__set('api_path', $this->apiPath . $id);
 		
 		$data = [
-			'WordPressUrl' => $_SERVER['HTTP_HOST'],
+			'WordPressUrl' =>  isset($_SERVER['HTTP_HOST']) ? sanitize_text_field(wp_unslash( $_SERVER['HTTP_HOST'] )) : '',
 			'PluginVersion' => $this->__get('plugin_version'),
     		'WordPressVersion' => $wp_version,
 			'LastSuccessfulSyncTimestamp' => !(is_null($last_import_date) || empty($last_import_date)) ? strtotime($last_import_date) : 'Never',

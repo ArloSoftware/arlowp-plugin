@@ -1,4 +1,8 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+use ArloTraining\CacheControl;
 
 /*
  * Change meta title
@@ -7,10 +11,10 @@ add_filter( 'document_title_parts', function($title) {
 	global $post;
 
 	if ($post) {
-		$new_title = set_title($title['title'], $post->ID, true);
+		$new_title = arlo_set_title($title['title'], $post->ID, true);
 
 		if (!empty($new_title['subtitle'])) {
-			$title['title'] = esc_attr($new_title['subtitle'] . ' - ' . $new_title['title']);
+			$title['title'] = esc_html($new_title['subtitle'] . ' - ' . $new_title['title']);
 		}
 	}
 
@@ -21,7 +25,7 @@ add_filter( 'document_title_parts', function($title) {
  * Add event category to title when filtered by a category
  */
 add_filter( 'the_title', function($title, $id = null) {
-	$new_title = set_title($title, $id);
+	$new_title = arlo_set_title($title, $id);
 
 	if (empty($new_title['subtitle'])) {
 		return $new_title['title'];
@@ -73,44 +77,32 @@ add_filter('page_template', function($template){
  *
  */
  
-function set_title($title, $id = null, $meta = false){
+function arlo_set_title($title, $id = null, $meta = false){
 	global $post;
 
 	$plugin = Arlo_For_Wordpress::get_instance();
 	$import_id = $plugin->get_importer()->get_current_import_id();	
-	
-	$settings = get_option('arlo_settings');
+	$post_types_settings = Arlo_For_Wordpress::get_post_types_settings();
 	
 	$pages = [];
-	
-	if (!empty($settings['post_types']['event']['posts_page'])) {
-		array_push($pages, $settings['post_types']['event']['posts_page']);
-	}
-	
-	if (!empty($settings['post_types']['eventsearch']['posts_page'])) {
-		array_push($pages, $settings['post_types']['eventsearch']['posts_page']);
-	}
-
-	if (!empty($settings['post_types']['upcoming']['posts_page'])) {
-		array_push($pages, $settings['post_types']['upcoming']['posts_page']);
-	}
-
-	if (!empty($settings['post_types']['oa']['posts_page'])) {
-		array_push($pages, $settings['post_types']['oa']['posts_page']);
+	foreach ( array( 'event', 'eventsearch', 'upcoming', 'oa' ) as $page_type ) {
+		if ( ! empty( $post_types_settings[ $page_type ]['posts_page'] ) ) {
+			array_push( $pages, (int) $post_types_settings[ $page_type ]['posts_page'] );
+		}
 	}	
 	
 	$subtitle = '';
 	
-	$arlo_category = \Arlo\Utilities::clean_string_url_parameter('arlo-category');
-	$arlo_location = \Arlo\Utilities::clean_string_url_parameter('arlo-location');
-	$arlo_search = \Arlo\Utilities::clean_string_url_parameter('arlo-search');
+	$arlo_category = \ArloTraining\Utilities::clean_string_url_parameter('arlo-category');
+	$arlo_location = \ArloTraining\Utilities::clean_string_url_parameter('arlo-location');
+	$arlo_search = \ArloTraining\Utilities::clean_string_url_parameter('arlo-search');
 	
 	$cat_slug = !empty($arlo_category) ? $arlo_category : '';	
 
 	$cat = null;
 
 	if (!empty($cat_slug))
-		$cat = \Arlo\Entities\Categories::get(array('slug' => $cat_slug), null, $import_id);		
+		$cat = \ArloTraining\Entities\Categories::get(array('slug' => $cat_slug), null, $import_id);		
 		
 	if ($id === null || !in_array($id, $pages) || ($post && $id != $post->ID) || (!in_the_loop() && !$meta) || is_nav_menu_item($id)) return ['title' => $title];
 	
@@ -141,10 +133,11 @@ function set_title($title, $id = null, $meta = false){
  *
  */
 function arlo_register_custom_post_types() {
-	$settings = get_option('arlo_settings');
+	$post_types_settings = Arlo_For_Wordpress::get_post_types_settings();
+	$templates = Arlo_For_Wordpress::get_templates();
 
 	foreach(Arlo_For_Wordpress::$post_types as $id => $type) {
-		$custom_type = isset( Arlo_For_Wordpress::$templates[$id]['type'] ) ? Arlo_For_Wordpress::$templates[$id]['type'] : $id;
+		$custom_type = isset( $templates[$id]['type'] ) ? $templates[$id]['type'] : $id;
 		$custom_type = in_array($custom_type,array('events','presenters','venues')) ? substr( $custom_type, 0, strlen($custom_type)-1 ) : $custom_type;
 
 		// default slug
@@ -153,15 +146,20 @@ function arlo_register_custom_post_types() {
 		
 		// slug based on page, if it exists
 		$page_id = null; 
-		if(isset($settings['post_types'][$id]['posts_page']) && $settings['post_types'][$id]['posts_page'] != 0) {
-			$page_id = $settings['post_types'][$id]['posts_page'];
-			$slug = substr(substr(str_replace(get_home_url(), '', get_permalink($settings['post_types'][$id]['posts_page'])), 0, -1), 1);
+		if ( ! empty( $post_types_settings[ $id ]['posts_page'] ) ) {
+			$page_id = (int) $post_types_settings[ $id ]['posts_page'];
+			$page_link = get_permalink( $page_id );
+			if ( ! empty( $page_link ) ) {
+				$slug = substr(substr(str_replace(get_home_url(), '', $page_link), 0, -1), 1);
+			} else {
+				$page_id = null;
+			}
 		}
 
 		$args = array(
 			'labels' => array(
-                'name' => __( $type['name'], 'arlo-for-wordpress'),
-                'singular_name' => __( $type['singular_name'], 'arlo-for-wordpress')
+                'name' => $type['name'],
+                'singular_name' => $type['singular_name']
             ),
 			'public'             => true,
 			'publicly_queryable' => true,
@@ -238,9 +236,13 @@ function arlo_register_custom_post_types() {
 	add_rewrite_tag('%paged%', '([^&]+)');
 	
 	// flush cached rewrite rules if we've just updated the arlo settings
-	if(isset($_GET['settings-updated'])) flush_rewrite_rules();
+	// It is triggered when the user saves changes on the WordPress settings page.
+	// wp_safe_redirect( admin_url( 'admin.php?page=arlo-for-wordpress&settings-updated=true' ) );
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- flush_rewrite_rules() is idempotent; capability check is sufficient.
+	if ( is_admin() && isset( $_GET['settings-updated'] ) && isset( $_GET['page'] ) && sanitize_key( wp_unslash( $_GET['page'] ) ) === 'arlo-for-wordpress' && current_user_can( 'manage_options' ) ) {
+		flush_rewrite_rules();
+	}
 }
-
 
 
 /**
@@ -250,13 +252,31 @@ function arlo_register_custom_post_types() {
  *
  */
  
- function set_search_redirect() {
-	$settings = get_option('arlo_settings');
-	if (!empty($_SERVER['QUERY_STRING']) && strpos($_SERVER['QUERY_STRING'], 'arlo-search') !== false && !empty($_GET['arlo-search'])) {
-		if(isset($settings['post_types']['eventsearch']['posts_page']) && $settings['post_types']['eventsearch']['posts_page'] != 0) {
-			$slug = substr(substr(str_replace(get_home_url(), '', get_permalink($settings['post_types']['eventsearch']['posts_page'])), 0, -1), 1);
-			$location = '/' . $slug . '/search/' . rawurlencode(str_replace(['/','\\'], '', wp_unslash($_GET['arlo-search']))) . '/';
-			wp_redirect( get_home_url() . $location );
+ function arlo_set_search_redirect() {
+	$eventsearch_page_id = Arlo_For_Wordpress::get_posts_page_id( 'eventsearch' );
+	$arlo_search = \ArloTraining\Utilities::filter_string_polyfill( INPUT_GET, 'arlo-search' );
+	if ( $arlo_search !== '' ) {
+		if ( $eventsearch_page_id > 0 ) {
+			
+			$arlo_nonce = \ArloTraining\Utilities::filter_string_polyfill( INPUT_GET, 'arlo-nonce' );
+			if ( ! wp_verify_nonce( $arlo_nonce, 'arlo-search-widget' ) ) {
+				wp_safe_redirect( get_home_url());
+				exit();
+			}
+			$search_page_url = get_permalink( $eventsearch_page_id );
+			if ( ! empty( $search_page_url ) ) {
+				$slug = substr(substr(str_replace(get_home_url(), '', $search_page_url), 0, -1), 1);
+				$location = '/' . $slug . '/search/' . rawurlencode(str_replace(['/','\\'], '', $arlo_search)) . '/';
+				wp_safe_redirect( get_home_url() . $location );
+				exit();
+			}
+		}
+	} elseif ( $eventsearch_page_id > 0 && isset( $_GET['arlo-search'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Presence-only check; value is not used here.
+		// Empty search submitted: redirect to the clean eventsearch base URL, stripping
+		// the query string (which would otherwise expose the nonce in the browser URL bar).
+		$search_page_url = get_permalink( $eventsearch_page_id );
+		if ( ! empty( $search_page_url ) ) {
+			wp_safe_redirect( $search_page_url );
 			exit();
 		}
 	}
@@ -270,10 +290,10 @@ function arlo_register_custom_post_types() {
  *
  */
  
- function set_region_redirect() {
+ function arlo_set_region_redirect() {
  	global $post;
 	$regions = get_option('arlo_regions');
-	$settings = get_option('arlo_settings');
+	$post_types_settings = Arlo_For_Wordpress::get_post_types_settings();
 	$selected_region = get_query_var('arlo-region', '');
 	$page_id = get_query_var('page_id', '');
 	
@@ -292,21 +312,21 @@ function arlo_register_custom_post_types() {
 		if (isset($arlo_post['regionalized']) 
 			&& is_bool($arlo_post['regionalized']) 
 			&& $arlo_post['regionalized'] 
-			&& !empty($settings['post_types'][$id]['posts_page'])) {
-			$arlo_page_ids[intval($settings['post_types'][$id]['posts_page'])] = $id;
+			&& !empty($post_types_settings[$id]['posts_page'])) {
+			$arlo_page_ids[intval($post_types_settings[$id]['posts_page'])] = $id;
 		}
 	}
 
 
 	if (is_array($regions) && count($regions)) {
-		$urlparts = parse_url(site_url());
+		$urlparts = wp_parse_url(site_url());
 		$domain = $urlparts['host'];
 
-		if (((array_key_exists($page_id, $arlo_page_ids) && !empty($settings['post_types'][$arlo_page_ids[$page_id]]['posts_page'])) || $page_type == 'arlo_event')) {
+		if (((array_key_exists($page_id, $arlo_page_ids) && !empty($post_types_settings[$arlo_page_ids[$page_id]]['posts_page'])) || $page_type == 'arlo_event')) {
 			if (empty($selected_region)) {
 				//try to read the region from a cookie
-				if (!empty($_COOKIE['arlo-region']) && in_array($_COOKIE['arlo-region'], array_keys($regions))) {
-					$selected_region = $_COOKIE['arlo-region'];
+				if (!empty($_COOKIE['arlo-region']) && in_array(sanitize_text_field($_COOKIE['arlo-region']), array_keys($regions))) {
+					$selected_region = sanitize_text_field(wp_unslash($_COOKIE['arlo-region']));
 				} else {
 					$regions_keys = array_keys($regions);
 					$selected_region = reset($regions_keys);
@@ -314,16 +334,39 @@ function arlo_register_custom_post_types() {
 				
 				setcookie("arlo-region", $selected_region, $cookie_time, '/', $domain);	
 				
+				$page_link = '';
 				if ($page_type == 'arlo_event') {
-					$slug = substr(substr(str_replace(get_home_url(), '', get_post_permalink($page_id)), 0, -1), 1);	
+					$page_link = get_post_permalink( $page_id );
 				} else {
-					$slug = substr(substr(str_replace(get_home_url(), '', get_permalink($settings['post_types'][$arlo_page_ids[$page_id]]['posts_page'])), 0, -1), 1);	
+					$host_page_id = (int) $post_types_settings[$arlo_page_ids[$page_id]]['posts_page'];
+					$page_link = get_permalink( $host_page_id );
 				}
 				
-				$location = str_replace($slug, $slug.'/region-' . $selected_region , $_SERVER['REQUEST_URI']);			
-				
-				wp_redirect(esc_url($location));
-				exit();				
+				if ( ! empty( $page_link ) && ! empty( $_SERVER['REQUEST_URI'] ) ) {
+					// Guard: a draft/pending page returns a ?page_id= permalink whose path
+					// equals the home-url path with no slug segment (and has a non-empty
+					// query string). Compare against the home-url path rather than a
+					// hard-coded '/' so subdirectory installs are handled correctly.
+					$home_path       = rtrim( wp_parse_url( get_home_url(), PHP_URL_PATH ) ?: '', '/' ) . '/';
+					$page_link_path  = rtrim( wp_parse_url( $page_link, PHP_URL_PATH ) ?: '', '/' ) . '/';
+					$page_link_query = wp_parse_url( $page_link, PHP_URL_QUERY );
+					if ( $page_link_path === $home_path && ! empty( $page_link_query ) ) {
+						return;
+					}
+
+					$request_uri = sanitize_url( wp_unslash( $_SERVER['REQUEST_URI'] ) );
+					$slug = substr(substr(str_replace(get_home_url(), '', $page_link), 0, -1), 1);
+					$location = str_replace($slug, $slug.'/region-' . rawurlencode( $selected_region ), $request_uri);
+
+					// Backstop: never redirect to the same URL that was just requested
+					// (str_replace matched nothing — prevents a self-referential 302 loop).
+					if ( $location === $request_uri ) {
+						return;
+					}
+
+					wp_safe_redirect( esc_url_raw( $location ) );
+					exit();
+				}
 			} else {
 				setcookie("arlo-region", $selected_region, $cookie_time, '/', $domain);	
 			}
@@ -333,8 +376,8 @@ function arlo_register_custom_post_types() {
 				setcookie("arlo-region", reset($regions_keys), $cookie_time, '/', $domain);
 				
 				//Some hosting has high level caching (caches the redirects) and no cookies are available which means it can stuck in a redirect loop
-				if (!empty($_COOKIE['arlo-region']))
-					wp_redirect($_SERVER['REQUEST_URI']);
+				if (!empty($_COOKIE['arlo-region']) && !empty($_SERVER['REQUEST_URI']))
+					wp_safe_redirect(sanitize_url(wp_unslash( $_SERVER['REQUEST_URI'] )));
 			}
 		}
 	}
@@ -374,38 +417,48 @@ function arlo_the_content_event($content) {
 	global $post, $wpdb;
 
 	if (get_option('arlo_plugin_disabled', '0') == '1') return;
+
+	$plugin = Arlo_For_Wordpress::get_instance();
+	$import_id = $plugin->get_importer()->get_current_import_id();
 	
 	$templates = arlo_get_option('templates');
 	$content = $templates['event']['html'];
     $arlo_region = \Arlo_For_Wordpress::get_region_parameter();	
 
-	$t1 = "{$wpdb->prefix}arlo_eventtemplates";
-	$t2 = "{$wpdb->prefix}posts";	
+	$parameters = array($post->ID, $import_id);
+	$filter_by_region = !empty($arlo_region);
+	if($filter_by_region) {
+		$parameters[] = $arlo_region;
+	}
 	
-	$sql = "
+	$sql_event = "
 	SELECT 
 		et.*, 
 		post.ID as post_id
 	FROM 
-		$t1 et 
+		{$wpdb->prefix}arlo_eventtemplates et 
 	LEFT JOIN 
-		$t2 post 
+		{$wpdb->prefix}posts post 
 	ON 
 		et.et_post_id = post.ID
 	WHERE 
 		post.post_type = 'arlo_event' 
 	AND 
-		post.ID = $post->ID
-	" . (!empty($arlo_region) ? " AND et.et_region = '" . esc_sql($arlo_region) . "'" : "") . "
+		post.ID = %d
+	AND
+		et.import_id = %d
+	" . ($filter_by_region ? " AND et.et_region = %s" : "") . "
 	ORDER 
 		BY et.et_name ASC
 	";
+	// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The SQL statement is dynamically constructed and parameters are prepared here.
+	$prepared_sql = $wpdb->prepare($sql_event, $parameters );
 	
-	$item = $wpdb->get_row($sql, ARRAY_A);	
+	$item = CacheControl::fetch_row($prepared_sql, ARRAY_A);
 
 	$GLOBALS['arlo_eventtemplate'] = $item;
 
-	$GLOBALS['no_event'] = $GLOBALS['no_onlineactivity'] = 1;
+	$GLOBALS['arlo_no_event'] = $GLOBALS['arlo_no_onlineactivity'] = 1;
 
 	$output = do_shortcode($content);
 
@@ -425,22 +478,27 @@ function arlo_the_content_event($content) {
  */
 function arlo_the_content_presenter($content) {
 	if (get_option('arlo_plugin_disabled', '0') == '1') return;
+
+	$plugin = Arlo_For_Wordpress::get_instance();
+	$import_id = $plugin->get_importer()->get_current_import_id();
         
 	$templates = arlo_get_option('templates');
 	$content = $templates['presenter']['html'];
 
 	global $post, $wpdb;
 
-	$t1 = "{$wpdb->prefix}arlo_presenters";
-	$t2 = "{$wpdb->prefix}posts";
-
-	$item = $wpdb->get_row(
+	$prepared_sql = $wpdb->prepare(
 		"SELECT p.*, post.ID as post_id
-		FROM $t1 p 
-		LEFT JOIN $t2 post 
+		FROM {$wpdb->prefix}arlo_presenters p 
+		LEFT JOIN {$wpdb->prefix}posts post 
 		ON p.p_post_id = post.ID
-		WHERE post.post_type = 'arlo_presenter' AND post.ID = $post->ID
-		ORDER BY p.p_lastname ASC", ARRAY_A);
+		WHERE post.post_type = 'arlo_presenter' AND post.ID = %d AND p.import_id = %d
+		ORDER BY p.p_lastname ASC",
+		$post->ID,
+		$import_id
+	);
+	
+    $item = CacheControl::fetch_row($prepared_sql, ARRAY_A);
 
 	$GLOBALS['arlo_presenter_list_item'] = $item;
 
@@ -462,22 +520,27 @@ function arlo_the_content_presenter($content) {
  */
 function arlo_the_content_venue($content) {
 	if (get_option('arlo_plugin_disabled', '0') == '1') return;
+
+	$plugin = Arlo_For_Wordpress::get_instance();
+	$import_id = $plugin->get_importer()->get_current_import_id();
     
 	$templates = arlo_get_option('templates');
 	$content = $templates['venue']['html'];
 
 	global $post, $wpdb;
 
-	$t1 = "{$wpdb->prefix}arlo_venues";
-	$t2 = "{$wpdb->prefix}posts";
-
-	$item = $wpdb->get_row(
+	$prepared_sql = $wpdb->prepare(
 		"SELECT v.*, post.ID as post_id
-		FROM $t1 v 
-		LEFT JOIN $t2 post 
+		FROM {$wpdb->prefix}arlo_venues v 
+		LEFT JOIN {$wpdb->prefix}posts post 
 		ON v.v_post_id = post.ID
-		WHERE post.post_type = 'arlo_venue' AND post.ID = $post->ID
-		ORDER BY v.v_name ASC", ARRAY_A);
+		WHERE post.post_type = 'arlo_venue' AND post.ID = %d AND v.import_id = %d
+		ORDER BY v.v_name ASC",
+		$post->ID,
+		$import_id
+	);
+    
+    $item = CacheControl::fetch_row($prepared_sql, ARRAY_A);
 
 	$GLOBALS['arlo_venue_list_item'] = $item;
 
@@ -525,7 +588,7 @@ function arlo_current_page() {
 	$page = 0;
 
 	//not sure why we watch that one first
-	$paged = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'paged');
+	$paged = \ArloTraining\Utilities::filter_string_polyfill(INPUT_GET, 'paged');
 	if (!empty($paged)) {
 		$page = intval($paged);
 	}
@@ -644,11 +707,10 @@ function arlo_get_post_by_name($name, $post_type='post') {
  */
 function arlo_is_archive( $post = null ) {
 	$post = get_post( $post );
-	$settings = get_option('arlo_settings');
 
 	if (!$post){ return false; }
 
-	foreach($settings['post_types'] as $post_type => $config) {
+	foreach(Arlo_For_Wordpress::get_post_types_settings() as $post_type => $config) {
 		if ($config['posts_page'] == $post->ID) {
 			return true;
 		}
@@ -659,9 +721,9 @@ function arlo_is_archive( $post = null ) {
 function arlo_add_datamodel() {
 	$plugin = Arlo_For_Wordpress::get_instance();
 
-	// error_log("DB Hash before install_schema: " . $plugin->get_schema_manager()->create_db_schema_hash());
+	// error_log("DB Hash before install_schema: " . $plugin->get_schema_manager()->get_plugin_db_schema_hash());
 
 	$plugin->get_schema_manager()->install_schema();
 
-	// error_log("DB Hash after install_schema: " . $plugin->get_schema_manager()->create_db_schema_hash());
+	// error_log("DB Hash after install_schema: " . $plugin->get_schema_manager()->get_plugin_db_schema_hash());
 }

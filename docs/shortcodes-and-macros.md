@@ -28,7 +28,10 @@
 * [arlo_event_code]
 * [arlo_event_duration]
 * [arlo_event_price]
-* [arlo_event_next_running]
+* [arlo_event_next_running ignore_resiter_link="false"]
+  > **Note**: The attribute name `ignore_resiter_link` is a known misspelling of
+  > `ignore_register_link`. It has been retained as-is to avoid breaking existing
+  > site configurations. Do not rename it.
 * [arlo_event_start_date format=""]
 * [arlo_event_end_date format=""]
 * [arlo_event_location]
@@ -36,7 +39,7 @@
 * [arlo_event_delivery]
 * [arlo_event_session_description]
 * [arlo_event_summary]
-* [arlo_event_presenters layout='list||string' link='true||false']
+* [arlo_event_presenters layout='list||string' link='permalink||yes||viewuri||false||{url}']
 * [arlo_event_notice]
 * [arlo_event_offers]
 * [arlo_event_offers_hasdiscount]

@@ -1,19 +1,16 @@
 <?php
 
-namespace Arlo;
+namespace ArloTraining;
 
-use Arlo\Utilities;
+use ArloTraining\Utilities;
 #[\AllowDynamicProperties]
 class VersionHandler {
-	const VERSION = '4.3.0';
+	const VERSION = '5.1.0';
 
-	private $dbl;
 	private $message_handler;
 	private $plugin;
 
-	public function __construct($dbl, $message_handler, $plugin, $theme_manager) {
-		$this->dbl = &$dbl; 	
-
+	public function __construct($message_handler, $plugin, $theme_manager) {
 		$this->message_handler = $message_handler;	
 		$this->plugin = $plugin;
 		$this->theme_manager = $theme_manager;
@@ -27,7 +24,7 @@ class VersionHandler {
 		$schema_manager = $this->plugin->get_schema_manager();
 		update_option('arlo_plugin_version', self::VERSION);
 				
-		$now = \Arlo\Utilities::get_now_utc();
+		$now = \ArloTraining\Utilities::get_now_utc();
 		update_option('arlo_updated', $now->format("Y-m-d H:i:s"));
 		
 		update_option('arlo_schema_version', $schema_manager::DB_SCHEMA_VERSION);
@@ -134,147 +131,152 @@ class VersionHandler {
 		if (version_compare($old_version, '4.0') < 0) {
 			$this->do_update('4.0');
 		}
+
+		if (version_compare($old_version, '5.1.0') < 0) {
+			$this->do_update('5.1.0');
+		}
 	}
 	
 	private function run_pre_data_update($version) {
-		
+		global $wpdb;
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.NotPrepared -- Trusted Schema update. Direct database query is required for custom table. Do not need cache for schema update
 		switch($version) {
 			case '2.4':
-				$exists = $this->dbl->get_var("SHOW TABLES LIKE '" . $this->dbl->prefix . "arlo_log'", 0, 0);
+				$exists = $wpdb->get_var("SHOW TABLES LIKE '" . $wpdb->prefix . "arlo_log'", 0, 0);
 				if (is_null($exists)) {
-					$this->dbl->query("RENAME TABLE " . $this->dbl->prefix . "arlo_import_log TO " . $this->dbl->prefix . "arlo_log");
+					$wpdb->query("RENAME TABLE " . $wpdb->prefix . "arlo_import_log TO " . $wpdb->prefix . "arlo_log");
 				}
 				
-				$exists = $this->dbl->get_var("SHOW TABLES LIKE '" . $this->dbl->prefix . "arlo_async_tasks'", 0, 0);
+				$exists = $wpdb->get_var("SHOW TABLES LIKE '" . $wpdb->prefix . "arlo_async_tasks'", 0, 0);
 				if (!is_null($exists)) {
-					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_async_tasks CHANGE task_modified task_modified TIMESTAMP NULL DEFAULT NULL COMMENT 'Dates are in UTC';");
-					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_async_tasks CHANGE task_created task_created TIMESTAMP NULL DEFAULT NULL COMMENT 'Dates are in UTC';");
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_async_tasks CHANGE task_modified task_modified TIMESTAMP NULL DEFAULT NULL COMMENT 'Dates are in UTC';");
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_async_tasks CHANGE task_created task_created TIMESTAMP NULL DEFAULT NULL COMMENT 'Dates are in UTC';");
 				}				
 				
-				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_eventtemplates_presenters LIKE 'et_arlo_id'", 0, 0);
+				$exists = $wpdb->get_var("SHOW COLUMNS FROM " . $wpdb->prefix . "arlo_eventtemplates_presenters LIKE 'et_arlo_id'", 0, 0);
 				if (!is_null($exists)) {
-					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_eventtemplates_presenters CHANGE  et_arlo_id  et_id int( 11 ) NOT NULL DEFAULT  '0'");	
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates_presenters CHANGE  et_arlo_id  et_id int( 11 ) NOT NULL DEFAULT  '0'");	
 				}
 				
-				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_events_tags LIKE 'e_arlo_id'", 0, 0);
+				$exists = $wpdb->get_var("SHOW COLUMNS FROM " . $wpdb->prefix . "arlo_events_tags LIKE 'e_arlo_id'", 0, 0);
 				if (!is_null($exists)) {
-					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events_tags CHANGE  e_arlo_id  e_id int( 11 ) NOT NULL DEFAULT  '0'");	
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events_tags CHANGE  e_arlo_id  e_id int( 11 ) NOT NULL DEFAULT  '0'");	
 				}
 
-				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_eventtemplates_tags LIKE 'et_arlo_id'", 0, 0);
+				$exists = $wpdb->get_var("SHOW COLUMNS FROM " . $wpdb->prefix . "arlo_eventtemplates_tags LIKE 'et_arlo_id'", 0, 0);
 				if (!is_null($exists)) {
-					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_eventtemplates_tags CHANGE  et_arlo_id  et_id int( 11 ) NOT NULL DEFAULT  '0'");	
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates_tags CHANGE  et_arlo_id  et_id int( 11 ) NOT NULL DEFAULT  '0'");	
 				}
 
 
-				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_events_presenters LIKE 'e_arlo_id'", 0, 0);
+				$exists = $wpdb->get_var("SHOW COLUMNS FROM " . $wpdb->prefix . "arlo_events_presenters LIKE 'e_arlo_id'", 0, 0);
 				if (!is_null($exists)) {
-					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events_presenters CHANGE  e_arlo_id  e_id int( 11 ) NOT NULL DEFAULT  '0'");
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events_presenters CHANGE  e_arlo_id  e_id int( 11 ) NOT NULL DEFAULT  '0'");
 						
 				}
 
-				$exists = $this->dbl->get_var("SHOW KEYS FROM " . $this->dbl->prefix . "arlo_categories WHERE key_name = 'c_arlo_id'", 0, 0);
+				$exists = $wpdb->get_var("SHOW KEYS FROM " . $wpdb->prefix . "arlo_categories WHERE key_name = 'c_arlo_id'", 0, 0);
 				if (!is_null($exists)) {
-					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_categories DROP KEY c_arlo_id ");	
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_categories DROP KEY c_arlo_id ");	
 				}
 
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_timezones DROP PRIMARY KEY, ADD PRIMARY KEY (id,active)");
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events_presenters DROP PRIMARY KEY, ADD PRIMARY KEY (e_id,p_arlo_id,active)");
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events_tags DROP PRIMARY KEY, ADD PRIMARY KEY (e_id,tag_id,active)");
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_eventtemplates_tags DROP PRIMARY KEY, ADD PRIMARY KEY (et_id,tag_id,active)");
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_categories DROP PRIMARY KEY, ADD PRIMARY KEY (c_id, active)");
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_eventtemplates_categories DROP PRIMARY KEY, ADD PRIMARY KEY (et_arlo_id,c_arlo_id,active)");				
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_timezones_olson DROP PRIMARY KEY, ADD PRIMARY KEY (timezone_id,olson_name,active)");				
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_eventtemplates_presenters DROP PRIMARY KEY, ADD PRIMARY KEY (et_id,p_arlo_id,active)");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_timezones DROP PRIMARY KEY, ADD PRIMARY KEY (id,active)");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events_presenters DROP PRIMARY KEY, ADD PRIMARY KEY (e_id,p_arlo_id,active)");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events_tags DROP PRIMARY KEY, ADD PRIMARY KEY (e_id,tag_id,active)");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates_tags DROP PRIMARY KEY, ADD PRIMARY KEY (et_id,tag_id,active)");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_categories DROP PRIMARY KEY, ADD PRIMARY KEY (c_id, active)");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates_categories DROP PRIMARY KEY, ADD PRIMARY KEY (et_arlo_id,c_arlo_id,active)");				
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_timezones_olson DROP PRIMARY KEY, ADD PRIMARY KEY (timezone_id,olson_name,active)");				
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates_presenters DROP PRIMARY KEY, ADD PRIMARY KEY (et_id,p_arlo_id,active)");
 															
 			break;
 
 			case '2.4.1.1':
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_categories CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_contentfields CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events_presenters CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events_tags CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_eventtemplates CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_eventtemplates_categories CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_eventtemplates_presenters CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_eventtemplates_tags CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_offers CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_onlineactivities CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_onlineactivities_tags CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_presenters CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");				
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_tags CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_timezones CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_timezones_olson CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_venues CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_categories CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_contentfields CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events_presenters CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events_tags CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates_categories CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates_presenters CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates_tags CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_offers CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_onlineactivities CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_onlineactivities_tags CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_presenters CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");				
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_tags CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_timezones CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_timezones_olson CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_venues CHANGE active import_id INT(10) UNSIGNED NOT NULL DEFAULT '0'");
 			break;
 
 			case '3.0':
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events DROP e_summary;");
-				$this->dbl->query("DROP TABLE " . $this->dbl->prefix . "arlo_timezones_olson;");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events DROP e_summary;");
+				$wpdb->query("DROP TABLE " . $wpdb->prefix . "arlo_timezones_olson;");
 			break;	
 
 			case '3.6':
-				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_events LIKE 'e_is_taxexempt'", 0, 0);
+				$exists = $wpdb->get_var("SHOW COLUMNS FROM " . $wpdb->prefix . "arlo_events LIKE 'e_is_taxexempt'", 0, 0);
 				if (is_null($exists)) {
-					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events ADD e_is_taxexempt TINYINT(1) NOT NULL DEFAULT '0' AFTER e_isonline");
-					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events ADD INDEX (e_is_taxexempt(1))");
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events ADD e_is_taxexempt TINYINT(1) NOT NULL DEFAULT '0' AFTER e_isonline");
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events ADD INDEX (e_is_taxexempt(1))");
 				}
 			break;
 
 			case '3.6.1':
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events DROP e_timezone_id;");
-				$this->dbl->query("DROP TABLE " . $this->dbl->prefix . "arlo_timezones;");
-				$this->dbl->query("CREATE TABLE " . $this->dbl->prefix . "arlo_timezones (
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events DROP e_timezone_id;");
+				$wpdb->query("DROP TABLE " . $wpdb->prefix . "arlo_timezones;");
+				$wpdb->query("CREATE TABLE " . $wpdb->prefix . "arlo_timezones (
 					id int(11) NOT NULL,
 					name varchar(256) NOT NULL,
 					windows_tz_id varchar(256) NOT NULL,
 					import_id int(10) unsigned NOT NULL,
 					PRIMARY KEY  (id, import_id))
-					" . $this->dbl->charset_collate . ";");
-				$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events ADD e_timezone_id INT(11) NULL AFTER e_timezone");
+					" . $wpdb->get_charset_collate() . ";");
+				$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events ADD e_timezone_id INT(11) NULL AFTER e_timezone");
 			break;
 
 			case '3.8':
-				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_events LIKE 'e_summary'", 0, 0);
+				$exists = $wpdb->get_var("SHOW COLUMNS FROM " . $wpdb->prefix . "arlo_events LIKE 'e_summary'", 0, 0);
 				if (is_null($exists)) {
-					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events ADD e_summary TEXT NULL AFTER e_sessiondescription");
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events ADD e_summary TEXT NULL AFTER e_sessiondescription");
 				}
-				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_eventtemplates LIKE 'et_registerprivateinteresturi'", 0, 0);
+				$exists = $wpdb->get_var("SHOW COLUMNS FROM " . $wpdb->prefix . "arlo_eventtemplates LIKE 'et_registerprivateinteresturi'", 0, 0);
 				if (is_null($exists)) {
-					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_eventtemplates ADD et_registerprivateinteresturi TEXT NULL AFTER et_registerinteresturi");
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates ADD et_registerprivateinteresturi TEXT NULL AFTER et_registerinteresturi");
 				}
 			break;
 
 			case '3.8.1':
-				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_async_tasks LIKE 'task_hostname'", 0, 0);
+				$exists = $wpdb->get_var("SHOW COLUMNS FROM " . $wpdb->prefix . "arlo_async_tasks LIKE 'task_hostname'", 0, 0);
 				if (is_null($exists)) {
-					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_async_tasks ADD task_hostname varchar(255) DEFAULT NULL AFTER task_status_text");
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_async_tasks ADD task_hostname varchar(255) DEFAULT NULL AFTER task_status_text");
 				}
-				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_async_tasks LIKE 'task_lb_count'", 0, 0);
+				$exists = $wpdb->get_var("SHOW COLUMNS FROM " . $wpdb->prefix . "arlo_async_tasks LIKE 'task_lb_count'", 0, 0);
 				if (is_null($exists)) {
-					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_async_tasks ADD task_lb_count tinyint(4) NOT NULL DEFAULT '0' AFTER task_hostname");
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_async_tasks ADD task_lb_count tinyint(4) NOT NULL DEFAULT '0' AFTER task_hostname");
 				}
 			break;
 
 			case '3.9':
-				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_async_tasks LIKE 'task_lb_count'", 0, 0);
+				$exists = $wpdb->get_var("SHOW COLUMNS FROM " . $wpdb->prefix . "arlo_async_tasks LIKE 'task_lb_count'", 0, 0);
 				if (!is_null($exists)) {
-					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_async_tasks DROP task_lb_count");
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_async_tasks DROP task_lb_count");
 				}
-				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_async_tasks LIKE 'task_hostname'", 0, 0);
+				$exists = $wpdb->get_var("SHOW COLUMNS FROM " . $wpdb->prefix . "arlo_async_tasks LIKE 'task_hostname'", 0, 0);
 				if (!is_null($exists)) {
-					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_async_tasks DROP task_hostname");
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_async_tasks DROP task_hostname");
 				}
-				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_eventtemplates LIKE 'et_credits'", 0, 0);
+				$exists = $wpdb->get_var("SHOW COLUMNS FROM " . $wpdb->prefix . "arlo_eventtemplates LIKE 'et_credits'", 0, 0);
 				if (is_null($exists)) {
-					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_eventtemplates ADD et_credits varchar(255) NULL AFTER et_registerprivateinteresturi");
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates ADD et_credits varchar(255) NULL AFTER et_registerprivateinteresturi");
 				}
-				$exists = $this->dbl->get_var("SHOW TABLES LIKE '" . $this->dbl->prefix . "arlo_import_parts'", 0, 0);
+				$exists = $wpdb->get_var("SHOW TABLES LIKE '" . $wpdb->prefix . "arlo_import_parts'", 0, 0);
 				if (!is_null($exists)) {
-					$this->dbl->query("DROP TABLE " . $this->dbl->prefix . "arlo_import_parts;");
+					$wpdb->query("DROP TABLE " . $wpdb->prefix . "arlo_import_parts;");
 				}
-				$this->dbl->query("CREATE TABLE " . $this->dbl->prefix . "arlo_import_parts (
+				$wpdb->query("CREATE TABLE " . $wpdb->prefix . "arlo_import_parts (
 					id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 					import_id INT(10) UNSIGNED NOT NULL,
 					part ENUM('image', 'fragment') NOT NULL,
@@ -283,56 +285,58 @@ class VersionHandler {
 					created datetime NOT NULL,
 					modified datetime NULL DEFAULT NULL,
 					PRIMARY KEY  (id))
-					" . $this->dbl->charset_collate . ";");
+					" . $wpdb->get_charset_collate() . ";");
 			break;
 
 			case '4.0':
-				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_eventtemplates LIKE 'et_hero_image'", 0, 0);
+				$exists = $wpdb->get_var("SHOW COLUMNS FROM " . $wpdb->prefix . "arlo_eventtemplates LIKE 'et_hero_image'", 0, 0);
 				if (is_null($exists)) {
-					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_eventtemplates ADD et_hero_image text NULL AFTER et_viewuri");
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates ADD et_hero_image text NULL AFTER et_viewuri");
 				}
-				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_eventtemplates LIKE 'et_list_image'", 0, 0);
+				$exists = $wpdb->get_var("SHOW COLUMNS FROM " . $wpdb->prefix . "arlo_eventtemplates LIKE 'et_list_image'", 0, 0);
 				if (is_null($exists)) {
-					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_eventtemplates ADD et_list_image text NULL AFTER et_hero_image");
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_eventtemplates ADD et_list_image text NULL AFTER et_hero_image");
 				}
 			break;
 
+
 			case '4.1':
-				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_timezones LIKE 'utc_offset'", 0, 0);
+				$exists = $wpdb->get_var("SHOW COLUMNS FROM " . $wpdb->prefix . "arlo_timezones LIKE 'utc_offset'", 0, 0);
 				if (is_null($exists)) {
-					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_timezones ADD utc_offset INT(11) NOT NULL AFTER windows_tz_id");
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_timezones ADD utc_offset INT(11) NOT NULL AFTER windows_tz_id");
 				}
-				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_events LIKE 'e_finishtimezoneabbr'", 0, 0);
+				$exists = $wpdb->get_var("SHOW COLUMNS FROM " . $wpdb->prefix . "arlo_events LIKE 'e_finishtimezoneabbr'", 0, 0);
 				if (is_null($exists)) {
-					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events ADD e_finishtimezoneabbr varchar(7) NULL AFTER e_finishdatetime");
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events ADD e_finishtimezoneabbr varchar(7) NULL AFTER e_finishdatetime");
 				}
-				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_events LIKE 'e_starttimezoneabbr'", 0, 0);
+				$exists = $wpdb->get_var("SHOW COLUMNS FROM " . $wpdb->prefix . "arlo_events LIKE 'e_starttimezoneabbr'", 0, 0);
 				if (is_null($exists)) {
-					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events ADD e_starttimezoneabbr varchar(7) NOT NULL AFTER e_finishdatetime");
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events ADD e_starttimezoneabbr varchar(7) NOT NULL AFTER e_finishdatetime");
 				}
-				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_events LIKE 'e_finishdatetimeoffset'", 0, 0);
+				$exists = $wpdb->get_var("SHOW COLUMNS FROM " . $wpdb->prefix . "arlo_events LIKE 'e_finishdatetimeoffset'", 0, 0);
 				if (is_null($exists)) {
-					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events ADD e_finishdatetimeoffset varchar(6) NOT NULL AFTER e_finishdatetime");
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events ADD e_finishdatetimeoffset varchar(6) NOT NULL AFTER e_finishdatetime");
 				}
-				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_events LIKE 'e_startdatetimeoffset'", 0, 0);
+				$exists = $wpdb->get_var("SHOW COLUMNS FROM " . $wpdb->prefix . "arlo_events LIKE 'e_startdatetimeoffset'", 0, 0);
 				if (is_null($exists)) {
-					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events ADD e_startdatetimeoffset varchar(6) NOT NULL AFTER e_finishdatetime");
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events ADD e_startdatetimeoffset varchar(6) NOT NULL AFTER e_finishdatetime");
 				}
-				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_events LIKE 'e_datetimeoffset'", 0, 0);
+				$exists = $wpdb->get_var("SHOW COLUMNS FROM " . $wpdb->prefix . "arlo_events LIKE 'e_datetimeoffset'", 0, 0);
 				if (is_null($exists)) {
-					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events DROP e_datetimeoffset;");
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events DROP e_datetimeoffset;");
 				}
-				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_events LIKE 'e_timezone'", 0, 0);
+				$exists = $wpdb->get_var("SHOW COLUMNS FROM " . $wpdb->prefix . "arlo_events LIKE 'e_timezone'", 0, 0);
 				if (is_null($exists)) {
-					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_events DROP e_timezone;");
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_events DROP e_timezone;");
 				}
 
-				$exists = $this->dbl->get_var("SHOW COLUMNS FROM " . $this->dbl->prefix . "arlo_venues LIKE 'v_locationname'", 0, 0);
+				$exists = $wpdb->get_var("SHOW COLUMNS FROM " . $wpdb->prefix . "arlo_venues LIKE 'v_locationname'", 0, 0);
 				if (is_null($exists)) {
-					$this->dbl->query("ALTER TABLE " . $this->dbl->prefix . "arlo_venues ADD v_locationname text NULL AFTER v_name");
+					$wpdb->query("ALTER TABLE " . $wpdb->prefix . "arlo_venues ADD v_locationname text NULL AFTER v_name");
 				}
 			break;
 		}
+		// phpcs:enable
 	}	
 	
 	private function do_update($version) {
@@ -444,92 +448,96 @@ class VersionHandler {
 				if ($this->message_handler->get_message_by_type_count('information') == 0) {
 					
 					$message = [
-					'<p>' . __('Arlo for WordPress will automatically send technical data to Arlo if problems are encountered when synchronising your event information. The data is sent securely and will help our team when providing support for this plugin. You can turn this off anytime in the', 'arlo-for-wordpress' ) . ' <a href="?page=arlo-for-wordpress#misc" class="arlo-settings-link" id="settings_misc">' . __('setting', 'arlo-for-wordpress' ) . '</a>.</p>',
-					'<p><a target="_blank" class="button button-primary" id="arlo_turn_off_send_data">' . __('Turn off', 'arlo-for-wordpress' ) . '</a></p>'
+					'<p>' . esc_html__('Arlo for WordPress will automatically send technical data to Arlo if problems are encountered when synchronising your event information. The data is sent securely and will help our team when providing support for this plugin. You can turn this off anytime in the', 'arlo-training-and-event-management-system' ) . ' <a href="?page=arlo-for-wordpress#misc" class="arlo-settings-link" id="settings_misc">' . esc_html__('setting', 'arlo-training-and-event-management-system' ) . '</a>.</p>',
+					'<p><a target="_blank" class="button button-primary" id="arlo_turn_off_send_data">' . esc_html__('Turn off', 'arlo-training-and-event-management-system' ) . '</a></p>'
 					];
 					
-					$this->message_handler->set_message('information', __('Send error data to Arlo', 'arlo-for-wordpress' ), implode('', $message), false);
+					$this->message_handler->set_message('information', esc_html__('Send error data to Arlo', 'arlo-training-and-event-management-system' ), implode('', $message), false);
 				}
 
 				if ( defined('DISABLE_WP_CRON') && DISABLE_WP_CRON ) {
 					$message = [
-						'<p>' . __('Arlo for WordPress requires that the Cron feature in WordPress is enabled, or replaced with an external trigger.', 'arlo-for-wordpress' ) .' ' . sprintf(__('<a target="_blank" href="%s">View documentation</a> for more information.', 'arlo-for-wordpress' ), 'http://developer.arlo.co/doc/wordpress/import#import-wordpress-cron') . '</p>',
-						'<p>' . __('You may safely dismiss this warning if your system administrator has installed an external Cron solution.', 'arlo-for-wordpress' ) . '</p>'
+						/* translators: %s: arlo for wordpress document link */
+						'<p>' . esc_html__('Arlo for WordPress requires that the Cron feature in WordPress is enabled, or replaced with an external trigger.', 'arlo-training-and-event-management-system' ) .' ' . wp_kses(sprintf(__('<a target="_blank" href="%s">View documentation</a> for more information.', 'arlo-training-and-event-management-system' ), 'https://developer.arlo.co/doc/wordpress/import#import-wordpress-cron'), ['a'=>['href'=>[],'target'=>[]]]) . '</p>',
+						'<p>' . esc_html__('You may safely dismiss this warning if your system administrator has installed an external Cron solution.', 'arlo-training-and-event-management-system' ) . '</p>'
 					];
 			
-					$this->message_handler->set_message('error', __('WordPress Cron is disabled', 'arlo-for-wordpress' ), implode('', $message), false);
+					$this->message_handler->set_message('error', esc_html__('WordPress Cron is disabled', 'arlo-training-and-event-management-system' ), implode('', $message), false);
 				}
 				
 			break;	
 
 			case '3.0':
+				global $wpdb;
 				$import_id = get_option('arlo_import_id','');
 				if (!empty($import_id)) {
+					// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Data migration. Direct database query is required for custom table. Do not need cache for one time data migration
 					//update post_id in the templates table
-					$sql = '
+					$items = $wpdb->get_results($wpdb->prepare("
 					SELECT
 						et_id,
 						et_post_name
 					FROM 
-						' .  $this->dbl->prefix . 'arlo_eventtemplates
+						{$wpdb->prefix}arlo_eventtemplates
 					WHERE
-						import_id = ' . $import_id . '
+						import_id = %d
 					AND
 						(et_post_id IS NULL OR et_post_id = 0)
-					';
-					$items = $this->dbl->get_results($sql);
+					", $import_id));
 					if (is_array($items) && count($items)) {
 						foreach($items as $key => $item) {
 							$post = arlo_get_post_by_name($item->et_post_name, 'arlo_event');
 							if (!is_null($post) && !empty($post->ID) && $post->ID > 0) {
-								$this->dbl->update($this->dbl->prefix . 'arlo_eventtemplates', array( 'et_post_id' => $post->ID), array( 'et_id' => $item->et_id ));
+								
+								$wpdb->update($wpdb->prefix . 'arlo_eventtemplates', array( 'et_post_id' => $post->ID), array( 'et_id' => $item->et_id ));
 							}
 						}
 					}
 
 					//update post_id in the presenters table
-					$sql = '
+					$items = $wpdb->get_results($wpdb->prepare("
 					SELECT
 						p_id,
 						p_post_name
 					FROM 
-						' .  $this->dbl->prefix . 'arlo_presenters
+						{$wpdb->prefix}arlo_presenters
 					WHERE
-						import_id = ' . $import_id . '
+						import_id = %d
 					AND
 						(p_post_id IS NULL OR p_post_id = 0)
-					';
-					$items = $this->dbl->get_results($sql);
+					", $import_id));
 					if (is_array($items) && count($items)) {
 						foreach($items as $key => $item) {
 							$post = arlo_get_post_by_name($item->p_post_name, 'arlo_presenter');
 							if (!is_null($post) && !empty($post->ID) && $post->ID > 0) {
-								$this->dbl->update($this->dbl->prefix . 'arlo_presenters', array( 'p_post_id' => $post->ID), array( 'p_id' => $item->p_id ));
+								
+								$wpdb->update($wpdb->prefix . 'arlo_presenters', array( 'p_post_id' => $post->ID), array( 'p_id' => $item->p_id ));
 							}
 						}
 					}
 
 					//update post_id in the venues table
-					$sql = '
+					$items = $wpdb->get_results($wpdb->prepare("
 					SELECT
 						v_id,
 						v_post_name
 					FROM 
-						' .  $this->dbl->prefix . 'arlo_venues
+						{$wpdb->prefix}arlo_venues
 					WHERE
-						import_id = ' . $import_id . '
+						import_id = %d
 					AND
 						(v_post_id IS NULL OR v_post_id = 0)
-					';
-					$items = $this->dbl->get_results($sql);
+					", $import_id));
 					if (is_array($items) && count($items)) {
 						foreach($items as $key => $item) {
 							$post = arlo_get_post_by_name($item->v_post_name, 'arlo_venue');
 							if (!is_null($post) && !empty($post->ID) && $post->ID > 0) {
-								$this->dbl->update($this->dbl->prefix . 'arlo_venues', array( 'v_post_id' => $post->ID), array( 'v_id' => $item->v_id ));
+								
+								$wpdb->update($wpdb->prefix . 'arlo_venues', array( 'v_post_id' => $post->ID), array( 'v_id' => $item->v_id ));
 							}
 						}
 					}
+					// phpcs:enable
 				}
 
 				$theme_id = 'custom';
@@ -564,9 +572,6 @@ class VersionHandler {
 
 				arlo_set_option('templates', $saved_templates);	
 
-				//use the new url structure
-				update_option('arlo_new_url_structure', 1);	
-
 				//kick off an import
 				if (get_option('arlo_import_disabled', '0') != '1')
 					$this->plugin->get_scheduler()->set_task("import", -1);					
@@ -585,7 +590,7 @@ class VersionHandler {
 				//try to add OA page (don't publish)
 				$page_name = 'oa';
 
-				$page_ids = $this->plugin->add_pages($page_name);				
+				$page_ids = Arlo_For_Wordpress::add_pages($page_name);
 			break;
 			case '3.3':
 				$theme_settings = get_option( 'arlo_themes_settings', [] );
@@ -594,7 +599,7 @@ class VersionHandler {
 
 				//Add Schedule template and OA template
 				$page_name = 'schedule';
-				$page_ids = $this->plugin->add_pages($page_name);	
+				$page_ids = Arlo_For_Wordpress::add_pages($page_name);	
 
 				$selected_theme_id = get_option( 'arlo_theme' );
 
@@ -681,14 +686,14 @@ class VersionHandler {
 
 			case '3.5.1':
 				//delete cookies
-				$urlparts = parse_url(site_url());
+				$urlparts = wp_parse_url(site_url());
 				$domain = $urlparts['host'];
 
 				unset( $_COOKIE['arlo-nav-tab'] );
-				setcookie('arlo-nav-tab', null, -1, '/', $domain);
+				setcookie('arlo-nav-tab', '', -1, '/', $domain);
 
 				unset( $_COOKIE['arlo-vertical-tab'] );
-				setcookie('arlo-vertical-tab', null, -1, '/', $domain);
+				setcookie('arlo-vertical-tab', '', -1, '/', $domain);
 				
 			break;			
 
@@ -804,9 +809,9 @@ class VersionHandler {
 
 				if ($is_notice_required) {
 					$message = [
-						'<p>'. __('The Filters tab has been removed and previous filter settings are no longer available. The delivery filter settings are now configured from the General Settings tab and apply to all Arlo for WordPress pages. Locations, tags and categories should be managed from the Arlo management platform.', 'arlo-for-wordpress' ) . '</p>'
+						'<p>'. esc_html__('The Filters tab has been removed and previous filter settings are no longer available. The delivery filter settings are now configured from the General Settings tab and apply to all Arlo for WordPress pages. Locations, tags and categories should be managed from the Arlo management platform.', 'arlo-training-and-event-management-system' ) . '</p>'
 					];
-					if (!$this->message_handler->set_message('import_error', __('Filter settings deleted', 'arlo-for-wordpress' ), implode('', $message), true)) {
+					if (!$this->message_handler->set_message('import_error', esc_html__('Filter settings deleted', 'arlo-training-and-event-management-system' ), implode('', $message), true)) {
 						Logger::log("Couldn't create Arlo 3.6 filters settings lost notice message");
 					}
 				}
@@ -818,6 +823,15 @@ class VersionHandler {
 				$settings = get_option('arlo_settings');
 				$settings['keep_settings'] = "1";
 				update_option('arlo_settings', $settings);
+			break;
+
+			case '5.1.0':
+				// Backfill deployment_mode introduced in 5.1.0.
+				$settings = get_option('arlo_settings');
+				if (is_array($settings) && !isset($settings['deployment_mode'])) {
+					$settings['deployment_mode'] = \Arlo_For_Wordpress::get_deployment_mode_default($settings['platform_name'] ?? '');
+					update_option('arlo_settings', $settings);
+				}
 			break;
 
 		}	

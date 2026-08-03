@@ -1,4 +1,7 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 /**
  * Arlo For Wordpress
  *
@@ -22,10 +25,11 @@
  * @author  Adam Fentosi <adam.fentosi@arlo.co>, Gabriel Oheix
  */
 
-use Arlo\VersionHandler;
-use Arlo\Importer\ImportRequest;
-use Arlo\ThemeManager;
+use ArloTraining\VersionHandler;
+use ArloTraining\Importer\ImportRequest;
+use ArloTraining\ThemeManager;
 #[\AllowDynamicProperties]
+
 class Arlo_For_Wordpress_Admin {
 
 	/**
@@ -169,10 +173,10 @@ class Arlo_For_Wordpress_Admin {
 		$screen = get_current_screen();	
 		
 		if ( in_array($screen->id, [$this->plugin_screen_hook_suffix, $this->plugin_venues_screen_hook_suffix, $this->plugin_oa_screen_hook_suffix, $this->plugin_loglist_screen_hook_suffix, $this->plugin_presenters_screen_hook_suffix, $this->plugin_templates_screen_hook_suffix, $this->plugin_events_screen_hook_suffix, $this->plugin_sessions_screen_hook_suffix])) {
-			wp_enqueue_style( $this->plugin_slug .'-admin-styles', plugins_url( 'assets/css/admin.css?20170424', __FILE__ ), array(), VersionHandler::VERSION );
+			wp_enqueue_style( $this->plugin_slug .'-admin-styles', plugins_url( 'assets/css/admin.css?20250625f', __FILE__ ), array(), VersionHandler::VERSION );
 			
 			if ($screen->id == $this->plugin_screen_hook_suffix) {
-				wp_enqueue_style( $this->plugin_slug .'-codemirror', plugins_url( 'assets/css/libs/codemirror.css', __FILE__ ), array(), VersionHandler::VERSION );
+				wp_enqueue_style('wp-codemirror');
 				wp_enqueue_style( $this->plugin_slug . '-fancybox', plugins_url( '../public/custom-assets/fancybox/jquery.fancybox.min.css', __FILE__), array(), '3.0.47' );
 			}
 		}
@@ -195,18 +199,39 @@ class Arlo_For_Wordpress_Admin {
 			return;
 		}
 
-		wp_enqueue_script( $this->plugin_slug . '-admin-global-script', plugins_url( 'assets/js/admin_public.js?20170424', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, true );
+		wp_enqueue_script( $this->plugin_slug . '-admin-global-script', plugins_url( 'assets/js/admin_public.js?20250425', __FILE__ ), array( 'jquery', 'common' ), VersionHandler::VERSION, false );
 
 		$screen = get_current_screen();
 		if ( $this->plugin_screen_hook_suffix == $screen->id ) {
-			wp_enqueue_script( $this->plugin_slug . '-lsapiclient', plugins_url( 'assets/js/lib/ls-apiclient-1.2.0.min.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, true );
-			wp_enqueue_script( $this->plugin_slug . '-codemirror', plugins_url( 'assets/js/lib/codemirror.js', __FILE__ ), array(), VersionHandler::VERSION, true );
-			wp_enqueue_script( $this->plugin_slug . '-codemirror-css', plugins_url( 'assets/js/lib/codemirror-css.js', __FILE__ ), array(), VersionHandler::VERSION, true );
-			wp_enqueue_script( $this->plugin_slug . '-plugin-script-cookie', plugins_url( '../public/assets/js/libs/js.cookie.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION );
-			wp_enqueue_script( $this->plugin_slug . '-arlo-for-wordpress-script', plugins_url( 'assets/js/arlo_for_wordpress.js?20170424', __FILE__ ), array( 'jquery', 'jquery-ui-core', $this->plugin_slug . '-plugin-script-cookie' ), VersionHandler::VERSION, true );
-			wp_enqueue_script( $this->plugin_slug . '-admin-script', plugins_url( 'assets/js/admin.js?20170424', __FILE__ ), array( 'jquery'), VersionHandler::VERSION, true );
-			wp_enqueue_script( $this->plugin_slug . '-plugin-script-tingle', plugins_url( '../public/custom-assets/fancybox/jquery.fancybox.min.js' , __FILE__), array('jquery'), '3.3.7', true );
+			wp_enqueue_script( $this->plugin_slug . '-lsapiclient', plugins_url( 'assets/js/lib/ls-apiclient-1.2.0.min.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, false );
+			wp_enqueue_script('wp-codemirror');
+			$settings = wp_enqueue_code_editor(['type' => 'text/html']);
+			wp_add_inline_script('wp-codemirror', 'var codeEditorSettings = ' . wp_json_encode($settings) . ';');
+			wp_add_inline_script('wp-codemirror', "
+        document.addEventListener('DOMContentLoaded', function () {
+            var textarea = document.getElementById('arlo_customcss');
+            if (textarea && wp.codeEditor && codeEditorSettings) {
+                if (codeEditorSettings.codemirror) {
+                    codeEditorSettings.codemirror.autoRefresh = true;
+                }
+                wp.codeEditor.initialize(textarea, codeEditorSettings);
+            }
+        });
+    	");
+			wp_enqueue_script( $this->plugin_slug . '-plugin-script-cookie', plugins_url( '../public/assets/js/libs/js.cookie.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, false );
+			wp_enqueue_script( $this->plugin_slug . '-arlo-for-wordpress-script', plugins_url( 'assets/js/arlo_for_wordpress.js?20260625b', __FILE__ ), array( 'jquery', 'jquery-ui-core', $this->plugin_slug . '-plugin-script-cookie' ), VersionHandler::VERSION, false );
+			wp_enqueue_script( $this->plugin_slug . '-admin-script', plugins_url( 'assets/js/admin.js?20170424', __FILE__ ), array( 'jquery'), VersionHandler::VERSION, false );
+			wp_enqueue_script( $this->plugin_slug . '-plugin-script-tingle', plugins_url( '../public/custom-assets/fancybox/jquery.fancybox.min.js' , __FILE__), array('jquery'), '3.3.7', false );
 		}
+		wp_localize_script($this->plugin_slug . '-admin-global-script', 'admin_ajax_var', array(
+			'nonce'         => wp_create_nonce($this->plugin_slug . '-arlo-for-wordpress-script'),
+			// Used by JS to build correct preview URLs on sites where the WP core
+			// files live in a subdirectory (siteurl != home). wp_parse_url() returns
+			// null when there is no path component (root install), and false when
+			// the URL is malformed. Use ?: (not ??) so both null and false normalise
+			// to '/' for JS: origin + home_url_path + '?page_id=...'
+			'home_url_path' => rtrim( wp_parse_url( get_home_url(), PHP_URL_PATH ) ?: '', '/' ) . '/',
+		));
 	}
 
 	/**
@@ -220,9 +245,9 @@ class Arlo_For_Wordpress_Admin {
 	public function enqueue_pointers() {
 
 		/*
-		 * $pointer = new Feature_Pointer($pointerID, $pointerTarget, $pointerTitle, $pointerContent, $pointerEdge, $pointerAlign)
+		 * $pointer = new Arlo_Feature_Pointer($pointerID, $pointerTarget, $pointerTitle, $pointerContent, $pointerEdge, $pointerAlign)
 		 *
-		 * Parameters for Feature_Pointer:
+		 * Parameters for Arlo_Feature_Pointer:
 		 * $pointerID: unique identifier for the pointer. Required
 		 * $pointerTarget: The ID of the element that the pointer will point too. Required
 		 * $pointerTitle: The title text of the pointer. Required
@@ -231,7 +256,7 @@ class Arlo_For_Wordpress_Admin {
 		 * $pointerAlign: How the pointer is aligned to the target element. Optional, defaults to 'center'
 		 */
 
-		$pointer = new Feature_Pointer('arlo-1st-pointer', '#toplevel_page_arlo-for-wordpress', __('Arlo for WordPress', 'arlo-for-wordpress' ), __('Arlo is almost ready. Just enter your details and you&apos;re good to go.', 'arlo-for-wordpress' ), 'left', 'center');
+		$pointer = new Arlo_Feature_Pointer('arlo-1st-pointer', '#toplevel_page_arlo-for-wordpress', esc_html__('Arlo for WordPress', 'arlo-training-and-event-management-system' ), esc_html__("Arlo is almost ready. Just enter your details and you're good to go.", 'arlo-training-and-event-management-system' ), 'left', 'center');
 
 	}
 
@@ -247,19 +272,19 @@ class Arlo_For_Wordpress_Admin {
 		 *
 		 * NOTE:  Alternative menu locations are available via WordPress administration menu functions.
 		 *
-		 *        Administration Menus: http://codex.wordpress.org/Administration_Menus
+		 *        Administration Menus: https://codex.wordpress.org/Administration_Menus
 		 *
 		 * @TODO:
 		 *
 		 * - Change 'Page Title' to the title of your plugin admin page
 		 * - Change 'Menu Text' to the text for menu item for the plugin settings page
 		 * - Change 'manage_options' to the capability you see fit
-		 *   For reference: http://codex.wordpress.org/Roles_and_Capabilities
+		 *   For reference: https://codex.wordpress.org/Roles_and_Capabilities
 		 */
 		 
 		 /*
 		$this->plugin_screen_hook_suffix = add_options_page(
-			ARLO_PLUGIN_NAME . ' ' . __( 'Settings', 'arlo-for-wordpress' ),
+			ARLO_PLUGIN_NAME . ' ' . esc_html__( 'Settings', 'arlo-for-wordpress' ),
 			ARLO_PLUGIN_NAME,
 			'manage_options',
 			$this->plugin_slug,
@@ -267,14 +292,18 @@ class Arlo_For_Wordpress_Admin {
 		);
 		*/
 		
-		$this->plugin_screen_hook_suffix = add_menu_page( 'Arlo settings page', 'Arlo settings', 'manage_options', $this->plugin_slug, array( $this, 'display_plugin_admin_page' ), 'none', '10.4837219128727371208127' );
-		$this->plugin_events_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Events', 'arlo-for-wordpress' ), __( 'Events', 'arlo-for-wordpress' ) , 'manage_options' , $this->plugin_slug . '-events' , array( $this, 'display_events_admin_page'));		
-		$this->plugin_oa_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Online Activities', 'arlo-for-wordpress' ), __( 'Online Activities', 'arlo-for-wordpress' ) , 'manage_options' , $this->plugin_slug . '-onlineactivities' , array( $this, 'display_oa_admin_page'));
-		$this->plugin_templates_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Templates', 'arlo-for-wordpress' ), __( 'Templates', 'arlo-for-wordpress' ) , 'manage_options' , $this->plugin_slug . '-templates' , array( $this, 'display_templates_admin_page'));		
-		$this->plugin_sessions_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Sessions', 'arlo-for-wordpress' ), __( 'Sessions', 'arlo-for-wordpress' ) , 'manage_options' , $this->plugin_slug . '-sessions' , array( $this, 'display_sessions_admin_page'));		
-		$this->plugin_presenters_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Presenters', 'arlo-for-wordpress' ), __( 'Presenters', 'arlo-for-wordpress' ) , 'manage_options' , $this->plugin_slug . '-presenters' , array( $this, 'display_presenters_admin_page'));
-		$this->plugin_venues_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Venues', 'arlo-for-wordpress' ), __( 'Venues', 'arlo-for-wordpress' ) , 'manage_options' , $this->plugin_slug . '-venues' , array( $this, 'display_venues_admin_page'));
-		$this->plugin_loglist_screen_hook_suffix = add_submenu_page($this->plugin_slug, __( 'Logs', 'arlo-for-wordpress' ), __( 'Logs', 'arlo-for-wordpress' ) , 'manage_options' , $this->plugin_slug . '-logs' , array( $this, 'display_loglist_admin_page'));
+		$svg_path    = plugin_dir_path( __FILE__ ) . 'assets/img/arlo-menu-icon.svg';
+		$svg_content = @file_get_contents( $svg_path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents, WordPress.PHP.NoSilencedErrors.Discouraged -- local file read for SVG data URI; @ suppresses the warning emitted when the file is missing so WP_DEBUG logs stay clean
+		$menu_icon   = is_string( $svg_content ) ? 'data:image/svg+xml;base64,' . base64_encode( $svg_content ) : 'none';
+		$this->plugin_screen_hook_suffix = add_menu_page( esc_html__( 'Arlo Settings', 'arlo-training-and-event-management-system' ), esc_html__( 'Arlo', 'arlo-training-and-event-management-system' ), 'manage_options', $this->plugin_slug, array( $this, 'display_plugin_admin_page' ), $menu_icon, '10.4837219128727371208127' );
+		add_submenu_page( $this->plugin_slug, esc_html__( 'Arlo Settings', 'arlo-training-and-event-management-system' ), esc_html__( 'Settings', 'arlo-training-and-event-management-system' ), 'manage_options', $this->plugin_slug, array( $this, 'display_plugin_admin_page' ) );
+		$this->plugin_events_screen_hook_suffix = add_submenu_page($this->plugin_slug, esc_html__( 'Events', 'arlo-training-and-event-management-system' ), esc_html__( 'Events', 'arlo-training-and-event-management-system' ) , 'manage_options' , $this->plugin_slug . '-events' , array( $this, 'display_events_admin_page'));		
+		$this->plugin_oa_screen_hook_suffix = add_submenu_page($this->plugin_slug, esc_html__( 'Online Activities', 'arlo-training-and-event-management-system' ), esc_html__( 'Online Activities', 'arlo-training-and-event-management-system' ) , 'manage_options' , $this->plugin_slug . '-onlineactivities' , array( $this, 'display_oa_admin_page'));
+		$this->plugin_templates_screen_hook_suffix = add_submenu_page($this->plugin_slug, esc_html__( 'Templates', 'arlo-training-and-event-management-system' ), esc_html__( 'Templates', 'arlo-training-and-event-management-system' ) , 'manage_options' , $this->plugin_slug . '-templates' , array( $this, 'display_templates_admin_page'));		
+		$this->plugin_sessions_screen_hook_suffix = add_submenu_page($this->plugin_slug, esc_html__( 'Sessions', 'arlo-training-and-event-management-system' ), esc_html__( 'Sessions', 'arlo-training-and-event-management-system' ) , 'manage_options' , $this->plugin_slug . '-sessions' , array( $this, 'display_sessions_admin_page'));		
+		$this->plugin_presenters_screen_hook_suffix = add_submenu_page($this->plugin_slug, esc_html__( 'Presenters', 'arlo-training-and-event-management-system' ), esc_html__( 'Presenters', 'arlo-training-and-event-management-system' ) , 'manage_options' , $this->plugin_slug . '-presenters' , array( $this, 'display_presenters_admin_page'));
+		$this->plugin_venues_screen_hook_suffix = add_submenu_page($this->plugin_slug, esc_html__( 'Venues', 'arlo-training-and-event-management-system' ), esc_html__( 'Venues', 'arlo-training-and-event-management-system' ) , 'manage_options' , $this->plugin_slug . '-venues' , array( $this, 'display_venues_admin_page'));
+		$this->plugin_loglist_screen_hook_suffix = add_submenu_page($this->plugin_slug, esc_html__( 'Logs', 'arlo-training-and-event-management-system' ), esc_html__( 'Logs', 'arlo-training-and-event-management-system' ) , 'manage_options' , $this->plugin_slug . '-logs' , array( $this, 'display_loglist_admin_page'));
 
 	}
 
@@ -359,7 +388,7 @@ class Arlo_For_Wordpress_Admin {
 
 		return array_merge(
 			array(
-				'settings' => '<a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug ) . '">' . __( 'Settings', 'arlo-for-wordpress' ) . '</a>'
+				'settings' => '<a href="' . esc_url(admin_url( 'admin.php?page=' . $this->plugin_slug )) . '">' . esc_html__( 'Settings', 'arlo-training-and-event-management-system' ) . '</a>'
 			),
 			$links
 		);
@@ -370,8 +399,8 @@ class Arlo_For_Wordpress_Admin {
 	 * NOTE:     Actions are points in the execution of a page or process
 	 *           lifecycle that WordPress fires.
 	 *
-	 *           Actions:    http://codex.wordpress.org/Plugin_API#Actions
-	 *           Reference:  http://codex.wordpress.org/Plugin_API/Action_Reference
+	 *           Actions:    https://codex.wordpress.org/Plugin_API#Actions
+	 *           Reference:  https://codex.wordpress.org/Plugin_API/Action_Reference
 	 *
 	 * @since    1.0.0
 	 */
@@ -383,8 +412,8 @@ class Arlo_For_Wordpress_Admin {
 	 * NOTE:     Filters are points of execution in which WordPress modifies data
 	 *           before saving it or sending it to the browser.
 	 *
-	 *           Filters: http://codex.wordpress.org/Plugin_API#Filters
-	 *           Reference:  http://codex.wordpress.org/Plugin_API/Filter_Reference
+	 *           Filters: https://codex.wordpress.org/Plugin_API#Filters
+	 *           Reference:  https://codex.wordpress.org/Plugin_API/Filter_Reference
 	 *
 	 * @since    1.0.0
 	 */
@@ -396,8 +425,8 @@ class Arlo_For_Wordpress_Admin {
 	 * NOTE:     Actions are points in the execution of a page or process
 	 *           lifecycle that WordPress fires.
 	 *
-	 *           Actions:    http://codex.wordpress.org/Plugin_API#Actions
-	 *           Reference:  http://codex.wordpress.org/Plugin_API/Action_Reference
+	 *           Actions:    https://codex.wordpress.org/Plugin_API#Actions
+	 *           Reference:  https://codex.wordpress.org/Plugin_API/Action_Reference
 	 *
 	 * @since    1.0.0
 	 */
@@ -429,9 +458,9 @@ class Arlo_For_Wordpress_Admin {
 			return;
 
 		foreach ( (array) $wp_settings_sections[$page] as $section ) {
-			echo '<div class="'.$section['id'].' arlo-section cf">';
+			echo '<div class="'.esc_attr($section['id']).' arlo-section cf">';
 			if ( $section['title'] )
-				echo "<h3>{$section['title']}</h3>\n";
+				echo "<h3>".esc_html($section['title'])."</h3>\n";
 
 			if ( $section['callback'] )
 				call_user_func( $section['callback'], $section );
@@ -467,33 +496,33 @@ class Arlo_For_Wordpress_Admin {
 
 		foreach ( (array) $wp_settings_fields[$page][$section] as $field ) {
 			$field['args']['label_for'] = !empty($field['args']['label_for']) ? $field['args']['label_for'] : "";
-			echo '<div class="' . ARLO_PLUGIN_PREFIX.'-field-wrap cf ' . ARLO_PLUGIN_PREFIX . '-' . strtolower(esc_attr($field['args']['label_for'])) . '" id="' . ARLO_PLUGIN_PREFIX . '-' . strtolower(esc_attr($field['args']['label_for'])) . '">';
+			echo '<div class="' . esc_attr(ARLO_PLUGIN_PREFIX . '-field-wrap cf ' . ARLO_PLUGIN_PREFIX . '-' . strtolower($field['args']['label_for'])) . '" id="' . esc_attr(ARLO_PLUGIN_PREFIX . '-' . strtolower($field['args']['label_for'])) . '">';
 				
 			if($field['callback'][1] == 'arlo_template_callback') {
 			
 				echo '
-					<table class="'.ARLO_PLUGIN_PREFIX.'-template-table">
+					<table class="'. esc_attr(ARLO_PLUGIN_PREFIX .'-template-table').'">
 						<tr>
 							<td>
 								<h2 class="nav-tab-wrapper vertical-nav-tab-wrapper">';
-								    foreach(Arlo_For_Wordpress::$templates as $id => $template) {
-								    	$name = __($template['name'], 'arlo-for-wordpress' );
-										echo '<a href="#pages/'.$id.'" class="nav-tab vertical-nav-tab ' . $this->plugin_slug . '-pages-' . $id . '" id="' . $this->plugin_slug . '-pages-' . $id . '">'.$name.'</a>';
+								    foreach(Arlo_For_Wordpress::get_templates() as $id => $template) {
+								    	$name = $template['name'];
+										echo '<a href="'.esc_url('#pages/'.$id).'" class="'.esc_attr("nav-tab vertical-nav-tab {$this->plugin_slug}-pages-{$id}").'" id="'.esc_attr("{$this->plugin_slug}-pages-{$id}").'">'.esc_html($name).'</a>';
 								    }
 								echo '</h2>
 							</td>
 							
 							<td>
-								<div class="' . ARLO_PLUGIN_PREFIX . '-field ' . ARLO_PLUGIN_PREFIX . '-template-field">';
+								<div class="' . esc_attr(ARLO_PLUGIN_PREFIX . '-field ' . ARLO_PLUGIN_PREFIX . '-template-field').'">';
 									call_user_func($field['callback'], $field['args']);
 
 									$type = isset($field["args"]["type"]) ? $field["args"]["type"] : $field["id"];
 
 									$path = ARLO_PLUGIN_DIR . 'admin/includes/codes/' . $type . '.php';
 									if(file_exists($path)) {
-										echo '<div class="' . ARLO_PLUGIN_PREFIX . '-shortcodes">
-											<h3>' . __( 'Recommended shortcodes', 'arlo-for-wordpress' ) . '</h3>
-											<a href="http://developer.arlo.co/doc/wordpress/shortcodes/" target="_blank">' . __( 'More about shortcodes', 'arlo-for-wordpress' ) . '</a>';
+										echo '<div class="' . esc_attr( ARLO_PLUGIN_PREFIX . '-shortcodes') .'">
+											<h3>' . esc_html__( 'Recommended shortcodes', 'arlo-training-and-event-management-system' ) . '</h3>
+											<a href="https://developer.arlo.co/doc/wordpress/shortcodes/" target="_blank">' . esc_html__( 'More about shortcodes', 'arlo-training-and-event-management-system' ) . '</a>';
 										
 										include($path);
 										echo '</div>';
@@ -506,8 +535,8 @@ class Arlo_For_Wordpress_Admin {
 				';
 			} else {
 				echo '
-					<div class="' . ARLO_PLUGIN_PREFIX . '-label"><label>' . $field['title'] . '</label></div>
-					<div class="' . ARLO_PLUGIN_PREFIX . '-field">';
+					<div class="' . esc_attr(ARLO_PLUGIN_PREFIX . '-label').'">' . $field['title'] . '</div>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Admin field title HTML output. $field['title'] is trusted field-title markup supplied by add_settings_field().
+					. '<div class="' . esc_attr(ARLO_PLUGIN_PREFIX . '-field').'">';
 					call_user_func($field['callback'], $field['args']);
 				echo '</div>
 				';
@@ -525,19 +554,20 @@ class Arlo_For_Wordpress_Admin {
 	 */
 
 	public function disable_visual_editor($default) {
-
-		if(isset($_GET['page']) && $_GET['page'] == 'arlo-for-wordpress') {
-
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Context implies safe execution. $_GET['page'] is menu slug, not a form submission. /wp-admin/admin.php?page=arlo-for-wordpress
+		if(isset($_GET['page']) && sanitize_key($_GET['page']) == 'arlo-for-wordpress') {
 			return false;
-
 		}
-
 		return $default;
 	}
 
 	public function settings_pre_saved($new, $old) {
-		$urlparts = parse_url(site_url());
+		$urlparts = wp_parse_url(site_url());
 		$domain = $urlparts['host'];
+
+		if (!empty($new['platform_name']) && (empty($old['platform_name']) || $old['platform_name'] !== $new['platform_name'])) {
+			$new['user_import_enabled'] = '1';
+		}
 
 		if (empty($new['import_fragment_size']) || !is_numeric($new['import_fragment_size'])) {
 			$new['import_fragment_size'] = ImportRequest::FRAGMENT_DEFAULT_BYTE_SIZE;
@@ -547,14 +577,23 @@ class Arlo_For_Wordpress_Admin {
 
 		if (empty($new['sleep_between_import_tasks']) || !is_numeric($new['sleep_between_import_tasks'])) {
 			$new['sleep_between_import_tasks'] = 0;
-		} else if ($new['sleep_between_import_tasks'] > \Arlo\Scheduler::MAX_SLEEP_BETWEEN_TASKS) {
-			$new['sleep_between_import_tasks'] = \Arlo\Scheduler::MAX_SLEEP_BETWEEN_TASKS;
+		} else if ($new['sleep_between_import_tasks'] > \ArloTraining\Scheduler::MAX_SLEEP_BETWEEN_TASKS) {
+			$new['sleep_between_import_tasks'] = \ArloTraining\Scheduler::MAX_SLEEP_BETWEEN_TASKS;
 		}
 
 		if (!empty($old["custom_shortcodes"])) {
 			$new["custom_shortcodes"] = $old["custom_shortcodes"];
 		} else {
 			$new["custom_shortcodes"] = array();
+		}
+
+		// Preserve post_types page assignments from the previous stored value when not
+		// present in $new or when the value is not an array. Several code paths (theme
+		// changes, partial form saves) call update_option('arlo_settings', ...) with a
+		// snapshot that predates or omits the key; a non-array value is treated the same
+		// as missing to prevent later iteration errors.
+		if ( ! isset( $new['post_types'] ) || ! is_array( $new['post_types'] ) ) {
+			$new['post_types'] = ( is_array( $old ) && isset( $old['post_types'] ) && is_array( $old['post_types'] ) ) ? $old['post_types'] : [];
 		}
 
 		// Custom shortcodes
@@ -645,14 +684,11 @@ class Arlo_For_Wordpress_Admin {
 		$plugin = Arlo_For_Wordpress::get_instance();
 
 		//save theme changes
-		$theme_id = get_option('arlo_theme', Arlo_For_Wordpress::DEFAULT_THEME);
-		$stored_themes_settings = get_option( 'arlo_themes_settings', [] );
-		$stored_themes_settings[$theme_id]->templates = $new['templates'];
-		update_option('arlo_themes_settings', $stored_themes_settings, 1);
+		$this->save_theme_templates( isset( $new['templates'] ) ? $new['templates'] : [] );
 			
 		if($old['platform_name'] != $new['platform_name'] && !empty($new['platform_name'])) {
-			$plugin->determine_url_structure($new['platform_name']);
-			
+			\Arlo_For_Wordpress::reset_connection_health();
+
 			$scheduler = $plugin->get_scheduler();
 			$scheduler->set_task("import", -1);
 		} else if (empty($new['platform_name'])) {
@@ -671,7 +707,7 @@ class Arlo_For_Wordpress_Admin {
 			if (WP_Filesystem($creds)) {
 				global $wp_filesystem;
 				$custom_css = (isset($new['customcss']) ? $new['customcss'] : '');
-				$new['customcss'] = preg_replace('/<\/style>/i', '', $custom_css);
+				$new['customcss'] = wp_strip_all_tags($custom_css);
 				
 				$filename = trailingslashit(plugin_dir_path( __FILE__ )).'../public/assets/css/custom.css';
 				if ($wp_filesystem->put_contents( $filename, $new['customcss'], FS_CHMOD_FILE)) {
@@ -714,8 +750,6 @@ class Arlo_For_Wordpress_Admin {
 					'post_status'		=> 'publish' // only there to ensure we don't create a loop if a user has tampered
 				));
 				
-				$posts = array_merge($posts, $regions);
-			
 				// update all posts of this type to have this parent id
 				foreach($posts as $post) {
 					wp_update_post(array(
@@ -725,6 +759,20 @@ class Arlo_For_Wordpress_Admin {
 				}
 			}
 		}
+	}
+
+	protected function save_theme_templates( $templates ) {
+		$templates = is_array( $templates ) ? $templates : [];
+		$theme_id = get_option( 'arlo_theme', Arlo_For_Wordpress::DEFAULT_THEME );
+		$stored_themes_settings = get_option( 'arlo_themes_settings', [] );
+		if ( ! is_array( $stored_themes_settings ) ) {
+			$stored_themes_settings = [];
+		}
+		if ( ! isset( $stored_themes_settings[ $theme_id ] ) || ! is_object( $stored_themes_settings[ $theme_id ] ) ) {
+			$stored_themes_settings[ $theme_id ] = new \stdClass();
+		}
+		$stored_themes_settings[ $theme_id ]->templates = $templates;
+		update_option( 'arlo_themes_settings', $stored_themes_settings, 1 );
 	}
 
 }

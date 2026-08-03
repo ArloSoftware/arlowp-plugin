@@ -26,7 +26,7 @@
       [/arlo_onlineactivites_list_item]
   </div>
 
-  [arlo_onlineactivites_list_pagination limit="6" wrap='<div class="arlo-pager">%s</div>']
+  [arlo_onlineactivites_list_pagination group="none" limit="6" wrap='<div class="arlo-pager">%s</div>']
 </div>
 <div class="arlo-align-center-row arlo-mobile-padding">
     <button class="arlo-button arlo-gray arlo-more-oa">Show more</button>

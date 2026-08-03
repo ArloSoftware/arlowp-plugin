@@ -1,4 +1,90 @@
 
+== v5.1.0 ==
+
+Enhancements
+------------------
+* Theme Z: new design theme.
+* Non-production deployment mode: sites using a test platform now sync daily
+  or weekly rather than every 30 minutes, reducing unnecessary API traffic.
+* Connection health tracking: sync auto-disables after sustained platform
+  failures; admin settings shows a live status indicator and cleaner reconnect
+  flow.
+* Improved Google structured data: event and course rich snippets updated to
+  the Google 2026 spec — correct attendance mode (online/in-person),
+  eventStatus, RFC 3339 datetimes, and Course provider field (previously
+  absent, making course pages ineligible for Google rich results).
+* Shortcode validation indicator on the Pages settings tab: live check shows
+  whether each assigned page contains the expected shortcode.
+* Warning shown when two or more Arlo page types are assigned to the same
+  host page.
+* Admin Pages tab: each host-page tab now shows the live URL/slug of the
+  assigned page, a private-page indicator, and direct View and Edit links.
+* [arlo_event_presenters]: new layout=list attribute for list display.
+* On activation, newly created Arlo pages are automatically assigned to
+  their corresponding page type slot; Settings → Pages no longer opens
+  with all dropdowns blank after a fresh install.
+* Page-setup admin notice now shows two categorised lists: pages with no
+  assignment under "Finish the setup", and assigned-but-unpublished pages
+  (with status label) under "Review these pages".
+
+Bug fixes
+------------------
+* Schema hash depended on the configured table prefix, causing a spurious
+  mismatch on any non-wp_ prefix that dropped and recreated all Arlo tables
+  and triggered a full re-import during plugin upgrades.
+* Event, presenter, and venue detail pages could briefly show content from an
+  in-progress import before sync completed.
+* Plugin pages that have been deleted or unpublished now show a stale-
+  assignment warning in admin with a recovery path; search form degrades
+  gracefully on the front end rather than disappearing.
+* Theme Z: corrected show-more button visibility on first load and grouped
+  event paging in the new theme.
+* Settings saved confirmation and all admin notices were silently discarded
+  since the plugin's initial release.
+* Import sync throttle was permanently bypassed — syncs ran on every cron
+  tick unconditionally rather than respecting the minimum interval.
+* Empty search form submission exposed the nonce in the browser address bar.
+* [arlo_event_template_list_image_src]: urldecode attribute was ignored; URL
+  decoding was always applied regardless of the attribute value.
+* [arlo_event_template_summary]: digest attribute was mishandled for zero,
+  negative, and non-integer values — output was suppressed or content was
+  truncated unexpectedly.
+* [arlo_event_presenters]: link='false' produced an empty anchor rather than
+  plain text.
+* Category and region filter selects had incorrect ARIA roles and missing
+  translated labels.
+* Draft or pending regionalized host page accessed by slug caused a 302
+  redirect loop when regions were configured.
+
+Performance improvements
+------------------
+* Eliminated 1,000+ duplicate database queries per page load by caching the
+  import ID for the request lifetime.
+* Admin list pagination (events, templates, presenters, venues, sessions,
+  online activities) replaced full-result fetches with count queries —
+  events admin reduced from ~16s to ~49ms on large datasets.
+* Front-end page loads no longer scan all bundled theme directories to resolve
+  the active theme's assets.
+
+Security
+------------------
+* Output escaping hardened across shortcodes, admin list tables, widgets,
+  and the import log page to meet current WordPress coding standards.
+* Capability and nonce enforcement strengthened on admin AJAX handlers and
+  GET-parameter action handlers.
+* Scheduler nonce moved from URL query string to POST body; snapshot callback
+  nonce consumption made atomic.
+* HMAC verification in the import crypto layer uses timing-safe comparison.
+* SQL query text no longer included in importer error log messages.
+* Sync log CSV export: field values sanitised against formula injection when
+  the export is opened in a spreadsheet application.
+* Removed the bundled demo Google Maps API key.
+
+Compatibility
+------------------
+* Support for PHP up to 8.5.
+* Support for WordPress 7.0.
+
 == v4.3.1 ==
 
 Updating metadata.
@@ -456,7 +542,7 @@ Fix start and end date times when the dates are returning a UTC value https://gi
 
 Enhancement
 ------------------
-New asynchronous import, for more information, please visit: http://developer.arlo.co/doc/wordpress/import
+New asynchronous import, for more information, please visit: https://developer.arlo.co/doc/wordpress/import
 
 Bugfixes
 ------------------

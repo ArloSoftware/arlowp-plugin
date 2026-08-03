@@ -1,19 +1,20 @@
 <?php
 
-namespace Arlo\Importer;
+namespace ArloTraining\Importer;
 
-use Arlo\Logger;
-use Arlo\CacheControl;
+use ArloTraining\Logger;
+use ArloTraining\CacheControl;
+use ArloTraining\Provisioning\SchemaManager;
 
 class Finish extends BaseImporter {
 
 	protected function save_entity($item) {}
 
 	public function run() {
-		if ($this->importer->get_import_lock_entries_number() == 1 && $this->importer->check_import_lock($this->import_id)) {
+		if ($this->importer->get_import_lock_entries_number() == 1 && $this->importer->check_import_lock()) {
 
             //clean up the old entries
-			$this->cleanup_import($this->import_id);
+			$this->cleanup_import();
        
             // update logs
             Logger::log('Synchronization successful', $this->import_id, null, true);            
@@ -26,6 +27,8 @@ class Finish extends BaseImporter {
 			$this->importer->set_tax_exempt_events($this->import_id);
 	        
 	        $this->message_handler->dismiss_by_type('import_error');
+			$this->message_handler->dismiss_by_type_and_title('error', SchemaManager::get_schema_upgrade_warning_title());
+			\Arlo_For_Wordpress::reset_connection_health();
 
 			$this->is_finished = true;
 
@@ -38,6 +41,7 @@ class Finish extends BaseImporter {
 	}
 
 	private function cleanup_import() {
+		global $wpdb;
 		$tables = array(
 			'eventtemplates',
 			'contentfields',
@@ -58,8 +62,9 @@ class Finish extends BaseImporter {
 		);
                 		
 		foreach($tables as $table) {
-			$table = $this->dbl->prefix . 'arlo_' . $table;
-			$this->dbl->query($this->dbl->prepare("DELETE FROM $table WHERE import_id <> %s", $this->import_id));
+			$table = $wpdb->prefix . 'arlo_' . $table;
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is constructed from trusted source. Direct database query is required. Do not need cache for delete operation.
+			$wpdb->query($wpdb->prepare("DELETE FROM $table WHERE import_id <> %d", $this->import_id));
 		}   
 
 		Logger::log('Database cleanup', $this->import_id);

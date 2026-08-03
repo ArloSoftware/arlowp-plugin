@@ -1,19 +1,21 @@
 <?php
 
-namespace Arlo\Importer;
+namespace ArloTraining\Importer;
 
-use Arlo\Logger;
-use Arlo\Utilities;
-use Arlo\Crypto;
+use ArloTraining\Logger;
+use ArloTraining\Utilities;
 
 class Importer {
 	const MAX_RETRY_ATTEMPT = 5;
+	const IMPORT_TIMEOUT_SECONDS = 90;
+	const IMPORT_INTERVAL_MIN_SECONDS = 600; // 10 minutes
+	const IMPORT_FAILURE_MAX_COUNT = 10;
+	const IMPORT_FAILURE_MIN_DURATION_HOURS = 3;
 
 	protected $data_json;			
 	
 	private $environment;
 	private $message_handler;
-	private $dbl;
 	private $api_client;
 	private $scheduler;
 	private $importing_parts;
@@ -47,9 +49,8 @@ class Importer {
 	public $nonce;
 	public $is_finished = false;
 
-	public function __construct($environment, $dbl, $message_handler, $api_client, $scheduler, $importing_parts) {
+	public function __construct($environment, $message_handler, $api_client, $scheduler, $importing_parts) {
 		$this->environment = $environment;
-		$this->dbl = $dbl;
 		$this->message_handler = $message_handler;
 		$this->api_client = $api_client;
 		$this->scheduler = $scheduler;
@@ -57,7 +58,7 @@ class Importer {
 	}
 
 	public function generate_import_id() {
-		return \Arlo\Utilities::get_random_int();
+		return \ArloTraining\Utilities::get_random_int();
 	}
 
 	public function set_import_id($import_id) {
@@ -71,20 +72,23 @@ class Importer {
 	}
 
 	public function get_current_import_id() {
-        //need to access the db directly, get_option('arlo_import_id'); can return a cached (old) value
-        $table_name = $this->dbl->prefix . "options";
-        
-        $sql = "SELECT option_value
-			FROM $table_name 
-            WHERE option_name = 'arlo_import_id'";
-	               
-		$this->current_import_id = $this->dbl->get_var($sql);
-                
-		return $this->current_import_id;		
+		if ( $this->current_import_id !== null ) {
+			return $this->current_import_id;
+		}
+
+		global $wpdb;
+		// Bypass WP's options cache (get_option may return a stale value during import).
+		// Result is cached in $this->current_import_id for the remainder of this request.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct query bypasses WP options cache; per-request caching is handled by the property.
+		$this->current_import_id = $wpdb->get_var("SELECT option_value
+			FROM {$wpdb->prefix}options
+			WHERE option_name = 'arlo_import_id'");
+
+		return $this->current_import_id;
 	}
 
 	public function set_last_import_date() {
-		$now = \Arlo\Utilities::get_now_utc();
+		$now = \ArloTraining\Utilities::get_now_utc();
        	$timestamp = $now->format("Y-m-d H:i:s");	
 	
 		update_option('arlo_last_import', $timestamp);
@@ -92,14 +96,15 @@ class Importer {
 	}	
 
 	public function set_tax_exempt_events($import_id) {
+		global $wpdb;
 		$settings = get_option('arlo_settings');
 
 		if (!empty($settings['taxexempt_tag'])) {
-			$sql = $this->dbl->prepare("
+			$sql = $wpdb->prepare("
 			UPDATE 
-				{$this->dbl->prefix}arlo_events AS e, 
-				{$this->dbl->prefix}arlo_events_tags AS et, 
-				{$this->dbl->prefix}arlo_tags AS t 
+				{$wpdb->prefix}arlo_events AS e, 
+				{$wpdb->prefix}arlo_events_tags AS et, 
+				{$wpdb->prefix}arlo_tags AS t 
 			SET 
 				e_is_taxexempt = 1
 			WHERE 
@@ -116,9 +121,9 @@ class Importer {
 				e.import_id = %d
 			", [trim($settings['taxexempt_tag']), $import_id, $import_id, $import_id]);			
 		} else {
-			$sql = $this->dbl->prepare("
+			$sql = $wpdb->prepare("
 			UPDATE 
-				{$this->dbl->prefix}arlo_events AS e
+				{$wpdb->prefix}arlo_events AS e
 			SET 
 				e_is_taxexempt = 0
 			WHERE 
@@ -126,10 +131,11 @@ class Importer {
 			", [$import_id]);
 		}
 		
-		$query = $this->dbl->query($sql);
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared --  Direct database query is required for custom table. Do not need cache for import process. SQL is prepared above
+		$query = $wpdb->query($sql);
 
 		if ($query === false) {					
-			throw new \Exception('SQL error at set_tax_exempt_events: ' . $this->dbl->last_error);
+			throw new \Exception('SQL error at set_tax_exempt_events: ' . $wpdb->last_error); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message is caught by the import pipeline, written to the Arlo log table via Logger, and escaped with esc_html() at admin render time.
 		}	
 	}
 
@@ -197,22 +203,39 @@ class Importer {
 	}
 
 	public function should_importer_run($force = false) {
-		if(!$force) {
-			Logger::log('Synchronization Started', $this->import_id);
+		if (!$force) {
 			Logger::log('Synchronization identified as automatic synchronization.', $this->import_id);
-			if(!empty($last)) {
-				Logger::log('Previous successful synchronization found.', $this->import_id);
-				if(strtotime('-1 hour') > strtotime($this->get_last_import_date())) {
-					Logger::log('Synchronization more than an hour old. Synchronization required.', $this->import_id);
-				}
-				else {
-					Logger::log('Synchronization less than an hour old (' . date("Y-m-d H:i:s", strtotime($this->get_last_import_date())) . '). Synchronization stopped.', $this->import_id);
-					return false;
-				}
+
+			$elapsed = $this->get_seconds_since_last_import();
+			if ($elapsed !== false && $elapsed < self::IMPORT_INTERVAL_MIN_SECONDS) {
+				Logger::log('Last synchronization is less than ' . self::IMPORT_INTERVAL_MIN_SECONDS . ' seconds old. Synchronization stopped.', $this->import_id);
+				return false;
 			}
 		}
 
 		return true;
+	}
+
+	/**
+	 * Returns the number of seconds since the last successful import,
+	 * or false if no valid timestamp is available.
+	 * Negative values (future timestamps from corrupt data) are treated as zero.
+	 *
+	 * @return int|false
+	 */
+	private function get_seconds_since_last_import() {
+		$last_import_date = $this->get_last_import_date();
+		if (empty($last_import_date)) {
+			return false;
+		}
+
+		try {
+			$last_utc_ts = (new \DateTime($last_import_date, new \DateTimeZone('UTC')))->getTimestamp();
+		} catch (\Exception $e) {
+			return false;
+		}
+
+		return max(0, time() - $last_utc_ts);
 	}
 
     public function check_viable_execution_environment() { 
@@ -238,114 +261,193 @@ class Importer {
 		$this->data_json = json_decode($item->import_text);
 
 		if (is_null($this->data_json)) {
-			throw new \Exception("JSON Error: " . json_last_error_msg());
+			throw new \Exception("JSON Error: " . json_last_error_msg()); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message is caught by the import pipeline, written to the Arlo log table via Logger, and escaped with esc_html() at admin render time.
 		}
 	}
 
-	public function run($force = false, $task_id = 0) {
-		$this->task_id = intval($task_id);
-		$retval = true;
+	/**
+	 * Resolves the task state for an import run.
+	 *
+	 * For a resumed import, returns the decoded task state object.
+	 * For a new import, initialises the task and returns null.
+	 * Returns false if the run should be aborted (throttled or invalid state).
+	 *
+	 * @param bool $force Whether to bypass the import interval throttle.
+	 * @return object|null|false
+	 */
+	private function resolve_task_state($force) {
+		$rows = $this->scheduler->get_task_data($this->task_id);
+		if (empty($rows)) {
+			return false;
+		}
+		$task = $rows[0];
 
-		$this->set_import_id(\Arlo\Utilities::get_random_int());
+		// Resuming an in-progress import
+		if (!empty($task->task_data_text)) {
+			$state = json_decode($task->task_data_text);
+			if (!is_object($state) || empty($state->import_id)) {
+				return false;
+			}
+			$this->set_import_id($state->import_id);
+			return $state;
+		}
+
+		// Starting a new import — check throttle
+		if (!$this->should_importer_run($force)) {
+			return false;
+		}
+
+		Logger::log('Synchronization Started', $this->import_id);
+		$this->scheduler->update_task_data($this->task_id, ['import_id' => $this->import_id]);
+		return null;
+	}
+
+	public function run($force = false, $task_id = 0) {
+		$retval = false;
+		$original_time_limit = $this->environment->arlo_set_time_limit(self::IMPORT_TIMEOUT_SECONDS);
+		try {
+			$retval = $this->execute_import($force, $task_id);
+		} catch(\Exception $e) {
+			Logger::log($e->getMessage());
+		} finally {
+			$this->environment->arlo_set_time_limit($original_time_limit);
+		}
+
+		return $retval;
+	}
+
+	private function execute_import($force, $task_id) {
+		$this->task_id = intval($task_id);
+
+		$this->set_import_id(\ArloTraining\Utilities::get_random_int());
 
 		if ($this->task_id > 0) {
-			$task = $this->scheduler->get_task_data($this->task_id);
-			if (count($task)) {
-				$task = $task[0];
-			};
-
-			if (empty($task->task_data_text) && $this->should_importer_run($force)) {
-				Logger::log('Synchronization Started', $this->import_id);
-		        $this->scheduler->update_task_data($this->task_id, ['import_id' => $this->import_id]);
-			} else {
-				$task->task_data_text = json_decode($task->task_data_text);
-				if (empty($task->task_data_text->import_id)) {
-					return false;
-				} else {
-					$this->set_import_id($task->task_data_text->import_id);
-				}
+			$task_state = $this->resolve_task_state($force);
+			if ($task_state === false) {
+				return false;
 			}
 		}
 
-		//if an import is already running, exit
-        if ($this->acquire_import_lock()) {
+		if (!$this->acquire_import_lock()) {
+			return $this->handle_lock_failure();
+		}
 
-			set_error_handler ( function($num, $str, $file, $line, $context = null) {
-				error_log($str . ' in ' . $file . ' on line ' . $line);
+		try {
+			return $this->run_locked_import(isset($task_state) ? $task_state : null, $force);
+		} finally {
+			$this->clear_import_lock();
+			$this->scheduler->unlock_process('import');
+		}
+	}
 
-				//pretty nasty, but need to know if our plugin throws the error or something else (like a cache plugin)
-				//arlo- is in case $file would not include the path; just 'arlo' would catch all errors for hosted servers like vanguard.wpdemo.arlo.co where domain is used in the plugin file path
-				if (strpos($file, 'arlo-') !== false || strpos($file, 'arlowp')) {
-
-					// specific error for file permission
-					if (strpos($str, 'fopen(') === 0) {
-						if (strpos($str, 'ermission denied') > 0) {
-							Logger::log("Missing write permission" . (strpos($str, "/import/") > 0 ? " on 'import' directory" : ""), $this->import_id);
-						}
-					}
-
-					throw new \Exception($str);
-				}
-			}, E_ALL & ~E_USER_NOTICE & ~E_NOTICE  & ~E_DEPRECATED);
-			
-			try {
-				$this->set_state($task->task_data_text);
-
-				if (!$this->is_finished) {
-
-					if (!$this->is_finished && isset($this->import_tasks[$this->current_task])) {
-						$this->run_import_task($this->current_task);
-					}
-
-					//means that wasn't any error/warning during the task
-					$this->current_task_retry--;
-					$this->scheduler->update_task_data($this->task_id, $this->get_state());
-					$this->scheduler->update_task($this->task_id, 1);
-				}
-
-				if ($this->is_finished) {
-					//finish task
-					$this->scheduler->update_task($this->task_id, 4, "Import finished");
-					$this->scheduler->clear_cron();
-
-					$this->importing_parts->delete_all_import_parts();
-				} else if ($this->current_task_num > 0) {
-					$this->kick_off_scheduler();
-				}
-			} catch(\Exception $e) {
-				if ($this->should_retry($this->get_state()) && !($e instanceof \Arlo\SchedulerException)) {
-					//pause the task 
-					$this->scheduler->update_task($this->task_id, 1);
-					$this->kick_off_scheduler();
-				} else {
-					Logger::log($e->getMessage(), $this->import_id);
-					Logger::log('Synchronization failed, please check the <a href="?page=arlo-for-wordpress-logs&s='.$this->import_id.'">Log</a> ', $this->import_id);
-					//cancel the task
-					$this->scheduler->update_task($this->task_id, 3);
-					$retval = false;
-				}
-			}
-
-			restore_error_handler();
+	private function handle_lock_failure() {
+		/**
+		 * For some reason there have been multiple cases of our import lock table going missing.
+		 * To resolve this, we will check for the table missing error and trigger DB rebuild.
+		 * It is likely another plugin, but its not unwise to simply handle it and move on.
+		 */
+		if ($this->check_import_lock_error()) {
+			Logger::log("Synchronization LOCK table missing, triggering db schema check", $this->import_id);
+			\Arlo_For_Wordpress::get_instance()->ensure_consistent_db_schema();
 		} else {
-			$retval = false;
-			/**
-			 * For some reason there have been multiple cases of our import lock table going missing. 
-			 * To resolve this, we will check for the table missing error and trigger DB rebuild.
-			 * It is likely another plugin, but its not unwise to simply handle it and move on.
-			 */
-			if ($this->check_import_lock_error()){
-				Logger::log("Synchronization LOCK table missing, triggering db schema check", $this->import_id);
-				\Arlo_For_Wordpress::get_instance()->check_db_schema();
-			} else {
-				Logger::log('Synchronization LOCK found, please wait 5 minutes and try again', $this->import_id);
+			Logger::log('Synchronization LOCK found, please wait 5 minutes and try again', $this->import_id);
+		}
+
+		return false;
+	}
+
+	/**
+	 * Custom PHP error handler used during imports. Converts plugin-originating
+	 * PHP errors into exceptions so they can be caught and logged by the import pipeline.
+	 *
+	 * @param int         $num     Error level.
+	 * @param string      $str     Error message.
+	 * @param string      $file    File where the error occurred.
+	 * @param int         $line    Line number.
+	 * @param mixed|null  $context Error context (deprecated in PHP 8).
+	 */
+	public function handle_import_error($num, $str, $file, $line, $context = null) {
+		error_log($str . ' in ' . $file . ' on line ' . $line); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Logging errors for debugging purposes.
+
+		//pretty nasty, but need to know if our plugin throws the error or something else (like a cache plugin)
+		//arlo- is in case $file would not include the path; just 'arlo' would catch all errors for hosted servers like vanguard.wpdemo.arlo.co where domain is used in the plugin file path
+		if (strpos($file, 'arlo-') !== false || strpos($file, 'arlowp') !== false) {
+
+			// specific error for file permission
+			if (strpos($str, 'fopen(') === 0) {
+				if (strpos($str, 'ermission denied') > 0) {
+					Logger::log("Missing write permission" . (strpos($str, "/import/") > 0 ? " on 'import' directory" : ""), $this->import_id);
+				}
 			}
-        }
 
-		$this->clear_import_lock();
-		$this->scheduler->unlock_process('import');
+			throw new \Exception($str); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message is caught by the import pipeline, written to the Arlo log table via Logger, and escaped with esc_html() at admin render time.
+		}
+	}
 
-		return $retval;
+	private function run_locked_import($task_state, $force = false) {
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler -- Logging errors for debugging purposes.
+		set_error_handler([$this, 'handle_import_error'], E_ALL & ~E_USER_NOTICE & ~E_NOTICE  & ~E_DEPRECATED);
+
+		try {
+			$this->set_state($task_state);
+
+			if (!$this->is_finished) {
+
+				if (!$this->is_finished && isset($this->import_tasks[$this->current_task])) {
+					$this->run_import_task($this->current_task);
+				}
+
+				//means that wasn't any error/warning during the task
+				$this->current_task_retry--;
+				$this->scheduler->update_task_data($this->task_id, $this->get_state());
+				$this->scheduler->update_task($this->task_id, 1);
+			}
+
+			if ($this->is_finished) {
+				//finish task
+				$this->scheduler->update_task($this->task_id, 4, "Import finished");
+				$this->scheduler->clear_cron();
+
+				$this->importing_parts->delete_all_import_parts();
+			} else if ($this->current_task_num > 0) {
+				$this->kick_off_scheduler();
+			}
+
+			return true;
+		} catch(\Exception $e) {
+			if ($this->should_retry($this->get_state())
+				&& !($e instanceof \ArloTraining\SchedulerException)
+				&& !($e instanceof \ArloTraining\PlatformAccessHttpException)
+				&& !($e instanceof \ArloTraining\SnapshotProcessException)) {
+				//pause the task
+				$this->scheduler->update_task($this->task_id, 1);
+				$this->kick_off_scheduler();
+				// Non-platform failure in retry path: platform was reachable, reset health counter
+				update_option('arlo_platform_access_failure_count', 0);
+				delete_option('arlo_platform_access_first_failure_at');
+				return true;
+			} else {
+				Logger::log($e->getMessage(), $this->import_id);
+				Logger::log('Synchronization failed', $this->import_id);
+				//cancel the task
+				$this->scheduler->update_task($this->task_id, 3);
+				if ($e instanceof \ArloTraining\PlatformAccessHttpException) {
+					if (!$force) {
+						// Scheduled sync platform failure: count toward auto-disable threshold.
+						$this->handle_platform_access_failure($e);
+					}
+					// Forced sync platform failure: leave health counters intact so accumulated
+					// failure state from scheduled syncs is not erased by an admin retry.
+				} else {
+					// Non-platform failure: platform was reachable, reset health counter.
+					update_option('arlo_platform_access_failure_count', 0);
+					delete_option('arlo_platform_access_first_failure_at');
+				}
+				return false;
+			}
+		} finally {
+			restore_error_handler();
+		}
 	}
 
 	private function update_task_data_for_retry($state) {
@@ -368,48 +470,45 @@ class Importer {
 	}
 
    	public function clear_import_lock() {
-        $table_name = $this->dbl->prefix . "arlo_import_lock";
+        global $wpdb;
       
-        $query = $this->dbl->query('DELETE FROM ' . $table_name);
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct database query is required. Do not need cache for import process.
+        $query = $wpdb->query("DELETE FROM {$wpdb->prefix}arlo_import_lock");
     }     
     
     public function get_import_lock_entries_number() {
-        $table_name = $this->dbl->prefix ."arlo_import_lock";
+        global $wpdb;
         
-        $sql = '
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct database query is required for custom table. Do not need cache for import process.
+        $wpdb->get_results("
             SELECT 
                 lock_acquired
             FROM
-                ' . $table_name . '
+                {$wpdb->prefix}arlo_import_lock
             WHERE
                 lock_expired > NOW()
-            ';
-	               
-        $this->dbl->get_results($sql);
+            ");
         
-        return $this->dbl->num_rows;
+        return $wpdb->num_rows;
     }
     
     private function cleanup_import_lock() {
-        $table_name = $this->dbl->prefix ."arlo_import_lock";
-      
-        $this->dbl->query(
-            'DELETE FROM  
-                ' . $table_name . '
-            WHERE 
-                lock_expired < NOW()
-            '
-        );
+        global $wpdb;
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Direct database query is required. Do not need to cache the result.
+        $wpdb->query("DELETE FROM {$wpdb->prefix}arlo_import_lock WHERE lock_expired < NOW()");
     }
     
     private function add_import_lock() {
+        global $wpdb;
         
-        $table_lock = $this->dbl->prefix . "arlo_import_lock";
-        $table_log = $this->dbl->prefix . "arlo_log";
-        
-        $query = $this->dbl->query(
-                'INSERT INTO ' . $table_lock . ' (import_id, lock_acquired, lock_expired)
-                SELECT ' . $this->import_id . ', NOW(), ADDTIME(NOW(), "00:05:00.00") FROM ' . $table_log . ' WHERE (SELECT count(1) FROM ' . $table_lock . ') = 0 LIMIT 1');
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct database query is required. Do not need cache for import process.
+        $query = $wpdb->query(
+            $wpdb->prepare(
+                "INSERT INTO {$wpdb->prefix}arlo_import_lock (import_id, lock_acquired, lock_expired)
+                SELECT %d, NOW(), ADDTIME(NOW(), '00:05:00.00') FROM {$wpdb->prefix}arlo_log WHERE (SELECT count(1) FROM {$wpdb->prefix}arlo_import_lock) = 0 LIMIT 1",
+                $this->import_id
+            )
+        );
                     
         return $query !== false && $query == 1;
     }
@@ -418,46 +517,134 @@ class Importer {
     	$lock_entries_num = $this->get_import_lock_entries_number();
         if ($lock_entries_num == 0) {
             $this->cleanup_import_lock();
-            if ($this->add_import_lock($this->import_id)) {
+            if ($this->add_import_lock()) {
                 return true;
             }
         } else if ($lock_entries_num == 1) {
-        	return $this->check_import_lock($this->import_id);
+        	return $this->check_import_lock();
         }
         
         return false;
     }
     
     public function check_import_lock() {
-    	$table_name = "{$this->dbl->prefix}arlo_import_lock";
+        global $wpdb;
         
-        $sql = '
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Direct database query is required. Do not need cache for import process.
+        $wpdb->get_results($wpdb->prepare("
             SELECT 
                 lock_acquired
             FROM
-                ' . $table_name . '
+                {$wpdb->prefix}arlo_import_lock
             WHERE
-                import_id = ' . $this->import_id . '
+                import_id = %d
             AND    
-                lock_expired > NOW()';
-               
-        $this->dbl->get_results($sql);
+                lock_expired > NOW()", $this->import_id));
         
-        if ($this->dbl->num_rows == 1) {
+        if ($wpdb->num_rows == 1) {
             return true;
         }
     
         return false;
 	}	
 	
+	/**
+	 * Record a platform access failure and disable imports if both sustained-failure
+	 * thresholds are exceeded.
+	 *
+	 * Increments the failure counter and, once IMPORT_FAILURE_MAX_COUNT failures have
+	 * occurred within a window of at least IMPORT_FAILURE_MIN_DURATION_HOURS, sets
+	 * arlo_import_connection_health_disabled and stores a normalised human-readable
+	 * reason in arlo_import_disabled_message. Is a no-op when
+	 * import_connection_healthchecks_enabled is off in settings.
+	 *
+	 * Public to allow direct invocation in unit tests without reflection.
+	 *
+	 * @param \ArloTraining\PlatformAccessHttpException $e The caught exception whose
+	 *        message is normalised and stored as the disable reason.
+	 *
+	 * @since 5.1.0
+	 */
+	public function handle_platform_access_failure(\ArloTraining\PlatformAccessHttpException $e) {
+		$arlo_settings = get_option('arlo_settings', []);
+		if (($arlo_settings['import_connection_healthchecks_enabled'] ?? '1') !== '1') return;
+
+		$now = \ArloTraining\Utilities::get_now_utc();
+
+		// Set first failure timestamp if not already set
+		if (empty(get_option('arlo_platform_access_first_failure_at', ''))) {
+			update_option('arlo_platform_access_first_failure_at', $now->format('Y-m-d H:i:s'));
+		}
+
+		// Increment failure count
+		$count = intval(get_option('arlo_platform_access_failure_count', 0)) + 1;
+		update_option('arlo_platform_access_failure_count', $count);
+
+		// Check if both thresholds are exceeded
+		if ($count >= self::IMPORT_FAILURE_MAX_COUNT) {
+			$first_failure_at = get_option('arlo_platform_access_first_failure_at', '');
+			if (!empty($first_failure_at)) {
+				try {
+					$first = new \DateTime($first_failure_at, new \DateTimeZone('UTC'));
+				} catch (\Exception $date_ex) {
+					// Stored timestamp is corrupt — reset counter and start a clean window from the current failure
+					update_option('arlo_platform_access_failure_count', 1);
+					update_option('arlo_platform_access_first_failure_at', $now->format('Y-m-d H:i:s'));
+					return;
+				}
+				$hours_elapsed = ($now->getTimestamp() - $first->getTimestamp()) / 3600;
+
+				if ($hours_elapsed >= self::IMPORT_FAILURE_MIN_DURATION_HOURS) {
+					$platform_host = !empty($arlo_settings['platform_name']) ? $arlo_settings['platform_name'] . '.arlo.co' : 'the Arlo platform';
+
+					$raw_message = $e->getMessage();
+
+					// Strip a leading "hostname: " prefix if present (e.g. messages thrown by
+					// Download::get_remote_data() are prefixed with the CDN hostname).
+					// This lets the patterns below match regardless of where the exception originated.
+					$normalised = preg_replace('/^[^\s:]+:\s+/', '', $raw_message);
+
+					if (preg_match('/^.+ returned \d+ .+$/', $normalised)) {
+						// HTTP error — hostname + status code already embedded; use as-is.
+						$stored_message = $normalised;
+					} elseif (preg_match('/^cURL error 28:/i', $normalised)) {
+						// cURL timeout — omit the "after X milliseconds" suffix.
+						$stored_message = $platform_host . ': Connection timed out';
+					} elseif (preg_match('/^cURL error \d+: (.+)$/i', $normalised, $m)) {
+						// Other cURL errors (SSL, DNS, etc.) — use the human-readable description.
+						$stored_message = $platform_host . ': ' . $m[1];
+					} else {
+						// Use the normalised form to avoid double-prefixing if the message
+						// originated from Download and carried a CDN hostname prefix.
+						$stored_message = $platform_host . ': ' . $normalised;
+					}
+
+					update_option('arlo_import_connection_health_disabled', '1');
+					update_option('arlo_import_disabled_message', sanitize_text_field($stored_message));
+					update_option('arlo_import_disabled_since', $now->format('Y-m-d H:i:s'));
+					update_option('arlo_platform_access_failure_count', 0);
+					delete_option('arlo_platform_access_first_failure_at');
+
+					$minutes_elapsed = max(1, (int) round($hours_elapsed * 60));
+					Logger::log(
+						'Automatic synchronization was disabled (' . $count . ' ' . ($count === 1 ? 'failure' : 'failures') . ' over ' . $minutes_elapsed . ' ' . ($minutes_elapsed === 1 ? 'minute' : 'minutes') . '). Reason: ' . $stored_message,
+						$this->import_id
+					);
+				}
+			}
+		}
+	}
+
 	private function check_import_lock_error(){
-		$tableMissingErr = "Table '{$this->dbl->wpdb->dbname}.{$this->dbl->prefix}arlo_import_lock' doesn't exist";
-		if ($this->dbl->last_error == $tableMissingErr){
+        global $wpdb;
+		$tableMissingErr = "Table '{$wpdb->dbname}.{$wpdb->prefix}arlo_import_lock' doesn't exist";
+		if ($wpdb->last_error == $tableMissingErr){
 			return true;
 		} else { return false; }
 	}
 
 	private function run_import_task($import_task) {
+		global $wpdb;
 		$this->data_json = null;
 		if ($this->current_task_num == 2) {
 			$this->get_data_json();
@@ -465,9 +652,9 @@ class Importer {
 		
 		$this->environment->start_time = time(); // Set start time of current process.
 		
-		$class_name = "Arlo\Importer\\" . $import_task;
-
-		$this->current_task_class = new $class_name($this, $this->dbl, $this->message_handler, (!empty($this->data_json->$import_task) ? $this->data_json->$import_task : null), $this->current_task_iteration, $this->api_client, $this->scheduler, $this->importing_parts);
+		$class_name = "ArloTraining\Importer\\" . $import_task;
+		
+		$this->current_task_class = new $class_name($this, $this->message_handler, (!empty($this->data_json->$import_task) ? $this->data_json->$import_task : null), $this->current_task_iteration, $this->api_client, $this->scheduler, $this->importing_parts);
 		$this->current_task_class->task_id = $this->task_id;
 
 		//we need to do some special setup for different tasks
@@ -483,7 +670,7 @@ class Importer {
 						$callback_json = json_decode($import->callback_json);
 
 						if (json_last_error() != JSON_ERROR_NONE) {
-							error_log("JSON Decode error: " . json_last_error_msg());
+							error_log("JSON Decode error: " . json_last_error_msg()); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Logging errors for debugging purposes.
 							Logger::log_error("JSON Decode error: " . json_last_error_msg(), $this->import_id);
 						}
 
@@ -538,65 +725,104 @@ class Importer {
 		return $subtask_desc;		
 	}
 
-	private function validate_import_entry($nonce = null, $request_id = null) {
+	/**
+	 * Look up an import entry by request ID and verify the nonce matches.
+	 *
+	 * On a successful match the nonce is consumed (blanked in the DB) so the
+	 * same callback cannot be replayed.
+	 *
+	 * @param string $nonce     The nonce from the callback POST body.
+	 * @param string $request_id The RequestID from the callback POST body.
+	 * @return object The matching import entry row.
+	 * @throws \ArloTraining\ImportCallbackRejectedException If no matching entry is found,
+	 *                                                        the nonce is empty/consumed, or
+	 *                                                        the nonce does not match.
+	 */
+	protected function get_and_validate_import_entry(string $nonce, string $request_id) {
 		$import = $this->get_import_entry(null, $request_id, 1);
-		
-		if (!is_null($import)) {
-			if ($nonce == $import->nonce) {
-				return $import;
-			}
+
+		if (is_null($import)) {
+			throw new \ArloTraining\ImportCallbackRejectedException('Import callback rejected: no valid import entry for request ID');
 		}
 
-		return false;
+		if (empty($nonce) || $nonce !== $import->nonce) {
+			throw new \ArloTraining\ImportCallbackRejectedException('Import callback rejected: nonce mismatch or empty nonce');
+		}
+
+		if (!$this->consume_import_nonce($import->import_id, $nonce)) {
+			throw new \ArloTraining\ImportCallbackRejectedException('Import callback rejected: nonce already consumed (possible replay)');
+		}
+
+		return $import;
 	}
 
-	private function kick_off_scheduler() {
+	public function kick_off_scheduler() {
 		$this->scheduler->unlock_process('import');
 		$this->scheduler->kick_off_scheduler();
 	}
 
 	public function callback() {
+		$original_time_limit = $this->environment->arlo_set_time_limit(self::IMPORT_TIMEOUT_SECONDS);
+		$import = null;
 		try {
-			$callback_json = json_decode(utf8_encode(file_get_contents("php://input")));
+			$handler = new SnapshotHandler($this);
 
-			if (!is_null($callback_json) && !empty($callback_json->Nonce) && 
-				($import = $this->validate_import_entry($callback_json->Nonce, $callback_json->RequestID)) !== false && !empty($callback_json->__jwe__)) {
-
-				$this->set_import_id($import->import_id);
-				$this->update_import_entry(['callback_json' => json_encode($callback_json) ]);
-				$response_json = json_decode($import->response_json);
-
-				//JWE decode
-				$decoded = preg_replace('/[\x00-\x1F\x7F]/', '', utf8_decode(Crypto::jwe_decrypt($callback_json->__jwe__, $response_json->Callback->EncryptedResponse->key->k)));
-				$decoded_json = json_decode($decoded);
-				if (!empty($decoded_json->SnapshotUri)) {
-					$this->update_import_entry(['callback_json' => $decoded]);
-					$this->kick_off_scheduler();
-				} else {
-					if (!empty($decoded_json->Error)) {
-						throw new \Exception($decoded_json->Error->Code . ': ' . $decoded_json->Error->Message);
-					} else {
-						throw new \Exception('Error in the response for the snapshot request');
-					}
-				}	
-			} else {
-				throw new \Exception('no Nonce or the requested import is not valid');
+			// 1. Read the raw POST body and parse it
+			$raw_body = file_get_contents('php://input');
+			if ($raw_body === false) {
+				throw new \Exception('Failed to read snapshot callback request body');
 			}
+			$snapshot_callback_response = $handler->parse_snapshot_callback_response($raw_body);
+
+			// 2. Match the callback to its original import request via nonce and request ID
+			$import = $this->get_and_validate_import_entry($snapshot_callback_response->Nonce, $snapshot_callback_response->RequestID);
+
+			// 3. Initialise the import
+			$this->set_import_id($import->import_id);
+			// Update the saved import entry with the callback response data
+			$this->update_import_entry(['callback_json' => wp_json_encode($snapshot_callback_response)]);
+
+			// 4. Decrypt the JWE payload
+			$key = $this->get_import_entry_encryption_key($import);
+			$snapshot = $handler->decrypt($snapshot_callback_response->__jwe__, $key);
+
+			// 5. Start the import process with the decrypted snapshot data
+			$handler->process($snapshot);
+		} catch(\ArloTraining\ImportCallbackRejectedException $e) {
+			Logger::log($e->getMessage());
 		} catch(\Exception $e) {
-			Logger::log($e->getMessagE(), (!empty($import->import_id)) ? $import->import_id : null);
-			Logger::log('Synchronization failed, please check the <a href="?page=arlo-for-wordpress-logs&s='.$this->import_id.'">Log</a> ', $this->import_id);
+			$log_import_id = (!empty($import->import_id)) ? $import->import_id : null;
+			Logger::log($e->getMessage(), $log_import_id);
 
 			if (!empty($import->import_id)) {
+				Logger::log('Synchronization failed', $import->import_id);
+
 				$task = $this->scheduler->get_tasks([1,2], null, null, 1, $import->import_id);
 
 				if (!empty($task[0]->task_id)) {
 					$this->scheduler->update_task($task[0]->task_id, 3);
 				}
+			} else {
+				Logger::log('Import callback failed');
 			}
+		} finally {
+			$this->environment->arlo_set_time_limit($original_time_limit);
 		}
 	}
 
+	protected function get_import_entry_encryption_key(object $import_entry): string {
+		if (empty($import_entry->response_json)) {
+			throw new \Exception('Encryption key missing from import entry response');
+		}
+		$original_response = json_decode($import_entry->response_json);
+		if (!is_object($original_response) || !isset($original_response->Callback->EncryptedResponse->key->k)) {
+			throw new \Exception('Encryption key missing from import entry response');
+		}
+		return (string) $original_response->Callback->EncryptedResponse->key->k;
+	}
+
 	public function get_import_entry($import_id = null, $request_id = null, $limit = null) {
+		global $wpdb;
 		$utc_date = gmdate("Y-m-d H:i:s"); 
 
 		$import_id = (!empty($import_id) && is_numeric($import_id) ? $import_id : null);
@@ -606,9 +832,7 @@ class Importer {
 		if (is_null($request_id) && is_null($import_id)) 
 			return null; 
 
-		$table_name = $this->dbl->prefix . "arlo_import";
-
-		$sql = '
+		$sql = "
 		SELECT
 			import_id,
 			request_id,
@@ -619,28 +843,41 @@ class Importer {
 			modified,
 			expired 
 		FROM 
-			' . $table_name . '
+			{$wpdb->prefix}arlo_import
 		WHERE
 			1
-			' . (!is_null($import_id) ? ' AND import_id = ' . $import_id : '' ) . '
-			' . (!is_null($request_id) ? ' AND request_id = "' . esc_sql($request_id) . '"' : '' ) . '
+			" . (!is_null($import_id) ? ' AND import_id = %d' : '' ) . "
+			" . (!is_null($request_id) ? ' AND request_id = %s' : '' ) . "
 		AND
-			expired >= "' . $utc_date . '"
-		' . (!is_null($limit) ? ' LIMIT ' . $limit : '' ) . '
-		';
+			expired >= %s
+		" . (!is_null($limit) ? ' LIMIT %d' : '' ) . "
+		";
 
-		if (is_null($import = $this->dbl->get_results($sql))) {
+		$parameter = [];
+		if(!is_null($import_id) ) {
+			$parameter[] = $import_id;
+		}
+		if(!is_null($request_id) ) {
+			$parameter[] = $request_id;
+		}
+		$parameter[] = $utc_date;
+		if(!is_null($limit) ) {
+			$parameter[] = $limit;
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Direct database query is required. The SQL statement is constructed from static strings and parameters are prepared here. Do not need cache for import process.
+		if (is_null($import = $wpdb->get_results($wpdb->prepare($sql, $parameter)))) {
 			Logger::log_error('Couldn\'t find valid import');
 		} else if ($limit == 1) {
-			$import = $import[0];
+			$import = !empty($import[0]) ? $import[0] : null;
 		}
 		
 		return $import;
 	}
 
 	public function update_import_entry($data = array()) {
+		global $wpdb;
 		$utc_date = gmdate("Y-m-d H:i:s"); 
-		$table_name = $this->dbl->prefix . "arlo_import";
 
 		$available_fields_for_update = [
 			'request_id',
@@ -650,46 +887,109 @@ class Importer {
 
 		$update_fields = [];
 
+		$parameter = [];
+		
 		foreach ($available_fields_for_update as $field) {
 			if (!empty($data[$field])) {
-				$update_fields[] = $field . '="' . $this->dbl->_real_escape($data[$field]) . '"';
+				$update_fields[] = $field . '=%s';
+				$parameter[] = $data[$field];
 			}
 		}
 
-		$sql = '
+		$sql = "
 		UPDATE 
-			' . $table_name . '
+			{$wpdb->prefix}arlo_import
 		SET
-			' . (count($update_fields) ? implode(', ', $update_fields) . ', ' : '' )  . '
-			modified = "' . $utc_date . '"
+			" . (count($update_fields) ? implode(', ', $update_fields) . ', ' : '' )  . "
+			modified = %s
 		WHERE 
-			import_id = ' . $this->import_id . '
-		';
+			import_id = %d
+		";
+		$parameter[] = $utc_date;
+		$parameter[] = $this->import_id;
 
-		if ($this->dbl->query($sql) === false) {
-			throw new \Exception('SQL error: ' . $this->dbl->last_error . ' ' .$this->dbl->last_query);
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Direct database query is required. The SQL statement is constructed from static strings and parameters are prepared here. Do not need cache for import process.
+		if ($wpdb->query($wpdb->prepare($sql, $parameter)) === false) {
+			throw new \Exception('SQL error: ' . $wpdb->last_error); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message is caught by the import pipeline, written to the Arlo log table via Logger, and escaped with esc_html() at admin render time.
 		}
 	}
 
+	/**
+	 * Insert a new import entry for the current import.
+	 *
+	 * @param string|null $nonce Nonce to store with the entry.
+	 * @return int|string The import ID.
+	 * @throws \Exception If the database insert fails.
+	 */
 	public function set_import_entry($nonce = null) {
+		global $wpdb;
 		$utc_date = gmdate("Y-m-d H:i:s");
 		$utc_plusonehour =  gmdate("Y-m-d H:i:s", time() + (60 * 60));
-		$table_name = $this->dbl->prefix . "arlo_import";
 
-		$sql = '
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Direct database query is required.Do not need cache for insert operation in data import process.
+		$query = $wpdb->query($wpdb->prepare("
 		INSERT INTO
-			' . $table_name . ' 
+			{$wpdb->prefix}arlo_import 
 			(import_id, nonce, created, expired)
 		VALUES
-			(%s, %s, %s, %s)
-		';
+			(%d, %s, %s, %s)
+		", (int) $this->import_id, $nonce, $utc_date, $utc_plusonehour));
 
-		$query = $this->dbl->query($this->dbl->prepare($sql, $this->import_id, $nonce, $utc_date, $utc_plusonehour));
-		
-		if ($query) {
-			return $this->dbl->insert_id;
-		} else {
-			return false;
+		if ( ! $query ) {
+			throw new \Exception('SQL error creating import entry: ' . $wpdb->last_error); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message is caught by the import pipeline, written to the Arlo log table via Logger, and escaped with esc_html() at admin render time.
 		}
+
+		return $this->import_id;
+	}
+
+	/**
+	 * Delete the import entry for the given import ID.
+	 *
+	 * @param int|string $import_id The import ID whose entry should be deleted.
+	 * @throws \Exception If the database delete fails.
+	 */
+	public function delete_import_entry( $import_id ) {
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct delete required; no cache to invalidate for a row that never completed setup.
+		$result = $wpdb->delete(
+			"{$wpdb->prefix}arlo_import",
+			['import_id' => (int) $import_id],
+			['%d']
+		);
+
+		if ($result === false) {
+			throw new \Exception('SQL error deleting import entry: ' . $wpdb->last_error); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message is caught by the import pipeline, written to the Arlo log table via Logger, and escaped with esc_html() at admin render time.
+		}
+	}
+
+	/**
+	 * Atomically consume the nonce on an import entry so the same callback
+	 * cannot be replayed.
+	 *
+	 * Called immediately after a successful nonce match in get_and_validate_import_entry().
+	 * The UPDATE includes the nonce in its WHERE clause so that only the first
+	 * concurrent request succeeds — if a second request races past the PHP-side
+	 * comparison, the DB update returns 0 rows and this method returns false,
+	 * causing the caller to reject the duplicate.
+	 *
+	 * @param int|string $import_id The import entry to consume the nonce for.
+	 * @param string     $nonce     The nonce value to match atomically.
+	 * @return bool True if the nonce was consumed, false if already consumed or row missing.
+	 * @throws \Exception If the DB update fails.
+	 */
+	private function consume_import_nonce($import_id, string $nonce): bool {
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- One-time nonce consumption; caching not applicable.
+		$result = $wpdb->update(
+			"{$wpdb->prefix}arlo_import",
+			['nonce' => ''],
+			['import_id' => (int) $import_id, 'nonce' => $nonce],
+			['%s'],
+			['%d', '%s']
+		);
+		if ($result === false) {
+			throw new \Exception('Import callback rejected: failed to consume nonce due to DB error: ' . $wpdb->last_error); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message is caught by the import pipeline, written to the Arlo log table via Logger, and escaped with esc_html() at admin render time.
+		}
+		return $result === 1;
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Arlo;
+namespace ArloTraining;
 
 class Arrays {
 	public static $arlo_timezone_system_names_to_php_tz_identifiers = [
@@ -127,5 +127,7 @@ class Arrays {
 		'Kamchatka Standard Time' => 'Asia/Kamchatka',
 		'Chatham Islands Standard Time' => 'Pacific/Chatham',
 		'Line Islands Standard Time' => 'Pacific/Kiritimati',
+		'British Summer Time' => 'Europe/London',
+		'Dateline Standard Time'=>'Etc/GMT+12',
 	];
 }

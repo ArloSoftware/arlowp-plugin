@@ -1,16 +1,21 @@
 <?php
 
-namespace Arlo\Entities;
+namespace ArloTraining\Entities;
+
+use ArloTraining\CacheControl;
+use Exception;
 
 class Events {
 	static function get($conditions=array(), $order=array(), $limit=null, $import_id = null) {
+		if (!is_null($limit) && (!is_numeric($limit) || $limit <= 0)){
+			throw new Exception('Limit must be a positive integer or null');
+		}
 		global $wpdb;
 			
 		$parameters = [];
 		
 		$where = array("e.import_id = %d");
 		$parameters[] =  $import_id;
-		$t1 = "{$wpdb->prefix}arlo_events";
         $join = [];
 
 		// conditions
@@ -55,7 +60,7 @@ class Events {
 				break;
 
 				case 'state':
-					$join['ce'] = " LEFT JOIN $t1 AS ce ON e.e_arlo_id = ce.e_parent_arlo_id AND e.import_id = ce.import_id";
+					$join['ce'] = " LEFT JOIN {$wpdb->prefix}arlo_events AS ce ON e.e_arlo_id = ce.e_parent_arlo_id AND e.import_id = ce.import_id";
 
 					if(is_array($value) && count($value) > 1) {
 						$ids_string = implode(',', array_map(function() {return "%d";}, $value));
@@ -93,21 +98,30 @@ class Events {
 			$where = ' WHERE ' . implode(' AND ', $where);
 		}
 		
-		// order
+		// order ,
 		if(!empty($order)) {
 			$order = ' ORDER BY ' . implode(', ', $order);
 		}
 		
 		//limit
-		$limit = ($limit > 1 ? ' LIMIT ' . $limit : '');
+		$limit = is_numeric($limit) ? (int)$limit : 0;
+		$limit_sql = '';
+		if ($limit > 1) {
+			$limit_sql = ' LIMIT %d';
+			$parameters[] = $limit;
+		}
 
-		$query = "SELECT e.* FROM $t1 AS e";
+		$query = "SELECT e.* FROM {$wpdb->prefix}arlo_events AS e";
 
 		$group = " GROUP BY e.e_id";
 
-		$query = $wpdb->prepare($query.implode("\n", $join).$where.$group.$order, $parameters);
+		$sql = $query.implode("\n", $join).$where.$group.$order.$limit_sql;
+		$query = $wpdb->prepare($sql, $parameters);// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The SQL statement is dynamically constructed and parameters are prepared here.
+		
 		if ($query) {
-			return (!empty($limit)) ? $wpdb->get_results($query.$limit) : $wpdb->get_row($query);
+			return ($limit > 1) 
+				? CacheControl::fetch_results($query)
+				: CacheControl::fetch_row($query);
 		} else {
 			throw new \Exception("Couldn't prepare the SQL statement");
 		}

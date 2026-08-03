@@ -31,7 +31,7 @@ function arlo_uninstall() {
 	arlo_delete_cookies();
 
 	// Nuke all settings if "Keep settings..." is unchecked
-	$settings = get_option('arlo_settings');
+	$settings = get_option('arlo_settings', []);
 	if (empty($settings['keep_settings'])) {
 
 		arlo_delete_important_options();
@@ -49,33 +49,31 @@ function arlo_delete_tables() {
 	//should use the SchemaManager->delete_tables
 	
     global $wpdb;
-	$sql="
-	DROP TABLE IF EXISTS " .
-		$wpdb->prefix . "arlo_async_tasks," .
-		$wpdb->prefix . "arlo_async_task_data," . 
-		$wpdb->prefix . "arlo_categories," . 
-		$wpdb->prefix . "arlo_contentfields, " . 
-		$wpdb->prefix . "arlo_events, " . 		
-		$wpdb->prefix . "arlo_events_presenters, " . 
-		$wpdb->prefix . "arlo_eventtemplates," . 
-		$wpdb->prefix . "arlo_eventtemplates_categories," . 		
-		$wpdb->prefix . "arlo_eventtemplates_presenters, " .
-		$wpdb->prefix . "arlo_onlineactivities, " . 
-		$wpdb->prefix . "arlo_onlineactivities_tags, " .
-		$wpdb->prefix . "arlo_offers, " . 		
-		$wpdb->prefix . "arlo_presenters, " . 
-		$wpdb->prefix . "arlo_venues, " . 
-		$wpdb->prefix . "arlo_events_tags, " . 
-		$wpdb->prefix . "arlo_eventtemplates_tags,  " . 
-		$wpdb->prefix . "arlo_tags,  " . 
-		$wpdb->prefix . "arlo_timezones,  " . 
-		$wpdb->prefix . "arlo_messages, " .
-		$wpdb->prefix . "arlo_log," .
-		$wpdb->prefix . "arlo_import," .
-		$wpdb->prefix . "arlo_import_parts," .
-		$wpdb->prefix . "arlo_import_lock";
-
-	$wpdb->query($sql);
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange -- Direct database query is required for uninstall process, using fixed table names. Do not need to cache result here. Schema change is trusted and only applied to arlo tables
+    $wpdb->query("DROP TABLE IF EXISTS 
+		{$wpdb->prefix}arlo_async_tasks,
+		{$wpdb->prefix}arlo_async_task_data, 
+		{$wpdb->prefix}arlo_categories, 
+		{$wpdb->prefix}arlo_contentfields, 
+		{$wpdb->prefix}arlo_events, 		
+		{$wpdb->prefix}arlo_events_presenters, 
+		{$wpdb->prefix}arlo_eventtemplates, 
+		{$wpdb->prefix}arlo_eventtemplates_categories, 		
+		{$wpdb->prefix}arlo_eventtemplates_presenters, 
+		{$wpdb->prefix}arlo_onlineactivities, 
+		{$wpdb->prefix}arlo_onlineactivities_tags, 
+		{$wpdb->prefix}arlo_offers, 		
+		{$wpdb->prefix}arlo_presenters, 
+		{$wpdb->prefix}arlo_venues, 
+		{$wpdb->prefix}arlo_events_tags, 
+		{$wpdb->prefix}arlo_eventtemplates_tags,  
+		{$wpdb->prefix}arlo_tags,  
+		{$wpdb->prefix}arlo_timezones,  
+		{$wpdb->prefix}arlo_messages, 
+		{$wpdb->prefix}arlo_log,
+		{$wpdb->prefix}arlo_import,
+		{$wpdb->prefix}arlo_import_parts,
+		{$wpdb->prefix}arlo_import_lock");
 
 }
 
@@ -91,7 +89,8 @@ function arlo_delete_custom_posts() {
 
 	$sql = "DELETE FROM $wpdb->posts WHERE post_type IN ('arlo_events', 'arlo_presenters', 'arlo_venues', 'arlo_event', 'arlo_presenter', 'arlo_venue')";
 
-	$wpdb->query($sql);
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct database query is required for uninstall process, input is fixed SQL string.
+    $wpdb->query($sql);
 
 }
 
@@ -113,6 +112,11 @@ function arlo_delete_options() {
 		'arlo_import_disabled',
 		'arlo_plugin_disabled',
 		'arlo_updated',
+		'arlo_platform_access_failure_count',
+		'arlo_platform_access_first_failure_at',
+		'arlo_import_connection_health_disabled',
+		'arlo_import_disabled_message',
+		'arlo_import_disabled_since',
 	];
 	
 	foreach ($options as $option) {
@@ -149,8 +153,8 @@ function arlo_delete_important_options() {
 }
 
 function arlo_delete_cookies() {
-	setcookie('arlo-vertical-tab', null, -1, '/');
-	setcookie('arlo-nav-tab', null, -1, '/');
+	setcookie('arlo-vertical-tab', '', -1, '/');
+	setcookie('arlo-nav-tab', '', -1, '/');
 }
 
 arlo_uninstall();

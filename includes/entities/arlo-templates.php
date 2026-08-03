@@ -1,17 +1,19 @@
 <?php
 
-namespace Arlo\Entities;
+namespace ArloTraining\Entities;
+
+use ArloTraining\CacheControl;
+use Exception;
 
 class Templates {
 	static function get($conditions=array(), $order=array(), $limit=null, $import_id = null) {
-		global $wpdb;
-
-		$cache_key = md5(serialize(func_get_args()));
-		$cache_category = 'ArloTemplates';
-	
-		if($cached = wp_cache_get($cache_key, $cache_category)) {
-			return $cached;
+		if (!is_null($limit) && (!is_numeric($limit) || $limit <= 0)){
+			throw new Exception('Limit must be a positive integer or null');
 		}
+
+		global $wpdb;
+		
+		$parameters = [];
 	
 		$query = "SELECT et.* FROM {$wpdb->prefix}arlo_eventtemplates AS et";
 		
@@ -45,14 +47,12 @@ class Templates {
 			$query .= ' ORDER BY ' . implode(', ', $order);
 		}
 
-		$query = $wpdb->prepare($query, $parameters);
+		$query = $wpdb->prepare($query, $parameters);// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The SQL statement is dynamically constructed and parameters are prepared here.
 
 		if ($query) {
-			$result = ($limit != 1) ? $wpdb->get_results($query) : $wpdb->get_row($query);
-			
-			wp_cache_add( $cache_key, $result, $cache_category, 30 );
-			
-			return $result;
+			return ($limit != 1) 
+				? CacheControl::fetch_results($query)
+				: CacheControl::fetch_row($query);
 		} else {
 			throw new \Exception("Couldn't prepare the SQL statement");
 		}	
