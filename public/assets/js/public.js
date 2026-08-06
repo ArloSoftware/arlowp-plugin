@@ -13,7 +13,9 @@
 		}
 
 		if ($('.arlo-show-more-hidden').children().length > 0) {
-			$('.arlo-show-more-hidden').before('<div class="arlo-show-more-link-container"><a href="#" class="arlo-show-more-link">' + showText + '</a></div>');
+			var $link = $('<a>', { href: '#', 'class': 'arlo-show-more-link' }).text(showText);
+			var $container = $('<div>', { 'class': 'arlo-show-more-link-container' }).append($link);
+			$('.arlo-show-more-hidden').before($container);
 		}
 
 		$(document).on('click touch', '.arlo-show-more-link', function(e) {

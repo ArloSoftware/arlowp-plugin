@@ -8,18 +8,22 @@
  * @link      https://arlo.co
  * @copyright 2018 Arlo
  */
- 
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 if(!class_exists('WP_List_Table')){
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
+
+use ArloTraining\CacheControl;
+use ArloTraining\Utilities;
 
 class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 	
 	public $singular;
 	public $plural;
-	public $table_name;
 
-	protected $wpdb;
 	protected $order;
 	protected $orderby;
 	protected $paged;
@@ -30,10 +34,9 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 
 	public function __construct() {
 		$this->init_variables();	
-		$this->table_name =  $this->wpdb->prefix . self::TABLENAME;
 		
-		$this->singular = __( 'Log entry', 'arlo-for-wordpress' );		
-		$this->plural = __( 'Log entries', 'arlo-for-wordpress' ); 
+		$this->singular = __( 'Log entry', 'arlo-training-and-event-management-system' );		
+		$this->plural = __( 'Log entries', 'arlo-training-and-event-management-system' ); 
 		
 		$this->_column_headers = array($this->get_columns(), $this->get_hidden_columns(), $this->get_sortable_columns());
 		
@@ -47,24 +50,17 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 		
 		$this->prepare_items();
 	}
-
-	public function get_db_prefix() {
-		return $this->wpdb->prefix;
-	}
 	
 	private function init_variables() {
-		global $wpdb;		
-	
 		$plugin = Arlo_For_Wordpress::get_instance();
 		$settings = get_option('arlo_settings');
 				
 		$this->plugin_slug = $plugin->plugin_slug;
-		$this->wpdb = &$wpdb;
 	}
 	
 	private function init_sql_variables() {
-		$order = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'order');
-		$paged = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'paged');
+		$order = \ArloTraining\Utilities::filter_string_polyfill(INPUT_GET, 'order');
+		$paged = \ArloTraining\Utilities::filter_string_polyfill(INPUT_GET, 'paged');
 
 		$this->orderby = $this->get_orderby_columnname();
 		$this->order = (!empty($order) && in_array(strtolower($order), ['asc','desc']) ? $order : 'desc');
@@ -74,7 +70,7 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 	}
 	
 	private function get_orderby_columnname() {
-		$orderby = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'orderby');
+		$orderby = \ArloTraining\Utilities::filter_string_polyfill(INPUT_GET, 'orderby');
 		$orderby = (!empty($orderby) ? $orderby : 'id');
 		$columns = $this->_column_headers[2];
 				
@@ -97,11 +93,11 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 			case 'id':
 			case 'message':
 			case 'created':
-				return $item->$column_name;
+				return esc_html($item->$column_name);
 			
 			case 'import_id':
 				if ($item->$column_name != '0') {
-					return $item->$column_name;
+					return esc_html($item->$column_name);
 				}
 			default:
 				return '';
@@ -109,62 +105,73 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 	}
 
 	private function get_sql_search_where_array() {
+		global $wpdb;
 		$where = array();
+		$parameter = array();
 
-		$s = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 's');
+		$s = \ArloTraining\Utilities::filter_string_polyfill(INPUT_GET, 's');
 
 		if (!empty($s)) {
 			$search_fields = $this->get_searchable_fields();
 			foreach ($search_fields as $field) {
-				$where[] = $field . " LIKE '%" . esc_sql(wp_unslash($s)) . "%'";
+				$where[] = $field . " LIKE %s";
+				$parameter[] = '%' . $wpdb->esc_like( wp_unslash( $s ) ) . '%';
 			}
 		}
-		return $where;	
+		return array(
+			'where' => $where,
+			'parameter' => $parameter
+		);	
 	}
 	
 	protected function get_sql_where_expression() {	
-		$search_where = $this->get_sql_search_where_array();
-		if (count($search_where)) {
-			$where = " (" . implode(" OR ", $search_where) . ")";
+		$search = $this->get_sql_search_where_array();
+		$where = '';
+		if (count($search['where'])) {
+			$where = " (" . implode(" OR ", $search['where']) . ")";
 		}
 		
-		return !empty($where) ? $where : '1';
+		return array(
+			'where' => !empty($where) ? $where : '1',
+			'parameter' => $search['parameter']
+		);
 	}		
 
 	public function get_sql_query() {
+		global $wpdb;
 		$where = $this->get_sql_where_expression();
 	
-		return "
+		$sql_log = "
 		SELECT
 			id,
 			import_id,
 			message,
 			created
 		FROM
-			" . $this->table_name . "
+			{$wpdb->prefix}arlo_log
 		WHERE
-			" . $where . "
+			" . $where['where'] . "
 		";
+		return Utilities::prepare_sql($sql_log, $where['parameter']);
 	}		
 	
 	private function get_num_rows() {	
 		$sql = $this->get_sql_query();
-			
-		$result = $this->wpdb->get_results($sql);
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$result = CacheControl::fetch_results($sql, OBJECT, CacheControl::GROUP_LOG);
 				
-		return $this->wpdb->num_rows;
+		return count($result);
 	}
 		
 	public function prepare_items() {
-        
+        global $wpdb;
 		$sql = $this->get_sql_query();
 		
 		if (!empty($this->orderby)) {
 			$sql .= ' ORDER BY ' . $this->orderby . ' ' . $this->order;
 		}		
-		
-		$limit = ($this->paged-1) * self::PERPAGE;
-		$sql .= ' LIMIT ' . $limit . ',' . self::PERPAGE;
+		$limit = ($this->paged -1) * self::PERPAGE;
+		$sql .= ' LIMIT %d,%d';
 			
 		$num = $this->get_num_rows();
 				
@@ -172,9 +179,10 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 			"total_items" => $num,
 			"total_pages" => ceil($num / self::PERPAGE),
 			"per_page" => self::PERPAGE,
-      	));		
+      	));
       	
-      	$items = $this->wpdb->get_results($sql);
+      	// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The SQL statement is dynamically constructed and parameters are prepared here. 
+      	$items = CacheControl::fetch_results($wpdb->prepare($sql,$limit,self::PERPAGE), OBJECT, CacheControl::GROUP_LOG);
       			
 		$this->items = $items;		
 	}	
@@ -188,10 +196,10 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table  {
 	
 	public function get_columns() {
 		return $columns = [
-			'id'    => __( 'ID', 'arlo-for-wordpress' ),
-			'import_id'    => __( 'Import ID', 'arlo-for-wordpress' ),
-			'message'    => __( 'Message', 'arlo-for-wordpress' ),
-			'created'    => __( 'Created date', 'arlo-for-wordpress' ),
+			'id'    => esc_html__( 'ID', 'arlo-training-and-event-management-system' ),
+			'import_id'    => esc_html__( 'Import ID', 'arlo-training-and-event-management-system' ),
+			'message'    => esc_html__( 'Message', 'arlo-training-and-event-management-system' ),
+			'created'    => esc_html__( 'Created date', 'arlo-training-and-event-management-system' ),
 		];
 	}	
 

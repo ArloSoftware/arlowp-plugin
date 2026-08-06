@@ -1,36 +1,165 @@
-name: Build Master
+name: Publish Release to WordPress.org
+
 on:
-  push:
-    branches:
-      - master
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing stable Git tag to publish, for example v5.1.0.
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: wordpress-org-production
+  cancel-in-progress: false
+
 jobs:
-  build:
-    name: Create Release
+  publish:
+    name: Publish GitHub release
     runs-on: ubuntu-latest
+    environment: wordpress-org-production
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - name: Create Build Archive (git archive)
-      run: |
-        git archive --format=zip --output arlo-training-and-event-management-system.zip -9 HEAD
-    - name: Generate Version Number
-      id: next_version
-      uses: anothrNick/github-tag-action@1.61.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        WITH_V: true
-        DEFAULT_BUMP: minor
-        DRY_RUN: true
-        RELEASE_BRANCHES: ^$
-        PRERELEASE: true
-    - name: Create Release
-      uses: softprops/action-gh-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        files: arlo-training-and-event-management-system.zip
-        tag_name: ${{ steps.next_version.outputs.new_tag }}
-        name: Version ${{ steps.next_version.outputs.new_tag }}
-        prerelease: true
+      - name: Check out release history
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Resolve release tag
+        id: release
+        env:
+          REQUESTED_TAG: ${{ inputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --tags --force origin
+
+          [[ -n "$REQUESTED_TAG" ]] || { echo 'A release tag is required.' >&2; exit 1; }
+          tag="${REQUESTED_TAG#v}"
+          tag="v$tag"
+          [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "'$tag' is not a stable SemVer Git tag." >&2; exit 1; }
+          git rev-parse --verify --quiet "refs/tags/$tag^{commit}" >/dev/null || { echo "Git tag '$tag' does not exist." >&2; exit 1; }
+
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
+          echo "Resolved Git tag $tag for WordPress.org version ${tag#v}."
+
+      - name: Check out selected tag
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ steps.release.outputs.tag }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate selected tag metadata
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          stable_tag=$(sed -nE 's/^Stable tag:[[:space:]]*//p' readme.txt | head -n 1 | sed -E 's/^[[:space:]]+|[[:space:]]+$//g; s/^v//')
+          plugin_version=$(sed -nE 's/^[[:space:]]*\*[[:space:]]*Version:[[:space:]]*//p' arlo-for-wordpress.php | head -n 1 | sed -E 's/^[[:space:]]+|[[:space:]]+$//g; s/^v//')
+          internal_version=$(sed -nE "s/.*const[[:space:]]+VERSION[[:space:]]*=[[:space:]]*'([^']+)'.*/\1/p" includes/arlo-version-handler.php | head -n 1 | sed -E 's/^v//')
+          [[ "$stable_tag" == "$VERSION" && "$plugin_version" == "$VERSION" && "$internal_version" == "$VERSION" ]] || {
+            echo "Selected tag v$VERSION does not match source versions: stable=$stable_tag plugin=$plugin_version internal=$internal_version." >&2
+            exit 1
+          }
+          echo "Release metadata matches v$VERSION."
+
+      - name: Verify WordPress.org SVN tag is available
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          svn_url="https://plugins.svn.wordpress.org/arlo-training-and-event-management-system/tags/$VERSION/"
+          status=$(curl --location --silent --show-error --output /dev/null --write-out '%{http_code}' "$svn_url")
+
+          case "$status" in
+            404)
+              echo "WordPress.org SVN tag $VERSION is available for publication."
+              ;;
+            200|207)
+              echo "WordPress.org SVN tag $VERSION already exists. Use Recover WordPress.org Release in repair-github-release mode to repair GitHub Release files without changing SVN." >&2
+              exit 1
+              ;;
+            *)
+              echo "Could not determine whether WordPress.org SVN tag $VERSION exists (HTTP $status)." >&2
+              exit 1
+              ;;
+          esac
+
+      - name: Build release archive
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Building the Git archive for $TAG."
+          git archive --format=zip --output=arlo-training-and-event-management-system.zip -9 "$TAG"
+          echo "Built arlo-training-and-event-management-system.zip."
+          sha256sum arlo-training-and-event-management-system.zip
+
+      - name: Prepare GitHub Release draft
+        id: github_release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.release.outputs.tag }}
+          VERSION: ${{ steps.release.outputs.version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive=arlo-training-and-event-management-system.zip
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            is_draft=$(gh release view "$TAG" --json isDraft --jq .isDraft)
+            echo "Updating the existing GitHub Release draft for $TAG."
+            gh release upload "$TAG" "$archive" --clobber
+            echo "publish_after_deploy=$is_draft" >> "$GITHUB_OUTPUT"
+          else
+            echo "Creating a GitHub Release draft for $TAG."
+            gh release create "$TAG" "$archive" --draft --title "Version $VERSION" --generate-notes --verify-tag
+            echo 'publish_after_deploy=true' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Announce WordPress.org deployment
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+        shell: bash
+        run: |
+          echo "Deploying version $VERSION to live WordPress.org SVN."
+
+      - name: Deploy selected tag to WordPress.org SVN
+        id: deploy
+        uses: 10up/action-wordpress-plugin-deploy@54bd289b8525fd23a5c365ec369185f2966529c2 # commit from stable
+        with:
+          generate-zip: true
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: arlo-training-and-event-management-system
+          VERSION: ${{ steps.release.outputs.version }}
+
+      - name: Attach deployed archive to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.release.outputs.tag }}
+          ARCHIVE: ${{ steps.deploy.outputs.zip-path }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Uploading the WordPress.org deployment archive to GitHub Release $TAG."
+          gh release upload "$TAG" "$ARCHIVE" --clobber
+
+      - name: Publish GitHub Release after successful deployment
+        if: steps.github_release.outputs.publish_after_deploy == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.release.outputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Publishing GitHub Release $TAG after a successful WordPress.org deployment."
+          gh release edit "$TAG" --draft=false
+          echo "GitHub Release $TAG is published."

@@ -1,7 +1,9 @@
 <?php
 
-namespace ArloAPI;
-
+namespace ArloTraining\API;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 class Client
 {
 	/**  Location for overloaded data.  */
@@ -12,7 +14,7 @@ class Client
 		/*
 		// for future use
 		if(!$transport) {
-			use \ArloAPI\Transports\Guzzle;
+			use \ArloTraining\API\Transports\Guzzle;
 			$transport = new Guzzle();
 		}*/
 		
@@ -56,7 +58,7 @@ class Client
         
         if(!$this->__get($name)) {
        		require_once __DIR__ . '/Resources/' . $name . '.php';
-       		$class = "ArloAPI\\Resources\\$name";
+       		$class = "ArloTraining\\API\\Resources\\$name";
        		$this->__set($name, new $class($this->__get('platform_name'), $this->__get('transport'), $this->__get('plugin_version')));
         }
         

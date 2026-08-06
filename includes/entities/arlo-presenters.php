@@ -1,17 +1,18 @@
 <?php
 
-namespace Arlo\Entities;
+namespace ArloTraining\Entities;
+
+use ArloTraining\CacheControl;
+use Exception;
 
 class Presenters {
 	static function get($conditions=array(), $order=array(), $limit=null, $import_id = null) {
+		if (!is_null($limit) && (!is_numeric($limit) || $limit <= 0)){
+			throw new Exception('Limit must be a positive integer or null');
+		}
+
 		global $wpdb;
 
-		$cache_key = md5(serialize(func_get_args()));
-		$cache_category = 'ArloPresenters';
-	
-		if($cached = wp_cache_get($cache_key, $cache_category)) {
-			return $cached;
-		}
 	
 		$query = "SELECT p.* FROM {$wpdb->prefix}arlo_presenters AS p";
 
@@ -41,14 +42,14 @@ class Presenters {
 				case 'e_id': 
 					$order[] = 'p_order';
 					$group_by[] = ' p.p_arlo_id ';
-					$join[] = '
+					$join[] = "
 					INNER JOIN 
-						' . $wpdb->prefix . 'arlo_events_presenters AS ep
+						{$wpdb->prefix}arlo_events_presenters AS ep
 					ON 
 						p.p_arlo_id = ep.p_arlo_id 
 					AND 
 						p.import_id = ep.import_id
-					';
+					";
 
 					if(is_array($value) && count($value) > 1) {
 						$where[] = "ep.e_id IN (" . implode(',', array_map(function() {return "%d";}, $value)) . ")";
@@ -66,22 +67,23 @@ class Presenters {
 				break;
 				case 'template_id': 
 					$order[] = 'p_order';
-					$join[] = '
+					$group_by[] = ' p.p_arlo_id ';
+					$join[] = "
 					INNER JOIN 
-						' . $wpdb->prefix . 'arlo_eventtemplates_presenters AS etp
+						{$wpdb->prefix}arlo_eventtemplates_presenters AS etp
 					ON 
 						p.p_arlo_id = etp.p_arlo_id 
 					AND 
 						p.import_id = etp.import_id
-					';
-					$join[] = '
+					";
+					$join[] = "
 					INNER JOIN 
-						' . $wpdb->prefix . 'arlo_eventtemplates AS et
+						{$wpdb->prefix}arlo_eventtemplates AS et
 					ON 
 						etp.et_id = et.et_id 
 					AND 
 						etp.import_id = et.import_id 
-					';
+					";
 					$where[] = "et.et_arlo_id = %d";
 					$parameters[] = $value;
 				break;
@@ -105,17 +107,17 @@ class Presenters {
 		}
 
 		if (intval($limit) > 1) {
-			$query .= 'LIMIT ' . $limit;
+			$query .= 'LIMIT %d';
+			$parameters[] = $limit;
 		}
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The SQL statement is dynamically constructed and parameters are prepared here.
 		$query = $wpdb->prepare($query, $parameters);
 
 		if ($query) {
-			$result = ($limit != 1) ? $wpdb->get_results($query, ARRAY_A) : $wpdb->get_row($query, ARRAY_A);
-
-			wp_cache_add( $cache_key, $result, $cache_category, 30 );
-
-			return $result;
+			return ($limit != 1) 
+				? CacheControl::fetch_results($query, ARRAY_A)
+				: CacheControl::fetch_row($query, ARRAY_A);
 		} else {
 			throw new \Exception("Couldn't prepare the SQL statement");
 		}		

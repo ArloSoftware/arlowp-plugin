@@ -1,7 +1,9 @@
 <?php
 
-namespace ArloAPI\Resources;
-
+namespace ArloTraining\API\Resources;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 class Resource
 {
 	/**  Location for overloaded data.  */

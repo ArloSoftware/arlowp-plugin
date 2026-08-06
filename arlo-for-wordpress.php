@@ -6,18 +6,21 @@
  * also follow WordPress Coding Standards and PHP best practices.
  *
  * @package   Arlo_For_Wordpress
- * @author    Arlo <info@arlo.co>
+ * @author    Arlo Software <support@arlo.co>
  * @license   GPL-2.0+
  * @link      https://arlo.co
- * @copyright 2018 Arlo
+ * @copyright 2026 Arlo Software
  *
  * @wordpress-plugin
- * Plugin Name:       Arlo
+ * Plugin Name:       Arlo Training Management Software
+ * Plugin URI:        https://www.arlo.co/apps/wordpress-events-plugin
  * Description:       Connect your WordPress to Arlo
- * Version:           4.3.0
- * Author:            Arlo
- * Author URI:        https://arlo.co
- * Text Domain:       arlo-for-wordpress
+ * Version:           5.1.0
+ * Requires at least: 7.0
+ * Author:            Arlo Software
+ * Author URI:        https://www.arlo.co
+ * Text Domain:       arlo-training-and-event-management-system
+ * Requires PHP:      7.4
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Domain Path:       /languages
@@ -26,7 +29,6 @@
 
 /*----------------------------------------------------------------------------*
  * Constants
- * https://github.com/Preferizi/lea-plugin.learningsource.dev
  *----------------------------------------------------------------------------*/
 
 // mostly used for adding css class prefixes, if this is changed, the prefixes in the css will need to be changed too.
@@ -35,6 +37,9 @@ define('ARLO_PLUGIN_NAME', 'Arlo');
 define('ARLO_PLUGIN_DIR', plugin_dir_path( __FILE__ ));
 define('ARLO_PLUGIN_ROOT_URL', plugin_dir_url( __FILE__ ));
 // If this file is called directly, abort.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
@@ -54,15 +59,14 @@ if ( ! defined( 'WPINC' ) ) {
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-api/Client.php' );
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-api/Transports/Wordpress.php' );
 
-//include database classes
-require_once( plugin_dir_path( __FILE__ ) . 'includes/database/arlo-database-layer.php');
-require_once( plugin_dir_path( __FILE__ ) . 'includes/database/arlo-wp-database-layer.php');
-
 //include provisioning classes
 require_once( plugin_dir_path( __FILE__ ) . 'includes/provisioning/arlo-schema-manager.php');
 
 //include exceptions
 require_once( plugin_dir_path( __FILE__ ) . 'includes/exceptions/arlo-exceptions.php');
+
+// Cache Controller
+require_once(plugin_dir_path(__FILE__) . '/includes/arlo-cache-control.php');
 
 //include extra classes
 require_once( plugin_dir_path( __FILE__ ) . 'includes/arlo-arrays.php');
@@ -107,6 +111,7 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-importing-pa
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-base-importer.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-import-request.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-download.php');
+require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-snapshot-handler.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-process-fragment.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-timezones.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-presenters.php');
@@ -119,8 +124,7 @@ require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-category-ite
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-category-depth.php');
 require_once( plugin_dir_path( __FILE__ ) . 'includes/importer/arlo-finish.php');
 
-// Cache Controller
-require_once(plugin_dir_path(__FILE__) . '/includes/arlo-cache-control.php');
+
 
 // start the public plugin class
 require_once( plugin_dir_path( __FILE__ ) . 'public/class-arlo-for-wordpress.php' );
@@ -144,7 +148,8 @@ register_deactivation_hook( __FILE__, array( 'Arlo_For_Wordpress', 'deactivate' 
  * - replace Arlo_For_Wordpress with the name of the class defined in
  *   `class-arlo-for-wordpress.php`
  */
-add_action( 'plugins_loaded', array( 'Arlo_For_Wordpress', 'get_instance' ) );
+add_action( 'init', array( 'Arlo_For_Wordpress', 'init' ), 1 );
+add_action( 'init', array( 'Arlo_For_Wordpress', 'get_instance' ), 2 );
 add_action( 'init', array( 'Arlo_For_Wordpress', 'check_plugin_version' ) );
 add_action( 'upgrader_process_complete', array( 'Arlo_For_Wordpress', 'bulk_plugin_updater' ), 10, 2 );
 
@@ -154,13 +159,9 @@ add_action( 'upgrader_process_complete', array( 'Arlo_For_Wordpress', 'bulk_plug
  *
  */
 require_once( plugin_dir_path( __FILE__ ) . '/widgets/upcoming-widget/class-arlo-for-wordpress-upcoming-widget.php' );
-add_action( 'plugins_loaded', array( 'Arlo_For_Wordpress_Upcoming_Widget', 'get_instance' ) );
 require_once( plugin_dir_path( __FILE__ ) . '/widgets/categories-widget/class-arlo-for-wordpress-categories-widget.php' );
-add_action( 'plugins_loaded', array( 'Arlo_For_Wordpress_Categories_Widget', 'get_instance' ) );
 require_once( plugin_dir_path( __FILE__ ) . '/widgets/search-widget/class-arlo-for-wordpress-search-widget.php' );
-add_action( 'plugins_loaded', array( 'arlo_for_wordpress_search_widget', 'get_instance' ) );
 require_once( plugin_dir_path( __FILE__ ) . '/widgets/region-selector/class-arlo-for-wordpress-region-selector.php' );
-add_action( 'plugins_loaded', array( 'arlo_for_wordpress_region_selector', 'get_instance' ) );
 
 
 /*----------------------------------------------------------------------------*
@@ -186,8 +187,8 @@ add_action( 'plugins_loaded', array( 'arlo_for_wordpress_region_selector', 'get_
 if ( is_admin() && ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) ) {
 
 	require_once( plugin_dir_path( __FILE__ ) . 'admin/class-arlo-for-wordpress-admin.php' );
-	add_action( 'plugins_loaded', array( 'Arlo_For_Wordpress_Admin', 'get_instance' ) );
+	add_action( 'init', array( 'Arlo_For_Wordpress_Admin', 'get_instance' ), 2 );
 
-	require_once( plugin_dir_path( __FILE__ ) . 'admin/includes/class-feature-pointer.php' );
+	require_once( plugin_dir_path( __FILE__ ) . 'admin/includes/class-arlo-feature-pointer.php' );
 
 }

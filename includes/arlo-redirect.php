@@ -1,20 +1,20 @@
 <?php
 
-namespace Arlo;
+namespace ArloTraining;
 
 use Arlo_For_Wordpress;
-use Arlo\Entities\Templates;
-use Arlo\Entities\Venues;
-use Arlo\Entities\Presenters;
-use Arlo\Entities\Categories;
+use ArloTraining\Entities\Templates;
+use ArloTraining\Entities\Venues;
+use ArloTraining\Entities\Presenters;
+use ArloTraining\Entities\Categories;
 
 class Redirect {
 
     public static function object_post_redirect() {
         //$object_post_type = filter_input(INPUT_GET, 'object_post_type', FILTER_SANITIZE_STRING);
-        $object_post_type = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'object_post_type');
+        $object_post_type = \ArloTraining\Utilities::filter_string_polyfill(INPUT_GET, 'object_post_type');
         
-        $arlo_id = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'arlo_id');
+        $arlo_id = \ArloTraining\Utilities::filter_string_polyfill(INPUT_GET, 'arlo_id');
 
         if (!empty($object_post_type) && !empty($arlo_id) && is_numeric($arlo_id)) {
             switch($object_post_type) {
@@ -42,8 +42,8 @@ class Redirect {
     // But the Arlo platform still have a link that redirects to the hypothetical wordpress page
     // So we redirect back to the Arlo website
     private static function private_event_redirect($arlo_id) {
-        $e = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 'e');
-        $t = \Arlo\Utilities::filter_string_polyfill(INPUT_GET, 't');
+        $e = \ArloTraining\Utilities::filter_string_polyfill(INPUT_GET, 'e');
+        $t = \ArloTraining\Utilities::filter_string_polyfill(INPUT_GET, 't');
 
         if (!empty($e) || !empty($t)) {
             $settings = get_option('arlo_settings');
@@ -54,7 +54,7 @@ class Redirect {
                 $platform_url = (strpos($platform_name, '.') ? $platform_name : $platform_name . '.arlo.co');
 
                 $redirect_url = 'https://' . $platform_url . '/events/' . rawurlencode($arlo_id) . '-fake-redirect-url?' . (!empty($e) ? 'e=' . rawurlencode($e) : (!empty($t) ? 't=' . rawurlencode($t) : ''));
-                wp_redirect($redirect_url, 301);
+                wp_redirect($redirect_url, 301); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect -- Intentional external redirect to the Arlo platform. The URL is built from admin-configured settings (platform_name), not user input. wp_safe_redirect() blocks external domains by default and the platform domain may be a custom domain that cannot be pre-registered.
                 exit;
             }
         }
@@ -72,7 +72,7 @@ class Redirect {
             if (!empty($post) && !empty($post->ID)) {
                 $redirect_url = get_permalink($post->ID);
                 if (!empty($redirect_url)){
-                    wp_redirect($redirect_url, 301);
+                    wp_safe_redirect($redirect_url, 301);
                     exit;
                 }
             }
@@ -92,7 +92,7 @@ class Redirect {
             if (!empty($post) && !empty($post->ID)) {
                 $redirect_url = get_permalink($post->ID);
                 if (!empty($redirect_url)){
-                    wp_redirect($redirect_url, 301);
+                    wp_safe_redirect($redirect_url, 301);
                     exit;
                 }
             }
@@ -112,7 +112,7 @@ class Redirect {
             if (!empty($post) && !empty($post->ID)) {
                 $redirect_url = get_permalink($post->ID);
                 if (!empty($redirect_url)) {
-                    wp_redirect($redirect_url, 301);
+                    wp_safe_redirect($redirect_url, 301);
                     exit;
                 }
             }
@@ -131,19 +131,19 @@ class Redirect {
             $post = arlo_get_post_by_name('events', 'page');
             if (!empty($post) && !empty($post->ID)) {
                 $redirect_url = get_permalink($post->ID) . 'cat-' . $category->c_slug;
-                wp_redirect($redirect_url, 301);
+                wp_safe_redirect($redirect_url, 301);
                 exit;
             }
             $post = arlo_get_post_by_name('schedule', 'page');
             if (!empty($post) && !empty($post->ID)) {
                 $redirect_url = get_permalink($post->ID) . 'cat-' . $category->c_slug;
-                wp_redirect($redirect_url, 301);
+                wp_safe_redirect($redirect_url, 301);
                 exit;
             }
             $post = arlo_get_post_by_name('upcoming', 'page');
             if (!empty($post) && !empty($post->ID)) {
                 $redirect_url = get_permalink($post->ID) . 'cat-' . $category->c_slug;
-                wp_redirect($redirect_url, 301);
+                wp_safe_redirect($redirect_url, 301);
                 exit;
             }
         }

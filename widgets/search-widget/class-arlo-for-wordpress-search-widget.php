@@ -6,7 +6,10 @@
  * @link      https://arlo.co
  * @copyright 2018 Arlo
  */
-
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+use ArloTraining\VersionHandler;
 class Arlo_For_Wordpress_Search_Widget extends WP_Widget {
 
 	/**
@@ -44,8 +47,6 @@ class Arlo_For_Wordpress_Search_Widget extends WP_Widget {
 	 */
 	public function __construct() {
 		 
-		// load plugin text domain
-		add_action( 'init', array( $this, 'widget_textdomain' ) );
 
 		// Hooks fired when the Widget is activated and deactivated
 		register_activation_hook( __FILE__, array( $this, 'activate' ) );
@@ -54,10 +55,10 @@ class Arlo_For_Wordpress_Search_Widget extends WP_Widget {
 		// TODO: update description
 		parent::__construct(
 			$this->get_widget_slug(),
-			__( 'Arlo event search', 'arlo-for-wordpress-search-widget' ),
+			esc_html__( 'Arlo event search', 'arlo-training-and-event-management-system' ),
 			array(
 				'classname'  => $this->get_widget_slug().'-class',
-				'description' => __( 'Arlo event search', 'arlo-for-wordpress-search-widget' )
+				'description' => esc_html__( 'Arlo event search', 'arlo-training-and-event-management-system' )
 			)
 		);
 
@@ -132,8 +133,10 @@ class Arlo_For_Wordpress_Search_Widget extends WP_Widget {
 		if ( ! isset ( $args['widget_id'] ) )
 			$args['widget_id'] = $this->id;
 
-		if ( isset ( $cache[ $args['widget_id'] ] ) )
-			return print $cache[ $args['widget_id'] ];
+		if ( isset ( $cache[ $args['widget_id'] ] ) ) {
+			echo $cache[ $args['widget_id'] ]; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Cached widget output. The cached content is already escaped/safe.
+			return;
+		}
 		
 		// go on with your widget logic, put everything into a string and …
 
@@ -153,7 +156,7 @@ class Arlo_For_Wordpress_Search_Widget extends WP_Widget {
 
 		wp_cache_set( $this->get_widget_slug(), $cache, 'widget' );
 
-		print $widget_string;
+		echo $widget_string; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Widget output. The content is built from safe sources.
 
 	} // end widget
 	
@@ -172,7 +175,7 @@ class Arlo_For_Wordpress_Search_Widget extends WP_Widget {
 
 		$instance = $old_instance;
 
-		$instance['title'] = strip_tags( wp_unslash($new_instance['title']) );
+		$instance['title'] = wp_strip_all_tags( wp_unslash($new_instance['title']) );
 
 		return $instance;
 
@@ -203,15 +206,6 @@ class Arlo_For_Wordpress_Search_Widget extends WP_Widget {
 	/* Public Functions
 	/*--------------------------------------------------*/
 
-	/**
-	 * Loads the Widget's text domain for localization and translation.
-	 */
-	public function widget_textdomain() {
-
-		// TODO be sure to change 'widget-name' to the name of *your* plugin
-		load_plugin_textdomain( $this->get_widget_slug(), false, plugin_dir_path( __FILE__ ) . 'lang/' );
-
-	} // end widget_textdomain
 
 	/**
 	 * Fired when the plugin is activated.
@@ -236,7 +230,7 @@ class Arlo_For_Wordpress_Search_Widget extends WP_Widget {
 	 */
 	public function register_admin_styles() {
 
-		wp_enqueue_style( $this->get_widget_slug().'-admin-styles', plugins_url( 'css/admin.css', __FILE__ ) );
+		wp_enqueue_style( $this->get_widget_slug().'-admin-styles', plugins_url( 'css/admin.css', __FILE__ ), [], VersionHandler::VERSION );
 
 	} // end register_admin_styles
 
@@ -245,7 +239,7 @@ class Arlo_For_Wordpress_Search_Widget extends WP_Widget {
 	 */
 	public function register_admin_scripts() {
 
-		wp_enqueue_script( $this->get_widget_slug().'-admin-script', plugins_url( 'js/admin.js', __FILE__ ), array('jquery') );
+		wp_enqueue_script( $this->get_widget_slug().'-admin-script', plugins_url( 'js/admin.js', __FILE__ ), array('jquery'), VersionHandler::VERSION, false );
 
 	} // end register_admin_scripts
 
@@ -254,7 +248,7 @@ class Arlo_For_Wordpress_Search_Widget extends WP_Widget {
 	 */
 	public function register_widget_styles() {
 
-		wp_enqueue_style( $this->get_widget_slug().'-widget-styles', plugins_url( 'css/widget.css', __FILE__ ) );
+		wp_enqueue_style( $this->get_widget_slug().'-widget-styles', plugins_url( 'css/widget.css', __FILE__ ), [], VersionHandler::VERSION );
 
 	} // end register_widget_styles
 
@@ -263,14 +257,14 @@ class Arlo_For_Wordpress_Search_Widget extends WP_Widget {
 	 */
 	public function register_widget_scripts() {
 
-		wp_enqueue_script( $this->get_widget_slug().'-script', plugins_url( 'js/widget.js', __FILE__ ), array('jquery') );
+		wp_enqueue_script( $this->get_widget_slug().'-script', plugins_url( 'js/widget.js', __FILE__ ), array('jquery'), VersionHandler::VERSION, false );
 
 	} // end register_widget_scripts
 
 } // end class
 
 // TODO: Remember to change 'Widget_Name' to match the class name definition
-add_action( 'widgets_init', 'register_widget_search_widget' );
-function register_widget_search_widget() {
+add_action( 'widgets_init', 'arlo_register_widget_search_widget' );
+function arlo_register_widget_search_widget() {
 	register_widget("Arlo_For_Wordpress_Search_Widget");
 }

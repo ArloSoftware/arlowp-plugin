@@ -1,24 +1,25 @@
 <?php
 
-namespace Arlo\Entities;
+namespace ArloTraining\Entities;
+
+use ArloTraining\CacheControl;
+use Exception;
 
 class Venues {
 	static function get($conditions = array(), $order = array(), $limit = null, $import_id = null) {
+		if (!is_null($limit) && (!is_numeric($limit) || $limit <= 0)){
+			throw new Exception('Limit must be a positive integer or null');
+		}
+
 		global $wpdb;
 
-		$cache_key = md5(serialize(func_get_args()));
-		$cache_category = 'ArloVenues';
-	
-		if($cached = wp_cache_get($cache_key, $cache_category)) {
-			return $cached;
-		}
-		
 		$parameters = [];
 
 		$query = "SELECT v.* FROM {$wpdb->prefix}arlo_venues AS v";
 		
-		$where = array("import_id = " . $import_id);
-	
+		$where = array("import_id = %d");
+		$parameters[] = $import_id;
+
 		// conditions
 		foreach($conditions as $key => $value) {
 			// what to do?
@@ -56,14 +57,12 @@ class Venues {
 			$query .= ' ORDER BY ' . implode(', ', $order);
 		}
 
-		$query = $wpdb->prepare($query, $parameters);
+		$query = $wpdb->prepare($query, $parameters); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The SQL statement is dynamically constructed and parameters are prepared here.
 
 		if ($query) {
-			$result = ($limit != 1) ? $wpdb->get_results($query, ARRAY_A) : $wpdb->get_row($query, ARRAY_A);
-
-			wp_cache_add( $cache_key, $result, $cache_category, 30 );
-
-			return $result;
+			return ($limit != 1) 
+				? CacheControl::fetch_results($query, ARRAY_A)
+				: CacheControl::fetch_row($query, ARRAY_A);
 		} else {
 			throw new \Exception("Couldn't prepare the SQL statement");
 		}

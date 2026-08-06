@@ -1,5 +1,7 @@
 <?php
-namespace Arlo\Shortcodes;
+namespace ArloTraining\Shortcodes;
+
+use ArloTraining\CacheControl;
 
 class Venues {
     public static function init() {
@@ -12,7 +14,7 @@ class Venues {
         foreach ($shortcodes as $shortcode) {
             $shortcode_name = str_replace('shortcode_', '', $shortcode->name);
 
-            Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
+            Shortcodes::add($shortcode_name, function($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
                 $method_name = 'shortcode_' . str_replace('arlo_', '', $shortcode_name);
                 if (!is_array($atts) && empty($atts)) { $atts = []; }
                 return self::$method_name($content, $atts, $shortcode_name, $import_id);
@@ -22,9 +24,9 @@ class Venues {
         $custom_shortcodes = Shortcodes::get_custom_shortcodes('venues');
 
         foreach ($custom_shortcodes as $shortcode_name => $shortcode) {
-            Shortcodes::add($shortcode_name, function($content = '', $atts, $shortcode_name, $import_id) {
+            Shortcodes::add($shortcode_name, function($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
                 if (!is_array($atts) && empty($atts)) { $atts = []; }
-                return self::shortcode_venue_list($content = '', $atts, $shortcode_name, $import_id);
+                return self::shortcode_venue_list($content, $atts, $shortcode_name, $import_id);
             });
         }
     }
@@ -45,26 +47,27 @@ class Venues {
         
         $limit = intval(isset($atts['limit']) ? $atts['limit'] : get_option('posts_per_page'));
 
-        $t1 = "{$wpdb->prefix}arlo_venues";
-        $t2 = "{$wpdb->prefix}posts";
-
-        $items = $wpdb->get_results(
+        $sql = $wpdb->prepare(
             "SELECT 
                 DISTINCT(v.v_arlo_id)
             FROM 
-                $t1 v 
+                {$wpdb->prefix}arlo_venues v 
             LEFT JOIN 
-                $t2 post 
+                {$wpdb->prefix}posts post 
             ON 
                 v.v_post_id = post.ID
             WHERE 
                 post.post_type = 'arlo_venue'
             AND
-                v.import_id = $import_id
+                v.import_id = %d
             ORDER BY 
-                v.v_name ASC", ARRAY_A);
+                v.v_name ASC",
+            $import_id
+        );
+        
+        $items = CacheControl::fetch_results($sql, ARRAY_A);
 
-        $num = $wpdb->num_rows;
+        $num = is_array($items) ? count($items) : 0;
 
         return arlo_pagination($num,$limit);        
     }
@@ -99,7 +102,7 @@ class Venues {
         $item_list['@type'] = 'ItemList';
         $item_list['itemListElement'] = $snippet_list_items;
 
-        $output .= Shortcodes::create_rich_snippet( json_encode($item_list) );
+        $output .= Shortcodes::create_rich_snippet( $item_list );
 
         return $output;        
     }
@@ -111,50 +114,64 @@ class Venues {
         $page = arlo_current_page();
         $offset = ($page - 1) * $limit;
 
-        $t1 = "{$wpdb->prefix}arlo_venues";
-        $t2 = "{$wpdb->prefix}posts";
-
-        return $wpdb->get_results(
+        $sql = $wpdb->prepare(
             "SELECT 
                 v.*, 
                 post.ID as post_id
             FROM 
-                $t1 v 
+                {$wpdb->prefix}arlo_venues v 
             LEFT JOIN 
-                $t2 post 
+                {$wpdb->prefix}posts post 
             ON 
                 v.v_post_id = post.ID
             WHERE 
                 post.post_type = 'arlo_venue'
             AND
-                v.import_id = $import_id
+                v.import_id = %d
             GROUP BY
                 v_arlo_id
             ORDER BY 
                 v.v_name ASC
             LIMIT 
-                $offset, $limit", ARRAY_A);
+                %d, %d",
+            $import_id,
+            $offset,
+            $limit
+        );
+        
+        $items = CacheControl::fetch_results($sql, ARRAY_A);
+        return $items;
     }
     
     private static function shortcode_venue_name($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_venue_list_item']['v_name'])) return '';
 
-        return htmlentities($GLOBALS['arlo_venue_list_item']['v_name'], ENT_QUOTES, "UTF-8");        
+        return esc_html($GLOBALS['arlo_venue_list_item']['v_name']);        
     }
 
     private static function shortcode_venue_link($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        if(!isset($GLOBALS['arlo_venue_list_item']['v_viewuri'])) return '';
-
-        return htmlentities($GLOBALS['arlo_venue_list_item']['v_viewuri'], ENT_QUOTES, "UTF-8");        
+        return esc_url(self::get_venue_viewuri());
     }    
     
     private static function shortcode_venue_permalink($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        if(!isset($GLOBALS['arlo_venue_list_item']['v_post_id'])) return '';
-
-        return get_permalink($GLOBALS['arlo_venue_list_item']['v_post_id']);        
+        return esc_url(self::get_venue_permalink());
     }
 
-    private static function get_map_query() {
+    private static function get_venue_viewuri() {
+        if(!isset($GLOBALS['arlo_venue_list_item']['v_viewuri'])) return '';
+
+        return $GLOBALS['arlo_venue_list_item']['v_viewuri'];
+    }
+
+    private static function get_venue_permalink() {
+        if(!isset($GLOBALS['arlo_venue_list_item']['v_post_id'])) return '';
+
+        return get_permalink($GLOBALS['arlo_venue_list_item']['v_post_id']);
+    }
+
+    private static function get_map_query_encoded() {
+        if (!isset($GLOBALS['arlo_venue_list_item']) || !is_array($GLOBALS['arlo_venue_list_item'])) return '';
+
         $array_fields = [
             'v_physicaladdressline1',
             'v_physicaladdressline2',
@@ -170,31 +187,33 @@ class Venues {
         $query = [];
 
         foreach($array_fields as $field) {
-            if (!empty($GLOBALS['arlo_venue_list_item'][$field])) {
-                $query[] = urlencode($GLOBALS['arlo_venue_list_item'][$field]);
+            $value = $GLOBALS['arlo_venue_list_item'][$field] ?? '';
+            if (is_scalar($value) && !empty($value)) {
+                $query[] = urlencode((string) $value);
             }
         }
         return implode(',', $query);
     }
     
     private static function shortcode_venue_map($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        $placeholder = isset($atts['placeholder']) ? $atts['placeholder'] : null;  //Added by Tony for theme.z
+        if (!isset($GLOBALS['arlo_venue_list_item']) || !is_array($GLOBALS['arlo_venue_list_item'])) return '';
+
+        $raw_placeholder = $atts['placeholder'] ?? null;
+        $placeholder_image_path = is_scalar($raw_placeholder) ? \ArloTraining\Utilities::sanitize_relative_url( (string) $raw_placeholder, null ) : null;
 
         $settings = get_option('arlo_settings');
-        
-        $api_key = (!empty($settings['googlemaps_api_key']) ? $settings['googlemaps_api_key'] : '');
-        if (empty($api_key) && strtolower($settings['platform_name']) == \Arlo_For_Wordpress::DEFAULT_PLATFORM) {
-            $api_key = \Arlo_For_Wordpress::GOOGLE_MAPS_API_KEY;
-        }
-        $name = $GLOBALS['arlo_venue_list_item']['v_name'];
+        $settings = is_array($settings) ? $settings : [];
+
+        $raw_key = $settings['googlemaps_api_key'] ?? '';
+        $api_key = is_scalar($raw_key) ? (string) $raw_key : '';
+        $raw_name = $GLOBALS['arlo_venue_list_item']['v_name'] ?? '';
+        $name = is_scalar($raw_name) ? (string) $raw_name : '';
         if (empty($api_key)) {
-            //Added by Tony for theme.z
-            if($placeholder != null) {
-                return "<img class='arlo-map-placeholder' src='". esc_url(ARLO_PLUGIN_ROOT_URL . $placeholder) ."' alt='" . esc_html($name) . "' />";
+            if($placeholder_image_path != null) {
+                return "<img class='arlo-map-placeholder' src='" . esc_url(ARLO_PLUGIN_ROOT_URL . $placeholder_image_path) ."' alt='" . esc_attr($name) . "' />";
             }
-            return;
+            return '';
         }
-        
         // merge and extract attributes
         extract(shortcode_atts(array(
             'height'    => 400,
@@ -203,40 +222,47 @@ class Venues {
             'type'      => 'dynamic'
         ), $atts, $shortcode_name, $import_id));
 
-        $lat = $GLOBALS['arlo_venue_list_item']['v_geodatapointlatitude'];
-        $long = $GLOBALS['arlo_venue_list_item']['v_geodatapointlongitude'];
+        $raw_lat  = $GLOBALS['arlo_venue_list_item']['v_geodatapointlatitude'] ?? 0;
+        $raw_long = $GLOBALS['arlo_venue_list_item']['v_geodatapointlongitude'] ?? 0;
+        $lat      = number_format( is_scalar($raw_lat) ? (float) $raw_lat : 0, 6, '.', '' );
+        $long     = number_format( is_scalar($raw_long) ? (float) $raw_long : 0, 6, '.', '' );
 
-        $query = self::get_map_query();
+        $query = self::get_map_query_encoded();
 
         if($lat != 0 || $long != 0) {
-            if(intval($height) <= 0) $height = 400;
-            if(intval($width) <= 0) $width = 400;
+            $height = intval( $height );
+            $width  = intval( $width );
+            $height = $height > 0 ? $height : 400;
+            $width  = $width  > 0 ? $width  : 400;
+            $zoom   = intval( $zoom );
+            /* translators: %s: Name of a venue */
+            $map_label = sprintf(__('Map of %s', 'arlo-training-and-event-management-system'), $name);
 
             switch ($type) {
                 case 'static':
-                    $map = '<img src="https://maps.googleapis.com/maps/api/staticmap?markers=color:green%7C';
-                    $map .= $lat . ',' . $long;
-                    $map .= '&size=' . $width . 'x' . $height;
-                    $map .= '&zoom=' . $zoom;
-                    $map .= '&key=' . $api_key . '"';
+                    $src  = 'https://maps.googleapis.com/maps/api/staticmap?markers=color:green%7C';
+                    $src .= $lat . ',' . $long;
+                    $src .= '&size=' . $width . 'x' . $height;
+                    $src .= '&zoom=' . $zoom;
+                    $src .= '&key=' . rawurlencode( $api_key );
+                    $map  = '<img src="' . esc_url( $src ) . '"';
                     $map .= ' height="' . $height . '"';
                     $map .= ' width="' . $width . '"';
-                    $map .= ' alt="' . esc_attr(sprintf(__('Map of %s', 'arlo-for-wordpress'), $name)) . '"'; 
+                    $map .= ' alt="' . esc_attr($map_label) . '"';
                     $map .= ' />';
                 break;
 
-                default: 
-                    $map = '<iframe src="https://www.google.com/maps/embed/v1/place?q=' ;
-                    $map .= $query;
-                    $map .= '&zoom=' . $zoom;
-                    $map .= '&key=' . $api_key ;
-                    $map .= '"';
+                default:
+                    $src  = 'https://www.google.com/maps/embed/v1/place?q=';
+                    $src .= $query;
+                    $src .= '&zoom=' . $zoom;
+                    $src .= '&key=' . rawurlencode( $api_key );
+                    $map  = '<iframe src="' . esc_url( $src ) . '"';
                     $map .= ' height="' . $height . '"';
                     $map .= ' width="' . $width . '"';
                     $map .= ' frameborder="0" style="border:0"';
-
-                    $map .= ' alt="' . esc_attr(sprintf(__('Map of %s', 'arlo-for-wordpress'), $name)) . '"'; 
-                    $map .= ' title="' . esc_attr(sprintf(__('Map of %s', 'arlo-for-wordpress'), $name)) . '"'; //added by Tony ,add titel attribute for WCAG
+                    $map .= ' title="' . esc_attr($map_label) . '"';
+                    $map .= ' aria-label="' . esc_attr($map_label) . '"';
                     $map .= ' allowfullscreen></iframe>';
                 break;
             }
@@ -244,10 +270,11 @@ class Venues {
             return $map;
         }
 
-        //Added by Tony for theme.z
-        if($placeholder != null) {
-            return "<img class='arlo-map-placeholder' src='". esc_url(ARLO_PLUGIN_ROOT_URL . $placeholder) ."' alt='" . esc_html($name) . "' />";
+        if($placeholder_image_path != null) {
+            return "<img class='arlo-map-placeholder' src='" . esc_url(ARLO_PLUGIN_ROOT_URL . $placeholder_image_path) ."' alt='" . esc_attr($name) . "' />";
         }
+
+        return '';
     }
     
     private static function shortcode_venue_address($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
@@ -263,22 +290,21 @@ class Venues {
         $items = str_replace(' ', '', $items);
         $items = explode(',', $items);
 
-        //added by Tony for theme.z ,special item: locale
         if(count($items) > 0 &&  $items[0] === 'locale') {
             $items = array('suburb' , 'city', 'state', 'post_code');
         }
         
         //consrtuct array
         $address = array(
-            'line1' => htmlentities($GLOBALS['arlo_venue_list_item']['v_physicaladdressline1'], ENT_QUOTES, "UTF-8"),
-            'line2' => htmlentities($GLOBALS['arlo_venue_list_item']['v_physicaladdressline2'], ENT_QUOTES, "UTF-8"),
-            'line3' => htmlentities($GLOBALS['arlo_venue_list_item']['v_physicaladdressline3'], ENT_QUOTES, "UTF-8"),
-            'line4' => htmlentities($GLOBALS['arlo_venue_list_item']['v_physicaladdressline4'], ENT_QUOTES, "UTF-8"),
-            'suburb' => htmlentities($GLOBALS['arlo_venue_list_item']['v_physicaladdresssuburb'], ENT_QUOTES, "UTF-8"),
-            'city' => htmlentities($GLOBALS['arlo_venue_list_item']['v_physicaladdresscity'], ENT_QUOTES, "UTF-8"),
-            'state' => htmlentities($GLOBALS['arlo_venue_list_item']['v_physicaladdressstate'], ENT_QUOTES, "UTF-8"),
-            'post_code' => htmlentities($GLOBALS['arlo_venue_list_item']['v_physicaladdresspostcode'], ENT_QUOTES, "UTF-8"),
-            'country' => htmlentities($GLOBALS['arlo_venue_list_item']['v_physicaladdresscountry'], ENT_QUOTES, "UTF-8"),
+            'line1' => esc_html($GLOBALS['arlo_venue_list_item']['v_physicaladdressline1']),
+            'line2' => esc_html($GLOBALS['arlo_venue_list_item']['v_physicaladdressline2']),
+            'line3' => esc_html($GLOBALS['arlo_venue_list_item']['v_physicaladdressline3']),
+            'line4' => esc_html($GLOBALS['arlo_venue_list_item']['v_physicaladdressline4']),
+            'suburb' => esc_html($GLOBALS['arlo_venue_list_item']['v_physicaladdresssuburb']),
+            'city' => esc_html($GLOBALS['arlo_venue_list_item']['v_physicaladdresscity']),
+            'state' => esc_html($GLOBALS['arlo_venue_list_item']['v_physicaladdressstate']),
+            'post_code' => esc_html($GLOBALS['arlo_venue_list_item']['v_physicaladdresspostcode']),
+            'country' => esc_html($GLOBALS['arlo_venue_list_item']['v_physicaladdresscountry']),
         );
         
         // check if we want to show all items
@@ -292,13 +318,13 @@ class Venues {
         $address_link = null;
         switch($link) {
             case 'permalink':
-                $address_link = self::shortcode_venue_permalink();
+                $address_link = self::get_venue_permalink();
                 break;
             case 'viewuri':
-                $address_link = self::shortcode_venue_link();
+                $address_link = self::get_venue_viewuri();
                 break;
             case 'map':
-                $address_link = "https://www.google.com/maps/search/?api=1&query=".self::get_map_query();
+                $address_link = "https://www.google.com/maps/search/?api=1&query=".self::get_map_query_encoded();
                 break;
             default:
                 if ($link) {
@@ -307,7 +333,7 @@ class Venues {
                 break;
         }
 
-        $content = $address_link ? sprintf('<a href="%s" target="_blank">',esc_attr($address_link)) . $content : $content;
+        $content = $address_link ? sprintf('<a href="%s" target="_blank">', esc_url($address_link)) . $content : $content;
         
         switch($layout) {
             case 'list':
@@ -369,13 +395,13 @@ class Venues {
     private static function shortcode_venue_directions($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_venue_list_item']['v_facilityinfodirections'])) return '';
 
-        return $GLOBALS['arlo_venue_list_item']['v_facilityinfodirections'];        
+        return wp_kses_post($GLOBALS['arlo_venue_list_item']['v_facilityinfodirections']);        
     }
 
     private static function shortcode_venue_parking($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
         if(!isset($GLOBALS['arlo_venue_list_item']['v_facilityinfoparking'])) return '';
 
-        return $GLOBALS['arlo_venue_list_item']['v_facilityinfoparking'];        
+        return wp_kses_post($GLOBALS['arlo_venue_list_item']['v_facilityinfoparking']);        
     }
 
 
@@ -386,7 +412,7 @@ class Venues {
 
         $venue_snippet = self::get_venue_snippet($link);
 
-        return Shortcodes::create_rich_snippet( json_encode($venue_snippet) ); 
+        return Shortcodes::create_rich_snippet( $venue_snippet ); 
     }
 
     /**
@@ -421,12 +447,12 @@ class Venues {
         // Only two pages currently supported
         if ($link_page != "upcoming" && $link_page != "schedule"){ return ''; }
 
-        $settings = get_option('arlo_settings');
-        $location_url = get_permalink($settings['post_types'][$link_page]['posts_page']);
+        $location_page_id = \Arlo_For_Wordpress::get_posts_page_id( $link_page );
+        $location_url = $location_page_id > 0 ? get_permalink( $location_page_id ) : '';
 
         if (!empty($location_url)){
             $arlo_region = \Arlo_For_Wordpress::get_region_parameter();
-            $location_url .= (!empty($arlo_region) ? 'region-' . $arlo_region . '/' : '');
+            $location_url .= (!empty($arlo_region) ? 'region-' . rawurlencode( $arlo_region ) . '/' : '');
 
             $location_url .= "venue-" . urlencode($GLOBALS['arlo_venue_list_item']['v_arlo_id']) . '-' . urlencode($GLOBALS['arlo_venue_list_item']['v_name']) . '/';
             return esc_url($location_url);
@@ -455,7 +481,7 @@ class Venues {
             break;
         }
         
-        $v_link = \Arlo\Utilities::get_absolute_url($v_link);
+        $v_link = \ArloTraining\Utilities::get_absolute_url($v_link);
 
         if (!empty($v_link)) {
             $venue_snippet["url"] = $v_link;
@@ -511,14 +537,18 @@ class Venues {
         return $venue_snippet;
     }
 
-    //added by Tony for theme.z
     private static function shortcode_venue_direction($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
-        $lat = $GLOBALS['arlo_venue_list_item']['v_geodatapointlatitude'];
-        $long = $GLOBALS['arlo_venue_list_item']['v_geodatapointlongitude'];
-        $query = self::get_map_query();
+        if (!isset($GLOBALS['arlo_venue_list_item']) || !is_array($GLOBALS['arlo_venue_list_item'])) return '';
+
+        $raw_lat  = $GLOBALS['arlo_venue_list_item']['v_geodatapointlatitude'] ?? 0;
+        $raw_long = $GLOBALS['arlo_venue_list_item']['v_geodatapointlongitude'] ?? 0;
+        $lat      = number_format( is_scalar($raw_lat) ? (float) $raw_lat : 0, 6, '.', '' );
+        $long     = number_format( is_scalar($raw_long) ? (float) $raw_long : 0, 6, '.', '' );
+        $query = self::get_map_query_encoded();
         if($lat != 0 || $long != 0) {
-            $url = "https://www.google.com/maps/dir//$query/@$lat,$long";
-            return $url;
+            return esc_url( "https://www.google.com/maps/dir//$query/@$lat,$long" );
         }
+
+        return '';
     }
 }

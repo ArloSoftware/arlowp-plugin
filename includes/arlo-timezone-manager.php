@@ -1,18 +1,16 @@
 <?php
 
-namespace Arlo;
+namespace ArloTraining;
 
 class TimeZoneManager {
-
-	private $dbl;	
+	
 	private $plugin;
 
 	public $timezones;
 	public $indexed_timezones;
 
-	public function __construct($plugin, $dbl) {
+	public function __construct($plugin) {
 		$this->plugin = $plugin;
-		$this->dbl = &$dbl; 		
 	}
 
 	public function get_timezones() {
@@ -41,23 +39,21 @@ class TimeZoneManager {
 	}	
 
 	private function query_timezones($timezone_id = 0) {
-		$table = $this->dbl->prefix . "arlo_timezones";
+		global $wpdb;
 		$import_id = $this->plugin->get_importer()->get_current_import_id();
 		$timezone_id = intval($timezone_id);
 
-		$sql = "
+		return CacheControl::fetch_results($wpdb->prepare("
 		SELECT
 			id,
 			name,
 			windows_tz_id
 		FROM
-			{$table}
+			{$wpdb->prefix}arlo_timezones
 		WHERE
-			import_id = " . $import_id . "
+			import_id = %d
 		ORDER BY utc_offset, name
-		";
-
-		return $this->dbl->get_results($sql, ARRAY_A);
+		", $import_id), ARRAY_A);
 	}
 
 }

@@ -1,12 +1,14 @@
 <?php
 
-namespace ArloAPI\Resources;
-
+namespace ArloTraining\API\Resources;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 // load main Transport class for extending
 require_once 'Resource.php';
 
 // now use it
-use ArloAPI\Resources\Resource;
+use ArloTraining\API\Resources\Resource;
 
 class OnlineActivitySearch extends Resource
 {

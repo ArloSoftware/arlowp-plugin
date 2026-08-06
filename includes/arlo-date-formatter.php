@@ -1,6 +1,6 @@
 <?php
 
-namespace Arlo;
+namespace ArloTraining;
 
 class DateFormatter {
 

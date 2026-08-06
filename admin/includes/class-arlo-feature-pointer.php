@@ -11,10 +11,13 @@
 
 /**
  *
- * @package Feature_Pointer
+ * @package Arlo_Feature_Pointer
  * @author  Arlo <info@arlo.co>
  */
-class Feature_Pointer {
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+class Arlo_Feature_Pointer {
 
 	private $pointerID = null;
 	private $pointerTarget = null;
@@ -92,15 +95,15 @@ class Feature_Pointer {
 		<script type="text/javascript">// <![CDATA[
 		jQuery(document).ready(function($) {
 			if(typeof(jQuery().pointer) != 'undefined') {
-				$('<?php echo $this->pointerTarget; ?>').pointer({
-					content: '<?php echo $this->pointerContent; ?>',
+				$(<?php echo wp_json_encode($this->pointerTarget);  ?>).pointer({
+					content: <?php echo wp_json_encode($this->pointerContent); ?>,
 					position: {
-						edge: '<?php echo $this->pointerEdge; ?>',
-						align: '<?php echo $this->pointerAlign; ?>'
+						edge: <?php echo wp_json_encode($this->pointerEdge); ?>,
+						align: <?php echo wp_json_encode($this->pointerAlign); ?>
 					},
 					close: function() {
 						$.post( ajaxurl, {
-							pointer: '<?php echo $this->pointerID; ?>',
+							pointer: <?php echo wp_json_encode($this->pointerID); ?>,
 							action: 'dismiss-wp-pointer'
 						});
 					}
