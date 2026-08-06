@@ -91,17 +91,6 @@ jobs:
               ;;
           esac
 
-      - name: Build release archive
-        env:
-          TAG: ${{ steps.release.outputs.tag }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          echo "Building the Git archive for $TAG."
-          git archive --format=zip --output=arlo-training-and-event-management-system.zip -9 "$TAG"
-          echo "Built arlo-training-and-event-management-system.zip."
-          sha256sum arlo-training-and-event-management-system.zip
-
       - name: Prepare GitHub Release draft
         id: github_release
         env:
@@ -111,17 +100,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          archive=arlo-training-and-event-management-system.zip
           if gh release view "$TAG" >/dev/null 2>&1; then
             is_draft=$(gh release view "$TAG" --json isDraft --jq .isDraft)
-            echo "Updating the existing GitHub Release draft for $TAG."
-            gh release upload "$TAG" "$archive" --clobber
-            echo "publish_after_deploy=$is_draft" >> "$GITHUB_OUTPUT"
+            [[ "$is_draft" == 'true' ]] || { echo "GitHub Release $TAG is already published." >&2; exit 1; }
+            echo "Using the existing GitHub Release draft for $TAG."
           else
             echo "Creating a GitHub Release draft for $TAG."
-            gh release create "$TAG" "$archive" --draft --title "Version $VERSION" --generate-notes --verify-tag
-            echo 'publish_after_deploy=true' >> "$GITHUB_OUTPUT"
+            gh release create "$TAG" --draft --title "Version $VERSION" --generate-notes --verify-tag
           fi
+          echo 'publish_after_deploy=true' >> "$GITHUB_OUTPUT"
 
       - name: Announce WordPress.org deployment
         env:
