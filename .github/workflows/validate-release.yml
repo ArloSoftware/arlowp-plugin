@@ -1,0 +1,54 @@
+name: Validate Release Metadata
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - arlo-for-wordpress.php
+      - includes/arlo-version-handler.php
+      - readme.txt
+      - CHANGELOG.txt
+      - .github/workflows/validate-release.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Validate release version declarations
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          stable_tag=$(sed -nE 's/^Stable tag:[[:space:]]*//p' readme.txt | head -n 1 | sed -E 's/^[[:space:]]+|[[:space:]]+$//g; s/^v//')
+          plugin_version=$(sed -nE 's/^[[:space:]]*\*[[:space:]]*Version:[[:space:]]*//p' arlo-for-wordpress.php | head -n 1 | sed -E 's/^[[:space:]]+|[[:space:]]+$//g; s/^v//')
+          internal_version=$(sed -nE "s/.*const[[:space:]]+VERSION[[:space:]]*=[[:space:]]*'([^']+)'.*/\1/p" includes/arlo-version-handler.php | head -n 1 | sed -E 's/^v//')
+
+          version_pattern='^[0-9]+\.[0-9]+\.[0-9]+$'
+          for value in "$stable_tag" "$plugin_version" "$internal_version"; do
+            [[ "$value" =~ $version_pattern ]] || {
+              echo "Expected a stable X.Y.Z release version, found '$value'." >&2
+              exit 1
+            }
+          done
+
+          [[ "$stable_tag" == "$plugin_version" ]] || {
+            echo "readme.txt Stable tag ($stable_tag) differs from plugin header ($plugin_version)." >&2
+            exit 1
+          }
+          [[ "$stable_tag" == "$internal_version" ]] || {
+            echo "readme.txt Stable tag ($stable_tag) differs from VersionHandler::VERSION ($internal_version)." >&2
+            exit 1
+          }
+          grep -Fq "== v$stable_tag ==" CHANGELOG.txt || {
+            echo "CHANGELOG.txt has no v$stable_tag section." >&2
+            exit 1
+          }
+
+          echo "Release metadata is consistent for v$stable_tag."

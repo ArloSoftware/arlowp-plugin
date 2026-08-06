@@ -1,29 +1,88 @@
-name: Deploy to WordPress.org
+name: Redeploy to WordPress.org
+
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing published stable Git tag to redeploy after a partial failure, for example v5.1.0.
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: wordpress-org-production
+  cancel-in-progress: false
+
 jobs:
   deploy:
-    name: New release
+    name: Deploy selected release
     runs-on: ubuntu-latest
+    environment: wordpress-org-production
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    - name: WordPress Plugin Deploy
-      id: deploy
-      uses: 10up/action-wordpress-plugin-deploy@stable
-      with:
-        generate-zip: true
-      env:
-        SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
-        SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
-        SLUG: arlo-training-and-event-management-system
-    - name: Upload release asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ${{ steps.deploy.outputs.zip-path }}
-        asset_name: arlo-training-and-event-management-system.zip
-        asset_content_type: application/zip
+      - name: Resolve deployment tag
+        id: release
+        env:
+          REQUESTED_TAG: ${{ inputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="$REQUESTED_TAG"
+          tag="${tag#v}"
+          tag="v$tag"
+          [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "'$tag' is not a stable SemVer tag." >&2; exit 1; }
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Check out selected tag
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ steps.release.outputs.tag }}
+          fetch-depth: 0
+
+      - name: Validate deployment source
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          stable_tag=$(sed -nE 's/^Stable tag:[[:space:]]*//p' readme.txt | head -n 1 | sed -E 's/^[[:space:]]+|[[:space:]]+$//g; s/^v//')
+          plugin_version=$(sed -nE 's/^[[:space:]]*\*[[:space:]]*Version:[[:space:]]*//p' arlo-for-wordpress.php | head -n 1 | sed -E 's/^[[:space:]]+|[[:space:]]+$//g; s/^v//')
+          internal_version=$(sed -nE "s/.*const[[:space:]]+VERSION[[:space:]]*=[[:space:]]*'([^']+)'.*/\1/p" includes/arlo-version-handler.php | head -n 1 | sed -E 's/^v//')
+          [[ "$stable_tag" == "$VERSION" && "$plugin_version" == "$VERSION" && "$internal_version" == "$VERSION" ]] || {
+            echo "Deployment tag v$VERSION does not match source versions." >&2
+            exit 1
+          }
+
+      - name: Verify GitHub Release is published
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.release.outputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          is_draft=$(gh release view "$TAG" --json isDraft --jq .isDraft)
+          [[ "$is_draft" == 'false' ]] || { echo "GitHub Release '$TAG' is still a draft." >&2; exit 1; }
+
+      - name: Deploy selected tag to WordPress.org SVN
+        id: deploy
+        uses: 10up/action-wordpress-plugin-deploy@54bd289b8525fd23a5c365ec369185f2966529c2 # stable
+        with:
+          generate-zip: true
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: arlo-training-and-event-management-system
+          VERSION: ${{ steps.release.outputs.version }}
+
+      - name: Attach deployed archive to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.release.outputs.tag }}
+          ARCHIVE: ${{ steps.deploy.outputs.zip-path }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release view "$TAG" >/dev/null
+          gh release upload "$TAG" "$ARCHIVE" --clobber

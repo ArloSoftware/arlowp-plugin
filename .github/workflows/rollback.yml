@@ -1,0 +1,91 @@
+name: Roll Back WordPress.org Distribution
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_version:
+        description: Existing WordPress.org SVN tag version to restore, for example 5.0.2.
+        required: true
+        type: string
+      mode:
+        description: restore-trunk copies the complete tagged source to trunk; pointer-only changes only trunk/readme.txt.
+        required: true
+        default: restore-trunk
+        type: choice
+        options:
+          - restore-trunk
+          - pointer-only
+      confirm:
+        description: Type ROLLBACK <target_version> to confirm.
+        required: true
+        type: string
+      dry_run:
+        description: Preview the SVN change without committing it.
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wordpress-org-production
+  cancel-in-progress: false
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    environment: wordpress-org-production
+    env:
+      SVN_REPOSITORY: https://plugins.svn.wordpress.org/arlo-training-and-event-management-system
+      TARGET_VERSION: ${{ inputs.target_version }}
+      MODE: ${{ inputs.mode }}
+      CONFIRM: ${{ inputs.confirm }}
+      DRY_RUN: ${{ inputs.dry_run }}
+      SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+      SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+    steps:
+      - name: Restore an existing tagged release to SVN trunk
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$TARGET_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo 'target_version must be X.Y.Z.' >&2; exit 1; }
+          [[ "$CONFIRM" == "ROLLBACK $TARGET_VERSION" ]] || { echo "Confirmation must be: ROLLBACK $TARGET_VERSION" >&2; exit 1; }
+
+          workdir=$(mktemp -d)
+          source_dir="$workdir/source"
+          trunk_dir="$workdir/trunk"
+          tag_url="$SVN_REPOSITORY/tags/$TARGET_VERSION"
+          svn_args=(--non-interactive --no-auth-cache --username "$SVN_USERNAME" --password "$SVN_PASSWORD")
+
+          svn "${svn_args[@]}" export "$tag_url" "$source_dir"
+          [[ -f "$source_dir/arlo-for-wordpress.php" && -f "$source_dir/readme.txt" && -f "$source_dir/includes/arlo-version-handler.php" ]] || { echo "SVN tag $TARGET_VERSION is not a complete plugin release." >&2; exit 1; }
+
+          stable_tag=$(sed -nE 's/^Stable tag:[[:space:]]*//p' "$source_dir/readme.txt" | head -n 1 | sed -E 's/^[[:space:]]+|[[:space:]]+$//g; s/^v//')
+          plugin_version=$(sed -nE 's/^[[:space:]]*\*[[:space:]]*Version:[[:space:]]*//p' "$source_dir/arlo-for-wordpress.php" | head -n 1 | sed -E 's/^[[:space:]]+|[[:space:]]+$//g; s/^v//')
+          internal_version=$(sed -nE "s/.*const[[:space:]]+VERSION[[:space:]]*=[[:space:]]*'([^']+)'.*/\1/p" "$source_dir/includes/arlo-version-handler.php" | head -n 1 | sed -E 's/^v//')
+          [[ "$stable_tag" == "$TARGET_VERSION" && "$plugin_version" == "$TARGET_VERSION" && "$internal_version" == "$TARGET_VERSION" ]] || {
+            echo "SVN tag $TARGET_VERSION has inconsistent source metadata." >&2
+            exit 1
+          }
+
+          svn "${svn_args[@]}" checkout "$SVN_REPOSITORY/trunk" "$trunk_dir"
+          if [[ "$MODE" == 'restore-trunk' ]]; then
+            rsync -a --delete --exclude .svn "$source_dir/" "$trunk_dir/"
+            while IFS= read -r path; do
+              [[ -n "$path" ]] && svn delete --force "$path"
+            done < <(svn status "$trunk_dir" | awk '$1 == "!" { print substr($0, 9) }')
+            svn add --force "$trunk_dir"
+          elif [[ "$MODE" == 'pointer-only' ]]; then
+            cp "$source_dir/readme.txt" "$trunk_dir/readme.txt"
+          else
+            echo "Unsupported rollback mode: $MODE" >&2
+            exit 1
+          fi
+
+          svn status "$trunk_dir"
+          if [[ "$DRY_RUN" == 'true' ]]; then
+            echo 'Dry run completed; no SVN changes were committed.'
+          else
+            svn "${svn_args[@]}" commit "$trunk_dir" -m "Emergency rollback: restore $TARGET_VERSION to trunk ($MODE)"
+          fi
