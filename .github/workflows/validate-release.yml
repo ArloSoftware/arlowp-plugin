@@ -25,6 +25,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          echo "Validating release metadata declarations."
 
           stable_tag=$(sed -nE 's/^Stable tag:[[:space:]]*//p' readme.txt | head -n 1 | sed -E 's/^[[:space:]]+|[[:space:]]+$//g; s/^v//')
           plugin_version=$(sed -nE 's/^[[:space:]]*\*[[:space:]]*Version:[[:space:]]*//p' arlo-for-wordpress.php | head -n 1 | sed -E 's/^[[:space:]]+|[[:space:]]+$//g; s/^v//')

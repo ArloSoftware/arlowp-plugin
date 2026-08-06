@@ -1,12 +1,20 @@
-name: Redeploy to WordPress.org
+name: Recover WordPress.org Release
 
 on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing published stable Git tag to redeploy after a partial failure, for example v5.1.0.
+        description: Stable Git tag to recover, for example v5.1.0.
         required: true
         type: string
+      mode:
+        description: Recover the WordPress.org deployment or repair the GitHub Release after SVN deployment succeeded.
+        required: true
+        default: deploy
+        type: choice
+        options:
+          - deploy
+          - repair-github-release
 
 permissions:
   contents: write
@@ -17,7 +25,7 @@ concurrency:
 
 jobs:
   deploy:
-    name: Deploy selected release
+    name: Recover selected release
     runs-on: ubuntu-latest
     environment: wordpress-org-production
     steps:
@@ -25,6 +33,7 @@ jobs:
         id: release
         env:
           REQUESTED_TAG: ${{ inputs.tag }}
+          MODE: ${{ inputs.mode }}
         shell: bash
         run: |
           set -euo pipefail
@@ -32,14 +41,17 @@ jobs:
           tag="${tag#v}"
           tag="v$tag"
           [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "'$tag' is not a stable SemVer tag." >&2; exit 1; }
+          [[ "$MODE" == 'deploy' || "$MODE" == 'repair-github-release' ]] || { echo "'$MODE' is not a supported recovery mode." >&2; exit 1; }
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
           echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
+          echo "Resolved Git tag $tag for WordPress.org version ${tag#v} in $MODE mode."
 
       - name: Check out selected tag
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           ref: ${{ steps.release.outputs.tag }}
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Validate deployment source
         env:
@@ -54,35 +66,94 @@ jobs:
             echo "Deployment tag v$VERSION does not match source versions." >&2
             exit 1
           }
+          echo "Release metadata matches v$VERSION."
 
-      - name: Verify GitHub Release is published
+      - name: Inspect WordPress.org SVN release tag
+        env:
+          MODE: ${{ inputs.mode }}
+          VERSION: ${{ steps.release.outputs.version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          svn_url="https://plugins.svn.wordpress.org/arlo-training-and-event-management-system/tags/$VERSION/"
+          status=$(curl --location --silent --show-error --output /dev/null --write-out '%{http_code}' "$svn_url")
+
+          case "$status" in
+            200|207)
+              tag_exists=true
+              ;;
+            404)
+              tag_exists=false
+              ;;
+            *)
+              echo "Could not determine whether WordPress.org SVN tag $VERSION exists (HTTP $status)." >&2
+              exit 1
+              ;;
+          esac
+
+          if [[ "$MODE" == 'deploy' && "$tag_exists" == 'true' ]]; then
+            echo "WordPress.org SVN tag $VERSION already exists. Use repair-github-release to repair GitHub Release files without changing SVN, or Revert WordPress.org Release to change live trunk." >&2
+            exit 1
+          fi
+
+          if [[ "$MODE" == 'repair-github-release' && "$tag_exists" != 'true' ]]; then
+            echo "WordPress.org SVN tag $VERSION does not exist, so there is no completed deployment to repair. Use deploy instead." >&2
+            exit 1
+          fi
+
+          echo "WordPress.org SVN tag $VERSION exists: $tag_exists."
+
+      - name: Verify GitHub Release exists
+        id: github_release
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.release.outputs.tag }}
         shell: bash
         run: |
           set -euo pipefail
+          gh release view "$TAG" >/dev/null || { echo "GitHub Release '$TAG' does not exist." >&2; exit 1; }
           is_draft=$(gh release view "$TAG" --json isDraft --jq .isDraft)
-          [[ "$is_draft" == 'false' ]] || { echo "GitHub Release '$TAG' is still a draft." >&2; exit 1; }
+          echo "is_draft=$is_draft" >> "$GITHUB_OUTPUT"
+          echo "GitHub Release $TAG exists (draft: $is_draft)."
 
-      - name: Deploy selected tag to WordPress.org SVN
-        id: deploy
+      - name: Build GitHub Release archive
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive=arlo-training-and-event-management-system.zip
+          echo "Building the GitHub Release archive from $TAG."
+          git archive --format=zip --prefix=arlo-training-and-event-management-system/ --output="$archive" -9 "$TAG"
+          sha256sum "$archive"
+
+      - name: Redeploy selected tag to WordPress.org SVN
+        if: inputs.mode == 'deploy'
         uses: 10up/action-wordpress-plugin-deploy@54bd289b8525fd23a5c365ec369185f2966529c2 # stable
-        with:
-          generate-zip: true
         env:
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           SLUG: arlo-training-and-event-management-system
           VERSION: ${{ steps.release.outputs.version }}
 
-      - name: Attach deployed archive to release
+      - name: Repair GitHub Release archive
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.release.outputs.tag }}
-          ARCHIVE: ${{ steps.deploy.outputs.zip-path }}
         shell: bash
         run: |
           set -euo pipefail
-          gh release view "$TAG" >/dev/null
-          gh release upload "$TAG" "$ARCHIVE" --clobber
+          archive=arlo-training-and-event-management-system.zip
+          echo "Replacing the GitHub Release archive for $TAG from the selected Git tag."
+          gh release upload "$TAG" "$archive" --clobber
+
+      - name: Publish repaired GitHub Release
+        if: steps.github_release.outputs.is_draft == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.release.outputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Publishing GitHub Release $TAG after recovery."
+          gh release edit "$TAG" --draft=false

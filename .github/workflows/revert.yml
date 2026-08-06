@@ -1,4 +1,4 @@
-name: Roll Back WordPress.org Distribution
+name: Revert WordPress.org Release
 
 on:
   workflow_dispatch:
@@ -16,7 +16,7 @@ on:
           - restore-trunk
           - pointer-only
       confirm:
-        description: Type ROLLBACK <target_version> to confirm.
+        description: Type REVERT <target_version> to confirm.
         required: true
         type: string
       dry_run:
@@ -33,7 +33,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  rollback:
+  revert:
     runs-on: ubuntu-latest
     environment: wordpress-org-production
     env:
@@ -45,12 +45,14 @@ jobs:
       SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
       SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
     steps:
-      - name: Restore an existing tagged release to SVN trunk
+      - name: Revert SVN trunk to an existing release tag
         shell: bash
         run: |
           set -euo pipefail
           [[ "$TARGET_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo 'target_version must be X.Y.Z.' >&2; exit 1; }
-          [[ "$CONFIRM" == "ROLLBACK $TARGET_VERSION" ]] || { echo "Confirmation must be: ROLLBACK $TARGET_VERSION" >&2; exit 1; }
+          [[ "$CONFIRM" == "REVERT $TARGET_VERSION" ]] || { echo "Confirmation must be: REVERT $TARGET_VERSION" >&2; exit 1; }
+          echo "Preparing to revert WordPress.org SVN trunk to version $TARGET_VERSION."
+          echo "Mode: $MODE. Dry run: $DRY_RUN."
 
           workdir=$(mktemp -d)
           source_dir="$workdir/source"
@@ -68,18 +70,22 @@ jobs:
             echo "SVN tag $TARGET_VERSION has inconsistent source metadata." >&2
             exit 1
           }
+          echo "SVN tag $TARGET_VERSION has consistent release metadata."
 
+          echo "Checking out the current WordPress.org SVN trunk."
           svn "${svn_args[@]}" checkout "$SVN_REPOSITORY/trunk" "$trunk_dir"
           if [[ "$MODE" == 'restore-trunk' ]]; then
+            echo "Replacing SVN trunk with the contents of release tag $TARGET_VERSION."
             rsync -a --delete --exclude .svn "$source_dir/" "$trunk_dir/"
             while IFS= read -r path; do
               [[ -n "$path" ]] && svn delete --force "$path"
             done < <(svn status "$trunk_dir" | awk '$1 == "!" { print substr($0, 9) }')
             svn add --force "$trunk_dir"
           elif [[ "$MODE" == 'pointer-only' ]]; then
+            echo "Updating only trunk/readme.txt to point to release tag $TARGET_VERSION."
             cp "$source_dir/readme.txt" "$trunk_dir/readme.txt"
           else
-            echo "Unsupported rollback mode: $MODE" >&2
+            echo "Unsupported revert mode: $MODE" >&2
             exit 1
           fi
 
@@ -87,5 +93,7 @@ jobs:
           if [[ "$DRY_RUN" == 'true' ]]; then
             echo 'Dry run completed; no SVN changes were committed.'
           else
-            svn "${svn_args[@]}" commit "$trunk_dir" -m "Emergency rollback: restore $TARGET_VERSION to trunk ($MODE)"
+            echo "Committing the revert of live WordPress.org SVN trunk to version $TARGET_VERSION."
+            svn "${svn_args[@]}" commit "$trunk_dir" -m "Revert WordPress.org trunk to $TARGET_VERSION ($MODE)"
+            echo "WordPress.org SVN trunk now reflects version $TARGET_VERSION."
           fi
