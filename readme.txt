@@ -1,9 +1,9 @@
 === Arlo Training Management Software ===   
-Contributors: ArloSoftwareTeam
+Contributors: arlosoftware
 Tags: training management software, tms, courses, course management, training management
 Requires at least: 7.0
 Tested up to: 7.0
-Stable tag: 5.1.0
+Stable tag: 5.1.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -160,6 +160,9 @@ The Arlo – Training and Event Management, and online registration plugin is on
 
 == Changelog ==
 
+= 5.1.1 =
+* Fix: [arlo_event_rich_snippet] now safely returns no output outside an event list context, preventing PHP warnings and deprecation notices.
+
 = 5.1.0 =
 * Improvement: Theme Z: new design theme.
 * Improvement: Non-production deployment mode syncs daily or weekly rather than every 30 minutes.
@@ -197,6 +200,6 @@ The Arlo – Training and Event Management, and online registration plugin is on
 For the complete changelog see [CHANGELOG.txt](https://plugins.svn.wordpress.org/arlo-training-and-event-management-system/trunk/CHANGELOG.txt).
 
 == Upgrade Notice ==
-= 5.1.0 =
+= 5.1.1 =
 Please make sure that you have a backup (from the files and from the database) before you do any upgrades. 
 

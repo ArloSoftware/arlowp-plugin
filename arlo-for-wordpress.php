@@ -15,7 +15,7 @@
  * Plugin Name:       Arlo Training Management Software
  * Plugin URI:        https://www.arlo.co/apps/wordpress-events-plugin
  * Description:       Connect your WordPress to Arlo
- * Version:           5.1.0
+ * Version:           5.1.1
  * Requires at least: 7.0
  * Author:            Arlo Software
  * Author URI:        https://www.arlo.co
