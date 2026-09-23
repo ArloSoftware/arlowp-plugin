@@ -917,6 +917,32 @@ class Events {
     }
 
     private static function shortcode_event_rich_snippet($content = '', $atts = [], $shortcode_name = '', $import_id = '') {
+        if (!isset($GLOBALS['arlo_event_list_item'], $GLOBALS['arlo_eventtemplate']) || !is_array($GLOBALS['arlo_event_list_item']) || !is_array($GLOBALS['arlo_eventtemplate'])) {
+            return '';
+        }
+
+        $required_string_event_fields = array('e_startdatetime', 'e_startdatetimeoffset', 'e_finishdatetime', 'e_finishdatetimeoffset');
+        $required_event_fields = array('e_timezone_id', 'v_id', 'e_id', 'e_isfull');
+        $required_template_fields = array('et_post_name', 'et_region');
+        foreach ($required_string_event_fields as $field) {
+            if (!isset($GLOBALS['arlo_event_list_item'][$field]) || !is_string($GLOBALS['arlo_event_list_item'][$field]) || $GLOBALS['arlo_event_list_item'][$field] === '') {
+                return '';
+            }
+        }
+        foreach ($required_event_fields as $field) {
+            if (!array_key_exists($field, $GLOBALS['arlo_event_list_item']) || is_null($GLOBALS['arlo_event_list_item'][$field]) || $GLOBALS['arlo_event_list_item'][$field] === '') {
+                return '';
+            }
+        }
+        foreach ($required_template_fields as $field) {
+            if (!array_key_exists($field, $GLOBALS['arlo_eventtemplate']) || is_null($GLOBALS['arlo_eventtemplate'][$field])) {
+                return '';
+            }
+        }
+        if ($GLOBALS['arlo_eventtemplate']['et_post_name'] === '') {
+            return '';
+        }
+
         extract(shortcode_atts(array(
             'link' => 'permalink'
         ), $atts, $shortcode_name, $import_id));
