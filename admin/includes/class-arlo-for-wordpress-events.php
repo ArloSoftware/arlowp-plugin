@@ -110,21 +110,30 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 
 			case 'e_startdatetime':
 			case 'e_finishdatetime':
-				//convert to the given timezone, if available
-				if (!empty($this->timezones[$item->e_timezone_id])) {
-					$timewithtz = str_replace(' ', 'T', $item->$column_name) . $item->{$column_name.'offset'};
-					
-					$date = new \DateTime($timewithtz);
-							
-					$timezone = new \DateTimeZone(\ArloTraining\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$this->timezones[$item->e_timezone_id]['windows_tz_id']]);
-					if ($timezone != null) {
-						$date->setTimezone($timezone);
+				$offset = $item->{$column_name . 'offset'};
 
-						$format_array = array("%"=>"","a"=>"D","A"=>"l","d"=>"d","e"=>"j","u"=>"N","w"=>"w","U"=>"W","V"=>"W","W"=>"W","b"=>"M","B"=>"F","h"=>"M","m"=>"m","C"=>"y","g"=>"y","G"=>"Y","y"=>"y","Y"=>"Y","H"=>"H","k"=>"G","I"=>"h","l"=>"g","M"=>"i","p"=>"A","P"=>"a","r"=>"h:i:s A","R"=>"H:i","S"=>"s","T"=>"H:i:s","X"=>"","z"=>"","Z"=>"","c"=>"","D"=>"m/d/y","F"=>"m/d/y","s"=>"U","x"=>"");
-						$format = strtr("%Y-%m-%d %H:%M:%S",$format_array);									
+				// The stored offset is the default; the mapped zone is used only when its rules agree with it.
+				if ( ! empty( $offset ) ) {
+					$date = new \DateTime( str_replace( ' ', 'T', $item->$column_name ) . $offset );
 
-						return esc_html( gmdate( $format, $date->getTimestamp() ) . ' ' . $date->format( 'T' ) );
+					$timezone   = null;
+					$windows_id = '';
+					if ( ! empty( $this->timezones[ $item->e_timezone_id ] ) ) {
+						$windows_id = (string) $this->timezones[ $item->e_timezone_id ]['windows_tz_id'];
+						$timezone   = \ArloTraining\TimeZoneManager::resolve_php_timezone( $windows_id );
 					}
+
+					$display_zone = \ArloTraining\TimeZoneManager::zone_for_instant( $timezone, $date );
+					$date->setTimezone( $display_zone );
+
+					$output = esc_html( $date->format( 'Y-m-d H:i:s' ) . ' ' . \ArloTraining\TimeZoneManager::get_abbreviation( $date ) );
+
+					if ( $display_zone !== $timezone ) {
+						$detail  = $this->get_timezone_warning( $timezone, $windows_id, $item->e_timezone_id, $date );
+						$output .= '<div class="arlo-timezone-warning" title="' . esc_attr( $detail ) . '"><span class="dashicons dashicons-warning" aria-hidden="true"></span>' . esc_html__( 'Invalid UTC offset', 'arlo-training-and-event-management-system' ) . '<span class="screen-reader-text">' . esc_html( $detail ) . '</span></div>';
+					}
+
+					return $output;
 				}
 
 				$abbreviation = ($column_name == 'e_startdatetime' ? $item->e_starttimezoneabbr : $item->e_finishtimezoneabbr);
@@ -153,7 +162,45 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 				return '';
 		}
 	}
-	
+
+	/**
+	 * Explains why the stored offset replaced the mapped time zone.
+	 *
+	 * @param \DateTimeZone|null $timezone    Zone resolved from the Windows ID, if any.
+	 * @param string            $windows_id  Windows time zone ID from the imported time zone row, or ''.
+	 * @param mixed             $timezone_id Arlo time zone ID stored on the event.
+	 * @param \DateTime         $date        Event time at the stored offset.
+	 * @return string
+	 */
+	private function get_timezone_warning( $timezone, $windows_id, $timezone_id, \DateTime $date ) {
+		$stored_offset = 'UTC' . $date->format( 'P' );
+		/* translators: %s: UTC offset stored by Arlo */
+		$using_offset = sprintf( __( "Using Arlo's offset of %s.", 'arlo-training-and-event-management-system' ), $stored_offset );
+
+		if ( null !== $timezone ) {
+			$zone_time = clone $date;
+			$zone_time->setTimezone( $timezone );
+
+			$reason = sprintf(
+				/* translators: 1: PHP time zone identifier, 2: UTC offset of that zone on the event date, 3: UTC offset stored by Arlo */
+				__( "The server timezone details for '%1\$s' resolves %2\$s for this date, which differs from Arlo's offset of %3\$s.", 'arlo-training-and-event-management-system' ),
+				$timezone->getName(),
+				'UTC' . $zone_time->format( 'P' ),
+				$stored_offset
+			);
+		} elseif ( '' !== $windows_id || ! empty( $timezone_id ) ) {
+			$reason = sprintf(
+				/* translators: %s: time zone name or ID */
+				__( 'Timezone %s is not recognised by the server.', 'arlo-training-and-event-management-system' ),
+				'' !== $windows_id ? "'" . $windows_id . "'" : 'ID ' . $timezone_id
+			);
+		} else {
+			$reason = __( 'This event has no timezone.', 'arlo-training-and-event-management-system' );
+		}
+
+		return $reason . "\n" . $using_offset;
+	}
+
 	function column_e_code($item) {
 		$actions = array(
 			'edit' => '<a href="' . esc_url(sprintf('https://%s/management/Console/#/events/%d', $this->platform_url, $item->e_arlo_id)) . '" target="_blank">Edit</a>',

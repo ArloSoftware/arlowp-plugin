@@ -126,6 +126,39 @@ class SystemRequirements {
 		];
 	} 
 
+	/**
+	 * Tests PHP's actual rules for the Canadian changes in tzdb 2026b through 2026e.
+	 *
+	 * These diagnostics are informational, not part of the import requirements gate.
+	 *
+	 * @return array[]
+	 */
+	public static function get_timezone_checks() {
+		// https://data.iana.org/time-zones/tzdb-2026e/NEWS
+		$expected_offsets = [
+			'America/Vancouver' => '-07:00',
+			'America/Edmonton'  => '-06:00',
+			'America/Inuvik'    => '-06:00',
+			'America/Winnipeg'  => '-05:00',
+		];
+		$instant          = new \DateTimeImmutable( '2026-11-02T12:00:00+00:00' );
+		$checks           = [];
+
+		foreach ( $expected_offsets as $identifier => $expected_offset ) {
+			$local_time = $instant->setTimezone( new \DateTimeZone( $identifier ) );
+			$offset     = $local_time->format( 'P' );
+			$checks[]   = [
+				'timezone'        => $identifier,
+				'date'            => $local_time->format( 'Y-m-d' ),
+				'expected_offset' => 'UTC' . $expected_offset,
+				'found_offset'    => 'UTC' . $offset,
+				'passed'          => $offset === $expected_offset,
+			];
+		}
+
+		return $checks;
+	}
+
 	public static function overall_check() {
 		$good = true;
 		foreach (self::get_system_requirements() as $requirement) {

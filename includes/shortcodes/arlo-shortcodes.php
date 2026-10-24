@@ -493,6 +493,8 @@ class Shortcodes {
 		$plugin = Arlo_For_Wordpress::get_instance();
 		$timezones = $plugin->get_timezone_manager()->get_indexed_timezones();
 
+		$GLOBALS['arlo_selected_timezone_names'] = null;
+
 		foreach($timezones as $timezone_id => $timezone) {
 			$selected = false;
 			if (!empty($timezone['id'])) {
@@ -500,22 +502,22 @@ class Shortcodes {
 			}
 
 			$timezone_windows_tz_id = $timezone['windows_tz_id'];
+			$resolved_timezone      = \ArloTraining\TimeZoneManager::resolve_php_timezone( $timezone_windows_tz_id );
+			if ( is_null( $resolved_timezone ) ) {
+				continue;
+			}
+
 			$timezone_get =  \ArloTraining\Utilities::filter_string_polyfill(INPUT_GET, 'timezone');
 
 
 			if ( (!empty($timezone_get) && $timezone_get == $timezone_id) || (empty($timezone_get) && isset($timezone_id) && $timezone_id == $items[0]['e_timezone_id']) ) {
 				$selected = true;
-				//get PHP timezones
-				$GLOBALS['arlo_selected_timezone_names'] = null;
-				if (!is_null($timezone_windows_tz_id)) {
-					$GLOBALS['arlo_selected_timezone_names'] = \ArloTraining\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$timezone_windows_tz_id];
-				}
+
+				$GLOBALS['arlo_selected_timezone_names'] = $resolved_timezone->getName();
 			}
 			
-			if (!is_null($timezone_windows_tz_id)) {
 				$content .= '<option value="' . intval($timezone_id) . '" ' . ($selected ? 'selected' : '') . '>'. esc_html($timezone['name']) . '</option>';
 			}
-		}
 
 		$content .= '</select>';
 		$content .= '</form>';

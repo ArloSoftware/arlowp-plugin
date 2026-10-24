@@ -173,7 +173,7 @@ class Arlo_For_Wordpress_Admin {
 		$screen = get_current_screen();	
 		
 		if ( in_array($screen->id, [$this->plugin_screen_hook_suffix, $this->plugin_venues_screen_hook_suffix, $this->plugin_oa_screen_hook_suffix, $this->plugin_loglist_screen_hook_suffix, $this->plugin_presenters_screen_hook_suffix, $this->plugin_templates_screen_hook_suffix, $this->plugin_events_screen_hook_suffix, $this->plugin_sessions_screen_hook_suffix])) {
-			wp_enqueue_style( $this->plugin_slug .'-admin-styles', plugins_url( 'assets/css/admin.css?20250625f', __FILE__ ), array(), VersionHandler::VERSION );
+			wp_enqueue_style( $this->plugin_slug .'-admin-styles', plugins_url( 'assets/css/admin.css?20261018a', __FILE__ ), array(), VersionHandler::VERSION );
 			
 			if ($screen->id == $this->plugin_screen_hook_suffix) {
 				wp_enqueue_style('wp-codemirror');

@@ -3,7 +3,7 @@ Contributors: arlosoftware
 Tags: training management software, tms, courses, course management, training management
 Requires at least: 7.0
 Tested up to: 7.1
-Stable tag: 5.1.1
+Stable tag: 5.1.2
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -160,6 +160,15 @@ The Arlo – Training and Event Management, and online registration plugin is on
 
 == Changelog ==
 
+= 5.1.2 =
+* Improvement: Support for the 2026 Canadian time zone changes (British Columbia, Manitoba, Alberta, Yukon).
+* Improvement: System requirements now checks for outdated server time zone data affecting the November 2026 Canadian time zone changes.
+* Fix: Event times use the UTC offset from Arlo when a time zone is not recognised, and unrecognised time zones no longer cause errors.
+* Fix: Corrected and added Arlo time zone mappings.
+* Fix: Admin Events list start and finish dates now show local clock times rather than UTC beside local time zone abbreviations.
+* Fix: Admin Events list flags events that use Arlo's stored UTC offset when the server does not recognise the time zone or its rules disagree.
+* Fix: Fixed-offset time zone abbreviations now use a clear UTC offset label.
+
 = 5.1.1 =
 * Fix: [arlo_event_rich_snippet] now safely returns no output outside an event list context, preventing PHP warnings and deprecation notices.
 
@@ -200,6 +209,6 @@ The Arlo – Training and Event Management, and online registration plugin is on
 For the complete changelog see [CHANGELOG.txt](https://plugins.svn.wordpress.org/arlo-training-and-event-management-system/trunk/CHANGELOG.txt).
 
 == Upgrade Notice ==
-= 5.1.1 =
+= 5.1.2 =
 Please make sure that you have a backup (from the files and from the database) before you do any upgrades. 
 
