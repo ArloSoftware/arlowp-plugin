@@ -34,6 +34,22 @@
 	margin: 0 0.5em;
 }
 
+.arlo-timezone-warning {
+	margin-top: 2px;
+	font-size: 11px;
+	line-height: 1.4;
+	color: #50575e;
+	cursor: help;
+}
+
+.arlo-timezone-warning .dashicons {
+	width: 14px;
+	height: 14px;
+	font-size: 14px;
+	color: #dba617;
+	vertical-align: text-bottom;
+}
+
 .arlo-list-ellipsis {
 	height: 2.4em;
 	line-height: 1.2em;
@@ -716,6 +732,20 @@ table.arlo-welcome td.logo {
 .arlo-system-requirements-table .arlo-required-setting-value {
 	text-align: center;
 	width: 80px;
+}
+
+.arlo-timezone-checks-table th:not(:first-child),
+.arlo-timezone-checks-table td:not(:first-child) {
+	padding-right: 16px;
+	text-align: left;
+	white-space: nowrap;
+}
+
+.arlo-timezone-advisory {
+	background-color: white;
+	border: 1px solid #c3c4c7;
+	margin-top: 16px;
+	padding: 1px 12px;
 }
 
 .green {

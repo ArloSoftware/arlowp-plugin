@@ -1830,7 +1830,55 @@ class Arlo_For_Wordpress_Settings {
 		}
 
 		echo '</table>';
-	} 
+		$this->render_timezone_checks( SystemRequirements::get_timezone_checks() );
+	}
+
+	/**
+	 * Displays only failed timezone checks, or a single success row.
+	 *
+	 * @param array[] $checks Point-in-time timezone diagnostic results.
+	 */
+	private function render_timezone_checks( array $checks ) {
+		$failures = array_filter(
+			$checks,
+			function ( $check ) {
+				return ! $check['passed'];
+			}
+		);
+
+		echo '<h3>' . esc_html__( 'Time zones', 'arlo-training-and-event-management-system' ) . '</h3>';
+		echo '<table class="arlo-system-requirements-table arlo-timezone-checks-table">';
+
+		if ( empty( $failures ) ) {
+			echo '<tr><td class="arlo-required-setting-icon"><i class="arlo-icons8-checkmark arlo-icons8 size-21 green"></i></td>
+				<td>' . esc_html__( 'No detected issues', 'arlo-training-and-event-management-system' ) . '</td></tr>';
+		} else {
+			echo '<tr>
+				<th class="arlo-required-setting-icon"></th>
+				<th class="arlo-required-setting" scope="col">' . esc_html__( 'Timezone', 'arlo-training-and-event-management-system' ) . '</th>
+				<th scope="col">' . esc_html__( 'Tested date', 'arlo-training-and-event-management-system' ) . '</th>
+				<th scope="col">' . esc_html__( 'Expected offset', 'arlo-training-and-event-management-system' ) . '</th>
+				<th scope="col">' . esc_html__( 'Found offset', 'arlo-training-and-event-management-system' ) . '</th>
+			</tr>';
+
+			foreach ( $failures as $check ) {
+				echo '<tr>
+					<td class="arlo-required-setting-icon"><i class="arlo-icons8-cancel arlo-icons8 size-21 red"></i><span class="screen-reader-text">' . esc_html__( 'Failed', 'arlo-training-and-event-management-system' ) . '</span></td>
+					<td class="arlo-required-setting">' . esc_html( $check['timezone'] ) . '</td>
+					<td>' . esc_html( $check['date'] ) . '</td>
+					<td>' . esc_html( $check['expected_offset'] ) . '</td>
+					<td class="red">' . esc_html( $check['found_offset'] ) . '</td>
+				</tr>';
+			}
+		}
+
+		echo '</table>';
+
+		if ( ! empty( $failures ) ) {
+			echo '<div class="arlo-timezone-advisory"><p>' . esc_html__( "Your server's timezone data appears to be out of date. Event times may display incorrectly if your site uses the affected timezones.", 'arlo-training-and-event-management-system' ) . '<br>'
+				. esc_html__( 'Ask your hosting provider to check for PHP or operating system timezone updates.', 'arlo-training-and-event-management-system' ) . '</p></div>';
+		}
+	}
 
 	function arlo_support_callback () {
 		echo '

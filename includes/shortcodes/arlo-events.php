@@ -1216,17 +1216,24 @@ class Events {
     private static function rich_snippet_time_format($datetime, $offset, $timezoneid){
         $timezone = null;
         $timezone_array = \Arlo_For_Wordpress::get_instance()->get_timezone_manager()->get_indexed_timezones($timezoneid);
-        if (!is_null($timezone_array) && !empty($timezone_array['windows_tz_id']) && !empty(\ArloTraining\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$timezone_array['windows_tz_id']])) {
-            $timezone = new \DateTimeZone(\ArloTraining\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$timezone_array['windows_tz_id']]);
-        } else {
-            try {
-                $timezone = new \DateTimeZone(str_replace(':', '', $offset));
-            } catch(\Exception $e) {
-                $timezone = new \DateTimeZone('UTC');
+			if ( ! is_null( $timezone_array ) && ! empty( $timezone_array['windows_tz_id'] ) ) {
+				$timezone = \ArloTraining\TimeZoneManager::resolve_php_timezone( $timezone_array['windows_tz_id'] );
+			}
+
+			$time = is_null( $timezone ) ? null : new \DateTime( $datetime, $timezone );
+			// Fallback: the stored offset replaces the zone when it is unmapped or its rules disagree with the stored offset.
+			$offset_zone = \ArloTraining\TimeZoneManager::offset_timezone( $offset );
+			if ( ! is_null( $offset_zone ) ) {
+				$offset_time = new \DateTime( $datetime, $offset_zone );
+				if ( is_null( $time ) || $time->getOffset() !== $offset_time->getOffset() ) {
+					$time = $offset_time;
             }
         }
 
-        $time = new \DateTime($datetime, $timezone);
+			if ( is_null( $time ) ) {
+				$time = new \DateTime( $datetime, new \DateTimeZone( 'UTC' ) );
+			}
+
         return $time->format(DATE_RFC3339);
     }
 
@@ -1653,9 +1660,15 @@ class Events {
         $utc_timezone_name = "UTC";
 
         $timezone_array = $plugin->get_timezone_manager()->get_indexed_timezones($timezoneid);
-        if (!is_null($timezone_array) && !empty($timezone_array['windows_tz_id']) && !empty(\ArloTraining\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$timezone_array['windows_tz_id']])) {
-            $timezone = new \DateTimeZone(\ArloTraining\Arrays::$arlo_timezone_system_names_to_php_tz_identifiers[$timezone_array['windows_tz_id']]);
-        } else {
+		if ( ! is_null( $timezone_array ) && ! empty( $timezone_array['windows_tz_id'] ) ) {
+			$timezone = \ArloTraining\TimeZoneManager::resolve_php_timezone( $timezone_array['windows_tz_id'] );
+		}
+
+		if ( ! empty( $offset ) ) {
+			$timezone = \ArloTraining\TimeZoneManager::zone_for_instant( $timezone, $date );
+		}
+
+		if ( is_null( $timezone ) ) {
             try {
                 $timezone = new \DateTimeZone(get_option('timezone_string'));
             } catch(\Exception $e) {
@@ -1670,7 +1683,7 @@ class Events {
         $selected_timezone = null;
 
         if (!empty($GLOBALS['arlo_selected_timezone_names'])) {
-            $selected_timezone = new \DateTimeZone($GLOBALS['arlo_selected_timezone_names']);
+			$selected_timezone = \ArloTraining\TimeZoneManager::first_valid_timezone( $GLOBALS['arlo_selected_timezone_names'] );
         }
       
         if($is_online) {
@@ -1689,7 +1702,7 @@ class Events {
         }
 
         if (empty($abbreviation)) {
-            $abbreviation = $date->format('T');
+            $abbreviation = \ArloTraining\TimeZoneManager::get_abbreviation( $date );
         }
 
 

@@ -1,3 +1,24 @@
+== v5.1.2 ==
+
+Enhancements
+------------------
+* Support for the 2026 Canadian time zone changes. The British Columbia,
+  Manitoba, Alberta and Yukon time zones sent by Arlo are now recognised.
+* System requirements now checks for outdated server time zone data affecting
+  the November 2026 Canadian time zone changes.
+
+Bug fixes
+------------------
+* Event times use the UTC offset from Arlo when a time zone is not recognised
+  or the server's time zone data disagrees with it, and unrecognised time
+  zones no longer cause errors.
+* Corrected and added Arlo time zone mappings.
+* Admin Events list start and finish dates now show the local clock time
+  rather than UTC beside a local time zone abbreviation.
+* Admin Events list flags events that use Arlo's stored UTC offset because
+  the server does not recognise the time zone or its rules disagree.
+* Fixed-offset time zone abbreviations now use a clear UTC offset label.
+
 == v5.1.1 ==
 
 Bug fixes

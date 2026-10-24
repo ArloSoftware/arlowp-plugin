@@ -5,7 +5,7 @@ namespace ArloTraining;
 use ArloTraining\Utilities;
 #[\AllowDynamicProperties]
 class VersionHandler {
-	const VERSION = '5.1.1';
+	const VERSION = '5.1.2';
 
 	private $message_handler;
 	private $plugin;
