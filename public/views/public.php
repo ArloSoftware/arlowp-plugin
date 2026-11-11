@@ -9,10 +9,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  * frontend of the theme when the plugin is activated.
  *
  * @package   Arlo_For_Wordpress_Admin
- * @author    Arlo <info@arlo.co>
- * @license   GPL-2.0+
+ * @author    Arlo Software <support@arlo.co>
+ * @license   GPL-2.0-or-later
  * @link      https://arlo.co
- * @copyright 2018 Arlo
+ * @copyright 2015-2026 Arlo Software
  */
 ?>
 

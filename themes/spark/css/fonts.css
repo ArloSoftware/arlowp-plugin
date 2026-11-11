@@ -1,9 +1,17 @@
+/*
+ * Arlo icon set (Spark themes).
+ * Glyphs are drawn from Font Awesome 4.7.0 (font: SIL OFL 1.1, CSS: MIT; https://fontawesome.io) and
+ * Arlo-authored SVG shapes. Class names are a public contract: customer templates and custom CSS
+ * reference them, so every name defined by earlier releases keeps rendering a glyph.
+ */
+
 @font-face {
-    font-family: 'Arlo--Theme2';
-    src: url('../fonts/Arlo--Theme2.eot?eyq22b');
-    src: url('../fonts/Arlo--Theme2.eot?eyq22b#iefix') format('embedded-opentype'), url('../fonts/Arlo--Theme2.ttf?eyq22b') format('truetype'), url('../fonts/Arlo--Theme2.woff?eyq22b') format('woff'), url('../fonts/Arlo--Theme2.svg?eyq22b#Arlo--Theme2') format('svg');
-    font-weight: normal;
-    font-style: normal;
+  font-family: "FontAwesome";
+  src: url("../../../public/custom-assets/font-awesome-4.7.0/fonts/fontawesome-webfont.woff2?v=4.7.0") format("woff2"),
+       url("../../../public/custom-assets/font-awesome-4.7.0/fonts/fontawesome-webfont.woff?v=4.7.0") format("woff"),
+       url("../../../public/custom-assets/font-awesome-4.7.0/fonts/fontawesome-webfont.ttf?v=4.7.0") format("truetype");
+  font-weight: normal;
+  font-style: normal;
 }
 
 .icons8-price-tag:before,
@@ -16,7 +24,7 @@
 .icons8-twitter:before {
     display: inline-block;
     /* use !important to prevent issues with browser extensions that change fonts */
-    font-family: 'Arlo--Theme2' !important;
+    font-family: "FontAwesome" !important;
     speak: none;
     font-style: normal;
     font-weight: normal;
@@ -30,13 +38,22 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-smoothing: antialiased;
+}.icons8-price-tag:before { content: "\f02b"; padding: 0 0.0715em; }.icons8-marker:before { content: "\f041"; padding: 0 0.2143em; }.icons8-gender-neutral-user:before { content: "\f2c0"; padding: 0 0.0715em; }.icons8-clock:before { content: "\f017"; padding: 0 0.0715em; }.icons8-department:before { content: " "; white-space: pre; padding: 0 0.375em; background-color: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' x='4.5' y='2.8' width='15' height='18.4' rx='1.2'/%3E%3Cg fill='%23000'%3E%3Crect x='7.4' y='6' width='2.2' height='2.2'/%3E%3Crect x='10.9' y='6' width='2.2' height='2.2'/%3E%3Crect x='14.4' y='6' width='2.2' height='2.2'/%3E%3Crect x='7.4' y='10.2' width='2.2' height='2.2'/%3E%3Crect x='10.9' y='10.2' width='2.2' height='2.2'/%3E%3Crect x='14.4' y='10.2' width='2.2' height='2.2'/%3E%3Crect x='7.4' y='14.4' width='2.2' height='2.2'/%3E%3Crect x='14.4' y='14.4' width='2.2' height='2.2'/%3E%3C/g%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M10.9 21v-4.4h2.2V21'/%3E%3C/svg%3E") no-repeat center / contain; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' x='4.5' y='2.8' width='15' height='18.4' rx='1.2'/%3E%3Cg fill='%23000'%3E%3Crect x='7.4' y='6' width='2.2' height='2.2'/%3E%3Crect x='10.9' y='6' width='2.2' height='2.2'/%3E%3Crect x='14.4' y='6' width='2.2' height='2.2'/%3E%3Crect x='7.4' y='10.2' width='2.2' height='2.2'/%3E%3Crect x='10.9' y='10.2' width='2.2' height='2.2'/%3E%3Crect x='14.4' y='10.2' width='2.2' height='2.2'/%3E%3Crect x='7.4' y='14.4' width='2.2' height='2.2'/%3E%3Crect x='14.4' y='14.4' width='2.2' height='2.2'/%3E%3C/g%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M10.9 21v-4.4h2.2V21'/%3E%3C/svg%3E") no-repeat center / contain; }.icons8-facebook:before { content: "\f09a"; padding: 0 0.2143em; }.icons8-linkedin:before { content: "\f0e1"; padding: 0 0.0715em; }.icons8-twitter:before { content: "\f099"; padding: 0 0.0357em; }
+
+/* Forced colors (Windows High Contrast) replace background colors, which would hide the SVG-mask icons. */
+@media (forced-colors: active) {
+  .icons8-department:before {
+    forced-color-adjust: none;
+    background-color: CanvasText;
+  }
 }
 
-.icons8-price-tag:before { content: "\f101"; }
-.icons8-marker:before { content: "\f118"; }
-.icons8-gender-neutral-user:before { content: "\f108"; }
-.icons8-clock:before { content: "\f12d"; }
-.icons8-department:before { content: "\f10e"; }
-.icons8-facebook:before { content: "\f120"; }
-.icons8-linkedin:before { content: "\f124"; }
-.icons8-twitter:before { content: "\f122"; }
+/* Printing omits backgrounds, which would hide the SVG-mask icons. */
+@media print {
+  .icons8-department:before,
+  .arlo#arlo .icons8-department:before {
+    background-color: currentColor !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

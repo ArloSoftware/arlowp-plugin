@@ -25,12 +25,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_permalink" target="_blank">[arlo_event_template_permalink]</a></li>
 			<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_next_running" target="_blank">[arlo_event_next_running]</a></li>
 			<li>
-				<a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_content_field_item" target="_blank">[arlo_content_field_item]</a>
+				<a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_content_field_item" target="_blank">[arlo_content_field_item]</a>
 				<ul>
-					<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_content_field_name" target="_blank">[arlo_content_field_name]</a></li>
-					<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_content_field_text" target="_blank">[arlo_content_field_text]</a></li>
+					<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_content_field_name" target="_blank">[arlo_content_field_name]</a></li>
+					<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_content_field_text" target="_blank">[arlo_content_field_text]</a></li>
 				</ul>
-				<a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_content_field_item" target="_blank">[/arlo_content_field_item]</a>
+				<a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_content_field_item" target="_blank">[/arlo_content_field_item]</a>
 			</li>
 			<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_tags" target="_blank">[arlo_event_template_tags]</a></li>
 			<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_rich_snippet" target="_blank">[arlo_event_template_rich_snippet]</a></li>

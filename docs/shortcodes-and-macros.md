@@ -1,5 +1,24 @@
 # SHORTCODES
 
+## Placeholders in attribute values
+
+Some attributes take your own markup and insert a value into it. In these attributes `%s` stands for the value and `%%` is a literal percent sign. Any other percent sign is left as written, so `style="width:100%"` is safe. Nothing else is read as a format: `%d` is not a placeholder except in `counts`, and positional forms such as `%1$s` render as written.
+
+* `wrap` (any Arlo shortcode): `%s` is the shortcode output. Example: `[arlo_event_name wrap="<h2 style='width:100%'>%s</h2>"]`
+* `group_header` (`[arlo_event_template_list_item group="category"]`): `%s` is the category name.
+* `events_after` (`[arlo_event_template_list_item group="category"]`): `%s` is the category slug. Each category list is fetched with one event more than `limit`, and the shortcode ends the list with a hidden `<span class="arlo-events-limit" data-limit="n"></span>` (placed just before `events_after`) that gives a load-more script the `limit`. It is output only when `events_after` is set.
+* `title` (`[arlo_categories]`): `%s` is the category name. The `%s` is removed when more than one category is selected.
+* `item` (`[arlo_category_breadcrumb]`, `[arlo_event_category_path]`): `{slug}` is the category slug and `{label}` is the category name. They are not `%s` placeholders.
+* The markup from `item`, `title` (`[arlo_categories]`), `group_header` and `events_after` is sanitised again after the value is inserted, so a value placed in `href`, `src` or `style` cannot run script. Put these values in element text or a `data-` attribute, or after a fixed prefix such as `href="/catalogue/{slug}"`.
+* `counts` (`[arlo_categories]`): `%s` or `%d` is the number of event templates in the category.
+* `format` (`[arlo_event_start_date]`, `[arlo_event_end_date]`, `[arlo_event_next_running]`, and `startdateformat` / `enddateformat`): a strftime format, or a PHP `date()` format when it contains no `%`.
+  * Supported conversions: `%a %A %b %B %h %c %C %d %D %e %F %g %G %H %I %j %k %l %m %M %n %p %P %r %R %s %S %t %T %u %U %V %w %W %x %X %y %Y %z %Z` and `%%`.
+  * Flags and width: `%-d` (no padding), `%_d` (pad with spaces), `%0e` (pad with zeros), `%^a` (upper case) and a width such as `%5d`.
+  * Differences from the C library: names are always English; `%e`, `%k` and `%l` are not padded unless `_` or a width is given; `%G` and `%g` give the calendar year, not the ISO week-numbering year that the C library gives (a compatibility shim for saved copies of the older Starter templates, which used `%G` as the year; use `%Y` and `%y` in your own templates); `%Z` is the event's time zone abbreviation and `%z` is its offset with a colon (`+13:00`), where the C library prints `+1300`.
+  * Anything else, including the `#` flag, `%E` and `%O` modifiers, unknown letters and a width above 64, is shown as written, as is a `%` that does not start a conversion.
+* `aftertext` (`[arlo_event_next_running]`) is appended as written and has no placeholder.
+---
+
 ## Event Template
 
 * [arlo_event_template_list]
@@ -10,6 +29,7 @@
 * [arlo_event_template_summary]
 * [arlo_event_template_permalink]
 * [arlo_timezones]
+* [arlo_suggest_templates limit="5" base="category" tagprefix="group_" onlyscheduled="false" regionalized="false"][/arlo_suggest_templates]
 * [arlo_suggest_datelocation]
 ---
 
@@ -86,3 +106,13 @@
 * [arlo_venue_link]
 * [arlo_venue_directions]
 * [arlo_venue_parking]
+---
+
+## Credit
+
+* [arlo_powered_by]
+  > **Note**: Renders a small "Powered by Arlo" logo linking to arlo.co only when
+  > the **Powered by Arlo link enabled** checkbox is ticked in Arlo > Settings > Misc.
+  > This enables the credit on Arlo pages and widgets whose templates contain the shortcode;
+  > it does not add the shortcode to templates.
+  > It renders nothing by default.

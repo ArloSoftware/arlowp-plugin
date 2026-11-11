@@ -5,119 +5,148 @@ namespace ArloTraining\Entities;
 use ArloTraining\CacheControl;
 use Exception;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 class Tags {
-	static function get($conditions = array(), $limit = null, $import_id = null) {
-		if (!is_null($limit) && (!is_numeric($limit) || $limit <= 0)){
-			throw new Exception('Limit must be a positive integer or null');
+	static function get( $conditions = array(), $limit = null, $import_id = null ) {
+		if ( ! is_null( $limit ) && ( ! is_numeric( $limit ) || $limit <= 0 ) ) {
+			throw new Exception( 'Limit must be a positive integer or null' );
 		}
 
 		global $wpdb;
 
 		$parameters = [];
-	
+
 		$query = "SELECT t.* FROM {$wpdb->prefix}arlo_tags AS t";
-		
-		$where = array("import_id = %d");
-		$parameters[] =  $import_id;
 
-		foreach($conditions as $key => $value) {
+		$where        = array( "import_id = %d" );
+		$parameters[] = $import_id;
+
+		foreach ( $conditions as $key => $value ) {
 			// what to do?
-			switch($key) {
+			switch ( $key ) {
 				case 'id':
-					if(is_array($value) && count($value) > 1) {
-						$where[] = "t.id IN (" . implode(',', array_map(function() {return "%d";}, $value)) . ")";
-						$parameters = array_merge($parameters, $value);
+					if ( is_array( $value ) && count( $value ) > 1 ) {
+						$where[]    = "t.id IN (" . implode(
+							',',
+							array_map(
+								function () {
+									return "%d";
+								},
+								$value
+							)
+						) . ")";
+						$parameters = array_merge( $parameters, $value );
 					} else {
-						if (is_array($value) && count($value) == 1) {
-							$value = array_pop($value);
+						if ( is_array( $value ) && count( $value ) == 1 ) {
+							$value = array_pop( $value );
 						}
 
-						if(!empty($value)) {						
-							$where[] = "t.id = %d";
+						if ( ! empty( $value ) ) {
+							$where[]      = "t.id = %d";
 							$parameters[] = $value;
-							$limit = 1;
-						}	
+							$limit        = 1;
+						}
 					}
-				break;
-				
+					break;
+
 				case 'tag':
-					if(is_array($value) && count($value) > 1) {
-						$where[] = "t.tag IN (" . implode(',', array_map(function() {return "%s";}, $value)) . ")";
-						$parameters = array_merge($parameters, $value);
+					if ( is_array( $value ) && count( $value ) > 1 ) {
+						$where[]    = "t.tag IN (" . implode(
+							',',
+							array_map(
+								function () {
+									return "%s";
+								},
+								$value
+							)
+						) . ")";
+						$parameters = array_merge( $parameters, $value );
 					} else {
-						if (is_array($value) && count($value) == 1) {
-							$value = array_pop($value);
+						if ( is_array( $value ) && count( $value ) == 1 ) {
+							$value = array_pop( $value );
 						}
 
-						if(!empty($value)) {
-							$where[] = "t.tag = %s";
+						if ( ! empty( $value ) ) {
+							$where[]      = "t.tag = %s";
 							$parameters[] = $value;
-							$limit = 1;
+							$limit        = 1;
 						}
 					}
-						
-				break;				
+
+					break;
 			}
 		}
-		
-		if(!empty($where)) {
-			$query .= ' WHERE ' . implode(' AND ', $where);
+
+		if ( ! empty( $where ) ) {
+			$query .= ' WHERE ' . implode( ' AND ', $where );
 			$query .= ' ORDER BY tag ASC';
 		}
 
-		$query = $wpdb->prepare($query, $parameters);// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The SQL statement is dynamically constructed and parameters are prepared here.
+		$query = $wpdb->prepare( $query, $parameters );// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The SQL statement is dynamically constructed and parameters are prepared here.
 
-		if ($query) {
-			return ($limit != 1) 
-				? CacheControl::fetch_results($query)
-				: CacheControl::fetch_row($query);
+		if ( $query ) {
+			return ( $limit != 1 )
+				? CacheControl::fetch_results( $query )
+				: CacheControl::fetch_row( $query );
 		} else {
-			throw new \Exception("Couldn't prepare the SQL statement");
+			throw new \Exception( "Couldn't prepare the SQL statement" );
 		}
-
 	}
 
-	public static function look_up_tags_by_tag($tags, $import_id) {
-		if (!isset($tags) || empty($tags)) return [];
-		
+	public static function look_up_tags_by_tag( $tags, $import_id ) {
+		if ( ! isset( $tags ) || empty( $tags ) ) {
+			return [];
+		}
+
 		$condition = [
-			'tag' => $tags
+			'tag' => $tags,
 		];
 
-		$tags = self::get($condition, 2, $import_id);
+		$tags = self::get( $condition, 2, $import_id );
 
-		if (!is_array($tags) && !is_null($tags)) {
-			$tags = [$tags];
+		if ( ! is_array( $tags ) && ! is_null( $tags ) ) {
+			$tags = [ $tags ];
 		}
 
 		return $tags;
 	}
 
-	public static function get_tag_ids_by_tag($tags, $import_id) {
-		if (!isset($tags) || empty($tags)) return [];
+	public static function get_tag_ids_by_tag( $tags, $import_id ) {
+		if ( ! isset( $tags ) || empty( $tags ) ) {
+			return [];
+		}
 
-		$tags = self::look_up_tags_by_tag($tags, $import_id);
+		$tags = self::look_up_tags_by_tag( $tags, $import_id );
 
-		if (!is_null($tags)) {
-			return array_map(function($tag) {
-				return $tag->id;
-			}, $tags);
+		if ( ! is_null( $tags ) ) {
+			return array_map(
+				function ( $tag ) {
+					return $tag->id;
+				},
+				$tags
+			);
 		}
 
 		return null;
 	}
 
-	public static function get_first_id_by_tag($tag, $import_id) {
-		if (empty($tag)) return null;
+	public static function get_first_id_by_tag( $tag, $import_id ) {
+		if ( empty( $tag ) ) {
+			return null;
+		}
 
 		$condition = [
-			'tag' => $tag
+			'tag' => $tag,
 		];
 
-		$tag_obj = self::get($condition, 1, $import_id);
-		if (empty($tag_obj->id)) return null;
+		$tag_obj = self::get( $condition, 1, $import_id );
+		if ( empty( $tag_obj->id ) ) {
+			return null;
+		}
 
 		return $tag_obj->id;
 	}
-
 }

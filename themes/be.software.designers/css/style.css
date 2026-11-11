@@ -9,7 +9,7 @@ color3: #F1F7FB;
 */
 
 
-/* Normalize.css */
+/*! Contains normalize.css (MIT License, Copyright Nicolas Gallagher and Jonathan Neal, https://github.com/necolas/normalize.css), selectors prefixed with .arlo#arlo. See THIRD-PARTY-NOTICES.txt */
 
 body.arlo {
     margin: 0;
@@ -927,7 +927,7 @@ body.arlo {
 }
 
 .arlo#arlo .arlo-delivery-icons {
-    font-family: "Arlo-Web-Controls";
+    font-family: "FontAwesome";
     font-style: normal;
     font-weight: normal;
     font-variant: normal;

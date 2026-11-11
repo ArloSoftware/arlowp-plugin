@@ -1,0 +1,121 @@
+/*
+ * Arlo icon set (admin and compatibility classes).
+ * Glyphs are drawn from Font Awesome 4.7.0 (font: SIL OFL 1.1, CSS: MIT; https://fontawesome.io) and
+ * Arlo-authored SVG shapes. Class names are a public contract: customer templates and custom CSS
+ * reference them, so every name defined by earlier releases keeps rendering a glyph.
+ */
+
+@font-face {
+  font-family: "FontAwesome";
+  src: url("../../../public/custom-assets/font-awesome-4.7.0/fonts/fontawesome-webfont.woff2?v=4.7.0") format("woff2"),
+       url("../../../public/custom-assets/font-awesome-4.7.0/fonts/fontawesome-webfont.woff?v=4.7.0") format("woff"),
+       url("../../../public/custom-assets/font-awesome-4.7.0/fonts/fontawesome-webfont.ttf?v=4.7.0") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+[data-icons8]:before { content: attr(data-icons8); }
+
+.arlo-icons8, [data-icons8]:before,
+.arlo-icons8-apartment:before,
+.arlo-icons8-arlo-logo-for-font:before,
+.arlo-icons8-cancel:before,
+.arlo-icons8-cancel-2:before,
+.arlo-icons8-checked-checkbox-2:before,
+.arlo-icons8-checked-checkbox-2-filled:before,
+.arlo-icons8-checkmark:before,
+.arlo-icons8-circled-play:before,
+.arlo-icons8-classroom:before,
+.arlo-icons8-coffee-maker:before,
+.arlo-icons8-coffee-to-go:before,
+.arlo-icons8-cup:before,
+.arlo-icons8-curriculum:before,
+.arlo-icons8-department:before,
+.arlo-icons8-design:before,
+.arlo-icons8-diploma:before,
+.arlo-icons8-diploma-1:before,
+.arlo-icons8-diploma-2:before,
+.arlo-icons8-embassy:before,
+.arlo-icons8-grid-2:before,
+.arlo-icons8-grid-3:before,
+.arlo-icons8-headset:before,
+.arlo-icons8-help:before,
+.arlo-icons8-help-filled:before,
+.arlo-icons8-home:before,
+.arlo-icons8-info:before,
+.arlo-icons8-info-filled:before,
+.arlo-icons8-java-coffee-cup-logo:before,
+.arlo-icons8-map-marker:before,
+.arlo-icons8-marker:before,
+.arlo-icons8-minus:before,
+.arlo-icons8-mouse:before,
+.arlo-icons8-play:before,
+.arlo-icons8-plus:before,
+.arlo-icons8-private:before,
+.arlo-icons8-search:before,
+.arlo-icons8-toggle-off:before,
+.arlo-icons8-toggle-off-filled:before,
+.arlo-icons8-tv:before,
+.arlo-icons8-tv-show:before,
+.arlo-icons8-unchecked-checkbox:before,
+.arlo-icons8-us-dollar:before,
+.arlo-icons8-us-dollar-2:before,
+.arlo-icons8-user-groups:before,
+.arlo-icons8-video-paylist:before {
+  display: inline-block;
+  font-family: "FontAwesome";
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  line-height: 1;
+  text-decoration: inherit;
+  text-rendering: optimizeLegibility;
+  text-transform: none;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-smoothing: antialiased;
+}.arlo-icons8-apartment:before { content: "\f0f7"; padding: 0 0.1072em; }.arlo-icons8-arlo-logo-for-font:before { content: " "; white-space: pre; padding: 0 0.375em; background-color: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2267.717 2267.717'%3E%3Cpath fill='black' d='M475.825 1087.944c26.595 0 56.617 11.152 72.917 25.738v128.684c-20.59 16.3-47.18 25.732-72.917 25.732-51.476 0-84.932-35.17-84.932-89.217 0-55.76 32.6-90.936 84.932-90.936zm1320.6 3.434c-49.757 0-84.07 38.604-84.07 87.503 0 47.186 34.313 86.647 84.07 86.647 51.475 0 84.93-39.46 84.93-86.646 0-48.9-33.455-87.502-84.93-87.502zM2209 1121.25c0 594.904-482.26 1077.166-1077.165 1077.166S54.67 1716.154 54.67 1121.25 536.932 44.08 1131.836 44.08 2209 526.346 2209 1121.25zM782.943 1392.49l-3.434-130.396c-13.723 6.004-26.595 10.295-41.174 10.295-20.59 0-24.88-17.157-24.88-37.748v-281.38H548.74v40.318c-27.452-29.166-66.913-48.042-120.96-48.042-120.958 0-204.17 96.94-204.17 233.343 0 134.69 83.212 230.767 204.17 230.767 58.338 0 104.66-27.452 132.97-62.622 17.155 45.465 54.903 63.48 108.95 63.48 46.327 0 88.36-8.576 113.24-18.014zm440.685-428.934c-.857-2.577-37.747-18.02-79.778-18.02-54.905 0-84.933 26.595-105.524 66.92-17.157-48.043-55.76-66.92-109.807-66.92-60.052 0-112.38 16.3-114.1 18.02l4.292 129.54c1.714-.863 24.018-9.438 42.038-9.438 19.727 0 23.16 16.3 23.16 37.747v280.522h164.712v-229.052c2.577-39.46 19.733-76.35 67.776-76.35 44.608 0 85.783 15.442 87.503 18.013l19.727-150.982zm285.11 428.937l-5.142-130.397c-14.586 6.005-28.315 10.295-42.038 10.295-20.59 0-25.738-17.155-25.738-38.603V792.84h-164.712v482.122c0 100.375 47.185 135.545 121.816 135.545 48.9 0 93.508-11.152 115.812-18.014zm531.325-213.613c0-136.402-102.946-237.628-243.638-237.628-138.973 0-241.918 101.226-241.918 237.628 0 134.688 102.946 235.057 241.918 235.057 140.692 0 243.638-100.368 243.638-235.057z'/%3E%3C/svg%3E") no-repeat center / contain; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2267.717 2267.717'%3E%3Cpath fill='black' d='M475.825 1087.944c26.595 0 56.617 11.152 72.917 25.738v128.684c-20.59 16.3-47.18 25.732-72.917 25.732-51.476 0-84.932-35.17-84.932-89.217 0-55.76 32.6-90.936 84.932-90.936zm1320.6 3.434c-49.757 0-84.07 38.604-84.07 87.503 0 47.186 34.313 86.647 84.07 86.647 51.475 0 84.93-39.46 84.93-86.646 0-48.9-33.455-87.502-84.93-87.502zM2209 1121.25c0 594.904-482.26 1077.166-1077.165 1077.166S54.67 1716.154 54.67 1121.25 536.932 44.08 1131.836 44.08 2209 526.346 2209 1121.25zM782.943 1392.49l-3.434-130.396c-13.723 6.004-26.595 10.295-41.174 10.295-20.59 0-24.88-17.157-24.88-37.748v-281.38H548.74v40.318c-27.452-29.166-66.913-48.042-120.96-48.042-120.958 0-204.17 96.94-204.17 233.343 0 134.69 83.212 230.767 204.17 230.767 58.338 0 104.66-27.452 132.97-62.622 17.155 45.465 54.903 63.48 108.95 63.48 46.327 0 88.36-8.576 113.24-18.014zm440.685-428.934c-.857-2.577-37.747-18.02-79.778-18.02-54.905 0-84.933 26.595-105.524 66.92-17.157-48.043-55.76-66.92-109.807-66.92-60.052 0-112.38 16.3-114.1 18.02l4.292 129.54c1.714-.863 24.018-9.438 42.038-9.438 19.727 0 23.16 16.3 23.16 37.747v280.522h164.712v-229.052c2.577-39.46 19.733-76.35 67.776-76.35 44.608 0 85.783 15.442 87.503 18.013l19.727-150.982zm285.11 428.937l-5.142-130.397c-14.586 6.005-28.315 10.295-42.038 10.295-20.59 0-25.738-17.155-25.738-38.603V792.84h-164.712v482.122c0 100.375 47.185 135.545 121.816 135.545 48.9 0 93.508-11.152 115.812-18.014zm531.325-213.613c0-136.402-102.946-237.628-243.638-237.628-138.973 0-241.918 101.226-241.918 237.628 0 134.688 102.946 235.057 241.918 235.057 140.692 0 243.638-100.368 243.638-235.057z'/%3E%3C/svg%3E") no-repeat center / contain; }.arlo-icons8-cancel:before { content: "\f05c"; padding: 0 0.0715em; }.arlo-icons8-cancel-2:before { content: "\f00d"; padding: 0 0.1072em; }.arlo-icons8-checked-checkbox-2:before { content: "\f046"; padding: 0 0.0357em; }.arlo-icons8-checked-checkbox-2-filled:before { content: "\f14a"; padding: 0 0.0715em; }.arlo-icons8-checkmark:before { content: "\f00c"; padding: 0 0em; }.arlo-icons8-circled-play:before { content: "\f01d"; padding: 0 0.0715em; }.arlo-icons8-classroom:before { content: "\f19d"; margin: 0 -0.1429em; }.arlo-icons8-coffee-maker:before { content: "\f0f4"; margin: 0 -0.0357em; }.arlo-icons8-coffee-to-go:before { content: "\f0f4"; margin: 0 -0.0357em; }.arlo-icons8-cup:before { content: "\f0f4"; margin: 0 -0.0357em; }.arlo-icons8-curriculum:before { content: "\f02d"; padding: 0 0.0357em; }.arlo-icons8-department:before { content: " "; white-space: pre; padding: 0 0.375em; background-color: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' x='4.5' y='2.8' width='15' height='18.4' rx='1.2'/%3E%3Cg fill='%23000'%3E%3Crect x='7.4' y='6' width='2.2' height='2.2'/%3E%3Crect x='10.9' y='6' width='2.2' height='2.2'/%3E%3Crect x='14.4' y='6' width='2.2' height='2.2'/%3E%3Crect x='7.4' y='10.2' width='2.2' height='2.2'/%3E%3Crect x='10.9' y='10.2' width='2.2' height='2.2'/%3E%3Crect x='14.4' y='10.2' width='2.2' height='2.2'/%3E%3Crect x='7.4' y='14.4' width='2.2' height='2.2'/%3E%3Crect x='14.4' y='14.4' width='2.2' height='2.2'/%3E%3C/g%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M10.9 21v-4.4h2.2V21'/%3E%3C/svg%3E") no-repeat center / contain; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' x='4.5' y='2.8' width='15' height='18.4' rx='1.2'/%3E%3Cg fill='%23000'%3E%3Crect x='7.4' y='6' width='2.2' height='2.2'/%3E%3Crect x='10.9' y='6' width='2.2' height='2.2'/%3E%3Crect x='14.4' y='6' width='2.2' height='2.2'/%3E%3Crect x='7.4' y='10.2' width='2.2' height='2.2'/%3E%3Crect x='10.9' y='10.2' width='2.2' height='2.2'/%3E%3Crect x='14.4' y='10.2' width='2.2' height='2.2'/%3E%3Crect x='7.4' y='14.4' width='2.2' height='2.2'/%3E%3Crect x='14.4' y='14.4' width='2.2' height='2.2'/%3E%3C/g%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M10.9 21v-4.4h2.2V21'/%3E%3C/svg%3E") no-repeat center / contain; }.arlo-icons8-design:before { content: "\f1fc"; padding: 0 0em; }.arlo-icons8-diploma:before { content: "\f0a3"; padding: 0 0.0715em; }.arlo-icons8-diploma-1:before { content: "\f0a3"; padding: 0 0.0715em; }.arlo-icons8-diploma-2:before { content: "\f0a3"; padding: 0 0.0715em; }.arlo-icons8-embassy:before { content: "\f19c"; margin: 0 -0.0715em; }.arlo-icons8-grid-2:before { content: "\f009"; padding: 0 0.0357em; }.arlo-icons8-grid-3:before { content: "\f00a"; padding: 0 0em; }.arlo-icons8-headset:before { content: " "; white-space: pre; padding: 0 0.375em; background-color: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M4.5 14v-2.5a7.5 7.5 0 0 1 15 0V14'/%3E%3Crect x='3' y='12.5' width='4' height='6.5' rx='1.4' fill='%23000'/%3E%3Crect x='17' y='12.5' width='4' height='6.5' rx='1.4' fill='%23000'/%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M19 19c0 1.8-1.8 2.6-4.2 2.6H13'/%3E%3Ccircle cx='12' cy='21.6' r='1.3' fill='%23000'/%3E%3C/svg%3E") no-repeat center / contain; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M4.5 14v-2.5a7.5 7.5 0 0 1 15 0V14'/%3E%3Crect x='3' y='12.5' width='4' height='6.5' rx='1.4' fill='%23000'/%3E%3Crect x='17' y='12.5' width='4' height='6.5' rx='1.4' fill='%23000'/%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M19 19c0 1.8-1.8 2.6-4.2 2.6H13'/%3E%3Ccircle cx='12' cy='21.6' r='1.3' fill='%23000'/%3E%3C/svg%3E") no-repeat center / contain; }.arlo-icons8-help:before { content: "\f29c"; padding: 0 0.0715em; }.arlo-icons8-help-filled:before { content: "\f059"; padding: 0 0.0715em; }.arlo-icons8-home:before { content: "\f015"; padding: 0 0.0357em; }.arlo-icons8-info:before { content: "\f129"; padding: 0 0.3215em; }.arlo-icons8-info-filled:before { content: "\f05a"; padding: 0 0.0715em; }.arlo-icons8-java-coffee-cup-logo:before { content: "\f0f4"; margin: 0 -0.0357em; }.arlo-icons8-map-marker:before { content: "\f041"; padding: 0 0.2143em; }.arlo-icons8-marker:before { content: "\f041"; padding: 0 0.2143em; }.arlo-icons8-minus:before { content: "\f056"; padding: 0 0.0715em; }.arlo-icons8-mouse:before { content: "\f245"; padding: 0 0.1428em; }.arlo-icons8-play:before { content: "\f04b"; padding: 0 0.1072em; }.arlo-icons8-plus:before { content: "\f055"; padding: 0 0.0715em; }.arlo-icons8-private:before { content: "\f023"; padding: 0 0.1785em; }.arlo-icons8-search:before { content: "\f002"; padding: 0 0.0357em; }.arlo-icons8-toggle-off:before { content: "\f204"; margin: 0 -0.0715em; }.arlo-icons8-toggle-off-filled:before { content: "\f204"; margin: 0 -0.0715em; }.arlo-icons8-tv:before { content: "\f26c"; margin: 0 -0.0715em; }.arlo-icons8-tv-show:before { content: " "; white-space: pre; padding: 0 0.375em; background-color: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' x='2.6' y='3.4' width='18.8' height='13.6' rx='1.7'/%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M8 21h8M12 17v4'/%3E%3Cpath fill='%23000' d='M10 7.6v6.2l5.1-3.1z'/%3E%3C/svg%3E") no-repeat center / contain; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' x='2.6' y='3.4' width='18.8' height='13.6' rx='1.7'/%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M8 21h8M12 17v4'/%3E%3Cpath fill='%23000' d='M10 7.6v6.2l5.1-3.1z'/%3E%3C/svg%3E") no-repeat center / contain; }.arlo-icons8-unchecked-checkbox:before { content: "\f096"; padding: 0 0.1072em; }.arlo-icons8-us-dollar:before { content: " "; white-space: pre; padding: 0 0.375em; background-color: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' cx='12' cy='12' r='9.6'/%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M15.2 9.2c-.5-1.1-1.7-1.8-3.2-1.8-1.8 0-3.1 1-3.1 2.4 0 3.5 6.4 1.8 6.4 5.2 0 1.5-1.4 2.5-3.3 2.5-1.6 0-2.9-.7-3.4-1.9M12 5.4v2M12 16.8v1.8'/%3E%3C/svg%3E") no-repeat center / contain; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' cx='12' cy='12' r='9.6'/%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M15.2 9.2c-.5-1.1-1.7-1.8-3.2-1.8-1.8 0-3.1 1-3.1 2.4 0 3.5 6.4 1.8 6.4 5.2 0 1.5-1.4 2.5-3.3 2.5-1.6 0-2.9-.7-3.4-1.9M12 5.4v2M12 16.8v1.8'/%3E%3C/svg%3E") no-repeat center / contain; }.arlo-icons8-us-dollar-2:before { content: "\f155"; padding: 0 0.2143em; }.arlo-icons8-user-groups:before { content: "\f0c0"; margin: 0 -0.0357em; }.arlo-icons8-video-paylist:before { content: "\f008"; margin: 0 -0.0357em; }
+
+.arlo-icons8.size-16 { font-size: 16px; }
+
+.arlo-icons8.size-21 { font-size: 21px; }
+      
+.arlo-icons8.size-24 { font-size: 24px; }
+
+.arlo-icons8.size-36 { font-size: 36px; }
+
+.arlo-icons8.size-48 { font-size: 48px; }
+
+.arlo-icons8.size-60 { font-size: 60px; }
+
+.arlo-icons8.size-72 { font-size: 72px; }
+
+/* Forced colors (Windows High Contrast) replace background colors, which would hide the SVG-mask icons. */
+@media (forced-colors: active) {
+  .arlo-icons8-arlo-logo-for-font:before,
+  .arlo-icons8-department:before,
+  .arlo-icons8-headset:before,
+  .arlo-icons8-tv-show:before,
+  .arlo-icons8-us-dollar:before {
+    forced-color-adjust: none;
+    background-color: CanvasText;
+  }
+}
+
+/* Printing omits backgrounds, and the Starter print styles clear them, which would hide the SVG-mask icons. */
+@media print {
+  .arlo-icons8-arlo-logo-for-font:before,
+  .arlo-icons8-department:before,
+  .arlo-icons8-headset:before,
+  .arlo-icons8-tv-show:before,
+  .arlo-icons8-us-dollar:before,
+  .arlo#arlo .arlo-icons8-arlo-logo-for-font:before,
+  .arlo#arlo .arlo-icons8-department:before,
+  .arlo#arlo .arlo-icons8-headset:before,
+  .arlo#arlo .arlo-icons8-tv-show:before,
+  .arlo#arlo .arlo-icons8-us-dollar:before {
+    background-color: currentColor !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

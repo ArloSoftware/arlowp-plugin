@@ -2,6 +2,67 @@
 
 /* Plugin Prefix is specified in arlo-for-wordpress.php */
 
+/* --- Page header with platform indicator (settings and list screens) --- */
+.arlo-page-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 0.5em;
+	margin-bottom: 0;
+}
+
+.arlo-page-header h1 {
+	margin-bottom: 0;
+}
+
+.arlo-platform-indicator {
+	display: flex;
+	align-items: center;
+	gap: 0.5em;
+	font-size: 0.875em;
+	color: #50575e;
+}
+
+/* --- Badge pills (used in header indicator and settings Status field) --- */
+.arlo-badge {
+	display: inline-block;
+	padding: 0.15em 0.65em;
+	font-size: 0.8em;
+	font-weight: 600;
+	line-height: 1.4;
+	border-radius: 10rem;
+	margin-right: 0.35em;
+	vertical-align: middle;
+	white-space: nowrap;
+}
+
+.arlo-badge-success {
+	background-color: #00a32a;
+	color: #fff;
+}
+
+.arlo-badge-error {
+	background-color: #d63638;
+	color: #fff;
+}
+
+.arlo-badge-warning {
+	background-color: #dba617;
+	color: #fff;
+}
+
+.arlo-badge-neutral {
+	background-color: #787c82;
+	color: #fff;
+}
+
+.arlo-badge-outline {
+	background-color: #fff;
+	color: #50575e;
+	border: 1px solid #8c8f94;
+}
+
 
 .arlo-changelog-content {
 	height: 40em;
@@ -32,6 +93,164 @@
 .arlo-inlineblock {
 	display: inline-block;
 	margin: 0 0.5em;
+}
+
+/* The Custom CSS tab has no label column, so its field can use the full width, leaving room for the editor hint beside the editor. */
+.arlo_customcss_section .arlo-label:empty {
+	display: none;
+}
+
+.arlo_customcss_section .arlo-label:empty + .arlo-field {
+	float: none;
+	width: auto;
+}
+
+.arlo-css-editor-row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 8px 24px;
+}
+
+.arlo-css-editor {
+	flex: 1 1 520px;
+	max-width: 1090px;
+	min-width: 0;
+}
+
+.arlo-css-editor-hint {
+	flex: 0 1 290px;
+	min-width: 0;
+	margin: 0;
+}
+
+/* The icon is hidden from assistive technology: the Custom CSS tab has screen reader text and the notice title carries its own message. */
+.nav-tab .arlo-tab-attention,
+.arlo-css-notice-icon {
+	color: #996800; /* At least 3:1 against the inactive tab (#dcdcde), active tab (#f0f0f1) and notice (#fff) backgrounds. */
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+	vertical-align: text-bottom;
+}
+
+.nav-tab .arlo-tab-attention {
+	margin-inline-start: 2px;
+}
+
+.arlo-css-notice-icon {
+	margin-inline-end: 6px;
+}
+
+/* A soft, decorative exclamation mark: the message is in the text, so the icon is hidden from assistive technology. */
+.arlo-css-editor-hint-icon {
+	display: inline-block;
+	box-sizing: border-box;
+	width: 18px;
+	height: 18px;
+	margin-inline-end: 8px;
+	border: 1.5px solid currentColor;
+	border-radius: 50%;
+	font-size: 12px;
+	font-weight: 700;
+	line-height: 15px;
+	text-align: center;
+	vertical-align: text-bottom;
+}
+
+.arlo-css-action-row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 12px 24px;
+	margin: 16px 0;
+}
+
+.arlo-css-action-row > .button {
+	flex-shrink: 0;
+}
+
+#arlo-css-analysis,
+#arlo-css-migration-confirmation,
+#arlo-css-discard-controls .arlo-css-action-row > p,
+#arlo-css-unsaved {
+	flex: 1 1 260px;
+	min-width: 0;
+	margin: 0;
+}
+
+#arlo-css-analysis:empty {
+	flex-basis: 0;
+}
+
+/* A plain white box for status that is not transient, so it does not look like a dismissible notice. */
+.arlo-css-box,
+#arlo-css-analysis.arlo-css-analysis-issues {
+	flex-basis: 100%;
+	box-sizing: border-box;
+	padding: 12px 16px;
+	border: 1px solid #dcdcde;
+	background: #fff;
+}
+
+.arlo-css-box {
+	margin: 20px 0 16px;
+}
+
+.arlo-css-box p {
+	margin: 0;
+}
+
+#arlo-css-analysis ul {
+	list-style: disc;
+	margin: 8px 0;
+	padding-inline-start: 24px;
+}
+
+#arlo-css-analysis p {
+	margin: 8px 0 0;
+}
+
+#arlo-css-migration-confirmation .description,
+#arlo-css-discard-controls .description {
+	display: block;
+	margin-inline-start: 24px;
+}
+
+#arlo-css-unsaved .description {
+	display: block;
+}
+
+#arlo-css-migration-summary,
+#arlo-css-discard-summary {
+	color: #646970;
+	font-style: normal;
+}
+
+#arlo-css-revert-toggle,
+#arlo-css-discard-toggle {
+	padding: 0;
+	vertical-align: baseline;
+}
+
+#arlo-css-migration-controls[hidden],
+#arlo-css-discard-controls[hidden],
+#arlo-css-migration-confirmation[hidden],
+#arlo-css-unsaved[hidden] {
+	display: none;
+}
+
+.button.arlo-css-migrate-button:not(:disabled) {
+	background: #008a20;
+	border-color: #008a20;
+	color: #fff;
+}
+
+.button.arlo-css-migrate-button:not(:disabled):hover,
+.button.arlo-css-migrate-button:not(:disabled):focus {
+	background: #007017;
+	border-color: #007017;
+	color: #fff;
 }
 
 .arlo-timezone-warning {
@@ -290,12 +509,12 @@
 	margin-left: 0.75em;
 }
 
-/* Private badge — reuses .arlo-badge.arlo-badge-neutral from admin_public.css */
+/* Private badge — reuses .arlo-badge.arlo-badge-neutral defined above */
 .arlo-url-slug-private {
 	margin-right: 0.5em;
 }
 
-/* (Updated) badge — reuses .arlo-badge.arlo-badge-outline from admin_public.css */
+/* (Updated) badge — reuses .arlo-badge.arlo-badge-outline defined above */
 .arlo-url-slug-updated {
 	margin-left: 0.75em;
 }
@@ -334,10 +553,6 @@
 	margin: 0px 6px;
 }
 
-.toplevel_page_arlo-for-wordpress p.developer strong span {
-	font-size: 1.3em;
-}
-
 .arlo-middle {
 	vertical-align: middle;
 }
@@ -346,23 +561,95 @@
 	float: left;
 }
 
-.wp-editor-wrap {
+.arlo-wrap .wp-editor-wrap {
 	margin-top: 1em;
+}
+
+/* Platform row: the URL group and the demo group wrap as two units, never mid-group. */
+.arlo-platform-row {
+	position: relative;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px 0;
 }
 
 .arlo-platform-url-wrap {
 	display: flex;
+	flex-wrap: nowrap;
 	align-items: center;
+	max-width: 100%;
 }
 
 .arlo-domain {
+	flex: 0 0 auto;
 	line-height: 27px;
+	white-space: nowrap;
 }
 
 #arlo_platform_name {
+	flex: 1 1 15em;
 	width: 15em;
+	min-width: 8em;
 	float: none;
 	margin: 0 5px;
+}
+
+#arlo_platform_name::placeholder {
+	font-style: italic;
+}
+
+.arlo-demo-option {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: center;
+}
+
+.arlo-demo-option[hidden],
+.arlo-demo-only[hidden] {
+	display: none;
+}
+
+.arlo-platform-or {
+	padding: 0 16px;
+	text-transform: uppercase;
+	color: #646970;
+}
+
+.arlo-info-toggle {
+	display: inline-flex;
+	margin-left: 8px;
+	padding: 0;
+	border: 0;
+	background: none;
+	color: var(--wp-admin-theme-color, #2271b1);
+	cursor: pointer;
+}
+
+.arlo-info-toggle:hover {
+	color: var(--wp-admin-theme-color-darker-10, #135e96);
+}
+
+.arlo-info-toggle:focus-visible {
+	outline: 2px solid var(--wp-admin-theme-color, #2271b1);
+	outline-offset: 2px;
+	border-radius: 50%;
+}
+
+/* WordPress pointer for the demo option; the arrow flips to the right when the icon is near the viewport edge. */
+.arlo-info-pointer .wp-pointer-arrow,
+.arlo-info-pointer .wp-pointer-arrow-inner {
+	pointer-events: none; /* The arrow's box overlaps the icon; let clicks and hover reach the icon. */
+}
+
+.arlo-info-pointer .wp-pointer-content p {
+	margin: 0;
+	padding: 12px 14px;
+}
+
+.arlo-info-pointer.arlo-info-pointer--right .wp-pointer-arrow {
+	right: 50px;
+	left: auto;
 }
 
 /* regions */
@@ -512,6 +799,38 @@
 	display: block;
 }
 
+.arlo-log-retention-select {
+	min-width: 180px;
+}
+
+.arlo-log-retention-warning {
+	margin-left: 1em;
+	vertical-align: middle;
+}
+
+.arlo-advanced-regions {
+	margin: 1em 0;
+}
+
+.arlo-advanced-regions summary {
+	cursor: pointer;
+	font-weight: 600;
+}
+
+.arlo-advanced-regions fieldset {
+	margin: 0.75em 0 0;
+	padding: 0;
+}
+
+.arlo-advanced-regions .description {
+	margin: 0.25em 0 0;
+}
+
+.arlo-legacy-region-id-handling-warning,
+.arlo-legacy-region-id-handling-length-warning {
+	margin-top: 0.5em;
+}
+
 /* label font size and weight is based on WP 3.9 admin styles, though not using those styles directly as the label would need to be in a table header cell, urgh */
 .arlo-label {
 	font-size: 14px;
@@ -602,13 +921,13 @@ table.arlo-welcome td.logo {
 
 /* clearing for divs containing floated elements */
 
-.cf:before,
-.cf:after {
+.arlo-wrap .cf:before,
+.arlo-wrap .cf:after {
     content: " "; 
     display: table;
 }
 
-.cf:after,
+.arlo-wrap .cf:after,
 .arlo-clear {
     clear: both;
 }
@@ -681,6 +1000,18 @@ table.arlo-welcome td.logo {
 	width: 100%;
 }
 
+/* Matches the WordPress editor's text area so a read-only template looks like the editor; the tint marks it read only. */
+.arlo-template-table .arlo-template-field .arlo-template-readonly {
+	box-sizing: border-box;
+	width: 100%;
+	padding: 10px;
+	border: 1px solid #dcdcde;
+	background: #f6f7f7;
+	box-shadow: none;
+	color: #1e1e1e;
+	font: 13px/1.5 Consolas, Monaco, monospace;
+}
+
 .arlo-template-table .arlo-template-field .arlo-shortcodes {
 	float: left;
 	box-sizing: border-box;
@@ -713,6 +1044,12 @@ table.arlo-welcome td.logo {
 
 .arlo-wrap.arlo-list .arlo_log #import_id{
 	width: 150px;
+}
+
+.arlo-wrap.arlo-list .arlo_log #diagnostic_level,
+.arlo-wrap.arlo-list .arlo_log .column-diagnostic_level{
+	width: 120px;
+	white-space: nowrap;
 }
 
 .arlo-wrap.arlo-list .arlo_log .column-id{
@@ -748,16 +1085,12 @@ table.arlo-welcome td.logo {
 	padding: 1px 12px;
 }
 
-.green {
+.arlo-wrap .green {
 	color: green;
 }
 
-.red {
+.arlo-wrap .red {
 	color: darkred;
-}
-
-.hidden {
-	display: none;
 }
 
 .arlo-delete-button {
@@ -767,21 +1100,73 @@ table.arlo-welcome td.logo {
     margin-left: 1em;	
 }
 
-#arlo-themes-for-designers a:focus,
 .arlo-field a:focus {
 	box-shadow: none;
 }
 
+/* The Theme tab has no label column either: the theme grid sits beside a help panel in the space the label would take. */
+.arlo_theme_section .arlo-label:empty {
+	display: none;
+}
+
+.arlo_theme_section .arlo-label:empty + .arlo-field {
+	float: none;
+	width: auto;
+}
+
+/* The help panel sits beside the theme cards in the same row, so its top always lines up with the first row of cards; the cards take the remaining width and collapse from four to three to two columns. */
+.arlo-themes-layout {
+	container-type: inline-size;
+}
+
+.arlo-themes-body {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 290px;
+	align-items: start;
+	column-gap: 24px;
+}
+
+.arlo-themes-help {
+	box-sizing: border-box;
+	min-width: 0;
+	padding: 4px 16px;
+	border: 1px solid #dcdcde;
+	background: #fff;
+}
+
+/* Stack the help panel once the container can no longer fit two 220px cards (plus their 16px gap) beside the 290px panel and 24px column gap. */
+@container (max-width: 769px) {
+	.arlo-themes-body {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.arlo-themes-help {
+		margin-top: 20px;
+	}
+}
+
+.arlo-themes {
+	--arlo-theme-gap: 16px;
+	--arlo-theme-min: 220px;
+	display: grid;
+	/* The max() floor stops the columns shrinking below four-per-row sizing, so the grid never exceeds four columns. */
+	grid-template-columns: repeat(auto-fill, minmax(max(var(--arlo-theme-min), calc((100% - 3 * var(--arlo-theme-gap)) / 4)), 1fr));
+	gap: 20px var(--arlo-theme-gap);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
 .arlo-themes .arlo-theme {
-	width: 250px;
-	height: 240px;
-	float: left;
-	margin-right: 1em;
+	display: flow-root;
+	min-width: 0;
+	margin: 0;
 }
 
 .arlo-themes .arlo-theme .arlo-theme-desc {
 	border: 1px solid #ccc;
-	height: 183px;
+	aspect-ratio: 250 / 183;
+	box-sizing: border-box;
 	position: relative;
 	background-color: white;
 	overflow: hidden;
@@ -835,7 +1220,9 @@ table.arlo-welcome td.logo {
     height: 100%;
     z-index: 15;
     text-align: center;
-    line-height: 183px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     color: white;
     background-color: white;
     font-size: 2em;
@@ -848,6 +1235,7 @@ table.arlo-welcome td.logo {
 .arlo-themes .arlo-theme .arlo-theme-desc .arlo-theme-overlay .arlo-theme-desc-text {
 	color: black;
 	font-size: 0.5em;
+	margin-top: 0;
 }
 
 .arlo-themes .arlo-theme .arlo-theme-desc .arlo-theme-overlay .arlo-theme-desc-text .arlo-theme-description {
@@ -913,7 +1301,6 @@ table.arlo-welcome td.logo {
 	-webkit-transition: opacity .25s ease-in-out;
 	-moz-transition: opacity .25s ease-in-out;
 	transition: opacity .25s ease-in-out;
-	cursor: pointer;
 }
 
 .arlo-themes .arlo-theme .arlo-theme-desc.arlo-theme-inverse:hover .arlo-themes-developer-banner {

@@ -1,56 +1,56 @@
 <?php
 /**
- * Arlo For Wordpress
+ * Arlo For WordPress
  *
  * @package   Arlo_For_Wordpress_Admin
- * @author    Arlo <info@arlo.co>
- * @license   GPL-2.0+
+ * @author    Arlo Software <support@arlo.co>
+ * @license   GPL-2.0-or-later
  * @link      https://arlo.co
- * @copyright 2018 Arlo
+ * @copyright 2015-2026 Arlo Software
  */
 
 /**
+ * Displays the first-run admin pointer.
  *
  * @package Arlo_Feature_Pointer
- * @author  Arlo <info@arlo.co>
+ * @author  Arlo Software <support@arlo.co>
  */
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 class Arlo_Feature_Pointer {
 
-	private $pointerID = null;
-	private $pointerTarget = null;
+	private $pointerID      = null;
+	private $pointerTarget  = null;
 	private $pointerContent = null;
-	private $pointerEdge = null;
-	private $pointerAlign = null;
+	private $pointerEdge    = null;
+	private $pointerAlign   = null;
 
 	/**
 	 * Initialize the class
-	 * 
+	 *
 	 *
 	 * @since     1.0.0
 	 */
-	public function __construct($pointerID, $pointerTarget, $pointerTitle, $pointerContent, $pointerEdge = null, $pointerAlign = null) {
+	public function __construct( $pointerID, $pointerTarget, $pointerTitle, $pointerContent, $pointerEdge = null, $pointerAlign = null ) {
 
 		$this->pointerID = $pointerID;
 
 		$this->pointerTarget = $pointerTarget;
 
-		$this->pointerContent = $this->set_pointer_title($pointerTitle);
+		$this->pointerContent = $this->set_pointer_title( $pointerTitle );
 
-		$this->pointerContent .= $this->set_pointer_content($pointerContent);
+		$this->pointerContent .= $this->set_pointer_content( $pointerContent );
 
-		$this->pointerEdge = ($pointerEdge == null) ? 'left' : $pointerEdge;
+		$this->pointerEdge = ( $pointerEdge == null ) ? 'left' : $pointerEdge;
 
-		$this->pointerAlign = ($pointerAlign == null) ? 'center' : $pointerAlign;
+		$this->pointerAlign = ( $pointerAlign == null ) ? 'center' : $pointerAlign;
 
-
-		$seen_it = explode( ',', (string) get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true ) );
+		$seen_it       = explode( ',', (string) get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true ) );
 		$do_add_script = false;
-		if ( ! in_array( $pointerID, $seen_it ) ) {
-			 $do_add_script = true;
-			 add_action( 'admin_print_footer_scripts', array( $this, 'feature_pointer_script' ) );
+		if ( ! in_array( $pointerID, $seen_it, true ) ) {
+			$do_add_script = true;
+			add_action( 'admin_print_footer_scripts', array( $this, 'feature_pointer_script' ) );
 		}
 
 		if ( $do_add_script ) {
@@ -64,11 +64,9 @@ class Arlo_Feature_Pointer {
 	 *
 	 * @since    1.0.0
 	 */
-	private function set_pointer_title($title) {
+	private function set_pointer_title( $title ) {
 
-		// TODO convert single quotes to &quot;
-
-		return '<h3>'.$title.'</h3>';
+		return '<h3>' . $title . '</h3>';
 	}
 
 
@@ -78,11 +76,9 @@ class Arlo_Feature_Pointer {
 	 *
 	 * @since    1.0.0
 	 */
-	private function set_pointer_content($content) {
+	private function set_pointer_content( $content ) {
 
-		// TODO convert single quotes to &quot;
-
-		return '<p>'.$content.'</p>';
+		return '<p>' . $content . '</p>';
 	}
 
 	/**
@@ -95,15 +91,15 @@ class Arlo_Feature_Pointer {
 		<script type="text/javascript">// <![CDATA[
 		jQuery(document).ready(function($) {
 			if(typeof(jQuery().pointer) != 'undefined') {
-				$(<?php echo wp_json_encode($this->pointerTarget);  ?>).pointer({
-					content: <?php echo wp_json_encode($this->pointerContent); ?>,
+				$(<?php echo wp_json_encode( $this->pointerTarget ); ?>).pointer({
+					content: <?php echo wp_json_encode( $this->pointerContent ); ?>,
 					position: {
-						edge: <?php echo wp_json_encode($this->pointerEdge); ?>,
-						align: <?php echo wp_json_encode($this->pointerAlign); ?>
+						edge: <?php echo wp_json_encode( $this->pointerEdge ); ?>,
+						align: <?php echo wp_json_encode( $this->pointerAlign ); ?>
 					},
 					close: function() {
 						$.post( ajaxurl, {
-							pointer: <?php echo wp_json_encode($this->pointerID); ?>,
+							pointer: <?php echo wp_json_encode( $this->pointerID ); ?>,
 							action: 'dismiss-wp-pointer'
 						});
 					}
@@ -113,5 +109,4 @@ class Arlo_Feature_Pointer {
 		// ]]></script>
 		<?php
 	} // end arlo_pointer1_footer_script()
-
 }

@@ -1,35 +1,31 @@
 /*
- * Icon Font Arlo-starter-template--Master
- * Made with love by Icons8 [ https://icons8.com/ ] using FontCustom [ https://github.com/FontCustom/fontcustom ]
- *
- * Contacts:
- *    [ https://icons8.com/contact ]
- *
- * Follow Icon8 on
- *    Twitter [ https://twitter.com/icons_8 ]
- *    Facebook [ https://www.facebook.com/Icons8 ]
- *    Google+ [ https://plus.google.com/+Icons8 ]
- *    GitHub [ https://github.com/icons8 ]
+ * Arlo icon set (Starter themes).
+ * Glyphs are drawn from Font Awesome 4.7.0 (font: SIL OFL 1.1, CSS: MIT; https://fontawesome.io) and
+ * Arlo-authored SVG shapes. Class names are a public contract: customer templates and custom CSS
+ * reference them, so every name defined by earlier releases keeps rendering a glyph.
  */
 
-
 @font-face {
-  font-family: "Arlo-starter-template--Master";
-  src: url("../fonts/arlo-icons.eot");
-  src: url("../fonts/arlo-icons.eot?#iefix") format("embedded-opentype"),
-       url("../fonts/arlo-icons.woff2") format("woff2"),
-       url("../fonts/arlo-icons.woff") format("woff"),
-       url("../fonts/arlo-icons.ttf") format("truetype"),
-       url("../fonts/arlo-icons.svg#Arlo-starter-template--Master") format("svg");
+  font-family: "FontAwesome";
+  src: url("../../../public/custom-assets/font-awesome-4.7.0/fonts/fontawesome-webfont.woff2?v=4.7.0") format("woff2"),
+       url("../../../public/custom-assets/font-awesome-4.7.0/fonts/fontawesome-webfont.woff?v=4.7.0") format("woff"),
+       url("../../../public/custom-assets/font-awesome-4.7.0/fonts/fontawesome-webfont.ttf?v=4.7.0") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
 
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-  @font-face {
-    font-family: "Arlo-starter-template--Master";
-    src: url("../fonts/arlo-icons.svg#Arlo-starter-template--Master") format("svg");
-  }
+/*
+ * Backward compatibility only. Custom CSS on older deployments may still name the earlier icon font family below
+ * (for example a pasted copy of a theme rule such as content: "\f111" with this font-family). This small font maps
+ * those earlier codepoints to the current icons so that CSS keeps drawing the intended glyph. The rules shipped with
+ * the plugin use Font Awesome above and do not need it, so it can be removed, with its font file, once no deployment
+ * relies on it.
+ */
+@font-face {
+  font-family: "Arlo-starter-template--Master";
+  src: url("../../../public/custom-assets/arlo-icon-compat/starter-glyphs.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
 }
 
 [data-icons8]:before { content: attr(data-icons8); }
@@ -150,7 +146,7 @@
 .icons8-user-groups:before,
 .icons8-video-conference:before {
   display: inline-block;
-  font-family: "Arlo-starter-template--Master";
+  font-family: "FontAwesome";
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
@@ -161,119 +157,37 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   font-smoothing: antialiased;
+}.icons8-about:before { content: "\f05a"; padding: 0 0.0715em; }.icons8-arlo-logo-font:before { content: " "; white-space: pre; padding: 0 0.375em; background-color: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2267.717 2267.717'%3E%3Cpath fill='black' d='M475.825 1087.944c26.595 0 56.617 11.152 72.917 25.738v128.684c-20.59 16.3-47.18 25.732-72.917 25.732-51.476 0-84.932-35.17-84.932-89.217 0-55.76 32.6-90.936 84.932-90.936zm1320.6 3.434c-49.757 0-84.07 38.604-84.07 87.503 0 47.186 34.313 86.647 84.07 86.647 51.475 0 84.93-39.46 84.93-86.646 0-48.9-33.455-87.502-84.93-87.502zM2209 1121.25c0 594.904-482.26 1077.166-1077.165 1077.166S54.67 1716.154 54.67 1121.25 536.932 44.08 1131.836 44.08 2209 526.346 2209 1121.25zM782.943 1392.49l-3.434-130.396c-13.723 6.004-26.595 10.295-41.174 10.295-20.59 0-24.88-17.157-24.88-37.748v-281.38H548.74v40.318c-27.452-29.166-66.913-48.042-120.96-48.042-120.958 0-204.17 96.94-204.17 233.343 0 134.69 83.212 230.767 204.17 230.767 58.338 0 104.66-27.452 132.97-62.622 17.155 45.465 54.903 63.48 108.95 63.48 46.327 0 88.36-8.576 113.24-18.014zm440.685-428.934c-.857-2.577-37.747-18.02-79.778-18.02-54.905 0-84.933 26.595-105.524 66.92-17.157-48.043-55.76-66.92-109.807-66.92-60.052 0-112.38 16.3-114.1 18.02l4.292 129.54c1.714-.863 24.018-9.438 42.038-9.438 19.727 0 23.16 16.3 23.16 37.747v280.522h164.712v-229.052c2.577-39.46 19.733-76.35 67.776-76.35 44.608 0 85.783 15.442 87.503 18.013l19.727-150.982zm285.11 428.937l-5.142-130.397c-14.586 6.005-28.315 10.295-42.038 10.295-20.59 0-25.738-17.155-25.738-38.603V792.84h-164.712v482.122c0 100.375 47.185 135.545 121.816 135.545 48.9 0 93.508-11.152 115.812-18.014zm531.325-213.613c0-136.402-102.946-237.628-243.638-237.628-138.973 0-241.918 101.226-241.918 237.628 0 134.688 102.946 235.057 241.918 235.057 140.692 0 243.638-100.368 243.638-235.057z'/%3E%3C/svg%3E") no-repeat center / contain; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2267.717 2267.717'%3E%3Cpath fill='black' d='M475.825 1087.944c26.595 0 56.617 11.152 72.917 25.738v128.684c-20.59 16.3-47.18 25.732-72.917 25.732-51.476 0-84.932-35.17-84.932-89.217 0-55.76 32.6-90.936 84.932-90.936zm1320.6 3.434c-49.757 0-84.07 38.604-84.07 87.503 0 47.186 34.313 86.647 84.07 86.647 51.475 0 84.93-39.46 84.93-86.646 0-48.9-33.455-87.502-84.93-87.502zM2209 1121.25c0 594.904-482.26 1077.166-1077.165 1077.166S54.67 1716.154 54.67 1121.25 536.932 44.08 1131.836 44.08 2209 526.346 2209 1121.25zM782.943 1392.49l-3.434-130.396c-13.723 6.004-26.595 10.295-41.174 10.295-20.59 0-24.88-17.157-24.88-37.748v-281.38H548.74v40.318c-27.452-29.166-66.913-48.042-120.96-48.042-120.958 0-204.17 96.94-204.17 233.343 0 134.69 83.212 230.767 204.17 230.767 58.338 0 104.66-27.452 132.97-62.622 17.155 45.465 54.903 63.48 108.95 63.48 46.327 0 88.36-8.576 113.24-18.014zm440.685-428.934c-.857-2.577-37.747-18.02-79.778-18.02-54.905 0-84.933 26.595-105.524 66.92-17.157-48.043-55.76-66.92-109.807-66.92-60.052 0-112.38 16.3-114.1 18.02l4.292 129.54c1.714-.863 24.018-9.438 42.038-9.438 19.727 0 23.16 16.3 23.16 37.747v280.522h164.712v-229.052c2.577-39.46 19.733-76.35 67.776-76.35 44.608 0 85.783 15.442 87.503 18.013l19.727-150.982zm285.11 428.937l-5.142-130.397c-14.586 6.005-28.315 10.295-42.038 10.295-20.59 0-25.738-17.155-25.738-38.603V792.84h-164.712v482.122c0 100.375 47.185 135.545 121.816 135.545 48.9 0 93.508-11.152 115.812-18.014zm531.325-213.613c0-136.402-102.946-237.628-243.638-237.628-138.973 0-241.918 101.226-241.918 237.628 0 134.688 102.946 235.057 241.918 235.057 140.692 0 243.638-100.368 243.638-235.057z'/%3E%3C/svg%3E") no-repeat center / contain; }.icons8-back:before { content: "\f060"; padding: 0 0.0715em; }.icons8-back-to:before { content: "\f112"; padding: 0 0em; }.icons8-beach-umbrella:before { content: "\f0e9"; padding: 0 0.0357em; }.icons8-building:before { content: "\f0f7"; padding: 0 0.1072em; }.icons8-business-building:before { content: "\f1ad"; padding: 0 0.0715em; }.icons8-buying:before { content: "\f290"; padding: 0 0em; }.icons8-buying-2:before { content: "\f291"; margin: 0 -0.0715em; }.icons8-calendar:before { content: "\f133"; padding: 0 0.0357em; }.icons8-cancel:before { content: "\f05c"; padding: 0 0.0715em; }.icons8-cancel-filled:before { content: "\f057"; padding: 0 0.0715em; }.icons8-certificate:before { content: "\f0a3"; padding: 0 0.0715em; }.icons8-chevron-left:before { content: "\f104"; padding: 0 0.3215em; }.icons8-chevron-left-filled:before { content: "\f053"; padding: 0 0.1428em; }.icons8-chevron-right:before { content: "\f105"; padding: 0 0.3215em; }.icons8-chevron-right-filled:before { content: "\f054"; padding: 0 0.1428em; }.icons8-chevron-up:before { content: "\f106"; padding: 0 0.1785em; }.icons8-chevron-up-filled:before { content: "\f077"; padding: 0 0em; }.icons8-circled-dot:before { content: "\f192"; padding: 0 0.0715em; }.icons8-circled-play:before { content: "\f01d"; padding: 0 0.0715em; }.icons8-circled-play-filled:before { content: "\f144"; padding: 0 0.0715em; }.icons8-clear-filters:before { content: "\f12d"; margin: 0 -0.0357em; }.icons8-clock:before { content: "\f017"; padding: 0 0.0715em; }.icons8-cocktail:before { content: "\f000"; padding: 0 0em; }.icons8-collapse-arrow:before { content: "\f102"; padding: 0 0.1785em; }.icons8-contact-us:before { content: "\f003"; padding: 0 0em; }.icons8-delete:before { content: "\f014"; padding: 0 0.1072em; }.icons8-delete-filled:before { content: "\f1f8"; padding: 0 0.1072em; }.icons8-department:before { content: " "; white-space: pre; padding: 0 0.375em; background-color: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' x='4.5' y='2.8' width='15' height='18.4' rx='1.2'/%3E%3Cg fill='%23000'%3E%3Crect x='7.4' y='6' width='2.2' height='2.2'/%3E%3Crect x='10.9' y='6' width='2.2' height='2.2'/%3E%3Crect x='14.4' y='6' width='2.2' height='2.2'/%3E%3Crect x='7.4' y='10.2' width='2.2' height='2.2'/%3E%3Crect x='10.9' y='10.2' width='2.2' height='2.2'/%3E%3Crect x='14.4' y='10.2' width='2.2' height='2.2'/%3E%3Crect x='7.4' y='14.4' width='2.2' height='2.2'/%3E%3Crect x='14.4' y='14.4' width='2.2' height='2.2'/%3E%3C/g%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M10.9 21v-4.4h2.2V21'/%3E%3C/svg%3E") no-repeat center / contain; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' x='4.5' y='2.8' width='15' height='18.4' rx='1.2'/%3E%3Cg fill='%23000'%3E%3Crect x='7.4' y='6' width='2.2' height='2.2'/%3E%3Crect x='10.9' y='6' width='2.2' height='2.2'/%3E%3Crect x='14.4' y='6' width='2.2' height='2.2'/%3E%3Crect x='7.4' y='10.2' width='2.2' height='2.2'/%3E%3Crect x='10.9' y='10.2' width='2.2' height='2.2'/%3E%3Crect x='14.4' y='10.2' width='2.2' height='2.2'/%3E%3Crect x='7.4' y='14.4' width='2.2' height='2.2'/%3E%3Crect x='14.4' y='14.4' width='2.2' height='2.2'/%3E%3C/g%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M10.9 21v-4.4h2.2V21'/%3E%3C/svg%3E") no-repeat center / contain; }.icons8-diploma:before { content: "\f0a3"; padding: 0 0.0715em; }.icons8-down-button:before { content: "\f13a"; padding: 0 0.0715em; }.icons8-drag-list-down:before { content: "\f0c9"; padding: 0 0.0715em; }.icons8-error:before { content: "\f06a"; padding: 0 0.0715em; }.icons8-exercise:before { content: "\f21e"; padding: 0 0em; }.icons8-expand-arrow:before { content: "\f103"; padding: 0 0.1785em; }.icons8-facebook-filled:before { content: "\f082"; padding: 0 0.0715em; }.icons8-filter:before { content: "\f0b0"; padding: 0 0.1072em; }.icons8-forward:before { content: "\f105"; padding: 0 0.3215em; }.icons8-generic-mouse:before { content: "\f245"; padding: 0 0.1428em; }.icons8-gift:before { content: "\f06b"; padding: 0 0.0715em; }.icons8-handshake:before { content: "\f2b5"; margin: 0 -0.1429em; }.icons8-headset:before { content: " "; white-space: pre; padding: 0 0.375em; background-color: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M4.5 14v-2.5a7.5 7.5 0 0 1 15 0V14'/%3E%3Crect x='3' y='12.5' width='4' height='6.5' rx='1.4' fill='%23000'/%3E%3Crect x='17' y='12.5' width='4' height='6.5' rx='1.4' fill='%23000'/%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M19 19c0 1.8-1.8 2.6-4.2 2.6H13'/%3E%3Ccircle cx='12' cy='21.6' r='1.3' fill='%23000'/%3E%3C/svg%3E") no-repeat center / contain; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M4.5 14v-2.5a7.5 7.5 0 0 1 15 0V14'/%3E%3Crect x='3' y='12.5' width='4' height='6.5' rx='1.4' fill='%23000'/%3E%3Crect x='17' y='12.5' width='4' height='6.5' rx='1.4' fill='%23000'/%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M19 19c0 1.8-1.8 2.6-4.2 2.6H13'/%3E%3Ccircle cx='12' cy='21.6' r='1.3' fill='%23000'/%3E%3C/svg%3E") no-repeat center / contain; }.icons8-headset-filled:before { content: " "; white-space: pre; padding: 0 0.375em; background-color: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M4.5 14v-2.5a7.5 7.5 0 0 1 15 0V14'/%3E%3Crect x='3' y='12.5' width='4' height='6.5' rx='1.4' fill='%23000'/%3E%3Crect x='17' y='12.5' width='4' height='6.5' rx='1.4' fill='%23000'/%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M19 19c0 1.8-1.8 2.6-4.2 2.6H13'/%3E%3Ccircle cx='12' cy='21.6' r='1.3' fill='%23000'/%3E%3C/svg%3E") no-repeat center / contain; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M4.5 14v-2.5a7.5 7.5 0 0 1 15 0V14'/%3E%3Crect x='3' y='12.5' width='4' height='6.5' rx='1.4' fill='%23000'/%3E%3Crect x='17' y='12.5' width='4' height='6.5' rx='1.4' fill='%23000'/%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M19 19c0 1.8-1.8 2.6-4.2 2.6H13'/%3E%3Ccircle cx='12' cy='21.6' r='1.3' fill='%23000'/%3E%3C/svg%3E") no-repeat center / contain; }.icons8-help:before { content: "\f29c"; padding: 0 0.0715em; }.icons8-id-verified:before { content: "\f2c3"; margin: 0 -0.0715em; }.icons8-increase:before { content: "\f062"; padding: 0 0.0357em; }.icons8-info:before { content: "\f129"; padding: 0 0.3215em; }.icons8-label:before { content: "\f02b"; padding: 0 0.0715em; }.icons8-left:before { content: "\f177"; padding: 0 0em; }.icons8-link:before { content: "\f0c1"; padding: 0 0.0357em; }.icons8-linkedin-filled:before { content: "\f08c"; padding: 0 0.0715em; }.icons8-login:before { content: "\f090"; padding: 0 0.0715em; }.icons8-logout-rounded-down:before { content: "\f08b"; padding: 0 0.0357em; }.icons8-marker:before { content: "\f041"; padding: 0 0.2143em; }.icons8-medal-first-place:before { content: "\f091"; padding: 0 0.0357em; }.icons8-menu:before { content: "\f0c9"; padding: 0 0.0715em; }.icons8-menu-filled:before { content: "\f0c9"; padding: 0 0.0715em; }.icons8-message:before { content: "\f003"; padding: 0 0em; }.icons8-monitor:before { content: "\f108"; margin: 0 -0.0357em; }.icons8-mouse:before { content: "\f245"; padding: 0 0.1428em; }.icons8-multiply:before { content: "\f00d"; padding: 0 0.1072em; }.icons8-multiply-filled:before { content: "\f00d"; padding: 0 0.1072em; }.icons8-next:before { content: "\f051"; padding: 0 0.2143em; }.icons8-next-filled:before { content: "\f051"; padding: 0 0.2143em; }.icons8-next-page:before { content: "\f101"; padding: 0 0.2143em; }.icons8-open-sign:before { content: "\f10c"; padding: 0 0.0715em; }.icons8-organization:before { content: "\f0e8"; padding: 0 0em; }.icons8-parachute:before { content: "\f10c"; padding: 0 0.0715em; }.icons8-personal-trainer:before { content: "\f2c0"; padding: 0 0.0715em; }.icons8-play:before { content: "\f04b"; padding: 0 0.1072em; }.icons8-play-filled:before { content: "\f04b"; padding: 0 0.1072em; }.icons8-positive-dynamic:before { content: "\f201"; margin: 0 -0.0715em; }.icons8-presentation:before { content: "\f080"; margin: 0 -0.0715em; }.icons8-price-tag:before { content: "\f02b"; padding: 0 0.0715em; }.icons8-price-tag-filled:before { content: "\f02b"; padding: 0 0.0715em; }.icons8-price-tag-usd:before { content: "\f02b"; padding: 0 0.0715em; }.icons8-price-tag-usd-filled:before { content: "\f02b"; padding: 0 0.0715em; }.icons8-prize:before { content: "\f091"; padding: 0 0.0357em; }.icons8-property-time:before { content: "\f252"; padding: 0 0.0715em; }.icons8-right:before { content: "\f178"; padding: 0 0em; }.icons8-right-2:before { content: "\f061"; padding: 0 0.0715em; }.icons8-schedule:before { content: "\f274"; padding: 0 0em; }.icons8-share:before { content: "\f1e0"; padding: 0 0.0715em; }.icons8-shop:before { content: "\f290"; padding: 0 0em; }.icons8-shopping-cart:before { content: "\f07a"; padding: 0 0.0357em; }.icons8-shopping-cart-2:before { content: "\f07a"; padding: 0 0.0357em; }.icons8-sign-out:before { content: "\f08b"; padding: 0 0.0357em; }.icons8-signin:before { content: "\f090"; padding: 0 0.0715em; }.icons8-slide-up:before { content: "\f077"; padding: 0 0em; }.icons8-small-business:before { content: "\f0b1"; padding: 0 0em; }.icons8-sort-down:before { content: "\f0dd"; padding: 0 0.2143em; }.icons8-sort-down-filled:before { content: "\f0dd"; padding: 0 0.2143em; }.icons8-sort-up:before { content: "\f0de"; padding: 0 0.2143em; }.icons8-sort-up-filled:before { content: "\f0de"; padding: 0 0.2143em; }.icons8-start:before { content: "\f144"; padding: 0 0.0715em; }.icons8-start-filled:before { content: "\f144"; padding: 0 0.0715em; }.icons8-steam-engine:before { content: "\f238"; padding: 0 0.0715em; }.icons8-stick-fighting:before { content: "\f10c"; padding: 0 0.0715em; }.icons8-subway:before { content: "\f239"; padding: 0 0.0715em; }.icons8-sustainability:before { content: "\f06c"; padding: 0 0em; }.icons8-test-tube:before { content: "\f0c3"; padding: 0 0.0357em; }.icons8-training:before { content: "\f19d"; margin: 0 -0.1429em; }.icons8-training-filled:before { content: "\f19d"; margin: 0 -0.1429em; }.icons8-tv:before { content: "\f26c"; margin: 0 -0.0715em; }.icons8-tv-show:before { content: " "; white-space: pre; padding: 0 0.375em; background-color: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' x='2.6' y='3.4' width='18.8' height='13.6' rx='1.7'/%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M8 21h8M12 17v4'/%3E%3Cpath fill='%23000' d='M10 7.6v6.2l5.1-3.1z'/%3E%3C/svg%3E") no-repeat center / contain; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' x='2.6' y='3.4' width='18.8' height='13.6' rx='1.7'/%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M8 21h8M12 17v4'/%3E%3Cpath fill='%23000' d='M10 7.6v6.2l5.1-3.1z'/%3E%3C/svg%3E") no-repeat center / contain; }.icons8-twitter-filled:before { content: "\f099"; padding: 0 0.0357em; }.icons8-unchecked-checkbox:before { content: "\f096"; padding: 0 0.1072em; }.icons8-university:before { content: "\f19c"; margin: 0 -0.0715em; }.icons8-us-dollar:before { content: " "; white-space: pre; padding: 0 0.375em; background-color: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' cx='12' cy='12' r='9.6'/%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M15.2 9.2c-.5-1.1-1.7-1.8-3.2-1.8-1.8 0-3.1 1-3.1 2.4 0 3.5 6.4 1.8 6.4 5.2 0 1.5-1.4 2.5-3.3 2.5-1.6 0-2.9-.7-3.4-1.9M12 5.4v2M12 16.8v1.8'/%3E%3C/svg%3E") no-repeat center / contain; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' cx='12' cy='12' r='9.6'/%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M15.2 9.2c-.5-1.1-1.7-1.8-3.2-1.8-1.8 0-3.1 1-3.1 2.4 0 3.5 6.4 1.8 6.4 5.2 0 1.5-1.4 2.5-3.3 2.5-1.6 0-2.9-.7-3.4-1.9M12 5.4v2M12 16.8v1.8'/%3E%3C/svg%3E") no-repeat center / contain; }.icons8-user:before { content: "\f2c0"; padding: 0 0.0715em; }.icons8-user-filled:before { content: "\f007"; padding: 0 0.1428em; }.icons8-user-groups:before { content: "\f0c0"; margin: 0 -0.0357em; }.icons8-video-conference:before { content: "\f03d"; padding: 0 0em; }
+
+/* Forced colors (Windows High Contrast) replace background colors, which would hide the SVG-mask icons. */
+@media (forced-colors: active) {
+  .icons8-arlo-logo-font:before,
+  .icons8-department:before,
+  .icons8-headset:before,
+  .icons8-headset-filled:before,
+  .icons8-tv-show:before,
+  .icons8-us-dollar:before {
+    forced-color-adjust: none;
+    background-color: CanvasText;
+  }
 }
 
-.icons8-about:before { content: "\f163"; }
-.icons8-arlo-logo-font:before { content: "\f172"; }
-.icons8-back:before { content: "\f110"; }
-.icons8-back-to:before { content: "\f15a"; }
-.icons8-beach-umbrella:before { content: "\f114"; }
-.icons8-building:before { content: "\f181"; }
-.icons8-business-building:before { content: "\f17c"; }
-.icons8-buying:before { content: "\f175"; }
-.icons8-buying-2:before { content: "\f177"; }
-.icons8-calendar:before { content: "\f129"; }
-.icons8-cancel:before { content: "\f16b"; }
-.icons8-cancel-filled:before { content: "\f16c"; }
-.icons8-certificate:before { content: "\f187"; }
-.icons8-chevron-left:before { content: "\f103"; }
-.icons8-chevron-left-filled:before { content: "\f102"; }
-.icons8-chevron-right:before { content: "\f106"; }
-.icons8-chevron-right-filled:before { content: "\f107"; }
-.icons8-chevron-up:before { content: "\f104"; }
-.icons8-chevron-up-filled:before { content: "\f105"; }
-.icons8-circled-dot:before { content: "\f158"; }
-.icons8-circled-play:before { content: "\f144"; }
-.icons8-circled-play-filled:before { content: "\f145"; }
-.icons8-clear-filters:before { content: "\f134"; }
-.icons8-clock:before { content: "\f101"; }
-.icons8-cocktail:before { content: "\f11f"; }
-.icons8-collapse-arrow:before { content: "\f112"; }
-.icons8-contact-us:before { content: "\f17d"; }
-.icons8-delete:before { content: "\f16f"; }
-.icons8-delete-filled:before { content: "\f170"; }
-.icons8-department:before { content: "\f182"; }
-.icons8-diploma:before { content: "\f186"; }
-.icons8-down-button:before { content: "\f159"; }
-.icons8-drag-list-down:before { content: "\f132"; }
-.icons8-error:before { content: "\f166"; }
-.icons8-exercise:before { content: "\f11e"; }
-.icons8-expand-arrow:before { content: "\f10f"; }
-.icons8-facebook-filled:before { content: "\f15f"; }
-.icons8-filter:before { content: "\f133"; }
-.icons8-forward:before { content: "\f111"; }
-.icons8-generic-mouse:before { content: "\f150"; }
-.icons8-gift:before { content: "\f127"; }
-.icons8-handshake:before { content: "\f12a"; }
-.icons8-headset:before { content: "\f10c"; }
-.icons8-headset-filled:before { content: "\f10d"; }
-.icons8-help:before { content: "\f164"; }
-.icons8-id-verified:before { content: "\f12e"; }
-.icons8-increase:before { content: "\f11b"; }
-.icons8-info:before { content: "\f162"; }
-.icons8-label:before { content: "\f184"; }
-.icons8-left:before { content: "\f168"; }
-.icons8-link:before { content: "\f154"; }
-.icons8-linkedin-filled:before { content: "\f15e"; }
-.icons8-login:before { content: "\f179"; }
-.icons8-logout-rounded-down:before { content: "\f17b"; }
-.icons8-marker:before { content: "\f100"; }
-.icons8-medal-first-place:before { content: "\f116"; }
-.icons8-menu:before { content: "\f130"; }
-.icons8-menu-filled:before { content: "\f131"; }
-.icons8-message:before { content: "\f153"; }
-.icons8-monitor:before { content: "\f10e"; }
-.icons8-mouse:before { content: "\f14f"; }
-.icons8-multiply:before { content: "\f16d"; }
-.icons8-multiply-filled:before { content: "\f16e"; }
-.icons8-next:before { content: "\f14a"; }
-.icons8-next-filled:before { content: "\f14b"; }
-.icons8-next-page:before { content: "\f15c"; }
-.icons8-open-sign:before { content: "\f126"; }
-.icons8-organization:before { content: "\f17e"; }
-.icons8-parachute:before { content: "\f113"; }
-.icons8-personal-trainer:before { content: "\f13e"; }
-.icons8-play:before { content: "\f146"; }
-.icons8-play-filled:before { content: "\f147"; }
-.icons8-positive-dynamic:before { content: "\f115"; }
-.icons8-presentation:before { content: "\f119"; }
-.icons8-price-tag:before { content: "\f136"; }
-.icons8-price-tag-filled:before { content: "\f137"; }
-.icons8-price-tag-usd:before { content: "\f138"; }
-.icons8-price-tag-usd-filled:before { content: "\f139"; }
-.icons8-prize:before { content: "\f189"; }
-.icons8-property-time:before { content: "\f12d"; }
-.icons8-right:before { content: "\f169"; }
-.icons8-right-2:before { content: "\f155"; }
-.icons8-schedule:before { content: "\f11c"; }
-.icons8-share:before { content: "\f152"; }
-.icons8-shop:before { content: "\f125"; }
-.icons8-shopping-cart:before { content: "\f174"; }
-.icons8-shopping-cart-2:before { content: "\f176"; }
-.icons8-sign-out:before { content: "\f17a"; }
-.icons8-signin:before { content: "\f178"; }
-.icons8-slide-up:before { content: "\f15b"; }
-.icons8-small-business:before { content: "\f128"; }
-.icons8-sort-down:before { content: "\f108"; }
-.icons8-sort-down-filled:before { content: "\f109"; }
-.icons8-sort-up:before { content: "\f10a"; }
-.icons8-sort-up-filled:before { content: "\f10b"; }
-.icons8-start:before { content: "\f14c"; }
-.icons8-start-filled:before { content: "\f14d"; }
-.icons8-steam-engine:before { content: "\f122"; }
-.icons8-stick-fighting:before { content: "\f120"; }
-.icons8-subway:before { content: "\f121"; }
-.icons8-sustainability:before { content: "\f12b"; }
-.icons8-test-tube:before { content: "\f11d"; }
-.icons8-training:before { content: "\f140"; }
-.icons8-training-filled:before { content: "\f13f"; }
-.icons8-tv:before { content: "\f148"; }
-.icons8-tv-show:before { content: "\f149"; }
-.icons8-twitter-filled:before { content: "\f160"; }
-.icons8-unchecked-checkbox:before { content: "\f157"; }
-.icons8-university:before { content: "\f12c"; }
-.icons8-us-dollar:before { content: "\f13a"; }
-.icons8-user:before { content: "\f141"; }
-.icons8-user-filled:before { content: "\f142"; }
-.icons8-user-groups:before { content: "\f17f"; }
-.icons8-video-conference:before { content: "\f123"; }
+/* Printing omits backgrounds, and the Starter print styles clear them, which would hide the SVG-mask icons. */
+@media print {
+  .icons8-arlo-logo-font:before,
+  .icons8-department:before,
+  .icons8-headset:before,
+  .icons8-headset-filled:before,
+  .icons8-tv-show:before,
+  .icons8-us-dollar:before,
+  .arlo#arlo .icons8-arlo-logo-font:before,
+  .arlo#arlo .icons8-department:before,
+  .arlo#arlo .icons8-headset:before,
+  .arlo#arlo .icons8-headset-filled:before,
+  .arlo#arlo .icons8-tv-show:before,
+  .arlo#arlo .icons8-us-dollar:before {
+    background-color: currentColor !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

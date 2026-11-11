@@ -2362,9 +2362,11 @@
   transition: all .2s !important;
 }
 .arlo#arlo .presenter-events li a:before {
-  content: "\f111";
+  content: "\f105";
+  width: 1em;
+  text-align: center;
   display: inline-block;
-  font-family: "Arlo-starter-template--Master";
+  font-family: "FontAwesome";
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
@@ -13849,9 +13851,11 @@
 }
 
 .arlo#arlo .arlo-tooltip-button:before {
-  content: "\f101";
+  content: "\f017";
+  width: 1em;
+  text-align: center;
   display: inline-block;
-  font-family: "Arlo-starter-template--Master";
+  font-family: "FontAwesome";
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
@@ -14123,9 +14127,11 @@
 }
 
 .arlo#arlo .arlo-bootstrap-modal .event-presenters li:not(:empty):before {
-  content: "\f141";
+  content: "\f2c0";
+  width: 1em;
+  text-align: center;
   display: inline-block;
-  font-family: "Arlo-starter-template--Master";
+  font-family: "FontAwesome";
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
@@ -14211,9 +14217,11 @@
 }
 
 .arlo .tingle-modal-box .session-presenters li:not(:empty):before {
-  content: "\f141";
+  content: "\f2c0";
+  width: 1em;
+  text-align: center;
   display: inline-block;
-  font-family: "Arlo-starter-template--Master";
+  font-family: "FontAwesome";
   font-style: normal;
   font-weight: normal;
   font-variant: normal;

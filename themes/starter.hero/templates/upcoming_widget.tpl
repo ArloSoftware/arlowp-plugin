@@ -40,7 +40,7 @@
 
 							<div class="collapse event-expandable">
 
-								<p>[arlo_event_dates startdateformat="%A, %e %B %G" enddateformat="%A, %e %B %G"]</p>
+								<p>[arlo_event_dates startdateformat="%A, %e %B %Y" enddateformat="%A, %e %B %Y"]</p>
 								<p class="muted">[arlo_event_start_date format="%I:%M %p"] - [arlo_event_end_date format="%I:%M %p"] ([arlo_event_duration])</p>
 
 								[arlo_event_provider wrap='<div class="m-t-10 m-b-10">Provided by %s</div>']
@@ -69,7 +69,7 @@
 
 						<div class="card-back bg-primary text-white">
 							<p class="date no-margin">
-								[arlo_event_dates startdateformat="%a %e %b %G" enddateformat="%a %e %b %G"]
+								[arlo_event_dates startdateformat="%a %e %b %Y" enddateformat="%a %e %b %Y"]
 							</p>
 							<p class="time normal-text muted truncate-1">[arlo_event_start_date format="%I:%M %p"] - [arlo_event_end_date format="%I:%M %p"] ([arlo_event_duration])</p>
 							<p class="normal-text summary m-b-5 truncate-4">[arlo_event_template_summary]</p>

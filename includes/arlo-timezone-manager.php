@@ -2,8 +2,12 @@
 
 namespace ArloTraining;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 class TimeZoneManager {
-	
+
 	private $plugin;
 
 	/** @var array<string,string|false> Resolved identifier per Windows time zone ID; false when none is usable. */
@@ -12,7 +16,7 @@ class TimeZoneManager {
 	public $timezones;
 	public $indexed_timezones;
 
-	public function __construct($plugin) {
+	public function __construct( $plugin ) {
 		$this->plugin = $plugin;
 	}
 
@@ -117,36 +121,38 @@ class TimeZoneManager {
 	}
 
 	public function get_timezones() {
-		if (!$this->timezones) {
+		if ( ! $this->timezones ) {
 			$this->timezones = $this->query_timezones();
 		}
 
 		return $this->timezones;
 	}
 
-	public function get_indexed_timezones($timezone_id = 0) {
-		if (!$this->indexed_timezones) {
+	public function get_indexed_timezones( $timezone_id = 0 ) {
+		if ( ! $this->indexed_timezones ) {
 			$this->timezones = $this->get_timezones();
 
 			$this->indexed_timezones = [];
-			foreach ($this->timezones as $timezone) {
-				$this->indexed_timezones[$timezone['id']] = $timezone;
+			foreach ( $this->timezones as $timezone ) {
+				$this->indexed_timezones[ $timezone['id'] ] = $timezone;
 			}
 		}
 
-		if (intval($timezone_id) > 0) {
-			return !empty($this->indexed_timezones[$timezone_id]) ? $this->indexed_timezones[$timezone_id] : null;
-		} 
+		if ( intval( $timezone_id ) > 0 ) {
+			return ! empty( $this->indexed_timezones[ $timezone_id ] ) ? $this->indexed_timezones[ $timezone_id ] : null;
+		}
 
 		return $this->indexed_timezones;
-	}	
+	}
 
-	private function query_timezones($timezone_id = 0) {
+	private function query_timezones( $timezone_id = 0 ) {
 		global $wpdb;
-		$import_id = $this->plugin->get_importer()->get_current_import_id();
-		$timezone_id = intval($timezone_id);
+		$import_id   = $this->plugin->get_importer()->get_current_import_id();
+		$timezone_id = intval( $timezone_id );
 
-		return CacheControl::fetch_results($wpdb->prepare("
+		return CacheControl::fetch_results(
+			$wpdb->prepare(
+				"
 		SELECT
 			id,
 			name,
@@ -156,7 +162,10 @@ class TimeZoneManager {
 		WHERE
 			import_id = %d
 		ORDER BY utc_offset, name
-		", $import_id), ARRAY_A);
+		",
+				$import_id
+			),
+			ARRAY_A
+		);
 	}
-
 }

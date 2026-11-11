@@ -5,10 +5,10 @@ jQuery(function($){
         // add in delivery tag icons
         var content = ""; 
         $tag = jQuery(tag); 
-        if ($tag.hasClass('arlo-web_privateonsite')) { content += "  "; } 
-        if ($tag.hasClass('arlo-web_public')) { content += "  "; } 
-        if ($tag.hasClass('arlo-web_liveonline')) { content += "  "; } 
-        if ($tag.hasClass('arlo-web_selfpacedonline')) { content += "  "; } 
+        if ($tag.hasClass('arlo-web_privateonsite')) { content += ' <i class="icons8-home"></i> '; } 
+        if ($tag.hasClass('arlo-web_public')) { content += ' <i class="icons8-user-groups"></i> '; } 
+        if ($tag.hasClass('arlo-web_liveonline')) { content += ' <i class="icons8-headset"></i> '; } 
+        if ($tag.hasClass('arlo-web_selfpacedonline')) { content += ' <i class="icons8-tv-show"></i> '; } 
         $tag.find('.arlo-delivery-icons').html(content); 
     })
 

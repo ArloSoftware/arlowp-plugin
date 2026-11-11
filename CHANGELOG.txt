@@ -1,3 +1,157 @@
+
+== v5.2.0 ==
+
+Enhancements
+------------------
+* New arlo_region_redirect_location filter lets sites control automatic region
+  redirects without editing plugin files, supporting site-managed regional URLs.
+* New experimental enhanced import mode (preview) with more optimised
+  performance. Off by default.
+* Diagnostic log retention can now be configured from the admin Misc settings,
+  with supported limits from 10,000 to 250,000 rows.
+* The "Powered by Arlo" link is now off by default and appears only when a site
+  administrator opts in. Opt in from the one-time notice on the Arlo settings
+  screen or from Arlo > Settings > Misc. Sites that were showing the link stop
+  showing it until they opt in; saved templates are not modified.
+* Custom CSS now lives in WordPress's own Additional CSS instead of in the plugin,
+  so it is kept with your theme settings and no longer depends on a file in the
+  plugin folder. Sites that have Custom CSS keep it working exactly as before until
+  an administrator migrates it from Arlo > Settings > Custom CSS, with a readiness
+  check and a revert, or discards it if it is no longer needed. New installs and
+  sites with no Custom CSS are pointed to Additional CSS. While a migration is
+  pending, a warning icon marks the Custom CSS tab.
+* Template source can now only be edited by users who may add raw HTML to WordPress
+  (the unfiltered_html capability: administrators on a single site, super
+  administrators on a multisite network, nobody when DISALLOW_UNFILTERED_HTML is
+  set). Other users see their templates read only with an explanation, and the
+  Upcoming events widget keeps its stored template for them instead of filtering
+  what they submit. Stored templates keep rendering, and theme switching and
+  upgrades are unaffected.
+* Updated bundled front-end libraries: js-cookie 2.2.0 to 3.0.8 and Font Awesome
+  Free in Theme Z 6.5.2 to 6.7.2. The unused jQuery UI stylesheet has been
+  removed from the admin assets.
+* Clearer first-time setup: a new install no longer contacts Arlo until an
+  administrator saves a platform name or chooses "Test with demo data" beside the
+  platform field, which explains what is sent. Host pages are created as drafts.
+* Admin CSS and JavaScript cleanup: Arlo admin assets now load only on Arlo
+  screens (or where an Arlo notice is shown), and their styles no longer affect
+  other plugins' admin notices.
+* Removed the bundled fancyBox library. The "For designers" explanation on the
+  Theme tab is now shown as text on the page instead of in a pop-up window.
+* Removed the Icons8 icon font and replaced it with Font Awesome alternatives.
+* Removed the old option to send logs to Arlo. Logs remain available in
+  Arlo > Logs.
+* Site-wide Arlo error notices are now only shown to administrators.
+* Removed the "leave a review" prompt from the Arlo settings screen and the
+  "Subscribe to our WP newsletter" row from Arlo > Settings > Misc.
+* Added backward compatibility support for region ID handling.
+
+Bug fixes
+------------------
+* The Theme Z Course Template now shows the number of date tiles set by the
+  show attribute of [arlo_event_list_item] instead of always showing four.
+* The Theme Z catalogue and schedule "Show more" buttons now follow the limit
+  set on [arlo_event_template_list_item] instead of assuming three events per
+  click, so a template with a different limit no longer skips events or shows
+  the extra event it fetches to detect another page. "Show more" also always
+  asks for its own category, even when the page has no category filter.
+* Import scheduling and retry handling are more reliable for standard
+  single-site imports, sites with large and complex imports that can run for
+  many minutes, and WordPress multisite installs.
+* Persistent import failures now back off more intelligently and missing
+  callbacks count toward connection health, reducing repeated full-import
+  attempts and the risk that failing imports consume PHP workers needed for
+  normal site traffic.
+* An import now waits up to 5 minutes for Arlo's snapshot callback; a callback
+  that arrives later is ignored and logged.
+* Scheduler lock management now prevents duplicate import runners from working
+  on the same checkpoint and avoids immediate retry storms, stale lock stalls,
+  and missed retries when a multisite process lock is busy.
+* Scheduled automatic imports are deduplicated, and stalled or overlong imports
+  are failed cleanly instead of occupying the import slot indefinitely.
+* Import entity writes are now idempotent when a large import fragment is
+  replayed after partial completion, preventing duplicate rows during retry
+  recovery.
+* PHP 8.1+ scheduler retry-backoff no longer fails with a fatal error because
+  of invalid named cron arguments.
+* Upgrades from 5.1.0 gracefully migrate the import lock table before schema
+  validation, avoiding unnecessary schema repair during the 5.2.0 upgrade.
+* Upgrading to 5.2.0 mid-import now ends that import instead of failing to
+  resume it.
+* Fixed a bug when handling state shortcode attributes that caused execution errors.
+* The [arlo_oa_rich_snippet] shortcode now outputs the online activity structured
+  data when used inside [arlo_oa_list_item] on the Event template.
+* Region fields now support Arlo region IDs up to 16 characters. Upgrades widen
+  those columns before schema validation, preserving existing imported data.
+  Sites with configured regions and local evidence that the old 5-character
+  column limit may have been hit request a fresh sync to restore full region IDs.
+* A temporary database error while checking the plugin's database structure no
+  longer causes the plugin's event data tables to be dropped and rebuilt. The
+  check is skipped, logged, and repeated on the next trigger.
+* Theme Z event template hero banners no longer show duplicate advertised
+  presenter links when a presenter is returned more than once for a template.
+* Improved security hardening of the import callback endpoint.
+* A percent sign in a shortcode attribute that takes a placeholder (wrap,
+  group_header, events_after, title, counts, aftertext and format), such as
+  width:100% in a wrap style, no longer causes a fatal error on PHP 8. %s is
+  still the placeholder and %% a literal percent sign.
+* The format attribute of the event date shortcodes again follows the strftime
+  conversions documented for it, as it did before 5.0.10. %j, %U, %W, %C, %F,
+  %r, %c, %x, %X, %n and %t now render correctly, and flags such as %-d, %-m and
+  %-I work instead of causing a fatal error on PHP 8. %G and %g continue to
+  give the calendar year rather than the ISO year, because earlier copies of
+  the Starter templates use %G as the year. The Starter and Starter Hero
+  themes now use %Y in their upcoming events templates.
+* PHP 8 notices on category pages and in the Categories widget.
+* The [arlo_powered_by] credit now translates its link label and logo text, and
+  encodes the ampersands in its link.
+* PHP 8.2+ deprecation notices ("Use of self in callables is deprecated") from
+  integer filter helpers on event list pages and shortcodes.
+* Database error when sorting the admin Presenters list by name.
+* Fixed a caching bug in the Search, Region selector, Categories and Upcoming
+  events widgets on sites with a persistent object cache.
+* The "Permalink setting change required" notice no longer appears for pretty
+  permalink structures other than /%postname%/, such as the multisite /blog
+  prefix, custom prefixes and category segments. It now appears only for Plain
+  permalinks, structures without a trailing slash, and structures that start with
+  index.php, with wording specific to each case.
+* Region values in the URL are now validated before use, so an unexpected value
+  is ignored and the default or saved region is used.
+* [arlo_presenter_events_list_advanced] no longer leaves the last event as the
+  current event template for shortcodes placed after it.
+* The month filter parsing has been hardened.
+* The meta description of an event template page now shows an ampersand or
+  comparison sign in the course summary as written, not as escaped text, and
+  allows up to 160 characters before it is shortened.
+* [arlo_categories] with depth="0" now lists every category level, as the
+  Categories widget describes, instead of rendering nothing.
+* [arlo_event_template_advertised_price] now shows online activity offer prices.
+* [arlo_suggest_templates] no longer empties the event template for shortcodes
+  placed after it in the same template.
+* Event rich snippets are no longer left out for online events or for events
+  with no time zone.
+
+Performance improvements
+------------------
+* Upcoming Events list performance is improved for large catalogues and
+  complex schedules. Queries now page by event IDs before hydrating event
+  details to reduce database work.
+* Diagnostic log maintenance now runs at safe import lifecycle points instead
+  of after every log write, keeping cleanup work bounded during busy imports.
+* Deleting the plugin now also removes its cached transients, and its
+  dismissed-notice user settings when "Keep settings" is off.
+
+Security
+------------------
+* Custom CSS can no longer close its own style element.
+* Updated bundled Bootstrap JS from 3.3.7 to 3.4.1, which includes upstream
+  XSS fixes.
+* Applied sanitisation to category breadcrumb, category path, category title and template list group markup.
+* Venue, presenter and template titles and descriptions are now sanitised on
+  every import, whichever user starts it. Page addresses are unchanged.
+* Rejected import callbacks are now throttled in the Arlo log, so
+  unauthenticated requests can no longer flood it.
+
 == v5.1.2 ==
 
 Enhancements
@@ -848,4 +1002,3 @@ Availability to modify the "Free" terminology
 Availability to choose the price display (incl/excl GST)
 Automatically submit the filter form when the dropdown filter is changes
 New "Provider" field
-
