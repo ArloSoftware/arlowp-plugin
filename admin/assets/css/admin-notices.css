@@ -1,0 +1,19 @@
+/*
+ * Styles for Arlo admin notices. These notices can render on any admin screen
+ * (import errors, disabled-state warnings), so this file is the
+ * only Arlo stylesheet loaded outside Arlo's own screens. Every selector is
+ * scoped to the plugin's `.arlo-message` notice wrapper so that core notices
+ * and other plugins' notices are never restyled.
+ */
+
+.notice.arlo-message .arlo-logo {
+	background: url(../img/arlo-logo.png) no-repeat center;
+	width: 48px;
+	height: 48px;
+	background-size: 48px;
+	display: block;
+}
+
+.notice.arlo-message.arlo-health-disabled-notice p a {
+	margin-right: 1.5em;
+}

@@ -16,33 +16,27 @@ use ArloTraining\API\Client;
 use ArloTraining\Utilities;
 use ArloTraining\CacheControl;
 use ArloTraining\Environment;
+use ArloTraining\FeatureFlagManager;
 use ArloTraining\ThemeManager;
 use ArloTraining\TimeZoneManager;
 use ArloTraining\SystemRequirements;
 use ArloTraining\Redirect;
+use ArloTraining\UserFlash;
 
 /**
  * Arlo for WordPress.
- * Text Domain: arlo-for-wordpress
  *
  * @package   Arlo_For_Wordpress
- * @author    Arlo <info@arlo.co>
- * @license   GPL-2.0+
+ * @author    Arlo Software <support@arlo.co>
+ * @license   GPL-2.0-or-later
  * @link      https://arlo.co
- * @copyright 2018 Arlo
- * 
+ * @copyright 2015-2026 Arlo Software
  */
 
 /**
- * Plugin class. This class should ideally be used to work with the
- * public-facing side of the WordPress site.
- *
- * If you're interested in introducing administrative or dashboard
- * functionality, then refer to 'class-arlo-for-wordpress-admin.php'
- *
+ * Public-facing plugin class: routing, rendering, scheduling hooks and plugin lifecycle.
  *
  * @package Arlo_For_Wordpress
- * @author  Adam Fentosi <adam.fentosi@arlo.co>, Gabriel Oheix
  */
 class Arlo_For_Wordpress {
 
@@ -50,76 +44,76 @@ class Arlo_For_Wordpress {
 	 * Init static member with translation
 	 */
 	public static function init() {
-        self::$post_types = array(
-			'upcoming' => array(
-				'slug' => 'upcomingevents',
-				'name' => esc_html__('Upcoming events', 'arlo-training-and-event-management-system'),
-				'singular_name' => esc_html__('Upcoming event list', 'arlo-training-and-event-management-system'),
-				'regionalized' => true
+		self::$post_types = array(
+			'upcoming'    => array(
+				'slug'          => 'upcomingevents',
+				'name'          => esc_html__( 'Upcoming events', 'arlo-training-and-event-management-system' ),
+				'singular_name' => esc_html__( 'Upcoming event list', 'arlo-training-and-event-management-system' ),
+				'regionalized'  => true,
 			),
-			'event' => array(
-				'slug' => 'event',
-				'name' => esc_html__('Events', 'arlo-training-and-event-management-system'),
-				'singular_name' => esc_html__('Catalogue', 'arlo-training-and-event-management-system'),
-				'regionalized' => true
+			'event'       => array(
+				'slug'          => 'event',
+				'name'          => esc_html__( 'Events', 'arlo-training-and-event-management-system' ),
+				'singular_name' => esc_html__( 'Catalogue', 'arlo-training-and-event-management-system' ),
+				'regionalized'  => true,
 			),
-			'venue' => array(
-				'slug' => 'venue',
-				'name' => esc_html__('Venues', 'arlo-training-and-event-management-system'),
-				'singular_name' => esc_html__('Venue list', 'arlo-training-and-event-management-system')
-			),		
-			'presenter' => array(
-				'slug' => 'presenter',
-				'name' => esc_html__('Presenters', 'arlo-training-and-event-management-system'),
-				'singular_name' => esc_html__('Presenter list', 'arlo-training-and-event-management-system')
+			'venue'       => array(
+				'slug'          => 'venue',
+				'name'          => esc_html__( 'Venues', 'arlo-training-and-event-management-system' ),
+				'singular_name' => esc_html__( 'Venue list', 'arlo-training-and-event-management-system' ),
+			),
+			'presenter'   => array(
+				'slug'          => 'presenter',
+				'name'          => esc_html__( 'Presenters', 'arlo-training-and-event-management-system' ),
+				'singular_name' => esc_html__( 'Presenter list', 'arlo-training-and-event-management-system' ),
 			),
 			'eventsearch' => array(
-				'slug' => 'eventsearch',
-				'name' => esc_html__('Event search', 'arlo-training-and-event-management-system'),
-				'singular_name' => esc_html__('Event search', 'arlo-training-and-event-management-system'),
-				'regionalized' => true
+				'slug'          => 'eventsearch',
+				'name'          => esc_html__( 'Event search', 'arlo-training-and-event-management-system' ),
+				'singular_name' => esc_html__( 'Event search', 'arlo-training-and-event-management-system' ),
+				'regionalized'  => true,
 			),
-			'schedule' => array(
-				'slug' => 'schedule',
-				'name' => esc_html__('Schedule', 'arlo-training-and-event-management-system'),
-				'singular_name' => esc_html__('Schedule', 'arlo-training-and-event-management-system'),
-				'regionalized' => true
+			'schedule'    => array(
+				'slug'          => 'schedule',
+				'name'          => esc_html__( 'Schedule', 'arlo-training-and-event-management-system' ),
+				'singular_name' => esc_html__( 'Schedule', 'arlo-training-and-event-management-system' ),
+				'regionalized'  => true,
 			),
-			'oa' => array(
-				'slug' => 'onlineactivities',
-				'name' => esc_html__('Online activities', 'arlo-training-and-event-management-system'),
-				'singular_name' => esc_html__('Online activity', 'arlo-training-and-event-management-system'),
-				'regionalized' => true
-			)
+			'oa'          => array(
+				'slug'          => 'onlineactivities',
+				'name'          => esc_html__( 'Online activities', 'arlo-training-and-event-management-system' ),
+				'singular_name' => esc_html__( 'Online activity', 'arlo-training-and-event-management-system' ),
+				'regionalized'  => true,
+			),
 		);
 
 		self::get_templates();
 
 		self::$filter_labels = array(
-			'category' => esc_html__('All categories', 'arlo-training-and-event-management-system'),
-			'delivery' => esc_html__('All delivery options', 'arlo-training-and-event-management-system'),
-			'month' => esc_html__('All months', 'arlo-training-and-event-management-system'),
-			'location' => esc_html__('All locations', 'arlo-training-and-event-management-system'),
-			'state' => esc_html__('Select state', 'arlo-training-and-event-management-system'),
-			'eventtag' => esc_html__('Select tag', 'arlo-training-and-event-management-system'),
-			'templatetag' => esc_html__('Select tag', 'arlo-training-and-event-management-system'),
-			'presenter' => esc_html__('All presenters', 'arlo-training-and-event-management-system'),
-			'oatag' => esc_html__('All tags', 'arlo-training-and-event-management-system')
+			'category'    => esc_html__( 'All categories', 'arlo-training-and-event-management-system' ),
+			'delivery'    => esc_html__( 'All delivery options', 'arlo-training-and-event-management-system' ),
+			'month'       => esc_html__( 'All months', 'arlo-training-and-event-management-system' ),
+			'location'    => esc_html__( 'All locations', 'arlo-training-and-event-management-system' ),
+			'state'       => esc_html__( 'Select state', 'arlo-training-and-event-management-system' ),
+			'eventtag'    => esc_html__( 'Select tag', 'arlo-training-and-event-management-system' ),
+			'templatetag' => esc_html__( 'Select tag', 'arlo-training-and-event-management-system' ),
+			'presenter'   => esc_html__( 'All presenters', 'arlo-training-and-event-management-system' ),
+			'oatag'       => esc_html__( 'All tags', 'arlo-training-and-event-management-system' ),
 		);
 
 		self::$filter_labels_v1 = array(
-			'category' => esc_html__('Categories', 'arlo-training-and-event-management-system'),
-			'delivery' => esc_html__('Delivery Methods', 'arlo-training-and-event-management-system'),
-			'month' => esc_html__('Months', 'arlo-training-and-event-management-system'),
-			'location' => esc_html__('Locations', 'arlo-training-and-event-management-system'),
-			'region' => esc_html__('Regions', 'arlo-training-and-event-management-system'),
-			'state' => esc_html__('States', 'arlo-training-and-event-management-system'),
-			'eventtag' => esc_html__('Event Tags', 'arlo-training-and-event-management-system'),
-			'templatetag' => esc_html__('Template Tags', 'arlo-training-and-event-management-system'),
-			'presenter' => esc_html__('Presenters', 'arlo-training-and-event-management-system'),
-			'oatag' => esc_html__('Tags', 'arlo-training-and-event-management-system')
+			'category'    => esc_html__( 'Categories', 'arlo-training-and-event-management-system' ),
+			'delivery'    => esc_html__( 'Delivery Methods', 'arlo-training-and-event-management-system' ),
+			'month'       => esc_html__( 'Months', 'arlo-training-and-event-management-system' ),
+			'location'    => esc_html__( 'Locations', 'arlo-training-and-event-management-system' ),
+			'region'      => esc_html__( 'Regions', 'arlo-training-and-event-management-system' ),
+			'state'       => esc_html__( 'States', 'arlo-training-and-event-management-system' ),
+			'eventtag'    => esc_html__( 'Event Tags', 'arlo-training-and-event-management-system' ),
+			'templatetag' => esc_html__( 'Template Tags', 'arlo-training-and-event-management-system' ),
+			'presenter'   => esc_html__( 'Presenters', 'arlo-training-and-event-management-system' ),
+			'oatag'       => esc_html__( 'Tags', 'arlo-training-and-event-management-system' ),
 		);
-    }
+	}
 
 	/**
 	 * Minimum required PHP version
@@ -129,6 +123,36 @@ class Arlo_For_Wordpress {
 	 * @var     string
 	 */
 	const MIN_PHP_VERSION = '7.4.0';
+
+	/**
+	 * Maximum age, in seconds, since task_modified before an import is treated as stalled.
+	 *
+	 * @since   5.2.0
+	 *
+	 * @var     int
+	 */
+	const IMPORT_STALLED_TIMEOUT_SECONDS = 28 * MINUTE_IN_SECONDS;
+
+	/**
+	 * Longest an import waits for Arlo's snapshot callback, measured from the snapshot request.
+	 *
+	 * This is a separate limit from IMPORT_STALLED_TIMEOUT_SECONDS and IMPORT_MAX_DURATION_SECONDS.
+	 * Once it passes, a missing callback fails the import and a callback that arrives later is ignored.
+	 *
+	 * @since   5.2.0
+	 *
+	 * @var     int
+	 */
+	const IMPORT_CALLBACK_WAIT_TIMEOUT_SECONDS = 5 * MINUTE_IN_SECONDS;
+
+	/**
+	 * Maximum total age, in seconds, since task_created before an import is stopped.
+	 *
+	 * @since   5.2.0
+	 *
+	 * @var     int
+	 */
+	const IMPORT_MAX_DURATION_SECONDS = 45 * MINUTE_IN_SECONDS;
 
 	/**
 	 * The default loaded theme
@@ -148,6 +172,21 @@ class Arlo_For_Wordpress {
 	 */
 	const DEFAULT_PLATFORM = 'websitetestdata';
 
+	// Absent until an administrator decides; '1' shows the public credit.
+	const POWERED_BY_SETTING = 'show_powered_by';
+
+	// Set when an existing site upgrades, so the opt-in banner explains the credit is now off; removed once the choice is recorded.
+	const POWERED_BY_UPGRADE_NOTICE_OPTION = 'arlo_powered_by_upgrade_notice';
+
+	/**
+	 * Longest meta description, in bytes, before it is cut at the next word boundary and given an ellipsis.
+	 *
+	 * The cut is looked for from ten bytes before this limit, so text shorter than the limit is never shortened.
+	 *
+	 * @var int
+	 */
+	const META_DESCRIPTION_MAX_LENGTH = 160;
+
 	/**
 	 * Deployment mode constants.
 	 *
@@ -157,6 +196,18 @@ class Arlo_For_Wordpress {
 	const DEPLOYMENT_MODE_NON_PRODUCTION = 'non_production';
 
 	/**
+	 * Importer-mode values persisted in arlo_settings and sealed into each import session.
+	 *
+	 * FULL_DELTA retains full-shadow behavior while allowing later experimental
+	 * delta behavior; it does not represent a delta-only import.
+	 */
+	const IMPORTER_MODE_FULL       = 'full';
+	const IMPORTER_MODE_FULL_DELTA = 'full_delta';
+
+	// Service escape hatch, absent or '0' by default: '1' makes new imports store region IDs as the pre-5.2.0 five-character column did.
+	const LEGACY_REGION_ID_HANDLING_SETTING = 'legacy_region_id_handling';
+
+	/**
 	 * Minimum age for showing the sync error notice after a confirmed failure.
 	 *
 	 * @since   5.1.0
@@ -164,9 +215,7 @@ class Arlo_For_Wordpress {
 	const SYNC_ERROR_NOTICE_MIN_AGE = 6 * HOUR_IN_SECONDS;
 
 	/**
-	 * @TODO - Rename "arlo-for-wordpress" to the name your your plugin
-	 *
-	 * Unique identifier for your plugin.
+	 * Unique identifier for the plugin.
 	 *
 	 *
 	 * The variable name is used as the text domain when internationalizing strings
@@ -195,8 +244,28 @@ class Arlo_For_Wordpress {
 	 *
 	 * @var      array
 	 */
-    protected $data = array();
-    
+	protected $data = array();
+
+	/**
+	 * Local-data keys for services scoped to one PHP request or built from them.
+	 *
+	 * The environment service uses the historical `get_environment` cache key.
+	 *
+	 * @var array
+	 */
+	const REQUEST_SCOPED_SERVICE_KEYS = array(
+		'scheduler',
+		'importer',
+		'importing_parts',
+		'get_environment',
+		'message_handler',
+		'api_client',
+		'notice_handler',
+		'timezone_manager',
+		'schema_manager',
+		'version_handler',
+	);
+
 	/**
 	 * $post_types: used to set default settings & create posts types for import
 	 *
@@ -205,7 +274,7 @@ class Arlo_For_Wordpress {
 	 * @var      array
 	 */
 	public static $post_types = array();
-    
+
 	/**
 	 * $pages: used to set the necessary pages
 	 *
@@ -213,60 +282,60 @@ class Arlo_For_Wordpress {
 	 *
 	 * @var      array
 	 */
-	 
-    public static $pages = array(
 
-			array(
-				'name'				=> 'events',
-				'title'				=> 'Events',
-				'content'			=> '[arlo_event_template_list]',
-				'child_post_type'	=> 'event',
-				'post_types_key'	=> 'event',
-			),
-			array(
-				'name'				=> 'eventsearch',
-				'title'				=> 'Event search',
-				'content'			=> '[arlo_event_template_search_list]',
-				'child_post_type'	=> 'event',
-				'post_types_key'	=> 'eventsearch',
-			),
-			array(
-				'name'				=> 'upcoming',
-				'title'				=> 'Upcoming Events',
-				'content'			=> '[arlo_upcoming_list]',
-				'post_types_key'	=> 'upcoming',
-			),
-			array(
-				'name'				=> 'presenters',
-				'title'				=> 'Presenters',
-				'content'			=> '[arlo_presenter_list]',
-				'child_post_type'	=> 'presenter',
-				'post_types_key'	=> 'presenter',
-			),
-			array(
-				'name'				=> 'venues',
-				'title'				=> 'Venues',
-				'content'			=> '[arlo_venue_list]',
-				'child_post_type'	=> 'venue',
-				'post_types_key'	=> 'venue',
-			),
-			array(
-				'name'				=> 'oa',
-				'title'				=> 'Online Activities',
-				'content'			=> '[arlo_onlineactivites_list]',
-				'child_post_type'	=> 'event',
-				'post_types_key'	=> 'oa',
-			),
-			array(
-				'name'				=> 'schedule',
-				'title'				=> 'Schedule',
-				'content'			=> '[arlo_schedule]',
-				'child_post_type'	=> 'event',
-				'post_types_key'	=> 'schedule',
-			),
-		);
+	public static $pages = array(
 
-    
+		array(
+			'name'            => 'events',
+			'title'           => 'Events',
+			'content'         => '[arlo_event_template_list]',
+			'child_post_type' => 'event',
+			'post_types_key'  => 'event',
+		),
+		array(
+			'name'            => 'eventsearch',
+			'title'           => 'Event search',
+			'content'         => '[arlo_event_template_search_list]',
+			'child_post_type' => 'event',
+			'post_types_key'  => 'eventsearch',
+		),
+		array(
+			'name'           => 'upcoming',
+			'title'          => 'Upcoming Events',
+			'content'        => '[arlo_upcoming_list]',
+			'post_types_key' => 'upcoming',
+		),
+		array(
+			'name'            => 'presenters',
+			'title'           => 'Presenters',
+			'content'         => '[arlo_presenter_list]',
+			'child_post_type' => 'presenter',
+			'post_types_key'  => 'presenter',
+		),
+		array(
+			'name'            => 'venues',
+			'title'           => 'Venues',
+			'content'         => '[arlo_venue_list]',
+			'child_post_type' => 'venue',
+			'post_types_key'  => 'venue',
+		),
+		array(
+			'name'            => 'oa',
+			'title'           => 'Online Activities',
+			'content'         => '[arlo_onlineactivites_list]',
+			'child_post_type' => 'event',
+			'post_types_key'  => 'oa',
+		),
+		array(
+			'name'            => 'schedule',
+			'title'           => 'Schedule',
+			'content'         => '[arlo_schedule]',
+			'child_post_type' => 'event',
+			'post_types_key'  => 'schedule',
+		),
+	);
+
+
 	/**
 	 * $price_settings: used to set the price showing on the site
 	 *
@@ -274,11 +343,11 @@ class Arlo_For_Wordpress {
 	 *
 	 * @var      array
 	 */
-    public static $price_settings = array(
-        'exclgst' => 'Exclude GST.',
-        'inclgst' => 'Include GST.',
-    ); 
-    
+	public static $price_settings = array(
+		'exclgst' => 'Exclude GST.',
+		'inclgst' => 'Include GST.',
+	);
+
 	/**
 	 * $dismissible_notices: valid dismissible notices
 	 *
@@ -286,14 +355,13 @@ class Arlo_For_Wordpress {
 	 *
 	 * @var      array
 	 */
-    public static $dismissible_notices = array(
-    	'welcome' => 'arlo-welcome-admin-notice',
-    	'developer' => 'arlo-developer-admin-notice',
-    	'newpages' => 'arlo-newpages-admin-notice',
-		'wp_video' => 'arlo-wp-video',
+	public static $dismissible_notices = array(
+		'welcome'   => 'arlo-welcome-admin-notice',
+		'newpages'  => 'arlo-newpages-admin-notice',
+		'wp_video'  => 'arlo-wp-video',
 		'pagesetup' => 'arlo-page-setup-admin-notice',
-    );     
-    
+	);
+
 	/**
 	 * $delivery_labels: used to show the different delivery types
 	 *
@@ -301,12 +369,12 @@ class Arlo_For_Wordpress {
 	 *
 	 * @var      array
 	 */
-    public static $delivery_labels = array(
-        0 => 'Workshop',
-        1 => 'Online',
-        99 => 'Online Activity'
-    );
-    
+	public static $delivery_labels = array(
+		0  => 'Workshop',
+		1  => 'Online',
+		99 => 'Online Activity',
+	);
+
 	/**
 	 * $templates: defines the available templates for the plugin
 	 *
@@ -326,59 +394,59 @@ class Arlo_For_Wordpress {
 	 * @return   array
 	 */
 	public static function get_templates() {
-		if (empty(self::$templates)) {
+		if ( empty( self::$templates ) ) {
 			self::$templates = array(
-				'event' => array(
-					'id' => 'event',
-					'name' => esc_html__('Event', 'arlo-training-and-event-management-system' ),
+				'event'       => array(
+					'id'   => 'event',
+					'name' => esc_html__( 'Event', 'arlo-training-and-event-management-system' ),
 				),
-				'events' => array(
-					'id' => 'events',
+				'events'      => array(
+					'id'        => 'events',
 					'shortcode' => '[arlo_event_template_list]',
-					'name' => esc_html__('Catalogue', 'arlo-training-and-event-management-system' )
+					'name'      => esc_html__( 'Catalogue', 'arlo-training-and-event-management-system' ),
 				),
-				'schedule' => array(
-					'id' => 'schedule',
+				'schedule'    => array(
+					'id'        => 'schedule',
 					'shortcode' => '[arlo_schedule]',
-					'name' => esc_html__('Schedule', 'arlo-training-and-event-management-system' )
+					'name'      => esc_html__( 'Schedule', 'arlo-training-and-event-management-system' ),
 				),
 				'eventsearch' => array(
-					'id' => 'eventsearch',
+					'id'        => 'eventsearch',
 					'shortcode' => '[arlo_event_template_search_list]',
-					'name' => esc_html__('Event search list', 'arlo-training-and-event-management-system' )
+					'name'      => esc_html__( 'Event search list', 'arlo-training-and-event-management-system' ),
 				),
-				'upcoming' => array(
-					'id' => 'upcoming',
+				'upcoming'    => array(
+					'id'        => 'upcoming',
 					'shortcode' => '[arlo_upcoming_list]',
-					'name' => esc_html__('Upcoming event list', 'arlo-training-and-event-management-system' ),
+					'name'      => esc_html__( 'Upcoming event list', 'arlo-training-and-event-management-system' ),
 				),
-				'oa' => array(
-					'id' => 'oa',
+				'oa'          => array(
+					'id'        => 'oa',
 					'shortcode' => '[arlo_onlineactivites_list]',
-					'name' => esc_html__('Online activity list', 'arlo-training-and-event-management-system' )
+					'name'      => esc_html__( 'Online activity list', 'arlo-training-and-event-management-system' ),
 				),
-				'presenter' => array(
-					'id' => 'presenter',
-					'name' => esc_html__('Presenter', 'arlo-training-and-event-management-system' )
+				'presenter'   => array(
+					'id'   => 'presenter',
+					'name' => esc_html__( 'Presenter', 'arlo-training-and-event-management-system' ),
 				),
-				'presenters' => array(
-					'id' => 'presenters',
+				'presenters'  => array(
+					'id'        => 'presenters',
 					'shortcode' => '[arlo_presenter_list]',
-					'name' => esc_html__('Presenter list', 'arlo-training-and-event-management-system' )
+					'name'      => esc_html__( 'Presenter list', 'arlo-training-and-event-management-system' ),
 				),
-				'venue' => array(
-					'id' => 'venue',
-					'name' => esc_html__('Venue', 'arlo-training-and-event-management-system' )
+				'venue'       => array(
+					'id'   => 'venue',
+					'name' => esc_html__( 'Venue', 'arlo-training-and-event-management-system' ),
 				),
-				'venues' => array(
-					'id' => 'venues',
+				'venues'      => array(
+					'id'        => 'venues',
 					'shortcode' => '[arlo_venue_list]',
-					'name' => esc_html__('Venue list', 'arlo-training-and-event-management-system' )
+					'name'      => esc_html__( 'Venue list', 'arlo-training-and-event-management-system' ),
 				),
-				'new_custom' => array(
-					'id' => 'new_custom',
-					'name' => esc_html__('New', 'arlo-training-and-event-management-system' )
-				)
+				'new_custom'  => array(
+					'id'   => 'new_custom',
+					'name' => esc_html__( 'New', 'arlo-training-and-event-management-system' ),
+				),
 			);
 		}
 
@@ -393,14 +461,14 @@ class Arlo_For_Wordpress {
 	 *
 	 * @var      array
 	 */
-    public static $shortcode_types = array(
-		'events' => 'Catalogue', 
-		'schedule' => 'Schedule', 
-		'upcoming' => 'Upcoming', 
-		'oa' => 'Online Activities', 
-		'presenters' => 'Presenters', 
-		'venues' => 'Venues'
-    );
+	public static $shortcode_types = array(
+		'events'     => 'Catalogue',
+		'schedule'   => 'Schedule',
+		'upcoming'   => 'Upcoming',
+		'oa'         => 'Online Activities',
+		'presenters' => 'Presenters',
+		'venues'     => 'Venues',
+	);
 
 	/**
 	 * $available_filters: defines the available filters for the plugin
@@ -410,55 +478,55 @@ class Arlo_For_Wordpress {
 	 * @var      array
 	 */
 
-	public static  $available_filters = array(
-		'event' => array(
-			'name' => 'Event',
+	public static $available_filters = array(
+		'event'    => array(
+			'name'    => 'Event',
 			'filters' => array(
 				'location' => 'Location',
-				'state' => 'State'
-			)
+				'state'    => 'State',
+			),
 		),
 		'upcoming' => array(
-			'name' => 'Upcoming',
+			'name'    => 'Upcoming',
 			'filters' => array(
-				'category' => 'Category', 
-				'month' => 'Month', 
-				'location' => 'Location', 
-				'delivery' => 'Delivery', 
-				'eventtag' => 'Event tag', 
-				'templatetag' => 'Template tag', 
-				'presenter' => 'Presenter',
-				'state' => 'State'
-			)
+				'category'    => 'Category',
+				'month'       => 'Month',
+				'location'    => 'Location',
+				'delivery'    => 'Delivery',
+				'eventtag'    => 'Event tag',
+				'templatetag' => 'Template tag',
+				'presenter'   => 'Presenter',
+				'state'       => 'State',
+			),
 		),
-		'oa' => array(
-			'name' => 'Online activities',
+		'oa'       => array(
+			'name'    => 'Online activities',
 			'filters' => array(
 				//'oatag' => 'Online activity tag',  //OA cannot be tagged currently
 				'templatetag' => 'Template tag',
-				'category' => 'Category'
-			)
+				'category'    => 'Category',
+			),
 		),
 		'template' => array(
-			'name' => 'Catalogue',
+			'name'    => 'Catalogue',
 			'filters' => array(
-				'category' => 'Category', 
-				'delivery' => 'Delivery', 
-				'location' => 'Location', 
+				'category'    => 'Category',
+				'delivery'    => 'Delivery',
+				'location'    => 'Location',
 				'templatetag' => 'Tag',
-				'state' => 'State'
-			)
+				'state'       => 'State',
+			),
 		),
 		'schedule' => array(
-			'name' => 'Schedule',
+			'name'    => 'Schedule',
 			'filters' => array(
-				'category' => 'Category', 
-				'delivery' => 'Delivery', 
-				'location' => 'Location', 
+				'category'    => 'Category',
+				'delivery'    => 'Delivery',
+				'location'    => 'Location',
 				'templatetag' => 'Tag',
-				'state' => 'State'
-			)
-		)
+				'state'       => 'State',
+			),
+		),
 	);
 
 	/**
@@ -469,43 +537,43 @@ class Arlo_For_Wordpress {
 	 * @var      array
 	 */
 
-	public static  $available_page_filters = array(
+	public static $available_page_filters = array(
 		'upcoming' => array(
-			'name' => 'Upcoming',
+			'name'    => 'Upcoming',
 			'filters' => array(
-				'category' => 'Category', 
-				'location' => 'Location', 
-				'delivery' => 'Delivery', 
-				'eventtag' => 'Event tag', 
-				'templatetag' => 'Template tag', 
-			)
-		),
-		'oa' => array(
-			'name' => 'Online activities',
-			'filters' => array(
-				'category' => 'Category',
+				'category'    => 'Category',
+				'location'    => 'Location',
+				'delivery'    => 'Delivery',
+				'eventtag'    => 'Event tag',
 				'templatetag' => 'Template tag',
-			)
+			),
+		),
+		'oa'       => array(
+			'name'    => 'Online activities',
+			'filters' => array(
+				'category'    => 'Category',
+				'templatetag' => 'Template tag',
+			),
 		),
 		'template' => array(
-			'name' => 'Catalogue',
+			'name'    => 'Catalogue',
 			'filters' => array(
-				'category' => 'Category', 
-				'delivery' => 'Delivery', 
-				'location' => 'Location', 
+				'category'    => 'Category',
+				'delivery'    => 'Delivery',
+				'location'    => 'Location',
 				'templatetag' => 'Template tag',
-			)
+			),
 		),
 		'schedule' => array(
-			'name' => 'Schedule',
+			'name'    => 'Schedule',
 			'filters' => array(
-				'category' => 'Category', 
-				'delivery' => 'Delivery', 
-				'location' => 'Location', 
+				'category'    => 'Category',
+				'delivery'    => 'Delivery',
+				'location'    => 'Location',
 				'templatetag' => 'Template tag',
-			)
-		)
-	);	
+			),
+		),
+	);
 
 	/**
 	 * $page_filter_options: behaviour selector for page filters
@@ -515,10 +583,10 @@ class Arlo_For_Wordpress {
 	 * @var      array
 	 */
 
-    public static $page_filter_options = array(
+	public static $page_filter_options = array(
 		'showonly' => 'Hide all except',
-        'exclude' => 'Show all except', //phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude -- 'exclude' here is not for a sql query.
-    );	
+		'exclude'  => 'Show all except', //phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude -- 'exclude' here is not for a sql query.
+	);
 
 
 	/**
@@ -529,7 +597,7 @@ class Arlo_For_Wordpress {
 	 * @var      array
 	 */
 
-    public static $filter_labels = array();
+	public static $filter_labels    = array();
 	public static $filter_labels_v1 = array();
 
 
@@ -543,29 +611,25 @@ class Arlo_For_Wordpress {
 		// check for a proxy redirect request
 		add_action( 'wp', array( $this, 'redirect_proxy' ) );
 
-
 		self::arlo_add_custom_shortcodes();
 
 		// Register custom post types
-		add_action( 'init', 'arlo_register_custom_post_types');
-
-		// Add review notice
-		add_action( 'init', array( $this, 'arlo_add_review_message' ) );
+		add_action( 'init', 'arlo_register_custom_post_types' );
 
 		// Load public-facing style sheet and JavaScript.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
-		
 		// cron actions
-		add_filter( 'cron_schedules', array( $this, 'add_cron_schedules' ) ); 
-		add_action( 'arlo_scheduler', array( $this, 'cron_scheduler' ) );
-		
-		add_action( 'arlo_set_import', array( $this, 'cron_set_import' ) );
-		
+		// phpcs:ignore WordPress.WP.CronInterval.CronSchedulesInterval -- Registers the plugin's 5-minute scheduler safety-net interval for fragmented import recovery; scheduled public imports still use the configured cadence gate.
+		add_filter( 'cron_schedules', array( $this, 'add_cron_schedules' ) );
+		add_action( 'arlo_scheduler', array( $this, 'run_scheduler_queue' ), 10, 0 );
+
+		add_action( 'arlo_set_import', array( $this, 'maybe_enqueue_scheduled_import' ) );
+
 		//load custom css
 		add_action( 'wp_head', array( $this, 'load_custom_css' ) );
-		
+
 		//add canonical urls for the filtered lists
 		global $wp_version;
 		if ( version_compare( '4.6', $wp_version ) === 1 ) {
@@ -573,57 +637,54 @@ class Arlo_For_Wordpress {
 		}
 		add_filter( 'get_canonical_url', array( $this, 'wp_canonical_fix' ), 10, 2 );
 		add_filter( 'wpseo_canonical', array( $this, 'yoast_canonical_fix' ) );
-		
+
 		//add meta description
 		add_action( 'wp_head', array( $this, 'add_meta_description' ) );
-		
-		// GP: Check if the scheduled task is entered. If it does not exist set it. (This ensures it is in as long as the plugin is activated.)
-		if ( ! wp_next_scheduled('arlo_set_import')) {
-			wp_schedule_event( time(), 'minutes_30', 'arlo_set_import' );
+
+		// Schedule recurring automatic-sync checks while the plugin is active.
+		// New installations wait one full interval; an existing schedule is preserved.
+		if ( ! wp_next_scheduled( 'arlo_set_import' ) ) {
+			wp_schedule_event( time() + ( 30 * MINUTE_IN_SECONDS ), 'minutes_30', 'arlo_set_import' );
 		}
-		
 
 		// content and excerpt filters to hijack arlo registered post types
-		add_filter('the_content', 'arlo_the_content');
-	
-	
-		add_action( 'wp_ajax_arlo_dismissible_notice', array($this, 'dismissible_notice_callback'));
+		add_filter( 'the_content', 'arlo_the_content' );
 
-		add_action( 'wp_ajax_arlo_increment_review_notice_date', array($this, 'increment_review_notice_date'));
+		add_action( 'wp_ajax_arlo_dismissible_notice', array( $this, 'dismissible_notice_callback' ) );
 
-		add_action( 'wp_ajax_arlo_turn_off_send_data', array($this, 'turn_off_send_data_callback'));
-		
-		add_action( 'wp_ajax_arlo_dismiss_message', array($this, 'dismiss_message_callback'));
-		
-		add_action( 'wp_ajax_arlo_start_scheduler', array($this, 'start_scheduler_callback'));
-		
-		add_action( 'wp_ajax_arlo_get_task_info', array($this, 'arlo_get_task_info_callback'));
-		
-		add_action( 'wp_ajax_arlo_terminate_task', array($this, 'arlo_terminate_task_callback'));
-		
-		add_action( 'wp_ajax_arlo_get_last_import_log', array($this, 'arlo_get_last_import_log_callback'));
+		add_action( 'wp_ajax_arlo_set_powered_by', array( $this, 'set_powered_by_callback' ) );
+
+		add_action( 'wp_ajax_arlo_dismiss_message', array( $this, 'dismiss_message_callback' ) );
+
+		add_action( 'wp_ajax_arlo_start_scheduler', array( $this, 'handle_start_scheduler_ajax' ) );
+
+		add_action( 'wp_ajax_arlo_get_task_info', array( $this, 'arlo_get_task_info_callback' ) );
+
+		add_action( 'wp_ajax_arlo_terminate_task', array( $this, 'arlo_terminate_task_callback' ) );
+
+		add_action( 'wp_ajax_arlo_get_last_import_log', array( $this, 'arlo_get_last_import_log_callback' ) );
 
 		//load scheduler tasks
-		add_action( 'wp_ajax_arlo_run_scheduler', array( $this, 'run_scheduler' ) );
-		add_action( 'wp_ajax_nopriv_arlo_run_scheduler', array( $this, 'run_scheduler' ) );
+		add_action( 'wp_ajax_arlo_run_scheduler', array( $this, 'handle_scheduler_loopback_request' ) );
+		add_action( 'wp_ajax_nopriv_arlo_run_scheduler', array( $this, 'handle_scheduler_loopback_request' ) );
 
 		add_action( 'wp_ajax_arlo_import_callback', array( $this, 'import_callback' ) );
 		add_action( 'wp_ajax_nopriv_arlo_import_callback', array( $this, 'import_callback' ) );
 
-		add_action( 'wp_ajax_arlo_check_page_shortcode', array($this, 'check_page_shortcode_callback') );
-		add_action( 'save_post_page', array($this, 'invalidate_shortcode_check_cache') );
-		add_action( 'transition_post_status', array($this, 'invalidate_shortcode_check_cache_on_status_change'), 10, 3 );
-		add_action( 'before_delete_post', array($this, 'invalidate_shortcode_check_cache_on_delete'), 10, 2 );
+		add_action( 'wp_ajax_arlo_check_page_shortcode', array( $this, 'check_page_shortcode_callback' ) );
+		add_action( 'save_post_page', array( $this, 'invalidate_shortcode_check_cache' ) );
+		add_action( 'transition_post_status', array( $this, 'invalidate_shortcode_check_cache_on_status_change' ), 10, 3 );
+		add_action( 'before_delete_post', array( $this, 'invalidate_shortcode_check_cache_on_delete' ), 10, 2 );
 
 		// the_post action - allows us to inject Arlo-specific data as required
 		// consider this later
 		//add_action( 'the_posts', array( $this, 'the_posts_action' ) );
-		
-		add_action( 'init', 'arlo_set_search_redirect');
-		
-		add_action( 'wp', 'arlo_set_region_redirect');
 
-		\ArloTraining\Shortcodes\Shortcodes::init(); 
+		add_action( 'init', 'arlo_set_search_redirect' );
+
+		add_action( 'wp', 'arlo_set_region_redirect' );
+
+		\ArloTraining\Shortcodes\Shortcodes::init();
 	}
 
 	/**
@@ -632,7 +693,7 @@ class Arlo_For_Wordpress {
 	 * @since     2.5
 	 *
 	 * @return    null
-	 */	
+	 */
 
 	public function import_callback() {
 		// Treat the callback as a forced manual import so the soft gates (user_import_enabled
@@ -640,27 +701,57 @@ class Arlo_For_Wordpress {
 		// sent to the Arlo platform (which requires passing the gate at request time), the
 		// resulting callback must be allowed to complete; swallowing it would orphan the task.
 		// The hard system-requirements gate (arlo_import_disabled) still applies.
-		if (!self::is_import_enabled(true)) return;
+		if ( ! self::is_import_enabled( true ) ) {
+			return;
+		}
 		$this->get_importer()->callback();
-	}	
+	}
 
 	/**
-	 * Run the scheduler action
+	 * Handles the `arlo_run_scheduler` AJAX loopback request.
 	 *
-	 * @since     2.4.1
+	 * Verifies the request, optionally
+	 * applies the site's configured pacing delay when scheduler work appears
+	 * to be waiting, then services the scheduler queue and ends the request.
 	 *
-	 * @return    null
+	 * Registered for both authenticated and anonymous requests (a valid
+	 * nonce is required either way), since this is the target the scheduler
+	 * re-triggers itself with in the background. It can also process tasks
+	 * created by admin-triggered sync actions.
+	 *
+	 * Remarks:
+	 * - The configured `arlo_settings['sleep_between_import_tasks']` value is
+	 *   read and clamped first (cheap, no DB query beyond the cached option).
+	 *   Only when that clamped value is greater than zero are the scheduler
+	 *   state checks (`Scheduler::has_available_task_slot()`,
+	 *   `Scheduler::is_import_running()`, `Scheduler::has_waiting_task()`)
+	 *   evaluated, so a site with no pacing delay configured skips those
+	 *   extra queries on every request. Those checks only guard the sleep,
+	 *   not `run_scheduler_queue()` itself — a request that will do no import work
+	 *   skips the sleep instead of holding a PHP-FPM worker for its duration,
+	 *   but cleanup still runs via `run_scheduler_queue()` on every request.
+	 * - The clamp is enforced at read time (not just at admin-settings save
+	 *   time) against `Scheduler::MAX_SLEEP_BETWEEN_TASKS_SECONDS` — a small
+	 *   compatibility delay, not a storm-control mechanism.
+	 * - Work is actually performed by `run_scheduler_queue()`.
+	 *
+	 * @since     5.2.0 Renamed from run_scheduler().
+	 *
+	 * @return    void Always terminates the request via `wp_die()`; never returns to the caller.
 	 */
-	public function run_scheduler() {
-		session_write_close();
+	public function handle_scheduler_loopback_request() {
 		check_ajax_referer( 'arlo_import', 'nonce' );
 
-		//avoid too many sql connections because of the async tasks
-		$settings = get_option('arlo_settings');
-		if (!empty($settings['sleep_between_import_tasks']) && is_numeric($settings['sleep_between_import_tasks'])) 
-			sleep($settings['sleep_between_import_tasks']); 
-		
-		$this->cron_scheduler();
+		// Guard only the compatibility sleep; run_scheduler_queue() still handles recovery cleanup.
+		$sleep_seconds = $this->get_pacing_sleep_seconds();
+		if ( $sleep_seconds > 0 ) {
+			$scheduler = $this->get_scheduler();
+			if ( $scheduler->has_available_task_slot() && ! $scheduler->is_import_running() && $scheduler->has_waiting_task() ) {
+				$this->pace_sleep( $sleep_seconds );
+			}
+		}
+
+		$this->run_scheduler_queue( 'self-kick' );
 		wp_die();
 	}
 
@@ -686,7 +777,7 @@ class Arlo_For_Wordpress {
 
 		// If the single instance hasn't been set, set it now.
 		if ( null == self::$instance ) {
-			self::$instance = new self;
+			self::$instance = new self();
 		}
 
 		return self::$instance;
@@ -703,11 +794,11 @@ class Arlo_For_Wordpress {
 	 *                                       activated on an individual blog.
 	 */
 	public static function activate( $network_wide ) {
-		$plugin = Arlo_For_Wordpress::get_instance();
+		$plugin = self::get_instance();
 
 		if ( function_exists( 'is_multisite' ) && is_multisite() ) {
 
-			if ( $network_wide  ) {
+			if ( $network_wide ) {
 
 				// Get all blog ids
 				$blog_ids = $plugin->get_blog_ids();
@@ -723,11 +814,9 @@ class Arlo_For_Wordpress {
 			} else {
 				$plugin->single_activate();
 			}
-
 		} else {
 			$plugin->single_activate();
 		}
-
 	}
 
 	/**
@@ -741,7 +830,7 @@ class Arlo_For_Wordpress {
 	 *                                       deactivated on an individual blog.
 	 */
 	public static function deactivate( $network_wide ) {
-		$plugin = Arlo_For_Wordpress::get_instance();
+		$plugin = self::get_instance();
 
 		if ( function_exists( 'is_multisite' ) && is_multisite() ) {
 
@@ -762,11 +851,9 @@ class Arlo_For_Wordpress {
 			} else {
 				$plugin->single_deactivate();
 			}
-
 		} else {
 			$plugin->single_deactivate();
 		}
-
 	}
 
 	/**
@@ -785,7 +872,6 @@ class Arlo_For_Wordpress {
 		switch_to_blog( $blog_id );
 		$this->single_activate();
 		restore_current_blog();
-
 	}
 
 	/**
@@ -800,60 +886,40 @@ class Arlo_For_Wordpress {
 	 */
 	private function get_blog_ids() {
 		// get_sites only exsit in multisite enviroment.
-		if (function_exists('get_sites')) {
-			$sites = get_sites(array(
-				'archived'  => 0,
-				'spam'      => 0,
-				'deleted'   => 0,
-				'fields'    => 'ids',
-			));
-			return array_map('strval', $sites);
+		if ( function_exists( 'get_sites' ) ) {
+			$sites = get_sites(
+				array(
+					'archived' => 0,
+					'spam'     => 0,
+					'deleted'  => 0,
+					'fields'   => 'ids',
+				)
+			);
+			return array_map( 'strval', $sites );
 		} else {
 			return array();
 		}
 	}
-	
-	
-	/**
-	 * Send log to Arlo
-	 *
-	 * @since     2.4
-	 *
-	 * @return    null
-	 */	
-	
 
-	public function send_log_to_arlo($message = '') {	
-		$client = $this->get_api_client();		
-		$last_import = $this->get_importer()->get_last_import_date();
-		
-		try {
-			$log = Logger::build_log_csv_string(1000);
-			$response = $client->WPLogError()->sendLog($message, $last_import, $log);
-		} catch (\Exception $e) {
-			Logger::log($e->getMessage());
-		}
-	}		
 
-	
 	/**
 	 * Check the plugin version on bulk update
 	 *
 	 * @since     2.4
 	 *
 	 * @return    null
-	 */	
-	
+	 */
+
 	public static function bulk_plugin_updater( $upgrader_object, $data ) {
-		if ($data['action'] == 'update' && $data['type'] == 'plugin' ) {
-			if (!empty($data['plugins'])){
-				foreach($data['plugins'] as $each_plugin){
-					if (basename($each_plugin) == 'arlo-for-wordpress.php'){
-						Arlo_For_Wordpress::check_plugin_version();
+		if ( $data['action'] == 'update' && $data['type'] == 'plugin' ) {
+			if ( ! empty( $data['plugins'] ) ) {
+				foreach ( $data['plugins'] as $each_plugin ) {
+					if ( basename( $each_plugin ) == 'arlo-for-wordpress.php' ) {
+						self::check_plugin_version();
 					}
 				}
-			} else if (empty($data['plugin']) && basename($each_plugin) == 'arlo-for-wordpress.php'){
-				Arlo_For_Wordpress::check_plugin_version();
+			} elseif ( empty( $data['plugin'] ) && basename( $each_plugin ) == 'arlo-for-wordpress.php' ) {
+				self::check_plugin_version();
 			}
 		}
 	}
@@ -873,39 +939,42 @@ class Arlo_For_Wordpress {
 	}
 
 	/**
-	 * Check the version of the plugin
+	 * Runs plugin-version migrations and then validates the resulting schema hash.
+	 *
+	 * Versioned migrations are the graceful upgrade path. `ensure_consistent_db_schema()`
+	 * only runs after them and should act as a last-resort repair for unexpected drift.
 	 *
 	 * @since     2.4
 	 *
-	 * @return    null
+	 * @return    void
 	 */
 	public static function check_plugin_version() {
-		$plugin = Arlo_For_Wordpress::get_instance();
+		$plugin = self::get_instance();
 
 		$plugin_version = $plugin->get_version_handler()->get_current_installed_version();
-		
-		if (!empty($plugin_version)) {
-            $import_id  = get_option('arlo_import_id',"");
+
+		if ( ! empty( $plugin_version ) ) {
+			$import_id   = get_option( 'arlo_import_id', "" );
 			$last_import = $plugin->get_importer()->get_last_import_date();
-			
+
 			//check system requirements and disable the import
-			if (!SystemRequirements::overall_check()) {
+			if ( ! SystemRequirements::overall_check() ) {
 				update_option( 'arlo_import_disabled', '1' );
 			} else {
 				update_option( 'arlo_import_disabled', '0' );
 				update_option( 'arlo_plugin_disabled', '0' );
-			}			
-            
-            if (empty($import_id)) {
-                if (empty($last_import)) {
-                    $last_import = gmdate("Y");
-                }
-                $plugin->get_importer()->set_import_id(gmdate("Y", strtotime($last_import)));
-            }
+			}
 
-			if ($plugin_version != VersionHandler::VERSION) {
-				$plugin->get_version_handler()->run_update($plugin_version);
-				
+			if ( empty( $import_id ) ) {
+				if ( empty( $last_import ) ) {
+					$last_import = gmdate( "Y" );
+				}
+				$plugin->get_importer()->set_import_id( gmdate( "Y", strtotime( $last_import ) ) );
+			}
+
+			if ( $plugin_version != VersionHandler::VERSION ) {
+				$plugin->get_version_handler()->run_update( $plugin_version );
+
 				$plugin->get_schema_manager()->ensure_consistent_db_schema();
 			}
 		} else {
@@ -914,14 +983,13 @@ class Arlo_For_Wordpress {
 			$plugin->get_version_handler()->set_installed_version();
 
 			//check system requirements and disable the plugin/import
-			if (!SystemRequirements::overall_check()) {
+			if ( ! SystemRequirements::overall_check() ) {
 				update_option( 'arlo_plugin_disabled', '1' );
 				update_option( 'arlo_import_disabled', '1' );
-			} 
+			}
 		}
-
 	}
-	
+
 
 	/**
 	 * Fired for each blog when the plugin is activated.
@@ -941,84 +1009,19 @@ class Arlo_For_Wordpress {
 
 		// must happen before adding pages
 		$this->set_default_options();
-		
-		// run import every 15 minutes
-		Logger::log("Plugin activated");
 
-		// set date to show review notice
-		self::set_review_notice_date("+7 day");
+		// run import every 15 minutes
+		Logger::log( "Plugin activated" );
 
 		// now add pages
 		$add_result = self::add_pages();
 		self::assign_posts_page_defaults( $add_result['pages'] );
 
-		update_option('arlo_plugin_version', VersionHandler::VERSION);
+		update_option( 'arlo_plugin_version', VersionHandler::VERSION );
 
-		if (!SystemRequirements::overall_check()) {
+		if ( ! SystemRequirements::overall_check() ) {
 			update_option( 'arlo_plugin_disabled', '1' );
 			update_option( 'arlo_import_disabled', '1' );
-		} 		
-
-		//load demo data
-		$settings = get_option('arlo_settings');
-		if (empty($settings['platform_name'])) {
-			$plugin = self::get_instance();
-			$plugin->load_demo();
-			do_action('arlo_scheduler');
-		}
-	}
-
-
-	/**
-	 * Set the date to show the review notice
-	 *
-	 * @since    3.6.0
-	 *
-	 */	
-	public function set_review_notice_date($increment) {
-		$date = \DateTime::createFromFormat('U', strtotime($increment, time()))->format("Y-m-d H:i:s");
-		update_option('arlo_review_notice_date',$date);
-	}
-
-
-	/**
-	 * Increment the date to show the review notice
-	 *
-	 * @since    3.6.0
-	 *
-	 */	
-	public function increment_review_notice_date() {
-		$nonce = \ArloTraining\Utilities::filter_string_polyfill(INPUT_POST, 'nonce');
-		if(empty($nonce) || !wp_verify_nonce($nonce, $this->plugin_slug . '-arlo-for-wordpress-script')) {
-			wp_die();
-		}
-		if (!current_user_can('manage_options')) {
-			wp_die();
-		}
-		self::set_review_notice_date("+1 month");
-		$this->get_message_handler()->delete_messages('review');
-	}
-
-
-	/**
-	 * Add a review message
-	 *
-	 * @since    3.6.0
-	 *
-	 */	
-	public function arlo_add_review_message() {
-		$review_notice_date = get_option('arlo_review_notice_date');
-
-		if (time() >= strtotime($review_notice_date) && $this->get_message_handler()->get_message_by_type_count('review', true) == 0) {
-			$message = "<p>
-				It's great to see that you've been using the <strong>Arlo for WordPress</strong> plugin for a while now. Hopefully you're happy with it! If so, would you consider leaving a positive review? It really helps to support the plugin and helps others to discover it too!
-			</p>
-			<p>
-				<a href='https://wordpress.org/support/plugin/arlo-training-and-event-management-system/reviews/' target='_blank' class='arlo-review-option'>Sure, I'd love to!</a> &#8226; <a href='#' target='_blank' class='arlo-review-option notice-dismiss-custom'>No thanks</a> &#8226; <a href='https://support.arlo.co/hc/en-gb/requests/new' target='_blank' class='arlo-review-option'>I actually need some help</a> &#8226; <a href='#' target='_blank' class='arlo-review-option notice-ask-later'>Ask me later</a>
-			</p>
-			";
-
-			$this->get_message_handler()->set_message('review', '', $message, true);
 		}
 	}
 
@@ -1028,22 +1031,22 @@ class Arlo_For_Wordpress {
 	 *
 	 * @since    3.0.0
 	 *
-	 */	
+	 */
 	public function set_default_theme() {
-		$theme_id = get_option('arlo_theme', '');
+		$theme_id = get_option( 'arlo_theme', '' );
 
 		//set default theme
-		if (empty($theme_id)) {
-			$theme_manager = $this->get_theme_manager();	
+		if ( empty( $theme_id ) ) {
+			$theme_manager  = $this->get_theme_manager();
 			$theme_settings = $theme_manager->get_themes_settings();
 
-			$theme_id = Arlo_For_Wordpress::DEFAULT_THEME;
+			$theme_id = self::DEFAULT_THEME;
 
-			$stored_themes_settings[$theme_id] = $theme_settings[$theme_id];
-			$stored_themes_settings[$theme_id]->templates = $theme_manager->load_default_templates($theme_id);
+			$stored_themes_settings[ $theme_id ]            = $theme_settings[ $theme_id ];
+			$stored_themes_settings[ $theme_id ]->templates = $theme_manager->load_default_templates( $theme_id );
 
-			update_option('arlo_themes_settings', $stored_themes_settings, 1);
-			update_option('arlo_theme', $theme_id, 1);
+			update_option( 'arlo_themes_settings', $stored_themes_settings, 1 );
+			update_option( 'arlo_theme', $theme_id, 1 );
 		}
 	}
 
@@ -1054,47 +1057,63 @@ class Arlo_For_Wordpress {
 	 *
 	 */
 	private function set_default_options() {
-		$settings = get_option('arlo_settings');
-		
-		if (is_array($settings) && count($settings)) {
-			//add new templates			
-			foreach(self::get_templates() as $id => $template) {
-				if (empty($settings['templates'][$id]['html'])) {
-					$settings['templates'][$id] = array(
-						'html' => arlo_get_template($id)
+		$settings = get_option( 'arlo_settings' );
+
+		if ( is_array( $settings ) && count( $settings ) ) {
+			//add new templates
+			foreach ( self::get_templates() as $id => $template ) {
+				if ( empty( $settings['templates'][ $id ]['html'] ) ) {
+					$settings['templates'][ $id ] = array(
+						'html' => arlo_get_template( $id ),
 					);
 				}
 			}
 
 			// Backfill deployment_mode on activation for installs that pre-date 5.1.0.
 			// Auto-updates are covered by the do_update('5.1.0') migration in VersionHandler.
-			if (!isset($settings['deployment_mode'])) {
-				$settings['deployment_mode'] = self::get_deployment_mode_default($settings['platform_name'] ?? '');
+			if ( ! isset( $settings['deployment_mode'] ) ) {
+				$settings['deployment_mode'] = self::get_deployment_mode_default( $settings['platform_name'] ?? '' );
+			}
+
+			// A settings row created earlier in activation (for example the Custom CSS state) lacks the
+			// new-install defaults. Settings readers expect a platform_name key, and a new install keeps its
+			// settings on uninstall, which activation used to guarantee.
+			if ( ! isset( $settings['platform_name'] ) ) {
+				$settings['platform_name'] = '';
+			}
+			if ( ! isset( $settings['keep_settings'] ) && empty( $settings['platform_name'] ) ) {
+				$settings['keep_settings'] = '1';
 			}
 
 			// Backfill post_types when missing or corrupt — can happen when arlo_settings was
 			// written by a partial or legacy install that pre-dates this key, or when a
 			// re-activation finds a non-empty option that never had post_types written into it.
-			if (!isset($settings['post_types']) || !is_array($settings['post_types'])) {
+			if ( ! isset( $settings['post_types'] ) || ! is_array( $settings['post_types'] ) ) {
 				$settings['post_types'] = self::$post_types;
 			}
-			
-			update_option('arlo_settings', $settings);
-			
+
+			$settings['log_retention_max_rows']                   = Logger::normalize_retention_max_rows( $settings['log_retention_max_rows'] ?? null );
+			$settings[ Logger::DIAGNOSTIC_VERBOSITY_SETTING_KEY ] = Logger::normalize_diagnostic_level( $settings[ Logger::DIAGNOSTIC_VERBOSITY_SETTING_KEY ] ?? null );
+
+			update_option( 'arlo_settings', $settings );
+
 		} else {
 			$default_settings = array(
-				'platform_name' => '',
-				'post_types'    => self::$post_types,
-				'templates'     => array()
+				'platform_name'                          => '',
+				'keep_settings'                          => '1',
+				'post_types'                             => self::$post_types,
+				'templates'                              => array(),
+				'log_retention_max_rows'                 => Logger::LOG_RETENTION_DEFAULT_MAX_ROWS,
+				Logger::DIAGNOSTIC_VERBOSITY_SETTING_KEY => Logger::DIAGNOSTIC_VERBOSITY_OFF,
 			);
-			
-			foreach(self::get_templates() as $id => $template) {
-				$default_settings['templates'][$id] = array(
-					'html' => arlo_get_template($id)
+
+			foreach ( self::get_templates() as $id => $template ) {
+				$default_settings['templates'][ $id ] = array(
+					'html' => arlo_get_template( $id ),
 				);
-			}		
-			
-			add_option('arlo_settings', $default_settings);			
+			}
+
+			add_option( 'arlo_settings', $default_settings );
 		}
 	}
 
@@ -1106,11 +1125,16 @@ class Arlo_For_Wordpress {
 	private function single_deactivate() {
 		// flush permalinks upon plugin deactivation
 		flush_rewrite_rules();
-		
+
 		wp_clear_scheduled_hook( 'arlo_scheduler' );
+		// wp_clear_scheduled_hook() is argument-sensitive; clear scheduler-owned
+		// single-event wakeups explicitly for consistency with Scheduler::clear_cron().
+		wp_clear_scheduled_hook( 'arlo_scheduler', \ArloTraining\Scheduler::RETRY_BACKOFF_CRON_ARGS );
+		wp_clear_scheduled_hook( 'arlo_scheduler', \ArloTraining\Scheduler::IMMEDIATE_FALLBACK_CRON_ARGS );
+		wp_clear_scheduled_hook( 'arlo_scheduler', \ArloTraining\Scheduler::LOCK_BUSY_RETRY_CRON_ARGS );
 		wp_clear_scheduled_hook( 'arlo_set_import' );
 		wp_clear_scheduled_hook( 'arlo_import' );
-		
+
 		$this->delete_running_tasks();
 	}
 
@@ -1122,7 +1146,7 @@ class Arlo_For_Wordpress {
 	 */
 	public function enqueue_styles() {
 
-		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-tingle', plugins_url( '../public/custom-assets/tingle/tingle.css', __FILE__), [], VersionHandler::VERSION );
+		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-tingle', plugins_url( '../public/custom-assets/tingle/tingle.css', __FILE__ ), [], VersionHandler::VERSION );
 
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css?20170424', __FILE__ ), [], VersionHandler::VERSION );
 
@@ -1130,34 +1154,35 @@ class Arlo_For_Wordpress {
 
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-darktooltip', plugins_url( 'assets/css/libs/darktooltip.min.css', __FILE__ ), [], VersionHandler::VERSION );
 
-		wp_enqueue_style( $this->plugin_slug .'-arlo-icons8', plugins_url( '../admin/assets/fonts/icons8/Arlo-WP.css', __FILE__ ), [], VersionHandler::VERSION );
+		wp_enqueue_style( $this->plugin_slug . '-arlo-icons8', plugins_url( '../admin/assets/css/arlo-icons.css', __FILE__ ), [], VersionHandler::VERSION );
 
 		// Enqueue theme assets from the current plugin path to avoid stale stored URLs.
 		$theme_settings = $this->get_theme_settings_for_assets();
-		
-		if (!empty($theme_settings)) {
+
+		if ( ! empty( $theme_settings ) ) {
 			//internal resources
-			if (isset($theme_settings->internalResources->stylesheets) && is_array($theme_settings->internalResources->stylesheets)) {
-				foreach ($theme_settings->internalResources->stylesheets as $key => $stylesheet) {
+			if ( isset( $theme_settings->internalResources->stylesheets ) && is_array( $theme_settings->internalResources->stylesheets ) ) {
+				foreach ( $theme_settings->internalResources->stylesheets as $key => $stylesheet ) {
 					wp_enqueue_style( $this->plugin_slug . '-theme-internal-stylesheet-' . $key, $stylesheet, [], VersionHandler::VERSION );
 				}
-			} 
+			}
 
 			//external resources
-			if (isset($theme_settings->externalResources->stylesheets) && is_array($theme_settings->externalResources->stylesheets)) {
-				foreach ($theme_settings->externalResources->stylesheets as $key => $stylesheet) {
-					wp_enqueue_style( $this->plugin_slug . '-theme-external-stylesheet-' . $key, plugins_url( $stylesheet, __FILE__), [], VersionHandler::VERSION );
+			if ( isset( $theme_settings->externalResources->stylesheets ) && is_array( $theme_settings->externalResources->stylesheets ) ) {
+				foreach ( $theme_settings->externalResources->stylesheets as $key => $stylesheet ) {
+					wp_enqueue_style( $this->plugin_slug . '-theme-external-stylesheet-' . $key, plugins_url( $stylesheet, __FILE__ ), [], VersionHandler::VERSION );
 				}
-			} 			
+			}
 		}
 
-		$customcss_load_type = get_option('arlo_customcss');
-		if ($customcss_load_type == 'file' && file_exists(plugin_dir_path( __FILE__ ) . 'assets/css/custom.css')) {
-			$customcss_timestamp = get_option('arlo_customcss_timestamp');
-			wp_enqueue_style( $this->plugin_slug .'-custom-styles', plugins_url( 'assets/css/custom.css', __FILE__ ), array(), $customcss_timestamp );		
-		}			
+		$settings = get_option( 'arlo_settings', [] );
+		$state    = \ArloTraining\CustomCss::resolve_state( is_array( $settings ) ? $settings : [] );
+		// Legacy mode only: links the pre-5.2.0 plugin-folder file until the site migrates; the plugin never writes it.
+		if ( \ArloTraining\CustomCss::links_legacy_file( $state ) ) {
+			wp_enqueue_style( $this->get_custom_css_style_handle(), plugins_url( 'assets/css/custom.css', __FILE__ ), [], get_option( 'arlo_customcss_timestamp', VersionHandler::VERSION ) );
+		}
 	}
-	
+
 	/**
 	 * Add canonical urls for the filtered lists (upcoming, category).
 	 * SEO compatibility
@@ -1165,79 +1190,79 @@ class Arlo_For_Wordpress {
 	 * @since    2.2.0
 	 */
 	public function add_canonical_urls() {
-		$page_id = get_query_var('page_id', '');
-		$obj = get_queried_object();
-		
-		$page_id = (empty($obj->ID) ? $page_id : $obj->ID);	
-		
+		$page_id = get_query_var( 'page_id', '' );
+		$obj     = get_queried_object();
+
+		$page_id = intval( empty( $obj->ID ) ? $page_id : $obj->ID );
+
 		$filter_enabled_page_ids = [];
-		$post_types_settings = self::get_post_types_settings();
-						
-		foreach($this::$available_filters as $page => $filters) {
-			if (!empty($post_types_settings[$page]['posts_page'])) {
-				$filter_enabled_page_ids[] = intval($post_types_settings[$page]['posts_page']);
-			}			
+		$post_types_settings     = self::get_post_types_settings();
+
+		foreach ( $this::$available_filters as $page => $filters ) {
+			if ( ! empty( $post_types_settings[ $page ]['posts_page'] ) ) {
+				$filter_enabled_page_ids[] = intval( $post_types_settings[ $page ]['posts_page'] );
+			}
 		}
-				
-		if (in_array($page_id, $filter_enabled_page_ids)) {
-			$url = get_home_url() . '/' .$obj->post_name;
+
+		if ( in_array( $page_id, $filter_enabled_page_ids, true ) ) {
+			$url = get_home_url() . '/' . $obj->post_name;
 			// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Reading GET parameters for URL construction, no state change.
 			//has to be the same order as in public.js to construct the same order
-			if (!empty($_GET['arlo-category'])) {
-				$url .= '/cat-' . sanitize_text_field(wp_unslash($_GET['arlo-category']));
-			}
-			
-			if (!empty($_GET['arlo-month'])) {
-				$url .= '/month-' . sanitize_text_field(wp_unslash($_GET['arlo-month']));
-			}
-			
-			if (!empty($_GET['arlo-location'])) {
-				$url .= '/location-' . sanitize_text_field(wp_unslash($_GET['arlo-location']));
+			if ( ! empty( $_GET['arlo-category'] ) ) {
+				$url .= '/cat-' . sanitize_text_field( wp_unslash( $_GET['arlo-category'] ) );
 			}
 
-			if (isset($_GET['arlo-delivery']) && is_numeric($_GET['arlo-delivery'])) {
-				$url .= '/delivery-' . intval($_GET['arlo-delivery']);
+			if ( ! empty( $_GET['arlo-month'] ) ) {
+				$url .= '/month-' . sanitize_text_field( wp_unslash( $_GET['arlo-month'] ) );
 			}
 
-			if (!empty($_GET['arlo-presenter'])) {
-				$url .= '/presenter-' . sanitize_text_field(wp_unslash($_GET['arlo-presenter']));
+			if ( ! empty( $_GET['arlo-location'] ) ) {
+				$url .= '/location-' . sanitize_text_field( wp_unslash( $_GET['arlo-location'] ) );
 			}
 
-			if (!empty($_GET['arlo-eventtag'])) {
-				if (is_numeric($_GET['arlo-eventtag'])) {
-					$tag = self::get_tag_by_id(sanitize_key($_GET['arlo-eventtag']));
-					if (!empty($tag['tag'])) {
+			if ( isset( $_GET['arlo-delivery'] ) && is_numeric( $_GET['arlo-delivery'] ) ) {
+				$url .= '/delivery-' . intval( $_GET['arlo-delivery'] );
+			}
+
+			if ( ! empty( $_GET['arlo-presenter'] ) ) {
+				$url .= '/presenter-' . sanitize_text_field( wp_unslash( $_GET['arlo-presenter'] ) );
+			}
+
+			if ( ! empty( $_GET['arlo-eventtag'] ) ) {
+				if ( is_numeric( $_GET['arlo-eventtag'] ) ) {
+					$tag = self::get_tag_by_id( sanitize_key( $_GET['arlo-eventtag'] ) );
+					if ( ! empty( $tag['tag'] ) ) {
 						$_GET['arlo-eventtag'] = $tag['tag'];
 					}
 				}
-				$url .= '/eventtag-' . sanitize_text_field(wp_unslash($_GET['arlo-eventtag']));
+				$url .= '/eventtag-' . sanitize_text_field( wp_unslash( $_GET['arlo-eventtag'] ) );
 			}
-			
-			if (!empty($_GET['arlo-oatag'])) {
-				if (is_numeric($_GET['arlo-oatag'])) {
-					$tag = self::get_tag_by_id(sanitize_key($_GET['arlo-oatag']));
-					if (!empty($tag['tag'])) {
+
+			if ( ! empty( $_GET['arlo-oatag'] ) ) {
+				if ( is_numeric( $_GET['arlo-oatag'] ) ) {
+					$tag = self::get_tag_by_id( sanitize_key( $_GET['arlo-oatag'] ) );
+					if ( ! empty( $tag['tag'] ) ) {
 						$_GET['arlo-oatag'] = $tag['tag'];
 					}
 				}
-				$url .= '/oatag-' . sanitize_text_field(wp_unslash($_GET['arlo-oatag']));
+				$url .= '/oatag-' . sanitize_text_field( wp_unslash( $_GET['arlo-oatag'] ) );
 			}
 
-			if (!empty($_GET['arlo-templatetag'])) {
-				if (is_numeric($_GET['arlo-templatetag'])) {
-					$tag = self::get_tag_by_id(sanitize_key($_GET['arlo-templatetag']));
-					if (!empty($tag['tag'])) {
+			if ( ! empty( $_GET['arlo-templatetag'] ) ) {
+				if ( is_numeric( $_GET['arlo-templatetag'] ) ) {
+					$tag = self::get_tag_by_id( sanitize_key( $_GET['arlo-templatetag'] ) );
+					if ( ! empty( $tag['tag'] ) ) {
 						$_GET['arlo-templatetag'] = $tag['tag'];
-					}					
+					}
 				}
-			
-				$url .= '/templatetag-' . sanitize_text_field(wp_unslash($_GET['arlo-templatetag']));
+
+				$url .= '/templatetag-' . sanitize_text_field( wp_unslash( $_GET['arlo-templatetag'] ) );
 			}
 			// phpcs:enable WordPress.Security.NonceVerification.Recommended
-			echo '<link rel="canonical" href="' . esc_url($url) . '/" />';
+			echo '<link rel="canonical" href="' . esc_url( $url ) . '/" />';
 		}
-	}	
-	
+	}
+
 	/**
 	 * Add meta descriptions for the template
 	 * SEO compatibility
@@ -1245,83 +1270,124 @@ class Arlo_For_Wordpress {
 	 * @since    2.2.0
 	 */
 	public function add_meta_description() {
-		$settings = get_option('arlo_settings');
-		$page_id = get_query_var('page_id', '');
-		$obj = get_queried_object();
+		$settings = get_option( 'arlo_settings' );
+		$page_id  = get_query_var( 'page_id', '' );
+		$obj      = get_queried_object();
 
-		$page_id = (empty($obj->ID) ? $page_id : $obj->ID);
-		
-		if (!empty($obj->post_type) && $obj->post_type == 'arlo_event' && !empty($obj->post_content)) {
-			$desc = wp_strip_all_tags($obj->post_content);
+		$page_id = ( empty( $obj->ID ) ? $page_id : $obj->ID );
+
+		if ( ! empty( $obj->post_type ) && $obj->post_type == 'arlo_event' && ! empty( $obj->post_content ) ) {
+			// Saved post content is entity-escaped by core, so decode it once here; the tag below escapes it again.
+			$desc = html_entity_decode( wp_strip_all_tags( $obj->post_content ), ENT_QUOTES, 'UTF-8' );
 		} else {
-			$category = $this->fetch_category($page_id);
-			if (!empty($category) && !empty($category->c_header)) {
-				$desc = wp_strip_all_tags($category->c_header);
+			$category = $this->fetch_category( $page_id );
+			if ( ! empty( $category ) && ! empty( $category->c_header ) ) {
+				$desc = wp_strip_all_tags( $category->c_header );
 			}
 		}
 
-		if (!empty($desc)) {
+		if ( ! empty( $desc ) ) {
 			$ellipsis = '';
-			if (strlen($desc) >= 150) {
-				$end_pos = strpos($desc, " ", 140);
+			if ( strlen( $desc ) >= self::META_DESCRIPTION_MAX_LENGTH ) {
+				$end_pos  = strpos( $desc, " ", self::META_DESCRIPTION_MAX_LENGTH - 10 );
 				$ellipsis = '...';
 			} else {
-				$end_pos = strlen($desc);
+				$end_pos = strlen( $desc );
 			}
-			$desc = substr($desc, 0, $end_pos) . $ellipsis;
-			
-			echo '<meta name="description" content="' . esc_attr(htmlspecialchars($desc, ENT_COMPAT, 'UTF-8')) . '">';
+			$desc = substr( $desc, 0, $end_pos ) . $ellipsis;
+
+			echo '<meta name="description" content="' . esc_attr( htmlspecialchars( $desc, ENT_COMPAT, 'UTF-8' ) ) . '">';
 		}
 	}
 
-	private function fetch_category($page_id) {
-		$filter_settings = get_option('arlo_page_filter_settings', []);
+	private function fetch_category( $page_id ) {
+		$filter_settings = get_option( 'arlo_page_filter_settings', [] );
 
-		$page = get_post($page_id);
-		if (!$page) return;
-		
+		$page = get_post( $page_id );
+		if ( ! $page ) {
+			return;
+		}
+
 		$template_name = $page->post_name;
 
 		//too early to call get_selected_categories()
 		$stored_atts = [];
-		\ArloTraining\Utilities::set_base_filter($template_name, 'category', $filter_settings, [], $stored_atts, '\ArloTraining\Utilities::convert_string_to_int_array');
-		\ArloTraining\Utilities::set_base_filter($template_name, 'category', $filter_settings, [], $stored_atts, '\ArloTraining\Utilities::convert_string_to_int_array', null, true);
-		$category_slug_or_array = \ArloTraining\Utilities::get_att_string('category', $stored_atts);
+		\ArloTraining\Utilities::set_base_filter( $template_name, 'category', $filter_settings, [], $stored_atts, '\ArloTraining\Utilities::convert_string_to_int_array' );
+		\ArloTraining\Utilities::set_base_filter( $template_name, 'category', $filter_settings, [], $stored_atts, '\ArloTraining\Utilities::convert_string_to_int_array', null, true );
+		$category_slug_or_array = \ArloTraining\Utilities::get_att_string( 'category', $stored_atts );
 
 		$category_id = 0;
-		if (is_array($category_slug_or_array)) {
-			if (isset($category_slug_or_array[0])) {
+		if ( is_array( $category_slug_or_array ) ) {
+			if ( isset( $category_slug_or_array[0] ) ) {
 				$category_id = $category_slug_or_array[0];
 			}
 		} else {
-			$category_id = intval($category_slug_or_array);
+			$category_id = intval( $category_slug_or_array );
 		}
 
-		if (empty($category_id)) {
+		if ( empty( $category_id ) ) {
 			return '';
 		}
 
 		$import_id = $this->get_importer()->get_current_import_id();
-		return \ArloTraining\Entities\Categories::get([ 'id' => intval($category_id)], 1, $import_id);
+		return \ArloTraining\Entities\Categories::get( [ 'id' => intval( $category_id ) ], 1, $import_id );
 	}
-	
-	
-	
+
+
+
 	/**
-	 * Register and enqueue public-facing style sheet.
+	 * Prints saved Custom CSS after the head stylesheets for legacy sites that do not link the old file.
 	 *
 	 * @since    2.2.0
 	 */
 	public function load_custom_css() {
-		$customcss_load_type = get_option('arlo_customcss');
-				
-		if ($customcss_load_type !== 'file' || !file_exists(plugin_dir_path( __FILE__ ) . 'assets/css/custom.css')) {
-			$settings = get_option('arlo_settings');
-			
-			if (!empty($settings['customcss'])) {
-				echo "\n<style type=\"text/css\">\n" , wp_strip_all_tags($settings['customcss']) , "\n</style>\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Custom CSS output. Content is sanitized using wp_strip_all_tags().
-			}
+		$settings = get_option( 'arlo_settings', [] );
+		$state    = \ArloTraining\CustomCss::resolve_state( is_array( $settings ) ? $settings : [] );
+		// Legacy mode only: a migrated or disabled site prints nothing, because its CSS lives in Additional CSS.
+		if ( \ArloTraining\CustomCss::prints_saved_css( $state ) && $this->register_custom_css_style() ) {
+			wp_print_styles( $this->get_custom_css_style_handle() );
 		}
+	}
+
+	/**
+	 * Registers the stored Custom CSS as an inline style on the Custom CSS handle.
+	 *
+	 * The CSS is printed as stored, with any closing style tag escaped in place. Like core's Additional
+	 * CSS, it is not otherwise parsed or filtered.
+	 *
+	 * @return bool Whether there is Custom CSS to output.
+	 */
+	private function register_custom_css_style() {
+		$handle = $this->get_custom_css_style_handle();
+		// The handle is only registered with non-empty CSS, so a registered handle means there is output.
+		if ( wp_style_is( $handle, 'registered' ) ) {
+			return true;
+		}
+
+		$settings = get_option( 'arlo_settings' );
+
+		if ( ! is_array( $settings ) || ! isset( $settings['customcss'] ) || ! is_string( $settings['customcss'] ) ) {
+			return false;
+		}
+
+		$custom_css = \ArloTraining\CustomCss::prepare_for_output( $settings['customcss'] );
+		if ( '' === trim( $custom_css ) ) {
+			return false;
+		}
+
+		wp_register_style( $handle, false, [], VersionHandler::VERSION );
+		wp_add_inline_style( $handle, $custom_css );
+
+		return true;
+	}
+
+	/**
+	 * Returns the style handle that carries stored Custom CSS.
+	 *
+	 * @return string
+	 */
+	private function get_custom_css_style_handle() {
+		return $this->plugin_slug . '-custom-styles';
 	}
 
 	/**
@@ -1330,40 +1396,44 @@ class Arlo_For_Wordpress {
 	 * @since    1.0.0
 	 */
 	public function enqueue_scripts() {
-		
-		wp_enqueue_script( $this->plugin_slug . '-plugin-script-tingle', plugins_url( '../public/custom-assets/tingle/tingle.min.js' , __FILE__), [], VersionHandler::VERSION, false );
-		
+
+		wp_enqueue_script( $this->plugin_slug . '-plugin-script-tingle', plugins_url( '../public/custom-assets/tingle/tingle.min.js', __FILE__ ), [], VersionHandler::VERSION, false );
+
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script', plugins_url( 'assets/js/public.js?20170424', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, false );
-		
+
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script-darktooltip', plugins_url( 'assets/js/libs/jquery.darktooltip.min.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, false );
-		
+
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script-cookie', plugins_url( 'assets/js/libs/js.cookie.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, false );
-		
-		wp_localize_script( $this->plugin_slug . '-plugin-script', 'objectL10n', array(
-			'showmoredates' => esc_html__( 'Show me more dates', 'arlo-training-and-event-management-system' ),
-		) );
+
+		wp_localize_script(
+			$this->plugin_slug . '-plugin-script',
+			'objectL10n',
+			array(
+				'showmoredates' => esc_html__( 'Show me more dates', 'arlo-training-and-event-management-system' ),
+			)
+		);
 		// Enqueue theme assets from the current plugin path to avoid stale stored URLs.
 		$theme_settings = $this->get_theme_settings_for_assets();
 
-		if (!empty($theme_settings)) {
+		if ( ! empty( $theme_settings ) ) {
 			//internal resources
-			if (isset($theme_settings->internalResources->javascripts) && is_array($theme_settings->internalResources->javascripts)) {
-				foreach ($theme_settings->internalResources->javascripts as $key => $script) {
+			if ( isset( $theme_settings->internalResources->javascripts ) && is_array( $theme_settings->internalResources->javascripts ) ) {
+				foreach ( $theme_settings->internalResources->javascripts as $key => $script ) {
 					wp_enqueue_script( $this->plugin_slug . '-theme-internal-script-' . $key, $script, array( 'jquery' ), VersionHandler::VERSION, false );
 				}
-			} 
+			}
 
 			//external resources
-			if (isset($theme_settings->externalResources->javascripts) && is_array($theme_settings->externalResources->javascripts)) {
-				foreach ($theme_settings->externalResources->javascripts as $key => $script) {
-					wp_enqueue_script( $this->plugin_slug . '-theme-external-script-' . $key, plugins_url( $script , __FILE__), [], VersionHandler::VERSION, true );
+			if ( isset( $theme_settings->externalResources->javascripts ) && is_array( $theme_settings->externalResources->javascripts ) ) {
+				foreach ( $theme_settings->externalResources->javascripts as $key => $script ) {
+					wp_enqueue_script( $this->plugin_slug . '-theme-external-script-' . $key, plugins_url( $script, __FILE__ ), [], VersionHandler::VERSION, true );
 				}
-			} 			
+			}
 		}
 	}
 
 	private function get_theme_settings_for_assets() {
-		$theme_id = get_option('arlo_theme');
+		$theme_id = get_option( 'arlo_theme' );
 		if ( ! is_string( $theme_id ) || '' === $theme_id || '.' === $theme_id || '..' === $theme_id || false !== strpos( $theme_id, '/' ) || false !== strpos( $theme_id, '\\' ) ) {
 			return null;
 		}
@@ -1376,7 +1446,7 @@ class Arlo_For_Wordpress {
 			return $theme_settings;
 		}
 
-		$stored_themes_settings = get_option('arlo_themes_settings', []);
+		$stored_themes_settings = get_option( 'arlo_themes_settings', [] );
 
 		if ( is_array( $stored_themes_settings ) && isset( $stored_themes_settings[ $theme_id ] ) && is_object( $stored_themes_settings[ $theme_id ] ) ) {
 			return $stored_themes_settings[ $theme_id ];
@@ -1384,171 +1454,220 @@ class Arlo_For_Wordpress {
 
 		return null;
 	}
-	
-	/**  Local Setter  */
-	public function __set($name, $value)
-    {
-        $this->data[$name] = $value;
-    }
-    
-    /**  Local Getter  */
-    public function __get($name)
-    {
-        if (array_key_exists($name, $this->data)) {
-            return $this->data[$name];
-        }
 
-        return null;
-    }         
-	
+	/**  Local Setter  */
+	public function __set( $name, $value ) {
+		$this->data[ $name ] = $value;
+	}
+
+	/**  Local Getter  */
+	public function __get( $name ) {
+		if ( array_key_exists( $name, $this->data ) ) {
+			return $this->data[ $name ];
+		}
+
+		return null;
+	}
+
+	/**
+	 * Clears cached services that are scoped to one PHP request.
+	 *
+	 * This is a request-boundary seam for integration tests that pump the
+	 * importer in one PHP process. It deliberately does not re-run the
+	 * constructor, register hooks, or clear persistent settings/options.
+	 *
+	 * @internal
+	 * @return void
+	 */
+	public function reset_request_scoped_services() {
+		foreach ( self::REQUEST_SCOPED_SERVICE_KEYS as $key ) {
+			unset( $this->data[ $key ] );
+		}
+	}
+
 	public function get_scheduler() {
-		if($scheduler = $this->__get('scheduler')) {
+		$scheduler = $this->__get( 'scheduler' );
+		if ( $scheduler ) {
 			return $scheduler;
 		}
-		
-		$scheduler = new Scheduler($this);
-		
-		$this->__set('scheduler', $scheduler);
-		
+
+		$scheduler = new Scheduler( $this );
+
+		$this->__set( 'scheduler', $scheduler );
+
 		return $scheduler;
 	}
 
 	public function get_theme_manager() {
-		if($theme_manager = $this->__get('theme_manager')) {
+		$theme_manager = $this->__get( 'theme_manager' );
+		if ( $theme_manager ) {
 			return $theme_manager;
 		}
-		
-		$theme_manager = new ThemeManager($this);
-		
-		$this->__set('theme_manager', $theme_manager);
-		
+
+		$theme_manager = new ThemeManager( $this );
+
+		$this->__set( 'theme_manager', $theme_manager );
+
 		return $theme_manager;
-	}	
+	}
 
 	public function get_importer() {
-		if($importer = $this->__get('importer')) {
+		$importer = $this->__get( 'importer' );
+		if ( $importer ) {
 			return $importer;
 		}
 
-		$settings = get_option('arlo_settings');
-		
-		$importer = new Importer($this->get_environment(), $this->get_message_handler(), $this->get_api_client(), $this->get_scheduler(), $this->get_importing_parts());
+		$settings = get_option( 'arlo_settings' );
 
-		if (!empty($settings['import_fragment_size'])) {
+		$importer = new Importer( $this->get_environment(), $this->get_message_handler(), $this->get_api_client(), $this->get_scheduler(), $this->get_importing_parts() );
+
+		if ( ! empty( $settings['import_fragment_size'] ) ) {
 			$importer->fragment_size = $settings['import_fragment_size'];
 		}
-		
-		$this->__set('importer', $importer);
-		
+
+		$this->__set( 'importer', $importer );
+
 		return $importer;
 	}
 
 	public function get_importing_parts() {
-		if($importing_parts = $this->__get('importing_parts')) {
+		$importing_parts = $this->__get( 'importing_parts' );
+		if ( $importing_parts ) {
 			return $importing_parts;
 		}
 
 		$importing_parts = new ImportingParts();
-		
-		$this->__set('importing_parts', $importing_parts);
-		
+
+		$this->__set( 'importing_parts', $importing_parts );
+
 		return $importing_parts;
 	}
 
 	public function get_environment() {
-		if($get_environment = $this->__get('get_environment')) {
+		$get_environment = $this->__get( 'get_environment' );
+		if ( $get_environment ) {
 			return $get_environment;
 		}
-		
+
 		$get_environment = new Environment();
-		
-		$this->__set('get_environment', $get_environment);
-		
+
+		$this->__set( 'get_environment', $get_environment );
+
 		return $get_environment;
-	}	
+	}
 
 	public function get_notice_handler() {
-		if($notice_handler = $this->__get('notice_handler')) {
+		$notice_handler = $this->__get( 'notice_handler' );
+		if ( $notice_handler ) {
 			return $notice_handler;
 		}
-		
-		$notice_handler = new NoticeHandler($this->get_message_handler(), $this->get_importer());
-		
-		$this->__set('notice_handler', $notice_handler);
-		
+
+		$notice_handler = new NoticeHandler( $this->get_message_handler(), $this->get_importer() );
+
+		$this->__set( 'notice_handler', $notice_handler );
+
 		return $notice_handler;
-	}		
-	
+	}
+
 	public function get_message_handler() {
-		if($message_handler = $this->__get('message_handler')) {
+		$message_handler = $this->__get( 'message_handler' );
+		if ( $message_handler ) {
 			return $message_handler;
 		}
-		
+
 		$message_handler = new MessageHandler();
-		
-		$this->__set('message_handler', $message_handler);
-		
+
+		$this->__set( 'message_handler', $message_handler );
+
 		return $message_handler;
-	}	
+	}
 
 	public function get_timezone_manager() {
-		if($timezone_manager = $this->__get('timezone_manager')) {
+		$timezone_manager = $this->__get( 'timezone_manager' );
+		if ( $timezone_manager ) {
 			return $timezone_manager;
 		}
-		
-		$timezone_manager = new TimeZoneManager($this);
-		
-		$this->__set('timezone_manager', $timezone_manager);
-		
+
+		$timezone_manager = new TimeZoneManager( $this );
+
+		$this->__set( 'timezone_manager', $timezone_manager );
+
 		return $timezone_manager;
-	}	
+	}
 
 	public function get_schema_manager() {
-		if($schema_manager = $this->__get('schema_manager')) {
+		$schema_manager = $this->__get( 'schema_manager' );
+		if ( $schema_manager ) {
 			return $schema_manager;
 		}
-		
-		$schema_manager = new SchemaManager($this->get_message_handler(), $this);
-		
-		$this->__set('schema_manager', $schema_manager);
-		
+
+		$schema_manager = new SchemaManager( $this->get_message_handler(), $this );
+
+		$this->__set( 'schema_manager', $schema_manager );
+
 		return $schema_manager;
-	}	
+	}
 
 	public function get_version_handler() {
-		if($version_handler = $this->__get('version_handler')) {
+		$version_handler = $this->__get( 'version_handler' );
+		if ( $version_handler ) {
 			return $version_handler;
 		}
-		
-		$version_handler = new VersionHandler($this->get_message_handler(), $this, $this->get_theme_manager());
-		
-		$this->__set('version_handler', $version_handler);
-		
+
+		$version_handler = new VersionHandler( $this->get_message_handler(), $this, $this->get_theme_manager() );
+
+		$this->__set( 'version_handler', $version_handler );
+
 		return $version_handler;
-	}		
-	
+	}
+
 	public function get_api_client() {
-		$platform_name = arlo_get_option('platform_name');
-		
-		if(!$platform_name) return false;
-	
-		if($client = $this->__get('api_client')) {
+		$platform_name = arlo_get_option( 'platform_name' );
+
+		if ( ! $platform_name ) {
+			return false;
+		}
+
+		$client = $this->__get( 'api_client' );
+		if ( $client ) {
 			return $client;
 		}
-	
+
 		$transport = new Wordpress();
-		$transport->setRequestTimeout(30);
-		
-		$client = new Client($platform_name, $transport, VersionHandler::VERSION);
-		
-		$this->__set('api_client', $client);
-		
+		$transport->setRequestTimeout( 20 );
+
+		$client = new Client( $platform_name, $transport, VersionHandler::VERSION );
+
+		$this->__set( 'api_client', $client );
+
 		return $client;
 	}
-	
-	public function cron_set_import() {
-		$settings = get_option('arlo_settings', []);
-		$settings = is_array($settings) ? $settings : [];
+
+	/**
+	 * Maybe enqueues an import task for the recurring `arlo_set_import` auto-sync tick.
+	 *
+	 * This method creates scheduler demand: it decides whether a new scheduled
+	 * import task should be queued. It applies the configured sync cadence, avoids
+	 * probing the importer while an import task is already non-terminal, checks the
+	 * importer start gates, and inserts the task through Scheduler::set_task_unique()
+	 * so concurrent ticks cannot create duplicate scheduled import rows.
+	 *
+	 * It is deliberately separate from run_scheduler_queue(), which services already
+	 * queued work. After any enqueue or notice handling, this method calls
+	 * run_scheduler_queue() so the existing or newly-created task queue can advance in
+	 * the same request.
+	 *
+	 * @since   5.2.0 Renamed from cron_set_import().
+	 * @return  void
+	 */
+	public function maybe_enqueue_scheduled_import() {
+		$settings = get_option( 'arlo_settings', [] );
+		$settings = is_array( $settings ) ? $settings : [];
+
+		// No outbound contact until an admin has configured a platform.
+		if ( ! self::has_configured_platform( $settings ) ) {
+			return;
+		}
 
 		// Throttle: skip this tick if the required interval has not elapsed since
 		// the last successful import. This lets the WP-Cron schedule remain at its
@@ -1557,25 +1676,39 @@ class Arlo_For_Wordpress {
 		// Falls through when no successful import has ever run (empty last_import)
 		// so the very first sync is never blocked.
 		$last_import = $this->get_importer()->get_last_import_date();
-		if (!empty($last_import)) {
-			$interval = self::get_sync_interval($settings);
-			if ($interval !== null) {
-				$last_import_ts = strtotime($last_import . ' UTC');
-				if ($last_import_ts !== false && (time() - $last_import_ts) < $interval) {
+		if ( ! empty( $last_import ) ) {
+			$interval = self::get_sync_interval( $settings );
+			if ( $interval !== null ) {
+				$last_import_ts = strtotime( $last_import . ' UTC' );
+				if ( $last_import_ts !== false && ( time() - $last_import_ts ) < $interval ) {
 					return;
 				}
 			}
 		}
 
 		$scheduler = $this->get_scheduler();
-		$scheduler->set_task("import");
-		
-		//check last import date
-		$type = 'import_error';
-		$last_import_ts = !empty($last_import) ? strtotime($last_import . ' UTC') : false;
+		// Intentionally not gated on is_import_enabled() here — disabled-state
+		// ticks should still run this method, but task queueing is gated by
+		// should_importer_run(). If a task is queued while imports are disabled,
+		// import() skips it as status 4.
+		// The first outstanding-task check avoids unnecessary importer probing;
+		// set_task_unique() repeats the check under a mutex before insertion.
+		if ( ! $scheduler->has_non_terminal_task( 'import' ) ) {
+			$should_enqueue_import = $this->get_importer()->should_importer_run( false, false );
+			if ( $should_enqueue_import ) {
+				$scheduler->set_task_unique( 'import' );
+			} else {
+				// Scheduled demand reached the importer gate but did not start work; keep log maintenance moving during chronic backoff/disable periods.
+				Logger::execute_log_maintenance();
+			}
+		}
+
+		// Check last import date.
+		$notice_type    = 'import_error';
+		$last_import_ts = ! empty( $last_import ) ? strtotime( $last_import . ' UTC' ) : false;
 		// If last_import is set but cannot be parsed as a timestamp, treat it as absent:
 		// probe from the beginning of time and suppress the "last successful…" sentence.
-		if (!empty($last_import) && $last_import_ts === false) {
+		if ( ! empty( $last_import ) && $last_import_ts === false ) {
 			$last_import = '';
 		}
 		$has_clear_failure_evidence = false;
@@ -1585,159 +1718,167 @@ class Arlo_For_Wordpress {
 		// visually clear in the settings UX.
 		$import_enabled = self::is_import_enabled();
 
-		if ($import_enabled && !empty($last_import) && $last_import_ts !== false) {
-			$has_clear_failure_evidence = $scheduler->has_failed_scheduled_import_since(gmdate('Y-m-d H:i:s', $last_import_ts));
-		} elseif ($import_enabled && empty($last_import)) {
+		if ( $import_enabled && ! empty( $last_import ) && $last_import_ts !== false ) {
+			$has_clear_failure_evidence = $scheduler->has_failed_scheduled_import_since( gmdate( 'Y-m-d H:i:s', $last_import_ts ) );
+		} elseif ( $import_enabled && empty( $last_import ) ) {
 			// No prior successful import: check for any failed import task since the beginning of time.
-			$has_clear_failure_evidence = $scheduler->has_failed_scheduled_import_since('0000-00-00 00:00:00');
+			$has_clear_failure_evidence = $scheduler->has_failed_scheduled_import_since( '0000-00-00 00:00:00' );
 		}
 
-		if ($import_enabled && !empty($settings['platform_name']) && self::should_show_sync_error_notice($last_import_ts !== false ? intval($last_import_ts) : null, $has_clear_failure_evidence)) {
-			$message_handler = $this->get_message_handler();
-			$sync_error_title = esc_html__('Event synchronisation error', 'arlo-training-and-event-management-system' );
-			
-			if ($message_handler->get_message_by_type_count($type) == 0) {	
+		if ( $import_enabled && ! empty( $settings['platform_name'] ) && self::should_show_sync_error_notice( $last_import_ts !== false ? intval( $last_import_ts ) : null, $has_clear_failure_evidence ) ) {
+			$message_handler  = $this->get_message_handler();
+			$sync_error_title = esc_html__( 'Event synchronisation error', 'arlo-training-and-event-management-system' );
+
+			if ( $message_handler->get_message_by_type_count( $notice_type ) == 0 ) {
 				$message = [
-				/* translators: %s: UTC time */
-				'<p>' . esc_html__('Arlo for WordPress encountered problems when synchronising your event information. Information about your events may be out of date.', 'arlo-training-and-event-management-system' ) . (!empty($last_import) ? ' ' . sprintf(esc_html__('The last successful synchronisation was %s UTC', 'arlo-training-and-event-management-system' ), esc_html($last_import)) : '') . '</p>',
-				'<p><a href="' . esc_url(get_admin_url() . 'admin.php?page=arlo-for-wordpress-logs').'" target="_blank" rel="noopener noreferrer">'. esc_html__('View diagnostic logs', 'arlo-training-and-event-management-system' ) . '</a> '. esc_html__('for more information.', 'arlo-training-and-event-management-system' ) . '</p>'
+					/* translators: %s: UTC time */
+					'<p>' . esc_html__( 'Arlo for WordPress encountered problems when synchronising your event information. Information about your events may be out of date.', 'arlo-training-and-event-management-system' ) . ( ! empty( $last_import ) ? ' ' . sprintf( esc_html__( 'The last successful synchronisation was %s UTC', 'arlo-training-and-event-management-system' ), esc_html( $last_import ) ) : '' ) . '</p>',
+					'<p><a href="' . esc_url( get_admin_url() . 'admin.php?page=arlo-for-wordpress-logs' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'View diagnostic logs', 'arlo-training-and-event-management-system' ) . '</a> ' . esc_html__( 'for more information.', 'arlo-training-and-event-management-system' ) . '</p>',
 				];
-				
-				if ($message_handler->set_message($type, $sync_error_title, implode('', $message), true) === false) {
-					Logger::log("Couldn't create Arlo import error message");
-				}
-				
-				if (isset($settings['arlo_send_data']) && $settings['arlo_send_data'] == "1") {
-					$this->send_log_to_arlo(wp_strip_all_tags($message[0]));
+
+				if ( $message_handler->set_message( $notice_type, $sync_error_title, implode( '', $message ), true ) === false ) {
+					Logger::log( "Couldn't create Arlo import error message" );
 				}
 			}
 		}
 
-		//kick off Scheduler
-		$this->cron_scheduler();
+		// Service the queue immediately after any enqueue or notice handling.
+		$this->run_scheduler_queue( 'scheduled-import-tick' );
 	}
-	
-	public function cron_scheduler() {
-		session_write_close();
-		try{
-			$this->clean_up_tasks();
-			$this->run_task_scheduler();
-		}catch(\Exception $e){
+
+	/**
+	 * Runs the scheduler queue for cron and loopback wakeups.
+	 *
+	 * This method consumes scheduler demand: it does not decide whether a new
+	 * scheduled auto-import should be created. Instead it is the common runner for
+	 * the `arlo_scheduler` WP-Cron hook and the `arlo_run_scheduler` AJAX loopback
+	 * used by the importer between fragmented steps.
+	 *
+	 * The AJAX loopback is the fast path while import work is progressing. The
+	 * recurring `arlo_scheduler` cron event is the slower recovery ping that can
+	 * clean up stalled or overlong tasks and resume queued work if a loopback was
+	 * missed, delayed, or paused by hosting limits.
+	 *
+	 * @since   5.2.0 Renamed from cron_scheduler().
+	 * @param   string  $source Scheduler wake source for support diagnostics.
+	 * @return  void
+	 */
+	public function run_scheduler_queue( $source = 'cron-event' ) {
+		Logger::log_diagnostic( Logger::DIAGNOSTIC_VERBOSITY_TRACE, 'Scheduler request started [source=' . $source . ']' );
+		try {
+			$this->fail_stalled_or_overlong_import_tasks();
+			$this->run_next_scheduler_task( $source );
+			Logger::log_diagnostic( Logger::DIAGNOSTIC_VERBOSITY_TRACE, 'Scheduler request finished [source=' . $source . '; outcome=ok]' );
+		} catch ( \Exception $e ) {
+			Logger::log_diagnostic( Logger::DIAGNOSTIC_VERBOSITY_TRACE, 'Scheduler request finished [source=' . $source . '; outcome=exception]' );
 			Logger::log( $e->getMessage() );
 			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				wp_die('<pre>' . esc_html( print_r($e, true) ) . '</pre>'); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r -- Debug detail gated behind WP_DEBUG; output is escaped via esc_html().
+				wp_die( '<pre>' . esc_html( print_r( $e, true ) ) . '</pre>' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r -- Debug detail gated behind WP_DEBUG; output is escaped via esc_html().
 			} else {
 				wp_die( esc_html__( 'An error occurred during the Arlo import scheduler. Please check the Arlo log for details.', 'arlo-training-and-event-management-system' ) );
 			}
 		}
 	}
-	
-	public function clean_up_tasks() {
-		$scheduler = $this->get_scheduler();
-		
-		$paused_running_tasks = array_merge($scheduler->get_paused_tasks(), $scheduler->get_running_tasks());
-				
-		foreach ($paused_running_tasks as $task) {
-			$ts = strtotime($task->task_modified);
-			$now = time() - gmdate('Z');
-			if ($now - $ts > 28*60) {
-				$task->task_data_text = json_decode($task->task_data_text);
 
-				$message = "Import doesn't respond within 28 minutes, stopped";
-				$scheduler->update_task($task->task_id, 3, 'Stopped by the scheduler: ');
-				Logger::log($message, !empty($task->task_data_text->import_id) ? $task->task_data_text->import_id : 0);
-				$scheduler->clear_cron();
-			} 
-		}
-	}
-	
-
-	private function delete_running_tasks() {		
+	private function delete_running_tasks() {
 		$this->get_scheduler()->delete_running_tasks();
 		$this->get_scheduler()->delete_paused_tasks();
 	}
 
-	public function run_task_scheduler() {	
-		$this->get_scheduler()->run_task();		
-	}
-	
+	/**
+	 * Connects an unconfigured site to the demo platform and publishes its Arlo host pages.
+	 *
+	 * Each host page is the page already mapped in the settings or, failing that, the page
+	 * holding the exact Arlo slug. No other page is ever published or mapped, and a live
+	 * existing mapping is never replaced. Slugs with no page are reported to the admin.
+	 *
+	 * @return void
+	 */
 	public function load_demo() {
-		$settings = get_option('arlo_settings');
-		$notice_id = self::$dismissible_notices['newpages'];
-		$user = wp_get_current_user();
-		update_user_meta($user->ID, $notice_id, 1);
-		
-		if (empty($settings['platform_name'])) {
-			$settings['platform_name'] = Arlo_For_Wordpress::DEFAULT_PLATFORM;
+		$settings = get_option( 'arlo_settings' );
+		$settings = is_array( $settings ) ? $settings : [];
+		$user     = wp_get_current_user();
+		update_user_meta( $user->ID, self::$dismissible_notices['newpages'], 1 );
+
+		if ( empty( $settings['platform_name'] ) ) {
+			$settings['platform_name'] = self::DEFAULT_PLATFORM;
 			$settings['keep_settings'] = "1";
 		}
-		
+
 		$error = [];
 
-		foreach (self::$pages as $page) {
-			//try to find and publish the page
-			$args = array(
-  				'name' => $page['name'],
-  				'post_type' => 'page',
-  				'post_status' => array('publish','draft'),
-  				'numberposts' => 1
-			);
+		foreach ( self::$pages as $page ) {
+			$key         = $page['post_types_key'];
+			$mapped_id   = absint( $settings['post_types'][ $key ]['posts_page'] ?? 0 );
+			$mapped_post = $mapped_id > 0 ? get_post( $mapped_id ) : null;
+			$has_mapping = $mapped_post instanceof \WP_Post && 'page' === $mapped_post->post_type && 'trash' !== $mapped_post->post_status;
 
-			$posts = get_posts($args);
-			
-			if (!(is_array($posts) && count($posts) == 1)) {
-				$args = array(
-	  				'post_type' => 'page',
-	  				'post_status' => array('publish','draft'),
-	  				'numberposts' => 1
+			if ( $has_mapping ) {
+				$target = $mapped_post;
+			} else {
+				$posts  = get_posts(
+					array(
+						'name'        => $page['name'],
+						'post_type'   => 'page',
+						'post_status' => array( 'publish', 'draft' ),
+						'numberposts' => 1,
+					)
 				);
-				
-				$posts = get_posts($args);					
+				$target = is_array( $posts ) && 1 === count( $posts ) ? $posts[0] : null;
 			}
 
-			if (is_array($posts) && count($posts) == 1) {
-				if ($posts[0]->post_status == 'draft') {
-					wp_publish_post($posts[0]->ID);
-				}
+			if ( ! $target instanceof \WP_Post ) {
+				$error[] = sanitize_text_field( $page['name'] );
+				continue;
+			}
 
-				$posts_page = $page['name'];
+			if ( 'draft' === $target->post_status ) {
+				wp_publish_post( $target->ID );
+			}
 
-				if ($page['name'] == 'events') {
-					$posts_page = 'event';
-				} else if ($page['name'] == 'venues') {
-					$posts_page = 'venue';
-				} else if ($page['name'] == 'presenters') {
-					$posts_page = 'presenter';
+			if ( ! $has_mapping ) {
+				if ( ! is_array( $settings['post_types'][ $key ] ?? null ) ) {
+					$settings['post_types'][ $key ] = array();
 				}
-				
-				$settings['post_types'][$posts_page]['posts_page'] = $posts[0]->ID;
-			} else {
-				$error[] = sanitize_text_field($page['name']);
-			} 
+				$settings['post_types'][ $key ]['posts_page'] = $target->ID;
+			}
 		}
-		
-		update_option('arlo_settings', $settings);
-		
-		$_SESSION['arlo-demo'] = $error;
-		
-		$scheduler = $this->get_scheduler();
-		$scheduler->set_task("import", -1);
-	}       
-        	
+
+		update_option( 'arlo_settings', $settings );
+
+		UserFlash::set( UserFlash::DEMO_SETUP_ERRORS, $error );
+	}
+
 	/**
 	 * Reset all connection-health state.
 	 *
 	 * Called on successful import, on platform name change, and on admin re-enable.
 	 *
+	 * Also clears the chronic-failure escalation timestamp
+	 * (`arlo_platform_access_last_failure_at`) so a subsequent scheduled sync
+	 * starts on the normal cadence again rather than continuing to back off.
+	 *
 	 * @since    5.1.0
 	 */
 	public static function reset_connection_health() {
-		update_option('arlo_import_connection_health_disabled', '0');
-		delete_option('arlo_import_disabled_message');
-		delete_option('arlo_import_disabled_since');
-		update_option('arlo_platform_access_failure_count', 0);
-		delete_option('arlo_platform_access_first_failure_at');
+		update_option( 'arlo_import_connection_health_disabled', '0' );
+		delete_option( 'arlo_import_disabled_message' );
+		delete_option( 'arlo_import_disabled_since' );
+		update_option( 'arlo_platform_access_failure_count', 0 );
+		delete_option( 'arlo_platform_access_first_failure_at' );
+		delete_option( 'arlo_platform_access_last_failure_at' );
 	}
+
+	/**
+	 * Returns whether an admin has connected the site to an Arlo platform.
+	 *
+	 * @param array $settings The arlo_settings option array.
+	 * @return bool Whether a platform name is stored.
+	 */
+	public static function has_configured_platform( array $settings ): bool {
+		return isset( $settings['platform_name'] ) && is_string( $settings['platform_name'] ) && '' !== $settings['platform_name'];
+	}
+
 	/**
 	 * Determine whether an import is allowed to run.
 	 *
@@ -1762,16 +1903,108 @@ class Arlo_For_Wordpress {
 	 */
 	public static function is_import_enabled( bool $forced_manual_import = false ): bool {
 		// Hard gate — applies to every import regardless of how it was triggered.
-		if (get_option('arlo_import_disabled', '0') == '1') return false;
+		if ( get_option( 'arlo_import_disabled', '0' ) == '1' ) {
+			return false;
+		}
 
 		// Soft gates — skipped when an admin has explicitly requested an import.
 		if ( ! $forced_manual_import ) {
-			$arlo_settings = get_option('arlo_settings', []);
-			if (($arlo_settings['import_connection_healthchecks_enabled'] ?? '1') === '1' && get_option('arlo_import_connection_health_disabled', '0') == '1') return false;
-			if (($arlo_settings['user_import_enabled'] ?? '1') !== '1') return false;
+			$arlo_settings = get_option( 'arlo_settings', [] );
+			if ( ( $arlo_settings['import_connection_healthchecks_enabled'] ?? '1' ) === '1' && get_option( 'arlo_import_connection_health_disabled', '0' ) == '1' ) {
+				return false;
+			}
+			if ( ( $arlo_settings['user_import_enabled'] ?? '1' ) !== '1' ) {
+				return false;
+			}
 		}
 
 		return true;
+	}
+
+	/**
+	 * Returns whether delta import is available, independently of the selected mode.
+	 *
+	 * @return bool Whether the feature is available.
+	 */
+	public static function is_delta_import_feature_available(): bool {
+		return FeatureFlagManager::is_enabled( ARLO_FEATURE_DELTA_IMPORT );
+	}
+
+	/**
+	 * Returns whether the privileged importer-mode setting may offer delta.
+	 *
+	 * @return bool Whether the feature is available and the live schema is ready.
+	 */
+	public static function is_delta_import_settings_available(): bool {
+		return self::is_delta_import_feature_available()
+			&& self::get_instance()->get_schema_manager()->supports_delta_infrastructure();
+	}
+
+	/**
+	 * Returns whether a value is one of the supported importer modes.
+	 *
+	 * @param mixed $mode Candidate importer mode.
+	 * @return bool Whether the value is a supported mode token.
+	 */
+	public static function is_supported_importer_mode( $mode ): bool {
+		return is_scalar( $mode ) && in_array( (string) $mode, [ self::IMPORTER_MODE_FULL, self::IMPORTER_MODE_FULL_DELTA ], true );
+	}
+
+	/**
+	 * Normalizes a submitted importer mode at a privileged settings-save boundary.
+	 *
+	 * @param array $input Submitted settings.
+	 * @param array $existing_settings Existing persisted settings.
+	 * @return array Normalized settings.
+	 */
+	public static function normalize_importer_mode_setting( array $input, array $existing_settings ): array {
+		$importer_mode_submitted = array_key_exists( 'importer_mode', $input );
+		$input                   = Utilities::normalize_filtered_enum_setting(
+			'importer_mode',
+			$input,
+			$existing_settings,
+			[
+				self::IMPORTER_MODE_FULL,
+				self::IMPORTER_MODE_FULL_DELTA,
+			],
+			self::IMPORTER_MODE_FULL
+		);
+
+		if ( $importer_mode_submitted && self::IMPORTER_MODE_FULL_DELTA === ( $input['importer_mode'] ?? null ) && ! self::is_delta_import_settings_available() ) {
+			$input['importer_mode'] = self::IMPORTER_MODE_FULL;
+		}
+
+		return $input;
+	}
+
+	/**
+	 * Whether new imports should store region IDs limited to five characters, as before 5.2.0.
+	 *
+	 * Read once when an import starts; running imports use the value frozen in their task data.
+	 *
+	 * @return bool True only for the normalised stored value '1'.
+	 */
+	public static function is_legacy_region_id_handling_enabled(): bool {
+		$settings = get_option( 'arlo_settings', [] );
+
+		return is_array( $settings ) && isset( $settings[ self::LEGACY_REGION_ID_HANDLING_SETTING ] ) && '1' === $settings[ self::LEGACY_REGION_ID_HANDLING_SETTING ];
+	}
+
+	/**
+	 * Resolves the importer mode for a new session.
+	 *
+	 * @return string A supported importer-mode token.
+	 */
+	public static function get_importer_mode(): string {
+		$settings = get_option( 'arlo_settings', [] );
+		$mode     = is_array( $settings ) ? ( $settings['importer_mode'] ?? null ) : null;
+
+		if ( self::is_delta_import_feature_available()
+			&& self::IMPORTER_MODE_FULL_DELTA === $mode ) {
+			return self::IMPORTER_MODE_FULL_DELTA;
+		}
+
+		return self::IMPORTER_MODE_FULL;
 	}
 
 	/**
@@ -1792,27 +2025,30 @@ class Arlo_For_Wordpress {
 	 *
 	 * @return bool False on importer failure; true otherwise.
 	 */
-	public function import($force = false, $task_id = 0): bool {
-		if (!self::is_import_enabled($force)) {
+	public function import( $force = false, $task_id = 0 ): bool {
+		if ( ! self::is_import_enabled( $force ) ) {
 			// Mark the task as finished so it does not re-enter the queue on subsequent
 			// scheduler runs. Without this, a pending task at status=0 is never updated
-			// and gets re-processed on every 5-minute arlo_scheduler cron tick, while
-			// cron_set_import() (every 30 min) adds new status=0 tasks behind it.
-			// Status 4 ("Import finished") is the correct terminal-success state.
-			if ($task_id > 0) {
-				$this->get_scheduler()->update_task($task_id, 4, 'Import skipped: sync is currently disabled');
+			// and gets re-processed on every 5-minute arlo_scheduler safety-net tick,
+			// while recurring sync ticks can add new status=0 tasks behind it.
+			// Status 4 is the terminal/completed queue state; the status text records the skip.
+			if ( $task_id > 0 ) {
+				if ( $this->get_scheduler()->update_task_if_active( $task_id, 4, 'Import task skipped: import is currently disabled' ) ) {
+					// Run after the terminal skip so disabled imports do not starve log maintenance.
+					Logger::execute_log_maintenance();
+				}
 			}
 			return true;
 		}
 		$importer = $this->get_importer();
 
 		//track warnings during the import
-		if ($importer->run($force, $task_id) !== false) {
-			if ($importer->is_finished) {
+		if ( $importer->run( $force, $task_id ) !== false ) {
+			if ( $importer->is_finished ) {
 				// flush the rewrite rules
-				flush_rewrite_rules(true);	
+				flush_rewrite_rules( true );
 				// delete cache generated in Arlo plugin, instead of all caches.
-      			CacheControl::cache_delete(CacheControl::GROUP_PRIMARY_OBJECTS);
+				CacheControl::cache_delete( CacheControl::GROUP_PRIMARY_OBJECTS );
 			}
 			return true;
 		}
@@ -1820,134 +2056,175 @@ class Arlo_For_Wordpress {
 		return false;
 	}
 
-	public static function delete_custom_posts($table, $column, $post_type) {		
+	/**
+	 * Deletes Arlo custom posts whose slugs are not retained by the entity table.
+	 *
+	 * @param string   $table     Allowed Arlo entity table suffix without prefix.
+	 * @param string   $column    Allowed slug column to read from the entity table.
+	 * @param string   $post_type Allowed Arlo post-type suffix without the arlo_ prefix.
+	 * @param int|null $import_id Optional import id used to scope retained entity slugs.
+	 * @return array{success: bool, deleted_count: int} Whether cleanup can continue and how many custom posts were deleted.
+	 */
+	public static function delete_custom_posts( $table, $column, $post_type, $import_id = null ) {
 		global $wpdb;
+		$deleted_count = 0;
 
-		// Simple whitelist based on known calls in importer
+		// Only importer-owned entity/post-type mappings are eligible for deletion.
 		$allowed_map = array(
-			'eventtemplates' => array('et_post_name', 'event'),
-			'presenters'    => array('p_post_name', 'presenter'),
-			'venues'        => array('v_post_name', 'venue'),
+			'eventtemplates' => array( 'et_post_name', 'event' ),
+			'presenters'     => array( 'p_post_name', 'presenter' ),
+			'venues'         => array( 'v_post_name', 'venue' ),
 		);
-		if (!isset($allowed_map[$table]) || $allowed_map[$table][0] !== $column || $allowed_map[$table][1] !== $post_type) {
-			return; // parameters not from known safe calls
+		if ( ! isset( $allowed_map[ $table ] ) || $allowed_map[ $table ][0] !== $column || $allowed_map[ $table ][1] !== $post_type ) {
+			Logger::log( 'Custom post cleanup skipped because parameters are not from known safe calls.', $import_id );
+			// Unknown mappings are a successful skip: nothing was deleted, and callers do not need to retry.
+			return array(
+				'success'       => true,
+				'deleted_count' => 0,
+			);
 		}
 
 		$sql = "SELECT `{$column}` FROM `{$wpdb->prefix}arlo_{$table}`";
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Direct database query is required for custom table. Table and column are validated against a whitelist above. Do not need cache here. this is for uninstall process ,or data import process
-		$items = $wpdb->get_results($sql, ARRAY_A);
+		if ( $import_id !== null ) {
+			$sql .= $wpdb->prepare( ' WHERE import_id = %d', intval( $import_id ) );
+		}
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Direct database query is required for a custom table. Table and column are validated against the fixed allowlist above and import_id is prepared. Used by importer cleanup; no cache applies.
+		$items = $wpdb->get_results( $sql, ARRAY_A );
+		if ( ! is_array( $items ) ) {
+			Logger::log( sprintf( 'Custom post cleanup skipped because retained slug query failed for %s: %s', $wpdb->prefix . 'arlo_' . $table, $wpdb->last_error ), $import_id );
+			return array(
+				'success'       => false,
+				'deleted_count' => 0,
+			);
+		}
 
-		$post_names = array();
-		foreach($items as $item) {
-			$post_names[] = $item[$column];
+		$retained_post_names = array();
+		foreach ( $items as $item ) {
+			$retained_post_names[ $item[ $column ] ] = true;
 		}
 
 		$args = array(
-			'post_type' => 'arlo_' . $post_type,
-			'posts_per_page' => -1
+			'post_type'      => 'arlo_' . $post_type,
+			'posts_per_page' => -1,
 		);
 
-		$posts = get_posts($args);
+		$posts = get_posts( $args );
 
-		if(!empty($posts)) {
-			foreach($posts as $post) {
-				if(!in_array($post->post_name, $post_names)) {
-					wp_delete_post( $post->ID, true );
+		if ( ! empty( $posts ) ) {
+			foreach ( $posts as $post ) {
+				if ( ! isset( $retained_post_names[ $post->post_name ] ) ) {
+					$deleted_post = wp_delete_post( $post->ID, true );
+					if ( ! empty( $deleted_post ) ) {
+						++$deleted_count;
+					}
 				}
 			}
 		}
+
+		return array(
+			'success'       => true,
+			'deleted_count' => $deleted_count,
+		);
 	}
 
 	public static function arlo_template_source() {
-		$plugin = Arlo_For_Wordpress::get_instance();
+		$plugin        = self::get_instance();
 		$theme_manager = $plugin->get_theme_manager();
 
-		$selected_theme_id = get_option('arlo_theme', Arlo_For_Wordpress::DEFAULT_THEME);
-		$theme_templates = $theme_manager->load_default_templates($selected_theme_id);
-		
+		$selected_theme_id = get_option( 'arlo_theme', self::DEFAULT_THEME );
+		$theme_templates   = $theme_manager->load_default_templates( $selected_theme_id );
+
 		$templates = [];
-		
-		foreach (Arlo_For_Wordpress::get_templates() as $key => $val) {
-			if ($key == 'new_custom') { continue; }
-			$template_type = array_key_exists( 'type', $val ) ? $val['type'] : $key;
-			$templates[ARLO_PLUGIN_PREFIX . '-' . $key] = (isset($theme_templates[$template_type]['html']) ? $theme_templates[$template_type]['html'] : '');
+
+		foreach ( self::get_templates() as $key => $val ) {
+			if ( $key == 'new_custom' ) {
+				continue; }
+			$template_type                                = array_key_exists( 'type', $val ) ? $val['type'] : $key;
+			$templates[ ARLO_PLUGIN_PREFIX . '-' . $key ] = ( isset( $theme_templates[ $template_type ]['html'] ) ? $theme_templates[ $template_type ]['html'] : '' );
 		}
 
 		return $templates;
 	}
-	
+
 	public static function arlo_add_custom_shortcodes() {
-		$settings = get_option('arlo_settings');
+		$settings = get_option( 'arlo_settings' );
 
-		if ( isset($settings['custom_shortcodes']) ) {
-			array_walk($settings['custom_shortcodes'], function (&$type,$shortcode) {
-				$type = array(
-					'id' => $shortcode,
-					'name' => ucfirst( str_replace("_"," ",$shortcode) ),
-					'shortcode' => '[arlo_'.$shortcode.']',
-					'type' => $type
-				);
-			});
+		if ( isset( $settings['custom_shortcodes'] ) ) {
+			array_walk(
+				$settings['custom_shortcodes'],
+				function ( &$type, $shortcode ) {
+					$type = array(
+						'id'        => $shortcode,
+						'name'      => ucfirst( str_replace( "_", " ", $shortcode ) ),
+						'shortcode' => '[arlo_' . $shortcode . ']',
+						'type'      => $type,
+					);
+				}
+			);
 
-			$current_templates = Arlo_For_Wordpress::get_templates();
-			$first_elements = array_slice( $current_templates, 0, count($current_templates)-1 );
+			$current_templates = self::get_templates();
+			$first_elements    = array_slice( $current_templates, 0, count( $current_templates ) - 1 );
 
-			$last_element = array_slice( $current_templates, count($current_templates)-1, 1 );
+			$last_element = array_slice( $current_templates, count( $current_templates ) - 1, 1 );
 
-			Arlo_For_Wordpress::$templates = array_merge( $first_elements, $settings['custom_shortcodes'], $last_element );
+			self::$templates = array_merge( $first_elements, $settings['custom_shortcodes'], $last_element );
 
-			
 			$custom_post_types = array();
 
-			foreach ($settings['custom_shortcodes'] as $shortcode_id => $shortcode) {
+			foreach ( $settings['custom_shortcodes'] as $shortcode_id => $shortcode ) {
 				$shortcode_name = $shortcode['name'];
-				$regionalized = !in_array($shortcode['type'],['venue','presenter','venues','presenters']);
-				$shortcode_id = $shortcode['id'];
+				$regionalized   = ! in_array( $shortcode['type'], [ 'venue', 'presenter', 'venues', 'presenters' ], true );
+				$shortcode_id   = $shortcode['id'];
 
-				$custom_post_types[$shortcode_id] = array(
-					'slug' => $shortcode_id,
-					'name' => $shortcode_name,
+				$custom_post_types[ $shortcode_id ] = array(
+					'slug'          => $shortcode_id,
+					'name'          => $shortcode_name,
 					'singular_name' => $shortcode_name,
-					'regionalized' => $regionalized
+					'regionalized'  => $regionalized,
 				);
 
 			}
 
-			Arlo_For_Wordpress::$post_types = array_merge(Arlo_For_Wordpress::$post_types, $custom_post_types);
+			self::$post_types = array_merge( self::$post_types, $custom_post_types );
 		}
 	}
 
-	public function add_cron_schedules($schedules) {
+	public function add_cron_schedules( $schedules ) {
 		// $schedules is placed last so WP core and third-party definitions always
 		// win on key collisions. WordPress core already provides 'hourly', 'daily',
 		// and (since 5.4) 'weekly'; the plugin-only keys ('minutes_5', 'minutes_15',
 		// 'minutes_30') are only registered when nothing else has claimed them.
-		return array_merge([
-			'minutes_5' => [
-				'interval' => 300,
-				'display' => esc_html__('Once every 5 minutes','arlo-training-and-event-management-system')
+		// The plugin-only keys are stored in the WP-Cron array of existing sites,
+		// so they keep their original names for upgrade compatibility.
+		return array_merge(
+			[
+				'minutes_5'  => [
+					'interval' => 300,
+					'display'  => esc_html__( 'Once every 5 minutes', 'arlo-training-and-event-management-system' ),
+				],
+				'minutes_15' => [
+					'interval' => 900,
+					'display'  => esc_html__( 'Once every 15 minutes', 'arlo-training-and-event-management-system' ),
+				],
+				'hourly'     => [
+					'interval' => 3600,
+					'display'  => esc_html__( 'Once every hour', 'arlo-training-and-event-management-system' ),
+				],
+				'minutes_30' => [
+					'interval' => 1800,
+					'display'  => esc_html__( 'Every 30 minutes', 'arlo-training-and-event-management-system' ),
+				],
+				'daily'      => [
+					'interval' => DAY_IN_SECONDS,
+					'display'  => esc_html__( 'Once daily', 'arlo-training-and-event-management-system' ),
+				],
+				'weekly'     => [
+					'interval' => WEEK_IN_SECONDS,
+					'display'  => esc_html__( 'Once weekly', 'arlo-training-and-event-management-system' ),
+				],
 			],
-			'minutes_15' => [
-				'interval' => 900,
-				'display' => esc_html__('Once every 15 minutes','arlo-training-and-event-management-system')
-			],
-			'hourly' => [
-				'interval' => 3600,
-				'display' => esc_html__('Once every hour','arlo-training-and-event-management-system')
-			],
-			'minutes_30' => [
-				'interval' => 1800,
-				'display' => esc_html__('Every 30 minutes','arlo-training-and-event-management-system')
-			],
-			'daily' => [
-				'interval' => DAY_IN_SECONDS,
-				'display' => esc_html__('Once daily','arlo-training-and-event-management-system')
-			],
-			'weekly' => [
-				'interval' => WEEK_IN_SECONDS,
-				'display' => esc_html__('Once weekly','arlo-training-and-event-management-system')
-			],
-		], $schedules);
+			$schedules
+		);
 	}
 
 	/**
@@ -1965,12 +2242,12 @@ class Arlo_For_Wordpress {
 	 *                                URLs cannot be present in a functioning install.
 	 * @return string                 One of the DEPLOYMENT_MODE_* constants.
 	 */
-	public static function get_deployment_mode_default($platform_name): string {
+	public static function get_deployment_mode_default( $platform_name ): string {
 		// Treat non-scalar values (e.g. a corrupted option) as an empty string so
 		// callers do not need to normalise before passing and no array-to-string
 		// conversion warning is emitted.
-		$platform_name = is_scalar($platform_name) ? (string)$platform_name : '';
-		if ($platform_name === '' || strtolower($platform_name) === self::DEFAULT_PLATFORM) {
+		$platform_name = is_scalar( $platform_name ) ? (string) $platform_name : '';
+		if ( $platform_name === '' || strtolower( $platform_name ) === self::DEFAULT_PLATFORM ) {
 			return self::DEPLOYMENT_MODE_NON_PRODUCTION;
 		}
 		return self::DEPLOYMENT_MODE_PRODUCTION;
@@ -1979,7 +2256,7 @@ class Arlo_For_Wordpress {
 	/**
 	 * Returns the recurrence key corresponding to the effective sync cadence
 	 * for the given settings. Used by get_sync_interval() to derive the
-	 * throttle interval enforced by the tick-skip gate in cron_set_import().
+	 * throttle interval enforced by the tick-skip gate in maybe_enqueue_scheduled_import().
 	 *
 	 * Rules:
 	 *   production                              → minutes_30 (null interval — gate disabled)
@@ -1996,22 +2273,22 @@ class Arlo_For_Wordpress {
 	 * @param  array $settings  The arlo_settings option array.
 	 * @return string           A schedule key registered in add_cron_schedules().
 	 */
-	public static function get_cron_schedule(array $settings): string {
+	public static function get_cron_schedule( array $settings ): string {
 		$mode = $settings['deployment_mode'] ?? null;
 
 		// If the key is absent, derive the default from the platform name so
 		// the method is self-contained even before set_default_options() runs.
-		if ($mode === null) {
-			$mode = self::get_deployment_mode_default($settings['platform_name'] ?? '');
+		if ( $mode === null ) {
+			$mode = self::get_deployment_mode_default( $settings['platform_name'] ?? '' );
 		}
 
-		if ($mode !== self::DEPLOYMENT_MODE_NON_PRODUCTION) {
+		if ( $mode !== self::DEPLOYMENT_MODE_NON_PRODUCTION ) {
 			return 'minutes_30';
 		}
 
 		// Non-production: weekly for the default test platform, daily for everything else.
-		$platform = is_scalar($settings['platform_name'] ?? '') ? (string)($settings['platform_name'] ?? '') : '';
-		if ($platform === '' || strtolower($platform) === self::DEFAULT_PLATFORM) {
+		$platform = is_scalar( $settings['platform_name'] ?? '' ) ? (string) ( $settings['platform_name'] ?? '' ) : '';
+		if ( $platform === '' || strtolower( $platform ) === self::DEFAULT_PLATFORM ) {
 			return 'weekly';
 		}
 
@@ -2020,7 +2297,7 @@ class Arlo_For_Wordpress {
 
 	/**
 	 * Returns the minimum number of seconds that must elapse between successful
-	 * imports for the given settings. Used by cron_set_import() to skip ticks
+	 * imports for the given settings. Used by maybe_enqueue_scheduled_import() to skip ticks
 	 * that fire before the configured interval has elapsed, without altering the
 	 * WP-Cron schedule itself.
 	 *
@@ -2033,12 +2310,12 @@ class Arlo_For_Wordpress {
 	 * @param  array $settings  The arlo_settings option array.
 	 * @return int|null         Interval in seconds, or null for no forced backoff.
 	 */
-	public static function get_sync_interval(array $settings): ?int {
+	public static function get_sync_interval( array $settings ): ?int {
 		$map = [
 			'daily'  => DAY_IN_SECONDS,
 			'weekly' => WEEK_IN_SECONDS,
 		];
-		return $map[ self::get_cron_schedule($settings) ] ?? null;
+		return $map[ self::get_cron_schedule( $settings ) ] ?? null;
 	}
 
 	/**
@@ -2049,11 +2326,11 @@ class Arlo_For_Wordpress {
 	 * immediately. When a prior successful import exists, the last successful import
 	 * must be at least SYNC_ERROR_NOTICE_MIN_AGE old before the notice is shown.
 	 *
-	 * cron_set_import() gates on is_import_enabled() before calling this helper,
+	 * maybe_enqueue_scheduled_import() gates on is_import_enabled() before calling this helper,
 	 * so it will not be reached when auto-sync is intentionally or automatically
 	 * disabled — those states have their own dedicated notices.
 	 *
-	 * On non-production installs, cron_set_import() only reaches this helper
+	 * On non-production installs, maybe_enqueue_scheduled_import() only reaches this helper
 	 * once the configured daily or weekly cadence is already due.
 	 *
 	 * @since  5.1.0
@@ -2062,169 +2339,252 @@ class Arlo_For_Wordpress {
 	 * @param  int|null $now_ts                 Optional current UTC timestamp for tests.
 	 * @return bool                             True when the warning should be shown.
 	 */
-	public static function should_show_sync_error_notice(?int $last_import_ts, bool $has_failure_evidence, ?int $now_ts = null): bool {
-		if (!$has_failure_evidence) {
+	public static function should_show_sync_error_notice( ?int $last_import_ts, bool $has_failure_evidence, ?int $now_ts = null ): bool {
+		if ( ! $has_failure_evidence ) {
 			return false;
 		}
 
 		// No prior successful import: show immediately on the first confirmed failure.
-		if ($last_import_ts === null || $last_import_ts <= 0) {
+		if ( $last_import_ts === null || $last_import_ts <= 0 ) {
 			return true;
 		}
 
 		$now_ts = $now_ts ?? time();
-		if ($now_ts <= $last_import_ts) {
+		if ( $now_ts <= $last_import_ts ) {
 			return false;
 		}
 
-		return ($now_ts - $last_import_ts) >= self::SYNC_ERROR_NOTICE_MIN_AGE;
+		return ( $now_ts - $last_import_ts ) >= self::SYNC_ERROR_NOTICE_MIN_AGE;
 	}
-	
+
 	public function redirect_proxy() {
 		Redirect::object_post_redirect();
-	}		
-	
-	public function start_scheduler_callback() {	
-		$nonce = \ArloTraining\Utilities::filter_string_polyfill(INPUT_POST, 'nonce');
-		if(empty($nonce) || !wp_verify_nonce($nonce, $this->plugin_slug . '-arlo-for-wordpress-script')) {
+	}
+
+	/**
+	 * Handles the admin AJAX request that wakes the scheduler queue.
+	 *
+	 * @since  5.2.0 Renamed from start_scheduler_callback().
+	 * @return void
+	 */
+	public function handle_start_scheduler_ajax() {
+		$nonce = \ArloTraining\Utilities::filter_string_polyfill( INPUT_POST, 'nonce' );
+		if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, $this->plugin_slug . '-arlo-for-wordpress-script' ) ) {
 			wp_die();
 		}
-		if (!current_user_can('manage_options')) {
+		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die();
 		}
-		do_action("arlo_scheduler");
-		
+
+		$this->run_scheduler_queue( 'admin-ajax' );
+
 		wp_die();
 	}
-	
-	public function arlo_get_last_import_log_callback() {
-		$successful = isset($_POST['successful']) ? true : false;
-		$nonce = \ArloTraining\Utilities::filter_string_polyfill(INPUT_POST, 'nonce');
-		if(empty($nonce) || !wp_verify_nonce($nonce, $this->plugin_slug . '-arlo-for-wordpress-script')) {
-			wp_die();
-		}
-		if (!current_user_can('manage_options')) {
-			wp_die();
-		}
-		$log = Logger::get_log($successful, 1);
 
-		if (count($log)) {
-			if (strpos($log[0]['message'], "Error code 404") !== false ) {
-				$log[0]['message'] = __('The provided platform name does not exist.', 'arlo-training-and-event-management-system' );
+	public function arlo_get_last_import_log_callback() {
+		$successful = isset( $_POST['successful'] ) ? true : false;
+		$nonce      = \ArloTraining\Utilities::filter_string_polyfill( INPUT_POST, 'nonce' );
+		if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, $this->plugin_slug . '-arlo-for-wordpress-script' ) ) {
+			wp_die();
+		}
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die();
+		}
+		$log = Logger::get_log_rows(
+			[
+				'successful'           => $successful,
+				'max_diagnostic_level' => Logger::DIAGNOSTIC_LEVEL_INFO,
+			],
+			1
+		);
+
+		if ( count( $log ) ) {
+			if ( strpos( $log[0]['message'], "Error code 404" ) !== false ) {
+				$log[0]['message'] = __( 'The provided platform name does not exist.', 'arlo-training-and-event-management-system' );
 			}
 
 			$log[0]['last_import'] = $this->get_importer()->get_last_import_date();
 
-			wp_send_json($log[0]);
+			wp_send_json( $log[0] );
 		}
 		wp_die();
 	}
-	
-	
+
+	/**
+	 * Terminates the selected import task from the admin AJAX action.
+	 *
+	 * Termination is cooperative: the task is marked terminal and live import mutex
+	 * ownership is left alone so any already-running request can stop at its next check.
+	 *
+	 * @return void
+	 */
 	public function arlo_terminate_task_callback() {
-		$task_id_string = \ArloTraining\Utilities::filter_string_polyfill(INPUT_POST, 'taskID');
-		$nonce = \ArloTraining\Utilities::filter_string_polyfill(INPUT_POST, 'nonce');
-		if(empty($nonce) || !wp_verify_nonce($nonce, $this->plugin_slug . '-arlo-for-wordpress-script')) {
+		$task_id_string = \ArloTraining\Utilities::filter_string_polyfill( INPUT_POST, 'taskID' );
+		$nonce          = \ArloTraining\Utilities::filter_string_polyfill( INPUT_POST, 'nonce' );
+		if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, $this->plugin_slug . '-arlo-for-wordpress-script' ) ) {
 			wp_die();
 		}
-		if (!current_user_can('manage_options')) {
+		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die();
 		}
-		$task_id = intval($task_id_string);
-		if ($task_id > 0) {
-			
-			//need to terminate all the upcoming immediate tasks
-			$this->get_scheduler()->terminate_all_immediate_task($task_id);
-			
-			$this->get_importer()->clear_import_lock();
-			
-			echo esc_html(sprintf("%d", $task_id));
+		$task_id = intval( $task_id_string );
+		if ( $task_id > 0 ) {
+			// Terminate the selected import and drain later active import rows.
+			$this->get_scheduler()->terminate_active_import_tasks_from( $task_id );
+
+			echo esc_html( sprintf( "%d", $task_id ) );
 		}
-		
+
 		wp_die();
 	}
-	
-	
+
+
 	public function arlo_get_task_info_callback() {
-		$task_id_string = \ArloTraining\Utilities::filter_string_polyfill(INPUT_POST, 'taskID');
-		$nonce = \ArloTraining\Utilities::filter_string_polyfill(INPUT_POST, 'nonce');
-		if(empty($nonce) || !wp_verify_nonce($nonce, $this->plugin_slug . '-arlo-for-wordpress-script')) {
+		$task_id_string = \ArloTraining\Utilities::filter_string_polyfill( INPUT_POST, 'taskID' );
+		$nonce          = \ArloTraining\Utilities::filter_string_polyfill( INPUT_POST, 'nonce' );
+		if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, $this->plugin_slug . '-arlo-for-wordpress-script' ) ) {
 			wp_die();
 		}
-		if (!current_user_can('manage_options')) {
+		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die();
 		}
-		$task_id = intval($task_id_string);
-		if ($task_id > 0) {
-			$task = $this->get_scheduler()->get_tasks(null, null, $task_id);
+		$task_id = intval( $task_id_string );
+		if ( $task_id > 0 ) {
+			$task = $this->get_scheduler()->get_tasks( null, null, $task_id );
 
-			wp_send_json($task);
+			wp_send_json( $task );
 		}
-		
+
 		wp_die();
 	}
-	
+
 	public function dismiss_message_callback() {
-		$nonce = \ArloTraining\Utilities::filter_string_polyfill(INPUT_POST, 'nonce');
-		if(empty($nonce) || !wp_verify_nonce($nonce, $this->plugin_slug . '-arlo-for-wordpress-script')) {
+		$nonce = \ArloTraining\Utilities::filter_string_polyfill( INPUT_POST, 'nonce' );
+		if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, $this->plugin_slug . '-arlo-for-wordpress-script' ) ) {
 			wp_die();
 		}
-		if (!current_user_can('manage_options')) {
+		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die();
 		}
-		$id_string = \ArloTraining\Utilities::filter_string_polyfill(INPUT_POST, 'id');
-		$id = intval($id_string);
-		
-		if ($id > 0) {			
-			$this->get_message_handler()->dismiss_message($id);
-		}		
-		
-		echo esc_html(sprintf("%d", $id));
-		wp_die();
-	}	
+		$id_string = \ArloTraining\Utilities::filter_string_polyfill( INPUT_POST, 'id' );
+		$id        = intval( $id_string );
 
-	public function turn_off_send_data_callback() {		
-		$nonce = \ArloTraining\Utilities::filter_string_polyfill(INPUT_POST, 'nonce');
-		if(empty($nonce) || !wp_verify_nonce($nonce, $this->plugin_slug . '-arlo-for-wordpress-script')) {
-			wp_die();
+		if ( $id > 0 ) {
+			$this->get_message_handler()->dismiss_message( $id );
 		}
-		if (!current_user_can('manage_options')) {
-			wp_die();
-		}
-		$this->change_setting('arlo_send_data', 0);
 
-		echo 0;
+		echo esc_html( sprintf( "%d", $id ) );
 		wp_die();
-	}		
-	
-	
+	}
+
+	/**
+	 * Records the site-wide "Powered by Arlo" choice made in the opt-in banner.
+	 *
+	 * @return void
+	 */
+	public function set_powered_by_callback() {
+		$nonce = \ArloTraining\Utilities::filter_string_polyfill( INPUT_POST, 'nonce' );
+		if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, $this->plugin_slug . '-arlo-for-wordpress-script' ) ) {
+			wp_send_json_error(
+				[
+					'code'    => 'invalid_nonce',
+					'message' => __( 'Please reload the page and try saving your choice again.', 'arlo-training-and-event-management-system' ),
+				],
+				403
+			);
+		}
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error(
+				[
+					'code'    => 'forbidden',
+					'message' => __( 'You do not have permission to change this setting.', 'arlo-training-and-event-management-system' ),
+				],
+				403
+			);
+		}
+
+		$value = isset( $_POST['value'] ) && is_string( $_POST['value'] ) ? wp_unslash( $_POST['value'] ) : null; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Scalar shape is checked here; only the exact '0'/'1' allowlist below is consumed.
+		if ( '1' !== $value && '0' !== $value ) {
+			wp_send_json_error(
+				[
+					'code'    => 'invalid_value',
+					'message' => __( 'Please choose whether to show the "Powered by Arlo" link.', 'arlo-training-and-event-management-system' ),
+				],
+				400
+			);
+		}
+
+		// The admin settings hooks are not loaded for AJAX requests, so the side effects of a recorded choice happen here.
+		$settings = get_option( 'arlo_settings', [] );
+		if ( ! is_array( $settings ) ) {
+			wp_send_json_error(
+				[
+					'code'    => 'invalid_settings',
+					'message' => __( 'The Arlo settings could not be read. Please review them in Arlo > Settings before trying again.', 'arlo-training-and-event-management-system' ),
+				],
+				500
+			);
+		}
+		$previous                             = $settings[ self::POWERED_BY_SETTING ] ?? null;
+		$settings[ self::POWERED_BY_SETTING ] = $value;
+
+		// update_option() returns false for both failed writes and unchanged values.
+		$saved           = $previous === $value || update_option( 'arlo_settings', $settings );
+		$stored_settings = get_option( 'arlo_settings', [] );
+		if ( ! $saved || ! is_array( $stored_settings ) || ( $stored_settings[ self::POWERED_BY_SETTING ] ?? null ) !== $value ) {
+			wp_send_json_error(
+				[
+					'code'    => 'save_failed',
+					'message' => __( 'Your choice could not be saved. Please try again.', 'arlo-training-and-event-management-system' ),
+				],
+				500
+			);
+		}
+		delete_option( self::POWERED_BY_UPGRADE_NOTICE_OPTION );
+		if ( $previous !== $value ) {
+			\ArloTraining\CacheControl::invalidate_upcoming_widget_cache();
+		}
+		wp_send_json_success( [ 'value' => $value ] );
+	}
+
+	/**
+	 * Returns whether the administrator opted in to the public "Powered by Arlo" credit.
+	 *
+	 * @param mixed $settings The arlo_settings option value.
+	 * @return bool Whether the credit may be shown.
+	 */
+	public static function is_powered_by_enabled( $settings ): bool {
+		return is_array( $settings ) && isset( $settings[ self::POWERED_BY_SETTING ] ) && '1' === $settings[ self::POWERED_BY_SETTING ];
+	}
+
+
 	public function dismissible_notice_callback() {
-		$id = \ArloTraining\Utilities::filter_string_polyfill(INPUT_POST, 'id');
-		$nonce = \ArloTraining\Utilities::filter_string_polyfill(INPUT_POST, 'nonce');
-		if(empty($nonce) || !wp_verify_nonce($nonce, $this->plugin_slug . '-arlo-for-wordpress-script')) {
+		$id    = \ArloTraining\Utilities::filter_string_polyfill( INPUT_POST, 'id' );
+		$nonce = \ArloTraining\Utilities::filter_string_polyfill( INPUT_POST, 'nonce' );
+		if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, $this->plugin_slug . '-arlo-for-wordpress-script' ) ) {
 			wp_die();
 		}
-		if (!current_user_can('manage_options')) {
+		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die();
 		}
-		if (!empty($id)) {
-			$this->get_notice_handler()->dismiss_user_notice($id);
-		}		
-		
+		if ( ! empty( $id ) ) {
+			$this->get_notice_handler()->dismiss_user_notice( $id );
+		}
+
 		echo 0;
 		wp_die();
 	}
 
-	public function change_setting($setting_name, $value) {
-		$settings = get_option('arlo_settings');
+	public function change_setting( $setting_name, $value ) {
+		$settings = get_option( 'arlo_settings' );
 
-		$settings[$setting_name] = $value;
+		$settings[ $setting_name ] = $value;
 
-		update_option('arlo_settings', $settings);
+		update_option( 'arlo_settings', $settings );
 	}
 
 	public static function get_post_types_settings(): array {
-		$settings = get_option('arlo_settings', []);
+		$settings = get_option( 'arlo_settings', [] );
 		if ( ! is_array( $settings ) || ! isset( $settings['post_types'] ) || ! is_array( $settings['post_types'] ) ) {
 			return [];
 		}
@@ -2245,8 +2605,8 @@ class Arlo_For_Wordpress {
 		return $post_types;
 	}
 
-	public static function get_posts_page_id(string $post_type): int {
-		$settings = get_option('arlo_settings', []);
+	public static function get_posts_page_id( string $post_type ): int {
+		$settings = get_option( 'arlo_settings', [] );
 		if ( ! is_array( $settings ) || ! isset( $settings['post_types'] ) || ! is_array( $settings['post_types'] ) ) {
 			return 0;
 		}
@@ -2259,13 +2619,13 @@ class Arlo_For_Wordpress {
 		return absint( $config['posts_page'] );
 	}
 
-	public static function get_current_page_arlo_type($default_page = null) {
+	public static function get_current_page_arlo_type( $default_page = null ) {
 		global $post;
 		if ( ! is_object( $post ) || empty( $post->ID ) ) {
 			return $default_page;
 		}
 
-		foreach (self::get_post_types_settings() as $key => $post_type) {
+		foreach ( self::get_post_types_settings() as $key => $post_type ) {
 			if ( ( $post_type['posts_page'] ?? 0 ) === (int) $post->ID ) {
 				return $key;
 			}
@@ -2280,7 +2640,7 @@ class Arlo_For_Wordpress {
 	 * from making arbitrary pages look valid, while still allowing the active
 	 * event-search page to keep working when its stored posts_page ID is stale.
 	 */
-	public static function get_current_page_if_contains_shortcode(string $shortcode) {
+	public static function get_current_page_if_contains_shortcode( string $shortcode ) {
 		global $post;
 
 		$current_page = get_post( $post );
@@ -2291,24 +2651,59 @@ class Arlo_For_Wordpress {
 		return has_shortcode( (string) $current_page->post_content, $shortcode ) ? $current_page : null;
 	}
 
-	public static function get_region_parameter() {
-		$regions = get_option('arlo_regions');
+	/**
+	 * Resolves the region to apply to the current request.
+	 *
+	 * The region in the URL takes precedence (upper-cased); otherwise the region cookie is used.
+	 * Either source is ignored when it is not a usable string, and the result is returned only
+	 * when it matches a configured region, compared case-insensitively.
+	 *
+	 * @return string The matching region as supplied by the request source, or an empty string.
+	 */
+	public static function get_region_parameter(): string {
+		$regions = get_option( 'arlo_regions' );
+		if ( ! is_array( $regions ) ) {
+			return '';
+		}
 
-		$arlo_region = get_query_var('arlo-region', '') 
-			? strtoupper(get_query_var('arlo-region', ''))
-			: (!empty($_COOKIE['arlo-region']) ? sanitize_text_field(wp_unslash( $_COOKIE['arlo-region'] )) : '');
+		$arlo_region = self::get_region_from_query();
+		if ( ! empty( $arlo_region ) ) {
+			$arlo_region = strtoupper( $arlo_region );
+		} elseif ( ! empty( $_COOKIE['arlo-region'] ) && is_scalar( $_COOKIE['arlo-region'] ) ) {
+			$arlo_region = sanitize_text_field( wp_unslash( $_COOKIE['arlo-region'] ) );
+		} else {
+			return '';
+		}
 
-		return (!empty($arlo_region) && is_array($regions) && \ArloTraining\Utilities::array_ikey_exists($arlo_region, $regions) ? $arlo_region : '');
+		if ( empty( $arlo_region ) || ! \ArloTraining\Utilities::array_ikey_exists( $arlo_region, $regions ) ) {
+			return '';
+		}
+
+		return $arlo_region;
 	}
-    
-    public function get_tag_by_id($tag_id) {
-        global $wpdb;        
-        
-        $prepared_sql = $wpdb->prepare("SELECT id, tag FROM " . $wpdb->prefix . "arlo_tags WHERE id = %d", $tag_id);
-        
-        return CacheControl::fetch_row($prepared_sql, ARRAY_A);
-	}	
-	
+
+	/**
+	 * Returns the arlo-region query value, validated as a string.
+	 *
+	 * Request-supplied values are not guaranteed to be scalar, so anything other than
+	 * a string is discarded before callers use it as a region key or cookie value.
+	 *
+	 * @return string The region query value, or an empty string when absent or not a string.
+	 */
+	public static function get_region_from_query(): string {
+		$region = get_query_var( 'arlo-region', '' );
+
+		return is_string( $region ) ? $region : '';
+	}
+
+	public function get_tag_by_id( $tag_id ) {
+		global $wpdb;
+
+		$prepared_sql = $wpdb->prepare( "SELECT id, tag FROM " . $wpdb->prefix . "arlo_tags WHERE id = %d", $tag_id );
+
+		return CacheControl::fetch_row( $prepared_sql, ARRAY_A );
+	}
+
 	/**
 	 * Ensures each Arlo host page exists as a WordPress page, creating missing ones as drafts.
 	 *
@@ -2332,8 +2727,8 @@ class Arlo_For_Wordpress {
 	 */
 	public static function add_pages( $page_name = '' ): array {
 		$result = array(
-			'pages'			=> array(),
-			'added_count'	=> 0,
+			'pages'       => array(),
+			'added_count' => 0,
 		);
 
 		foreach ( self::$pages as $page ) {
@@ -2346,57 +2741,62 @@ class Arlo_For_Wordpress {
 			}
 
 			// Use an exact slug match to avoid false positives from full-text search.
-			$existing = get_posts( array(
-				'post_type'		 => 'page',
-				'post_status'	 => array( 'publish', 'future', 'draft', 'pending', 'private' ),
-				'name'			 => $page['name'],
-				'posts_per_page' => 1,
-				'fields'		 => 'ids',
-			) );
+			$existing = get_posts(
+				array(
+					'post_type'      => 'page',
+					'post_status'    => array( 'publish', 'future', 'draft', 'pending', 'private' ),
+					'name'           => $page['name'],
+					'posts_per_page' => 1,
+					'fields'         => 'ids',
+				)
+			);
 
 			if ( ! empty( $existing ) ) {
-				$found_id		= $existing[0];
-				$found_status	= get_post_status( $found_id );
+				$found_id     = $existing[0];
+				$found_status = get_post_status( $found_id );
 
 				// If the page vanished between get_posts() and get_post_status() (race condition),
 				// treat both fields as null so assign_posts_page_defaults() skips this entry
 				// rather than writing a dead post ID into settings.
 				if ( false === $found_status ) {
-					$found_id		= null;
-					$found_status	= null;
+					$found_id     = null;
+					$found_status = null;
 				}
 
 				$result['pages'][] = array(
-					'post_id'		=> $found_id,
-					'post_status'	=> $found_status,
-					'post_types_key'	=> $page['post_types_key'],
-					'is_new'		=> false,
+					'post_id'        => $found_id,
+					'post_status'    => $found_status,
+					'post_types_key' => $page['post_types_key'],
+					'is_new'         => false,
 				);
 				continue;
 			}
 
-			$post_id = wp_insert_post( array(
-				'post_type'		=> 'page',
-				'post_status'	=> 'draft',
-				'post_name'		=> $page['name'],
-				'post_title'	=> $page['title'],
-				'post_content'	=> $page['content'],
-			), true );
+			$post_id = wp_insert_post(
+				array(
+					'post_type'    => 'page',
+					'post_status'  => 'draft',
+					'post_name'    => $page['name'],
+					'post_title'   => $page['title'],
+					'post_content' => $page['content'],
+				),
+				true
+			);
 
 			if ( ! is_wp_error( $post_id ) && $post_id > 0 ) {
 				$result['pages'][] = array(
-					'post_id'		=> $post_id,
-					'post_status'	=> 'draft',
-					'post_types_key'	=> $page['post_types_key'],
-					'is_new'		=> true,
+					'post_id'        => $post_id,
+					'post_status'    => 'draft',
+					'post_types_key' => $page['post_types_key'],
+					'is_new'         => true,
 				);
 				++$result['added_count'];
 			} else {
 				$result['pages'][] = array(
-					'post_id'		=> null,
-					'post_status'	=> null,
-					'post_types_key'	=> $page['post_types_key'],
-					'is_new'		=> false,
+					'post_id'        => null,
+					'post_status'    => null,
+					'post_types_key' => $page['post_types_key'],
+					'is_new'         => false,
 				);
 			}
 		}
@@ -2449,9 +2849,9 @@ class Arlo_For_Wordpress {
 				continue;
 			}
 
-			$key		= $page['post_types_key'] ?? null;
-			$post_id	= $page['post_id'] ?? null;
-			$is_new		= $page['is_new'] ?? false;
+			$key     = $page['post_types_key'] ?? null;
+			$post_id = $page['post_id'] ?? null;
+			$is_new  = $page['is_new'] ?? false;
 
 			if ( empty( $key ) || ! is_string( $key ) || empty( $post_id ) || ! is_int( $post_id ) || true !== $is_new ) {
 				continue;
@@ -2474,7 +2874,7 @@ class Arlo_For_Wordpress {
 			}
 
 			$settings['post_types'][ $key ]['posts_page'] = $post_id;
-			$changed = true;
+			$changed                                      = true;
 		}
 
 		if ( $changed ) {
@@ -2489,21 +2889,19 @@ class Arlo_For_Wordpress {
 	 * @todo Check all the conditions in rewrite_rules are met
 	 * @return string
 	 */
-	public function wp_canonical_fix( $canonical, $post ){
+	public function wp_canonical_fix( $canonical, $post ) {
 		$canonical = untrailingslashit( $canonical );
 
-		$region = $this->get_region_parameter();
+		$region       = $this->get_region_parameter();
 		$regionalized = false;
 		if ( arlo_is_archive( $post ) ) {
-			foreach(self::get_post_types_settings() as $post_type => $config) {
-				if ( $config['posts_page'] == $post->ID && !empty( $this::$post_types[ $post_type ][ 'regionalized' ] ) ) {
+			foreach ( self::get_post_types_settings() as $post_type => $config ) {
+				if ( $config['posts_page'] == $post->ID && ! empty( $this::$post_types[ $post_type ]['regionalized'] ) ) {
 					$regionalized = true;
 				}
 			}
-		} else {
-			if ( !empty( $this::$post_types[ str_replace( 'arlo_', '', $post->post_type ) ][ 'regionalized' ] ) ) {
+		} elseif ( ! empty( $this::$post_types[ str_replace( 'arlo_', '', $post->post_type ) ]['regionalized'] ) ) {
 				$regionalized = true;
-			}
 		}
 
 		if ( ! empty( $region ) && $regionalized ) {
@@ -2520,7 +2918,7 @@ class Arlo_For_Wordpress {
 	 * @param  string $canonical
 	 * @return string
 	 */
-	public function yoast_canonical_fix( $canonical ){
+	public function yoast_canonical_fix( $canonical ) {
 		$post = get_queried_object();
 		return $this->wp_canonical_fix( $canonical, $post );
 	}
@@ -2533,7 +2931,7 @@ class Arlo_For_Wordpress {
 	 * @see Arlo_For_Wordpress->add_canonical_urls() This code was inspired by
 	 */
 	private function url_add_filters( $url, $page ) {
-		$settings = get_option('arlo_settings');
+		$settings = get_option( 'arlo_settings' );
 
 		// Build a canonical URL by appending the active filter values as
 		// path segments (e.g. /cat-Sales/presenter-12-Jos%C3%A9-Garc%C3%ADa/).
@@ -2556,76 +2954,76 @@ class Arlo_For_Wordpress {
 		// throw a TypeError on non-string input on PHP 8+.
 
 		//has to be the same order as in public.js to construct the same order
-		$category = get_query_var('arlo-category');
-		if (!empty($category) && is_string($category)) {
-			$url .= '/cat-' . rawurlencode(sanitize_text_field(wp_unslash(rawurldecode($category))));
+		$category = get_query_var( 'arlo-category' );
+		if ( ! empty( $category ) && is_string( $category ) ) {
+			$url .= '/cat-' . rawurlencode( sanitize_text_field( wp_unslash( rawurldecode( $category ) ) ) );
 		}
 
-		$month = get_query_var('arlo-month');
-		if (!empty($month) && is_string($month)) {
-			$url .= '/month-' . rawurlencode(sanitize_text_field(wp_unslash(rawurldecode($month))));
+		$month = get_query_var( 'arlo-month' );
+		if ( ! empty( $month ) && is_string( $month ) ) {
+			$url .= '/month-' . rawurlencode( sanitize_text_field( wp_unslash( rawurldecode( $month ) ) ) );
 		}
 
-		$location = get_query_var('arlo-location');
-		if (!empty($location) && is_string($location)) {
-			$url .= '/location-' . rawurlencode(sanitize_text_field(wp_unslash(rawurldecode($location))));
+		$location = get_query_var( 'arlo-location' );
+		if ( ! empty( $location ) && is_string( $location ) ) {
+			$url .= '/location-' . rawurlencode( sanitize_text_field( wp_unslash( rawurldecode( $location ) ) ) );
 		}
 
-		$venue = get_query_var('arlo-venue');
-		if (!empty($venue) && is_string($venue)) {
-			$url .= '/venue-' . rawurlencode(sanitize_text_field(wp_unslash(rawurldecode($venue))));
+		$venue = get_query_var( 'arlo-venue' );
+		if ( ! empty( $venue ) && is_string( $venue ) ) {
+			$url .= '/venue-' . rawurlencode( sanitize_text_field( wp_unslash( rawurldecode( $venue ) ) ) );
 		}
 
-		if (get_query_var('arlo-delivery') !== '' && is_numeric(get_query_var('arlo-delivery'))) {
-			$url .= '/delivery-' . intval(get_query_var('arlo-delivery'));
+		if ( get_query_var( 'arlo-delivery' ) !== '' && is_numeric( get_query_var( 'arlo-delivery' ) ) ) {
+			$url .= '/delivery-' . intval( get_query_var( 'arlo-delivery' ) );
 		}
 
-		$eventtag = get_query_var('arlo-eventtag');
-		if (!empty($eventtag) && is_string($eventtag)) {
-			$eventtag = rawurldecode($eventtag);
-			if (is_numeric($eventtag)) {
-				$tag = $this->get_tag_by_id($eventtag);
-				if (!empty($tag['tag'])) {
+		$eventtag = get_query_var( 'arlo-eventtag' );
+		if ( ! empty( $eventtag ) && is_string( $eventtag ) ) {
+			$eventtag = rawurldecode( $eventtag );
+			if ( is_numeric( $eventtag ) ) {
+				$tag = $this->get_tag_by_id( $eventtag );
+				if ( ! empty( $tag['tag'] ) ) {
 					$eventtag = $tag['tag'];
 				}
 			}
-			$url .= '/eventtag-' . rawurlencode(sanitize_text_field(wp_unslash($eventtag)));
+			$url .= '/eventtag-' . rawurlencode( sanitize_text_field( wp_unslash( $eventtag ) ) );
 		}
 
-		$presenter = get_query_var('arlo-presenter');
-		if (!empty($presenter) && is_string($presenter)) {
-			$url .= '/presenter-' . rawurlencode(sanitize_text_field(wp_unslash(rawurldecode($presenter))));
+		$presenter = get_query_var( 'arlo-presenter' );
+		if ( ! empty( $presenter ) && is_string( $presenter ) ) {
+			$url .= '/presenter-' . rawurlencode( sanitize_text_field( wp_unslash( rawurldecode( $presenter ) ) ) );
 		}
 
-		$templatetag = get_query_var('arlo-templatetag');
-		if (!empty($templatetag) && is_string($templatetag)) {
-			$templatetag = rawurldecode($templatetag);
-			if (is_numeric($templatetag)) {
-				$tag = $this->get_tag_by_id($templatetag);
-				if (!empty($tag['tag'])) {
+		$templatetag = get_query_var( 'arlo-templatetag' );
+		if ( ! empty( $templatetag ) && is_string( $templatetag ) ) {
+			$templatetag = rawurldecode( $templatetag );
+			if ( is_numeric( $templatetag ) ) {
+				$tag = $this->get_tag_by_id( $templatetag );
+				if ( ! empty( $tag['tag'] ) ) {
 					$templatetag = $tag['tag'];
-				}					
+				}
 			}
-			$url .= '/templatetag-' . rawurlencode(sanitize_text_field(wp_unslash($templatetag)));
+			$url .= '/templatetag-' . rawurlencode( sanitize_text_field( wp_unslash( $templatetag ) ) );
 		}
 
-		$state = get_query_var('arlo-state');
-		if (!empty($state) && is_string($state)) {
-			$url .= '/state-' . rawurlencode(sanitize_text_field(wp_unslash(rawurldecode($state))));
+		$state = get_query_var( 'arlo-state' );
+		if ( ! empty( $state ) && is_string( $state ) ) {
+			$url .= '/state-' . rawurlencode( sanitize_text_field( wp_unslash( rawurldecode( $state ) ) ) );
 		}
 
-		$event_id = get_query_var('arlo-event-id');
-		if (!empty($event_id) && is_string($event_id)) {
-			$url .= '/event-' . rawurlencode(sanitize_text_field(wp_unslash(rawurldecode($event_id))));
+		$event_id = get_query_var( 'arlo-event-id' );
+		if ( ! empty( $event_id ) && is_string( $event_id ) ) {
+			$url .= '/event-' . rawurlencode( sanitize_text_field( wp_unslash( rawurldecode( $event_id ) ) ) );
 		}
 
-		$search = get_query_var('arlo-search');
-		if (!empty($search) && is_string($search)) {
-			$url .= '/search/' . rawurlencode(sanitize_text_field(wp_unslash(rawurldecode($search))));
+		$search = get_query_var( 'arlo-search' );
+		if ( ! empty( $search ) && is_string( $search ) ) {
+			$url .= '/search/' . rawurlencode( sanitize_text_field( wp_unslash( rawurldecode( $search ) ) ) );
 		}
 
-		if (!empty(get_query_var('paged')) && is_numeric(get_query_var('paged')) && strpos($url, "/page/") === false) {
-			$url .= '/page/' . wp_unslash(get_query_var('paged'));
+		if ( ! empty( get_query_var( 'paged' ) ) && is_numeric( get_query_var( 'paged' ) ) && strpos( $url, "/page/" ) === false ) {
+			$url .= '/page/' . wp_unslash( get_query_var( 'paged' ) );
 		}
 
 		return $url;
@@ -2641,39 +3039,39 @@ class Arlo_For_Wordpress {
 	 * @since 5.1.0
 	 */
 	public function check_page_shortcode_callback() {
-		$nonce = \ArloTraining\Utilities::filter_string_polyfill(INPUT_POST, 'nonce');
-		if (empty($nonce) || !wp_verify_nonce($nonce, $this->plugin_slug . '-arlo-for-wordpress-script')) {
+		$nonce = \ArloTraining\Utilities::filter_string_polyfill( INPUT_POST, 'nonce' );
+		if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, $this->plugin_slug . '-arlo-for-wordpress-script' ) ) {
 			wp_die();
 		}
-		if (!current_user_can('manage_options')) {
+		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die();
 		}
 
-		$post_id = absint(\ArloTraining\Utilities::filter_string_polyfill(INPUT_POST, 'post_id'));
-		$template_id = \ArloTraining\Utilities::filter_string_polyfill(INPUT_POST, 'template_id');
+		$post_id     = absint( \ArloTraining\Utilities::filter_string_polyfill( INPUT_POST, 'post_id' ) );
+		$template_id = \ArloTraining\Utilities::filter_string_polyfill( INPUT_POST, 'template_id' );
 
-		if ($post_id === 0) {
-			wp_send_json_error(array('code' => 'invalid_post_id'), 400);
+		if ( $post_id === 0 ) {
+			wp_send_json_error( array( 'code' => 'invalid_post_id' ), 400 );
 			return;
 		}
 
 		$templates = self::get_templates();
-		if (!array_key_exists($template_id, $templates) || empty($templates[$template_id]['shortcode'])) {
-			wp_send_json_error(array('code' => 'unknown_template'), 400);
+		if ( ! array_key_exists( $template_id, $templates ) || empty( $templates[ $template_id ]['shortcode'] ) ) {
+			wp_send_json_error( array( 'code' => 'unknown_template' ), 400 );
 			return;
 		}
 
-		$shortcode = $templates[$template_id]['shortcode'];
+		$shortcode = $templates[ $template_id ]['shortcode'];
 		$cache_key = 'arlo_sc_check_' . $template_id . '_' . $post_id;
-		$cached = get_transient($cache_key);
-		if ($cached !== false) {
-			wp_send_json_success($cached);
+		$cached    = get_transient( $cache_key );
+		if ( $cached !== false ) {
+			wp_send_json_success( $cached );
 			return;
 		}
 
-		$post = get_post($post_id);
+		$post = get_post( $post_id );
 
-		if ($post === null) {
+		if ( $post === null ) {
 			$data = array(
 				'post_id'          => $post_id,
 				'template_id'      => $template_id,
@@ -2683,12 +3081,12 @@ class Arlo_For_Wordpress {
 				'post_slug'        => null,
 				'post_status'      => null,
 			);
-			set_transient($cache_key, $data, 5 * MINUTE_IN_SECONDS);
-			wp_send_json_success($data);
+			set_transient( $cache_key, $data, 5 * MINUTE_IN_SECONDS );
+			wp_send_json_success( $data );
 			return;
 		}
 
-		if ($post->post_type !== 'page') {
+		if ( $post->post_type !== 'page' ) {
 			$data = array(
 				'post_id'          => $post_id,
 				'template_id'      => $template_id,
@@ -2698,12 +3096,12 @@ class Arlo_For_Wordpress {
 				'post_slug'        => null,
 				'post_status'      => $post->post_status,
 			);
-			set_transient($cache_key, $data, 5 * MINUTE_IN_SECONDS);
-			wp_send_json_success($data);
+			set_transient( $cache_key, $data, 5 * MINUTE_IN_SECONDS );
+			wp_send_json_success( $data );
 			return;
 		}
 
-		if ($post->post_status !== 'publish') {
+		if ( $post->post_status !== 'publish' ) {
 			// Compute slug for draft/future/pending pages that already have a slug set.
 			$draftable_statuses = [ 'draft', 'future', 'pending' ];
 			$not_pub_slug       = null;
@@ -2722,8 +3120,8 @@ class Arlo_For_Wordpress {
 				'post_slug'        => $not_pub_slug,
 				'post_status'      => $post->post_status,
 			);
-			set_transient($cache_key, $data, 5 * MINUTE_IN_SECONDS);
-			wp_send_json_success($data);
+			set_transient( $cache_key, $data, 5 * MINUTE_IN_SECONDS );
+			wp_send_json_success( $data );
 			return;
 		}
 
@@ -2736,15 +3134,15 @@ class Arlo_For_Wordpress {
 			? ( wp_make_link_relative( $pub_permalink ) ?: null )
 			: null;
 
-		preg_match('/^\[([^\s\]]+)/', $shortcode, $m);
-		$tag = isset($m[1]) ? $m[1] : '';
-		$found = ($tag !== '') && has_shortcode($content, $tag);
+		preg_match( '/^\[([^\s\]]+)/', $shortcode, $m );
+		$tag   = isset( $m[1] ) ? $m[1] : '';
+		$found = ( $tag !== '' ) && has_shortcode( $content, $tag );
 
 		// When post_content is genuinely empty, the content may be managed outside
 		// the core editor (for example by a page builder or other plugin). Only
 		// flag this case; short-but-non-empty content (e.g. a single shortcode
 		// tag) should still receive a definitive true/false result.
-		if (!$found && trim($content) === '') {
+		if ( ! $found && trim( $content ) === '' ) {
 			$data = array(
 				'post_id'          => $post_id,
 				'template_id'      => $template_id,
@@ -2754,8 +3152,8 @@ class Arlo_For_Wordpress {
 				'post_slug'        => $pub_slug,
 				'post_status'      => 'publish',
 			);
-			set_transient($cache_key, $data, 5 * MINUTE_IN_SECONDS);
-			wp_send_json_success($data);
+			set_transient( $cache_key, $data, 5 * MINUTE_IN_SECONDS );
+			wp_send_json_success( $data );
 			return;
 		}
 
@@ -2768,8 +3166,8 @@ class Arlo_For_Wordpress {
 			'post_slug'        => $pub_slug,
 			'post_status'      => 'publish',
 		);
-		set_transient($cache_key, $data, 5 * MINUTE_IN_SECONDS);
-		wp_send_json_success($data);
+		set_transient( $cache_key, $data, 5 * MINUTE_IN_SECONDS );
+		wp_send_json_success( $data );
 	}
 
 	/**
@@ -2782,14 +3180,14 @@ class Arlo_For_Wordpress {
 	 *
 	 * @param int $post_id The saved post ID.
 	 */
-	public function invalidate_shortcode_check_cache($post_id) {
-		$safe_id   = absint($post_id);
+	public function invalidate_shortcode_check_cache( $post_id ) {
+		$safe_id   = absint( $post_id );
 		$templates = self::get_templates();
-		foreach ($templates as $template_id => $template) {
-			if (empty($template['shortcode'])) {
+		foreach ( $templates as $template_id => $template ) {
+			if ( empty( $template['shortcode'] ) ) {
 				continue;
 			}
-			delete_transient('arlo_sc_check_' . $template_id . '_' . $safe_id);
+			delete_transient( 'arlo_sc_check_' . $template_id . '_' . $safe_id );
 		}
 	}
 
@@ -2802,12 +3200,12 @@ class Arlo_For_Wordpress {
 	 * @param string  $old_status Previous post status.
 	 * @param WP_Post $post       The post object.
 	 */
-	public function invalidate_shortcode_check_cache_on_status_change($new_status, $old_status, $post) {
-		if ($new_status === $old_status || !($post instanceof WP_Post) || $post->post_type !== 'page') {
+	public function invalidate_shortcode_check_cache_on_status_change( $new_status, $old_status, $post ) {
+		if ( $new_status === $old_status || ! ( $post instanceof WP_Post ) || $post->post_type !== 'page' ) {
 			return;
 		}
 
-		$this->invalidate_shortcode_check_cache($post->ID);
+		$this->invalidate_shortcode_check_cache( $post->ID );
 	}
 
 	/**
@@ -2821,11 +3219,237 @@ class Arlo_For_Wordpress {
 	 * @param int     $post_id The post ID about to be deleted.
 	 * @param WP_Post $post    The post object.
 	 */
-	public function invalidate_shortcode_check_cache_on_delete($post_id, $post) {
-		if (!($post instanceof WP_Post) || $post->post_type !== 'page') {
+	public function invalidate_shortcode_check_cache_on_delete( $post_id, $post ) {
+		if ( ! ( $post instanceof WP_Post ) || $post->post_type !== 'page' ) {
 			return;
 		}
 
-		$this->invalidate_shortcode_check_cache($post_id);
+		$this->invalidate_shortcode_check_cache( $post_id );
+	}
+
+	/**
+	 * Return the configured pacing delay between scheduler tasks, clamped to
+	 * a safe range.
+	 *
+	 * Remarks:
+	 * - Reads `arlo_settings['sleep_between_import_tasks']` and clamps it at
+	 *   read time (not just at admin-settings save time) to
+	 *   `Scheduler::MAX_SLEEP_BETWEEN_TASKS_SECONDS` — a small compatibility
+	 *   delay, not a storm-control mechanism.
+	 * - Returns `0` when the setting is absent, empty, non-numeric, or
+	 *   clamps to zero (e.g. a negative saved value), which callers treat as
+	 *   "no pacing delay configured."
+	 *
+	 * @since    5.2.0
+	 *
+	 * @return   int Seconds to pace between scheduler requests; `0` disables pacing.
+	 */
+	protected function get_pacing_sleep_seconds() {
+		$settings = get_option( 'arlo_settings', [] );
+		if ( ! is_array( $settings ) || empty( $settings['sleep_between_import_tasks'] ) || ! is_numeric( $settings['sleep_between_import_tasks'] ) ) {
+			return 0;
+		}
+
+		return max( 0, min( (int) $settings['sleep_between_import_tasks'], Scheduler::MAX_SLEEP_BETWEEN_TASKS_SECONDS ) );
+	}
+
+	/**
+	 * Pause the current request for the given number of seconds.
+	 *
+	 * Remarks:
+	 * - Thin wrapper around PHP's `sleep()` so tests can mock the pacing
+	 *   delay instead of actually waiting on it.
+	 *
+	 * @since    5.2.0
+	 *
+	 * @param    int  $seconds Number of seconds to sleep.
+	 * @return   void
+	 */
+	protected function pace_sleep( $seconds ) {
+		sleep( $seconds );
+	}
+
+	/**
+	 * Fails abandoned or overlong import tasks and clears scheduler cron state.
+	 *
+	 * The stale-task sweep is keyed off `task_modified`, while the absolute-duration
+	 * ceiling is keyed off `task_created` so a slow but still-progressing import
+	 * cannot occupy the in-flight slot indefinitely.
+	 *
+	 * @return  void
+	 */
+	private function fail_stalled_or_overlong_import_tasks() {
+		$scheduler      = $this->get_scheduler();
+		$current_utc_ts = time();
+
+		$in_flight_tasks      = array_merge( $scheduler->get_paused_tasks(), $scheduler->get_running_tasks() );
+		$task_marked_terminal = false;
+
+		foreach ( $in_flight_tasks as $task ) {
+			$modified_ts = ! empty( $task->task_modified ) ? strtotime( $task->task_modified . ' UTC' ) : false;
+			if ( $modified_ts !== false && $current_utc_ts - $modified_ts > self::IMPORT_STALLED_TIMEOUT_SECONDS ) {
+				$task_data          = $this->decode_scheduler_task_data( $task->task_data_text );
+				$post_switch_finish = $this->is_post_switch_finish_task_data( $task_data );
+
+				$stalled_minutes = intval( self::IMPORT_STALLED_TIMEOUT_SECONDS / MINUTE_IN_SECONDS );
+				$message         = $post_switch_finish
+					? sprintf( 'Import cleanup stalled after processing completed for %d minutes', $stalled_minutes )
+					: sprintf( "Import doesn't respond within %d minutes, stopped", $stalled_minutes );
+				$status_text     = $post_switch_finish ? 'Stopped by the scheduler: import cleanup stalled after processing completed' : 'Stopped by the scheduler: ';
+
+				if ( $scheduler->update_task_if_active( $task->task_id, 3, $status_text ) ) {
+					if ( $post_switch_finish ) {
+						update_option( 'arlo_import_cleanup_pending', $this->get_cleanup_pending_import_id( $task_data ) );
+					}
+
+					Logger::log( $message, ! empty( $task_data->import_id ) ? $task_data->import_id : 0 );
+					$scheduler->clear_cron();
+					$this->record_callback_timeout_for_swept_task( $task, $task_data, $post_switch_finish );
+					$task_marked_terminal = true;
+				}
+
+				// Keep no-progress failures distinct from capacity-bound overlong imports.
+				continue;
+			}
+
+			$created_ts = ! empty( $task->task_created ) ? strtotime( $task->task_created . ' UTC' ) : false;
+			if ( $created_ts !== false && $current_utc_ts - $created_ts > self::IMPORT_MAX_DURATION_SECONDS ) {
+				$task_data          = $this->decode_scheduler_task_data( $task->task_data_text );
+				$post_switch_finish = $this->is_post_switch_finish_task_data( $task_data );
+				// Absolute task age is a capacity limit; after live switch it means cleanup debt, not a bad catalogue.
+
+				$max_duration_minutes = intval( self::IMPORT_MAX_DURATION_SECONDS / MINUTE_IN_SECONDS );
+				$message              = $post_switch_finish
+					? sprintf( 'Import processing complete; cleanup pending after exceeding maximum cleanup duration of %d minutes', $max_duration_minutes )
+					: sprintf( 'Import task terminated (timed out) after %d minutes', $max_duration_minutes );
+				$status               = $post_switch_finish ? 4 : 3;
+				$status_text          = $post_switch_finish ? 'Import processing complete; cleanup pending' : 'Stopped by the scheduler: maximum duration exceeded';
+
+				if ( $scheduler->update_task_if_active( $task->task_id, $status, $status_text ) ) {
+					if ( $post_switch_finish ) {
+						update_option( 'arlo_import_cleanup_pending', $this->get_cleanup_pending_import_id( $task_data ) );
+					}
+
+					Logger::log( $message, ! empty( $task_data->import_id ) ? $task_data->import_id : 0, null, $post_switch_finish );
+					$scheduler->clear_cron();
+					$this->record_callback_timeout_for_swept_task( $task, $task_data, $post_switch_finish );
+					$task_marked_terminal = true;
+				}
+			}
+		}
+
+		if ( $task_marked_terminal ) {
+			// Run once after the sweep wins at least one terminal update; maintenance is best-effort.
+			Logger::execute_log_maintenance();
+		}
+	}
+
+	/**
+	 * Counts a swept scheduled import toward the platform failure counter when it never received its callback.
+	 *
+	 * A task stopped by the stall or duration sweep while it was only waiting for the snapshot
+	 * callback has failed for the same reason as one that exhausted its retries, so it must feed
+	 * the failure backoff and connection-health breaker. Manual syncs and imports that were making
+	 * progress are left uncounted, as in Importer::run_locked_import().
+	 *
+	 * @param object $task               Scheduler task row that was just marked failed.
+	 * @param object $task_data          Decoded task checkpoint.
+	 * @param bool   $post_switch_finish Whether the live switch had already happened.
+	 * @return void
+	 */
+	private function record_callback_timeout_for_swept_task( $task, $task_data, bool $post_switch_finish ): void {
+		if ( $post_switch_finish || ( isset( $task->task_priority ) && -1 === (int) $task->task_priority ) ) {
+			return;
+		}
+
+		$waiting_for_callback = ( isset( $task_data->finished_subtask ) && 'ImportRequest' === $task_data->finished_subtask )
+			|| ( isset( $task_data->current_subtask ) && 'Download' === $task_data->current_subtask );
+		if ( ! $waiting_for_callback || empty( $task_data->import_id ) ) {
+			return;
+		}
+
+		$import_id = (int) $task_data->import_id;
+		$importer  = $this->get_importer();
+		if ( ! $importer->is_awaiting_snapshot_callback( $import_id ) ) {
+			return;
+		}
+
+		Logger::log( 'No snapshot callback was received before the import was stopped by the scheduler', $import_id );
+		$importer->handle_platform_access_failure( new \ArloTraining\CallbackTimeoutException( 'No snapshot callback received before the import was stopped by the scheduler' ) );
+	}
+
+	/**
+	 * Returns whether scheduler task data represents cleanup after a successful live switch.
+	 *
+	 * @param object|null $task_data Decoded scheduler task-data object.
+	 * @return bool True when the task is tied to the current live import id or carries a live-switch flag.
+	 */
+	private function is_post_switch_finish_task_data( $task_data ): bool {
+		if ( ! is_object( $task_data ) ) {
+			return false;
+		}
+
+		if ( ! empty( $task_data->live_switch_done ) ) {
+			return true;
+		}
+
+		if ( empty( $task_data->import_id ) ) {
+			return false;
+		}
+
+		$current_live_import_id = $this->get_uncached_current_import_id();
+
+		return (string) $task_data->import_id === (string) $current_live_import_id;
+	}
+
+	/**
+	 * Returns the import id that should be marked as pending cleanup.
+	 *
+	 * @param object $task_data Decoded scheduler task-data object.
+	 * @return string|int|null Import id from task data, or the current live import id when absent.
+	 */
+	private function get_cleanup_pending_import_id( $task_data ) {
+		if ( ! empty( $task_data->import_id ) ) {
+			return $task_data->import_id;
+		}
+
+		return $this->get_uncached_current_import_id();
+	}
+
+	/**
+	 * Returns the current live import id without using the WordPress options cache.
+	 *
+	 * This uncached API exists because get_option('arlo_import_id') can be cached
+	 * or stale during import cleanup.
+	 *
+	 * @return string|int|null Current live import id, or null when unset.
+	 */
+	private function get_uncached_current_import_id() {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bypasses WP options cache; cached arlo_import_id can be stale while import cleanup is classified.
+		return $wpdb->get_var( $wpdb->prepare( 'SELECT option_value FROM %i WHERE option_name = %s', $wpdb->options, 'arlo_import_id' ) );
+	}
+
+	/**
+	 * Decodes scheduler task data for cleanup logging.
+	 *
+	 * @param   string|null  $task_data_text Raw JSON task data.
+	 * @return  object Decoded task data object, or an empty object when absent/invalid.
+	 */
+	private function decode_scheduler_task_data( $task_data_text ): object {
+		$task_data = json_decode( ! empty( $task_data_text ) ? $task_data_text : '{}' );
+
+		return is_object( $task_data ) ? $task_data : (object) array();
+	}
+
+	/**
+	 * Runs the next task selected by the scheduler queue.
+	 *
+	 * @param   string  $source Scheduler wake source for support diagnostics.
+	 * @return  void
+	 */
+	private function run_next_scheduler_task( $source = 'cron-event' ) {
+		$this->get_scheduler()->run_task( null, $source );
 	}
 }

@@ -10,55 +10,53 @@ require_once 'Resource.php';
 // now use it
 use ArloTraining\API\Resources\Resource;
 
-class OnlineActivitySearch extends Resource
-{
+class OnlineActivitySearch extends Resource {
+
 	protected $apiPath = '/resources/onlineactivitysearch';
 
-	public function search($template_id = null, $fields = array(), $count = 20, $group_by = null, $skip=0, $region) {
+	public function search( $template_id = null, $fields = array(), $count = 20, $group_by = null, $skip = 0, $region = '' ) {
 		$templates = $template_id;
-		
-		if(is_array($templates)) {
-			$templates = '[' . implode(',', $templates) . ']';
+
+		if ( is_array( $templates ) ) {
+			$templates = '[' . implode( ',', $templates ) . ']';
 		}
-		
+
 		$data = array(
-			'fields=' . implode(',', $fields),
+			'fields=' . implode( ',', $fields ),
 			'top=' . $count,
 			'includeTotalCount=true',
 			'skip=' . $skip,
-			'format=json'
+			'format=json',
 		);
-		
-		if (!empty($region)) {
+
+		if ( ! empty( $region ) ) {
 			$data[] = 'region=' . $region;
 		}
-		
-		if(!is_null($templates)) {
+
+		if ( ! is_null( $templates ) ) {
 			$data[] = 'filter=templateid=' . $templates;
 		}
-				
-		$results = $this->request(implode('&', $data));
-		
+
+		$results = $this->request( implode( '&', $data ) );
+
 		$ordered = [];
-		
-		if($group_by && in_array($group_by, $fields)) {
-		
-			foreach($results->Items as $result) {
+
+		if ( $group_by && in_array( $group_by, $fields, true ) ) {
+
+			foreach ( $results->Items as $result ) {
 				$key = $result->{$group_by};
-			
-				if(!isset($output[$key])) $output[$key] = [];
-			
-				$ordered[$key][] = $result;
+
+				$ordered[ $key ][] = $result;
 			}
-			
+
 			$results->Items = $ordered;
 		}
-		
+
 		return $results;
 	}
-	
+
 	/* Helper functions */
-	
+
 	/**
 	 * getAllOnlineActivities
 	 *
@@ -68,33 +66,32 @@ class OnlineActivitySearch extends Resource
 	 *
 	 * @return array
 	 */
-	public function getAllOnlineActivities($fields=array(), $regions = array()) {
+	public function getAllOnlineActivities( $fields = array(), $regions = array() ) {
 		$maxCount = 100;
-		
-		if (!(is_array($regions) && count($regions))) {
-			$regions = [''];
+
+		if ( ! ( is_array( $regions ) && count( $regions ) ) ) {
+			$regions = [ '' ];
 		}
-		
-		foreach($regions as $region) {
-			$result = $this->search(null, $fields, $maxCount, null, 0, $region);
-			
-			$items[$region] = $result->Items;
-			
+
+		foreach ( $regions as $region ) {
+			$result = $this->search( null, $fields, $maxCount, null, 0, $region );
+
+			$items[ $region ] = $result->Items;
+
 			// get items over and above the max 100 imposed by the API
 			// Dirty... but is a limitation of the public API
-			if($result->TotalCount > $maxCount) {
-				$iterate = ceil($result->TotalCount/$maxCount)-1;// we've already gone once - minus 1
-				
-				for($i=1;$i<=$iterate;$i++) {
-					$items[$region] = array_merge($items[$region], $this->search(null, $fields, $maxCount, null, $i*$maxCount, $region)->Items);
+			if ( $result->TotalCount > $maxCount ) {
+				$iterate = ceil( $result->TotalCount / $maxCount ) - 1;// we've already gone once - minus 1
+
+				for ( $i = 1;$i <= $iterate;$i++ ) {
+					$items[ $region ] = array_merge( $items[ $region ], $this->search( null, $fields, $maxCount, null, $i * $maxCount, $region )->Items );
 				}
-			}		
-		}				
-	
-		
+			}
+		}
+
 		return $items;
 	}
-	
+
 	/**
 	 * getAllOnlineActivitiesByTemplateIDs
 	 *
@@ -105,7 +102,7 @@ class OnlineActivitySearch extends Resource
 	 *
 	 * @return array
 	 */
-	public function getAllOnlineActivitiesByTemplateIDs($ids, $fields=array()) {
-		return $this->search($ids, $fields, 1000, null)->Items;
+	public function getAllOnlineActivitiesByTemplateIDs( $ids, $fields = array() ) {
+		return $this->search( $ids, $fields, 1000, null )->Items;
 	}
 }

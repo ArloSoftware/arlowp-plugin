@@ -10,30 +10,30 @@ require_once 'Resource.php';
 // now use it
 use ArloTraining\API\Resources\Resource;
 
-class EventTemplateSearch extends Resource
-{
+class EventTemplateSearch extends Resource {
+
 	protected $apiPath = '/resources/eventtemplatesearch';
 
-	public function search($fields = array(), $count = 20, $skip = 0, $region) {
+	public function search( $fields = array(), $count = 20, $skip = 0, $region = '' ) {
 		$data = array(
-			'fields=' . implode(',', $fields),
+			'fields=' . implode( ',', $fields ),
 			'top=' . $count,
 			'includeTotalCount=true',
 			'skip=' . $skip,
-			'format=json'
+			'format=json',
 		);
-		
-		if (!empty($region)) {
+
+		if ( ! empty( $region ) ) {
 			$data[] = 'region=' . $region;
 		}
-		
-		$results = $this->request(implode('&', $data));
-		
+
+		$results = $this->request( implode( '&', $data ) );
+
 		return $results;
 	}
-	
+
 	/* Helper functions */
-	
+
 	/**
 	 * getAllEventTemplates
 	 *
@@ -43,30 +43,29 @@ class EventTemplateSearch extends Resource
 	 *
 	 * @return array
 	 */
-	public function getAllEventTemplates($fields = array(), $regions = array()) {
+	public function getAllEventTemplates( $fields = array(), $regions = array() ) {
 		$maxCount = 10;
-		
-		if (!(is_array($regions) && count($regions))) {
-			$regions = [''];
-		}		
-		
-		foreach($regions as $region) {
-			$result = $this->search($fields, $maxCount, 0, $region);
-				
-			$items[$region] = $result->Items;
-			
+
+		if ( ! ( is_array( $regions ) && count( $regions ) ) ) {
+			$regions = [ '' ];
+		}
+
+		foreach ( $regions as $region ) {
+			$result = $this->search( $fields, $maxCount, 0, $region );
+
+			$items[ $region ] = $result->Items;
+
 			// get items over and above the max 200 imposed by the API
 			// Dirty... but is a limitation of the public API
-			if($result->TotalCount > $maxCount) {
-				$iterate = ceil($result->TotalCount/$maxCount)-1;// we've already gone once - minus 1
-				
-				for($i=1;$i<=$iterate;$i++) {
-					$items[$region] = array_merge($items[$region], $this->search($fields, $maxCount, $i*$maxCount, $region)->Items);
+			if ( $result->TotalCount > $maxCount ) {
+				$iterate = ceil( $result->TotalCount / $maxCount ) - 1;// we've already gone once - minus 1
+
+				for ( $i = 1;$i <= $iterate;$i++ ) {
+					$items[ $region ] = array_merge( $items[ $region ], $this->search( $fields, $maxCount, $i * $maxCount, $region )->Items );
 				}
 			}
-			
 		}
-		
+
 		return $items;
 	}
 }

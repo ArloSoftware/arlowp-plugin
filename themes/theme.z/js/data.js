@@ -74,15 +74,16 @@ jQuery(function($){
         var urlParams = ['pagefor=event', 'epage=' + currentPage];
 
         for (var i in filters) {
-            if (filters.hasOwnProperty(i) && $('#' + filters[i]).length == 1) {
-                var content = $('#' + filters[i]).val().trim();
-                if(i=='cat') {
-                    content = slug
-                }
-                if (content != '') {
-                    url += i + '-' + encodeURIComponent(content) + '/'; 
-                }
-            } 
+            var content = '';
+            if (i == 'cat' && slug) {
+                // The button's own category is requested even when the page has no category filter.
+                content = String(slug);
+            } else if (filters.hasOwnProperty(i) && $('#' + filters[i]).length == 1) {
+                content = $('#' + filters[i]).val().trim();
+            }
+            if (content != '') {
+                url += i + '-' + encodeURIComponent(content) + '/';
+            }
         }
 
         if (urlParams.length > 0) {
@@ -91,23 +92,30 @@ jQuery(function($){
         $.get(url, function(html) {
             var $eventItems =$(html).find(eventsSelector);
             var $eventList = $button.parent().prev();
+            var limit = getEventsPerPage($eventList);
             var idx = 0;
             $eventItems.each(function() {
-                if(idx >= 3) return
+                if(idx >= limit) return
                 $(this).removeClass('hide')
                 $eventList.append($(this));
                 idx++;
             })
-            if($eventItems.length <= 3) {
+            if($eventItems.length <= limit) {
                 $button.parent().hide(); //hide load more ,if there is no next link
             }
             $button.data('page', currentPage)
             $button.removeAttr('disabled');
         })
     })
+    // Every list is fetched with one item more than the template limit, which only signals that another page exists.
+    // The shortcode marks the end of each list with that limit; output without a marker used the default limit of 3.
+    function getEventsPerPage($eventList) {
+        var limit = parseInt($eventList.find('.arlo-events-limit').first().data('limit'), 10);
+        return limit > 0 ? limit : 3;
+    }
     function initCategory(el) {
         var $eventList = $(el).parent().prev();
-        var more = $eventList.find('.arlo-events-item').length > 3
+        var more = $eventList.find('.arlo-events-item').length > getEventsPerPage($eventList)
         if(more) {
             $eventList.find('.arlo-events-item:last').remove();
         } else {
@@ -118,7 +126,7 @@ jQuery(function($){
 
     function initSchedule(el) {
         var $eventList = $(el).parent().prev();
-        var more = $eventList.find('.arlo-schedules-item').length > 3
+        var more = $eventList.find('.arlo-schedules-item').length > getEventsPerPage($eventList)
         if (more) {
             $eventList.find('.arlo-schedules-item:last').remove();
         } else {
@@ -192,7 +200,10 @@ jQuery(function($){
         arloInitDiscountIcon();
         //initListPageFunc('arlo-event-list-items', $(".arlo-event-more"), arloInitDiscountIcon)
         var eventPage = 1;
-        var eventSize = 4;
+        // [arlo_event_list_item show="n"] emits an .arlo-show-more-hidden list after the first n items.
+        var $showBoundary = $(".arlo-event-list-items .arlo-show-more-hidden").first();
+        var eventSize = $showBoundary.length ? $showBoundary.prevAll(".arlo-event-list-items-item").length : $(".arlo-event-list-items-item").length;
+        eventSize = Math.max(eventSize, 1);
         function page() {
             var idx = 0;
             var visiable = 0;

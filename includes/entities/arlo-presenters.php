@@ -5,121 +5,140 @@ namespace ArloTraining\Entities;
 use ArloTraining\CacheControl;
 use Exception;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 class Presenters {
-	static function get($conditions=array(), $order=array(), $limit=null, $import_id = null) {
-		if (!is_null($limit) && (!is_numeric($limit) || $limit <= 0)){
-			throw new Exception('Limit must be a positive integer or null');
+	static function get( $conditions = array(), $order = array(), $limit = null, $import_id = null ) {
+		if ( ! is_null( $limit ) && ( ! is_numeric( $limit ) || $limit <= 0 ) ) {
+			throw new Exception( 'Limit must be a positive integer or null' );
 		}
 
 		global $wpdb;
 
-	
 		$query = "SELECT p.* FROM {$wpdb->prefix}arlo_presenters AS p";
 
-		$where = array("p.import_id = %d");
-		$parameters[] =  $import_id;
-		$group_by = $join = [];
-		
+		$where        = array( "p.import_id = %d" );
+		$parameters[] = $import_id;
+		$group_by     = $join = [];
+
 		// conditions
-		foreach($conditions as $key => $value) {
+		foreach ( $conditions as $key => $value ) {
 			// what to do?
-			switch($key) {
+			switch ( $key ) {
 				case 'id':
-					if(is_array($value) && count($value) > 1) {
-						$where[] = "p.p_arlo_id IN (" . implode(',', array_map(function() {return "%d";}, $value)) . ")";
-						$parameters = array_merge($parameters, $value);
+					if ( is_array( $value ) && count( $value ) > 1 ) {
+						$where[]    = "p.p_arlo_id IN (" . implode(
+							',',
+							array_map(
+								function () {
+									return "%d";
+								},
+								$value
+							)
+						) . ")";
+						$parameters = array_merge( $parameters, $value );
 					} else {
-						if (is_array($value) && count($value) == 1) {
-							$value = array_pop($value);
+						if ( is_array( $value ) && count( $value ) == 1 ) {
+							$value = array_pop( $value );
 						}
 
-						if(!empty($value)) {						
-							$where[] = "p.p_arlo_id = %d";
+						if ( ! empty( $value ) ) {
+							$where[]      = "p.p_arlo_id = %d";
 							$parameters[] = $value;
-						}	
+						}
 					}
-				break;
-				case 'e_id': 
-					$order[] = 'p_order';
+					break;
+				case 'e_id':
+					$order[]    = 'p_order';
 					$group_by[] = ' p.p_arlo_id ';
-					$join[] = "
-					INNER JOIN 
+					$join[]     = "
+					INNER JOIN
 						{$wpdb->prefix}arlo_events_presenters AS ep
-					ON 
-						p.p_arlo_id = ep.p_arlo_id 
-					AND 
+					ON
+						p.p_arlo_id = ep.p_arlo_id
+					AND
 						p.import_id = ep.import_id
 					";
 
-					if(is_array($value) && count($value) > 1) {
-						$where[] = "ep.e_id IN (" . implode(',', array_map(function() {return "%d";}, $value)) . ")";
-						$parameters = array_merge($parameters, $value);
+					if ( is_array( $value ) && count( $value ) > 1 ) {
+						$where[]    = "ep.e_id IN (" . implode(
+							',',
+							array_map(
+								function () {
+									return "%d";
+								},
+								$value
+							)
+						) . ")";
+						$parameters = array_merge( $parameters, $value );
 					} else {
-						if (is_array($value) && count($value) == 1) {
-							$value = array_pop($value);
+						if ( is_array( $value ) && count( $value ) == 1 ) {
+							$value = array_pop( $value );
 						}
 
-						if(!empty($value)) {						
-							$where[] = "ep.e_id = %d";
+						if ( ! empty( $value ) ) {
+							$where[]      = "ep.e_id = %d";
 							$parameters[] = $value;
-						}	
+						}
 					}
-				break;
-				case 'template_id': 
-					$order[] = 'p_order';
-					$group_by[] = ' p.p_arlo_id ';
-					$join[] = "
-					INNER JOIN 
+					break;
+				case 'template_id':
+					$order[]      = 'p_order';
+					$group_by[]   = ' p.p_arlo_id ';
+					$join[]       = "
+					INNER JOIN
 						{$wpdb->prefix}arlo_eventtemplates_presenters AS etp
-					ON 
-						p.p_arlo_id = etp.p_arlo_id 
-					AND 
+					ON
+						p.p_arlo_id = etp.p_arlo_id
+					AND
 						p.import_id = etp.import_id
 					";
-					$join[] = "
-					INNER JOIN 
+					$join[]       = "
+					INNER JOIN
 						{$wpdb->prefix}arlo_eventtemplates AS et
-					ON 
-						etp.et_id = et.et_id 
-					AND 
-						etp.import_id = et.import_id 
+					ON
+						etp.et_id = et.et_id
+					AND
+						etp.import_id = et.import_id
 					";
-					$where[] = "et.et_arlo_id = %d";
+					$where[]      = "et.et_arlo_id = %d";
 					$parameters[] = $value;
-				break;
+					break;
 			}
 		}
 
-		if (count($join)) {
-			$query .= implode("\n", $join);
+		if ( count( $join ) ) {
+			$query .= implode( "\n", $join );
 		}
 
-		if (count($where)) {
-			$query .= ' WHERE ' . implode(' AND ', $where);
+		if ( count( $where ) ) {
+			$query .= ' WHERE ' . implode( ' AND ', $where );
 		}
 
-		if (count($group_by)) {
-			$query .= ' GROUP BY ' . implode(', ', $group_by);
+		if ( count( $group_by ) ) {
+			$query .= ' GROUP BY ' . implode( ', ', $group_by );
 		}
 
-		if (count($order)) {
-			$query .= ' ORDER BY ' . implode(', ', $order);
+		if ( count( $order ) ) {
+			$query .= ' ORDER BY ' . implode( ', ', $order );
 		}
 
-		if (intval($limit) > 1) {
-			$query .= 'LIMIT %d';
+		if ( intval( $limit ) > 1 ) {
+			$query       .= 'LIMIT %d';
 			$parameters[] = $limit;
 		}
 
 		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The SQL statement is dynamically constructed and parameters are prepared here.
-		$query = $wpdb->prepare($query, $parameters);
+		$query = $wpdb->prepare( $query, $parameters );
 
-		if ($query) {
-			return ($limit != 1) 
-				? CacheControl::fetch_results($query, ARRAY_A)
-				: CacheControl::fetch_row($query, ARRAY_A);
+		if ( $query ) {
+			return ( $limit != 1 )
+				? CacheControl::fetch_results( $query, ARRAY_A )
+				: CacheControl::fetch_row( $query, ARRAY_A );
 		} else {
-			throw new \Exception("Couldn't prepare the SQL statement");
-		}		
+			throw new \Exception( "Couldn't prepare the SQL statement" );
+		}
 	}
 }

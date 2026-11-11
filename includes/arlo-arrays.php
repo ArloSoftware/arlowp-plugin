@@ -2,6 +2,10 @@
 
 namespace ArloTraining;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 class Arrays {
 	// A value is one identifier or an ordered list of candidates; the first one the host accepts is used.
 	public static $arlo_timezone_system_names_to_php_tz_identifiers = [

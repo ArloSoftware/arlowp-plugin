@@ -10,30 +10,30 @@ require_once 'Resource.php';
 // now use it
 use ArloTraining\API\Resources\Resource;
 
-class Presenters extends Resource
-{
+class Presenters extends Resource {
+
 	protected $apiPath = '/resources/presenters/';
-	
-	public function search($fields = array(), $count = 20) {
+
+	public function search( $fields = array(), $count = 20 ) {
 		$data = array(
-			'fields=' . implode(',', $fields),
+			'fields=' . implode( ',', $fields ),
 			'top=' . $count,
-			'format=json'
+			'format=json',
 		);
-		
-		$results = $this->request(implode('&', $data));
-		
+
+		$results = $this->request( implode( '&', $data ) );
+
 		return $results;
 	}
 
-	public function getPresenter($id) {
-		$this->__set('api_path', $this->apiPath . $id);
+	public function getPresenter( $id ) {
+		$this->__set( 'api_path', $this->apiPath . $id );
 		$results = $this->request();
-		
+
 		return $results;
 	}
 
-	public function getAllPresenters($fields=array()) {
-		return $this->search($fields, 1000)->Items;
+	public function getAllPresenters( $fields = array() ) {
+		return $this->search( $fields, 1000 )->Items;
 	}
 }

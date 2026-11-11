@@ -1,111 +1,114 @@
 <?php
 /**
- * Arlo For Wordpress
+ * Arlo For WordPress
  *
  * @package   Arlo_For_Wordpress_Admin
- * @author    Arlo <info@arlo.co>
- * @license   GPL-2.0+
+ * @author    Arlo Software <support@arlo.co>
+ * @license   GPL-2.0-or-later
  * @link      https://arlo.co
- * @copyright 2018 Arlo
+ * @copyright 2015-2026 Arlo Software
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 require_once 'class-arlo-for-wordpress-lists.php';
- 
 
-class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
+
+class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists {
 	const TABLENAME = 'arlo_events';
 
-	public function __construct() {		
-		$this->singular = __( 'Event', 'arlo-training-and-event-management-system' );		
-		$this->plural = __( 'Events', 'arlo-training-and-event-management-system' );
+	public function __construct() {
+		$this->singular = __( 'Event', 'arlo-training-and-event-management-system' );
+		$this->plural   = __( 'Events', 'arlo-training-and-event-management-system' );
 
-		parent::__construct();		
+		parent::__construct();
 	}
-	
+
 	public function get_title() {
 		$title = parent::get_title();
-		
-		$et_id = \ArloTraining\Utilities::filter_string_polyfill(INPUT_GET, 'et_id');
-		if (!empty($et_id) && !empty(self::$filter_column_mapping['et_id']) && intval($et_id) > 0 && !empty($this->items[0]->et_name)) {
+
+		$et_id = \ArloTraining\Utilities::filter_string_polyfill( INPUT_GET, 'et_id' );
+		if ( ! empty( $et_id ) && ! empty( self::$filter_column_mapping['et_id'] ) && intval( $et_id ) > 0 && ! empty( $this->items[0]->et_name ) ) {
 			$title .= ' for template: ' . esc_html( $this->items[0]->et_name );
 		}
-		
+
 		return $title;
-	}	
-	
+	}
+
 	public function get_columns() {
 		return $columns = [
-			'e_code'    => esc_html__( 'Code', 'arlo-training-and-event-management-system' ),
-			'e_name'    => esc_html__( 'Name', 'arlo-training-and-event-management-system' ),
-			'e_startdatetime'    => esc_html__( 'Start date', 'arlo-training-and-event-management-system' ),
-			'e_finishdatetime'    => esc_html__( 'Finish date', 'arlo-training-and-event-management-system' ),
-			'v_name' => esc_html__( 'Venue name', 'arlo-training-and-event-management-system' ),
+			'e_code'                => esc_html__( 'Code', 'arlo-training-and-event-management-system' ),
+			'e_name'                => esc_html__( 'Name', 'arlo-training-and-event-management-system' ),
+			'e_startdatetime'       => esc_html__( 'Start date', 'arlo-training-and-event-management-system' ),
+			'e_finishdatetime'      => esc_html__( 'Finish date', 'arlo-training-and-event-management-system' ),
+			'v_name'                => esc_html__( 'Venue name', 'arlo-training-and-event-management-system' ),
 			'et_descriptionsummary' => esc_html__( 'Summary', 'arlo-training-and-event-management-system' ),
-			'e_sessiondescription' => esc_html__( 'Description', 'arlo-training-and-event-management-system' ),
-			'e_notice' => esc_html__( 'Notice', 'arlo-training-and-event-management-system' ),
-			'e_session_num' => esc_html__( 'Num. of sessions', 'arlo-training-and-event-management-system' ),
-			'e_region' => esc_html__( 'Regions', 'arlo-training-and-event-management-system' ),
+			'e_sessiondescription'  => esc_html__( 'Description', 'arlo-training-and-event-management-system' ),
+			'e_notice'              => esc_html__( 'Notice', 'arlo-training-and-event-management-system' ),
+			'e_session_num'         => esc_html__( 'Num. of sessions', 'arlo-training-and-event-management-system' ),
+			'e_region'              => esc_html__( 'Regions', 'arlo-training-and-event-management-system' ),
 			//'e_isonline' => esc_html__( 'Online', 'arlo-for-wordpress' ),
 		];
-	}	
-	
+	}
+
 	public function get_hidden_columns() {
 		return array();
 	}
-	
+
 	public function get_sortable_columns() {
 		return array(
-			'e_code' => array( 'e_code', true ),
-			'e_name' => array( 'e_name', true ),
-			'e_startdatetime' => array( 'e_startdatetime', true ),
-			'e_finishdatetime' => array( 'e_finishdatetime', true ),
-			'v_name' => array( 'v_name', true ),
-			'e_placesremaining' => array( 'e_placesremaining', true ),
+			'e_code'                => array( 'e_code', true ),
+			'e_name'                => array( 'e_name', true ),
+			'e_startdatetime'       => array( 'e_startdatetime', true ),
+			'e_finishdatetime'      => array( 'e_finishdatetime', true ),
+			'v_name'                => array( 'v_name', true ),
+			'e_placesremaining'     => array( 'e_placesremaining', true ),
 			'et_descriptionsummary' => array( 'et_descriptionsummary', true ),
-			'e_sessiondescription' => array( 'e_sessiondescription', true ),			
+			'e_sessiondescription'  => array( 'e_sessiondescription', true ),
 		);
 	}
-	
-	public function column_default($item, $column_name) {
-		switch ($column_name) {
+
+	public function column_default( $item, $column_name ) {
+		switch ( $column_name ) {
 
 			case 'e_code':
 			case 'e_placesremaining':
 			case 'e_region':
-				return esc_html($item->$column_name);
+				return esc_html( $item->$column_name );
 
 			case 'e_name':
-				$field = '<div class="arlo-event-name">' . esc_html($item->e_name) . (is_numeric($item->e_placesremaining) && $item->e_placesremaining > 0 ? ' (' . intval( $item->e_placesremaining ) . ')' : '') . '</div>';
-				
-				if ($item->e_isonline) {
+				$field = '<div class="arlo-event-name">' . esc_html( $item->e_name ) . ( is_numeric( $item->e_placesremaining ) && $item->e_placesremaining > 0 ? ' (' . intval( $item->e_placesremaining ) . ')' : '' ) . '</div>';
+
+				if ( $item->e_isonline ) {
 					$field .= '<div class="arlo-event-online">Live online</div>';
 				}
-				
-				if (!empty($item->presenters))
-					$field .= '<div class="arlo-event-presenter"><a href="' . esc_url( admin_url( 'admin.php?page=' . $this->plugin_slug . '-presenters&ep_e_id=' . $item->e_arlo_id) ) .'" >' . esc_html($item->presenters) . '</a></div>';
 
-				if (!empty($item->e_providerorganisation)) {
-					$field .= '<div class="arlo-event-provider">';
-					if (!empty($item->e_providerwebsite)) {
-						$field .= '<a href="' . esc_url($item->e_providerwebsite)  .'" target="_blank">' . esc_html($item->e_providerorganisation) . '</a>';					
-					} else {
-						$field .= esc_html($item->e_providerorganisation);
-					}
-					$field .= "</div>";					
+				if ( ! empty( $item->presenters ) ) {
+					$field .= '<div class="arlo-event-presenter"><a href="' . esc_url( admin_url( 'admin.php?page=' . $this->plugin_slug . '-presenters&ep_e_id=' . $item->e_arlo_id ) ) . '" >' . esc_html( $item->presenters ) . '</a></div>';
 				}
-				
-				if (!empty($item->e_registeruri)) 		
-					$field .= '<div class="arlo-event_registeruri"><a href="' . esc_url($item->e_registeruri) . '" target="_blank">' . esc_html( wp_strip_all_tags( $item->e_registermessage ) ) . '</a></div>';
+
+				if ( ! empty( $item->e_providerorganisation ) ) {
+					$field .= '<div class="arlo-event-provider">';
+					if ( ! empty( $item->e_providerwebsite ) ) {
+						$field .= '<a href="' . esc_url( $item->e_providerwebsite ) . '" target="_blank">' . esc_html( $item->e_providerorganisation ) . '</a>';
+					} else {
+						$field .= esc_html( $item->e_providerorganisation );
+					}
+					$field .= "</div>";
+				}
+
+				if ( ! empty( $item->e_registeruri ) ) {
+					$field .= '<div class="arlo-event_registeruri"><a href="' . esc_url( $item->e_registeruri ) . '" target="_blank">' . esc_html( wp_strip_all_tags( $item->e_registermessage ) ) . '</a></div>';
+				}
 
 				return $field;
 
 			case 'et_descriptionsummary':
 			case 'e_sessiondescription':
-				if (!empty($item->$column_name))
+				if ( ! empty( $item->$column_name ) ) {
 					return '<div class="arlo-list-ellipsis">' . esc_html( wp_strip_all_tags( $item->$column_name ) ) . '</div>';
+				}
 				break;
 
 			case 'e_startdatetime':
@@ -118,8 +121,8 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 
 					$timezone   = null;
 					$windows_id = '';
-					if ( ! empty( $this->timezones[ $item->e_timezone_id ] ) ) {
-						$windows_id = (string) $this->timezones[ $item->e_timezone_id ]['windows_tz_id'];
+					if ( null !== $item->e_timezone_id && ! empty( $this->timezones[ $item->e_timezone_id ] ) ) {
+						$windows_id = (string) ( $this->timezones[ $item->e_timezone_id ]['windows_tz_id'] ?? '' );
 						$timezone   = \ArloTraining\TimeZoneManager::resolve_php_timezone( $windows_id );
 					}
 
@@ -136,26 +139,27 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 					return $output;
 				}
 
-				$abbreviation = ($column_name == 'e_startdatetime' ? $item->e_starttimezoneabbr : $item->e_finishtimezoneabbr);
-				return esc_html($item->$column_name) . " " . esc_html($abbreviation);
+				$abbreviation = ( $column_name == 'e_startdatetime' ? $item->e_starttimezoneabbr : $item->e_finishtimezoneabbr );
+				return esc_html( $item->$column_name ) . " " . esc_html( $abbreviation );
 
 			case 'v_name':
-				$field = '';				
-				if (!empty($item->$column_name)) {
-					$field = '<div class="arlo-venue-name"><a href="' . esc_url(admin_url( 'admin.php?page=' . $this->plugin_slug . '-venues&v_e_id=' . $item->e_arlo_id))  .'" >' . esc_html($item->$column_name). '</a></div>';			
+				$field = '';
+				if ( ! empty( $item->$column_name ) ) {
+					$field = '<div class="arlo-venue-name"><a href="' . esc_url( admin_url( 'admin.php?page=' . $this->plugin_slug . '-venues&v_e_id=' . $item->e_arlo_id ) ) . '" >' . esc_html( $item->$column_name ) . '</a></div>';
 				}
 
-				if (!empty($item->e_locationname)) {
-					$field .= '<div class="arlo-location">' . esc_html($item->e_locationname) . (!empty($item->e_locationroomname) ? ' (' . esc_html($item->e_locationroomname) . ')' : '') . '</div>';
-				} elseif (!empty($item->e_locationroomname)) {
-					$field .= '<div class="arlo-locationroom">' . esc_html($item->e_locationroomname) . '</div>';
+				if ( ! empty( $item->e_locationname ) ) {
+					$field .= '<div class="arlo-location">' . esc_html( $item->e_locationname ) . ( ! empty( $item->e_locationroomname ) ? ' (' . esc_html( $item->e_locationroomname ) . ')' : '' ) . '</div>';
+				} elseif ( ! empty( $item->e_locationroomname ) ) {
+					$field .= '<div class="arlo-locationroom">' . esc_html( $item->e_locationroomname ) . '</div>';
 				}
-				
+
 				return $field;
 
 			case 'e_session_num':
-				if (!empty($item->$column_name))
-					return '<a href="' . esc_url(admin_url( 'admin.php?page=' . $this->plugin_slug . '-sessions&e_parent_id=' . $item->e_arlo_id))  .'" >' . esc_html($item->$column_name) . '</a>';					
+				if ( ! empty( $item->$column_name ) ) {
+					return '<a href="' . esc_url( admin_url( 'admin.php?page=' . $this->plugin_slug . '-sessions&e_parent_id=' . $item->e_arlo_id ) ) . '" >' . esc_html( $item->$column_name ) . '</a>';
+				}
 				break;
 
 			default:
@@ -201,29 +205,29 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 		return $reason . "\n" . $using_offset;
 	}
 
-	function column_e_code($item) {
+	function column_e_code( $item ) {
 		$actions = array(
-			'edit' => '<a href="' . esc_url(sprintf('https://%s/management/Console/#/events/%d', $this->platform_url, $item->e_arlo_id)) . '" target="_blank">Edit</a>',
-			'view' => sprintf('<a href="%s" target="_blank">View</a>', esc_url($item->guid)),
+			'edit' => '<a href="' . esc_url( sprintf( 'https://%s/management/Console/#/events/%d', $this->platform_url, $item->e_arlo_id ) ) . '" target="_blank">Edit</a>',
+			'view' => sprintf( '<a href="%s" target="_blank">View</a>', esc_url( $item->guid ) ),
 		);
 
-		return sprintf('%1$s %2$s', esc_html($item->e_code), $this->row_actions($actions) );
+		return sprintf( '%1$s %2$s', esc_html( $item->e_code ), $this->row_actions( $actions ) );
 	}
-		
+
 	protected function get_sql_where_array() {
-		$where = [
+		$where     = [
 			"e.import_id = %d",
-			"e.e_parent_arlo_id = 0"
+			"e.e_parent_arlo_id = 0",
 		];
 		$parameter = [
-			$this->import_id
+			$this->import_id,
 		];
 		return array(
-			'where' => $where,
-			'parameter' => $parameter
+			'where'     => $where,
+			'parameter' => $parameter,
 		);
 	}
-	
+
 	protected function get_searchable_fields() {
 		return [
 			'e_code',
@@ -237,13 +241,13 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			'e_registermessage',
 			'e_providerorganisation',
 		];
-	}	
+	}
 
 	protected function get_total_items_count() {
 		global $wpdb;
 
 		$where = $this->get_sql_where_expression();
-		$sql = "
+		$sql   = "
 		SELECT
 			COUNT(DISTINCT e.e_arlo_id)
 		FROM
@@ -264,18 +268,18 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			" . $where['where'];
 
 		$row = \ArloTraining\CacheControl::fetch_row(
-			\ArloTraining\Utilities::prepare_sql($sql, $where['parameter']),
+			\ArloTraining\Utilities::prepare_sql( $sql, $where['parameter'] ),
 			ARRAY_N
 		);
 
-		return !empty($row) ? intval($row[0]) : 0;
+		return ! empty( $row ) ? intval( $row[0] ) : 0;
 	}
-	
-		
+
+
 	public function get_sql_query() {
 		global $wpdb;
-		$where = $this->get_sql_where_expression();
-		$parameter = [];
+		$where       = $this->get_sql_where_expression();
+		$parameter   = [];
 		$parameter[] = $this->import_id;
 		$parameter[] = $this->import_id;
 
@@ -311,25 +315,25 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 			posts.guid
 		FROM
 			{$wpdb->prefix}arlo_events AS e
-		LEFT JOIN 
+		LEFT JOIN
 			{$wpdb->prefix}arlo_eventtemplates AS et
 		ON
 			e.et_arlo_id = et.et_arlo_id
 		AND
 			et.import_id = e.import_id
-		LEFT JOIN 
+		LEFT JOIN
 			{$wpdb->prefix}arlo_events_presenters AS ep
 		ON
 			e.e_id = ep.e_id
 		AND
 			ep.import_id = e.import_id
-		LEFT JOIN 
+		LEFT JOIN
 			{$wpdb->prefix}arlo_presenters AS p
 		ON
 			ep.p_arlo_id = p.p_arlo_id
 		AND
 			p.import_id = e.import_id
-		LEFT JOIN 
+		LEFT JOIN
 			{$wpdb->prefix}arlo_venues AS v
 		ON
 			e.v_id = v.v_arlo_id
@@ -344,14 +348,14 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists  {
 		GROUP BY
 			e.e_arlo_id
 		";
-		return \ArloTraining\Utilities::prepare_sql($sql_events, array_merge($parameter, $where['parameter']));
-	}	
-	
-	public function get_new_link() {
-		return esc_url(sprintf('https://%s/management/Console/#/events/new/', $this->platform_url));
+		return \ArloTraining\Utilities::prepare_sql( $sql_events, array_merge( $parameter, $where['parameter'] ) );
 	}
-	
+
+	public function get_new_link() {
+		return esc_url( sprintf( 'https://%s/management/Console/#/events/new/', $this->platform_url ) );
+	}
+
 	public function get_list_link() {
-		return esc_url(sprintf('https://%s/management/Console/#/events/', $this->platform_url));
-	}			
+		return esc_url( sprintf( 'https://%s/management/Console/#/events/', $this->platform_url ) );
+	}
 }

@@ -15,7 +15,6 @@ if (typeof (Arlo) === "undefined") {
 
 	Arlo.ArloForWordPress.prototype = {
 		VERSION: '3.0',
-		apiClient: null,
 		pluginSlug: 'arlo-for-wordpress',
 		tabIDs: [],
 		editor: null,
@@ -62,6 +61,9 @@ if (typeof (Arlo) === "undefined") {
 				me.initRegionFields();
 				me.initFilterSettingsFields();
 				me.initDeploymentModeField();
+				me.initLogRetentionField();
+				me.initLegacyRegionIdHandlingField();
+				me.initPoweredByOptIn();
 				me.getLastImportLog();
 
 				me.initEvents();
@@ -291,7 +293,7 @@ if (typeof (Arlo) === "undefined") {
 				data = {
 					action: 'arlo_terminate_task',
 					taskID: taskID,
-					nonce: admin_ajax_var.nonce
+					nonce: arloAdmin.nonce
 				},
 				taskPlaceholder = $("#arlo-task-" + taskID);
 			
@@ -304,7 +306,7 @@ if (typeof (Arlo) === "undefined") {
 				data = {
 					action: 'arlo_get_task_info',
 					taskID: taskID,
-					nonce: admin_ajax_var.nonce
+					nonce: arloAdmin.nonce
 				},
 				taskPlaceholder = $("#arlo-task-" + taskID);
 						
@@ -368,7 +370,7 @@ if (typeof (Arlo) === "undefined") {
 			var me = this,
 				data = {
 					action: 'arlo_start_scheduler',
-					nonce: admin_ajax_var.nonce
+					nonce: arloAdmin.nonce
 				}
 				
 			$.post(me.ajaxUrl, data);
@@ -465,7 +467,7 @@ if (typeof (Arlo) === "undefined") {
 			var me = this,
 				data = {
 					action: 'arlo_get_last_import_log',
-					nonce: admin_ajax_var.nonce
+					nonce: arloAdmin.nonce
 				};
 			
 			if (successful) {
@@ -527,6 +529,109 @@ if (typeof (Arlo) === "undefined") {
 				$('#arlo_platform_name').focus().select();	
 			});
 			
+			// The demo option and its hint wording only apply while the platform field is empty.
+			var $platformName = $('#arlo_platform_name');
+			var $demoOnly     = $('.arlo-demo-only');
+			if ( $platformName.length && $demoOnly.length ) {
+				var syncDemoOption = function() {
+					$demoOnly.prop('hidden', String($platformName.val()).trim() !== '');
+				};
+				$platformName.on('input change', syncDemoOption);
+				syncDemoOption();
+			}
+
+			// Information pointer for the demo option, using the WordPress pointer widget so it positions
+			// itself against the icon. Shown on hover or keyboard focus and kept open while the mouse is over
+			// either the icon or the pointer itself (a half-second delay bridges the gap between them). A click or
+			// tap pins it open until clicked again, Escape, or an outside click. The text also stays available
+			// to assistive technology through aria-describedby.
+			var $infoToggle = $('.arlo-info-toggle');
+			var infoText    = $('#arlo-demo-info').text().trim();
+			if ( $infoToggle.length && infoText && typeof $.fn.pointer === 'function' ) {
+				var infoPinned  = false;
+				var infoVisible = false;
+				var infoTimer   = null;
+				var arrowCentre = 63; // Arrow centre measured from the pointer edge, from wp-pointer.css.
+
+				var cancelInfoClose = function() {
+					clearTimeout(infoTimer);
+				};
+				var hideInfo = function() {
+					cancelInfoClose();
+					if ( infoVisible ) {
+						$infoToggle.pointer('destroy');
+						infoVisible = false;
+					}
+				};
+				var scheduleInfoClose = function() {
+					cancelInfoClose();
+					if ( !infoPinned ) {
+						infoTimer = setTimeout(hideInfo, 500);
+					}
+				};
+				var showInfo = function() {
+					cancelInfoClose();
+					hideInfo();
+					var viewport   = document.documentElement.clientWidth;
+					var width      = Math.min(320, viewport - 16);
+					var iconRect   = $infoToggle[0].getBoundingClientRect();
+					var alignRight = iconRect.left + iconRect.width / 2 - arrowCentre + width > viewport - 8;
+
+					$infoToggle.pointer({
+						content: $('<div></div>').append($('<p></p>').text(infoText)).html(),
+						pointerClass: 'wp-pointer arlo-info-pointer' + (alignRight ? ' arlo-info-pointer--right' : ''),
+						pointerWidth: width,
+						position: {
+							edge: 'top',
+							at: 'center bottom+4',
+							my: (alignRight ? 'right+' : 'left-') + arrowCentre + ' top'
+						},
+						buttons: function() { return false; }
+					}).pointer('open');
+					infoVisible = true;
+					$infoToggle.pointer('widget').on('mouseenter', cancelInfoClose).on('mouseleave', scheduleInfoClose);
+				};
+				var unpinInfo = function() {
+					infoPinned = false;
+					hideInfo();
+				};
+
+				$infoToggle.on('mouseenter focus', function() {
+					cancelInfoClose();
+					if ( !infoVisible ) {
+						showInfo();
+					}
+				});
+				$infoToggle.on('mouseleave blur', scheduleInfoClose);
+				$infoToggle.on('click', function() {
+					if ( infoPinned ) {
+						unpinInfo();
+					} else {
+						// A close scheduled by a recent mouseleave or blur must not outlive the pin.
+						cancelInfoClose();
+						infoPinned = true;
+						if ( !infoVisible ) {
+							showInfo();
+						}
+					}
+				});
+				$(document).on('keydown', function(e) {
+					if ( e.key === 'Escape' && infoVisible ) {
+						unpinInfo();
+					}
+				});
+				$(document).on('click', function(e) {
+					if ( !$(e.target).closest('.arlo-demo-option, .arlo-info-pointer').length ) {
+						unpinInfo();
+					}
+				});
+				$(window).on('resize', function() {
+					if ( infoVisible ) {
+						showInfo();
+					}
+				});
+			}
+
 			//nav-bar
 			$('.nav-tab-wrapper.main-tab .nav-tab').click(function() {
 				var tabID = $(this).attr('id').split('-').pop();
@@ -605,7 +710,7 @@ if (typeof (Arlo) === "undefined") {
 				var capturedPostId = parseInt( $select.val(), 10 );
 				state.activeXhr = $.post( me.ajaxUrl, {
 					action:      'arlo_check_page_shortcode',
-					nonce:       admin_ajax_var.nonce,
+					nonce:       arloAdmin.nonce,
 					post_id:     capturedPostId,
 					template_id: templateId
 				} )
@@ -823,7 +928,7 @@ if (typeof (Arlo) === "undefined") {
 					// home_url_path is the path component of get_home_url(), normalised to
 					// end with '/'. On standard installs it is '/'; on WP-in-directory
 					// installs (core files in /wp/, site at /) it correctly reflects home.
-					var homePath = ( admin_ajax_var.home_url_path || '/' );
+					var homePath = ( arloAdmin.home_url_path || '/' );
 					$links.append(
 						$( '<a class="arlo-sc-check__link" target="_blank" rel="noopener noreferrer"></a>' )
 							.attr( 'href', window.location.origin + homePath + '?page_id=' + parseInt( postId, 10 ) + '&preview=true' )
@@ -916,6 +1021,137 @@ if (typeof (Arlo) === "undefined") {
 				});
 			}
 		},
+		initLogRetentionField: function() {
+			var $select = $('#log_retention_max_rows');
+			var $warning = $('#arlo-log-retention-warning');
+			var $message = $('#arlo-log-retention-warning-message');
+			if (!$select.length || !$warning.length || !$message.length) {
+				return;
+			}
+
+			var updateWarning = function() {
+				var valueChanged = $select.val() !== $select.attr('data-original-value');
+				if (!valueChanged) {
+					$warning.hide();
+					return;
+				}
+
+				$warning.css('display', 'inline-flex');
+				$message.text($select.attr('data-maintenance-message') || '');
+			};
+
+			$select.on('change', updateWarning);
+			updateWarning();
+		},
+		initLegacyRegionIdHandlingField: function() {
+			var $checkbox = $('#legacy_region_id_handling');
+			var $importWarning = $('#arlo-legacy-region-id-handling-warning');
+			var $lengthWarning = $('#arlo-legacy-region-id-handling-length-warning');
+			if (!$checkbox.length || !$importWarning.length || !$lengthWarning.length) {
+				return;
+			}
+
+			var legacyMaxLength = 5;
+			var updateWarnings = function() {
+				var enabled = $checkbox.prop('checked');
+				$importWarning.css('display', enabled === ($checkbox.attr('data-original-value') === '1') ? 'none' : 'flex');
+
+				var tooLong = false;
+				$('#arlo-regions .arlo-region-id input').each(function() {
+					if ($(this).val().length > legacyMaxLength) {
+						tooLong = true;
+					}
+				});
+				$lengthWarning.css('display', enabled && tooLong ? 'flex' : 'none');
+			};
+
+			$checkbox.on('change', updateWarnings);
+			$('#arlo-regions').on('input', '.arlo-region-id input', updateWarnings);
+			// Removing a row fires no input event; defer so the row is gone before the remaining IDs are checked.
+			$('#arlo-regions').on('click', 'li .arlo-icons8-minus', function() {
+				window.setTimeout(updateWarnings, 0);
+			});
+			updateWarnings();
+		},
+		initPoweredByOptIn: function() {
+			var me = this,
+				notice = $('#arlo-powered-by-opt-in-notice'),
+				checkbox = $('#arlo-powered-by-opt-in'),
+				settingsCheckbox = $('#show_powered_by'),
+				form = $('#arlo-settings'),
+				saving = false,
+				savedChoice = null;
+
+			if (!notice.length) {
+				return;
+			}
+
+			function showFailure() {
+				checkbox.prop('checked', savedChoice === '1');
+				notice.find('.arlo-powered-by-opt-in-failed').prop('hidden', false);
+			}
+
+			function savePoweredBy(value, dismiss) {
+				if (saving) {
+					return;
+				}
+
+				var controls = checkbox.add(settingsCheckbox).add(notice.find('.notice-dismiss')).add(form.find(':submit')).filter(':enabled');
+				saving = true;
+				controls.prop('disabled', true);
+				notice.attr('aria-busy', 'true');
+				notice.find('.arlo-powered-by-opt-in-failed').prop('hidden', true);
+
+				$.ajax({
+					url: me.ajaxUrl,
+					type: 'POST',
+					dataType: 'json',
+					data: {
+						action: 'arlo_set_powered_by',
+						value: value,
+						nonce: arloAdmin.nonce
+					}
+				}).done(function(response) {
+					if (!response || response.success !== true || !response.data || response.data.value !== value) {
+						showFailure();
+						return;
+					}
+					savedChoice = value;
+					settingsCheckbox.prop('checked', value === '1');
+					if (dismiss) {
+						notice.remove();
+					} else if (value === '1') {
+						notice.find('.arlo-powered-by-opt-in-prompt').prop('hidden', true);
+						notice.find('.arlo-powered-by-opt-in-saved').prop('hidden', false);
+					}
+				}).fail(showFailure).always(function() {
+					saving = false;
+					controls.prop('disabled', false);
+					notice.attr('aria-busy', 'false');
+				});
+			}
+
+			checkbox.on('change', function() {
+				savePoweredBy(this.checked ? '1' : '0', false);
+			});
+			form.on('submit', function(event) {
+				if (saving) {
+					event.preventDefault();
+					return false;
+				}
+			});
+			notice.on('click', '.notice-dismiss', function(event) {
+				event.preventDefault();
+				if (saving) {
+					return;
+				}
+				if (savedChoice !== null) {
+					notice.remove();
+				} else {
+					savePoweredBy('0', true);
+				}
+			});
+		},
 		initEvents: function() {
 			var me = this;		
 
@@ -1002,26 +1238,19 @@ if (typeof (Arlo) === "undefined") {
 			});
 
 			//dismissible message
-			$('.toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-dismiss, .toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-dismiss-custom').click(function() {
+			$('.toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-dismiss').click(function() {
 				var id = $(this).closest('.notice.is-dismissible.arlo-message').attr('id');
 				if (id != null) {
 					var data = {
 						action: 'arlo_dismiss_message',
 						id: id,
-						nonce: admin_ajax_var.nonce
+						nonce: arloAdmin.nonce
 					}
 					
 					$.post(me.ajaxUrl, data);
 				}
 			})
 
-			$('.toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-dismiss-custom, .toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-ask-later').click(function(e) {
-				e.preventDefault();
-				$(this).closest('.arlo-message').fadeOut(function() {
-					$(this).closest('.arlo-message').remove();
-				});
-			});
-			
 			//dismissible admin notices
 			$('.toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-user-dismissable-message .notice-dismiss').click(function() {
 				var id = $(this).parent().attr('id');
@@ -1029,35 +1258,12 @@ if (typeof (Arlo) === "undefined") {
 					var data = {
 						action: 'arlo_dismissible_notice',
 						id: id,
-						nonce: admin_ajax_var.nonce
+						nonce: arloAdmin.nonce
 					}
 					
 					$.post(me.ajaxUrl, data);
 				}
 			});
-
-			$('.toplevel_page_arlo-for-wordpress .notice.is-dismissible.arlo-message:not(.arlo-user-dismissable-message) .notice-ask-later').click(function() {
-				var data = {
-					action: 'arlo_increment_review_notice_date',
-					nonce: admin_ajax_var.nonce
-				}
-				
-				$.post(me.ajaxUrl, data);
-			});
-
-			//turn off arlo_send_data
-			$('#arlo_turn_off_send_data').click(function() {
-				var el = $(this),
-					data = {
-						action: 'arlo_turn_off_send_data',
-						nonce: admin_ajax_var.nonce
-					}
-				
-				$.post(me.ajaxUrl, data, function() {
-					el.parentsUntil('.arlo-message').parent().find('.notice-dismiss').trigger('click');
-					$('#arlo_send_data').removeAttr("checked");
-				});
-			});	
 
 			$(".theme-apply").click(function(e) {
 				var target = $(e.currentTarget),
@@ -1086,4 +1292,3 @@ if (typeof (Arlo) === "undefined") {
 		}
 	}
 })(Arlo, jQuery);
-

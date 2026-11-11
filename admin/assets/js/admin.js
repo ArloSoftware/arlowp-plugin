@@ -1,10 +1,9 @@
-(function ( $, LSApi, Arlo) {
+(function ( $, Arlo) {
 	"use strict";
 
 	$(function () {
 		$(document).ready(function() {
 			var config = {
-				apiClient: LSApi,
 				ajaxUrl: window.ajaxurl,
 				templates: window.arlo_templates,
 				immediateTaskIDs: window.ArloImmediateTaskIDs,
@@ -16,4 +15,4 @@
 		});
 	});
 
-}(jQuery, window.LS.Api, window.Arlo));
+}(jQuery, window.Arlo));

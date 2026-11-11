@@ -1,35 +1,31 @@
 /*
- * Icon Font WP---WC-Demo-Themes
- * Made with love by Icons8 [ https://icons8.com/ ] using FontCustom [ https://github.com/FontCustom/fontcustom ]
- *
- * Contacts:
- *    [ https://icons8.com/contact ]
- *
- * Follow Icon8 on
- *    Twitter [ https://twitter.com/icons_8 ]
- *    Facebook [ https://www.facebook.com/Icons8 ]
- *    Google+ [ https://plus.google.com/+Icons8 ]
- *    GitHub [ https://github.com/icons8 ]
+ * Arlo icon set (Block themes).
+ * Glyphs are drawn from Font Awesome 4.7.0 (font: SIL OFL 1.1, CSS: MIT; https://fontawesome.io) and
+ * Arlo-authored SVG shapes. Class names are a public contract: customer templates and custom CSS
+ * reference them, so every name defined by earlier releases keeps rendering a glyph.
  */
 
-
 @font-face {
-  font-family: "WP---WC-Demo-Themes";
-  src: url("../fonts/WP---WC-Demo-Themes_c5578cab815efd1618fed22f1ee58d50.eot");
-  src: url("../fonts/WP---WC-Demo-Themes_c5578cab815efd1618fed22f1ee58d50.eot?#iefix") format("embedded-opentype"),
-       url("../fonts/WP---WC-Demo-Themes_c5578cab815efd1618fed22f1ee58d50.woff2") format("woff2"),
-       url("../fonts/WP---WC-Demo-Themes_c5578cab815efd1618fed22f1ee58d50.woff") format("woff"),
-       url("../fonts/WP---WC-Demo-Themes_c5578cab815efd1618fed22f1ee58d50.ttf") format("truetype"),
-       url("../fonts/WP---WC-Demo-Themes_c5578cab815efd1618fed22f1ee58d50.svg#WP---WC-Demo-Themes") format("svg");
+  font-family: "FontAwesome";
+  src: url("../../../public/custom-assets/font-awesome-4.7.0/fonts/fontawesome-webfont.woff2?v=4.7.0") format("woff2"),
+       url("../../../public/custom-assets/font-awesome-4.7.0/fonts/fontawesome-webfont.woff?v=4.7.0") format("woff"),
+       url("../../../public/custom-assets/font-awesome-4.7.0/fonts/fontawesome-webfont.ttf?v=4.7.0") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
 
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-  @font-face {
-    font-family: "WP---WC-Demo-Themes";
-    src: url("../fonts/WP---WC-Demo-Themes_c5578cab815efd1618fed22f1ee58d50.svg#WP---WC-Demo-Themes") format("svg");
-  }
+/*
+ * Backward compatibility only. Custom CSS on older deployments may still name the earlier icon font family below
+ * (for example a pasted copy of a theme rule such as content: "\f111" with this font-family). This small font maps
+ * those earlier codepoints to the current icons so that CSS keeps drawing the intended glyph. The rules shipped with
+ * the plugin use Font Awesome above and do not need it, so it can be removed, with its font file, once no deployment
+ * relies on it.
+ */
+@font-face {
+  font-family: "WP---WC-Demo-Themes";
+  src: url("../../../public/custom-assets/arlo-icon-compat/block-glyphs.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
 }
 
 [data-icons8]:before { content: attr(data-icons8); }
@@ -105,7 +101,7 @@
 .icons8-user-groups:before,
 .icons8-user-groups-filled:before {
   display: inline-block;
-  font-family: "WP---WC-Demo-Themes";
+  font-family: "FontAwesome";
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
@@ -116,74 +112,37 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   font-smoothing: antialiased;
+}.icons8-calendar:before { content: "\f133"; padding: 0 0.0357em; }.icons8-calendar-filled:before { content: "\f073"; padding: 0 0.0357em; }.icons8-circled-play:before { content: "\f01d"; padding: 0 0.0715em; }.icons8-circled-play-filled:before { content: "\f144"; padding: 0 0.0715em; }.icons8-classroom:before { content: "\f19d"; margin: 0 -0.1429em; }.icons8-classroom-filled:before { content: "\f19d"; margin: 0 -0.1429em; }.icons8-clock:before { content: "\f017"; padding: 0 0.0715em; }.icons8-clock-filled:before { content: "\f017"; padding: 0 0.0715em; }.icons8-comments:before { content: "\f0e5"; padding: 0 0em; }.icons8-comments-filled:before { content: "\f075"; padding: 0 0em; }.icons8-compass:before { content: "\f14e"; padding: 0 0.0715em; }.icons8-compass-filled:before { content: "\f14e"; padding: 0 0.0715em; }.icons8-date:before { content: "\f133"; padding: 0 0.0357em; }.icons8-diploma-1:before { content: "\f0a3"; padding: 0 0.0715em; }.icons8-diploma-1-filled:before { content: "\f0a3"; padding: 0 0.0715em; }.icons8-expand-arrow:before { content: "\f103"; padding: 0 0.1785em; }.icons8-expand-arrow-2:before { content: "\f078"; padding: 0 0em; }.icons8-facebook:before { content: "\f09a"; padding: 0 0.2143em; }.icons8-facebook-filled:before { content: "\f082"; padding: 0 0.0715em; }.icons8-flag-2:before { content: "\f11d"; padding: 0 0em; }.icons8-flag-2-filled:before { content: "\f024"; padding: 0 0em; }.icons8-gender-neutral-user:before { content: "\f2c0"; padding: 0 0.0715em; }.icons8-gender-neutral-user-filled:before { content: "\f007"; padding: 0 0.1428em; }.icons8-headset:before { content: " "; white-space: pre; padding: 0 0.375em; background-color: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M4.5 14v-2.5a7.5 7.5 0 0 1 15 0V14'/%3E%3Crect x='3' y='12.5' width='4' height='6.5' rx='1.4' fill='%23000'/%3E%3Crect x='17' y='12.5' width='4' height='6.5' rx='1.4' fill='%23000'/%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M19 19c0 1.8-1.8 2.6-4.2 2.6H13'/%3E%3Ccircle cx='12' cy='21.6' r='1.3' fill='%23000'/%3E%3C/svg%3E") no-repeat center / contain; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M4.5 14v-2.5a7.5 7.5 0 0 1 15 0V14'/%3E%3Crect x='3' y='12.5' width='4' height='6.5' rx='1.4' fill='%23000'/%3E%3Crect x='17' y='12.5' width='4' height='6.5' rx='1.4' fill='%23000'/%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M19 19c0 1.8-1.8 2.6-4.2 2.6H13'/%3E%3Ccircle cx='12' cy='21.6' r='1.3' fill='%23000'/%3E%3C/svg%3E") no-repeat center / contain; }.icons8-headset-filled:before { content: " "; white-space: pre; padding: 0 0.375em; background-color: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M4.5 14v-2.5a7.5 7.5 0 0 1 15 0V14'/%3E%3Crect x='3' y='12.5' width='4' height='6.5' rx='1.4' fill='%23000'/%3E%3Crect x='17' y='12.5' width='4' height='6.5' rx='1.4' fill='%23000'/%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M19 19c0 1.8-1.8 2.6-4.2 2.6H13'/%3E%3Ccircle cx='12' cy='21.6' r='1.3' fill='%23000'/%3E%3C/svg%3E") no-repeat center / contain; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M4.5 14v-2.5a7.5 7.5 0 0 1 15 0V14'/%3E%3Crect x='3' y='12.5' width='4' height='6.5' rx='1.4' fill='%23000'/%3E%3Crect x='17' y='12.5' width='4' height='6.5' rx='1.4' fill='%23000'/%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M19 19c0 1.8-1.8 2.6-4.2 2.6H13'/%3E%3Ccircle cx='12' cy='21.6' r='1.3' fill='%23000'/%3E%3C/svg%3E") no-repeat center / contain; }.icons8-help:before { content: "\f29c"; padding: 0 0.0715em; }.icons8-help-filled:before { content: "\f059"; padding: 0 0.0715em; }.icons8-home:before { content: "\f015"; padding: 0 0.0357em; }.icons8-home-filled:before { content: "\f015"; padding: 0 0.0357em; }.icons8-info:before { content: "\f129"; padding: 0 0.3215em; }.icons8-info-filled:before { content: "\f05a"; padding: 0 0.0715em; }.icons8-label:before { content: "\f02b"; padding: 0 0.0715em; }.icons8-label-filled:before { content: "\f02b"; padding: 0 0.0715em; }.icons8-light-on:before { content: "\f0eb"; padding: 0 0.2143em; }.icons8-light-on-filled:before { content: "\f0eb"; padding: 0 0.2143em; }.icons8-linkedin:before { content: "\f0e1"; padding: 0 0.0715em; }.icons8-linkedin-filled:before { content: "\f08c"; padding: 0 0.0715em; }.icons8-map-marker:before { content: "\f041"; padding: 0 0.2143em; }.icons8-map-marker-filled:before { content: "\f041"; padding: 0 0.2143em; }.icons8-marker:before { content: "\f041"; padding: 0 0.2143em; }.icons8-marker-filled:before { content: "\f041"; padding: 0 0.2143em; }.icons8-parking:before { content: " "; white-space: pre; padding: 0 0.375em; background-color: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z'/%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M9.5 18V6.5h4a3.4 3.4 0 0 1 0 6.8h-4'/%3E%3C/svg%3E") no-repeat center / contain; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z'/%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M9.5 18V6.5h4a3.4 3.4 0 0 1 0 6.8h-4'/%3E%3C/svg%3E") no-repeat center / contain; }.icons8-parking-filled:before { content: " "; white-space: pre; padding: 0 0.375em; background-color: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z'/%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M9.5 18V6.5h4a3.4 3.4 0 0 1 0 6.8h-4'/%3E%3C/svg%3E") no-repeat center / contain; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z'/%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M9.5 18V6.5h4a3.4 3.4 0 0 1 0 6.8h-4'/%3E%3C/svg%3E") no-repeat center / contain; }.icons8-play:before { content: "\f04b"; padding: 0 0.1072em; }.icons8-play-filled:before { content: "\f04b"; padding: 0 0.1072em; }.icons8-price-tag:before { content: "\f02b"; padding: 0 0.0715em; }.icons8-price-tag-filled:before { content: "\f02b"; padding: 0 0.0715em; }.icons8-price-tag-usd:before { content: "\f02b"; padding: 0 0.0715em; }.icons8-price-tag-usd-filled:before { content: "\f02b"; padding: 0 0.0715em; }.icons8-private:before { content: "\f023"; padding: 0 0.1785em; }.icons8-private-filled:before { content: "\f023"; padding: 0 0.1785em; }.icons8-search:before { content: "\f002"; padding: 0 0.0357em; }.icons8-search-filled:before { content: "\f002"; padding: 0 0.0357em; }.icons8-shopping-cart:before { content: "\f07a"; padding: 0 0.0357em; }.icons8-shopping-cart-filled:before { content: "\f07a"; padding: 0 0.0357em; }.icons8-start:before { content: "\f144"; padding: 0 0.0715em; }.icons8-start-filled:before { content: "\f144"; padding: 0 0.0715em; }.icons8-timetable:before { content: "\f073"; padding: 0 0.0357em; }.icons8-timetable-filled:before { content: "\f073"; padding: 0 0.0357em; }.icons8-topic:before { content: "\f097"; padding: 0 0.1428em; }.icons8-topic-filled:before { content: "\f02e"; padding: 0 0.1428em; }.icons8-training:before { content: "\f19d"; margin: 0 -0.1429em; }.icons8-training-filled:before { content: "\f19d"; margin: 0 -0.1429em; }.icons8-tv-show:before { content: " "; white-space: pre; padding: 0 0.375em; background-color: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' x='2.6' y='3.4' width='18.8' height='13.6' rx='1.7'/%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M8 21h8M12 17v4'/%3E%3Cpath fill='%23000' d='M10 7.6v6.2l5.1-3.1z'/%3E%3C/svg%3E") no-repeat center / contain; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' x='2.6' y='3.4' width='18.8' height='13.6' rx='1.7'/%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M8 21h8M12 17v4'/%3E%3Cpath fill='%23000' d='M10 7.6v6.2l5.1-3.1z'/%3E%3C/svg%3E") no-repeat center / contain; }.icons8-tv-show-filled:before { content: " "; white-space: pre; padding: 0 0.375em; background-color: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' fill-rule='evenodd' d='M4.3 3.4h15.4A1.7 1.7 0 0 1 21.4 5.1v10.2A1.7 1.7 0 0 1 19.7 17H4.3A1.7 1.7 0 0 1 2.6 15.3V5.1A1.7 1.7 0 0 1 4.3 3.4zM10 7.6v6.2l5.1-3.1z'/%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M8 21h8M12 17v4'/%3E%3C/svg%3E") no-repeat center / contain; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' fill-rule='evenodd' d='M4.3 3.4h15.4A1.7 1.7 0 0 1 21.4 5.1v10.2A1.7 1.7 0 0 1 19.7 17H4.3A1.7 1.7 0 0 1 2.6 15.3V5.1A1.7 1.7 0 0 1 4.3 3.4zM10 7.6v6.2l5.1-3.1z'/%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M8 21h8M12 17v4'/%3E%3C/svg%3E") no-repeat center / contain; }.icons8-twitter:before { content: "\f099"; padding: 0 0.0357em; }.icons8-twitter-filled:before { content: "\f099"; padding: 0 0.0357em; }.icons8-user-groups:before { content: "\f0c0"; margin: 0 -0.0357em; }.icons8-user-groups-filled:before { content: "\f0c0"; margin: 0 -0.0357em; }
+
+/* Forced colors (Windows High Contrast) replace background colors, which would hide the SVG-mask icons. */
+@media (forced-colors: active) {
+  .icons8-headset:before,
+  .icons8-headset-filled:before,
+  .icons8-parking:before,
+  .icons8-parking-filled:before,
+  .icons8-tv-show:before,
+  .icons8-tv-show-filled:before {
+    forced-color-adjust: none;
+    background-color: CanvasText;
+  }
 }
 
-.icons8-calendar:before { content: "\f106"; }
-.icons8-calendar-filled:before { content: "\f107"; }
-.icons8-circled-play:before { content: "\f10e"; }
-.icons8-circled-play-filled:before { content: "\f10f"; }
-.icons8-classroom:before { content: "\f127"; }
-.icons8-classroom-filled:before { content: "\f126"; }
-.icons8-clock:before { content: "\f12d"; }
-.icons8-clock-filled:before { content: "\f12e"; }
-.icons8-comments:before { content: "\f13b"; }
-.icons8-comments-filled:before { content: "\f13c"; }
-.icons8-compass:before { content: "\f144"; }
-.icons8-compass-filled:before { content: "\f145"; }
-.icons8-date:before { content: "\f128"; }
-.icons8-diploma-1:before { content: "\f135"; }
-.icons8-diploma-1-filled:before { content: "\f136"; }
-.icons8-expand-arrow:before { content: "\f131"; }
-.icons8-expand-arrow-2:before { content: "\f132"; }
-.icons8-facebook:before { content: "\f120"; }
-.icons8-facebook-filled:before { content: "\f121"; }
-.icons8-flag-2:before { content: "\f139"; }
-.icons8-flag-2-filled:before { content: "\f13a"; }
-.icons8-gender-neutral-user:before { content: "\f108"; }
-.icons8-gender-neutral-user-filled:before { content: "\f109"; }
-.icons8-headset:before { content: "\f11c"; }
-.icons8-headset-filled:before { content: "\f11d"; }
-.icons8-help:before { content: "\f116"; }
-.icons8-help-filled:before { content: "\f117"; }
-.icons8-home:before { content: "\f11a"; }
-.icons8-home-filled:before { content: "\f11b"; }
-.icons8-info:before { content: "\f137"; }
-.icons8-info-filled:before { content: "\f138"; }
-.icons8-label:before { content: "\f12f"; }
-.icons8-label-filled:before { content: "\f130"; }
-.icons8-light-on:before { content: "\f133"; }
-.icons8-light-on-filled:before { content: "\f134"; }
-.icons8-linkedin:before { content: "\f124"; }
-.icons8-linkedin-filled:before { content: "\f125"; }
-.icons8-map-marker:before { content: "\f140"; }
-.icons8-map-marker-filled:before { content: "\f141"; }
-.icons8-marker:before { content: "\f118"; }
-.icons8-marker-filled:before { content: "\f119"; }
-.icons8-parking:before { content: "\f142"; }
-.icons8-parking-filled:before { content: "\f143"; }
-.icons8-play:before { content: "\f10a"; }
-.icons8-play-filled:before { content: "\f10b"; }
-.icons8-price-tag:before { content: "\f101"; }
-.icons8-price-tag-filled:before { content: "\f102"; }
-.icons8-price-tag-usd:before { content: "\f100"; }
-.icons8-price-tag-usd-filled:before { content: "\f103"; }
-.icons8-private:before { content: "\f110"; }
-.icons8-private-filled:before { content: "\f111"; }
-.icons8-search:before { content: "\f129"; }
-.icons8-search-filled:before { content: "\f12a"; }
-.icons8-shopping-cart:before { content: "\f112"; }
-.icons8-shopping-cart-filled:before { content: "\f113"; }
-.icons8-start:before { content: "\f10c"; }
-.icons8-start-filled:before { content: "\f10d"; }
-.icons8-timetable:before { content: "\f12b"; }
-.icons8-timetable-filled:before { content: "\f12c"; }
-.icons8-topic:before { content: "\f13d"; }
-.icons8-topic-filled:before { content: "\f13e"; }
-.icons8-training:before { content: "\f104"; }
-.icons8-training-filled:before { content: "\f105"; }
-.icons8-tv-show:before { content: "\f11e"; }
-.icons8-tv-show-filled:before { content: "\f11f"; }
-.icons8-twitter:before { content: "\f122"; }
-.icons8-twitter-filled:before { content: "\f123"; }
-.icons8-user-groups:before { content: "\f114"; }
-.icons8-user-groups-filled:before { content: "\f115"; }
+/* Printing omits backgrounds, which would hide the SVG-mask icons. */
+@media print {
+  .icons8-headset:before,
+  .icons8-headset-filled:before,
+  .icons8-parking:before,
+  .icons8-parking-filled:before,
+  .icons8-tv-show:before,
+  .icons8-tv-show-filled:before,
+  .arlo#arlo .icons8-headset:before,
+  .arlo#arlo .icons8-headset-filled:before,
+  .arlo#arlo .icons8-parking:before,
+  .arlo#arlo .icons8-parking-filled:before,
+  .arlo#arlo .icons8-tv-show:before,
+  .arlo#arlo .icons8-tv-show-filled:before {
+    background-color: currentColor !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

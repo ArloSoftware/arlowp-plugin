@@ -4,6 +4,10 @@ namespace ArloTraining\Importer;
 
 use ArloTraining\Crypto;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 /**
  * Handles the snapshot callback data pipeline: nonce generation, parsing the
  * raw callback body, decrypting the JWE payload, and processing the decoded
@@ -13,6 +17,11 @@ use ArloTraining\Crypto;
  * of the I/O and state-management concerns that live on Importer.
  */
 class SnapshotHandler {
+
+	/**
+	 * Largest callback body accepted. The real callback is well under 4 KB.
+	 */
+	const MAX_CALLBACK_BODY_BYTES = 8192;
 
 	private $importer;
 
@@ -34,6 +43,34 @@ class SnapshotHandler {
 	}
 
 	/**
+	 * Read the callback request body without consuming more than the size limit.
+	 *
+	 * Reads at most one byte past MAX_CALLBACK_BODY_BYTES so an oversized body is
+	 * detectable by parse_snapshot_callback_response() while the remainder of an
+	 * unauthenticated request is never read into memory.
+	 *
+	 * @param resource|null $stream Readable stream; defaults to the request body.
+	 * @return string|false The body (at most MAX_CALLBACK_BODY_BYTES + 1 bytes), or false when it cannot be read.
+	 */
+	public static function read_bounded_callback_body( $stream = null ) {
+		$owns_stream = null === $stream;
+		if ( $owns_stream ) {
+			$stream = fopen( 'php://input', 'r' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen -- php://input has no WordPress filesystem API equivalent; the read below is bounded to the callback size limit.
+			if ( false === $stream ) {
+				return false;
+			}
+		}
+
+		$body = stream_get_contents( $stream, self::MAX_CALLBACK_BODY_BYTES + 1 );
+
+		if ( $owns_stream ) {
+			fclose( $stream ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Closes the php://input handle opened above.
+		}
+
+		return $body;
+	}
+
+	/**
 	 * Parse and validate the raw callback body string.
 	 *
 	 * Rejects oversized bodies before decoding, then delegates field-level
@@ -41,28 +78,28 @@ class SnapshotHandler {
 	 *
 	 * @param string $raw_body The raw POST body (JSON string).
 	 * @return object Decoded JSON with Nonce, RequestID, and __jwe__ fields.
-	 * @throws \Exception If the body is missing, oversized, or structurally invalid.
+	 * @throws \ArloTraining\ImportCallbackRejectedException If the body is missing, oversized, or structurally invalid.
 	 */
 	public function parse_snapshot_callback_response( string $raw_body ): object {
 		// Reject oversized bodies before any parsing work. The real callback
 		// contains a 32-char nonce, a ≤63-char RequestID, and a compact JWE
 		// token; the full payload is well under 4 KB on any legitimate request.
-		if ( strlen( $raw_body ) > 8192 ) {
-			throw new \Exception( 'Snapshot callback body exceeds maximum allowed size' );
+		if ( strlen( $raw_body ) > self::MAX_CALLBACK_BODY_BYTES ) {
+			throw new \ArloTraining\ImportCallbackRejectedException( 'Snapshot callback body exceeds maximum allowed size' );
 		}
 
 		$callback = json_decode( $raw_body );
 
 		if ( json_last_error() !== JSON_ERROR_NONE ) {
-			throw new \Exception( 'Failed to parse snapshot callback body: ' . json_last_error_msg() ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message is caught by the import pipeline, written to the Arlo log table via Logger, and escaped with esc_html() at admin render time.
+			throw new \ArloTraining\ImportCallbackRejectedException( 'Failed to parse snapshot callback body: ' . json_last_error_msg() ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message is caught by Importer::callback(), written to the Arlo log table via Logger, and escaped with esc_html() at admin render time.
 		}
 
 		if ( ! is_object( $callback ) ) {
-			throw new \Exception( 'Snapshot callback body must be a JSON object' );
+			throw new \ArloTraining\ImportCallbackRejectedException( 'Snapshot callback body must be a JSON object' );
 		}
 
 		if ( empty( $callback->Nonce ) || empty( $callback->__jwe__ ) || empty( $callback->RequestID ) ) {
-			throw new \Exception( 'Snapshot callback body missing required fields (Nonce, RequestID, __jwe__)' );
+			throw new \ArloTraining\ImportCallbackRejectedException( 'Snapshot callback body missing required fields (Nonce, RequestID, __jwe__)' );
 		}
 
 		$this->validate_callback_fields( $callback );
@@ -91,11 +128,11 @@ class SnapshotHandler {
 	 * requests.
 	 *
 	 * @param object $callback The decoded callback object.
-	 * @throws \Exception If any field fails its format check.
+	 * @throws \ArloTraining\ImportCallbackRejectedException If any field fails its format check.
 	 */
 	private function validate_callback_fields( object $callback ): void {
 		if ( ! is_scalar( $callback->Nonce ) || ! is_scalar( $callback->RequestID ) || ! is_scalar( $callback->__jwe__ ) ) {
-			throw new \Exception( 'Snapshot callback fields must be scalar values' );
+			throw new \ArloTraining\ImportCallbackRejectedException( 'Snapshot callback fields must be scalar values' );
 		}
 
 		$nonce      = (string) $callback->Nonce;
@@ -103,15 +140,15 @@ class SnapshotHandler {
 		$jwe        = (string) $callback->__jwe__;
 
 		if ( ! preg_match( '/^[0-9a-f]{32}$/i', $nonce ) ) {
-			throw new \Exception( 'Snapshot callback Nonce has invalid format' );
+			throw new \ArloTraining\ImportCallbackRejectedException( 'Snapshot callback Nonce has invalid format' );
 		}
 
 		if ( strlen( $request_id ) > 63 ) {
-			throw new \Exception( 'Snapshot callback RequestID exceeds maximum allowed length' );
+			throw new \ArloTraining\ImportCallbackRejectedException( 'Snapshot callback RequestID exceeds maximum allowed length' );
 		}
 
 		if ( substr_count( $jwe, '.' ) !== 4 ) {
-			throw new \Exception( 'Snapshot callback __jwe__ has invalid JWE structure' );
+			throw new \ArloTraining\ImportCallbackRejectedException( 'Snapshot callback __jwe__ has invalid JWE structure' );
 		}
 	}
 
@@ -151,12 +188,14 @@ class SnapshotHandler {
 	 */
 	public function process( object $snapshot_response ): void {
 		if ( ! empty( $snapshot_response->SnapshotUri ) ) {
-			$this->importer->update_import_entry( [
-				'callback_json' => wp_json_encode( $snapshot_response ),
-			] );
+			$this->importer->update_import_entry(
+				[
+					'callback_json' => wp_json_encode( $snapshot_response ),
+				]
+			);
 			$this->importer->kick_off_scheduler();
 		} elseif ( ! empty( $snapshot_response->Error ) ) {
-			$code    = sanitize_text_field( (string) ( $snapshot_response->Error->Code    ?? '' ) );
+			$code    = sanitize_text_field( (string) ( $snapshot_response->Error->Code ?? '' ) );
 			$message = sanitize_text_field( (string) ( $snapshot_response->Error->Message ?? '' ) );
 			$parts   = array_filter( [ $code, $message ] );
 			throw new \Exception(

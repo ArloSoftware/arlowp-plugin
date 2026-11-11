@@ -39,7 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_list_image" target="_blank">[arlo_event_template_list_image]</a></li>
 			<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/upcomingeventrelated#arlo_upcoming_offer" target="_blank">[arlo_upcoming_offer]</a></li>
 			<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_event_template_tags" target="_blank">[arlo_event_template_tags]</a></li>
-			<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_template_tags" target="_blank">[arlo_event_tags]</a></li>
+			<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventrelated#arlo_event_tags" target="_blank">[arlo_event_tags]</a></li>
 			<li>
 				<li><a href="https://developer.arlo.co/doc/wordpress/shortcodes/templateshortcodes/eventtemplaterelated#arlo_content_field_item" target="_blank">[arlo_content_field_item]</a></li>
 				<li>

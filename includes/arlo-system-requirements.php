@@ -4,127 +4,129 @@ namespace ArloTraining;
 
 use ArloTraining\Utilities;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 class SystemRequirements {
 	public static function get_system_requirements() {
 		return [
 			[
-				'name' => 'PHP version',
+				'name'           => 'PHP version',
 				'expected_value' => '7.4',
-				'current_value' => function () {
-					if (!defined('PHP_MAJOR_VERSION') || !defined('PHP_MINOR_VERSION') || !defined('PHP_RELEASE_VERSION')) {
+				'current_value'  => function () {
+					if ( ! defined( 'PHP_MAJOR_VERSION' ) || ! defined( 'PHP_MINOR_VERSION' ) || ! defined( 'PHP_RELEASE_VERSION' ) ) {
 						return 'Unknown';
 					}
 					return PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION . '.' . PHP_RELEASE_VERSION;
 				},
-				'check' => function($current_value, $expected_value) {
-					if (!strncmp('Unknown', $current_value, 7))	return null;
-					return version_compare($current_value, $expected_value) >= 0;
-				}
+				'check'          => function ( $current_value, $expected_value ) {
+					if ( ! strncmp( 'Unknown', $current_value, 7 ) ) {
+						return null;
+					}
+					return version_compare( $current_value, $expected_value ) >= 0;
+				},
 			],
 			[
-				'name' => 'WordPress version',
+				'name'           => 'WordPress version',
 				'expected_value' => '7.0',
-				'current_value' => function () {
-					if (!isset($GLOBALS['wp_version'])) {
+				'current_value'  => function () {
+					if ( ! isset( $GLOBALS['wp_version'] ) ) {
 						return 'Unknown';
 					}
 					return $GLOBALS['wp_version'];
 				},
-				'check' => function($current_value, $expected_value) {
-					if (!strncmp('Unknown', $current_value, 7))	return null;
-					return version_compare($current_value, $expected_value) >= 0;
-				}
+				'check'          => function ( $current_value, $expected_value ) {
+					if ( ! strncmp( 'Unknown', $current_value, 7 ) ) {
+						return null;
+					}
+					return version_compare( $current_value, $expected_value ) >= 0;
+				},
 			],
 			[
-				'name' => 'Memory limit',
+				'name'           => 'Memory limit',
 				'expected_value' => '64M',
-				'current_value' => function () {
-					$memory_limit_setting = ini_get('memory_limit');
-					return Utilities::settingToMegabytes($memory_limit_setting);
+				'current_value'  => function () {
+					$memory_limit_setting = ini_get( 'memory_limit' );
+					return Utilities::settingToMegabytes( $memory_limit_setting );
 				},
-				'check' => function($current_value, $expected_value) {
-					return intval($current_value) >= intval($expected_value) || intval($current_value) === -1;
-				}
+				'check'          => function ( $current_value, $expected_value ) {
+					return intval( $current_value ) >= intval( $expected_value ) || intval( $current_value ) === -1;
+				},
 			],
 			[
-				'name' => 'Max execution time',
+				'name'           => 'Max execution time',
 				'expected_value' => '30',
-				'current_value' => function () {
-					return ini_get('max_execution_time');
+				'current_value'  => function () {
+					return ini_get( 'max_execution_time' );
 				},
-				'check' => function($current_value, $expected_value) {
-					return intval($current_value) >= intval($expected_value) || $current_value == 0;
-				}
+				'check'          => function ( $current_value, $expected_value ) {
+					return intval( $current_value ) >= intval( $expected_value ) || $current_value == 0;
+				},
 			],
 			[
-				'name' => 'cUrl enabled',
+				'name'           => 'cUrl enabled',
 				'expected_value' => 'Yes',
-				'current_value' => function () {
-					return extension_loaded('curl') ? 'Yes': 'No';
+				'current_value'  => function () {
+					return extension_loaded( 'curl' ) ? 'Yes' : 'No';
 				},
-				'check' => function($current_value, $expected_value) {
+				'check'          => function ( $current_value, $expected_value ) {
 					return $current_value == 'Yes';
-				}
+				},
 			],
 			[
-				'name' => 'OpenSSL or mCrypt enabled',
+				'name'           => 'OpenSSL enabled',
 				'expected_value' => 'OpenSSL',
-				'current_value' => function () {
-					if (extension_loaded('openssl')) {
+				'current_value'  => function () {
+					if ( extension_loaded( 'openssl' ) ) {
 						return 'OpenSSL';
-					} else if (extension_loaded('mcrypt')) {
-						return 'mCrypt';
 					}
 					return 'None';
 				},
-				'check' => function($current_value, $expected_value) {
-					return in_array($current_value, ['OpenSSL', 'mCrypt']);
-				}
+				'check'          => function ( $current_value, $expected_value ) {
+					return $current_value === $expected_value;
+				},
 			],
 			[
-				'name' => 'RIJNDAEL 128 available',
+				'name'           => 'RIJNDAEL 128 available',
 				'expected_value' => 'Yes',
-				'current_value' => function () {
-					if (extension_loaded('openssl')) {
-						return (in_array('AES-256-CBC', openssl_get_cipher_methods())
-						     || in_array('aes-256-cbc', openssl_get_cipher_methods()) ? 'Yes' : 'No');
-					} else if (extension_loaded('mcrypt')) {
-						return (in_array(MCRYPT_RIJNDAEL_128, mcrypt_list_algorithms()) ? 'Yes' : 'No');
+				'current_value'  => function () {
+					if ( extension_loaded( 'openssl' ) ) {
+						return ( in_array( 'AES-256-CBC', openssl_get_cipher_methods(), true )
+							|| in_array( 'aes-256-cbc', openssl_get_cipher_methods(), true ) ? 'Yes' : 'No' );
 					}
 					return 'N/A';
 				},
-				'check' => function($current_value, $expected_value) {
+				'check'          => function ( $current_value, $expected_value ) {
 					return $current_value == 'Yes';
-				}
+				},
 			],
 			[
-				'name' => 'CBC mode available',
+				'name'           => 'CBC mode available',
 				'expected_value' => 'Yes',
-				'current_value' => function () {
-					if (extension_loaded('openssl')) {
-						return (in_array('AES-256-CBC', openssl_get_cipher_methods())
-						     || in_array('aes-256-cbc', openssl_get_cipher_methods()) ? 'Yes' : 'No');
-					} else if (extension_loaded('mcrypt')) {
-						return (in_array(MCRYPT_MODE_CBC, mcrypt_list_modes()) ? 'Yes' : 'No');
+				'current_value'  => function () {
+					if ( extension_loaded( 'openssl' ) ) {
+						return ( in_array( 'AES-256-CBC', openssl_get_cipher_methods(), true )
+							|| in_array( 'aes-256-cbc', openssl_get_cipher_methods(), true ) ? 'Yes' : 'No' );
 					}
 					return 'N/A';
 				},
-				'check' => function($current_value, $expected_value) {
+				'check'          => function ( $current_value, $expected_value ) {
 					return $current_value == 'Yes';
-				}
+				},
 			],
 			[
-				'name' => 'SHA512 available',
+				'name'           => 'SHA512 available',
 				'expected_value' => 'Yes',
-				'current_value' => function () {
-					return in_array('sha512', hash_algos()) ? 'Yes' : 'No';
+				'current_value'  => function () {
+					return in_array( 'sha512', hash_algos(), true ) ? 'Yes' : 'No';
 				},
-				'check' => function($current_value, $expected_value) {
+				'check'          => function ( $current_value, $expected_value ) {
 					return $current_value == 'Yes';
-				}
-			]									
+				},
+			],
 		];
-	} 
+	}
 
 	/**
 	 * Tests PHP's actual rules for the Canadian changes in tzdb 2026b through 2026e.
@@ -161,10 +163,10 @@ class SystemRequirements {
 
 	public static function overall_check() {
 		$good = true;
-		foreach (self::get_system_requirements() as $requirement) {
+		foreach ( self::get_system_requirements() as $requirement ) {
 			$current_value = $requirement['current_value']();
-			
-			if ($requirement['check']($current_value, $requirement['expected_value']) === false) {
+
+			if ( $requirement['check']( $current_value, $requirement['expected_value'] ) === false ) {
 				$good = false;
 				break;
 			}

@@ -9,7 +9,7 @@ color3: #747a87;
 */
 
 
-/* Normalize.css */
+/*! Contains normalize.css (MIT License, Copyright Nicolas Gallagher and Jonathan Neal, https://github.com/necolas/normalize.css), selectors prefixed with .arlo#arlo. See THIRD-PARTY-NOTICES.txt */
 
 body.arlo {
     margin: 0;
@@ -316,7 +316,7 @@ body.arlo {
 .arlo#arlo .arlo-list.events .discount:before,
 .arlo#arlo .arlo-list.upcoming .arlo-event-offers li:first-child:before {
     display: inline-block;
-    font-family: "WP---WC-Demo-Themes";
+    font-family: "FontAwesome";
     font-style: normal;
     font-weight: normal;
     font-variant: normal;
@@ -330,11 +330,14 @@ body.arlo {
 }
 
 .arlo#arlo .arlo-list.upcoming .arlo-event-offers li:first-child:before {
-    content: "\f102";
+    content: "\f02b";
+    width: 1em;
+    text-align: center;
 }
 
 .arlo#arlo .arlo-list.events .discount:before {
-    content: "\f101";
+    content: "\f02b";
+    text-align: center;
     width: 30px;
     float: left;
     height: 30px;
