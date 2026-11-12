@@ -176,7 +176,7 @@ class CustomCssCompatibility {
 			if ( 'at' === $type && 'import' === $value ) {
 				$this->finding( 'import', __( 'Keep @import statements at the top of Custom CSS, before style rules. After migrating, check that the imported stylesheet still loads. If both are already true, you can leave this import unchanged.', 'arlo-training-and-event-management-system' ), false, $token );
 				if ( $this->block_theme ) {
-					$this->finding( 'block-theme-import', __( 'This theme\'s Additional CSS is merged into its global stylesheet, where browsers ignore @import. Load this stylesheet or font through the theme instead.', 'arlo-training-and-event-management-system' ), false, $token );
+					$this->finding( 'block-theme-import', $this->block_theme_import_advice(), false, $token );
 				}
 				if ( $seen_rule || ! empty( $stack ) ) {
 					$this->finding( 'import-order', __( 'Move this @import out of any nested block and place it before ordinary style rules. Browsers can ignore imports in their current position.', 'arlo-training-and-event-management-system' ), false, $token );
@@ -293,6 +293,78 @@ class CustomCssCompatibility {
 			// For example a trailing // comment: once embedded, browsers join it to the first selector that follows and drop that rule.
 			$this->finding( 'unfinished-rule', __( 'The CSS ends in the middle of a rule or statement, such as text after the last closing brace. Once migrated, browsers would join it to the CSS that follows it in Additional CSS and ignore that rule. Remove it or finish it before migrating.', 'arlo-training-and-event-management-system' ), true, null, 'blocking' );
 		}
+	}
+
+	/**
+	 * Advice for an @import that a block theme's merged global stylesheet would ignore.
+	 *
+	 * Called as the @import keyword has just been read. Only this import's own URL is classified.
+	 *
+	 * @return string Translated advice.
+	 */
+	private function block_theme_import_advice(): string {
+		$url = $this->import_url();
+
+		if ( null !== $url && 1 === preg_match( '#fonts\.(?:googleapis|bunny|gstatic|adobe)\.|typekit\.net|[?&]family=#i', $url ) ) {
+			return __( 'This theme\'s Additional CSS is merged into its global stylesheet, where browsers ignore @import, so these fonts would stop loading. Add the fonts in WordPress instead (Appearance > Editor > Styles > Typography > Fonts), then remove this @import and keep the rules that use the fonts.', 'arlo-training-and-event-management-system' );
+		}
+
+		return __( 'This theme\'s Additional CSS is merged into its global stylesheet, where browsers ignore @import. Load this stylesheet or font through the theme instead.', 'arlo-training-and-event-management-system' );
+	}
+
+	/**
+	 * Reads the URL of the @import that has just been read, without moving the cursor.
+	 *
+	 * Understands comments, quoted strings and url(), so a semicolon inside a quoted URL does not end it and the next
+	 * import is never read. Anything it cannot read plainly, including escapes, is treated as unknown.
+	 *
+	 * @return string|null The URL, or null when it is missing, escaped, malformed or longer than the look-ahead bound.
+	 */
+	private function import_url(): ?string {
+		$end = min( strlen( $this->css ), $this->offset + 2048 );
+		$i   = $this->offset;
+
+		while ( $i < $end ) {
+			if ( $this->space( $this->css[ $i ] ) ) {
+				++$i;
+			} elseif ( '/*' === substr( $this->css, $i, 2 ) ) {
+				$close = strpos( $this->css, '*/', $i + 2 );
+				if ( false === $close || $close >= $end ) {
+					return null;
+				}
+				$i = $close + 2;
+			} else {
+				break;
+			}
+		}
+
+		$in_url = 0 === strncasecmp( substr( $this->css, $i, 4 ), 'url(', 4 );
+		if ( $in_url ) {
+			$i += 4;
+			while ( $i < $end && $this->space( $this->css[ $i ] ) ) {
+				++$i;
+			}
+		}
+
+		$quote = $i < $end ? $this->css[ $i ] : '';
+		$stop  = '"' === $quote || "'" === $quote ? $quote : ( $in_url ? ')' : '' );
+		if ( '' === $stop ) {
+			return null;
+		}
+
+		$start = '' !== $quote && $stop === $quote ? $i + 1 : $i;
+		for ( $j = $start; $j < $end; ++$j ) {
+			$char = $this->css[ $j ];
+			if ( $char === $stop ) {
+				return substr( $this->css, $start, $j - $start );
+			}
+			// Escapes, line breaks and, in an unquoted url(), quotes or spaces mean the URL is not a plain one.
+			if ( '\\' === $char || "\r" === $char || "\n" === $char || ( ')' === $stop && ( false !== strpos( "\"'(", $char ) || $this->space( $char ) ) ) ) {
+				return null;
+			}
+		}
+
+		return null;
 	}
 
 	/**

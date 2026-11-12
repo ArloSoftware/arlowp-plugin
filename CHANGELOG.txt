@@ -1,4 +1,11 @@
 
+== v5.2.1 ==
+
+Bug fixes
+------------------
+* On block themes, Arlo's stylesheets now load before Additional CSS, so Custom
+  CSS migrated to Additional CSS overrides them as it did before migrating.
+
 == v5.2.0 ==
 
 Enhancements
