@@ -3,7 +3,7 @@ Contributors: arlosoftware
 Tags: event registration, event management, events, courses, course management
 Requires at least: 7.0
 Tested up to: 7.1
-Stable tag: 5.2.0
+Stable tag: 5.2.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -246,6 +246,9 @@ Arlo Training Management Software is written in English. Translations can be con
 
 
 == Changelog ==
+
+= 5.2.1 =
+* Fix: On block themes, Arlo's stylesheets now load before Additional CSS, so Custom CSS migrated to Additional CSS overrides them as it did before migrating.
 
 = 5.2.0 =
 * Improvement: New arlo_region_redirect_location filter lets sites control automatic region redirects without editing plugin files, supporting site-managed regional URLs.

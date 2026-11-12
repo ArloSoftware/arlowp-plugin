@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 #[\AllowDynamicProperties]
 class VersionHandler {
-	const VERSION                                     = '5.2.0';
+	const VERSION                                     = '5.2.1';
 	private const PRE_VERSION_5_2_0_REGION_MAX_LENGTH = 5;
 
 	private $message_handler;

@@ -188,6 +188,18 @@ class Arlo_For_Wordpress {
 	const META_DESCRIPTION_MAX_LENGTH = 160;
 
 	/**
+	 * Priority at which core enqueues global styles on wp_enqueue_scripts.
+	 *
+	 * Core adds wp_enqueue_global_styles() to wp_enqueue_scripts without a
+	 * priority in wp-includes/default-filters.php, so it runs at the default
+	 * of 10. The plugin uses this value as the anchor for ordering its own
+	 * stylesheets relative to core's global styles.
+	 *
+	 * @var int
+	 */
+	const WP_GLOBAL_STYLES_ENQUEUE_PRIORITY = 10;
+
+	/**
 	 * Deployment mode constants.
 	 *
 	 * @since   5.1.0
@@ -617,7 +629,9 @@ class Arlo_For_Wordpress {
 		add_action( 'init', 'arlo_register_custom_post_types' );
 
 		// Load public-facing style sheet and JavaScript.
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
+		// Exactly one of these two enqueues the stylesheets, depending on requires_plugin_styles_before_global_css().
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_pre_global_styles' ), self::WP_GLOBAL_STYLES_ENQUEUE_PRIORITY - 1 );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_post_global_styles' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
 		// cron actions
@@ -1140,11 +1154,57 @@ class Arlo_For_Wordpress {
 
 
 	/**
-	 * Register and enqueue public-facing style sheet.
+	 * Enqueues the public-facing stylesheets before core enqueues global styles, when requires_plugin_styles_before_global_css() is true.
 	 *
-	 * @since    1.0.0
+	 * @since    5.2.0
 	 */
-	public function enqueue_styles() {
+	public function enqueue_pre_global_styles(): void {
+		if ( $this->requires_plugin_styles_before_global_css() ) {
+			$this->enqueue_plugin_styles();
+		}
+	}
+
+	/**
+	 * Enqueues the public-facing stylesheets after core's global styles, unless enqueue_pre_global_styles() already has.
+	 *
+	 * @since    5.2.0
+	 */
+	public function enqueue_post_global_styles(): void {
+		if ( ! $this->requires_plugin_styles_before_global_css() ) {
+			$this->enqueue_plugin_styles();
+		}
+	}
+
+	/**
+	 * Whether the shipped Arlo stylesheets must be enqueued before core's global styles.
+	 *
+	 * True for block theme sites outside legacy Custom CSS mode.
+	 *
+	 * @return bool
+	 */
+	private function requires_plugin_styles_before_global_css(): bool {
+		$settings = get_option( 'arlo_settings', [] );
+		$state    = \ArloTraining\CustomCss::resolve_state( is_array( $settings ) ? $settings : [] );
+
+		// Legacy mode keeps its historical order: its saved CSS prints after the Arlo styles, and sites may rely on that cascade until they migrate.
+		if ( \ArloTraining\CustomCss::MODE_LEGACY === $state['mode'] ) {
+			return false;
+		}
+
+		// A block theme prints Additional CSS inside the global styles element, so Arlo styles enqueued after it would override the site's
+		// own CSS, whether it was migrated from Custom CSS or written there later. Classic themes print Additional CSS after every
+		// enqueued stylesheet, so they need no change.
+		return \ArloTraining\CustomCssMigration::STORE_GLOBAL_STYLES === \ArloTraining\CustomCssMigration::current_store();
+	}
+
+	/**
+	 * Enqueues the plugin, theme and legacy Custom CSS stylesheets.
+	 *
+	 * The enqueue order is the Arlo cascade order: shipped base styles, then the selected Arlo theme's styles, then the legacy
+	 * plugin-folder Custom CSS file. Only legacy mode links that file, and it is never enqueued ahead of core's global styles. When this
+	 * runs relative to core's global styles is decided by the callers; see requires_plugin_styles_before_global_css().
+	 */
+	private function enqueue_plugin_styles(): void {
 
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-tingle', plugins_url( '../public/custom-assets/tingle/tingle.css', __FILE__ ), [], VersionHandler::VERSION );
 
