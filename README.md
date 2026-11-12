@@ -53,7 +53,7 @@ The GitHub Actions workflow files must be present on the default `master` branch
    - `includes/arlo-version-handler.php`: `VersionHandler::VERSION`
    - `CHANGELOG.txt`: add a `== vX.Y.Z ==` entry for the release
 
-1. **Raise PR.** Open a pull request from the staged release branch into `master`. The **Validate Release Metadata** workflow checks pull requests into `master` and can also be run manually. **Publish Release to WordPress.org** independently revalidates the version declarations for the selected tag, but intentionally does not require a changelog entry.
+1. **Raise PR.** Open a pull request from the staged release branch into `master`. The **Validate Release** workflow checks the version declarations and runs Plugin Check on the release package for pull requests into `master`, and can also be run manually. **Publish Release to WordPress.org** independently revalidates the version declarations for the selected tag, but intentionally does not require a changelog entry.
 
 1. **Tag release.** After the pull request is approved and merged, create an annotated tag from the approved commit on `master`. The tag determines the exact source published to WordPress.org:
 

@@ -1,4 +1,4 @@
-name: Validate Release Metadata
+name: Validate Release
 
 on:
   pull_request:
@@ -16,6 +16,7 @@ permissions:
 
 jobs:
   validate:
+    name: Release Metadata
     runs-on: ubuntu-latest
     steps:
       - name: Check out source
@@ -53,3 +54,100 @@ jobs:
           }
 
           echo "Release metadata is consistent for v$stable_tag."
+
+  plugin-check:
+    name: Plugin Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    # Runs on the runner's own PHP; wp-env's Alpine (musl) container lacks GLOB_BRACE, which the plugin uses.
+    services:
+      mysql:
+        image: mysql:8.4.13
+        env:
+          MYSQL_DATABASE: wordpress_plugin_check
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306/tcp
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -uroot -proot"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      PLUGIN_SLUG: arlo-training-and-event-management-system
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+        with:
+          php-version: '8.5'
+          extensions: mysqli
+          tools: wp-cli
+          coverage: none
+
+      - name: Provision WordPress
+        shell: bash
+        run: |
+          set -euo pipefail
+          wp_root="$RUNNER_TEMP/wordpress"
+          wp core download --path="$wp_root" --version=latest
+          wp config create --path="$wp_root" --dbname=wordpress_plugin_check --dbuser=root --dbpass=root \
+            --dbhost="127.0.0.1:${{ job.services.mysql.ports['3306'] }}" --skip-check
+          wp core install --path="$wp_root" --url=http://localhost --title="Plugin Check" \
+            --admin_user=admin --admin_password=admin --admin_email=admin@example.com --skip-email
+
+      - name: Build release package
+        shell: bash
+        run: |
+          set -euo pipefail
+          # git archive applies .gitattributes export-ignore, matching the published package.
+          package_dir="$RUNNER_TEMP/wordpress/wp-content/plugins/$PLUGIN_SLUG"
+          mkdir -p "$package_dir"
+          git archive HEAD | tar -x -C "$package_dir"
+
+      - name: Run Plugin Check
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/wordpress"
+          wp plugin install plugin-check --activate
+          wp plugin activate "$PLUGIN_SLUG"
+          results="$RUNNER_TEMP/plugin-check-results.txt"
+          status=0
+          wp plugin check "$PLUGIN_SLUG" --format=json \
+            --require=wp-content/plugins/plugin-check/cli.php > "$results" || status=$?
+          cat "$results"
+
+          # Output is a "FILE:" heading plus one JSON array of findings per file.
+          # Every finding is annotated; only errors fail the job.
+          errors=0
+          warnings=0
+          file=''
+          while IFS= read -r line; do
+            case "$line" in
+              "FILE: "*)
+                file="${line#FILE: }"
+                ;;
+              "["*)
+                jq -r --arg file "$file" '.[] | "::\(if .type == "ERROR" then "error" else "warning" end) file=\($file),line=\(.line),col=\(.column),title=\(.code)::\(.message | gsub("%"; "%25") | gsub("\r"; "%0D") | gsub("\n"; "%0A"))"' <<< "$line"
+                errors=$((errors + $(jq '[.[] | select(.type == "ERROR")] | length' <<< "$line")))
+                warnings=$((warnings + $(jq '[.[] | select(.type != "ERROR")] | length' <<< "$line")))
+                ;;
+            esac
+          done < "$results"
+
+          echo "Plugin Check reported $errors error(s) and $warnings warning(s)."
+          if [[ "$errors" -ne 0 ]]; then
+            echo "::error::Plugin Check reported $errors error(s). Warnings do not fail this job."
+            exit 1
+          fi
+          if [[ "$status" -ne 0 ]]; then
+            echo "::error::wp plugin check exited with status $status."
+            exit 1
+          fi
+          echo "Plugin Check passed."
