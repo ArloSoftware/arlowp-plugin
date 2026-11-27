@@ -14,7 +14,7 @@
  * Plugin Name:       Arlo Training Management Software
  * Plugin URI:        https://www.arlo.co/apps/wordpress-events-plugin
  * Description:       Connect your WordPress to Arlo
- * Version:           5.2.1
+ * Version:           5.2.2
  * Requires at least: 7.0
  * Author:            Arlo Software
  * Author URI:        https://www.arlo.co
@@ -41,9 +41,6 @@ define( 'ARLO_PLUGIN_PREFIX', 'arlo' );
 define( 'ARLO_PLUGIN_NAME', 'Arlo' );
 define( 'ARLO_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ARLO_PLUGIN_ROOT_URL', plugin_dir_url( __FILE__ ) );
-if ( ! defined( 'ARLO_FEATURE_DELTA_IMPORT' ) ) {
-	define( 'ARLO_FEATURE_DELTA_IMPORT', 'delta_import' );
-}
 
 /*----------------------------------------------------------------------------*
  * Public-Facing Functionality
@@ -66,11 +63,12 @@ require_once plugin_dir_path( __FILE__ ) . '/includes/arlo-cache-control.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/arlo-arrays.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/arlo-utilities.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-settingspersistence.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-settingssanitizer.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-customcss.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-customcsscompatibility.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-customcssmarkuprewriter.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-customcssmigration.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-templateaccess.php';
-require_once plugin_dir_path( __FILE__ ) . 'includes/class-featureflagmanager.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/arlo-date-formatter.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/arlo-scheduler.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/arlo-crypto.php';
@@ -86,6 +84,9 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/arlo-timezone-manager.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/arlo-redirect.php';
 
 //include shortcodes
+require_once plugin_dir_path( __FILE__ ) . 'includes/shortcodes/class-shortcoderendercontext.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/shortcodes/class-resolvedshortcodewrap.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/shortcodes/class-shortcodewrapsanitizer.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-shortcodes.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-filters.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-categories.php';
@@ -97,6 +98,7 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-venues.php'
 require_once plugin_dir_path( __FILE__ ) . 'includes/shortcodes/arlo-upcoming-events.php';
 
 // Include Arlo entities
+require_once plugin_dir_path( __FILE__ ) . 'includes/entities/class-queryshape.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/entities/arlo-templates.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/entities/arlo-events.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/entities/arlo-online-activities.php';

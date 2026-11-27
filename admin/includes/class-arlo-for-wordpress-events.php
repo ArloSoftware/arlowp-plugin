@@ -205,11 +205,14 @@ class Arlo_For_Wordpress_Events extends Arlo_For_Wordpress_Lists {
 		return $reason . "\n" . $using_offset;
 	}
 
-	function column_e_code( $item ) {
-		$actions = array(
-			'edit' => '<a href="' . esc_url( sprintf( 'https://%s/management/Console/#/events/%d', $this->platform_url, $item->e_arlo_id ) ) . '" target="_blank">Edit</a>',
-			'view' => sprintf( '<a href="%s" target="_blank">View</a>', esc_url( $item->guid ) ),
-		);
+	public function column_e_code( $item ) {
+		$actions = array();
+
+		if ( $this->should_show_arlo_manage_record_link() ) {
+			$actions['edit'] = '<a href="' . esc_url( sprintf( 'https://%s/management/Console/#/events/%d', $this->platform_url, $item->e_arlo_id ) ) . '" target="_blank">Edit</a>';
+		}
+
+		$actions['view'] = sprintf( '<a href="%s" target="_blank">View</a>', esc_url( $item->guid ) );
 
 		return sprintf( '%1$s %2$s', esc_html( $item->e_code ), $this->row_actions( $actions ) );
 	}

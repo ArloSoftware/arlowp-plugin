@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 
 use ArloTraining\Logger;
+use ArloTraining\SettingsSanitizer;
 use ArloTraining\VersionHandler;
 use ArloTraining\NoticeHandler;
 use ArloTraining\SystemRequirements;
@@ -21,7 +22,6 @@ use ArloTraining\UserFlash;
 use ArloTraining\Importer\ImportRequest;
 #[\AllowDynamicProperties]
 class Arlo_For_Wordpress_Settings {
-	private const REGION_ID_MAX_LENGTH               = 16;
 	const LOAD_DEMO_NONCE_ACTION                     = 'arlo-load-demo';
 	private const LEGACY_REGION_ID_HANDLING_DOCS_URL = 'https://developer.arlo.co/doc/wordpress/settings#legacy-region-id-handling';
 
@@ -32,141 +32,220 @@ class Arlo_For_Wordpress_Settings {
 			'arlo_settings',
 			'arlo_settings',
 			array(
-				'sanitize_callback' => function ( $input ) {
-					if ( \ArloTraining\SettingsPersistence::is_system_write() ) {
-						return $input;
-					}
-					if ( ! is_array( $input ) ) {
-						// Treat malformed full-option writes as no-ops so stored settings are not wiped.
-						return self::get_existing_settings_array();
-					}
-					$region_id = ( isset( $input['regionid'] ) && is_array( $input['regionid'] ) ? $input['regionid'] : [] );
-					$input['regionid'] = array_map(
-						function ( $value ) {
-							return is_scalar( $value ) ? substr( strtoupper( sanitize_text_field( (string) $value ) ), 0, self::REGION_ID_MAX_LENGTH ) : '';
-						},
-						$region_id
-					);
-
-					if ( isset( $input['platform_name'] ) ) {
-						$old = get_option( 'arlo_settings', array() );
-						$old = is_array( $old ) ? $old : array();
-						try {
-							$input['platform_name'] = Utilities::sanitize_and_validate_platform_name(
-								$input['platform_name'],
-								$old['platform_name'] ?? ''
-							);
-						} catch ( \ArloTraining\PlatformNameException $e ) {
-							// The assignment in the try block threw before completing, so
-							// $input['platform_name'] still holds the raw submitted value.
-							// Normalize the display name with the same helper, then esc_html() before embedding in any
-							// message to guard against XSS via wp_kses_post().
-							$display_name = Utilities::normalize_platform_name( sanitize_text_field( wp_unslash( $input['platform_name'] ) ) );
-							$safe_name = esc_html( $display_name ) . '.arlo.co';
-							$messages = [
-								'invalid_format'       => __( 'Arlo platform name must contain only letters, numbers and hyphens (e.g. myplatform).', 'arlo-training-and-event-management-system' ),
-								/* translators: %s: the platform URL the user typed, e.g. myplatform.arlo.co */
-								'timeout'              => sprintf( __( "Arlo platform '%s' could not be reached — the connection timed out. Please check the name and try again.", 'arlo-training-and-event-management-system' ), $safe_name ),
-								/* translators: %s: the platform URL the user typed, e.g. myplatform.arlo.co */
-								'ssl_error'            => sprintf( __( "Could not establish a secure connection to Arlo platform '%s'. Please check the name and contact support if the problem persists.", 'arlo-training-and-event-management-system' ), $safe_name ),
-								/* translators: %s: the platform URL the user typed, e.g. myplatform.arlo.co */
-								'not_found'            => sprintf( __( "Arlo platform '%s' could not be found. Please check it and try again.", 'arlo-training-and-event-management-system' ), $safe_name ),
-								/* translators: %s: the platform URL the user typed, e.g. myplatform.arlo.co */
-								'redirect'             => sprintf( __( "Arlo platform '%s' appears to have moved to a new address. Open it in your browser to find the correct domain, then enter it here.", 'arlo-training-and-event-management-system' ), $safe_name ),
-								/* translators: %s: the platform URL the user typed, e.g. myplatform.arlo.co */
-								'server_error'         => sprintf( __( "Arlo platform '%s' returned an unexpected error. Please check the name and try again.", 'arlo-training-and-event-management-system' ), $safe_name ),
-								/* translators: %s: the platform URL the user typed, e.g. myplatform.arlo.co */
-								'unexpected_http'      => sprintf( __( "Arlo platform '%s' returned an unexpected response. Please check the name and try again.", 'arlo-training-and-event-management-system' ), $safe_name ),
-								/* translators: %s: the platform URL the user typed, e.g. myplatform.arlo.co */
-								'invalid_content_type' => sprintf( __( "Arlo platform '%s' returned an unexpected response. Please check the name and try again.", 'arlo-training-and-event-management-system' ), $safe_name ),
-								/* translators: %s: the platform URL the user typed, e.g. myplatform.arlo.co */
-								'request_failed'       => sprintf( __( "Could not reach Arlo platform '%s'. Please check the name and try again.", 'arlo-training-and-event-management-system' ), $safe_name ),
-							];
-							add_settings_error(
-								'arlo_settings',
-								'invalid_platform_name',
-								$messages[ $e->getMessage() ] ?? $messages['request_failed']
-							);
-							$input['platform_name'] = $old['platform_name'] ?? '';
-						}
-					}
-
-					if ( ! empty( $input['import_callback_host'] ) ) {
-						$host = trim( $input['import_callback_host'] );
-						// Strip any characters outside the RFC 3986 URL character set.
-						$host = preg_replace( '/[^A-Za-z0-9\-._~:\/?#\[\]@!$&\'()*+,;=%]/', '', $host );
-						if ( empty( $host ) ) {
-							$input['import_callback_host'] = '';
-						} else {
-							if ( strpos( $host, '://' ) === false ) {
-								$host = 'https://' . $host;
-							}
-							$scheme = strtolower( (string) wp_parse_url( $host, PHP_URL_SCHEME ) );
-							if ( ! in_array( $scheme, array( 'http', 'https' ), true ) || filter_var( $host, FILTER_VALIDATE_URL ) === false ) {
-								$input['import_callback_host'] = '';
-							} else {
-								$input['import_callback_host'] = esc_url_raw( $host );
-							}
-						}
-					}
-					$input['import_connection_healthchecks_enabled'] = isset( $input['import_connection_healthchecks_enabled'] ) ? '1' : '0';
-					$input = Arlo_For_Wordpress::normalize_importer_mode_setting( $input, self::get_existing_settings_array() );
-					$input = self::sanitize_log_diagnostic_level_input( $input );
-					$input = self::sanitize_log_retention_max_rows_input( $input );
-					$input['user_import_enabled'] = isset( $input['user_import_enabled'] ) ? '1' : '0';
-
-					// Sanitize deployment_mode.
-					$allowed_modes = [ Arlo_For_Wordpress::DEPLOYMENT_MODE_PRODUCTION, Arlo_For_Wordpress::DEPLOYMENT_MODE_NON_PRODUCTION ];
-					$submitted_mode = ( isset( $input['deployment_mode'] ) && in_array( $input['deployment_mode'], $allowed_modes, true ) )
-						? $input['deployment_mode']
-						: Arlo_For_Wordpress::get_deployment_mode_default( $input['platform_name'] ?? '' );
-
-					// First-save override: on a brand-new install deployment_mode is not yet
-					// stored (set_default_options() intentionally omits it so the UI dropdown
-					// shows Production as a safe unknown-state default). On the very first save,
-					// if the submitted platform name is websitetestdata or empty we know this
-					// is a demo/dev site and forcibly set non_production — regardless of what
-					// the dropdown said. This prevents a fresh install from accidentally syncing
-					// at full frequency just because the admin didn't notice the dropdown.
-					// On all subsequent saves the key is already stored, so this block is skipped
-					// and the admin's explicit dropdown choice is honoured as-is.
-					$previously_stored = get_option( 'arlo_settings', [] );
-					$previously_stored = is_array( $previously_stored ) ? $previously_stored : [];
-					if ( ! isset( $previously_stored['deployment_mode'] ) ) {
-						$new_platform = is_scalar( $input['platform_name'] ?? '' ) ? strtolower( (string) ( $input['platform_name'] ?? '' ) ) : '';
-						if ( $new_platform === '' || $new_platform === Arlo_For_Wordpress::DEFAULT_PLATFORM ) {
-							$submitted_mode = Arlo_For_Wordpress::DEPLOYMENT_MODE_NON_PRODUCTION;
-						}
-					}
-					$input['deployment_mode'] = $submitted_mode;
-
-					// Check for conflicting host page assignments.
-					// If any are found, add a settings error for each.
-					foreach ( $this->validate_post_page_mappings( isset( $input['post_types'] ) && is_array( $input['post_types'] ) ? $input['post_types'] : [] ) as $conflict ) {
-						$labels  = array_column( $conflict['post_types'], 'label' );
-						$message = wp_kses(
-							sprintf(
-								/* translators: 1: WordPress page title hyperlinked to the public page 2: comma-separated list of conflicting Arlo page type names */
-								__( 'Host page %1$s is assigned to multiple conflicting Arlo page types (%2$s).<br>The page will not function correctly until the conflict is fixed.', 'arlo-training-and-event-management-system' ),
-								'<a href="' . esc_url( $conflict['page_url'] ) . '" target="_blank" rel="noreferrer noopener">' . esc_html( $conflict['page_title'] ) . '</a>',
-								esc_html( implode( ', ', $labels ) )
-							),
-							[
-								'a'  => [
-									'href'   => [],
-									'target' => [],
-									'rel'    => [],
-								],
-								'br' => [],
-							]
-						);
-						add_settings_error( 'arlo_settings', 'duplicate_host_page_' . $conflict['page_id'], $message, 'warning' );
-					}
-
-					return $input;
-				},
+				'sanitize_callback' => array( $this, 'sanitize_settings' ),
 			)
 		);
+
+		$this->register_screen_hooks();
+	}
+
+	/**
+	 * Explains which region IDs are accepted, for the Region ID field hints.
+	 *
+	 * @return string
+	 */
+	private static function region_id_rules_message(): string {
+		return sprintf(
+			/* translators: %d: the longest region ID, in characters */
+			__( 'A region ID can contain only letters, numbers, hyphens and underscores, starting with a letter or number, and be up to %d characters long.', 'arlo-training-and-event-management-system' ),
+			SettingsSanitizer::REGION_ID_MAX_LENGTH
+		);
+	}
+
+	/**
+	 * Tells the administrator that a submitted region ID was rejected, and why.
+	 *
+	 * @return string
+	 */
+	private static function invalid_region_id_notice(): string {
+		return self::region_id_rules_message() . ' ' . __( 'A region ID that does not follow this was not saved.', 'arlo-training-and-event-management-system' );
+	}
+
+	/**
+	 * Settings API sanitize callback for the arlo_settings option.
+	 *
+	 * Returns system writes unchanged. For a settings form submission it reduces the posted values to the shapes the
+	 * settings save reads and raises settings errors for values it rejects (an invalid region ID, platform name or host
+	 * page conflict). A value that is not an array returns the stored settings, so a malformed write cannot wipe them.
+	 *
+	 * It depends only on its argument and stored options, so it can be attached to the sanitize_option_arlo_settings filter
+	 * on an instance that was not constructed.
+	 *
+	 * @param mixed $input Submitted settings.
+	 * @return mixed The sanitized settings array, or the stored settings when the submission is not an array.
+	 */
+	public function sanitize_settings( $input ) {
+		if ( \ArloTraining\SettingsPersistence::is_system_write() ) {
+			return $input;
+		}
+		if ( ! is_array( $input ) ) {
+			// Treat malformed full-option writes as no-ops so stored settings are not wiped.
+			return self::get_existing_settings_array();
+		}
+		if ( SettingsSanitizer::has_invalid_region_id( $input['regionid'] ?? [] ) ) {
+			add_settings_error( 'arlo_settings', 'invalid_region_id', self::invalid_region_id_notice() );
+		}
+		$input['regionid'] = SettingsSanitizer::sanitize_region_ids( $input['regionid'] ?? [] );
+
+		// Region names are plain text; keep the array keys because settings_saved() pairs them with the region IDs.
+		// A submitted null is a submitted value, so these guards use array_key_exists() rather than isset().
+		if ( array_key_exists( 'regionname', $input ) ) {
+			$input['regionname'] = SettingsSanitizer::sanitize_text_values( $input['regionname'] );
+		}
+		if ( isset( $input['post_types'] ) && is_array( $input['post_types'] ) ) {
+			// Registered types include the custom shortcode types. An empty registry means the post types have not been
+			// registered, which says nothing about which IDs are valid, so no ID is dropped.
+			$registered_post_types = array_keys( Arlo_For_Wordpress::$post_types );
+			$input['post_types']   = SettingsSanitizer::sanitize_post_type_settings( $input['post_types'], array() === $registered_post_types ? null : $registered_post_types );
+		}
+		// A filter such as delivery is posted in several groups and in both rule sets, so its offered values are read once.
+		$offered_old_values = [];
+		$get_offered        = function ( string $filter ) use ( &$offered_old_values ) {
+			if ( ! array_key_exists( $filter, $offered_old_values ) ) {
+				$offered_old_values[ $filter ] = $this->get_filter_offered_old_values( $filter );
+			}
+
+			return $offered_old_values[ $filter ];
+		};
+		foreach ( [ 'arlo_filter_settings', 'arlo_page_filter_settings' ] as $filter_settings_key ) {
+			if ( array_key_exists( $filter_settings_key, $input ) ) {
+				$input[ $filter_settings_key ] = SettingsSanitizer::sanitize_filter_rules( $input[ $filter_settings_key ], $get_offered );
+			}
+		}
+
+		// The single-line text inputs. Values that were not edited are left as they are stored, so saving the form does not
+		// change existing values unnecessarily. A setting that was not submitted stays absent.
+		$stored = self::get_existing_settings_array();
+		$input  = SettingsSanitizer::sanitize_plain_text_settings( $input, $stored );
+
+		// Templates are content strings by design; only their shape is checked.
+		if ( array_key_exists( 'templates', $input ) ) {
+			$input['templates'] = SettingsSanitizer::sanitize_template_settings( $input['templates'], is_array( $stored['templates'] ?? null ) ? $stored['templates'] : [] );
+		}
+		if ( isset( $input['platform_name'] ) ) {
+			$old = get_option( 'arlo_settings', array() );
+			$old = is_array( $old ) ? $old : array();
+			try {
+				$input['platform_name'] = Utilities::sanitize_and_validate_platform_name(
+					$input['platform_name'],
+					$old['platform_name'] ?? ''
+				);
+			} catch ( \ArloTraining\PlatformNameException $e ) {
+				// The assignment in the try block threw before completing, so
+				// $input['platform_name'] still holds the raw submitted value.
+				// Normalize the display name with the same helper, then esc_html() before embedding in any
+				// message to guard against XSS via wp_kses_post().
+				$display_name = Utilities::normalize_platform_name( sanitize_text_field( wp_unslash( $input['platform_name'] ) ) );
+				$safe_name    = esc_html( $display_name ) . '.arlo.co';
+				$messages     = [
+					'invalid_format'       => __( 'Arlo platform name must contain only letters, numbers and hyphens (e.g. myplatform).', 'arlo-training-and-event-management-system' ),
+					/* translators: %s: the platform URL the user typed, e.g. myplatform.arlo.co */
+					'timeout'              => sprintf( __( "Arlo platform '%s' could not be reached — the connection timed out. Please check the name and try again.", 'arlo-training-and-event-management-system' ), $safe_name ),
+					/* translators: %s: the platform URL the user typed, e.g. myplatform.arlo.co */
+					'ssl_error'            => sprintf( __( "Could not establish a secure connection to Arlo platform '%s'. Please check the name and contact support if the problem persists.", 'arlo-training-and-event-management-system' ), $safe_name ),
+					/* translators: %s: the platform URL the user typed, e.g. myplatform.arlo.co */
+					'not_found'            => sprintf( __( "Arlo platform '%s' could not be found. Please check it and try again.", 'arlo-training-and-event-management-system' ), $safe_name ),
+					/* translators: %s: the platform URL the user typed, e.g. myplatform.arlo.co */
+					'redirect'             => sprintf( __( "Arlo platform '%s' appears to have moved to a new address. Open it in your browser to find the correct domain, then enter it here.", 'arlo-training-and-event-management-system' ), $safe_name ),
+					/* translators: %s: the platform URL the user typed, e.g. myplatform.arlo.co */
+					'server_error'         => sprintf( __( "Arlo platform '%s' returned an unexpected error. Please check the name and try again.", 'arlo-training-and-event-management-system' ), $safe_name ),
+					/* translators: %s: the platform URL the user typed, e.g. myplatform.arlo.co */
+					'unexpected_http'      => sprintf( __( "Arlo platform '%s' returned an unexpected response. Please check the name and try again.", 'arlo-training-and-event-management-system' ), $safe_name ),
+					/* translators: %s: the platform URL the user typed, e.g. myplatform.arlo.co */
+					'invalid_content_type' => sprintf( __( "Arlo platform '%s' returned an unexpected response. Please check the name and try again.", 'arlo-training-and-event-management-system' ), $safe_name ),
+					/* translators: %s: the platform URL the user typed, e.g. myplatform.arlo.co */
+					'request_failed'       => sprintf( __( "Could not reach Arlo platform '%s'. Please check the name and try again.", 'arlo-training-and-event-management-system' ), $safe_name ),
+				];
+				add_settings_error(
+					'arlo_settings',
+					'invalid_platform_name',
+					$messages[ $e->getMessage() ] ?? $messages['request_failed']
+				);
+				$input['platform_name'] = $old['platform_name'] ?? '';
+			}
+		}
+
+		if ( ! empty( $input['import_callback_host'] ) ) {
+			$input['import_callback_host'] = SettingsSanitizer::sanitize_callback_host( $input['import_callback_host'] );
+		}
+		$input['import_connection_healthchecks_enabled'] = isset( $input['import_connection_healthchecks_enabled'] ) ? '1' : '0';
+		$input                        = Arlo_For_Wordpress::normalize_importer_mode_setting( $input, self::get_existing_settings_array() );
+		$input                        = SettingsSanitizer::sanitize_log_diagnostic_level( $input );
+		$input                        = SettingsSanitizer::sanitize_log_retention_max_rows( $input );
+		$input['user_import_enabled'] = isset( $input['user_import_enabled'] ) ? '1' : '0';
+
+		// Sanitize deployment_mode.
+		$allowed_modes  = [ Arlo_For_Wordpress::DEPLOYMENT_MODE_PRODUCTION, Arlo_For_Wordpress::DEPLOYMENT_MODE_NON_PRODUCTION ];
+		$submitted_mode = ( isset( $input['deployment_mode'] ) && in_array( $input['deployment_mode'], $allowed_modes, true ) )
+		? $input['deployment_mode']
+		: Arlo_For_Wordpress::get_deployment_mode_default( $input['platform_name'] ?? '' );
+
+		// First-save override: on a brand-new install deployment_mode is not yet
+		// stored (set_default_options() intentionally omits it so the UI dropdown
+		// shows Production as a safe unknown-state default). On the very first save,
+		// if the submitted platform name is websitetestdata or empty we know this
+		// is a demo/dev site and set non_production, overriding the submitted
+		// dropdown value. This prevents a fresh install from accidentally syncing
+		// at full frequency just because the admin didn't notice the dropdown.
+		// On all subsequent saves the key is already stored, so this block is skipped
+		// and the admin's explicit dropdown choice is honoured as-is.
+		$previously_stored = get_option( 'arlo_settings', [] );
+		$previously_stored = is_array( $previously_stored ) ? $previously_stored : [];
+		if ( ! isset( $previously_stored['deployment_mode'] ) ) {
+			$new_platform = is_scalar( $input['platform_name'] ?? '' ) ? strtolower( (string) ( $input['platform_name'] ?? '' ) ) : '';
+			if ( $new_platform === '' || $new_platform === Arlo_For_Wordpress::DEFAULT_PLATFORM ) {
+				$submitted_mode = Arlo_For_Wordpress::DEPLOYMENT_MODE_NON_PRODUCTION;
+				add_settings_error(
+					'arlo_settings',
+					'deployment_mode_defaulted',
+					'' === $new_platform
+						? __( 'Deployment mode was set to Non-production because no Arlo platform is selected. You can change it at any time.', 'arlo-training-and-event-management-system' )
+						: __( 'Deployment mode was set to Non-production because the demo platform is selected. You can change it at any time.', 'arlo-training-and-event-management-system' ),
+					'info'
+				);
+				// An error on this page stops core adding its own confirmation, so keep the usual one.
+				add_settings_error( 'arlo_settings', 'settings_updated', __( 'Settings saved.', 'arlo-training-and-event-management-system' ), 'success' );
+			}
+		}
+		$input['deployment_mode'] = $submitted_mode;
+
+		// Check for conflicting host page assignments.
+		// If any are found, add a settings error for each.
+		foreach ( $this->validate_post_page_mappings( isset( $input['post_types'] ) && is_array( $input['post_types'] ) ? $input['post_types'] : [] ) as $conflict ) {
+			$labels  = array_column( $conflict['post_types'], 'label' );
+			$message = wp_kses(
+				sprintf(
+					/* translators: 1: WordPress page title hyperlinked to the public page 2: comma-separated list of conflicting Arlo page type names */
+					__( 'Host page %1$s is assigned to multiple conflicting Arlo page types (%2$s).<br>The page will not function correctly until the conflict is fixed.', 'arlo-training-and-event-management-system' ),
+					'<a href="' . esc_url( $conflict['page_url'] ) . '" target="_blank" rel="noreferrer noopener">' . esc_html( $conflict['page_title'] ) . '</a>',
+					esc_html( implode( ', ', $labels ) )
+				),
+				[
+					'a'  => [
+						'href'   => [],
+						'target' => [],
+						'rel'    => [],
+					],
+					'br' => [],
+				]
+			);
+			add_settings_error( 'arlo_settings', 'duplicate_host_page_' . $conflict['page_id'], $message, 'warning' );
+		}
+
+		// Last, so a value the specific sanitisers above produced is not reduced twice.
+		return SettingsSanitizer::sanitize_scalar_settings( $input, $stored, SettingsSanitizer::scalar_rules_by_setting_key() );
+	}
+
+	/**
+	 * Registers the admin notices, settings field sections and request handlers for the settings screen.
+	 *
+	 * Reads the current request's query parameters and handles the nonce-protected action links (import, reconnect,
+	 * enable sync, run scheduler, add pages, download log), several of which redirect and exit. Call it only while
+	 * constructing the controller for a real admin request.
+	 *
+	 * @return void
+	 */
+	private function register_screen_hooks(): void {
 
 		$plugin          = Arlo_For_Wordpress::get_instance();
 		$settings_object = get_option( 'arlo_settings', [] );
@@ -431,8 +510,6 @@ class Arlo_For_Wordpress_Settings {
 				wp_safe_redirect( $base_redirect_url . '#pages/' . sanitize_key( $custom_shortcode ) );
 				exit;
 			}
-
-			add_action( 'admin_print_scripts', array( $this, "arlo_check_current_tasks" ) );
 		}
 
 		/*
@@ -597,7 +674,7 @@ class Arlo_For_Wordpress_Settings {
 		// create Deployment mode field
 		add_settings_field(
 			'arlo_deployment_mode',
-			'<label for="arlo_deployment_mode">' . esc_html__( 'Deployment', 'arlo-training-and-event-management-system' ) . '</label>',
+			'<label for="arlo_deployment_mode">' . esc_html__( 'Deployment', 'arlo-training-and-event-management-system' ) . ' <a href="https://developer.arlo.co/doc/wordpress/settings#deployment" target="_blank" aria-label="' . esc_attr__( 'Deployment documentation', 'arlo-training-and-event-management-system' ) . '"><i class="arlo-icons8 arlo-icons8-help-filled size-16" aria-hidden="true"></i></a></label>',
 			array( $this, 'arlo_deployment_mode_callback' ),
 			$this->plugin_slug,
 			'arlo_general_section'
@@ -692,7 +769,7 @@ class Arlo_For_Wordpress_Settings {
 		 *
 		 */
 
-		add_settings_section( 'arlo_pages_section', null, array( $this, 'arlo_pages_section_callback' ), $this->plugin_slug );
+		add_settings_section( 'arlo_pages_section', null, null, $this->plugin_slug );
 
 		// loop though slug array and create each required slug field
 		foreach ( Arlo_For_Wordpress::get_templates() as $id => $template ) {
@@ -814,16 +891,14 @@ class Arlo_For_Wordpress_Settings {
 			]
 		);
 
-		if ( \Arlo_For_Wordpress::is_delta_import_settings_available() ) {
-			add_settings_field(
-				'arlo_importer_mode_setting',
-				'<label for="importer_mode">' . esc_html__( 'Importer mode', 'arlo-training-and-event-management-system' ) . '</label>',
-				array( $this, 'arlo_importer_mode_callback' ),
-				$this->plugin_slug,
-				'arlo_misc_section',
-				[ 'option_name' => 'importer_mode' ]
-			);
-		}
+		add_settings_field(
+			'arlo_importer_mode_setting',
+			'<label for="importer_mode">' . esc_html__( 'Importer mode', 'arlo-training-and-event-management-system' ) . '</label>',
+			array( $this, 'arlo_importer_mode_callback' ),
+			$this->plugin_slug,
+			'arlo_misc_section',
+			[ 'option_name' => 'importer_mode' ]
+		);
 
 		add_settings_field(
 			'arlo_import_connection_healthchecks_enabled_setting',
@@ -895,15 +970,6 @@ class Arlo_For_Wordpress_Settings {
 	 *
 	 */
 
-
-	function arlo_pages_section_callback() {
-		echo '
-			<script type="text/javascript">
-	    			var arlo_templates = ' . wp_json_encode( \Arlo_For_Wordpress::arlo_template_source() ) . ';' . '
-	    			var arlo_shortcodes = ' . wp_json_encode( array_keys( Arlo_For_Wordpress::get_templates() ) ) . ';' .
-				'</script>
-		';
-	}
 
 	/*
 	 *
@@ -1103,7 +1169,17 @@ class Arlo_For_Wordpress_Settings {
 				esc_html( $status['destination_label'] ),
 				esc_html( $when )
 			)
-		) . '</p></div>';
+		) . '</p>';
+		if ( $status['adjusted'] > 0 ) {
+			echo '<p class="description">' . esc_html(
+				sprintf(
+					/* translators: %d: number of places in the CSS that were rewritten. */
+					_n( 'Arlo adjusted %d place in your CSS, rewriting an angle bracket so that WordPress\'s editor accepts it.', 'Arlo adjusted %d places in your CSS, rewriting angle brackets so that WordPress\'s editor accepts them.', $status['adjusted'], 'arlo-training-and-event-management-system' ),
+					$status['adjusted']
+				)
+			) . '</p>';
+		}
+		echo '</div>';
 
 		if ( ! current_user_can( 'manage_options' ) || ! \ArloTraining\CustomCss::current_user_can_edit() ) {
 			return;
@@ -1186,7 +1262,7 @@ class Arlo_For_Wordpress_Settings {
 		}
 		echo '</select>';
 		echo '<p class="description arlo-deployment-mode-hint" style="' . esc_attr( $current === Arlo_For_Wordpress::DEPLOYMENT_MODE_NON_PRODUCTION ? '' : 'display:none;' ) . '">'
-			. esc_html__( 'Non-production deployments synchronise less frequently.', 'arlo-training-and-event-management-system' )
+			. esc_html__( 'Non-production syncs daily, or weekly on the demo platform, instead of about every 30 minutes.', 'arlo-training-and-event-management-system' )
 			. '</p>';
 		echo '</div>';
 	}
@@ -1215,22 +1291,105 @@ class Arlo_For_Wordpress_Settings {
 		echo '</div>';
 	}
 
-	//[x]: checked escaped html
-	function get_select_filter_options( &$item, $key, $options = [] ) {
+	/**
+	 * Returns the old values the filter editor dropdown offers for a filter, for validating a posted rule.
+	 *
+	 * The values come from the same options and value field as the dropdown, in the form a browser posts them, so a value the
+	 * dropdown could not have posted is not offered. The options are not narrowed to the region of the current request, because
+	 * a region cookie must not change which rules an administrator can save.
+	 *
+	 * @param string $filter Filter key.
+	 * @return string[]|null The offered values, or null when no editor offers the filter.
+	 */
+	private function get_filter_offered_old_values( string $filter ): ?array {
+		$offered_filters = [ 'delivery' ];
+		foreach ( Arlo_For_Wordpress::$available_page_filters as $page_filters ) {
+			$offered_filters = array_merge( $offered_filters, array_map( 'strval', array_keys( $page_filters['filters'] ) ) );
+		}
+		if ( ! in_array( $filter, $offered_filters, true ) ) {
+			return null;
+		}
+
+		$import_id = Arlo_For_Wordpress::get_instance()->get_importer()->get_current_import_id();
+		$values    = [];
+		if ( ! empty( $import_id ) ) {
+			foreach ( \ArloTraining\Shortcodes\Filters::get_filter_options_for_all_regions( $filter, $import_id ) as $key => $item ) {
+				$values[] = $this->get_posted_filter_option_value( $this->normalize_filter_option( $item, $key ) );
+			}
+		}
+
+		return $values;
+	}
+
+	/**
+	 * Returns a filter option as an array with its text, value and ID.
+	 *
+	 * Options such as the delivery labels are plain strings keyed by their value.
+	 *
+	 * @param mixed      $item Option as Filters::get_filter_options() returns it.
+	 * @param int|string $key  Key of the option.
+	 * @return array The option; an array option that already has text or a value is returned as it is.
+	 */
+	private function normalize_filter_option( $item, $key ) {
 		if ( ! is_array( $item ) || ( empty( $item['string'] ) && empty( $item['value'] ) ) ) {
-			$item = array(
+			return array(
 				'string' => $item,
 				'value'  => $key,
 				'id'     => $key,
 			);
 		}
 
-		extract( $options );
+		return $item;
+	}
 
-		$value = ( isset( $value_field ) && isset( $item[ $value_field ] ) ? $item[ $value_field ] : $item["string"] );
+	/**
+	 * Returns the value the filter editor dropdown gives an option.
+	 *
+	 * @param array       $item        Option as normalize_filter_option() returns it.
+	 * @param string|null $value_field Item field that holds the value; null, or a field the item lacks, uses the text.
+	 * @return string The option value, before escaping.
+	 */
+	private function get_filter_option_value( array $item, ?string $value_field = 'id' ): string {
+		// The dropdown and the validation of a posted rule both use this, so they cannot disagree about an option's value.
+		return (string) ( null !== $value_field && isset( $item[ $value_field ] ) ? $item[ $value_field ] : $item['string'] );
+	}
+
+	/**
+	 * Returns the value a browser posts for an option of the filter editor dropdown.
+	 *
+	 * The dropdown writes the value with esc_attr(), which keeps entity text such as &amp; as it is, and a browser posts
+	 * that attribute decoded.
+	 *
+	 * @param array $item Option as normalize_filter_option() returns it.
+	 * @return string The posted value.
+	 */
+	private function get_posted_filter_option_value( array $item ): string {
+		return html_entity_decode( esc_attr( $this->get_filter_option_value( $item ) ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+	}
+
+	/**
+	 * Replaces a filter option with the HTML of its dropdown option.
+	 *
+	 * Written as an array_walk() callback, so it changes the option in place and returns nothing.
+	 *
+	 * @param mixed      $item    Option as Filters::get_filter_options() returns it; replaced by its HTML.
+	 * @param int|string $key     Key of the option; the value of a plain string option.
+	 * @param array      $options {
+	 *     Optional settings.
+	 *
+	 *     @type string $value_field    Item field that holds the option value; the option text when omitted.
+	 *     @type string $selected_value Value to mark as selected. A saved value that is HTML-escaped also matches.
+	 * }
+	 * @return void
+	 */
+	public function convert_filter_option_to_html( &$item, $key, $options = [] ): void {
+		$item = $this->normalize_filter_option( $item, $key );
+
+		$value          = $this->get_filter_option_value( $item, $options['value_field'] ?? null );
+		$selected_value = $options['selected_value'] ?? null;
 
 		$selected = '';
-		if ( isset( $selected_value ) ) {
+		if ( null !== $selected_value ) {
 			// Match raw values first, then legacy HTML-escaped saved values for backward compatibility.
 			$value_string           = (string) $value;
 			$selected_value_string  = (string) $selected_value;
@@ -1260,21 +1419,36 @@ class Arlo_For_Wordpress_Settings {
 	}
 
 	/**
-	 * Renders the "Powered by Arlo" opt-in; the hidden field makes an unticked save an explicit choice.
+	 * Renders the "Powered by Arlo" opt-in.
+	 *
+	 * Once a choice is stored, a hidden field makes an unticked save an explicit "no". While the site is undecided no hidden
+	 * field is rendered, so saving other settings doesn't unintentionally dismiss the opt-in banner while it's visible: the
+	 * banner stays until it is answered, or no longer applies. When the banner records an answer, its script adds the same
+	 * hidden "0" field to this form, so the two controls stay consistent without a page reload. Nothing here can turn the
+	 * credit on without a visible tick.
 	 *
 	 * @return void
 	 */
 	public function powered_by_checkbox_callback() {
 		$option_name = Arlo_For_Wordpress::POWERED_BY_SETTING;
 		$field_name  = 'arlo_settings[' . $option_name . ']';
+		$settings    = get_option( 'arlo_settings', [] );
+		$has_choice  = is_array( $settings ) && array_key_exists( $option_name, $settings );
 
-		echo '<fieldset>';
+		echo '<fieldset class="arlo-powered-by-setting">';
 		echo '<legend class="screen-reader-text"><span>' . esc_html__( 'Powered by Arlo link enabled', 'arlo-training-and-event-management-system' ) . '</span></legend>';
-		echo '<input type="hidden" name="' . esc_attr( $field_name ) . '" value="0">';
+		if ( $has_choice ) {
+			echo '<input type="hidden" name="' . esc_attr( $field_name ) . '" value="0">';
+		}
 		echo '<label for="' . esc_attr( $option_name ) . '">';
-		echo '<input type="checkbox" name="' . esc_attr( $field_name ) . '" value="1" id="' . esc_attr( $option_name ) . '"' . ( Arlo_For_Wordpress::is_powered_by_enabled( get_option( 'arlo_settings', [] ) ) ? ' checked="checked"' : '' ) . '> ';
-		echo esc_html__( 'Show a small "Powered by Arlo" logo linking to arlo.co on Arlo pages and widgets whose templates contain the credit shortcode.', 'arlo-training-and-event-management-system' );
+		echo '<input type="checkbox" name="' . esc_attr( $field_name ) . '" value="1" id="' . esc_attr( $option_name ) . '"' . ( Arlo_For_Wordpress::is_powered_by_enabled( $settings ) ? ' checked="checked"' : '' ) . '> ';
+		echo '<span>' . sprintf(
+			/* translators: %s: the product credit name in italics. */
+			esc_html__( 'Show a small %s logo linking to arlo.co.', 'arlo-training-and-event-management-system' ),
+			'<em>' . esc_html__( 'Powered by Arlo', 'arlo-training-and-event-management-system' ) . '</em>'
+		) . '</span>';
 		echo '</label>';
+		echo '<p class="description">' . esc_html__( 'This appears on Arlo pages and widgets where the template contains the shortcode.', 'arlo-training-and-event-management-system' ) . '</p>';
 		echo '</fieldset>';
 	}
 
@@ -1284,8 +1458,9 @@ class Arlo_For_Wordpress_Settings {
 		}
 
 		$option_name     = $args['option_name'];
+		$delta_available = \Arlo_For_Wordpress::is_delta_import_settings_available();
 		$settings_object = self::get_existing_settings_array();
-		$current_value   = \Arlo_For_Wordpress::is_supported_importer_mode( $settings_object[ $option_name ] ?? null )
+		$current_value   = $delta_available && \Arlo_For_Wordpress::is_supported_importer_mode( $settings_object[ $option_name ] ?? null )
 			? (string) $settings_object[ $option_name ]
 			: \Arlo_For_Wordpress::IMPORTER_MODE_FULL;
 		$options         = [
@@ -1293,13 +1468,25 @@ class Arlo_For_Wordpress_Settings {
 			\Arlo_For_Wordpress::IMPORTER_MODE_FULL_DELTA => __( 'Default + Delta (experimental)', 'arlo-training-and-event-management-system' ),
 		];
 
-		echo '<select id="' . esc_attr( $option_name ) . '" name="' . esc_attr( 'arlo_settings[' . $option_name . ']' ) . '">';
+		// A disabled field is not submitted; normalize_importer_mode_setting() keeps the stored mode on the full import.
+		echo '<select id="' . esc_attr( $option_name ) . '" name="' . esc_attr( 'arlo_settings[' . $option_name . ']' ) . '"' . disabled( $delta_available, false, false ) . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- disabled() returns a fixed attribute string.
 		foreach ( $options as $value => $label ) {
 			$selected = selected( $current_value, $value, false );
 			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- selected() returns a pre-formatted attribute string; esc_attr() would corrupt the quotes.
 			echo '<option ' . $selected . ' value="' . esc_attr( $value ) . '">' . esc_html( $label ) . '</option>';
 		}
 		echo '</select>';
+
+		if ( ! $delta_available ) {
+			echo '<p class="description arlo-importer-mode-unavailable">'
+				. esc_html__( "Default + Delta needs InnoDB database tables, which this site's database does not use. Full imports are used, and give the same result.", 'arlo-training-and-event-management-system' )
+				. '</p>';
+			return;
+		}
+
+		echo '<p class="description arlo-importer-mode-hint" style="' . esc_attr( \Arlo_For_Wordpress::IMPORTER_MODE_FULL_DELTA === $current_value ? '' : 'display:none;' ) . '">'
+			. esc_html__( 'Delta import is a best-effort optimisation and is not guaranteed. If it cannot be used, the import continues automatically with the full import, which is always the most reliable option for any dataset size.', 'arlo-training-and-event-management-system' )
+			. '</p>';
 	}
 
 	/**
@@ -1476,40 +1663,6 @@ class Arlo_For_Wordpress_Settings {
 		}
 
 		echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML output. The 'html' argument is a trusted HTML string passed from add_settings_field().
-	}
-
-	/**
-	 * Normalize supported log-retention values in a settings array.
-	 *
-	 * Unsupported values are preserved unchanged so invalid input is never mistaken
-	 * for a valid retention change.
-	 *
-	 * @param array $input Settings array.
-	 * @return array Settings array with supported log-retention values normalized.
-	 */
-	public static function sanitize_log_retention_max_rows_input( array $input ): array {
-		if ( array_key_exists( 'log_retention_max_rows', $input ) && Logger::is_supported_retention_max_rows( $input['log_retention_max_rows'] ) ) {
-			$input['log_retention_max_rows'] = Logger::normalize_retention_max_rows( $input['log_retention_max_rows'] );
-		}
-
-		return $input;
-	}
-
-	/**
-	 * Normalize supported diagnostic log level values in a settings array.
-	 *
-	 * Unsupported values are preserved unchanged so invalid input is never mistaken
-	 * for an intentional diagnostic level change.
-	 *
-	 * @param array $input Settings array.
-	 * @return array Settings array with supported diagnostic level values normalized.
-	 */
-	public static function sanitize_log_diagnostic_level_input( array $input ): array {
-		if ( array_key_exists( Logger::DIAGNOSTIC_VERBOSITY_SETTING_KEY, $input ) && Logger::is_supported_diagnostic_level( $input[ Logger::DIAGNOSTIC_VERBOSITY_SETTING_KEY ] ) ) {
-			$input[ Logger::DIAGNOSTIC_VERBOSITY_SETTING_KEY ] = Logger::normalize_diagnostic_level( $input[ Logger::DIAGNOSTIC_VERBOSITY_SETTING_KEY ] );
-		}
-
-		return $input;
 	}
 
 	/**
@@ -2150,7 +2303,7 @@ class Arlo_For_Wordpress_Settings {
 			foreach ( $available_filters as $filter_key => $filter ) {
 				$filter_options         = \ArloTraining\Shortcodes\Filters::get_filter_options( $filter_key, $import_id );
 				$default_filter_options = $filter_options;
-				array_walk( $default_filter_options, [ $this, 'get_select_filter_options' ], [ 'value_field' => 'id' ] );
+				array_walk( $default_filter_options, [ $this, 'convert_filter_option_to_html' ], [ 'value_field' => 'id' ] );
 
 				$expand_filter = ( ! empty( $filter_settings[ $filter_group ][ $filter_key ] ) && count( $filter_settings[ $filter_group ][ $filter_key ] ) )
 								|| ( ! empty( $filter_settings["hiddenfilters"][ $filter_group ][ $filter_key ] ) )
@@ -2176,7 +2329,7 @@ class Arlo_For_Wordpress_Settings {
 							$filter_rename_setting_options = $filter_options;
 							array_walk(
 								$filter_rename_setting_options,
-								[ $this, 'get_select_filter_options' ],
+								[ $this, 'convert_filter_option_to_html' ],
 								[
 									'selected_value' => $old_value,
 									'value_field'    => 'id',
@@ -2192,7 +2345,7 @@ class Arlo_For_Wordpress_Settings {
 							$filter_hidden_setting_options = $filter_options;
 							array_walk(
 								$filter_hidden_setting_options,
-								[ $this, 'get_select_filter_options' ],
+								[ $this, 'convert_filter_option_to_html' ],
 								[
 									'selected_value' => $old_value,
 									'value_field'    => 'id',
@@ -2208,7 +2361,7 @@ class Arlo_For_Wordpress_Settings {
 							$filter_hidden_setting_options = $filter_options;
 							array_walk(
 								$filter_hidden_setting_options,
-								[ $this, 'get_select_filter_options' ],
+								[ $this, 'convert_filter_option_to_html' ],
 								[
 									'selected_value' => $old_value,
 									'value_field'    => 'id',
@@ -2220,7 +2373,7 @@ class Arlo_For_Wordpress_Settings {
 				}
 
 				/* Empty entry */
-				array_walk( $filter_options, [ $this, 'get_select_filter_options' ], [ 'value_field' => 'id' ] );
+				array_walk( $filter_options, [ $this, 'convert_filter_option_to_html' ], [ 'value_field' => 'id' ] );
 				$filters_settings_html .= $this->arlo_output_filter_actions( $actions, $setting_name, $filter_options, $filter_group, $filter_key, '', wp_rand() );
 
 				$filters_settings_html .= '</ul></div>';
@@ -2274,36 +2427,6 @@ class Arlo_For_Wordpress_Settings {
 		return $option_html;
 	}
 
-	function arlo_check_current_tasks() {
-		global $wpdb;
-
-		$plugin    = Arlo_For_Wordpress::get_instance();
-		$scheduler = $plugin->get_scheduler();
-
-		$next_immediate_task     = $scheduler->get_next_immediate_tasks();
-		$next_immediate_task_ids = [];
-
-		$running_task     = $scheduler->get_running_tasks();
-		$running_task_ids = [];
-
-		$running_task = array_merge( $running_task, $scheduler->get_paused_tasks() );
-
-		foreach ( $next_immediate_task as $task ) {
-			$next_immediate_task_ids[] = $task->task_id;
-		}
-
-		foreach ( $running_task as $task ) {
-			$running_task_ids[] = $task->task_id;
-		}
-
-		echo "
-		<script type='text/javascript'>
-			var ArloImmediateTaskIDs = " . wp_json_encode( $next_immediate_task_ids ) . ";
-			var ArloRunningTaskIDs = " . wp_json_encode( $running_task_ids ) . ";
-		</script>
-		";
-	}
-
 	function arlo_regions_callback( $args ) {
 		$regions = get_option( 'arlo_regions', array() );
 
@@ -2320,7 +2443,7 @@ class Arlo_For_Wordpress_Settings {
 			<ul>
 				<li>
 					<div class="arlo-order-number">1.</div>
-					<div class="arlo-region-id"><input type="text" maxlength="' . esc_attr( self::REGION_ID_MAX_LENGTH ) . '" name="arlo_settings[regionid][]"></div>
+					<div class="arlo-region-id"><input type="text" maxlength="' . esc_attr( SettingsSanitizer::REGION_ID_MAX_LENGTH ) . '" pattern="' . esc_attr( SettingsSanitizer::REGION_ID_HTML_PATTERN ) . '" title="' . esc_attr( self::region_id_rules_message() ) . '" name="arlo_settings[regionid][]"></div>
 					<div class="arlo-region-controls">
 						<i class="arlo-icons8-minus arlo-icons8 size-21"></i>
 						<i class="arlo-icons8-plus arlo-icons8 size-21"></i>
@@ -2335,7 +2458,7 @@ class Arlo_For_Wordpress_Settings {
 			foreach ( $regions as $regionid => $regionname ) {
 				echo '<li>
 					<div class="arlo-order-number">' . esc_html( ( ++$key ) ) . '</div>
-					<div class="arlo-region-id"><input type="text" maxlength="' . esc_attr( self::REGION_ID_MAX_LENGTH ) . '" name="arlo_settings[regionid][]" value="' . esc_attr( $regionid ) . '"></div>
+					<div class="arlo-region-id"><input type="text" maxlength="' . esc_attr( SettingsSanitizer::REGION_ID_MAX_LENGTH ) . '" pattern="' . esc_attr( SettingsSanitizer::REGION_ID_HTML_PATTERN ) . '" title="' . esc_attr( self::region_id_rules_message() ) . '" name="arlo_settings[regionid][]" value="' . esc_attr( $regionid ) . '"></div>
 					<div class="arlo-region-controls">
 						<i class="arlo-icons8-minus arlo-icons8 size-21"></i>
 						<i class="arlo-icons8-plus arlo-icons8 size-21"></i>
@@ -2348,7 +2471,7 @@ class Arlo_For_Wordpress_Settings {
 
 		echo '<li>
 			<div class="arlo-order-number">' . esc_html( ( $key + 1 ) ) . '</div>
-			<div class="arlo-region-id"><input type="text" maxlength="' . esc_attr( self::REGION_ID_MAX_LENGTH ) . '" name="arlo_settings[regionid][]"></div>
+			<div class="arlo-region-id"><input type="text" maxlength="' . esc_attr( SettingsSanitizer::REGION_ID_MAX_LENGTH ) . '" pattern="' . esc_attr( SettingsSanitizer::REGION_ID_HTML_PATTERN ) . '" title="' . esc_attr( self::region_id_rules_message() ) . '" name="arlo_settings[regionid][]"></div>
 			<div class="arlo-region-controls">
 				<i class="arlo-icons8-minus arlo-icons8 size-21"></i>
 				<i class="arlo-icons8-plus arlo-icons8 size-21"></i>
@@ -2356,6 +2479,7 @@ class Arlo_For_Wordpress_Settings {
 			<div class="arlo-region-name"><input type="text" name="arlo_settings[regionname][]"></div>
 		  </li>
 		</ul>
+		<span id="arlo-region-id-warning" class="arlo-sc-check arlo-sc-check--invalid arlo-region-id-warning" role="status" aria-live="polite" aria-atomic="true" style="display:none"><span class="dashicons dashicons-warning" aria-hidden="true"></span><span class="arlo-sc-check__msg">' . esc_html( self::region_id_rules_message() ) . '</span></span>
 
 		<p>For more information, please visit our <a href="https://developer.arlo.co/doc/wordpress/settings#regions" target="_blank">documentation</a></p>
 	    ';
@@ -2545,9 +2669,9 @@ class Arlo_For_Wordpress_Settings {
 			echo '
 			<li class="arlo-theme">
 				<div class="arlo-theme-desc ' . ( count( $images ) == 0 ? 'arlo-theme-inverse' : '' ) . '">
-					' . ( ! empty( $theme_data->forDesigners ) && $theme_data->forDesigners ? '<div class="arlo-themes-developer-banner">For<br />designers</div>' : '' ) . // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- dynamically constructed safe HTML string
-						$desc[0]   // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Description HTML output. Content is constructed from safe HTML elements.
-					. ' <div class="arlo-theme-overlay">' . $overlay . '</div>' . // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Overlay HTML output. Content is constructed from safe HTML elements.
+					' . ( ! empty( $theme_data->forDesigners ) && $theme_data->forDesigners ? '<div class="arlo-themes-developer-banner">For<br />designers</div>' : '' ) . // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Static banner markup, shown only for themes flagged for designers
+						$desc[0]   // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Either an img tag built above with esc_url(), or the overlay markup described below.
+					. ' <div class="arlo-theme-overlay">' . $overlay . '</div>' . // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $overlay is built above with esc_attr(), esc_html(), wp_kses_post() and esc_url().
 				'</div>
 				<div class="arlo-theme-information">
 					<div class="arlo-theme-name">' . esc_html( wp_strip_all_tags( $theme_data->name ) ) . '</div>

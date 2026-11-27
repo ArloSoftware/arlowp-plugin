@@ -110,9 +110,11 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists {
 	}
 
 	public function column_e_code( $item ) {
-		$actions = array(
-			'edit' => '<a href="' . esc_url( sprintf( 'https://%s/management/Console/#/events/%d', $this->platform_url, $item->e_parent_arlo_id ) ) . '" target="_blank">Edit</a>',
-		);
+		$actions = array();
+
+		if ( $this->should_show_arlo_manage_record_link() ) {
+			$actions['edit'] = '<a href="' . esc_url( sprintf( 'https://%s/management/Console/#/events/%d', $this->platform_url, $item->e_parent_arlo_id ) ) . '" target="_blank">Edit</a>';
+		}
 
 		return sprintf( '%1$s %2$s', esc_html( $item->e_code ), $this->row_actions( $actions ) );
 	}
@@ -192,19 +194,19 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists {
 			GROUP_CONCAT(DISTINCT es.e_region) as e_region
 		FROM
 			{$wpdb->prefix}arlo_events AS es
-		LEFT JOIN 
+		LEFT JOIN
 			{$wpdb->prefix}arlo_events AS e
 		ON
 			es.e_parent_arlo_id = e.e_arlo_id
 		AND
 			e.import_id = es.import_id
-		LEFT JOIN 
+		LEFT JOIN
 			{$wpdb->prefix}arlo_eventtemplates AS et
 		ON
 			e.et_arlo_id = et.et_arlo_id
 		AND
 			et.import_id = es.import_id
-		LEFT JOIN 
+		LEFT JOIN
 			{$wpdb->prefix}arlo_venues AS v
 		ON
 			es.v_id = v_arlo_id
@@ -212,7 +214,7 @@ class Arlo_For_Wordpress_Sessions extends Arlo_For_Wordpress_Lists {
 			v.import_id = es.import_id
 		WHERE
 			" . $where['where'] . "
-		GROUP BY 
+		GROUP BY
 			es.e_arlo_id
 		";
 		return \ArloTraining\Utilities::prepare_sql( $sql_sessions, $where['parameter'] );

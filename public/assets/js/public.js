@@ -40,7 +40,7 @@
         	}
 
 			if ($('#arlo-filter-region').length > 0) {
-				page += 'region-' + $('#arlo-filter-region').val() + '/';
+				page += 'region-' + encodeURIComponent($('#arlo-filter-region').val()) + '/';
 			}
 
 			if ($(this).val() != "") {
@@ -71,7 +71,7 @@
         	}
 
 			if ($('#arlo-filter-region').length > 0) {
-				page += 'region-' + $('#arlo-filter-region').val() + '/';
+				page += 'region-' + encodeURIComponent($('#arlo-filter-region').val()) + '/';
 			}
 
         	var url = page;
@@ -131,13 +131,29 @@
 
 		//modal init
 		$('.arlo-sessions-popup-trigger').each(function(i, el) {
+			// The shortcode emits the popup content beside its trigger, so only an element with the target's id inside
+			// the trigger's parent counts. A trigger without content of its own is left alone, so it cannot stop the
+			// triggers after it or open another row's content.
+			// themes/theme.z/js/data.js repeats this lookup for the rows a Show more appends, because this script is loaded
+			// with every theme; keep the two in step.
+			var target = String($(el).attr('data-target') || '').trim();
+			var $content = target.length < 2 || target.charAt(0) !== '#' ? $() : $(el).parent().find('[id]').filter(function(j, candidate) {
+				return candidate.id === target.slice(1);
+			});
+			var popupContent = $content.length === 1 ? $content.html().trim() : '';
+			if (!popupContent) {
+				// The trigger's empty link would reload the page.
+				$(el).click(function(e) {
+					e.preventDefault();
+				});
+				return;
+			}
+
 			var modal = new tingle.modal({
 				footer: true,
 				cssClass: ['arlo'],
 			    closeMethods: ['overlay', 'button', 'escape']
 			});
-
-			var popupContent = $($(el).data('target')).html();
 
 			modal.setContent(popupContent);
 
@@ -183,7 +199,7 @@
     	Cookies.set("arlo-region", newRegion, { path: "/", domain: window.location.hostname });
 
     	if (uriRegion) {
-		    window.location.href = window.location.href.replace("/region-" + uriRegion + "/", "/region-" + newRegion + "/").replace(/location-\w+(%\d+)?\w*/g,"");
+		    window.location.href = window.location.href.replace("/region-" + uriRegion + "/", "/region-" + encodeURIComponent(newRegion) + "/").replace(/location-\w+(%\d+)?\w*/g,"");
     	} else {
     		window.location.reload();
     	}

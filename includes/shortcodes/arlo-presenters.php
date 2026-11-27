@@ -276,7 +276,10 @@ class Presenters {
 			)
 		);
 
-		$performer = ! empty( $GLOBALS['arlo_presenter_list_item'] ) ? Shortcodes::get_performer( $GLOBALS['arlo_presenter_list_item'], $link ) : "";
+		$performer = Shortcodes::get_performer( isset( $GLOBALS['arlo_presenter_list_item'] ) ? $GLOBALS['arlo_presenter_list_item'] : null, $link );
+		if ( empty( $performer ) ) {
+			return '';
+		}
 
 		return Shortcodes::create_rich_snippet( $performer );
 	}

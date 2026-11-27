@@ -8,11 +8,53 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
+/**
+ * Supplies the selectable options of a named filter, for the filter controls that shortcodes render and for the filter
+ * editor on the settings screen.
+ *
+ * Options are read, never written, from the synchronized data of the import the caller passes. They are raw platform data,
+ * so callers must escape them at output. A filter key the class does not know has no options (null).
+ */
 class Filters {
+	/**
+	 * Returns the options of a filter for the import, narrowed to the visitor's region.
+	 *
+	 * @param string     $filter    Filter key.
+	 * @param int|string $import_id Import ID to read.
+	 * @param int|null   $post_id   Optional event template post to narrow the options to.
+	 * @return array Options of the filter.
+	 */
 	public static function get_filter_options( $filter, $import_id, $post_id = null ) {
+		return self::query_filter_options( $filter, $import_id, $post_id, \Arlo_For_Wordpress::get_region_parameter() );
+	}
+
+	/**
+	 * Returns the options of a filter for the import across all regions.
+	 *
+	 * The settings screen uses this to validate a posted rule, because a region cookie must not change which rules an
+	 * administrator can save.
+	 *
+	 * @param string     $filter    Filter key.
+	 * @param int|string $import_id Import ID to read.
+	 * @return array Options of the filter.
+	 */
+	public static function get_filter_options_for_all_regions( $filter, $import_id ) {
+		return self::query_filter_options( $filter, $import_id, null, '' );
+	}
+
+	/**
+	 * Reads the options of a filter for the import.
+	 *
+	 * @param string     $filter    Filter key.
+	 * @param int|string $import_id Import ID to read.
+	 * @param int|null   $post_id   Optional event template post to narrow the options to.
+	 * @param string     $region    Region to narrow the options to; an empty string applies no region.
+	 * @return array Options of the filter.
+	 */
+	private static function query_filter_options( $filter, $import_id, $post_id, string $region ) {
 		global $post, $wpdb;
 
-		$arlo_region      = \Arlo_For_Wordpress::get_region_parameter();
+		$arlo_region      = $region;
 		$join             = [];
 		$where            = [];
 		$join_parameters  = [];
@@ -348,6 +390,7 @@ class Filters {
                         {$wpdb->prefix}arlo_presenters AS p
                     ON
                         p.p_arlo_id = epresenter.p_arlo_id
+                        AND p.import_id = epresenter.import_id
                     WHERE
                         epresenter.import_id = %d
                     ORDER BY p_firstname",

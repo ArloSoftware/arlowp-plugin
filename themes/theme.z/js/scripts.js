@@ -282,28 +282,49 @@ jQuery(function($) {
         }
     }
 
+    function applySearchTokenHighlighting(target, pattern) {
+        // Match text once so keywords cannot rewrite tags or escaped entities.
+        var walker = document.createTreeWalker(target, NodeFilter.SHOW_TEXT);
+        var nodes = [];
+        while(walker.nextNode()) nodes.push(walker.currentNode);
+        nodes.forEach(function(node) {
+            if(node.parentElement.closest('script,style,textarea')) return;
+            var text = node.nodeValue;
+            pattern.lastIndex = 0;
+            var match = pattern.exec(text);
+            if(!match) return;
+            var fragment = document.createDocumentFragment();
+            var offset = 0;
+            do {
+                fragment.appendChild(document.createTextNode(text.slice(offset, match.index)));
+                var strong = document.createElement('strong');
+                strong.textContent = match[0];
+                fragment.appendChild(strong);
+                offset = match.index + match[0].length;
+                match = pattern.exec(text);
+            } while(match);
+            fragment.appendChild(document.createTextNode(text.slice(offset)));
+            node.parentNode.replaceChild(fragment, node);
+        })
+    }
+
     //event search
     function eventSearchPageFuncion() {
         //highlight
         var text = $(".arlo-search-field").val();
         if(text) {
-            var keys = text.split(' ')
+            var keys = text.split(' ').filter(Boolean)
             var finalkeys = []
             keys.forEach(key => {
                 if(!finalkeys.find(x => x.toLowerCase().indexOf(key.toLowerCase()) >= 0)) {
                     finalkeys.push(key)
                 }
             })
+            if(!finalkeys.length) return;
+            var pattern = new RegExp(finalkeys.map(key => key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'ig')
             var $targets = $(".arlo-event-search-result-item-title,.arlo-event-search-result-item-desc");
             $targets.each(function() {
-                var html = $(this).html();
-                finalkeys.forEach(function(key) {
-                    const matches = html.match(new RegExp(key, 'ig')) || []
-                    matches.forEach(match => {
-                        html = html.replaceAll(match, '<strong>' + match + '</strong>')
-                    })
-                })
-                $(this).html(html)
+                applySearchTokenHighlighting(this, pattern)
             })
         }
         

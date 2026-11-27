@@ -30,11 +30,19 @@ class RemoteHttpSnapshotPartProvider implements SnapshotPartProvider {
 	 * @return string Decoded JSON text.
 	 */
 	public function get_snapshot_part_content( SnapshotPartRequest $request ): string {
-		$encrypted_contents = $this->transport->get_remote_content( $request->uri, $request->context->platform_hostname, self::MAX_RESPONSE_BYTES, $request->context->import_id );
-		$key                = $request->context->encryption_key;
-		$method             = $request->context->encryption_method;
-		$plain_contents     = \ArloTraining\Crypto::decrypt_gzip( $encrypted_contents, $key, $method, ImportRequest::FRAGMENT_MAX_BYTE_SIZE + 1 );
-		$iteration          = SnapshotPartRequest::PART_TYPE_FRAGMENT === $request->part_type ? $request->fragment_index + 1 : null;
+		try {
+			$encrypted_contents = $this->transport->get_remote_content( $request->uri, $request->context->platform_hostname, self::MAX_RESPONSE_BYTES, $request->context->import_id );
+		} catch ( \ArloTraining\PlatformAccessHttpException $exception ) {
+			if ( SnapshotPartRequest::PART_TYPE_FRAGMENT !== $request->part_type ) {
+				throw $exception;
+			}
+			// Fragments come from the CDN, not the platform API, so their failures must not count as platform access failures.
+			throw new \ArloTraining\FragmentAccessHttpException( $exception->getMessage(), $exception->getCode(), $exception ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception is caught by the importer and written to the error log; not rendered in any browser context.
+		}
+		$key            = $request->context->encryption_key;
+		$method         = $request->context->encryption_method;
+		$plain_contents = \ArloTraining\Crypto::decrypt_gzip( $encrypted_contents, $key, $method, ImportRequest::FRAGMENT_MAX_BYTE_SIZE + 1 );
+		$iteration      = SnapshotPartRequest::PART_TYPE_FRAGMENT === $request->part_type ? $request->fragment_index + 1 : null;
 		Logger::log_diagnostic( Logger::DIAGNOSTIC_VERBOSITY_DEBUG, 'Snapshot data decrypted [part=' . $request->part_type . ( is_null( $iteration ) ? '' : '; iteration=' . $iteration ) . '; bytes=' . strlen( $plain_contents ) . ']', $request->context->import_id );
 
 		return $plain_contents;

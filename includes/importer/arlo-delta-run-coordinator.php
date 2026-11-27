@@ -274,11 +274,16 @@ class DeltaRunCoordinator extends AbstractImportStep {
 				throw $exception;
 			}
 			if ( $has_committed_bundle || ( isset( $writer ) && $writer->has_committed_bundle() ) ) {
+				$has_committed_bundle = true;
 				throw new DeltaFatalException( 'Event availability delta failed after its first committed bundle.', 0, $exception ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- The chained exception is propagated to the importer and logged; it is not rendered.
 			}
 			$this->handle_prewrite_failure( $repository, $exception, 'selected_event_availability' );
 			$this->outcome = new DeltaCoordinatorOutcome( DeltaCoordinatorOutcome::CONTINUE_FULL_SHADOW );
 			return;
+		} finally {
+			if ( $has_committed_bundle ) {
+				$this->purge_page_caches_after_committed_availability();
+			}
 		}
 
 		try {
@@ -306,6 +311,21 @@ class DeltaRunCoordinator extends AbstractImportStep {
 			Logger::log_diagnostic( Logger::DIAGNOSTIC_VERBOSITY_DEBUG, 'Event availability delta finalization claim failed after promotion [run_id=' . $this->incremental_run_id . '; exception=' . get_class( $exception ) . ']', $this->import_id );
 		}
 		$this->outcome = new DeltaCoordinatorOutcome( DeltaCoordinatorOutcome::TERMINAL_SUCCESS, $completion_detail );
+	}
+
+	/**
+	 * Purges supported page caches because committed availability changes are live.
+	 *
+	 * A failing third-party purge must not replace the delta outcome, so it is logged and swallowed.
+	 *
+	 * @return void
+	 */
+	private function purge_page_caches_after_committed_availability(): void {
+		try {
+			CacheControl::Clear();
+		} catch ( \Throwable $exception ) {
+			Logger::log_diagnostic( Logger::DIAGNOSTIC_VERBOSITY_DEBUG, 'Page cache purge failed after committed Event availability changes [run_id=' . $this->incremental_run_id . '; exception=' . get_class( $exception ) . '; message=' . $exception->getMessage() . ']', $this->import_id );
+		}
 	}
 
 	private function promote_selected_baseline( object $run ): void {

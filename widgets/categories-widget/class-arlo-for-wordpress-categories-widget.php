@@ -104,7 +104,7 @@ class Arlo_For_Wordpress_Categories_Widget extends WP_Widget {
 		$widget_string .= ob_get_clean();
 		$widget_string .= $after_widget;
 
-		echo $widget_string; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The content is built from safe sources.
+		echo $widget_string; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $before_widget and $after_widget are the theme's registered sidebar markup; the view output is escaped where each value is emitted.
 	} // end widget
 
 	/**
@@ -117,7 +117,7 @@ class Arlo_For_Wordpress_Categories_Widget extends WP_Widget {
 
 		$instance = $old_instance;
 
-		$instance['title']  = isset( $new_instance['title'] ) && is_scalar( $new_instance['title'] ) ? wp_strip_all_tags( wp_unslash( (string) $new_instance['title'] ) ) : '';
+		$instance['title']  = isset( $new_instance['title'] ) && is_scalar( $new_instance['title'] ) ? wp_strip_all_tags( (string) $new_instance['title'] ) : '';
 		$instance['depth']  = isset( $new_instance['depth'] ) && is_scalar( $new_instance['depth'] ) ? intval( $new_instance['depth'] ) : 0;
 		$instance['parent'] = ! empty( $new_instance['parent'] );
 

@@ -126,7 +126,7 @@ class Templates {
                             )
                 ";
 				$where_parameters[] = $import_id;
-				$where_parameters[] = $tagprefix . '%';
+				$where_parameters[] = $wpdb->esc_like( $tagprefix ) . '%';
 				$where_parameters[] = $import_id;
 				$where_parameters[] = $GLOBALS['arlo_eventtemplate']['et_id'];
 
@@ -480,7 +480,7 @@ class Templates {
 
 		$requested_event_page_number = null;
 		$requested_page_target       = \ArloTraining\Utilities::filter_string_polyfill( INPUT_GET, 'pagefor' );
-		$requested_event_page_raw    = \ArloTraining\Utilities::clean_int_url_parameter( 'epage' );
+		$requested_event_page_raw    = \ArloTraining\Utilities::get_int_request_parameter( 'epage' );
 		if ( $requested_page_target === 'event' && $requested_event_page_raw !== null ) {
 			$requested_event_page_number = max( 1, (int) $requested_event_page_raw );
 		}
@@ -511,7 +511,7 @@ class Templates {
 								if ( isset( $atts['group_header'] ) ) {
 									if ( $previous != null ) {
 										if ( isset( $atts['events_after'] ) ) {
-											$output .= self::get_events_limit_marker_html( $atts );
+											$output .= self::get_events_limit_marker_html( $atts, (string) $previous['c_slug'] );
 											// Sanitise before substitution so attributes are quoted and values stay whole, and again after because markup and platform values can combine into a URL scheme that neither passes alone.
 											$output .= wp_kses_post( Shortcodes::apply_placeholder( wp_kses_post( $atts['events_after'] ), esc_attr( $previous['c_slug'] ) ) );
 										}
@@ -566,7 +566,7 @@ class Templates {
 			$output .= Shortcodes::create_rich_snippet( $item_list );
 
 			if ( isset( $atts['events_after'] ) && $previous != null ) {
-				$output .= self::get_events_limit_marker_html( $atts );
+				$output .= self::get_events_limit_marker_html( $atts, (string) $previous['c_slug'] );
 				// Sanitise before substitution so attributes are quoted and values stay whole, and again after because markup and platform values can combine into a URL scheme that neither passes alone.
 				$output .= wp_kses_post( Shortcodes::apply_placeholder( wp_kses_post( $atts['events_after'] ), esc_attr( $previous['c_slug'] ) ) );
 			}
@@ -599,6 +599,13 @@ class Templates {
 				$shortcode_name
 			)
 		);
+
+		// Tell the shortcode dispatcher whether the resolved layout emits class tokens
+		// so it can sanitize the wrapper's class attribute without re-running the filter.
+		$context = ShortcodeRenderContext::current();
+		if ( null !== $context ) {
+			$context->set_uses_class_layout( 'class' === $layout );
+		}
         // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Table names are plugin-owned ($wpdb->prefix); every value is bound with a %d placeholder.
 		$sql_tags = $wpdb->prepare(
 			"
@@ -916,74 +923,85 @@ class Templates {
 	}
 
 	private static function shortcode_event_template_filters( $content = '', $atts = [], $shortcode_name = '', $import_id = '' ) {
-		return self::generate_template_filters_form( $atts, $shortcode_name, $import_id, 'event' );
+		return self::generate_template_filters_form_html( $atts, $shortcode_name, $import_id, 'event' );
 	}
 
 	private static function shortcode_schedule_filters( $content = '', $atts = [], $shortcode_name = '', $import_id = '' ) {
-		return self::generate_template_filters_form( $atts, $shortcode_name, $import_id, 'schedule' );
+		return self::generate_template_filters_form_html( $atts, $shortcode_name, $import_id, 'schedule' );
 	}
 
-	private static function generate_template_filters_form( $atts, $shortcode_name, $import_id, $default_page = 'event' ) {
-		global $post;
-
-		extract(
-			shortcode_atts(
-				array(
-					'filters'     => 'category,location,delivery',
-					'resettext'   => esc_html__( 'Reset', 'arlo-training-and-event-management-system' ),
-					'buttonclass' => 'button',
-				),
-				$atts,
-				$shortcode_name
-			)
+	/**
+	 * Builds the filter form shown above the catalogue and schedule lists.
+	 *
+	 * @param array<string, mixed>|string $atts              Shortcode attributes; `filters` is a comma-separated list of filter keys,
+	 *                                                       `resettext` and `buttonclass` style the reset link, and `hidereset` hides it.
+	 * @param string                      $shortcode_name    Name of the shortcode being rendered.
+	 * @param string|int                  $import_id         The import whose filter options are listed.
+	 * @param string                      $default_page_type Arlo page type to use when the current page is not a mapped host page.
+	 * @return string The form markup, or an empty string when no requested filter has options to show.
+	 */
+	private static function generate_template_filters_form_html( $atts, $shortcode_name, $import_id, $default_page_type ): string {
+		$atts = shortcode_atts(
+			array(
+				'filters'     => 'category,location,delivery',
+				'resettext'   => esc_html__( 'Reset', 'arlo-training-and-event-management-system' ),
+				'buttonclass' => 'button',
+				'hidereset'   => null,
+			),
+			is_array( $atts ) ? $atts : [],
+			$shortcode_name
 		);
 
-		$filters_array = explode( ',', $filters );
+		$requested_filters = explode( ',', $atts['filters'] );
 
-		$page_type    = \Arlo_For_Wordpress::get_current_page_arlo_type( $default_page );
-		$filter_group = $page_type == 'event' ? 'events' : $page_type;
-		$page_id      = \Arlo_For_Wordpress::get_posts_page_id( $page_type );
+		$page_type    = \Arlo_For_Wordpress::get_current_page_arlo_type( $default_page_type );
+		$filter_group = 'event' === $page_type ? 'events' : $page_type;
+		$page_link    = self::get_host_page_link( $page_type );
 
+		$filter_html = '';
+
+		foreach ( \Arlo_For_Wordpress::$available_filters[ 'schedule' === $page_type ? 'schedule' : 'template' ]['filters'] as $filter_key => $filter ) {
+			if ( ! in_array( $filter_key, $requested_filters, true ) ) {
+				continue;
+			}
+
+			$selected = isset( self::$event_template_atts[ $filter_key ] ) && is_string( self::$event_template_atts[ $filter_key ] ) ? self::$event_template_atts[ $filter_key ] : '';
+			$items    = Filters::get_filter_options( $filter_key, $import_id );
+
+			$filter_html .= Shortcodes::create_filter( $filter_key, $items, \Arlo_For_Wordpress::$filter_labels[ $filter_key ], 'generic', $selected, $filter_group );
+		}
+
+		if ( '' === $filter_html ) {
+			return '';
+		}
+
+		$reset_style = null !== $atts['hidereset'] ? 'display: none' : '';
+
+		return '
+            <form id="arlo-event-filter" class="arlo-filters" method="get" action="' . esc_url( $page_link ) . '">
+                ' . $filter_html . '
+                <div class="arlo-filters-buttons"><input type="hidden" id="arlo-page" value="' . esc_url( $page_link ) . '">
+                    <a role="button" style="' . esc_attr( $reset_style ) . '" href="' . esc_url( $page_link ) . '" class="' . esc_attr( $atts['buttonclass'] ) . '">' . esc_html( $atts['resettext'] ) . '</a>
+                </div>
+            </form>
+            ';
+	}
+
+	/**
+	 * Returns the permalink of the page that hosts the given list type, falling back to the current page.
+	 *
+	 * @param string $page_type The Arlo page type, such as event or schedule.
+	 */
+	private static function get_host_page_link( $page_type ): string {
+		global $post;
+
+		$page_id   = \Arlo_For_Wordpress::get_posts_page_id( (string) $page_type );
 		$page_link = $page_id > 0 ? get_permalink( $page_id ) : '';
 		if ( empty( $page_link ) ) {
 			$page_link = get_permalink( get_post( $post ) );
 		}
 
-		$filter_html = '';
-
-		$atts = is_array( $atts ) ? $atts : [];
-		$atts = array_merge( $atts, self::$event_template_atts );
-
-		foreach ( \Arlo_For_Wordpress::$available_filters[ $page_type == 'schedule' ? 'schedule' : 'template' ]['filters'] as $filter_key => $filter ) :
-
-			$att = ( isset( self::$event_template_atts[ $filter_key ] ) && is_string( self::$event_template_atts[ $filter_key ] ) ? self::$event_template_atts[ $filter_key ] : '' );
-
-			if ( ! in_array( $filter_key, $filters_array, true ) ) {
-				continue;
-			}
-
-			$items = Filters::get_filter_options( $filter_key, $import_id );
-
-			$filter_html .= Shortcodes::create_filter( $filter_key, $items, \Arlo_For_Wordpress::$filter_labels[ $filter_key ], 'generic', $att, $filter_group );
-
-		endforeach;
-
-		// category select
-		if ( ! empty( $filter_html ) ) {
-
-			$reset_style = "";
-			if ( isset( $atts['hidereset'] ) ) {
-				$reset_style = "display: none";
-			}
-			return '
-            <form id="arlo-event-filter" class="arlo-filters" method="get" action="' . esc_url( $page_link ) . '">
-                ' . $filter_html . '
-                <div class="arlo-filters-buttons"><input type="hidden" id="arlo-page" value="' . esc_url( $page_link ) . '">
-                    <a role="button" style="' . esc_attr( $reset_style ) . '" href="' . esc_url( $page_link ) . '" class="' . esc_attr( $buttonclass ) . '">' . esc_html( $resettext ) . '</a>
-                </div>
-            </form>
-            ';
-		}
+		return is_string( $page_link ) ? $page_link : '';
 	}
 
 	private static function shortcode_suggest_datelocation( $content = '', $atts = [], $shortcode_name = '', $import_id = '' ) {
@@ -1040,6 +1058,16 @@ class Templates {
 	}
 
 	private static function shortcode_event_template_rich_snippet( $content = '', $atts = [], $shortcode_name = '', $import_id = '' ) {
+		$template = isset( $GLOBALS['arlo_eventtemplate'] ) ? $GLOBALS['arlo_eventtemplate'] : null;
+		if (
+			! Shortcodes::has_rich_snippet_string( $template, 'et_post_name' )
+			|| ! Shortcodes::has_rich_snippet_string( $template, 'et_name' )
+			// The region is nullable and empty without regions, but the column must exist.
+			|| ! Shortcodes::has_rich_snippet_string( $template, 'et_region', true )
+		) {
+			return '';
+		}
+
 		$et_snippet = self::get_rich_snippet_data( $atts, $import_id, $shortcode_name );
 		return Shortcodes::create_rich_snippet( $et_snippet );
 	}
@@ -1155,8 +1183,9 @@ class Templates {
 			return;
 		}
 
-		$limit             = intval( isset( $atts['limit'] ) ? $atts['limit'] : get_option( 'posts_per_page' ) );
-		$page              = arlo_current_page();
+		$limit = intval( isset( $atts['limit'] ) ? $atts['limit'] : get_option( 'posts_per_page' ) );
+		// A request for the next events of a category is not for another page of categories, whatever page address it came from.
+		$page              = null !== $requested_event_page_number ? 1 : arlo_current_page();
 		$offset            = ( $page - 1 ) * $limit;
 		$group_by_category = isset( $atts['climit'] );
 
@@ -1587,15 +1616,19 @@ class Templates {
 	}
 
 	/**
-	 * Marks the end of a category's event list with the list limit.
+	 * Marks the end of a category's event list with the list limit and the category it belongs to.
 	 *
-	 * Each category is fetched with one event more than the limit, so a load-more script needs the limit to tell that extra event from a full page.
+	 * Each category is fetched with one event more than the limit, so a load-more script needs the limit to tell that extra event from a full page. The slug is the one `events_after` receives, so the script can match a Show more button to its own list.
+	 *
+	 * The slug is named only when it has the characters of a slug the importer builds. The shortcode dispatcher expands shortcodes in this output and `events_after` sanitises its own copy of the slug, so any other value could differ from the button's, and the script then falls back to matching the button to the list by position.
 	 *
 	 * @param array<string, mixed> $atts Shortcode attributes.
+	 * @param string               $slug Slug of the category the list belongs to.
 	 */
-	private static function get_events_limit_marker_html( $atts ): string {
-		$limit = intval( isset( $atts['limit'] ) ? $atts['limit'] : get_option( 'posts_per_page' ) );
-		return '<span class="arlo-events-limit" data-limit="' . esc_attr( (string) $limit ) . '" hidden></span>';
+	private static function get_events_limit_marker_html( $atts, string $slug ): string {
+		$limit          = intval( isset( $atts['limit'] ) ? $atts['limit'] : get_option( 'posts_per_page' ) );
+		$slug_attribute = 1 === preg_match( '/^[A-Za-z0-9_%-]*$/', $slug ) ? ' data-slug="' . esc_attr( $slug ) . '"' : '';
+		return '<span class="arlo-events-limit" data-limit="' . esc_attr( (string) $limit ) . '"' . $slug_attribute . ' hidden></span>';
 	}
 
 	private static function generate_bestoffer_list_sql( $template_id, $region, $limit, $import_id ) {

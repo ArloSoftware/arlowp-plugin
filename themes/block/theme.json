@@ -6,9 +6,7 @@
     "forDesigners": false,
     "demoUrl": "https://support.arlo.co/hc/en-gb/articles/115001797703",
     "externalResources": {
-        "stylesheets": [
-            ""
-        ],
+        "stylesheets": [],
         "javascripts": []
     },
     "images": [

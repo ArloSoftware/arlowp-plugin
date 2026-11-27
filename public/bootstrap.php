@@ -16,7 +16,10 @@ add_filter(
 			$new_title = arlo_set_title( $title['title'], $post->ID, true );
 
 			if ( ! empty( $new_title['subtitle'] ) ) {
-				$title['title'] = esc_html( $new_title['subtitle'] . ' - ' . $new_title['title'] );
+				// Only the subtitle carries request text. The page title keeps its brackets, and core escapes the whole
+				// title again, which keeps these references.
+				$subtitle_html  = \ArloTraining\Utilities::escape_shortcode_brackets_in_html( esc_html( $new_title['subtitle'] ) );
+				$title['title'] = $subtitle_html . esc_html( ' - ' . $new_title['title'] );
 			}
 		}
 
@@ -27,19 +30,23 @@ add_filter(
 );
 
 /*
- * Add event category to title when filtered by a category
+ * Add a subtitle only to filtered Arlo host pages. The incoming WordPress title may already contain
+ * markup from earlier filters. Preserve it as supplied and escape only the subtitle this filter adds. The subtitle
+ * carries request text, so its square brackets are also written as character references that a theme expanding
+ * shortcodes in titles cannot read as shortcode syntax.
  */
 add_filter(
 	'the_title',
-	function ( $title, $id = null ) {
-		$new_title = arlo_set_title( $title, $id );
+	function ( $incoming_title, $id = null ) {
+		$subtitle = arlo_set_title( $incoming_title, $id )['subtitle'] ?? '';
 
-		if ( empty( $new_title['subtitle'] ) ) {
-			return $new_title['title'];
+		if ( empty( $subtitle ) ) {
+			return $incoming_title;
 		}
 
-		$title_with_glue = ( empty( $new_title['title'] ) ? '' : $new_title['title'] . ': ' );
-		return $title_with_glue . '<span class="cat-title-ext">' . esc_html( $new_title['subtitle'] ) . ' </span>';
+		$title_prefix  = empty( $incoming_title ) ? '' : $incoming_title . ': ';
+		$subtitle_html = '<span class="cat-title-ext">' . esc_html( $subtitle ) . ' </span>';
+		return $title_prefix . \ArloTraining\Utilities::escape_shortcode_brackets_in_html( wp_kses_post( $subtitle_html ) );
 	},
 	10,
 	2
@@ -124,9 +131,9 @@ function arlo_set_title( $title, $id = null, $meta = false ) {
 
 	$subtitle = '';
 
-	$arlo_category = \ArloTraining\Utilities::clean_string_url_parameter( 'arlo-category' );
-	$arlo_location = \ArloTraining\Utilities::clean_string_url_parameter( 'arlo-location' );
-	$arlo_search   = \ArloTraining\Utilities::clean_string_url_parameter( 'arlo-search' );
+	$arlo_category = \ArloTraining\Utilities::get_sanitized_request_parameter( 'arlo-category' );
+	$arlo_location = \ArloTraining\Utilities::get_sanitized_request_parameter( 'arlo-location' );
+	$arlo_search   = \ArloTraining\Utilities::get_sanitized_request_parameter( 'arlo-search' );
 
 	$cat_slug = ! empty( $arlo_category ) ? $arlo_category : '';
 
@@ -163,7 +170,8 @@ function arlo_set_title( $title, $id = null, $meta = false ) {
 }
 
 /**
- * Registers the arlo custom post types
+ * Registers the Arlo custom post types and the rewrite rules for the host pages mapped to them, then records the
+ * routing those rules were built from.
  *
  * @since    1.0.0
  *
@@ -171,22 +179,28 @@ function arlo_set_title( $title, $id = null, $meta = false ) {
 function arlo_register_custom_post_types() {
 	$post_types_settings = Arlo_For_Wordpress::get_post_types_settings();
 	$templates           = Arlo_For_Wordpress::get_templates();
+	$routes              = array();
 
 	foreach ( Arlo_For_Wordpress::$post_types as $id => $type ) {
+		// The kind of page this post type represents, which picks the rewrite rules below. Custom shortcodes declare
+		// their own type; the built-in plural names are reduced to the singular names the switch below uses.
 		$custom_type = isset( $templates[ $id ]['type'] ) ? $templates[ $id ]['type'] : $id;
 		$custom_type = in_array( $custom_type, array( 'events', 'presenters', 'venues' ), true ) ? substr( $custom_type, 0, strlen( $custom_type ) - 1 ) : $custom_type;
 
-		// default slug
+		// Fallback base, such as arlo/events, built from the letters of the post type name. It is used whenever no
+		// routable host page supplies a base: nothing is mapped, or the mapped page is missing, a draft or pending,
+		// or the site has no pretty permalinks. It keeps the detail posts reachable, but the list-page rules further
+		// down are only added for a routable host page, so those routes do not exist on the fallback.
 		$slug = str_replace( '_', '-', strtolower( trim( preg_replace( '/[^A-Za-z]+/', '', $type['name'] ) ) ) );
 		$slug = 'arlo/' . $slug;
 
-		// slug based on page, if it exists
+		// A mapped host page replaces the fallback base with the page's own path, such as events or training/events.
 		$page_id = null;
 		if ( ! empty( $post_types_settings[ $id ]['posts_page'] ) ) {
 			$page_id   = (int) $post_types_settings[ $id ]['posts_page'];
 			$page_link = get_permalink( $page_id );
 			// A draft or pending page only has a ?page_id= permalink. It is not a routable base, and using it as
-			// the slug would build invalid rewrite regexes, so such a page falls back to the default slug.
+			// the slug would build invalid rewrite regexes, so such a page uses the fallback base.
 			if ( ! empty( $page_link ) && empty( wp_parse_url( $page_link, PHP_URL_QUERY ) ) ) {
 				$slug = substr( substr( str_replace( get_home_url(), '', $page_link ), 0, -1 ), 1 );
 			} else {
@@ -206,7 +220,7 @@ function arlo_register_custom_post_types() {
 			'query_var'          => true,
 			'rewrite'            => array(
 				'slug'       => $slug,
-				'with_front' => false, // false ensures no blog-like url
+				'with_front' => false, // Keeps the permalink structure's prefix, such as /blog/, out of the base.
 			),
 			'capability_type'    => 'page',
 			'has_archive'        => false,
@@ -217,8 +231,11 @@ function arlo_register_custom_post_types() {
 			),
 		);
 
-		// let's try some custom rewrite rules
-
+		// Rules that send the list page's path segments (region-, cat-, month-, and so on) to its host page as query
+		// variables. They need a routable host page; without one only the detail routes that register_post_type()
+		// adds below exist. All of them are 'top' rules, so they are tried before WordPress's own page rules, and
+		// the first one registered that matches wins. The order of the post types and of the rules in each case
+		// therefore decides which rule handles a URL.
 		if ( $page_id ) {
 			switch ( $custom_type ) {
 				case 'upcoming':
@@ -228,22 +245,26 @@ function arlo_register_custom_post_types() {
 					add_rewrite_rule( '^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(oatag-([^/]*))?/?(page/([^/]*))?/?(templatetag-([^/]*))?', 'index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-oatag=$matches[6]&paged=$matches[8]&arlo-templatetag=$matches[10]', 'top' );
 					break;
 				case 'event':
-					// Base event rule with only event and region
+					// Event detail URLs go first: the list rule below has no end anchor, so it would also match them.
+					// Base event rule with only event and region.
 					add_rewrite_rule( '^' . $slug . '/(\d+-[^/]*)+/?(region-([^/]*))?/?$', 'index.php?arlo_event=$matches[1]&arlo-region=$matches[3]', 'top' );
-					// Events with location and state
+					// Event with location and state.
 					add_rewrite_rule( '^' . $slug . '/(\d+-[^/]*)+/?(region-([^/]*))?/?(location-([^/]*))?/?(state-([^/]*))?/?$', 'index.php?arlo_event=$matches[1]&arlo-region=$matches[3]&arlo-location=$matches[5]&arlo-state=$matches[7]', 'top' );
-					// Events with Event ID
+					// Event with event ID.
 					add_rewrite_rule( '^' . $slug . '/(\d+-[^/]*)+/?(region-([^/]*))?/?(event-([^/]*))?/?$', 'index.php?arlo_event=$matches[1]&arlo-region=$matches[3]&arlo-event-id=$matches[5]', 'top' );
 
+					// The catalogue list page itself.
 					add_rewrite_rule( '^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(delivery-([^/]*))?/?(templatetag-([^/]*))?/?(state-([^/]*))?/?(page/([^/]*))?', 'index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-delivery=$matches[10]&arlo-templatetag=$matches[12]&arlo-state=$matches[14]&paged=$matches[16]', 'top' );
 					break;
 				case 'eventsearch':
+					// The search route goes first, because the rule after it matches any path under the base.
 					add_rewrite_rule( '^' . $slug . '/?(region-([^/]*))?/search/([^/]*)?/?(page/([^/]*))?', 'index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-search=$matches[3]&paged=$matches[5]', 'top' );
 					add_rewrite_rule( '^' . $slug . '/?(region-([^/]*))?/?(page/([^/]*))?', 'index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&paged=$matches[4]', 'top' );
 					break;
 				case 'schedule':
 					add_rewrite_rule( '^' . $slug . '/(region-([^/]*))?/?(cat-([^/]*))?/?(month-([^/]*))?/?(location-([^/]*))?/?(venue-([^/]*))?/?(delivery-([^/]*))?/?(templatetag-([^/]*))?/?(state-([^/]*))?/?(page/([^/]*))?', 'index.php?page_id=' . $page_id . '&arlo-region=$matches[2]&arlo-category=$matches[4]&arlo-month=$matches[6]&arlo-location=$matches[8]&arlo-venue=$matches[10]&arlo-delivery=$matches[12]&arlo-templatetag=$matches[14]&arlo-state=$matches[16]&paged=$matches[18]', 'top' );
 					break;
+				// Presenter and venue lists only page; their detail routes come from register_post_type().
 				case 'presenter':
 					add_rewrite_rule( '^' . $slug . '/page/([^/]*)/?', 'index.php?page_id=' . $page_id . '&paged=$matches[1]', 'top' );
 					break;
@@ -253,10 +274,14 @@ function arlo_register_custom_post_types() {
 			}
 		}
 
+		// Registers the detail posts, which get their own routes under the base.
 		register_post_type( 'arlo_' . $id, $args );
+
+		// What this post type's rules were built from.
+		$routes[ $id ] = array( $custom_type, $slug, $page_id );
 	}
 
-	// these should possibly be in there own function?
+	// The query variables the rules above write to, so WordPress accepts and passes them on.
 	add_rewrite_tag( '%page_id%', '([^&]+)' );
 	add_rewrite_tag( '%arlo-region%', '([^&]+)' );
 	add_rewrite_tag( '%arlo-category%', '([^&]+)' );
@@ -273,13 +298,8 @@ function arlo_register_custom_post_types() {
 	add_rewrite_tag( '%arlo-event-id%', '([^&]+)' );
 	add_rewrite_tag( '%paged%', '([^&]+)' );
 
-	// flush cached rewrite rules if we've just updated the arlo settings
-	// It is triggered when the user saves changes on the WordPress settings page.
-	// wp_safe_redirect( admin_url( 'admin.php?page=arlo-for-wordpress&settings-updated=true' ) );
-	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- flush_rewrite_rules() is idempotent; capability check is sufficient.
-	if ( is_admin() && isset( $_GET['settings-updated'] ) && isset( $_GET['page'] ) && sanitize_key( wp_unslash( $_GET['page'] ) ) === 'arlo-for-wordpress' && current_user_can( 'manage_options' ) ) {
-		flush_rewrite_rules();
-	}
+	// Lets a later admin request tell when the stored rules no longer match what was registered here.
+	Arlo_For_Wordpress::record_routing_signature( $routes );
 }
 
 
@@ -417,7 +437,8 @@ function arlo_set_region_redirect() {
 
 	$cookie_time = time() + apply_filters( 'arlo_region_cookie_time', 60 * 60 * 24 * 30 );
 
-	if ( ! empty( $page_obj ) ) {
+	// Archives supply a WP_Post_Type or WP_Term, which lack these post properties.
+	if ( ! empty( $page_obj ) && isset( $page_obj->post_type, $page_obj->ID ) ) {
 		$page_type = $page_obj->post_type;
 		$page_id   = $page_obj->ID;
 	}
@@ -600,7 +621,8 @@ function arlo_set_region_redirect() {
 
 					return;
 				}
-			} else {
+			} elseif ( \ArloTraining\Utilities::array_ikey_exists( $selected_region, $regions ) ) {
+				// Persist only a region the site has configured; the value keeps the spelling the visitor supplied.
 				setcookie( "arlo-region", $selected_region, $cookie_time, '/', $domain );
 			}
 		} else {
@@ -613,21 +635,34 @@ function arlo_set_region_redirect() {
 }
 
 /**
- * Checks if a post is a arlo custom post and sends the content to the revelant function
+ * Renders Arlo's detail template in place of the stored content of an Arlo event, presenter or venue post.
+ *
+ * Only arlo_event, arlo_presenter and arlo_venue posts on a singular view are replaced. Every other post,
+ * including a post type owned by another plugin that shares a short name such as event or venue, is returned
+ * unchanged.
  *
  * @since    1.0.0
  *
- * @param    string $content The content of the custom post
+ * @param    string $content The stored content of the post.
  *
- * @return   string
+ * @return   string The rendered Arlo template for an Arlo detail post, otherwise the unchanged content.
  */
 function arlo_the_content( $content ) {
 	global $post;
 
-	$post_type = str_replace( 'arlo_', '', get_post_type( $post ) );
+	// Only Arlo's own detail post types are rendered here; a post type owned by another plugin keeps its content.
+	// Add a case when a type gains an arlo_the_content_<type>() handler.
+	if ( ! is_singular() ) {
+		return $content;
+	}
 
-	if ( function_exists( 'arlo_the_content_' . $post_type ) && is_singular() ) {
-		return call_user_func_array( 'arlo_the_content_' . $post_type, func_get_args() );
+	switch ( Arlo_For_Wordpress::get_post_type_key( get_post_type( $post ) ) ) {
+		case 'event':
+			return arlo_the_content_event( $content );
+		case 'presenter':
+			return arlo_the_content_presenter( $content );
+		case 'venue':
+			return arlo_the_content_venue( $content );
 	}
 
 	return $content;
@@ -791,13 +826,19 @@ function arlo_the_content_venue( $content ) {
  *
  * @since    2.0.0
  *
- * @param    int $num Total amount of items e.g. Event Templates or Venues
+ * @param    int             $num   Total amount of items e.g. Event Templates or Venues.
+ * @param    int|string|null $limit Items per page; null uses the WordPress default. Nonpositive limits omit pagination.
  *
  * @return   string The pagination HTML
  */
 function arlo_pagination( $num, $limit = null ) {
 	// the WordPress posts per page option value
-	$limit = intval( is_null( $limit ) ? get_option( 'posts_per_page' ) : $limit );
+	$limit = is_null( $limit ) ? get_option( 'posts_per_page' ) : $limit;
+	$limit = is_scalar( $limit ) ? intval( $limit ) : 0;
+
+	if ( $limit <= 0 ) {
+		return '';
+	}
 
 	$big = 999999999;
 

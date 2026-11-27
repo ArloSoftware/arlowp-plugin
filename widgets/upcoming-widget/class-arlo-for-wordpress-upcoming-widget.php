@@ -110,7 +110,7 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 		$widget_string .= ob_get_clean();
 		$widget_string .= $after_widget;
 
-		echo $widget_string; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The content is built from safe sources.
+		echo $widget_string; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $before_widget and $after_widget are the theme's registered sidebar markup; the view output is escaped where each value is emitted.
 	} // end widget
 
 	/**
@@ -149,6 +149,10 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 	 */
 	public function update( $new_instance, $old_instance ) {
 
+		// Read before wp_parse_args() fills defaults, so a missing field can be told apart from a submitted one.
+		$submitted_number   = $new_instance['number'] ?? null;
+		$submitted_template = $new_instance['template'] ?? null;
+
 		$new_instance = wp_parse_args(
 			$new_instance,
 			array(
@@ -162,15 +166,25 @@ class Arlo_For_Wordpress_Upcoming_Widget extends WP_Widget {
 
 		$instance = array();
 
-		$instance['title']       = sanitize_text_field( wp_unslash( $new_instance['title'] ) );
-		$instance['number']      = intval( $new_instance['number'] );
-		$instance['eventtag']    = sanitize_text_field( wp_unslash( $new_instance['eventtag'] ) );
-		$instance['templatetag'] = sanitize_text_field( wp_unslash( $new_instance['templatetag'] ) );
+		// WP_Widget::update_callback() has already unslashed these values, so unslashing again would strip real backslashes.
+		$instance['title']       = sanitize_text_field( $new_instance['title'] );
+		$instance['eventtag']    = sanitize_text_field( $new_instance['eventtag'] );
+		$instance['templatetag'] = sanitize_text_field( $new_instance['templatetag'] );
 
-		// The template is raw markup, so it is never filtered. A user who may not add raw HTML keeps the stored template instead.
-		$instance['template'] = \ArloTraining\TemplateAccess::restricts_current_user()
-			? ( isset( $old_instance['template'] ) && is_string( $old_instance['template'] ) ? $old_instance['template'] : '' )
-			: wp_unslash( $new_instance['template'] );
+		// A missing or non-scalar number keeps the stored value rather than turning into a different number.
+		if ( is_scalar( $submitted_number ) ) {
+			$instance['number'] = intval( $submitted_number );
+		} elseif ( isset( $old_instance['number'] ) && is_numeric( $old_instance['number'] ) ) {
+			$instance['number'] = intval( $old_instance['number'] );
+		} else {
+			$instance['number'] = 5;
+		}
+
+		// The template is raw markup, so it is never filtered. A user who may not add raw HTML, or a submission that is not a string, keeps the stored template instead.
+		$stored_template      = isset( $old_instance['template'] ) && is_string( $old_instance['template'] ) ? $old_instance['template'] : '';
+		$instance['template'] = ! \ArloTraining\TemplateAccess::restricts_current_user() && is_string( $submitted_template )
+			? $submitted_template
+			: $stored_template;
 
 		return $instance;
 	}

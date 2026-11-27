@@ -388,7 +388,7 @@ class CustomCssMigration {
 	 * Describes how a migrated site's block is doing.
 	 *
 	 * @param array $settings Saved settings.
-	 * @return array{mode: string, integrity: string|null, store: string|null, migrated_at: int|null, destination_url: string, destination_label: string, back_to_before: bool}
+	 * @return array{mode: string, integrity: string|null, store: string|null, migrated_at: int|null, adjusted: int, destination_url: string, destination_label: string, back_to_before: bool}
 	 */
 	public static function status( array $settings ): array {
 		$state     = CustomCss::resolve_state( $settings );
@@ -399,6 +399,7 @@ class CustomCssMigration {
 			'integrity'         => null,
 			'store'             => is_array( $migration ) ? $store : null,
 			'migrated_at'       => is_array( $migration ) && isset( $migration['migrated_at'] ) && is_int( $migration['migrated_at'] ) ? $migration['migrated_at'] : null,
+			'adjusted'          => is_array( $migration ) && isset( $migration['adjusted'] ) && is_int( $migration['adjusted'] ) && $migration['adjusted'] > 0 ? $migration['adjusted'] : 0,
 			'destination_url'   => self::destination_url( $store ),
 			'destination_label' => self::destination_label( $store ),
 			'back_to_before'    => false,
@@ -425,11 +426,12 @@ class CustomCssMigration {
 	/**
 	 * Reports whether CSS can be migrated, combining the CSS scan with checks on this site.
 	 *
-	 * @param string      $css   CSS about to be migrated.
-	 * @param string|null $store Destination store; defaults to the active theme's.
+	 * @param string      $css     CSS about to be migrated.
+	 * @param string|null $store   Destination store; defaults to the active theme's.
+	 * @param array|null  $rewrite Result of CustomCssMarkupRewriter::rewrite() for this CSS, when the caller already has it; otherwise it is worked out here.
 	 * @return array Result from CustomCssCompatibility::analyze() with site findings added.
 	 */
-	public static function preflight( string $css, ?string $store = null ): array {
+	public static function preflight( string $css, ?string $store = null, ?array $rewrite = null ): array {
 		$store    = $store ?? self::current_store();
 		$settings = get_option( 'arlo_settings', [] );
 		$state    = CustomCss::resolve_state( is_array( $settings ) ? $settings : [] );
@@ -450,6 +452,10 @@ class CustomCssMigration {
 			$analysis['status']   = 'warning';
 			return $analysis;
 		}
+
+		// Core's block editor refuses Additional CSS holding a "<" followed by a letter, so the migration rewrites each one it safely can and
+		// blocks on any it cannot. The block is compared with the rewritten text, because that is what a migration writes.
+		$rewrite = $rewrite ?? CustomCssMarkupRewriter::rewrite( $css );
 
 		// Pasted marker comments would put a second marker pair inside the block, so the block could no longer be found and the write would be undone.
 		if ( 1 === preg_match( '~ARLO-CUSTOM-CSS:(?:BEGIN|END)~i', $css ) ) {
@@ -477,7 +483,7 @@ class CustomCssMigration {
 		}
 
 		$existing   = self::read_store( $store );
-		$inspection = null === $existing ? [ 'state' => 'none' ] : self::inspect_existing_block( $existing, $css );
+		$inspection = null === $existing ? [ 'state' => 'none' ] : self::inspect_existing_block( $existing, $rewrite['css'] );
 		if ( 'conflict' === $inspection['state'] ) {
 			$extra[] = self::finding( 'existing-arlo-block', 'blocking', __( 'Additional CSS already contains an Arlo block from an earlier migration (between the ARLO-CUSTOM-CSS comment markers) that does not match the CSS in the editor. It is not overwritten, because it may hold edits you made there. Review it, then delete that block from Additional CSS or copy what you need from it into the editor above (leaving out the ARLO-CUSTOM-CSS comment lines), and check again.', 'arlo-training-and-event-management-system' ), self::additional_css_link( $store ) );
 		} elseif ( 'identical' === $inspection['state'] ) {
@@ -508,16 +514,193 @@ class CustomCssMigration {
 			);
 		}
 
+		foreach ( self::markup_findings( $rewrite ) as $finding ) {
+			$extra[] = $finding;
+		}
+
+		// The rewriter could not read all of the CSS, or it has too many brackets to adjust, so any it holds would be written as they are and leave the editor error.
+		// The scan already blocks CSS it cannot read, so this only adds the position of the first bracket when nothing else has blocked.
+		if ( ! $rewrite['reliable'] && null !== $rewrite['unreadable'] && empty( $analysis['blocked'] ) ) {
+			$extra[] = [
+				'code'    => 'markup-unreadable',
+				'line'    => $rewrite['unreadable']['line'],
+				'column'  => $rewrite['unreadable']['column'],
+				'level'   => 'blocking',
+				'message' => sprintf(
+					/* translators: %s: a short piece of the CSS around the problem. */
+					__( 'WordPress\'s editor rejects a "<" followed by a letter. Arlo could not adjust this one, because it could not read all of this CSS (look for an unclosed quote or bracket, or a malformed url()) or because the CSS has too many of them. Near: %s', 'arlo-training-and-event-management-system' ),
+					$rewrite['unreadable']['snippet']
+				),
+			];
+		}
+
+		// Adjusting makes CSS longer. CSS that is within the check's bound but would not be once adjusted would migrate, then be refused when it is checked again after a revert.
+		if ( $rewrite['reliable'] && strlen( $rewrite['css'] ) > CustomCssCompatibility::MAX_BYTES && strlen( $css ) <= CustomCssCompatibility::MAX_BYTES ) {
+			$extra[] = self::finding(
+				'markup-too-large',
+				'blocking',
+				sprintf(
+					/* translators: %s: the largest size that can be checked, for example "2 MB". */
+					__( 'Once Arlo has adjusted its angle brackets this CSS would be larger than %s, the most that can be checked and migrated. Shorten the CSS, then check again.', 'arlo-training-and-event-management-system' ),
+					size_format( CustomCssCompatibility::MAX_BYTES )
+				)
+			);
+		}
+
 		foreach ( $extra as $finding ) {
 			$analysis['findings'][] = $finding;
 			if ( 'blocking' === $finding['level'] ) {
 				$analysis['blocked'] = true;
-				if ( 'clear' === $analysis['status'] ) {
-					$analysis['status'] = 'warning';
-				}
+			}
+			// Adjustments are listed, so the CSS is not reported as having no issues, but they never block.
+			if ( 'clear' === $analysis['status'] && ( 'blocking' === $finding['level'] || ! empty( $finding['fixable'] ) ) ) {
+				$analysis['status'] = 'warning';
 			}
 		}
 		return $analysis;
+	}
+
+	/**
+	 * Describes the angle brackets a migration will rewrite, one finding per kind, and any it cannot.
+	 *
+	 * @param array $rewrite Result of CustomCssMarkupRewriter::rewrite().
+	 * @return array Findings: the rewrites are 'warning' findings flagged 'fixable' with a 'count'; each bracket that cannot be rewritten is 'blocking'.
+	 */
+	private static function markup_findings( array $rewrite ): array {
+		$kinds  = [
+			'url'     => 'markup-url',
+			'string'  => 'markup-escape',
+			'escape'  => 'markup-escape',
+			'range'   => 'markup-range',
+			'comment' => 'markup-comment',
+		];
+		$groups = [];
+		foreach ( $rewrite['changes'] as $change ) {
+			$code = $kinds[ $change['kind'] ];
+			if ( ! isset( $groups[ $code ] ) ) {
+				$groups[ $code ] = [
+					'count' => 0,
+					'first' => $change,
+				];
+			}
+			++$groups[ $code ]['count'];
+		}
+
+		$findings = [];
+		foreach ( [ 'markup-url', 'markup-escape', 'markup-range', 'markup-comment' ] as $code ) {
+			if ( ! isset( $groups[ $code ] ) ) {
+				continue;
+			}
+			$count      = $groups[ $code ]['count'];
+			$texts      = self::markup_texts( $code, $count );
+			$findings[] = [
+				'code'    => $code,
+				'line'    => $groups[ $code ]['first']['line'],
+				'column'  => $groups[ $code ]['first']['column'],
+				'level'   => 'warning',
+				'message' => $texts[0],
+				'fix'     => $texts[1],
+				'fixable' => true,
+				'count'   => $count,
+			];
+		}
+
+		foreach ( $rewrite['residue'] as $hit ) {
+			$findings[] = [
+				'code'    => 'markup-unfixable',
+				'line'    => $hit['line'],
+				'column'  => $hit['column'],
+				'level'   => 'blocking',
+				'message' => sprintf(
+					/* translators: %s: a short piece of the CSS around the problem. */
+					__( 'WordPress\'s editor rejects a "<" followed by a letter, and this one cannot be rewritten without changing what the CSS means. Remove it, or write the CSS another way. Near: %s', 'arlo-training-and-event-management-system' ),
+					$hit['snippet']
+				),
+			];
+		}
+		$more = $rewrite['residue_count'] - count( $rewrite['residue'] );
+		if ( $more > 0 ) {
+			// The ones that are not described are still located, by line, so none is lost.
+			$others  = array_values( array_diff( $rewrite['residue_lines'], array_column( $rewrite['residue'], 'line' ) ) );
+			$message = sprintf(
+				/* translators: %d: number of further places that are not listed. */
+				_n( '%d more place like this is not listed.', '%d more places like this are not listed.', $more, 'arlo-training-and-event-management-system' ),
+				$more
+			);
+			if ( [] !== $others ) {
+				$shown    = array_slice( $others, 0, 20 );
+				$message .= ' ' . sprintf(
+					/* translators: %s: line numbers, separated by commas. */
+					__( 'They are on lines %s.', 'arlo-training-and-event-management-system' ),
+					implode( ', ', $shown ) . ( count( $others ) > count( $shown ) ? ', …' : '' )
+				);
+			}
+			$findings[] = self::finding(
+				'markup-unfixable-more',
+				'blocking',
+				$message . ' ' . __( 'Fix the ones above, then check again.', 'arlo-training-and-event-management-system' )
+			);
+		}
+		return $findings;
+	}
+
+	/**
+	 * What is wrong, and what the migration will do about it, for a group of brackets that will be rewritten.
+	 *
+	 * They are separate so the settings screen can show the fix after an arrow.
+	 *
+	 * @param string $code  Finding code.
+	 * @param int    $count How many places.
+	 * @return array{0: string, 1: string} The problem, and the fix.
+	 */
+	private static function markup_texts( string $code, int $count ): array {
+		switch ( $code ) {
+			case 'markup-url':
+				return [
+					sprintf(
+						/* translators: %d: number of addresses. */
+						_n( '%d address in a url() contains angle brackets, which WordPress\'s editor rejects', '%d addresses in url() contain angle brackets, which WordPress\'s editor rejects', $count, 'arlo-training-and-event-management-system' ),
+						$count
+					),
+					sprintf(
+						/* translators: 1: the text %3C, 2: the text %3E. */
+						__( 'Arlo will save them as %1$s and %2$s, which browsers read as the same address.', 'arlo-training-and-event-management-system' ),
+						'%3C',
+						'%3E'
+					),
+				];
+			case 'markup-escape':
+				return [
+					sprintf(
+						/* translators: %d: number of places. */
+						_n( '%d quoted string or selector contains a "<" that WordPress\'s editor rejects', '%d quoted strings or selectors contain a "<" that WordPress\'s editor rejects', $count, 'arlo-training-and-event-management-system' ),
+						$count
+					),
+					sprintf(
+						/* translators: %s: the CSS escape for a less-than sign. */
+						_n( 'Arlo will save it as the CSS escape %s, which means the same character.', 'Arlo will save each as the CSS escape %s, which means the same character.', $count, 'arlo-training-and-event-management-system' ),
+						'\\00003C'
+					),
+				];
+			case 'markup-range':
+				return [
+					sprintf(
+						/* translators: %d: number of places. */
+						_n( '%d media or container query compares sizes with "<" and no space after it, which WordPress\'s editor rejects', '%d media or container queries compare sizes with "<" and no space after it, which WordPress\'s editor rejects', $count, 'arlo-training-and-event-management-system' ),
+						$count
+					),
+					_n( 'Arlo will add a space after the "<", for example (width< 600px), which means the same.', 'Arlo will add a space after each "<", for example (width< 600px), which means the same.', $count, 'arlo-training-and-event-management-system' ),
+				];
+			default:
+				return [
+					sprintf(
+						/* translators: %d: number of comments. */
+						_n( '%d comment contains angle brackets, such as an email address or a tag name, which WordPress\'s editor rejects', '%d comments contain angle brackets, such as an email address or a tag name, which WordPress\'s editor rejects', $count, 'arlo-training-and-event-management-system' ),
+						$count
+					),
+					_n( 'Arlo will save them as square brackets, and encode any commented-out address, so the comment still reads the same.', 'Arlo will save them as square brackets, and encode any commented-out address, so each comment still reads the same.', $count, 'arlo-training-and-event-management-system' ),
+				];
+		}
 	}
 
 	/**
@@ -576,10 +759,20 @@ class CustomCssMigration {
 		if ( ! self::needs_editor( $settings ) ) {
 			return new \WP_Error( 'wrong_state' );
 		}
-		$analysis = self::preflight( $css, $store );
+		// Worked out once and handed to the check, so what the check reports is exactly what is written below.
+		$rewrite  = CustomCssMarkupRewriter::rewrite( $css );
+		$analysis = self::preflight( $css, $store, $rewrite );
 		if ( ! empty( $analysis['blocked'] ) ) {
 			return new \WP_Error( 'blocked', '', $analysis );
 		}
+
+		// Everything from here on, including the saved copy and the integrity hash, is the CSS as it is written: with each angle bracket
+		// the editor would reject rewritten. The check has already blocked any that cannot be, and this is the last guard whatever the reason
+		// one is left: nothing the editor would reject is ever written.
+		if ( CustomCssMarkupRewriter::contains_markup( $rewrite['css'] ) ) {
+			return new \WP_Error( 'blocked', '', $analysis );
+		}
+		$css = $rewrite['css'];
 
 		$before = self::read_store( $store, true );
 		if ( null === $before ) {
@@ -617,6 +810,7 @@ class CustomCssMigration {
 			'content_hash'  => hash( 'sha256', CustomCss::normalize_line_endings( $css ) ),
 			'migrated_at'   => time(),
 			'migrated_by'   => $user_id,
+			'adjusted'      => count( $rewrite['changes'] ),
 			'previous_hash' => hash( 'sha256', $before ),
 		];
 		$next[ CustomCss::STATE_KEY ] = $state;

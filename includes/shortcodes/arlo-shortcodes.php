@@ -179,7 +179,10 @@ class Shortcodes {
 
 		$shortcode_name = 'arlo_' . $name;
 
-		// add the shortcode
+		// The dispatcher returns each handler's markup as built, then expands shortcodes in it again. Handlers
+		// escape the values they emit for HTML with esc_html(), esc_attr(), esc_url(), wp_kses_post() or
+		// wp_json_encode() and JSON_HEX_TAG, but that escaping keeps square brackets. A value a visitor
+		// supplies must also go through Utilities::escape_shortcode_brackets_in_html() so it cannot run as shortcode syntax.
 		add_shortcode( $shortcode_name, array( '\ArloTraining\Shortcodes\Shortcodes', 'the_shortcode' ) );
 
 		$closure = new \ReflectionFunction( $function );
@@ -201,56 +204,98 @@ class Shortcodes {
 		);
 	}
 
-	public static function the_shortcode( $atts, $content = "", $shortcode_name = '' ) {
-		// merge and extract attributes
-		extract(
-			shortcode_atts(
-				array(
-					'wrap'                        => '%s',
-					'label'                       => '',
-					'strip_html'                  => 'false',
-					'decode_quotes_in_shortcodes' => 'false',
-				),
-				$atts,
-				$shortcode_name
-			)
+	/**
+	 * Render an Arlo shortcode through its registered handler and content filters.
+	 *
+	 * The handler's filtered output feeds two kinds of wrap slot. Attribute slots are resolved from it
+	 * first, before nested shortcodes, labels or tag stripping apply. Body slots receive the output
+	 * after nested shortcode expansion and any label or tag stripping. A wrapper with only attribute
+	 * slots is returned without a body, so those steps do not apply to it.
+	 *
+	 * @param array|string $atts             Original shortcode attributes, or an empty string when there are none.
+	 * @param string|null  $enclosed_content Enclosed shortcode content, or null for a self-closing shortcode.
+	 * @param string       $shortcode_name   Registered shortcode tag, including the arlo_ prefix.
+	 * @return string Rendered shortcode output.
+	 */
+	public static function the_shortcode( $atts, $enclosed_content = "", $shortcode_name = '' ) {
+		$render_options = shortcode_atts(
+			array(
+				'wrap'                        => '%s',
+				'label'                       => '',
+				'strip_html'                  => 'false',
+				'decode_quotes_in_shortcodes' => 'false',
+			),
+			$atts,
+			$shortcode_name
 		);
 
-		// need to decide ordering - currently makes sense to process the specific filter first
-		$content = apply_filters( 'arlo_shortcode_content_' . $shortcode_name, $content, $atts, $shortcode_name );
-		$content = apply_filters( 'arlo_shortcode_content', $content, $atts, $shortcode_name );
-		$content = (string) $content;
+		// An attribute filter can set wrap to null or an empty string to suppress the output.
+		$wrap                        = $render_options['wrap'] ?? '';
+		$label                       = $render_options['label'];
+		$strip_html                  = $render_options['strip_html'];
+		$decode_quotes_in_shortcodes = $render_options['decode_quotes_in_shortcodes'];
 
+		// Only the author-supplied template is decoded, before any imported value is rendered into it.
 		if ( $decode_quotes_in_shortcodes === 'true' ) {
-			if ( preg_match( '/\[(?:[^\/])(?:[^\]\[]*)(?:&quot;|&apos;)(?:[^\]\[]*)\]/', $content ) === 1 ) {
-				$content = str_replace( [ '&quot;','&apos;' ], [ '"','\'' ], $content );
-			}
+			$enclosed_content = self::decode_quotes_in_shortcode_tags( (string) $enclosed_content );
 		}
 
-		// run any shortcodes prior to conituning
-		$content = do_shortcode( $content );
+		// The content filters, which include the shortcode's handler, run inside a render context. The handler
+		// can use it to report the layout it actually resolved, even if an attribute filter changed it. The
+		// sanitizer reads that to decide whether a class slot may accept the output as class tokens.
+		$render_context  = new ShortcodeRenderContext();
+		$filtered_output = ShortcodeRenderContext::with_current(
+			$render_context,
+			static function () use ( $atts, $enclosed_content, $shortcode_name ) {
+				$output = apply_filters( 'arlo_shortcode_content_' . $shortcode_name, $enclosed_content, $atts, $shortcode_name );
+				return apply_filters( 'arlo_shortcode_content', $output, $atts, $shortcode_name );
+			}
+		);
+
+		$uses_class_layout = $render_context->uses_class_layout() ?? ( 'class' === ( $atts['layout'] ?? '' ) );
+		$is_stringable     = is_object( $filtered_output ) && method_exists( $filtered_output, '__toString' );
+		$filtered_text     = is_scalar( $filtered_output ) ? (string) $filtered_output : '';
+
+		// Resolve attribute slots from the filtered text before nested shortcodes, labels or tag stripping apply.
+		// Output that is not text, such as an array or an object, still resolves the wrapper: its attribute
+		// slots are dropped and the static markup is kept, as for any other invalid attribute value.
+		$has_non_text_output = null !== $filtered_output && ! is_scalar( $filtered_output );
+		$resolved_wrap       = ( '' !== trim( $filtered_text ) || $has_non_text_output )
+			? ShortcodeWrapSanitizer::resolve_attribute_slots( $wrap, $filtered_text, $shortcode_name, $uses_class_layout )
+			: null;
+
+		// An attribute-only wrapper has no body slot, so the output is used only through its attributes:
+		// labels, strip_html and nested shortcode expansion do not apply.
+		if ( $resolved_wrap && $resolved_wrap->is_attributes_only() ) {
+			return do_shortcode( $resolved_wrap->fill_body( '' ) );
+		}
+
+		$body_text = $is_stringable ? (string) $filtered_output : $filtered_text;
+		$body      = do_shortcode( $body_text );
 
 		// if not empty, process labels and wrapping
-		if ( trim( $content ) != '' ) {
+		if ( '' !== trim( $body ) ) {
 			//strip html, if neccessary
 			if ( $strip_html !== 'false' ) {
 				if ( $strip_html == 'true' ) {
-					$content = wp_strip_all_tags( $content );
+					$body = wp_strip_all_tags( $body );
 				} else {
-					$content = wp_strip_all_tags( $content, $strip_html );
+					$body = wp_strip_all_tags( $body, $strip_html );
 				}
 			}
 
 			// prepend label
 			if ( ! empty( $label ) ) {
-				$content = '<label>' . wp_kses_post( $label ) . '</label> ' . $content;
+				$body = '<label>' . wp_kses_post( $label ) . '</label> ' . $body;
 			}
 
-			// wrap content
-			$content = self::apply_placeholder( wp_kses_post( $wrap ), $content );
+			if ( $resolved_wrap ) {
+				$body = $resolved_wrap->fill_body( $body );
+			}
 		}
 
-		return do_shortcode( $content );
+		// Expand shortcodes in the assembled markup; finalized wrapper attributes are protected from expansion.
+		return do_shortcode( $body );
 	}
 
 	/**
@@ -308,7 +353,7 @@ class Shortcodes {
 			$label = $filter_settings[ $group ][ $type ][ $label ];
 		}
 
-		$urlParameter = \ArloTraining\Utilities::clean_string_url_parameter( 'arlo-' . $type );
+		$urlParameter = \ArloTraining\Utilities::get_sanitized_request_parameter( 'arlo-' . $type );
 
 		$selected_value = ! empty( $urlParameter ) || $urlParameter == "0" ? $urlParameter : ( ! empty( $att_default ) || $att_default == "0" ? $att_default : '' );
 
@@ -409,7 +454,28 @@ class Shortcodes {
 		return '<script type="application/ld+json">' . $encoded . '</script>';
 	}
 
+	/**
+	 * Describes a presenter row as a schema.org Person.
+	 *
+	 * @param mixed  $presenter A presenter row, which must carry both name columns and, to link by permalink, a post ID column.
+	 * @param string $link      'permalink' or 'viewuri'.
+	 * @return array The Person, or an empty array when the row cannot be described.
+	 */
 	public static function get_performer( $presenter, $link ) {
+		if ( ! is_array( $presenter ) ) {
+			return array();
+		}
+
+		foreach ( array( 'p_firstname', 'p_lastname' ) as $name_key ) {
+			if ( ! array_key_exists( $name_key, $presenter ) || ( null !== $presenter[ $name_key ] && ! is_string( $presenter[ $name_key ] ) ) ) {
+				return array();
+			}
+		}
+
+		if ( '' === trim( (string) $presenter['p_firstname'] . (string) $presenter['p_lastname'] ) ) {
+			return array();
+		}
+
 		$performer         = array( "@type" => "Person" );
 		$name_separator    = ( ! empty( $presenter["p_firstname"] ) && ! empty( $presenter["p_lastname"] ) ? " " : "" );
 		$performer["name"] = $presenter["p_firstname"] . $name_separator . $presenter["p_lastname"];
@@ -420,14 +486,25 @@ class Shortcodes {
 				$p_link = self::get_rich_snippet_field( $presenter, "p_viewuri" );
 				break;
 			default:
-				$p_post_id = empty( $presenter['post_id'] ) ? $presenter['p_post_id'] : $presenter['post_id'];
-				$p_link    = get_permalink( $p_post_id );
+				if ( ! array_key_exists( 'post_id', $presenter ) && ! array_key_exists( 'p_post_id', $presenter ) ) {
+					return array();
+				}
+
+				$p_post_id = empty( $presenter['post_id'] ) ? ( isset( $presenter['p_post_id'] ) ? $presenter['p_post_id'] : 0 ) : $presenter['post_id'];
+				if ( ! is_scalar( $p_post_id ) ) {
+					return array();
+				}
+
+				// get_permalink() falls back to the current post when it has no ID.
+				$p_link = empty( $p_post_id ) ? '' : get_permalink( $p_post_id );
 				break;
 		}
 
 		$p_link = \ArloTraining\Utilities::get_absolute_url( $p_link );
 
-		$performer["url"] = $p_link;
+		if ( ! empty( $p_link ) ) {
+			$performer["url"] = $p_link;
+		}
 
 		if ( ! empty( $presenter["p_profile"] ) ) {
 			$performer["description"] = wp_strip_all_tags( $presenter["p_profile"] );
@@ -489,12 +566,12 @@ class Shortcodes {
 			}
 		}
 
-		$search_term = \ArloTraining\Utilities::clean_string_url_parameter( 'arlo-search' );
+		$search_term = \ArloTraining\Utilities::get_sanitized_request_parameter( 'arlo-search' );
 
 		return '
 		<form class="arlo-search" action="' . esc_url( $search_url ) . '">
 			' . wp_nonce_field( "arlo-search-widget", "arlo-nonce", true, false ) /* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_nonce_field() returns trusted core-generated HTML */ . '
-			<input type="text" class="' . esc_attr( "arlo-search-field $inputclass" ) . '" placeholder="' . esc_attr( $placeholder ) . '" aria-label="' . esc_attr( $placeholder ) . '" name="arlo-search" value="' . esc_attr( $search_term ) . '">
+			<input type="text" class="' . esc_attr( "arlo-search-field $inputclass" ) . '" placeholder="' . esc_attr( $placeholder ) . '" aria-label="' . esc_attr( $placeholder ) . '" name="arlo-search" value="' . \ArloTraining\Utilities::escape_shortcode_brackets_in_html( esc_attr( $search_term ) ) . '">
 			' . ( $showbutton == "true" ? '<input type="submit" class="' . esc_attr( "arlo-search-button $buttonclass" ) . '" value="' . esc_attr( $buttontext ) . '">' : '' ) . '
 		</form>
 		';
@@ -644,8 +721,8 @@ class Shortcodes {
 			}
 		}
 		if ( $is_single && $post ) {
-			$post_type = str_replace( 'arlo_', '', $post->post_type );
-			if ( isset( $post_types_settings[ $post_type ] ) ) {
+			$post_type = \Arlo_For_Wordpress::get_post_type_key( $post->post_type );
+			if ( '' !== $post_type && isset( $post_types_settings[ $post_type ] ) ) {
 				$origin_id    = $post_types_settings[ $post_type ]['posts_page'];
 				$origin_title = get_the_title( $origin_id );
 				$origin_link  = get_page_link( $origin_id );
@@ -668,7 +745,7 @@ class Shortcodes {
                             <a href="' . esc_url( $origin_url ) . '">' . esc_html( $origin_txt ) . '</a>
                         </li>';
 
-		$arlo_category = \ArloTraining\Utilities::clean_string_url_parameter( 'arlo-category' );
+		$arlo_category = \ArloTraining\Utilities::get_sanitized_request_parameter( 'arlo-category' );
 		$cat_slug      = ( ! empty( $arlo_category ) ? $arlo_category : '' );
 		$cat           = null;
 
@@ -767,7 +844,7 @@ class Shortcodes {
 		$currency   = "";
 
 		foreach ( $offers_array as $offer ) {
-			$replacement_price_field = strpos( 'inclusive', $price_field ) !== false ? "replacement_amount_taxinclusive" : "replacement_amount_taxexclusive";
+			$replacement_price_field = strpos( $price_field, 'inclusive' ) !== false ? "replacement_amount_taxinclusive" : "replacement_amount_taxexclusive";
 
 			$low_price  = ( $offer[ $price_field ] < $low_price || $low_price == 0 ? $offer[ $price_field ] : $low_price );
 			$high_price = ( $offer[ $price_field ] > $high_price || $high_price == 0 ? $offer[ $price_field ] : $high_price );
@@ -865,9 +942,32 @@ class Shortcodes {
 	}
 
 	public static function get_rich_snippet_field( $event, $field ) {
-		if ( ! empty( $event ) ) {
-			return array_key_exists( $field, $event ) ? ( ! empty( $event[ $field ] ) ? $event[ $field ] : '' ) : '';
+		if ( ! is_array( $event ) || ! array_key_exists( $field, $event ) || empty( $event[ $field ] ) ) {
+			return '';
 		}
+
+		return $event[ $field ];
+	}
+
+	/**
+	 * Whether a context row has a string value under a key. Rich snippet handlers use it to refuse rows
+	 * that cannot be described, such as another list's row or a row without a name.
+	 *
+	 * @param mixed  $row         The context, which must be an array.
+	 * @param string $key         Column that must exist.
+	 * @param bool   $allow_empty Whether null and an empty or blank string are acceptable values.
+	 * @return bool
+	 */
+	public static function has_rich_snippet_string( $row, $key, $allow_empty = false ) {
+		if ( ! is_array( $row ) || ! array_key_exists( $key, $row ) ) {
+			return false;
+		}
+
+		if ( null === $row[ $key ] || ( is_string( $row[ $key ] ) && '' === trim( $row[ $key ] ) ) ) {
+			return (bool) $allow_empty;
+		}
+
+		return is_string( $row[ $key ] );
 	}
 
 	public static function get_template_permalink( $post_name, $region ) {
@@ -935,5 +1035,25 @@ class Shortcodes {
 		}
 
 		return $link;
+	}
+
+	/**
+	 * Turns `&quot;` and `&apos;` back into quotes inside square brackets in author-supplied markup.
+	 *
+	 * This repairs a shortcode that was saved with encoded quotes. The match is by brackets, not by
+	 * registered shortcode name, and only the quote entities change. Call this only on the author's
+	 * template, never on rendered output, because it would undo the escaping of imported values.
+	 *
+	 * @param string $template Author-supplied markup that has not had imported values rendered into it.
+	 * @return string
+	 */
+	private static function decode_quotes_in_shortcode_tags( string $template ): string {
+		return (string) preg_replace_callback(
+			'/\[(?!\/)[^\[\]]*\]/',
+			static function ( $matches ) {
+				return str_replace( [ '&quot;', '&apos;' ], [ '"', "'" ], $matches[0] );
+			},
+			$template
+		);
 	}
 }

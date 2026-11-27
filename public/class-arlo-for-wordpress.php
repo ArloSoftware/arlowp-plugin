@@ -16,7 +16,6 @@ use ArloTraining\API\Client;
 use ArloTraining\Utilities;
 use ArloTraining\CacheControl;
 use ArloTraining\Environment;
-use ArloTraining\FeatureFlagManager;
 use ArloTraining\ThemeManager;
 use ArloTraining\TimeZoneManager;
 use ArloTraining\SystemRequirements;
@@ -178,6 +177,12 @@ class Arlo_For_Wordpress {
 	// Set when an existing site upgrades, so the opt-in banner explains the credit is now off; removed once the choice is recorded.
 	const POWERED_BY_UPGRADE_NOTICE_OPTION = 'arlo_powered_by_upgrade_notice';
 
+	// Option holding the routing fingerprint that the stored rewrite rules were last flushed for.
+	const REWRITE_SIGNATURE_OPTION = 'arlo_rewrite_signature';
+
+	// Marks a stored fingerprint whose routes could not be found even right after a flush.
+	const REWRITE_UNVERIFIED_SUFFIX = ':unverified';
+
 	/**
 	 * Longest meta description, in bytes, before it is cut at the next word boundary and given an ellipsis.
 	 *
@@ -286,6 +291,33 @@ class Arlo_For_Wordpress {
 	 * @var      array
 	 */
 	public static $post_types = array();
+
+	/**
+	 * Fingerprint of the routing inputs registered on this request, or an empty string when none was recorded.
+	 *
+	 * @since    5.2.2
+	 *
+	 * @var      string
+	 */
+	private static $routing_signature = '';
+
+	/**
+	 * Rewrite bases registered on this request, used to confirm the stored rules still contain the Arlo routes.
+	 *
+	 * @since    5.2.2
+	 *
+	 * @var      string[]
+	 */
+	private static $routing_bases = array();
+
+	/**
+	 * ID of the site the routing was recorded for, so it is never applied to another site after a blog switch.
+	 *
+	 * @since    5.2.2
+	 *
+	 * @var      int
+	 */
+	private static $routing_blog_id = 0;
 
 	/**
 	 * $pages: used to set the necessary pages
@@ -649,8 +681,8 @@ class Arlo_For_Wordpress {
 		if ( version_compare( '4.6', $wp_version ) === 1 ) {
 			add_action( 'wp_head', array( $this, 'add_canonical_urls' ) );
 		}
-		add_filter( 'get_canonical_url', array( $this, 'wp_canonical_fix' ), 10, 2 );
-		add_filter( 'wpseo_canonical', array( $this, 'yoast_canonical_fix' ) );
+		add_filter( 'get_canonical_url', array( $this, 'filter_canonical_url' ), 10, 2 );
+		add_filter( 'wpseo_canonical', array( $this, 'filter_yoast_canonical' ) );
 
 		//add meta description
 		add_action( 'wp_head', array( $this, 'add_meta_description' ) );
@@ -661,7 +693,8 @@ class Arlo_For_Wordpress {
 			wp_schedule_event( time() + ( 30 * MINUTE_IN_SECONDS ), 'minutes_30', 'arlo_set_import' );
 		}
 
-		// content and excerpt filters to hijack arlo registered post types
+		// Renders the template an administrator saved (editable only with unfiltered_html) for Arlo's own
+		// custom posts. Imported values are escaped by the shortcode handlers that render that template.
 		add_filter( 'the_content', 'arlo_the_content' );
 
 		add_action( 'wp_ajax_arlo_dismissible_notice', array( $this, 'dismissible_notice_callback' ) );
@@ -754,6 +787,16 @@ class Arlo_For_Wordpress {
 	 * @return    void Always terminates the request via `wp_die()`; never returns to the caller.
 	 */
 	public function handle_scheduler_loopback_request() {
+		// check_ajax_referer() string-casts the nonce it reads, so refuse a non-string value in the field it would read before it gets there.
+		foreach ( array( 'nonce', '_ajax_nonce', '_wpnonce' ) as $nonce_field ) {
+			if ( isset( $_REQUEST[ $nonce_field ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Shape check only; check_ajax_referer() verifies the nonce straight after.
+				if ( ! is_string( $_REQUEST[ $nonce_field ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Shape check only; check_ajax_referer() verifies the nonce straight after.
+					wp_die( -1, 403 );
+				}
+				break;
+			}
+		}
+
 		check_ajax_referer( 'arlo_import', 'nonce' );
 
 		// Guard only the compatibility sleep; run_scheduler_queue() still handles recovery cleanup.
@@ -820,11 +863,13 @@ class Arlo_For_Wordpress {
 				foreach ( $blog_ids as $blog_id ) {
 
 					switch_to_blog( $blog_id );
-					$plugin->single_activate();
+					try {
+						$plugin->single_activate();
+					} finally {
+						// Every switch pushes a frame, so each iteration must pop its own.
+						restore_current_blog();
+					}
 				}
-
-				restore_current_blog();
-
 			} else {
 				$plugin->single_activate();
 			}
@@ -856,12 +901,13 @@ class Arlo_For_Wordpress {
 				foreach ( $blog_ids as $blog_id ) {
 
 					switch_to_blog( $blog_id );
-					$plugin->single_deactivate();
-
+					try {
+						$plugin->single_deactivate();
+					} finally {
+						// Every switch pushes a frame, so each iteration must pop its own.
+						restore_current_blog();
+					}
 				}
-
-				restore_current_blog();
-
 			} else {
 				$plugin->single_deactivate();
 			}
@@ -917,22 +963,31 @@ class Arlo_For_Wordpress {
 
 
 	/**
-	 * Check the plugin version on bulk update
+	 * Runs check_plugin_version() when Arlo is updated through the WordPress plugin upgrader.
+	 *
+	 * Hooked to `upgrader_process_complete`.
 	 *
 	 * @since     2.4
 	 *
-	 * @return    null
+	 * @param     \WP_Upgrader $upgrader_object Upgrader instance. Unused.
+	 * @param     array        $data            Hook payload (`action`, `type`, and `plugin` or `plugins`).
+	 * @return    void
 	 */
-
 	public static function bulk_plugin_updater( $upgrader_object, $data ) {
-		if ( $data['action'] == 'update' && $data['type'] == 'plugin' ) {
-			if ( ! empty( $data['plugins'] ) ) {
+		// Other upgraders and plugins fire this hook too, so validate every value before use.
+		// The previous release's code is still loaded here, so any migration for the new
+		// release runs on the next request through the `init` and `admin_init` hooks.
+		if ( isset( $data['action'], $data['type'] ) && 'update' === $data['action'] && 'plugin' === $data['type'] ) {
+			// Plugin_Upgrader::bulk_upgrade() sends a `plugins` list; Plugin_Upgrader::upgrade()
+			// (the one-click update) sends a single `plugin` string.
+			if ( ! empty( $data['plugins'] ) && is_array( $data['plugins'] ) ) {
 				foreach ( $data['plugins'] as $each_plugin ) {
-					if ( basename( $each_plugin ) == 'arlo-for-wordpress.php' ) {
+					// Match the main file name, not the path: the plugin directory name can differ between installs.
+					if ( is_string( $each_plugin ) && 'arlo-for-wordpress.php' === basename( $each_plugin ) ) {
 						self::check_plugin_version();
 					}
 				}
-			} elseif ( empty( $data['plugin'] ) && basename( $each_plugin ) == 'arlo-for-wordpress.php' ) {
+			} elseif ( ! empty( $data['plugin'] ) && is_string( $data['plugin'] ) && 'arlo-for-wordpress.php' === basename( $data['plugin'] ) ) {
 				self::check_plugin_version();
 			}
 		}
@@ -1006,6 +1061,127 @@ class Arlo_For_Wordpress {
 
 
 	/**
+	 * Records a fingerprint of the routing the Arlo rewrite rules are registered from.
+	 *
+	 * $routes must describe the rules registered on this request, so the fingerprint cannot disagree with them. The
+	 * permalink structure, home URL and plugin version are added because the rules depend on them too.
+	 *
+	 * @since    5.2.2
+	 *
+	 * @param array $routes Per post type key: the template type, the rewrite base and the mapped host page ID (or null).
+	 * @return void
+	 */
+	public static function record_routing_signature( array $routes ): void {
+		$encoded = wp_json_encode(
+			array(
+				$routes,
+				get_option( 'permalink_structure' ),
+				get_home_url(),
+				VersionHandler::VERSION,
+			)
+		);
+
+		// Without a signature nothing is flushed, which is safer than flushing blindly.
+		self::$routing_signature = is_string( $encoded ) ? md5( $encoded ) : '';
+
+		self::$routing_blog_id = get_current_blog_id();
+		self::$routing_bases   = array();
+		foreach ( $routes as $route ) {
+			if ( isset( $route[1] ) && is_string( $route[1] ) && '' !== $route[1] ) {
+				self::$routing_bases[] = $route[1];
+			}
+		}
+	}
+
+	/**
+	 * Flushes the rewrite rules when the routing recorded by record_routing_signature() differs from the routing last
+	 * flushed for, or when the stored rules no longer contain the Arlo routes.
+	 *
+	 * Does nothing unless a routing was recorded and the current user can edit pages. The flush is soft, so
+	 * .htaccess and web.config are never rewritten.
+	 *
+	 * @since    5.2.2
+	 *
+	 * @return bool True when the rules were flushed, false when nothing needed doing.
+	 */
+	public static function maybe_flush_rewrite_rules(): bool {
+		// Anonymous visitors can reach admin_init through wp-admin/admin-post.php. Only users who can edit pages can
+		// change a host page, so only they can have changed the routing.
+		if ( '' === self::$routing_signature || ! current_user_can( 'edit_pages' ) ) {
+			return false;
+		}
+
+		// The rules and the fingerprint option belong to one site, so a blog switch since recording means the recorded
+		// routing is not this site's.
+		if ( get_current_blog_id() !== self::$routing_blog_id ) {
+			return false;
+		}
+
+		$stored = get_option( self::REWRITE_SIGNATURE_OPTION, '' );
+
+		// A previous flush could not find the routes, so checking again would flush on every request.
+		if ( self::$routing_signature . self::REWRITE_UNVERIFIED_SUFFIX === $stored ) {
+			return false;
+		}
+
+		if ( self::$routing_signature === $stored && self::stored_rules_contain_routes() ) {
+			return false;
+		}
+
+		// Soft, because Arlo adds no server-level rules. The fingerprint is stored after the flush, so an interrupted
+		// flush is retried on the next request.
+		flush_rewrite_rules( false );
+		update_option(
+			self::REWRITE_SIGNATURE_OPTION,
+			self::$routing_signature . ( self::stored_rules_contain_routes() ? '' : self::REWRITE_UNVERIFIED_SUFFIX ),
+			false
+		);
+
+		return true;
+	}
+
+	/**
+	 * Whether the stored rewrite rules contain a rule under every registered Arlo rewrite base.
+	 *
+	 * Without pretty permalinks WordPress stores no rules, so there is nothing to check.
+	 *
+	 * @since    5.2.2
+	 *
+	 * @return bool
+	 */
+	private static function stored_rules_contain_routes(): bool {
+		$structure = get_option( 'permalink_structure' );
+		if ( ! is_string( $structure ) || '' === $structure ) {
+			return true;
+		}
+
+		$rules = get_option( 'rewrite_rules' );
+		if ( ! is_array( $rules ) || empty( $rules ) ) {
+			return false;
+		}
+
+		$patterns = array();
+		foreach ( array_keys( $rules ) as $pattern ) {
+			$patterns[] = ltrim( (string) $pattern, '^' );
+		}
+
+		foreach ( array_unique( self::$routing_bases ) as $base ) {
+			$found = false;
+			foreach ( $patterns as $pattern ) {
+				if ( 0 === strpos( $pattern, $base . '/' ) ) {
+					$found = true;
+					break;
+				}
+			}
+			if ( ! $found ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * Fired for each blog when the plugin is activated.
 	 *
 	 * @since    1.0.0
@@ -1015,8 +1191,12 @@ class Arlo_For_Wordpress {
 		$this->check_plugin_version();
 		arlo_add_datamodel();
 
-		// flush permalinks upon plugin deactivation
+		// flush permalinks upon plugin activation
 		flush_rewrite_rules();
+
+		// This request has not registered the Arlo rules, so the flush above lacks them. Clearing the fingerprint
+		// makes the first admin request flush again.
+		delete_option( self::REWRITE_SIGNATURE_OPTION );
 
 		//set default themes
 		$this->set_default_theme();
@@ -1140,6 +1320,9 @@ class Arlo_For_Wordpress {
 		// flush permalinks upon plugin deactivation
 		flush_rewrite_rules();
 
+		// Any flush while inactive drops the Arlo rules, so the fingerprint must not survive into reactivation.
+		delete_option( self::REWRITE_SIGNATURE_OPTION );
+
 		wp_clear_scheduled_hook( 'arlo_scheduler' );
 		// wp_clear_scheduled_hook() is argument-sensitive; clear scheduler-owned
 		// single-event wakeups explicitly for consistency with Scheduler::clear_cron().
@@ -1208,9 +1391,9 @@ class Arlo_For_Wordpress {
 
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-tingle', plugins_url( '../public/custom-assets/tingle/tingle.css', __FILE__ ), [], VersionHandler::VERSION );
 
-		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css?20170424', __FILE__ ), [], VersionHandler::VERSION );
+		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css', __FILE__ ), [], VersionHandler::VERSION );
 
-		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-bootstrap-modals', plugins_url( 'assets/css/libs/bootstrap-modals.css?20170424', __FILE__ ), [], VersionHandler::VERSION );
+		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-bootstrap-modals', plugins_url( 'assets/css/libs/bootstrap-modals.css', __FILE__ ), [], VersionHandler::VERSION );
 
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles-darktooltip', plugins_url( 'assets/css/libs/darktooltip.min.css', __FILE__ ), [], VersionHandler::VERSION );
 
@@ -1230,6 +1413,9 @@ class Arlo_For_Wordpress {
 			//external resources
 			if ( isset( $theme_settings->externalResources->stylesheets ) && is_array( $theme_settings->externalResources->stylesheets ) ) {
 				foreach ( $theme_settings->externalResources->stylesheets as $key => $stylesheet ) {
+					if ( ! $this->is_usable_external_resource( $stylesheet ) ) {
+						continue;
+					}
 					wp_enqueue_style( $this->plugin_slug . '-theme-external-stylesheet-' . $key, plugins_url( $stylesheet, __FILE__ ), [], VersionHandler::VERSION );
 				}
 			}
@@ -1459,7 +1645,7 @@ class Arlo_For_Wordpress {
 
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script-tingle', plugins_url( '../public/custom-assets/tingle/tingle.min.js', __FILE__ ), [], VersionHandler::VERSION, false );
 
-		wp_enqueue_script( $this->plugin_slug . '-plugin-script', plugins_url( 'assets/js/public.js?20170424', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, false );
+		wp_enqueue_script( $this->plugin_slug . '-plugin-script', plugins_url( 'assets/js/public.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, false );
 
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script-darktooltip', plugins_url( 'assets/js/libs/jquery.darktooltip.min.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, false );
 
@@ -1486,6 +1672,9 @@ class Arlo_For_Wordpress {
 			//external resources
 			if ( isset( $theme_settings->externalResources->javascripts ) && is_array( $theme_settings->externalResources->javascripts ) ) {
 				foreach ( $theme_settings->externalResources->javascripts as $key => $script ) {
+					if ( ! $this->is_usable_external_resource( $script ) ) {
+						continue;
+					}
 					wp_enqueue_script( $this->plugin_slug . '-theme-external-script-' . $key, plugins_url( $script, __FILE__ ), [], VersionHandler::VERSION, true );
 				}
 			}
@@ -1848,9 +2037,10 @@ class Arlo_For_Wordpress {
 	/**
 	 * Connects an unconfigured site to the demo platform and publishes its Arlo host pages.
 	 *
-	 * Each host page is the page already mapped in the settings or, failing that, the page
-	 * holding the exact Arlo slug. No other page is ever published or mapped, and a live
-	 * existing mapping is never replaced. Slugs with no page are reported to the admin.
+	 * Only a page already mapped as a host page in the settings is published. Activation and the
+	 * "Add draft pages" action map the pages they create, so those drafts are published here. A
+	 * page that merely shares an Arlo slug, but was never mapped, belongs to the site: it is
+	 * neither published nor adopted, and the host page is reported to the admin instead.
 	 *
 	 * @return void
 	 */
@@ -1871,36 +2061,14 @@ class Arlo_For_Wordpress {
 			$key         = $page['post_types_key'];
 			$mapped_id   = absint( $settings['post_types'][ $key ]['posts_page'] ?? 0 );
 			$mapped_post = $mapped_id > 0 ? get_post( $mapped_id ) : null;
-			$has_mapping = $mapped_post instanceof \WP_Post && 'page' === $mapped_post->post_type && 'trash' !== $mapped_post->post_status;
 
-			if ( $has_mapping ) {
-				$target = $mapped_post;
-			} else {
-				$posts  = get_posts(
-					array(
-						'name'        => $page['name'],
-						'post_type'   => 'page',
-						'post_status' => array( 'publish', 'draft' ),
-						'numberposts' => 1,
-					)
-				);
-				$target = is_array( $posts ) && 1 === count( $posts ) ? $posts[0] : null;
-			}
-
-			if ( ! $target instanceof \WP_Post ) {
+			if ( ! $mapped_post instanceof \WP_Post || 'page' !== $mapped_post->post_type || 'trash' === $mapped_post->post_status ) {
 				$error[] = sanitize_text_field( $page['name'] );
 				continue;
 			}
 
-			if ( 'draft' === $target->post_status ) {
-				wp_publish_post( $target->ID );
-			}
-
-			if ( ! $has_mapping ) {
-				if ( ! is_array( $settings['post_types'][ $key ] ?? null ) ) {
-					$settings['post_types'][ $key ] = array();
-				}
-				$settings['post_types'][ $key ]['posts_page'] = $target->ID;
+			if ( 'draft' === $mapped_post->post_status ) {
+				wp_publish_post( $mapped_post->ID );
 			}
 		}
 
@@ -1982,22 +2150,12 @@ class Arlo_For_Wordpress {
 	}
 
 	/**
-	 * Returns whether delta import is available, independently of the selected mode.
-	 *
-	 * @return bool Whether the feature is available.
-	 */
-	public static function is_delta_import_feature_available(): bool {
-		return FeatureFlagManager::is_enabled( ARLO_FEATURE_DELTA_IMPORT );
-	}
-
-	/**
 	 * Returns whether the privileged importer-mode setting may offer delta.
 	 *
-	 * @return bool Whether the feature is available and the live schema is ready.
+	 * @return bool Whether the live schema is ready for delta (transaction-capable tables).
 	 */
 	public static function is_delta_import_settings_available(): bool {
-		return self::is_delta_import_feature_available()
-			&& self::get_instance()->get_schema_manager()->supports_delta_infrastructure();
+		return self::get_instance()->get_schema_manager()->supports_delta_infrastructure();
 	}
 
 	/**
@@ -2018,8 +2176,7 @@ class Arlo_For_Wordpress {
 	 * @return array Normalized settings.
 	 */
 	public static function normalize_importer_mode_setting( array $input, array $existing_settings ): array {
-		$importer_mode_submitted = array_key_exists( 'importer_mode', $input );
-		$input                   = Utilities::normalize_filtered_enum_setting(
+		$input = Utilities::normalize_filtered_enum_setting(
 			'importer_mode',
 			$input,
 			$existing_settings,
@@ -2030,7 +2187,8 @@ class Arlo_For_Wordpress {
 			self::IMPORTER_MODE_FULL
 		);
 
-		if ( $importer_mode_submitted && self::IMPORTER_MODE_FULL_DELTA === ( $input['importer_mode'] ?? null ) && ! self::is_delta_import_settings_available() ) {
+		// A disabled field is not submitted, so the carried-over stored value is coerced as well.
+		if ( self::IMPORTER_MODE_FULL_DELTA === ( $input['importer_mode'] ?? null ) && ! self::is_delta_import_settings_available() ) {
 			$input['importer_mode'] = self::IMPORTER_MODE_FULL;
 		}
 
@@ -2059,8 +2217,7 @@ class Arlo_For_Wordpress {
 		$settings = get_option( 'arlo_settings', [] );
 		$mode     = is_array( $settings ) ? ( $settings['importer_mode'] ?? null ) : null;
 
-		if ( self::is_delta_import_feature_available()
-			&& self::IMPORTER_MODE_FULL_DELTA === $mode ) {
+		if ( self::IMPORTER_MODE_FULL_DELTA === $mode ) {
 			return self::IMPORTER_MODE_FULL_DELTA;
 		}
 
@@ -2617,6 +2774,26 @@ class Arlo_For_Wordpress {
 		return is_array( $settings ) && isset( $settings[ self::POWERED_BY_SETTING ] ) && '1' === $settings[ self::POWERED_BY_SETTING ];
 	}
 
+	/**
+	 * Returns whether at least one saved template contains the credit shortcode.
+	 *
+	 * @param mixed $settings The arlo_settings option value.
+	 * @return bool Whether a saved template would show the credit once the administrator opts in.
+	 */
+	public static function templates_contain_powered_by_credit( $settings ): bool {
+		if ( ! is_array( $settings ) ) {
+			return false;
+		}
+
+		foreach ( (array) ( $settings['templates'] ?? [] ) as $template ) {
+			if ( is_array( $template ) && isset( $template['html'] ) && is_string( $template['html'] ) && has_shortcode( $template['html'], 'arlo_powered_by' ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 
 	public function dismissible_notice_callback() {
 		$id    = \ArloTraining\Utilities::filter_string_polyfill( INPUT_POST, 'id' );
@@ -2641,6 +2818,25 @@ class Arlo_For_Wordpress {
 		$settings[ $setting_name ] = $value;
 
 		update_option( 'arlo_settings', $settings );
+	}
+
+	/**
+	 * Resolves a WordPress post type to the Arlo routing key it belongs to.
+	 *
+	 * Arlo registers each key in $post_types as the arlo_<key> post type. Other plugins can register types such as
+	 * event or venue, so only the exact prefixed name of a registered key is accepted.
+	 *
+	 * @param mixed $post_type WordPress post type.
+	 * @return string The routing key, or an empty string when the post type is not an Arlo post type.
+	 */
+	public static function get_post_type_key( $post_type ): string {
+		if ( ! is_string( $post_type ) || 0 !== strpos( $post_type, 'arlo_' ) ) {
+			return '';
+		}
+
+		$key = substr( $post_type, 5 );
+
+		return isset( self::$post_types[ $key ] ) ? $key : '';
 	}
 
 	public static function get_post_types_settings(): array {
@@ -2743,23 +2939,47 @@ class Arlo_For_Wordpress {
 	}
 
 	/**
-	 * Returns the arlo-region query value, validated as a string.
+	 * Returns the arlo-region query value, validated as a string and percent-decoded when it came from the URL path.
 	 *
 	 * Request-supplied values are not guaranteed to be scalar, so anything other than
 	 * a string is discarded before callers use it as a region key or cookie value.
 	 *
-	 * @return string The region query value, or an empty string when absent or not a string.
+	 * WordPress takes a query var from $_POST, then $_GET, then the rewrite capture. A value from $_POST or $_GET
+	 * (?arlo-region=A%3AB) is already decoded. A rewrite capture (/region-A%3AB/) is the raw path segment, which is
+	 * percent-encoded because every link the plugin builds uses rawurlencode(), so it is decoded exactly once. A
+	 * region ID containing a literal "%" is therefore addressed as /region-A%2541/ or ?arlo-region=A%2541 and
+	 * resolves to A%41 in both forms.
+	 *
+	 * @return string The region value as the visitor selected it, or an empty string when absent or not a string.
 	 */
 	public static function get_region_from_query(): string {
 		$region = get_query_var( 'arlo-region', '' );
 
-		return is_string( $region ) ? $region : '';
+		if ( ! is_string( $region ) ) {
+			return '';
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing -- Only checks which source supplied the query var; the value is read through get_query_var() and matched against configured regions.
+		$from_request_parameters = isset( $_GET['arlo-region'] ) || isset( $_POST['arlo-region'] );
+
+		return $from_request_parameters ? $region : rawurldecode( $region );
 	}
 
-	public function get_tag_by_id( $tag_id ) {
+	/**
+	 * Looks up a tag by its local ID.
+	 *
+	 * @param int|string $tag_id Local `arlo_tags.id` value.
+	 * @return array{id: string, tag: string}|null The tag row, or null when there is no such tag or no live import.
+	 */
+	public function get_tag_by_id( $tag_id ): ?array {
 		global $wpdb;
 
-		$prepared_sql = $wpdb->prepare( "SELECT id, tag FROM " . $wpdb->prefix . "arlo_tags WHERE id = %d", $tag_id );
+		$import_id = $this->get_importer()->get_current_import_id();
+		if ( empty( $import_id ) ) {
+			return null;
+		}
+
+		$prepared_sql = $wpdb->prepare( "SELECT id, tag FROM " . $wpdb->prefix . "arlo_tags WHERE id = %d AND import_id = %d", $tag_id, $import_id );
 
 		return CacheControl::fetch_row( $prepared_sql, ARRAY_A );
 	}
@@ -2944,146 +3164,224 @@ class Arlo_For_Wordpress {
 
 	/**
 	 * Add extra parameters to the canonical URL generated by WP (default)
-	 * @param  string $canonical
-	 * @todo Condition for single event
-	 * @todo Check all the conditions in rewrite_rules are met
-	 * @return string
+	 *
+	 * Callback for the get_canonical_url filter. A suppressed canonical, and the canonical of content that is
+	 * not an Arlo host page or entity page, is returned unchanged.
+	 *
+	 * @param  string|false $canonical_url The canonical URL, or an empty value when suppressed.
+	 * @param  mixed        $post          Post the canonical URL belongs to.
+	 * @todo Only add the segments the page's rewrite rule accepts
+	 * @return string|false The canonical URL with the Arlo segments added, or the value received when it is
+	 *                       suppressed or does not belong to an Arlo page.
 	 */
-	public function wp_canonical_fix( $canonical, $post ) {
-		$canonical = untrailingslashit( $canonical );
+	public function filter_canonical_url( $canonical_url, $post ) {
+		// An empty or non-string canonical is intentionally suppressed, so it is left as is.
+		if ( ! is_string( $canonical_url ) || '' === $canonical_url ) {
+			return $canonical_url;
+		}
+
+		// Only a post can be an Arlo host page or entity page (Yoast passes any queried object).
+		if ( ! $post instanceof \WP_Post ) {
+			return $canonical_url;
+		}
+
+		$is_archive    = arlo_is_archive( $post );
+		$post_type_key = '';
+		if ( ! $is_archive ) {
+			$post_type_key = self::get_post_type_key( $post->post_type );
+			if ( '' === $post_type_key ) {
+				// The canonical of content the plugin does not own is not modified.
+				return $canonical_url;
+			}
+		}
+
+		$canonical_url = untrailingslashit( $canonical_url );
 
 		$region       = $this->get_region_parameter();
 		$regionalized = false;
-		if ( arlo_is_archive( $post ) ) {
+		if ( $is_archive ) {
 			foreach ( self::get_post_types_settings() as $post_type => $config ) {
 				if ( $config['posts_page'] == $post->ID && ! empty( $this::$post_types[ $post_type ]['regionalized'] ) ) {
 					$regionalized = true;
 				}
 			}
-		} elseif ( ! empty( $this::$post_types[ str_replace( 'arlo_', '', $post->post_type ) ]['regionalized'] ) ) {
-				$regionalized = true;
+		} elseif ( ! empty( $this::$post_types[ $post_type_key ]['regionalized'] ) ) {
+			$regionalized = true;
 		}
 
 		if ( ! empty( $region ) && $regionalized ) {
-			$canonical .= '/region-' . rawurlencode( $region );
+			$canonical_url .= '/region-' . rawurlencode( $region );
 		}
-		$canonical = $this->url_add_filters( $canonical, $post );
+		$canonical_url = $this->append_url_filter_segments( $canonical_url );
 
 		// Ensure that the canonical URL doesn't result in a 302
-		return user_trailingslashit( $canonical );
+		return user_trailingslashit( $canonical_url );
 	}
 
 	/**
 	 * Add extra parameters to the canonical URL generated by Yoast SEO (wpseo)
-	 * @param  string $canonical
-	 * @return string
+	 *
+	 * Callback for the wpseo_canonical filter.
+	 *
+	 * @param  string|false $canonical_url The canonical URL, or an empty value when suppressed.
+	 * @return string|false The canonical URL with the Arlo segments added, or the value received when it is
+	 *                       suppressed or does not belong to an Arlo page.
 	 */
-	public function yoast_canonical_fix( $canonical ) {
+	public function filter_yoast_canonical( $canonical_url ) {
 		$post = get_queried_object();
-		return $this->wp_canonical_fix( $canonical, $post );
+		return $this->filter_canonical_url( $canonical_url, $post );
 	}
 
 	/**
-	 * Add currently selected filters to the supplied URL
-	 * @param  string $url
-	 * @param  string $page
-	 * @return string
-	 * @see Arlo_For_Wordpress->add_canonical_urls() This code was inspired by
+	 * Legacy alias for `filter_canonical_url()`.
+	 *
+	 * The parameter names are unchanged, so callers that pass named arguments keep working.
+	 *
+	 * @deprecated 5.2.2 Use `filter_canonical_url()` instead.
+	 *
+	 * @param  string|false $canonical The canonical URL, or an empty value when suppressed.
+	 * @param  mixed        $post      Post the canonical URL belongs to.
+	 * @return string|false The canonical URL with the Arlo segments added, or the value received when it is
+	 *                       suppressed or does not belong to an Arlo page.
 	 */
-	private function url_add_filters( $url, $page ) {
-		$settings = get_option( 'arlo_settings' );
+	public function wp_canonical_fix( $canonical, $post ) {
+		_deprecated_function( __METHOD__, '5.2.2', 'Arlo_For_Wordpress::filter_canonical_url' );
+		return $this->filter_canonical_url( $canonical, $post );
+	}
 
-		// Build a canonical URL by appending the active filter values as
-		// path segments (e.g. /cat-Sales/presenter-12-Jos%C3%A9-Garc%C3%ADa/).
-		//
-		// Query vars captured by WP rewrite rules arrive percent-encoded
-		// (e.g. Jos%C3%A9), and sanitize_text_field() would strip those
-		// raw %XX sequences, mangling non-ASCII names. So we rawurldecode()
-		// first to get clean UTF-8, then sanitize, then rawurlencode()
-		// back into a safe path segment. This round-trip preserves the
-		// readable value while ensuring no decoded character (/, ?, #,
-		// etc.) can break URL structure.
-		//
-		// rawurldecode() is used instead of urldecode() because these
-		// values come from URL path segments (rewrite-rule captures),
-		// not query strings. urldecode() would convert literal '+' to
-		// space, which is incorrect for path data.
-		//
-		// is_string() guards each value because get_query_var() can
-		// return an array (e.g. ?param[]=x) and rawurldecode() would
-		// throw a TypeError on non-string input on PHP 8+.
+	/**
+	 * Legacy alias for `filter_yoast_canonical()`.
+	 *
+	 * The parameter name is unchanged, so callers that pass a named argument keep working.
+	 *
+	 * @deprecated 5.2.2 Use `filter_yoast_canonical()` instead.
+	 *
+	 * @param  string|false $canonical The canonical URL, or an empty value when suppressed.
+	 * @return string|false The canonical URL with the Arlo segments added, or the value received when it is
+	 *                       suppressed or does not belong to an Arlo page.
+	 */
+	public function yoast_canonical_fix( $canonical ) {
+		_deprecated_function( __METHOD__, '5.2.2', 'Arlo_For_Wordpress::filter_yoast_canonical' );
+		return $this->filter_yoast_canonical( $canonical );
+	}
 
-		//has to be the same order as in public.js to construct the same order
-		$category = get_query_var( 'arlo-category' );
+	/**
+	 * Appends the active Arlo filters to a canonical URL as path segments.
+	 *
+	 * Each value is sanitized and percent-encoded, so it cannot change the URL structure.
+	 * The region segment is not added here; the caller adds it first.
+	 *
+	 * @param string $base_url Canonical URL without a trailing slash.
+	 * @return string The URL with the filter segments appended.
+	 */
+	private function append_url_filter_segments( string $base_url ): string {
+		$url = $base_url;
+
+		// Filters are read from the main query as the segments the Arlo rewrite
+		// rules capture (e.g. /cat-Sales/presenter-12-Jos%C3%A9-Garc%C3%ADa/).
+		// A filter that is not set, or whose value has an unexpected type, adds
+		// nothing.
+		//
+		// Values captured by a rewrite rule arrive percent-encoded (e.g.
+		// Jos%C3%A9), and sanitize_text_field() would strip those raw %XX
+		// sequences, mangling non-ASCII names. So each value is
+		// rawurldecode()d first to get clean UTF-8, then sanitized, then
+		// rawurlencode()d back into a safe path segment. This preserves the
+		// readable value while ensuring no decoded character (/, ?, #, etc.)
+		// can break the URL structure.
+		//
+		// rawurldecode() is used instead of urldecode() because these values
+		// come from URL path segments, not query strings. urldecode() would
+		// convert a literal '+' to a space, which is incorrect for path data.
+		//
+		// Values are read through Utilities::get_unslashed_query_var() so that a backslash
+		// is neither removed from a path value nor doubled in a query-string
+		// value. sanitize_text_field() keeps backslashes.
+		//
+		// is_string() guards each value because get_query_var() can return an
+		// array (e.g. ?param[]=x) and rawurldecode() would throw a TypeError
+		// on non-string input on PHP 8+.
+		//
+		// This mirrors add_canonical_urls(), which builds the same segments from
+		// the query string.
+		//
+		// The segments must stay in the same order as the Arlo rewrite rules
+		// and as public.js builds them, so the canonical URL matches the URL
+		// the visitor reached.
+
+		$category = \ArloTraining\Utilities::get_unslashed_query_var( 'arlo-category' );
 		if ( ! empty( $category ) && is_string( $category ) ) {
-			$url .= '/cat-' . rawurlencode( sanitize_text_field( wp_unslash( rawurldecode( $category ) ) ) );
+			$url .= '/cat-' . rawurlencode( sanitize_text_field( rawurldecode( $category ) ) );
 		}
 
-		$month = get_query_var( 'arlo-month' );
+		$month = \ArloTraining\Utilities::get_unslashed_query_var( 'arlo-month' );
 		if ( ! empty( $month ) && is_string( $month ) ) {
-			$url .= '/month-' . rawurlencode( sanitize_text_field( wp_unslash( rawurldecode( $month ) ) ) );
+			$url .= '/month-' . rawurlencode( sanitize_text_field( rawurldecode( $month ) ) );
 		}
 
-		$location = get_query_var( 'arlo-location' );
+		$location = \ArloTraining\Utilities::get_unslashed_query_var( 'arlo-location' );
 		if ( ! empty( $location ) && is_string( $location ) ) {
-			$url .= '/location-' . rawurlencode( sanitize_text_field( wp_unslash( rawurldecode( $location ) ) ) );
+			$url .= '/location-' . rawurlencode( sanitize_text_field( rawurldecode( $location ) ) );
 		}
 
-		$venue = get_query_var( 'arlo-venue' );
+		$venue = \ArloTraining\Utilities::get_unslashed_query_var( 'arlo-venue' );
 		if ( ! empty( $venue ) && is_string( $venue ) ) {
-			$url .= '/venue-' . rawurlencode( sanitize_text_field( wp_unslash( rawurldecode( $venue ) ) ) );
+			$url .= '/venue-' . rawurlencode( sanitize_text_field( rawurldecode( $venue ) ) );
 		}
 
 		if ( get_query_var( 'arlo-delivery' ) !== '' && is_numeric( get_query_var( 'arlo-delivery' ) ) ) {
 			$url .= '/delivery-' . intval( get_query_var( 'arlo-delivery' ) );
 		}
 
-		$eventtag = get_query_var( 'arlo-eventtag' );
+		$eventtag = \ArloTraining\Utilities::get_unslashed_query_var( 'arlo-eventtag' );
 		if ( ! empty( $eventtag ) && is_string( $eventtag ) ) {
 			$eventtag = rawurldecode( $eventtag );
+			// A numeric value is a tag ID, which is replaced by the tag name for the URL.
 			if ( is_numeric( $eventtag ) ) {
 				$tag = $this->get_tag_by_id( $eventtag );
 				if ( ! empty( $tag['tag'] ) ) {
 					$eventtag = $tag['tag'];
 				}
 			}
-			$url .= '/eventtag-' . rawurlencode( sanitize_text_field( wp_unslash( $eventtag ) ) );
+			$url .= '/eventtag-' . rawurlencode( sanitize_text_field( $eventtag ) );
 		}
 
-		$presenter = get_query_var( 'arlo-presenter' );
+		$presenter = \ArloTraining\Utilities::get_unslashed_query_var( 'arlo-presenter' );
 		if ( ! empty( $presenter ) && is_string( $presenter ) ) {
-			$url .= '/presenter-' . rawurlencode( sanitize_text_field( wp_unslash( rawurldecode( $presenter ) ) ) );
+			$url .= '/presenter-' . rawurlencode( sanitize_text_field( rawurldecode( $presenter ) ) );
 		}
 
-		$templatetag = get_query_var( 'arlo-templatetag' );
+		$templatetag = \ArloTraining\Utilities::get_unslashed_query_var( 'arlo-templatetag' );
 		if ( ! empty( $templatetag ) && is_string( $templatetag ) ) {
 			$templatetag = rawurldecode( $templatetag );
+			// A numeric value is a tag ID, which is replaced by the tag name for the URL.
 			if ( is_numeric( $templatetag ) ) {
 				$tag = $this->get_tag_by_id( $templatetag );
 				if ( ! empty( $tag['tag'] ) ) {
 					$templatetag = $tag['tag'];
 				}
 			}
-			$url .= '/templatetag-' . rawurlencode( sanitize_text_field( wp_unslash( $templatetag ) ) );
+			$url .= '/templatetag-' . rawurlencode( sanitize_text_field( $templatetag ) );
 		}
 
-		$state = get_query_var( 'arlo-state' );
+		$state = \ArloTraining\Utilities::get_unslashed_query_var( 'arlo-state' );
 		if ( ! empty( $state ) && is_string( $state ) ) {
-			$url .= '/state-' . rawurlencode( sanitize_text_field( wp_unslash( rawurldecode( $state ) ) ) );
+			$url .= '/state-' . rawurlencode( sanitize_text_field( rawurldecode( $state ) ) );
 		}
 
-		$event_id = get_query_var( 'arlo-event-id' );
+		$event_id = \ArloTraining\Utilities::get_unslashed_query_var( 'arlo-event-id' );
 		if ( ! empty( $event_id ) && is_string( $event_id ) ) {
-			$url .= '/event-' . rawurlencode( sanitize_text_field( wp_unslash( rawurldecode( $event_id ) ) ) );
+			$url .= '/event-' . rawurlencode( sanitize_text_field( rawurldecode( $event_id ) ) );
 		}
 
-		$search = get_query_var( 'arlo-search' );
+		$search = \ArloTraining\Utilities::get_unslashed_query_var( 'arlo-search' );
 		if ( ! empty( $search ) && is_string( $search ) ) {
-			$url .= '/search/' . rawurlencode( sanitize_text_field( wp_unslash( rawurldecode( $search ) ) ) );
+			$url .= '/search/' . rawurlencode( sanitize_text_field( rawurldecode( $search ) ) );
 		}
 
+		// The page number is added last, unless the URL already carries one.
 		if ( ! empty( get_query_var( 'paged' ) ) && is_numeric( get_query_var( 'paged' ) ) && strpos( $url, "/page/" ) === false ) {
-			$url .= '/page/' . wp_unslash( get_query_var( 'paged' ) );
+			$url .= '/page/' . get_query_var( 'paged' );
 		}
 
 		return $url;
@@ -3511,5 +3809,17 @@ class Arlo_For_Wordpress {
 	 */
 	private function run_next_scheduler_task( $source = 'cron-event' ) {
 		$this->get_scheduler()->run_task( null, $source );
+	}
+
+	/**
+	 * Tells whether a theme.json externalResources entry names a file.
+	 *
+	 * An empty entry resolves through plugins_url() to the plugin's public directory, which is not an asset.
+	 *
+	 * @param mixed $entry Entry from a theme's externalResources list.
+	 * @return bool
+	 */
+	private function is_usable_external_resource( $entry ): bool {
+		return is_string( $entry ) && '' !== trim( $entry );
 	}
 }

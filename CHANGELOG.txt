@@ -1,4 +1,143 @@
 
+== v5.2.2 ==
+
+Enhancements
+------------------
+* Updated Swiper (Theme Z) to 14.4.0 and Font Awesome Free (Theme Z) to 7.3.1.
+* The Starter themes no longer load Bootstrap 3 JavaScript or selectize.js.
+  Their filter and event card panels now use a small Arlo script instead.
+  Custom code on those themes that uses Bootstrap's dropdown, tab, modal or
+  carousel, collapse events, data-parent accordions or .selectize() needs to
+  load its own copy of the library.
+* The third-party credits now match the bundled files, and an unused CodeMirror
+  stylesheet was removed.
+* The Starter themes' stylesheets are about 45% smaller. Rules that no Starter
+  template, script or widget uses were removed. Pages render the same as
+  before.
+* The "Powered by Arlo" opt-in notice now previews the credit, and a site that
+  was showing it before the 5.2.0 upgrade is labelled "Previously enabled".
+* Theme Z's presenter events slider now uses Swiper 14, which needs Chrome or
+  Edge 110, Safari 16.4 or Firefox 110 or later. On an older browser the slider
+  may not work and only the first events are visible.
+* The Edit links on the Arlo admin lists, and the New and Manage buttons above
+  them, open your Arlo management console. They are no longer shown while the
+  plugin is connected to the demo platform (Test with demo data), which has no
+  management console. The readme External services section now describes these
+  admin links.
+* The Importer mode setting now explains that delta import is a best-effort
+  optimisation, and that the import continues with the full import when delta
+  cannot be used.
+* The Importer mode setting is always shown, and explains why it is disabled
+  when the database has no InnoDB tables. The Deployment setting now explains
+  Non-production syncing and why a first save sets it.
+* Editing the "No events to show" text, the No event on a template text, the
+  "Free" text, the Google Maps API key or the tax exempt tag now saves plain
+  text only.
+* Hardened how the wrap attribute of Arlo shortcodes is rendered. A wrap value
+  that is not valid where it is used is now left out. Wrappers around element
+  content are unchanged.
+* The canonical URL callbacks wp_canonical_fix() and yoast_canonical_fix() are
+  now filter_canonical_url() and filter_yoast_canonical(). The old names still
+  work but are deprecated. Code that unhooks them with remove_filter() needs the
+  new names.
+* Hardened the filter settings. A rename, exclude or show-only rule is now saved
+  only for a value that the filter offers.
+* Hardened input checks. Malformed import responses, scheduler requests, widget
+  fields and URL regions are now rejected or ignored without PHP warnings. A URL
+  region that is not one of your regions is no longer saved as the visitor's
+  region preference.
+* Hardened the sanitisation of the event search term where it is shown in the
+  search field and the Search widget. The term still displays and submits as
+  typed.
+* Hardened the page title and the browser title on filtered event pages. A
+  location or search term in the address still displays as typed.
+
+Bug fixes
+------------------
+* Zero or invalid resolved pagination limits no longer cause a PHP
+  division-by-zero error; pagination is omitted instead.
+* The Block theme no longer requests the plugin's public folder as a stylesheet,
+  and Arlo's public assets no longer carry a fixed 20170424 query string.
+* In the Starter and Starter hero themes, the first click on an event card's
+  expand button no longer leaves the card in the wrong state.
+* Another plugin's custom post type named event, presenter or venue no longer
+  has its content replaced by Arlo's event, presenter or venue template, and
+  its canonical URL no longer gets a region segment added.
+* The [arlo_event_template_rich_snippet], [arlo_oa_rich_snippet],
+  [arlo_venue_rich_snippet] and [arlo_presenter_rich_snippet] shortcodes now
+  render nothing when they are used outside their own list item or page, or
+  when the row they describe is incomplete or has no name. Previously a
+  customised template could raise PHP warnings or a fatal error, or output
+  meaningless structured data. Presenters and venues without a page no longer
+  get the address of another page in their structured data.
+* Rewrite rules are no longer regenerated on every admin request. They are
+  refreshed only when Arlo's page addresses change, and repaired if Arlo's
+  routes go missing.
+* Saving any Arlo setting while the "Powered by Arlo" opt-in notice was showing
+  recorded the credit as declined and removed the notice. The notice now stays
+  until you answer it.
+* Visiting the archive of another plugin's custom post type no longer raises
+  PHP "Undefined property" warnings from Arlo's region redirect.
+* The Arlo Settings page no longer shows every tab stacked, with broken region
+  and filter controls, for administrators who cannot edit templates.
+* Test with demo data no longer publishes an existing page just because its
+  address matches an Arlo page, such as events. It publishes only the pages
+  assigned as Arlo pages, and the notice now lists any that still need one.
+* Network activating or deactivating Arlo on a multisite network no longer
+  leaves WordPress switched to another site afterwards, so other plugins'
+  activation and deactivation code runs in the site it was started from.
+* Upgrading from a release older than 3.3 no longer stops with a fatal error
+  ("Class ArloTraining\Arlo_For_Wordpress not found") when the 3.2 and 3.3
+  upgrade steps add the Online activities and Schedule pages.
+* Saving the Arlo Upcoming Events widget no longer removes backslashes from its
+  template, so escaped content such as JSON-LD is no longer saved as invalid
+  JSON. Templates already saved this way need to be edited again.
+* Backslashes are no longer removed from filter and search values in Arlo page
+  addresses, Arlo widget titles, or searches on the Arlo admin lists.
+* Arlo no longer changes a canonical URL that is turned off, or the canonical
+  URL of a post or page that is not an Arlo page.
+* The presenter filter no longer lists presenters from an import that is not
+  live, which could add stale names or list a renamed presenter twice, and a tag
+  ID from an import that is not live no longer resolves to a tag name in page
+  addresses.
+* Changing the tax exempt tag now clears the tax exempt flag from events that
+  carry only the previous tag, so their prices no longer show without tax.
+* A delta import that updates event availability now clears the page cache of
+  supported caching plugins (WP Super Cache and W3 Total Cache), so cached pages
+  no longer show old availability until they expire.
+* Saving the settings with a host page missing from a post type entry no longer
+  raises a PHP warning or moves that type's Arlo posts out from under their host
+  page. The stored host page is kept.
+* On a site that shows prices with tax, the structured data of the
+  [arlo_event_rich_snippet] and [arlo_oa_rich_snippet] shortcodes now compares a
+  replacement offer's price with tax, so the low and high prices are correct
+  when an offer has been replaced.
+* An import now stops and reports the failure when the database rejects a write
+  to a presenter, venue or event template page, or to a stored snapshot part.
+  Previously the failure was ignored and the import carried on with incomplete
+  data. A failed event template page creation was also ignored.
+* A failed download of a snapshot fragment is now retried, except when the
+  server answers 400, 401, 403 or 404, which cannot succeed on retry. Fragment
+  download failures no longer count toward disabling sync after repeated
+  platform failures, because fragments are not served by the Arlo platform.
+* In Theme Z, the catalogue and schedule "Show more" buttons no longer stop
+  working when the filter shortcode is removed or shows no filters, and the
+  next batch of courses keeps the page's active filters and region.
+* In Theme Z, a customised template that keeps a "Show more" button for a
+  catalogue or schedule category but removes the page wrapper around it no
+  longer stops the page's other lists from loading more.
+* In Theme Z, each "Show more" button now pages only its own list, so a list
+  with no next page no longer shows "Show more" or loads another list's page.
+  A failed request can now be retried.
+* In Theme Z, damaged customised markup around the "Show more" buttons or the
+  session popups no longer breaks the other buttons and popups on the page.
+* Migrating Custom CSS no longer leaves Additional CSS that the Site Editor
+  rejects with "The custom CSS is invalid. Do not use <> markup." A "<" followed
+  by a letter, such as in an inline SVG image address or a comment, is now
+  rewritten in a way that means the same to browsers, and the readiness check
+  lists what will be adjusted. CSS with a "<" that cannot be rewritten safely is
+  listed under "Must fix" and is not migrated until it is changed.
+
 == v5.2.1 ==
 
 Bug fixes

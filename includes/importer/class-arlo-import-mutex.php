@@ -309,12 +309,15 @@ class ImportMutex {
 	/**
 	 * Returns the numeric MySQL errno when the active wpdb handle exposes mysqli.
 	 *
+	 * The errno separates duplicate-key lock contention, lock waits, deadlocks and connection errors from schema
+	 * faults, which the error text alone cannot do reliably. It is read from the connection object, so no query runs
+	 * and no request data is involved.
+	 *
 	 * @return int MySQL errno, or 0 when unavailable.
 	 */
 	private function get_database_errno(): int {
 		if ( isset( $this->wpdb->dbh ) && $this->wpdb->dbh instanceof \mysqli ) {
-			// phpcs:ignore WordPress.DB.RestrictedFunctions.mysql_mysqli_errno -- Numeric MySQL errno is required to distinguish duplicate-key lock contention from transient database errors and schema faults.
-			return mysqli_errno( $this->wpdb->dbh );
+			return (int) $this->wpdb->dbh->errno;
 		}
 
 		return 0;

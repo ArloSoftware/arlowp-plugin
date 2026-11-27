@@ -121,7 +121,7 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table {
 			$search_fields = $this->get_searchable_fields();
 			foreach ( $search_fields as $field ) {
 				$where[]     = $field . " LIKE %s";
-				$parameter[] = '%' . $wpdb->esc_like( wp_unslash( $s ) ) . '%';
+				$parameter[] = '%' . $wpdb->esc_like( $s ) . '%';
 			}
 		}
 		return array(
@@ -175,7 +175,7 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table {
 		";
 		$sql   = Utilities::prepare_sql( $sql, $where['parameter'] );
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql is prepared through Utilities::prepare_sql(); the admin list count must reflect the live table so pagination does not strand users on stale pages.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql is the plugin-owned log table with fixed column names, and the search term is bound by Utilities::prepare_sql(); the admin list count must reflect the live table so pagination does not strand users on stale pages.
 		$result = $wpdb->get_var( $sql );
 
 		return is_null( $result ) ? 0 : intval( $result );
@@ -206,7 +206,7 @@ class Arlo_For_Wordpress_LogList extends WP_List_Table {
 			)
 		);
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql already contains prepared filter values from get_sql_query(); only the LIMIT placeholders are bound here. The list must read the live page after pagination is clamped.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql is the plugin-owned log table with fixed column names and the search term already bound by get_sql_query(); ORDER BY uses a sortable column name from get_sortable_columns() and an asc or desc direction, and only the LIMIT placeholders are bound here. The list must read the live page after pagination is clamped.
 		$items = $wpdb->get_results( $wpdb->prepare( $sql, $limit, self::PERPAGE ), OBJECT );
 
 		$this->items = $items;

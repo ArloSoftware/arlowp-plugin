@@ -675,7 +675,15 @@ class OnlineActivities {
 	}
 
 	private static function shortcode_oa_rich_snippet( $content = '', $atts = [], $shortcode_name = '', $import_id = '' ) {
-		if ( ! isset( $GLOBALS['arlo_oa_list_item']['et_post_name'] ) ) {
+		$oa = isset( $GLOBALS['arlo_oa_list_item'] ) ? $GLOBALS['arlo_oa_list_item'] : null;
+		if (
+			! Shortcodes::has_rich_snippet_string( $oa, 'et_post_name' )
+			|| ! Shortcodes::has_rich_snippet_string( $oa, 'oa_name' )
+			// The region is nullable and empty without regions, but the column must exist.
+			|| ! Shortcodes::has_rich_snippet_string( $oa, 'et_region', true )
+			|| ! isset( $oa['oa_id'] )
+			|| ! ( is_int( $oa['oa_id'] ) || ( is_string( $oa['oa_id'] ) && ctype_digit( $oa['oa_id'] ) ) )
+		) {
 			return '';
 		}
 

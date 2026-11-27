@@ -11,6 +11,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Utilities {
 
+	/**
+	 * Prepares a dynamically built statement.
+	 *
+	 * Every variable value must be a placeholder in $sql with its value in $parameters. When there are no parameters
+	 * the statement is returned as built, so it must contain only fixed text and plugin-owned table names.
+	 *
+	 * @param string $sql        Statement with %s, %d and %f placeholders.
+	 * @param array  $parameters Values for the placeholders.
+	 * @return string The prepared statement.
+	 */
 	public static function prepare_sql( $sql, $parameters = array() ) {
 		global $wpdb;
 
@@ -18,7 +28,7 @@ class Utilities {
 			return $sql;
 		}
 
-		return $wpdb->prepare( $sql, $parameters ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The SQL statement is dynamically constructed and parameters are prepared here.
+		return $wpdb->prepare( $sql, $parameters ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Statement fragments are fixed text or plugin-owned table names, and every value is passed in $parameters and prepared here.
 	}
 
 	/**
@@ -52,14 +62,14 @@ class Utilities {
 	}
 
 	public static function get_filter_keys_string_array( $name, $atts = [] ) {
-		$url_parameter = self::clean_string_url_parameter( 'arlo-' . $name );
+		$url_parameter = self::get_sanitized_request_parameter( 'arlo-' . $name );
 		$global_att    = self::get_shortcode_att_string_array( $name, $atts );
 		$by_page       = self::get_filter_setting_string_array( $name );
 		return self::get_only_prioritised_filter_array( $url_parameter, $global_att, $by_page );
 	}
 
 	public static function get_filter_keys_int_array( $name, $atts = [] ) {
-		$url_parameter = self::clean_int_url_parameter( 'arlo-' . $name );
+		$url_parameter = self::get_int_request_parameter( 'arlo-' . $name );
 		$global_att    = self::get_shortcode_att_int_array( $name, $atts );
 		$by_page       = self::get_filter_setting_int_array( $name );
 		return self::get_only_prioritised_filter_array( $url_parameter, $global_att, $by_page );
@@ -218,21 +228,83 @@ class Utilities {
 		return $value;
 	}
 
-	public static function clean_string_url_parameter( $parameter_name ) {
+	/**
+	 * Returns a query var as the visitor supplied it, without WordPress request slashing.
+	 *
+	 * @param string $name Query var name.
+	 * @return mixed The query var value: a string without added slashes, or the
+	 *               original value when it is not a string (e.g. an array).
+	 */
+	public static function get_unslashed_query_var( string $name ) {
+		$value = get_query_var( $name );
+
+		// WP_Query takes a public query var from $_GET or $_POST when it is
+		// present there, and wp_magic_quotes() slashes those superglobals.
+		// Values captured from a pretty permalink path by a rewrite rule are
+		// not slashed, so only a value sourced from the request is unslashed.
+		if ( is_string( $value ) && ( isset( $_GET[ $name ] ) || isset( $_POST[ $name ] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification -- Only tests where WordPress sourced the query var; the value is not read from the superglobal.
+			return wp_unslash( $value );
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Returns a sanitized string request parameter.
+	 *
+	 * The query string takes precedence. Otherwise the value is the query var WordPress
+	 * holds, which is a posted value or one captured from the page address by an Arlo
+	 * rewrite rule, so a filter works whichever way it was supplied.
+	 *
+	 * @param string $parameter_name Query string key or query var name, e.g. 'arlo-category'.
+	 * @return string The sanitized value, or an empty string when it is missing or is not a string.
+	 */
+	public static function get_sanitized_request_parameter( string $parameter_name ): string {
 		$parameter_value = self::filter_string_polyfill( INPUT_GET, $parameter_name );
 		if ( $parameter_value !== '' ) {
 			return $parameter_value;
 		}
-		$query_var = get_query_var( $parameter_name );
+		$query_var = self::get_unslashed_query_var( $parameter_name );
 		// get_query_var() can return an array if the var was injected as ?param[]=x.
 		// urldecode() throws a TypeError on PHP 8+ when passed an array.
 		if ( is_array( $query_var ) || is_object( $query_var ) ) {
 			return '';
 		}
-		return sanitize_text_field( wp_unslash( urldecode( (string) $query_var ) ) );
+		return sanitize_text_field( urldecode( (string) $query_var ) );
 	}
 
-	public static function clean_int_url_parameter( $parameter_name ) {
+	/**
+	 * Escapes square brackets in HTML that is already escaped, so they are not read as shortcode syntax.
+	 *
+	 * Shortcode handlers return markup that the dispatcher expands again, and esc_html() and esc_attr()
+	 * keep `[` and `]`. A value the visitor controls, such as a search term, would otherwise run any
+	 * registered shortcode. The references display and submit as the original characters in HTML.
+	 *
+	 * The references are hexadecimal because do_shortcode() turns the decimal `&#91;` and `&#93;` back
+	 * into brackets when it returns, and the dispatcher then parses its own output again.
+	 *
+	 * Call it on the result of esc_html() or esc_attr(), and only where the result is written into HTML
+	 * text or a quoted attribute value. It does not escape anything else, and it is not for URLs, JSON
+	 * or other contexts that do not decode character references.
+	 *
+	 * @param string $html Text already escaped for HTML output.
+	 * @return string The text with `[` and `]` as hexadecimal character references.
+	 */
+	public static function escape_shortcode_brackets_in_html( string $html ): string {
+		return str_replace( array( '[', ']' ), array( '&#x5B;', '&#x5D;' ), $html );
+	}
+
+	/**
+	 * Returns an integer request parameter.
+	 *
+	 * The query string takes precedence. Otherwise the value is the query var WordPress
+	 * holds, which is a posted value or one captured from the page address by an Arlo
+	 * rewrite rule.
+	 *
+	 * @param string $parameter_name Query string key or query var name, e.g. 'epage'.
+	 * @return int|null The integer value, or null when it is missing or not numeric.
+	 */
+	public static function get_int_request_parameter( string $parameter_name ): ?int {
 		$parameter_value = self::filter_string_polyfill( INPUT_GET, $parameter_name );
 		if ( ! empty( $parameter_value ) ) {
 			return intval( $parameter_value );
@@ -247,12 +319,12 @@ class Utilities {
 	}
 
 	public static function get_att_string( $name, $atts = [] ) {
-		$string_parameter = self::clean_string_url_parameter( 'arlo-' . $name );
+		$string_parameter = self::get_sanitized_request_parameter( 'arlo-' . $name );
 		return ! empty( $string_parameter ) || $string_parameter == "0" ? $string_parameter : ( is_array( $atts ) && array_key_exists( $name, $atts ) ? $atts[ $name ] : '' );
 	}
 
 	public static function get_att_int( $name, $atts = [] ) {
-		$int_parameter = self::clean_int_url_parameter( 'arlo-' . $name );
+		$int_parameter = self::get_int_request_parameter( 'arlo-' . $name );
 		return ! empty( $int_parameter ) || $int_parameter == "0" ? $int_parameter : ( is_array( $atts ) && array_key_exists( $name, $atts ) ? intval( $atts[ $name ] ) : '' );
 	}
 
@@ -433,7 +505,7 @@ class Utilities {
 	}
 
 	public static function set_base_filter( $template_name, $filter_name = '', $filter_settings = [], $atts = [], &$stored_atts = [], $callback = '', $callback_parameters = [], $is_hidden = false ) {
-		$parameter              = \ArloTraining\Utilities::clean_string_url_parameter( 'arlo-' . $filter_name );
+		$parameter              = \ArloTraining\Utilities::get_sanitized_request_parameter( 'arlo-' . $filter_name );
 		$filter_setting_section = ( $is_hidden ? 'hiddenfilters' : 'showonlyfilters' );
 		$filter_setting_name    = $filter_name;
 		$filter_name            = ( $is_hidden ? $filter_name . 'hidden' : $filter_setting_name );

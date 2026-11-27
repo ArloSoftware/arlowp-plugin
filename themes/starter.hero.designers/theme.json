@@ -11,9 +11,8 @@
             "/custom-assets/font-awesome-4.7.0/css/font-awesome.min.css"
         ],
         "javascripts": [
-            "/custom-assets/selectize.min.js",
-            "/custom-assets/bootstrap.min.js",
-            "/custom-assets/slick-1.7.1/slick.min.js"
+            "/custom-assets/slick-1.7.1/slick.min.js",
+            "/assets/js/arlo-collapse.js"
         ]
     },
     "images": [

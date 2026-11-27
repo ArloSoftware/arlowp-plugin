@@ -97,15 +97,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<div class="arlo-init-spinner__icon" aria-hidden="true"></div>
 		</div>
 	</div>
-	<script type="text/javascript">
-		// Fail-safe: don't leave the settings UI hidden forever if the settings JS fails to initialise.
-		document.addEventListener('DOMContentLoaded', function() {
-			window.setTimeout(function() {
-				var wrap = document.querySelector('.arlo-sections-wrap');
-				if (wrap) {
-					wrap.classList.remove('arlo-initializing');
-				}
-			}, 4000);
-		});
-	</script>
 </div>

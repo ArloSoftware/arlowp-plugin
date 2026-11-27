@@ -288,6 +288,37 @@ abstract class AbstractImportStep {
 	}
 
 	/**
+	 * Writes an existing Arlo post's columns directly, failing the step if the database rejects the write.
+	 *
+	 * The columns must already be sanitised; title and content are emoji-encoded for three byte columns. An update that changed no row is not a failure and leaves the post cache alone.
+	 *
+	 * @param int   $post_id           ID of the existing post.
+	 * @param array $post_config_array Sanitised post columns to write.
+	 * @throws \Exception If the database reports a failed write.
+	 */
+	protected function update_post_row( $post_id, array $post_config_array ) {
+		global $wpdb;
+
+		// As wp_insert_post() does: a three byte column rejects the whole update for a four byte character such as an emoji.
+		foreach ( array( 'post_title', 'post_content' ) as $field ) {
+			if ( isset( $post_config_array[ $field ] ) && in_array( $wpdb->get_col_charset( $wpdb->posts, $field ), array( 'utf8', 'utf8mb3' ), true ) ) {
+				$post_config_array[ $field ] = wp_encode_emoji( $post_config_array[ $field ] );
+			}
+		}
+
+		$updated = $wpdb->update( $wpdb->prefix . 'posts', $post_config_array, array( 'id' => $post_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct update of the plugin-owned Arlo post: importer updates deliberately avoid wp_update_post() so third-party post hooks do not fire for every imported entity. The title and content are sanitised first, as wp_insert_post() does on create, and a changed row is cleared from the core post cache below. Arlo's own caches are invalidated through CacheControl when the import finishes.
+
+		if ( false === $updated ) {
+			throw new \Exception( 'Post update error: ' . $wpdb->last_error ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception is caught by the calling context and written to the error log; not rendered in any browser context.
+		}
+
+		// $wpdb->update() returns the number of changed rows, so an unchanged post skips the cache clear.
+		if ( $updated ) {
+			clean_post_cache( $post_id );
+		}
+	}
+
+	/**
 	 * Sanitises post_title and post_content as wp_insert_post() would, for a row written without it.
 	 *
 	 * Other columns, including post_name, are returned unchanged. Backslashes are preserved.

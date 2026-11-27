@@ -337,11 +337,19 @@ class EventAvailabilityOverlayWriter {
 	/**
 	 * Executes one fixed transaction-control statement for the overlay transaction.
 	 *
+	 * Only transaction start, commit, rollback and the named savepoint statements are accepted, so the unprepared
+	 * query below can never carry anything else.
+	 *
 	 * @param string $query Transaction statement.
 	 * @return void
+	 * @throws \InvalidArgumentException When the statement is not one of the accepted transaction statements.
 	 */
 	private function execute_transaction_statement( string $query ): void {
-		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- The Event overlay requires fixed transaction control statements around plugin-owned row updates.
+		if ( 1 !== preg_match( '/^(?:START TRANSACTION|COMMIT|ROLLBACK|(?:SAVEPOINT|RELEASE SAVEPOINT|ROLLBACK TO SAVEPOINT) [a-z_]+)$/D', $query ) ) {
+			throw new \InvalidArgumentException( 'Event availability overlay accepts only transaction control statements.' );
+		}
+
+		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- The Event overlay requires fixed transaction control statements around plugin-owned row updates; $query matched the transaction statement pattern above.
 		if ( false === $this->wpdb->query( $query ) ) {
 			// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			throw new \RuntimeException( 'Event availability overlay transaction failed.' );

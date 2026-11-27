@@ -115,6 +115,9 @@ class Events {
 					break;
 
 				default:
+					// Keys outside the named cases are SQL text, so only the fixed shapes are accepted.
+					$key = QueryShape::get_validated_condition_key( $key );
+
 					if ( is_array( $value ) ) {
 						$enhanced   = str_replace( '%s', substr( str_repeat( '%s, ', count( $value ) ), 0, -2 ), $key );
 						$where[]    = str_replace( '%d', substr( str_repeat( '%d, ', count( $value ) ), 0, -2 ), $enhanced );
@@ -135,10 +138,8 @@ class Events {
 			$where = ' WHERE ' . implode( ' AND ', $where );
 		}
 
-		// order ,
-		if ( ! empty( $order ) ) {
-			$order = ' ORDER BY ' . implode( ', ', $order );
-		}
+		// order
+		$order = QueryShape::build_order_clause( $order );
 
 		//limit
 		$limit     = is_numeric( $limit ) ? (int) $limit : 0;

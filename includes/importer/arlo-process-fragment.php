@@ -235,17 +235,13 @@ class ProcessFragment extends AbstractImportStep {
 					}
 					break;
 			}
-			try {
-				$this->current_task_class->run();
-				if ( $import_task === 'Download' && $this->current_task_class->is_finished ) {
-					// Download just stored the fragment; build the per-fragment plan from its contents for later wakes.
-					$this->get_data_json();
-					$this->build_fragment_step_plan();
-				}
-				--$this->current_task_retry;
-			} catch ( \Exception $e ) {
-				throw new \Exception( $e->getMessage() ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message is caught by the import pipeline, written to the Arlo log table via Logger, and escaped with esc_html() at admin render time.
+			$this->current_task_class->run();
+			if ( $import_task === 'Download' && $this->current_task_class->is_finished ) {
+				// Download just stored the fragment; build the per-fragment plan from its contents for later wakes.
+				$this->get_data_json();
+				$this->build_fragment_step_plan();
 			}
+			--$this->current_task_retry;
 		} else {
 			Logger::log_diagnostic( Logger::DIAGNOSTIC_VERBOSITY_DEBUG, 'Skipping empty snapshot fragment step [fragment=' . ( $this->iteration + 1 ) . '; step=' . $import_task . ']', $this->import_id );
 			$this->current_task_class->is_finished = true;

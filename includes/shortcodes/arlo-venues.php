@@ -467,6 +467,10 @@ class Venues {
 			)
 		);
 
+		if ( ! isset( $GLOBALS['arlo_venue_list_item'] ) || ! Shortcodes::has_rich_snippet_string( $GLOBALS['arlo_venue_list_item'], 'v_name' ) ) {
+			return '';
+		}
+
 		$venue_snippet = self::get_venue_snippet( $link );
 
 		return Shortcodes::create_rich_snippet( $venue_snippet );
@@ -548,7 +552,12 @@ class Venues {
 				$v_link = Shortcodes::get_rich_snippet_field( $GLOBALS['arlo_venue_list_item'], 'v_viewuri' );
 				break;
 			default:
-				$v_link = get_permalink( arlo_get_post_by_name( Shortcodes::get_rich_snippet_field( $GLOBALS['arlo_venue_list_item'], 'v_post_name' ), 'arlo_venue' ) );
+				// An empty post name would match the first venue post, and get_permalink() falls back to the current post.
+				$v_post_name = Shortcodes::get_rich_snippet_field( $GLOBALS['arlo_venue_list_item'], 'v_post_name' );
+				$v_post      = is_string( $v_post_name ) && '' !== $v_post_name ? arlo_get_post_by_name( $v_post_name, 'arlo_venue' ) : false;
+				if ( $v_post ) {
+					$v_link = get_permalink( $v_post );
+				}
 				break;
 		}
 

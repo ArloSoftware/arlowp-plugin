@@ -74,6 +74,14 @@ class ImportingParts {
 				)
 			);
 
+			if ( false === $updated ) {
+				$error = $wpdb->last_error;
+				// Remove the partial part: a retry inserts a fresh one, so a chunk can never be appended twice or leave a part that looks complete.
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct database query is required for custom table. Do not need cache for import process.
+				$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}arlo_import_parts WHERE id = %d", $insert_id ) );
+				throw new \Exception( 'Import part write error: ' . $error ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception is caught by the calling context and written to the error log; not rendered in any browser context.
+			}
+
 			$offset += $size;
 			$chunk   = substr( $content, $offset, $size );
 		}

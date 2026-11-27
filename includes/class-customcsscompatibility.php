@@ -16,7 +16,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class CustomCssCompatibility {
 
-	private const MAX_BYTES    = 2097152;
+	/**
+	 * Largest CSS the scan reads, in bytes. The migration keeps adjusted CSS within it too, so migrated CSS can always be checked again.
+	 */
+	public const MAX_BYTES = 2097152;
+
 	private const MAX_FINDINGS = 50;
 	private const MAX_DEPTH    = 256;
 
