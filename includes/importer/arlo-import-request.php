@@ -189,15 +189,21 @@ class ImportRequest extends AbstractImportStep {
 					throw $exception;
 				}
 
-				// Platform deployments may explicitly reject schema 200 when its feature is not enabled; persist a full-schema session before one compatibility retry.
+				// A delta snapshot may not be supported for this dataset, for example because of conflicts in the data or protocol limits (manifest size).
+				// Persist a full-schema session and retry once with the full snapshot, the safest import, so the import still runs.
 				$importer_mode = \Arlo_For_Wordpress::IMPORTER_MODE_FULL;
 				$schema_level  = SnapshotManifest::SCHEMA_LEVEL_DEFAULT;
 				$this->persist_session_admission( $importer_mode, $schema_level, $legacy_region_id_handling );
-				Logger::log_diagnostic( Logger::DIAGNOSTIC_VERBOSITY_DEBUG, 'Platform rejected the delta snapshot schema; retrying with the full snapshot schema [platform=' . $platform_hostname . '; rejected_schema_level=' . SnapshotManifest::SCHEMA_LEVEL_DELTA . '; fallback_schema_level=' . $schema_level . ']', $this->import_id );
+				Logger::log_diagnostic( Logger::DIAGNOSTIC_VERBOSITY_DEBUG, 'Platform declined the delta snapshot schema; retrying with the full snapshot schema so the import completes [platform=' . $platform_hostname . '; declined_schema_level=' . SnapshotManifest::SCHEMA_LEVEL_DELTA . '; fallback_schema_level=' . $schema_level . ']', $this->import_id );
 				$snapshot_request_response = $this->request_snapshot_import( $platform_hostname, $schema_level );
 			}
 
-			if ( ! is_object( $snapshot_request_response ) || empty( $snapshot_request_response->RequestID ) ) {
+			// The request ID is stored in a 63-byte column and echoed back by the callback, so only a usable scalar of that length is accepted.
+			// The callback parser treats an empty-like ID such as "0" as missing, so an acknowledgement with one could never be matched.
+			$request_id = is_object( $snapshot_request_response ) && isset( $snapshot_request_response->RequestID ) && ( is_string( $snapshot_request_response->RequestID ) || is_int( $snapshot_request_response->RequestID ) )
+				? (string) $snapshot_request_response->RequestID
+				: '';
+			if ( '' === $request_id || '0' === $request_id || strlen( $request_id ) > 63 ) {
 				throw new \ArloTraining\PlatformAccessHttpException( 'Snapshot request returned an invalid response or no RequestID' );
 			}
 
@@ -205,12 +211,12 @@ class ImportRequest extends AbstractImportStep {
 				'PlatformHostname' => $platform_hostname,
 			];
 			$data                                    = [
-				'request_id'    => $snapshot_request_response->RequestID,
+				'request_id'    => $request_id,
 				'response_json' => wp_json_encode( $snapshot_request_response ),
 			];
 
 			$this->importer->update_import_entry( $data );
-			Logger::log_diagnostic( Logger::DIAGNOSTIC_VERBOSITY_DEBUG, 'Arlo accepted the import snapshot request [request_id=' . $snapshot_request_response->RequestID . '; platform=' . $platform_hostname . ']', $this->import_id );
+			Logger::log_diagnostic( Logger::DIAGNOSTIC_VERBOSITY_DEBUG, 'Arlo accepted the import snapshot request [request_id=' . $request_id . '; platform=' . $platform_hostname . ']', $this->import_id );
 		} catch ( \Throwable $e ) {
 			Logger::log_diagnostic( Logger::DIAGNOSTIC_VERBOSITY_DEBUG, 'Import snapshot request failed [exception=' . get_class( $e ) . '; message=' . $e->getMessage() . ']', $this->import_id );
 			try {
@@ -314,7 +320,8 @@ class ImportRequest extends AbstractImportStep {
 	}
 
 	/**
-	 * Returns whether the platform explicitly rejected only the delta schema level.
+	 * Returns whether the platform explicitly declined only the delta schema level.
+	 * A decline is not an error: the full snapshot is the safest import, so one retry with it keeps the import running.
 	 * This intentionally does not treat other platform failures as compatibility signals.
 	 *
 	 * @param \ArloTraining\PlatformAccessHttpException $exception Platform request failure.

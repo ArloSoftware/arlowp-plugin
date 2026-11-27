@@ -494,7 +494,8 @@ class NoticeHandler {
 	/**
 	 * Offers the public credit opt-in to undecided sites with credit-bearing templates.
 	 *
-	 * Rendered on the Arlo settings screen until an administrator records a choice for the site.
+	 * Shown only on the Arlo settings screen, to users who can manage options, until a choice is recorded.
+	 * Ticking the box opts in, and dismissing the banner records "no". Nothing is shown publicly without the tick.
 	 *
 	 * @return void
 	 */
@@ -509,32 +510,39 @@ class NoticeHandler {
 			return;
 		}
 
-		$templates_show_credit = false;
-		foreach ( (array) ( $settings['templates'] ?? [] ) as $template ) {
-			if ( is_array( $template ) && isset( $template['html'] ) && is_string( $template['html'] ) && has_shortcode( $template['html'], 'arlo_powered_by' ) ) {
-				$templates_show_credit = true;
-				break;
-			}
-		}
-		if ( ! $templates_show_credit ) {
+		if ( ! \Arlo_For_Wordpress::templates_contain_powered_by_credit( $settings ) ) {
 			return;
 		}
 
-		if ( '1' === get_option( \Arlo_For_Wordpress::POWERED_BY_UPGRADE_NOTICE_OPTION ) ) {
-			$prompt = '<strong>' . esc_html__( '"Powered by Arlo" links are now disabled by default.', 'arlo-training-and-event-management-system' ) . '</strong>'
-				. '<br>'
-				. esc_html__( 'You can continue supporting Arlo by showing a small "Powered by Arlo" logo linking to arlo.co on Arlo pages and widgets whose templates contain the credit shortcode.', 'arlo-training-and-event-management-system' );
-		} else {
-			$prompt = esc_html__( 'Support Arlo by showing a small "Powered by Arlo" logo linking to arlo.co on Arlo pages and widgets whose templates contain the credit shortcode.', 'arlo-training-and-event-management-system' );
+		$was_enabled = '1' === get_option( \Arlo_For_Wordpress::POWERED_BY_UPGRADE_NOTICE_OPTION );
+
+		$lead = '';
+		if ( $was_enabled ) {
+			$lead = '<p><strong>' . sprintf(
+				/* translators: %s: the product credit name in italics. */
+				esc_html__( '%s is now off by default.', 'arlo-training-and-event-management-system' ),
+				'<em>' . esc_html__( 'Powered by Arlo', 'arlo-training-and-event-management-system' ) . '</em>'
+			) . '</strong> <span class="arlo-powered-by-opt-in-pill">' . esc_html__( 'Previously enabled', 'arlo-training-and-event-management-system' ) . '</span></p>';
 		}
+
+		// Inline preview of the public credit, in place of the quoted name, so the label shows what learners will see.
+		$credit = '<span class="arlo-powered-by-opt-in-credit"><span class="arlo-powered-by-opt-in-credit-content">' . esc_html__( 'Powered by ', 'arlo-training-and-event-management-system' )
+			. '<img src="' . esc_url( ARLO_PLUGIN_ROOT_URL . 'public/assets/img/Arlo-logo.svg' ) . '" alt="' . esc_attr__( 'Arlo', 'arlo-training-and-event-management-system' ) . '" width="27" height="27"></span></span>';
+		/* translators: %s: the "Powered by" text followed by the Arlo logo, as it appears on the public site. */
+		$label = sprintf( esc_html__( 'Show learners they\'re booking on a fast and secure platform with a small %s link to arlo.co.', 'arlo-training-and-event-management-system' ), $credit );
 
 		echo '<div id="arlo-powered-by-opt-in-notice" class="notice notice-info is-dismissible">'
 			. '<div class="arlo-powered-by-opt-in-prompt">'
-			. '<p>' . $prompt . '</p>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $prompt is built above from esc_html__() strings and static markup.
-			. '<p><label><input type="checkbox" id="arlo-powered-by-opt-in"> ' . esc_html__( 'Show "Powered by Arlo" link', 'arlo-training-and-event-management-system' ) . '</label></p>'
+			. $lead // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $lead is built above from esc_html__() strings and static markup.
+			. '<p><label><input type="checkbox" id="arlo-powered-by-opt-in" aria-describedby="arlo-powered-by-opt-in-description"> ' . $label . '</label></p>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $label is built above from esc_html__() strings and the escaped credit markup.
+			. '<p id="arlo-powered-by-opt-in-description" class="description">' . esc_html__( 'This appears on Arlo pages and widgets where the template contains the shortcode.', 'arlo-training-and-event-management-system' ) . '</p>'
 			. '</div>'
 			. '<p class="arlo-powered-by-opt-in-saved" role="status" hidden><span class="dashicons dashicons-yes" aria-hidden="true"></span> '
-			. esc_html__( 'Thanks! "Powered by Arlo" is now shown on your Arlo pages. You can change this any time in Arlo > Settings > Misc.', 'arlo-training-and-event-management-system' ) . '</p>'
+			. sprintf(
+				/* translators: %s: the product credit name in italics. */
+				esc_html__( 'Thanks! %s is now shown on your Arlo pages. You can change this any time in Arlo > Settings > Misc.', 'arlo-training-and-event-management-system' ),
+				'<em>' . esc_html__( 'Powered by Arlo', 'arlo-training-and-event-management-system' ) . '</em>'
+			) . '</p>'
 			. '<p class="arlo-powered-by-opt-in-failed" role="alert" hidden>'
 			. esc_html__( 'Your choice could not be saved. Please try again, or reload this page and change the setting in Arlo > Settings > Misc.', 'arlo-training-and-event-management-system' ) . '</p>'
 			// An existing dismiss button prevents WordPress from attaching its immediate notice-removal handler.
@@ -566,10 +574,9 @@ class NoticeHandler {
 
 			echo $this->create_user_notice( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- User admin notice HTML output. create_notice() filters notice body HTML with KSES before output.
 				'newpages',
-				$this->create_message_object( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Message object creation. No output here.
+				$this->create_message_object( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The notice built here is output by create_user_notice() above, and create_notice() filters its body with wp_kses().
 					null,
-					/* translators: %s: errors */
-					'<p>' . sprintf( esc_html__( 'Couldn\'t set the following post types: %s', 'arlo-training-and-event-management-system' ), implode( ', ', $error ) ) . '</p>', // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Error message HTML output. Content is escaped using esc_html__ and safe concatenation.
+					$this->get_demo_setup_error_html( $error ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Returns markup escaped by get_demo_setup_error_html(); create_notice() also filters the body with wp_kses().
 					'error notice',
 					false,
 					true
@@ -688,7 +695,7 @@ class NoticeHandler {
 
 					echo $this->create_user_notice( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- User admin notice HTML output. create_notice() filters notice body HTML with KSES before output.
 						'newpages',
-						$this->create_message_object( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Message object creation. No output here.
+						$this->create_message_object( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The notice built here is output by create_user_notice() above, and create_notice() filters its body with wp_kses().
 							esc_html__( 'Start editing your new pages', 'arlo-training-and-event-management-system' ),
 							'<p>' . sprintf(
 								/* translators: 1: Event link 2: Events link 3: Catalogue 4: Schedule link 5: Schedule 6: Upcoming link 7: Upcoming page name 8: Presenter page 9: presenters list link 10: Presenters list 11: Venue link 12: Venue list link 13: Venues list */
@@ -723,6 +730,61 @@ class NoticeHandler {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Lists the Arlo pages the demo setup left without a host page, and why.
+	 *
+	 * An existing page at an Arlo address is named, because the demo setup never publishes or assigns
+	 * a page the admin did not choose.
+	 *
+	 * @param string[] $slugs Slugs of the Arlo pages that have no usable page assigned.
+	 * @return string Notice body HTML, escaped.
+	 */
+	private function get_demo_setup_error_html( array $slugs ): string {
+		$titles = [];
+		foreach ( \Arlo_For_Wordpress::$pages as $page ) {
+			$titles[ $page['name'] ] = $page['title'];
+		}
+
+		$items = '';
+		foreach ( $slugs as $slug ) {
+			$name     = esc_html( $titles[ $slug ] ?? $slug );
+			$existing = get_page_by_path( $slug, OBJECT, 'page' );
+
+			if ( $existing instanceof \WP_Post ) {
+				$existing_title = trim( $existing->post_title ) !== ''
+					? esc_html( $existing->post_title )
+					/* translators: %d: WordPress page ID */
+					: esc_html( sprintf( __( '#%d (no title)', 'arlo-training-and-event-management-system' ), $existing->ID ) );
+				$status = 'publish' === $existing->post_status
+					? __( 'published', 'arlo-training-and-event-management-system' )
+					: self::get_unpublished_page_status_label( $existing->post_status );
+				$items .= '<li>' . sprintf(
+					/* translators: 1: Arlo page name, 2: page address, 3: title of the existing page, 4: status of the existing page, for example "draft". */
+					esc_html__( '%1$s: your site already has a page at /%2$s/ ("%3$s", %4$s). It was not changed.', 'arlo-training-and-event-management-system' ),
+					$name,
+					esc_html( $slug ),
+					$existing_title,
+					esc_html( $status )
+				) . '</li>';
+			} else {
+				$items .= '<li>' . sprintf(
+					/* translators: %s: Arlo page name, for example "Events". */
+					esc_html__( '%s: no page is assigned.', 'arlo-training-and-event-management-system' ),
+					$name
+				) . '</li>';
+			}
+		}
+
+		$pages_link = '<a href="' . esc_url( admin_url( 'admin.php?page=arlo-for-wordpress#pages' ) ) . '" class="arlo-pages-setup">' . esc_html__( 'Arlo > Settings > Pages', 'arlo-training-and-event-management-system' ) . '</a>';
+
+		return '<p><strong>' . esc_html__( 'These Arlo pages still need a host page:', 'arlo-training-and-event-management-system' ) . '</strong></p><ul>' . $items . '</ul><p>'
+			. sprintf(
+				/* translators: %s: link to the Arlo Pages settings tab. */
+				esc_html__( 'Choose a host page for each of them in %s. To use an existing page, publish it first if it is a draft.', 'arlo-training-and-event-management-system' ),
+				$pages_link
+			) . '</p>';
 	}
 
 	private static function get_unpublished_page_status_label( $status ) {

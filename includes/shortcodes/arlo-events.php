@@ -118,6 +118,12 @@ class Events {
 			)
 		);
 
+		// Tell the shortcode dispatcher whether the resolved layout emits class tokens.
+		$context = ShortcodeRenderContext::current();
+		if ( null !== $context ) {
+			$context->set_uses_class_layout( 'class' === $layout );
+		}
+
 		$prepared_sql = $wpdb->prepare(
 			"
             SELECT
@@ -234,7 +240,7 @@ class Events {
 			if ( $within_ul ) {
 				$output .= "</ul>"; }
 
-			$arlo_event_id = \ArloTraining\Utilities::clean_string_url_parameter( 'arlo-event-id' );
+			$arlo_event_id = \ArloTraining\Utilities::get_sanitized_request_parameter( 'arlo-event-id' );
 			if ( ! empty( $arlo_event_id ) ) {
 				$url = Shortcodes::get_template_permalink( $GLOBALS['arlo_eventtemplate']['et_post_name'], $GLOBALS['arlo_eventtemplate']['et_region'] );
 
@@ -261,9 +267,9 @@ class Events {
 		$parameters[] = $post->ID;
 
 		$arlo_region   = \Arlo_For_Wordpress::get_region_parameter();
-		$arlo_location = \ArloTraining\Utilities::clean_string_url_parameter( 'arlo-location' );
-		$arlo_state    = \ArloTraining\Utilities::clean_string_url_parameter( 'arlo-state' );
-		$arlo_event_id = \ArloTraining\Utilities::clean_string_url_parameter( 'arlo-event-id' );
+		$arlo_location = \ArloTraining\Utilities::get_sanitized_request_parameter( 'arlo-location' );
+		$arlo_state    = \ArloTraining\Utilities::get_sanitized_request_parameter( 'arlo-state' );
+		$arlo_event_id = \ArloTraining\Utilities::get_sanitized_request_parameter( 'arlo-event-id' );
 
 		if ( ! empty( $arlo_region ) ) {
 			$where       .= " AND {$wpdb->prefix}arlo_eventtemplates.et_region = %s AND {$wpdb->prefix}arlo_events.e_region = %s";
@@ -657,6 +663,7 @@ class Events {
 	private static function shortcode_event_delivery( $content = '', $atts = [], $shortcode_name = '', $import_id = '' ) {
 		$e_arlo_id = $GLOBALS['arlo_event_list_item']['e_arlo_id'];
 
+		// The label is a fixed plugin string chosen by the integer e_isonline value. No imported text is returned.
 		$output = \Arlo_For_Wordpress::$delivery_labels[ $GLOBALS['arlo_event_list_item']['e_isonline'] ];
 
 		return $output;
@@ -1355,7 +1362,10 @@ class Events {
 		$e_id       = $id = isset( $GLOBALS['arlo_event_session_list_item']['e_id'] ) ? $GLOBALS['arlo_event_session_list_item']['e_id'] : $GLOBALS['arlo_event_list_item']['e_id'];
 		$presenters = \ArloTraining\Entities\Presenters::get( [ 'e_id' => $e_id ], null, null, $import_id );
 		foreach ( $presenters as $i => $presenter ) {
-			array_push( $performers, Shortcodes::get_performer( $presenter, $link ) );
+			$performer = Shortcodes::get_performer( $presenter, $link );
+			if ( ! empty( $performer ) ) {
+				array_push( $performers, $performer );
+			}
 		}
 
 		if ( ! empty( $performers ) ) {
@@ -1507,7 +1517,7 @@ class Events {
 		$arlo_location = \ArloTraining\Utilities::get_filter_keys_string_array( 'location' );
 		$arlo_venue    = \ArloTraining\Utilities::get_att_string( 'venue' );
 		$arlo_delivery = \ArloTraining\Utilities::get_filter_keys_int_array( 'delivery' );
-		$arlo_state    = \ArloTraining\Utilities::clean_string_url_parameter( 'arlo-state' );
+		$arlo_state    = \ArloTraining\Utilities::get_sanitized_request_parameter( 'arlo-state' );
 
 		$arlo_locationhidden = \ArloTraining\Utilities::get_filter_keys_string_array( 'locationhidden' );
 		$arlo_deliveryhidden = \ArloTraining\Utilities::get_filter_keys_int_array( 'deliveryhidden' );

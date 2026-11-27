@@ -18,6 +18,7 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
 
 use ArloTraining\VersionHandler;
 use ArloTraining\CacheControl;
+use ArloTraining\Utilities;
 
 class Arlo_For_Wordpress_Lists extends WP_List_Table {
 	public $singular;
@@ -91,7 +92,7 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table {
 			{$wpdb->prefix}arlo_timezones
 		WHERE
 			import_id = %d
-		ORDER BY name		
+		ORDER BY name
 		",
 			$this->import_id
 		);
@@ -178,7 +179,7 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table {
 			$search_fields = $this->get_searchable_fields();
 			foreach ( $search_fields as $field ) {
 				$search_where[]     = $field . " LIKE %s";
-				$search_parameter[] = '%' . $wpdb->esc_like( wp_unslash( $s ) ) . '%';
+				$search_parameter[] = '%' . $wpdb->esc_like( $s ) . '%';
 			}
 		}
 
@@ -274,6 +275,24 @@ class Arlo_For_Wordpress_Lists extends WP_List_Table {
 
 	public function get_sortable_columns() {
 		die( 'function Arlo_For_Wordpress_Lists::get_sortable_columns() must be over-ridden in a sub-class.' );
+	}
+
+	/**
+	 * Whether to show the links that open a record in the Arlo management console.
+	 *
+	 * The Edit row actions and the New and Manage buttons on the list screens let an administrator jump from a record
+	 * in the WordPress admin straight to the connected record in the platform's Arlo management console. The demo
+	 * platform (Arlo_For_Wordpress::DEFAULT_PLATFORM, connected by "Test with demo data") is shared sample data with
+	 * no management console for the site's administrator, so those links would lead nowhere useful and are hidden.
+	 * They are hidden too while no platform is connected. The View links go to the site itself and are not affected.
+	 *
+	 * @return bool
+	 */
+	public function should_show_arlo_manage_record_link(): bool {
+		// Stored values from older versions can include a scheme, a trailing slash or the .arlo.co suffix.
+		$platform = strtolower( Utilities::normalize_platform_name( (string) $this->platform_name ) );
+
+		return '' !== $platform && Arlo_For_Wordpress::DEFAULT_PLATFORM !== $platform;
 	}
 
 	public function get_new_link() {

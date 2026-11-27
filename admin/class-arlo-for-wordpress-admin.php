@@ -104,6 +104,7 @@ class Arlo_For_Wordpress_Admin {
 		add_action( 'admin_post_arlo_custom_css_discard', [ $this, 'discard_custom_css' ] );
 
 		add_action( 'admin_init', array( $this, 'check_plugin_version' ) );
+		add_action( 'admin_init', array( 'Arlo_For_Wordpress', 'maybe_flush_rewrite_rules' ) );
 	}
 
 	/**
@@ -115,10 +116,8 @@ class Arlo_For_Wordpress_Admin {
 	 */
 
 	public function check_plugin_version( $plugin ) {
-		global $wp_rewrite;
 		$plugin = Arlo_For_Wordpress::get_instance();
 		$plugin->check_plugin_version();
-		$wp_rewrite->flush_rules();
 	}
 
 	/**
@@ -245,8 +244,9 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script-cookie', plugins_url( '../public/assets/js/libs/js.cookie.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, false );
 		// Depends on the global script so the arloAdmin data it reads is printed first.
-		wp_enqueue_script( $this->plugin_slug . '-arlo-for-wordpress-script', plugins_url( 'assets/js/arlo_for_wordpress.js', __FILE__ ), array( 'jquery', 'jquery-ui-core', 'wp-pointer', $this->plugin_slug . '-plugin-script-cookie', $this->plugin_slug . '-admin-global-script' ), VersionHandler::VERSION, false );
+		wp_enqueue_script( $this->plugin_slug . '-arlo-for-wordpress-script', plugins_url( 'assets/js/arlo_for_wordpress.js', __FILE__ ), array( 'jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'wp-pointer', $this->plugin_slug . '-plugin-script-cookie', $this->plugin_slug . '-admin-global-script' ), VersionHandler::VERSION, false );
 		wp_enqueue_script( $this->plugin_slug . '-admin-script', plugins_url( 'assets/js/admin.js', __FILE__ ), array( 'jquery' ), VersionHandler::VERSION, false );
+		$this->add_settings_inline_data();
 		wp_enqueue_script( $this->plugin_slug . '-custom-css-migration', plugins_url( 'assets/js/custom-css-migration.js', __FILE__ ), [ 'wp-i18n' ], VersionHandler::VERSION, true );
 		wp_localize_script(
 			$this->plugin_slug . '-custom-css-migration',
@@ -263,15 +263,25 @@ document.addEventListener('DOMContentLoaded', function () {
 				'blocked'      => __( 'This CSS cannot be migrated until the items marked "Must fix" are resolved. Edit it in the editor above and check again.', 'arlo-training-and-event-management-system' ),
 				'empty'        => __( 'There is no CSS in the editor to migrate. Put your CSS back in the editor to migrate it, or use Discard this CSS below if you no longer need it.', 'arlo-training-and-event-management-system' ),
 				'mustFix'      => __( 'Must fix', 'arlo-training-and-event-management-system' ),
+				'autoFixed'    => __( 'Will be adjusted during migration (automatically)', 'arlo-training-and-event-management-system' ),
+				'fixHint'      => __( 'Fix:', 'arlo-training-and-event-management-system' ),
+				'reviewFirst'  => __( 'Nothing has been migrated yet. Review these changes, then select the button again to continue.', 'arlo-training-and-event-management-system' ),
+				'noAction'     => __( 'No action is needed.', 'arlo-training-and-event-management-system' ),
 				'warnings'     => __( 'Findings', 'arlo-training-and-event-management-system' ),
 				'checkFailed'  => __( 'The check failed:', 'arlo-training-and-event-management-system' ),
 				'edited'       => __( 'Your CSS changed while it was being checked, so nothing was migrated. Check it again, or migrate when you are ready.', 'arlo-training-and-event-management-system' ),
+				'stale'        => __( 'You have edited the CSS since this check, so line numbers may have moved. Select Check migration readiness to refresh.', 'arlo-training-and-event-management-system' ),
 				'newTab'       => __( '(opens in a new tab)', 'arlo-training-and-event-management-system' ),
 				'unsaved'      => __( 'Your changes in this editor have not been migrated and will be lost if you leave this page.', 'arlo-training-and-event-management-system' ),
 				/* translators: 1: CSS line number, 2: finding description. */
 				'line'         => __( 'Line %1$d: %2$s', 'arlo-training-and-event-management-system' ),
 				/* translators: 1: CSS line number, 2: position on that line, 3: finding description. */
 				'linePosition' => __( 'Line %1$d, pos %2$d: %3$s', 'arlo-training-and-event-management-system' ),
+				/* translators: %d: CSS line number. This is the link at the start of a finding. */
+				'lineLabel'    => __( 'Line %d', 'arlo-training-and-event-management-system' ),
+				/* translators: 1: CSS line number, 2: position on that line. This is the link at the start of a finding. */
+				'posLabel'     => __( 'Line %1$d, pos %2$d', 'arlo-training-and-event-management-system' ),
+				'goTo'         => __( '(moves the cursor there in the editor)', 'arlo-training-and-event-management-system' ),
 			]
 		);
 	}
@@ -683,6 +693,13 @@ document.addEventListener('DOMContentLoaded', function () {
 			$new['post_types'] = ( is_array( $old ) && isset( $old['post_types'] ) && is_array( $old['post_types'] ) ) ? $old['post_types'] : [];
 		}
 
+		// A submitted entry without a host page keeps the stored one, so a partial entry neither unmaps nor re-parents.
+		foreach ( $new['post_types'] as $id => $post_type ) {
+			if ( is_array( $post_type ) && ! array_key_exists( 'posts_page', $post_type ) && isset( $old['post_types'][ $id ]['posts_page'] ) ) {
+				$new['post_types'][ $id ]['posts_page'] = $old['post_types'][ $id ]['posts_page'];
+			}
+		}
+
 		$new_custom_shortcode        = isset( $new["new_custom_shortcode"] ) && is_scalar( $new["new_custom_shortcode"] ) ? (string) $new["new_custom_shortcode"] : '';
 		$new_custom_shortcode_type   = isset( $new["new_custom_shortcode_type"] ) && is_scalar( $new["new_custom_shortcode_type"] ) ? (string) $new["new_custom_shortcode_type"] : '';
 		$delete_shortcode            = isset( $new["delete_shortcode"] ) && is_scalar( $new["delete_shortcode"] ) ? (string) $new["delete_shortcode"] : '';
@@ -1021,7 +1038,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		// need to check for posts-page change here
 		// loop through each post type and check if the posts-page has changed
 		foreach ( $new['post_types'] as $id => $post_type ) {
-			if ( isset( $old['post_types'][ $id ]['posts_page'] ) && $old['post_types'][ $id ]['posts_page'] != $new['post_types'][ $id ]['posts_page'] ) {
+			if ( isset( $old['post_types'][ $id ]['posts_page'], $new['post_types'][ $id ]['posts_page'] ) && $old['post_types'][ $id ]['posts_page'] != $new['post_types'][ $id ]['posts_page'] ) {
 				$posts = get_posts(
 					array(
 						'posts_per_page' => -1,
@@ -1055,5 +1072,53 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 		$stored_themes_settings[ $theme_id ]->templates = $templates;
 		update_option( 'arlo_themes_settings', $stored_themes_settings, 1 );
+	}
+
+	/**
+	 * Attaches the settings screen's inline script data to its scripts.
+	 *
+	 * The data is read by globals, so the data scripts print before the scripts that read it. Call this
+	 * only on the settings screen, after the settings scripts are enqueued.
+	 *
+	 * @return void
+	 */
+	private function add_settings_inline_data(): void {
+		$inline = '';
+		foreach ( $this->get_settings_client_state() as $name => $value ) {
+			$inline .= 'var ' . $name . ' = ' . wp_json_encode( $value, JSON_HEX_TAG ) . ';';
+		}
+
+		wp_add_inline_script( $this->plugin_slug . '-admin-script', $inline, 'before' );
+
+		// Attached to the settings script so it prints even when that script's file fails to load.
+		wp_add_inline_script(
+			$this->plugin_slug . '-arlo-for-wordpress-script',
+			"// Fail-safe: don't leave the settings UI hidden forever if the settings JS fails to initialise.
+document.addEventListener('DOMContentLoaded', function () {
+	window.setTimeout(function () {
+		var wrap = document.querySelector('.arlo-sections-wrap');
+		if (wrap) {
+			wrap.classList.remove('arlo-initializing');
+		}
+	}, 4000);
+});",
+			'before'
+		);
+	}
+
+	/**
+	 * Collects the state the settings screen's scripts read from globals, keyed by global name.
+	 *
+	 * @return array<string, array>
+	 */
+	protected function get_settings_client_state(): array {
+		$scheduler = Arlo_For_Wordpress::get_instance()->get_scheduler();
+
+		return array(
+			'arlo_templates'       => Arlo_For_Wordpress::arlo_template_source(),
+			'arlo_shortcodes'      => array_keys( Arlo_For_Wordpress::get_templates() ),
+			'ArloImmediateTaskIDs' => array_values( wp_list_pluck( $scheduler->get_next_immediate_tasks(), 'task_id' ) ),
+			'ArloRunningTaskIDs'   => array_values( wp_list_pluck( array_merge( $scheduler->get_running_tasks(), $scheduler->get_paused_tasks() ), 'task_id' ) ),
+		);
 	}
 }

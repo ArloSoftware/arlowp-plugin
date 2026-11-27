@@ -22,7 +22,7 @@ if ( ! empty( $instance['templatetag'] ) ) {
 	$arlo_templatetag = " templatetag='" . rawurlencode( $instance['templatetag'] ) . "' ";
 }
 
-$arlo_template = ! empty( $instance['template'] ) ? $instance['template'] : arlo_get_template( 'upcoming_widget' );
+$arlo_template = ! empty( $instance['template'] ) && is_string( $instance['template'] ) ? $instance['template'] : arlo_get_template( 'upcoming_widget' );
 
 $arlo_content = "[arlo_upcoming_widget_list $arlo_limit $arlo_eventtag $arlo_templatetag ]" . $arlo_template . "[/arlo_upcoming_widget_list]";
 

@@ -124,11 +124,10 @@ class Offers {
 		}
 
 		// order
-		if ( ! empty( $order ) ) {
-			$order = ' ORDER BY ' . implode( ', ', $order );//ReviewNote, the value in $order is string literals defined in PHP, no parameter there.
-		}
+		$order = QueryShape::build_order_clause( $order );
 
-		$join = implode( "\n", $join ); //ReviewNote, the value in $join is string literals, no parameter there.
+		// Join fragments are fixed literals written in this file; callers cannot supply them.
+		$join = implode( "\n", $join );
 
 		$query = $wpdb->prepare( $query . $join . $where . $order, $parameters );// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The SQL statement is dynamically constructed and parameters are prepared here.
 

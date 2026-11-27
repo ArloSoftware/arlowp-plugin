@@ -61,8 +61,10 @@ if (typeof (Arlo) === "undefined") {
 				me.initRegionFields();
 				me.initFilterSettingsFields();
 				me.initDeploymentModeField();
+				me.initImporterModeField();
 				me.initLogRetentionField();
 				me.initLegacyRegionIdHandlingField();
+				me.initRegionIdWarning();
 				me.initPoweredByOptIn();
 				me.getLastImportLog();
 
@@ -1021,6 +1023,15 @@ if (typeof (Arlo) === "undefined") {
 				});
 			}
 		},
+		initImporterModeField: function() {
+			var $sel = $('#importer_mode');
+			var $hint = $sel.siblings('.arlo-importer-mode-hint');
+			if ($sel.length && $hint.length) {
+				$sel.on('change', function() {
+					$hint.toggle($sel.val() === 'full_delta');
+				});
+			}
+		},
 		initLogRetentionField: function() {
 			var $select = $('#log_retention_max_rows');
 			var $warning = $('#arlo-log-retention-warning');
@@ -1073,6 +1084,33 @@ if (typeof (Arlo) === "undefined") {
 			});
 			updateWarnings();
 		},
+		initRegionIdWarning: function() {
+			var $warning = $('#arlo-region-id-warning');
+			var pattern = $('#arlo-region-empty .arlo-region-id input').attr('pattern');
+			if (!$warning.length || !pattern) {
+				return;
+			}
+
+			// The rule is the input's own pattern attribute, which browsers anchor, so it is anchored the same way here.
+			var validRegionId = new RegExp('^(?:' + pattern + ')$');
+			var updateWarning = function() {
+				var invalid = false;
+				$('#arlo-regions .arlo-region-id input').each(function() {
+					var value = $.trim($(this).val());
+					if (value !== '' && !validRegionId.test(value)) {
+						invalid = true;
+					}
+				});
+				$warning.css('display', invalid ? 'flex' : 'none');
+			};
+
+			$('#arlo-regions').on('input', '.arlo-region-id input', updateWarning);
+			// Removing a row fires no input event; defer so the row is gone before the remaining IDs are checked.
+			$('#arlo-regions').on('click', 'li .arlo-icons8-minus', function() {
+				window.setTimeout(updateWarning, 0);
+			});
+			updateWarning();
+		},
 		initPoweredByOptIn: function() {
 			var me = this,
 				notice = $('#arlo-powered-by-opt-in-notice'),
@@ -1084,6 +1122,18 @@ if (typeof (Arlo) === "undefined") {
 
 			if (!notice.length) {
 				return;
+			}
+
+			// The Misc checkbox mirrors the answer given in this banner. A site that has not answered renders no hidden "0" field there,
+			// so once the banner records an answer, add it: unticking the Misc checkbox later is then saved as an explicit opt-out.
+			// The field only ever submits "0". Showing the credit still requires ticking a visible checkbox.
+			function addOptOutFieldToSettingsForm() {
+				var name = settingsCheckbox.attr('name');
+
+				if (!settingsCheckbox.length || !name || form.find('input[type="hidden"][name="' + name + '"]').length) {
+					return;
+				}
+				$('<input>', { type: 'hidden', name: name, value: '0' }).insertBefore(settingsCheckbox);
 			}
 
 			function showFailure() {
@@ -1117,6 +1167,7 @@ if (typeof (Arlo) === "undefined") {
 						return;
 					}
 					savedChoice = value;
+					addOptOutFieldToSettingsForm();
 					settingsCheckbox.prop('checked', value === '1');
 					if (dismiss) {
 						notice.remove();

@@ -334,25 +334,29 @@ class Importer {
 		$settings = get_option( 'arlo_settings' );
 
 		if ( ! empty( $settings['taxexempt_tag'] ) ) {
+			// Recomputes every event so a previously configured tag cannot leave its events exempt.
 			$sql = $wpdb->prepare(
 				"
 			UPDATE
-				{$wpdb->prefix}arlo_events AS e,
-				{$wpdb->prefix}arlo_events_tags AS et,
-				{$wpdb->prefix}arlo_tags AS t
+				{$wpdb->prefix}arlo_events AS e
 			SET
-				e_is_taxexempt = 1
+				e.e_is_taxexempt = CASE WHEN EXISTS (
+					SELECT 1
+					FROM
+						{$wpdb->prefix}arlo_events_tags AS et,
+						{$wpdb->prefix}arlo_tags AS t
+					WHERE
+						t.tag = %s
+					AND
+						t.id = et.tag_id
+					AND
+						et.e_id = e.e_id
+					AND
+						et.import_id = %d
+					AND
+						t.import_id = %d
+				) THEN 1 ELSE 0 END
 			WHERE
-				t.tag = %s
-			AND
-				t.id = et.tag_id
-			AND
-				et.e_id = e.e_id
-			AND
-				et.import_id = %d
-			AND
-				t.import_id = %d
-			AND
 				e.import_id = %d
 			",
 				[ trim( $settings['taxexempt_tag'] ), $import_id, $import_id, $import_id ]
@@ -463,6 +467,7 @@ class Importer {
 
 	/**
 	 * Seals the configured mode into one immutable new-session admission result.
+	 * Delta is best effort: any mode that cannot safely run is admitted as the full import, the safest and most reliable mode, so an import still runs.
 	 *
 	 * @param string $mode Metadata-free configured importer mode.
 	 * @return string Admitted importer mode for the current session.
@@ -921,8 +926,8 @@ class Importer {
 	public function handle_import_error( $num, $str, $file, $line, $context = null ) {
 		error_log( $str . ' in ' . $file . ' on line ' . $line ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Logging errors for debugging purposes.
 
-		//pretty nasty, but need to know if our plugin throws the error or something else (like a cache plugin)
-		//arlo- is in case $file would not include the path; just 'arlo' would catch all errors for hosted servers like vanguard.wpdemo.arlo.co where domain is used in the plugin file path
+		// Only errors raised by this plugin should abort the import; errors from other code, such as a cache plugin, are left alone.
+		// Match 'arlo-' or 'arlowp' rather than a bare 'arlo', which would also match every file on a host whose directory path contains an Arlo domain name.
 		if ( strpos( $file, 'arlo-' ) !== false || strpos( $file, 'arlowp' ) !== false ) {
 
 			// specific error for file permission
@@ -943,7 +948,7 @@ class Importer {
 	 * the snapshot callback, self-kicks the scheduler, or completes a terminal
 	 * delta no-op. Retryable exceptions are paused and deferred with backoff;
 	 * exhausted retries, SchedulerException, PlatformAccessHttpException,
-	 * SnapshotProcessException, and DeltaFatalException fail terminally. Post-switch Finish failures are
+	 * non-retryable FragmentAccessHttpException, SnapshotProcessException, and DeltaFatalException fail terminally. Post-switch Finish failures are
 	 * recorded as cleanup debt rather than failed imports.
 	 *
 	 * @param object|null $task_state Decoded task state for a resumed import, or null to start fresh.
@@ -1103,6 +1108,7 @@ class Importer {
 			if ( $can_retry
 				&& ! ( $e instanceof \ArloTraining\SchedulerException )
 				&& ! ( $e instanceof \ArloTraining\PlatformAccessHttpException )
+				&& ! ( $e instanceof \ArloTraining\FragmentAccessHttpException && ! $e->is_retryable() )
 				&& ! ( $e instanceof \ArloTraining\SnapshotProcessException )
 				&& ! ( $e instanceof \ArloTraining\DeltaFatalException ) ) {
 				// pause the task and defer the retry with an escalating backoff so a
@@ -1378,17 +1384,18 @@ class Importer {
 							Logger::log_error( "JSON Decode error: " . json_last_error_msg(), $this->import_id );
 						}
 
-						if ( ! empty( $callback_json->SnapshotUri ) ) {
+						if ( ! empty( $callback_json->SnapshotUri ) && is_string( $callback_json->SnapshotUri ) ) {
 							$this->current_task_class->uri              = $callback_json->SnapshotUri;
 							$this->current_task_class->import_part      = "image";
 							$this->current_task_class->import_iteration = null;
 							$this->current_task_class->response_json    = json_decode( $import->response_json );
 							$this->configure_snapshot_manifest_admission( $callback_json, $this->current_task_class->response_json );
 							Logger::log_diagnostic( Logger::DIAGNOSTIC_VERBOSITY_DEBUG, 'Snapshot image download prepared from Arlo callback [snapshot_uri=' . $callback_json->SnapshotUri . ']', $this->import_id );
-						} elseif ( ! empty( $callback_json->Error ) ) {
+						} elseif ( ! empty( $callback_json->Error ) && is_object( $callback_json->Error ) ) {
 							$error_code = ( isset( $callback_json->Error->Code ) && is_scalar( $callback_json->Error->Code ) ) ? (string) $callback_json->Error->Code : 'unknown';
+							$error_text = ( isset( $callback_json->Error->Message ) && is_scalar( $callback_json->Error->Message ) ) ? (string) $callback_json->Error->Message : 'unknown';
 							Logger::log_diagnostic( Logger::DIAGNOSTIC_VERBOSITY_DEBUG, 'Arlo snapshot callback returned an error [code=' . $error_code . ']', $this->import_id );
-							Logger::log_error( $callback_json->Error->Code . ': ' . $callback_json->Error->Message, $this->import_id );
+							Logger::log_error( $error_code . ': ' . $error_text, $this->import_id );
 						} elseif ( ! empty( $callback_json->__jwe__ ) ) {
 							Logger::log_error( 'Snapshot callback payload is not ready for Download; callback_json contains encrypted callback data but no SnapshotUri or Error.', $this->import_id, null, false, \ArloTraining\SnapshotProcessException::class );
 						} else {
@@ -2045,10 +2052,11 @@ class Importer {
 			throw new \Exception( 'Encryption key missing from import entry response' );
 		}
 		$original_response = json_decode( $import_entry->response_json );
-		if ( ! is_object( $original_response ) || ! isset( $original_response->Callback->EncryptedResponse->key->k ) ) {
+		// The stored response is plugin-written JSON, but a damaged row must fail here rather than reach the string cast or decryption.
+		if ( ! is_object( $original_response ) || ! isset( $original_response->Callback->EncryptedResponse->key->k ) || ! is_string( $original_response->Callback->EncryptedResponse->key->k ) || '' === $original_response->Callback->EncryptedResponse->key->k ) {
 			throw new \Exception( 'Encryption key missing from import entry response' );
 		}
-		return (string) $original_response->Callback->EncryptedResponse->key->k;
+		return $original_response->Callback->EncryptedResponse->key->k;
 	}
 
 	/**

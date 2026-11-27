@@ -55,9 +55,7 @@ class Templates {
 		}
 
 		// order
-		if ( ! empty( $order ) ) {
-			$query .= ' ORDER BY ' . implode( ', ', $order );
-		}
+		$query .= QueryShape::build_order_clause( $order );
 
 		$query = $wpdb->prepare( $query, $parameters );// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The SQL statement is dynamically constructed and parameters are prepared here.
 

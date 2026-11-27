@@ -3,7 +3,7 @@ Contributors: arlosoftware
 Tags: event registration, event management, events, courses, course management
 Requires at least: 7.0
 Tested up to: 7.1
-Stable tag: 5.2.1
+Stable tag: 5.2.2
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -108,6 +108,10 @@ Nothing is sent when the plugin is installed or activated on a new install. Conn
 * Platform name check: when you save a new platform name, your server makes a short request to that platform to confirm it exists. The request carries WordPress's standard User-Agent, which includes the WordPress version and your site URL.
 * Images: event and presenter images are loaded by each visitor's browser from the image URLs in your Arlo content, which are usually hosted by Arlo. Because that content is authored in your Arlo account, it can also include images from other sites if you add them. The demonstration data used by *Test with demo data* includes example images hosted by Arlo, and is only used if you choose that option. Loading an image discloses the visitor's IP address and browser details to the host serving it.
 * Links: registration and event links go to your Arlo platform only when a visitor follows them.
+* Presenter social links: when your Arlo data includes a presenter's Facebook, LinkedIn or Twitter ID, the presenter shortcodes can link to that profile on `facebook.com`, `www.linkedin.com` or `twitter.com`. The links load nothing, and nothing is sent to those sites until a visitor follows one.
+* Private event links: private events are not imported, so your site has no page for them. When a visitor follows an Arlo link for a private event to your site, the plugin redirects them (HTTP 301) to that event on your Arlo platform (`{platform}.arlo.co`). This happens only when the visitor requests that address. The plugin includes the event ID and the link's `e` or `t` value in the redirect address, without appending other visitor data. Following the redirect discloses the visitor's IP address and browser details to Arlo.
+* Admin links: links in the WordPress admin open another site only when you click them, and they open in a new tab. Most go to Arlo. They are the *Edit* links, and the buttons and links to create or manage records in Arlo, on the *Events*, *Online Activities*, *Templates*, *Sessions*, *Presenters* and *Venues* screens, which open your Arlo management console (`{platform}.arlo.co`), and links to Arlo support (`support.arlo.co`) and developer documentation (`developer.arlo.co`). Nothing is sent to Arlo until you click. The *Presenters* screen also links to a presenter's Twitter, Facebook and LinkedIn profiles when your Arlo data includes them, and nothing is sent to those sites until you click. While the plugin is connected to the demo platform, an admin notice also links to Arlo's trial sign-up (`www.arlo.co/register`), `www.arlo.co` and the developer documentation (`developer.arlo.co`), and nothing is sent until you click. A console link carries the ID of the record in its address. The console links are not shown while the plugin is connected to the demo platform (*Test with demo data*), because demo data has no management console to open.
+* Credit link (off by default): the *Powered by Arlo* credit is hidden unless an administrator opts in, from the one-time notice on the Arlo settings screen or under *Arlo > Settings > Misc*. When it is on, it appears on Arlo pages and widgets whose templates contain the `[arlo_powered_by]` shortcode, as a small logo linking to `www.arlo.co` that opens in a new tab. The logo is a file bundled with the plugin, so nothing is loaded from Arlo, and nothing is sent to Arlo until a visitor follows the link.
 
 [Terms](https://www.arlo.co/legal/master-subscription-agreement) | [Privacy policy](https://www.arlo.co/legal/privacy-policy)
 
@@ -122,32 +126,36 @@ Used to show venue maps. Only enabled once you enter your own Google Maps API ke
 
 == Privacy ==
 
-= Cookie =
+= Cookies =
+**Visitors (`arlo-region`)**
+
 If your Arlo platform uses regions and they are configured in the plugin, it sets one first-party cookie, `arlo-region`, in the visitor's browser. Sites without regions do not set it. It stores only the region code the visitor is viewing, or the default region for a visitor who has not chosen one, and is used by your site to show events for that region. It is set when a visitor views your site and when the visitor changes region with the region selector, and it lasts up to 30 days by default. The plugin does not send it to Arlo or any other service.
+
+**Administrators (`arlo-current-tab`)**
+
+When an administrator uses *Arlo > Settings*, the plugin sets one first-party cookie, `arlo-current-tab`, in that administrator's browser to remember which settings tab was open. It stores only the tab names, lasts 7 days, and is not set for visitors. The plugin does not send it to Arlo or any other service.
 
 = Your own privacy notices =
 This section describes what the plugin does so you can reflect it in your own privacy notice. Site owners are responsible for their own privacy notices and any consent requirements that apply to them.
 
 == Third-party code and credits ==
 
-This plugin is licensed GPLv2 or later. It bundles the third-party components listed below under the MIT, Apache-2.0, CC BY 4.0 (icons) and SIL OFL 1.1 (fonts) licences. Copyright lines, licence texts and per-file details are in THIRD-PARTY-NOTICES.txt in the plugin folder.
+This plugin is licensed GPLv2 or later. It bundles the third-party components listed below under the MIT, CC BY 4.0 (icons) and SIL OFL 1.1 (fonts) licences. Copyright lines, licence texts and per-file details are in THIRD-PARTY-NOTICES.txt in the plugin folder.
 
-The Arlo source code for this plugin is developed in the open at https://github.com/ArloSoftware/arlowp-plugin. The third-party libraries below are bundled as published by their authors (Arlo's changes to the Bootstrap 3 CSS are described in THIRD-PARTY-NOTICES.txt), including their minified (`*.min.js`, `*.min.css`) files. This plugin has no build step for them, and the non-minified source of each one is available at the upstream address given.
+The Arlo source code for this plugin is developed in the open at https://github.com/ArloSoftware/arlowp-plugin. The third-party libraries below are bundled as published by their authors (Arlo's changes to the Bootstrap 3 CSS are described in THIRD-PARTY-NOTICES.txt, which also says that `slick.min.css` is a minified copy of slick's `slick.css`), including their minified (`*.min.js`, `*.min.css`) files. This plugin has no build step for them, and the non-minified source of each one is available at the upstream address given.
 
-* Bootstrap 3.4.1 (JavaScript) - MIT - https://github.com/twbs/bootstrap/tree/v3.4.1 - `public/custom-assets/bootstrap.min.js`
-* Bootstrap collapse plugin 3.2.0 - MIT - https://github.com/twbs/bootstrap/tree/v3.2.0 - `public/custom-assets/collapse.min.js`
 * Bootstrap 3 CSS, namespaced and modified (based on 3.3.x) - MIT - https://github.com/twbs/bootstrap/tree/v3.3.4 - `themes/starter*/css/bootstrap.css`, `public/assets/css/libs/bootstrap-modals.css`
 * normalize.css - MIT - https://github.com/necolas/normalize.css - `themes/*/css/style.css`, `themes/theme.z/scss/_normalize.scss` (8.0.1)
-* selectize.js 0.12.4 - Apache-2.0 - https://github.com/selectize/selectize.js/tree/v0.12.4 - `public/custom-assets/selectize.min.js`
 * slick 1.7.1 - MIT - https://github.com/kenwheeler/slick/tree/1.7.1 - `public/custom-assets/slick-1.7.1/`
 * tingle 0.12.0 - MIT - https://github.com/robinparisi/tingle/tree/v0.12.0 - `public/custom-assets/tingle/`
 * darktooltip 0.1.8 - MIT - https://github.com/rubentd/darktooltip/tree/v0.1.8 - `public/assets/js/libs/jquery.darktooltip.min.js`, `public/assets/css/libs/darktooltip.min.css`
 * js-cookie 3.0.8 - MIT - https://github.com/js-cookie/js-cookie/tree/v3.0.8 - `public/assets/js/libs/js.cookie.js`
 * Font Awesome 4.7.0 - fonts SIL OFL 1.1, CSS MIT - https://fontawesome.com/v4/license/ - `public/custom-assets/font-awesome-4.7.0/`, the glyph subsets in `public/custom-assets/arlo-icon-compat/`, and the Arlo icon stylesheets that use these glyphs (`admin/assets/css/arlo-icons.css`, `themes/*/css/arlo-icons.css`, `themes/*/css/fonts.css`, `themes/be.software.designers/css/arlo-web-controls.css`)
-* Font Awesome Free 6.7.2 - icons CC BY 4.0, fonts SIL OFL 1.1, code MIT - https://github.com/FortAwesome/Font-Awesome/tree/6.7.2 - `themes/theme.z/`
-* Swiper 8.4.7 - MIT - https://github.com/nolimits4web/swiper/tree/v8.4.7 - `themes/theme.z/`
+* Font Awesome Free 7.3.1 - icons CC BY 4.0, fonts SIL OFL 1.1, code MIT - https://github.com/FortAwesome/Font-Awesome/tree/7.3.1 - `themes/theme.z/`
+* Swiper 14.4.0 - MIT - https://github.com/nolimits4web/swiper/tree/v14.4.0 - `themes/theme.z/`
 * Poppins - SIL OFL 1.1 - https://github.com/itfoundry/Poppins - `themes/theme.z/fonts/`
-* CodeMirror 5 stylesheet (5.10.0 or 5.11.0) - MIT - https://github.com/codemirror/codemirror5/tree/5.11.0 - `admin/assets/css/libs/codemirror.css`
+
+**Versions kept on purpose.** Some bundled libraries are older than the latest upstream release: the Bootstrap 3 CSS (Bootstrap 3 is end of life; the stylesheets are modified copies of 3.3.x), slick 1.7.1, tingle 0.12.0, darktooltip 0.1.8 and Font Awesome 4.7.0 (the final Font Awesome 4 release). They stay at these versions because the plugin, its bundled themes and existing deployments are built on them, and a newer release would change how they look or behave. For Bootstrap, slick and Font Awesome, the upstream projects document breaking changes in their newer releases. For tingle and darktooltip, the newer releases change the modal and tooltip markup and behaviour. Only the Bootstrap 3 stylesheets are bundled, not its JavaScript. The security advisories published for Bootstrap 3 concern its JavaScript plugins (for example collapse, tooltip and popover), so they do not apply to the stylesheets. No published security advisory was found for slick, tingle, darktooltip or Font Awesome 4.7.0 (OSV, GitHub Advisory Database and NVD, checked 15 November 2026). THIRD-PARTY-NOTICES.txt gives the reason for each library.
 
 == Installation ==
 = From your WordPress dashboard =
@@ -193,7 +201,19 @@ Registration and payment happen on Arlo's checkout, not on your WordPress site. 
 
 = How often does my site update from Arlo? =
 
-A site set to the *Production* deployment mode checks for new data automatically in the background about every 30 minutes. A site set to *Non-production* (for staging or test sites) syncs daily, or weekly when it uses the demo platform. To update straight away, save your settings and select *Synchronize now* in *Arlo > Settings*. Large platforms can take several minutes to import.
+A site set to the *Production* deployment mode checks for new data automatically in the background about every 30 minutes. A site set to *Non-production* (for staging or test sites) syncs daily, or weekly when it uses the demo platform. Saving settings for the first time with no platform or the demo platform sets *Non-production*, which you can change at any time. To update straight away, save your settings and select *Synchronize now* in *Arlo > Settings*. Large platforms can take several minutes to import.
+
+= What does the Importer mode setting do? =
+
+*Arlo > Settings > Misc* shows an *Importer mode* setting. *Default* always imports the full data and is the most reliable option for any dataset size. *Default + Delta (experimental)* is a best-effort optimisation that applies only the changes since the last import. It is available to every site and is off by default. Delta import is not guaranteed: if it cannot be used, the import continues automatically with the full import, which gives the same result. Delta needs InnoDB database tables. Without them the setting is shown disabled and full imports are used.
+
+= Is any part of the plugin locked or limited? =
+
+No. Every feature of the plugin is available on every site. Nothing in the plugin is locked, limited, or switched off by a licence key, trial period, usage limit, or plan. Where a feature has a technical precondition (for example, *Default + Delta* importer mode needs InnoDB database tables), the settings screen says so.
+
+= Does the plugin add a Powered by Arlo link to my site? =
+
+Not unless you choose it. The *Powered by Arlo* credit is off by default and is shown only after an administrator ticks the box in the one-time notice on the Arlo settings screen, or in *Arlo > Settings > Misc*. It appears only where a template contains the `[arlo_powered_by]` shortcode, links to `www.arlo.co`, and no feature depends on it.
 
 = Why is my template read only? =
 
@@ -246,6 +266,51 @@ Arlo Training Management Software is written in English. Translations can be con
 
 
 == Changelog ==
+
+= 5.2.2 =
+* Improvement: Updated Swiper (Theme Z) to 14.4.0 and Font Awesome Free (Theme Z) to 7.3.1.
+* Improvement: The Starter themes no longer load Bootstrap 3 JavaScript or selectize.js. Their filter and event card panels now use a small Arlo script instead. Custom code on those themes that uses Bootstrap's dropdown, tab, modal or carousel, collapse events, data-parent accordions or .selectize() needs to load its own copy of the library.
+* Improvement: The third-party credits now match the bundled files, and an unused CodeMirror stylesheet was removed.
+* Improvement: The Starter themes' stylesheets are about 45% smaller. Rules that no Starter template, script or widget uses were removed. Pages render the same as before.
+* Improvement: The "Powered by Arlo" opt-in notice now previews the credit, and a site that was showing it before the 5.2.0 upgrade is labelled "Previously enabled".
+* Improvement: Theme Z's presenter events slider now uses Swiper 14, which needs Chrome or Edge 110, Safari 16.4 or Firefox 110 or later. On an older browser the slider may not work and only the first events are visible.
+* Improvement: The Edit links on the Arlo admin lists, and the New and Manage buttons above them, open your Arlo management console. They are no longer shown while the plugin is connected to the demo platform (Test with demo data), which has no management console. The External services section now describes these admin links.
+* Improvement: The Importer mode setting now explains that delta import is a best-effort optimisation, and that the import continues with the full import when delta cannot be used.
+* Improvement: The Importer mode setting is always shown, and explains why it is disabled when the database has no InnoDB tables. The Deployment setting now explains Non-production syncing and why a first save sets it.
+* Improvement: Editing the "No events to show" text, the No event on a template text, the "Free" text, the Google Maps API key or the tax exempt tag now saves plain text only.
+* Improvement: Hardened how the wrap attribute of Arlo shortcodes is rendered. A wrap value that is not valid where it is used is now left out. Wrappers around element content are unchanged.
+* Improvement: The canonical URL callbacks wp_canonical_fix() and yoast_canonical_fix() are now filter_canonical_url() and filter_yoast_canonical(). The old names still work but are deprecated. Code that unhooks them with remove_filter() needs the new names.
+* Improvement: Hardened the filter settings. A rename, exclude or show-only rule is now saved only for a value that the filter offers.
+* Improvement: Hardened input checks. Malformed import responses, scheduler requests, widget fields and URL regions are now rejected or ignored without PHP warnings. A URL region that is not one of your regions is no longer saved as the visitor's region preference.
+* Improvement: Hardened the sanitisation of the event search term where it is shown in the search field and the Search widget. The term still displays and submits as typed.
+* Improvement: Hardened the page title and the browser title on filtered event pages. A location or search term in the address still displays as typed.
+* Fix: Zero or invalid resolved pagination limits no longer cause a PHP division-by-zero error; pagination is omitted instead.
+* Fix: The Block theme no longer requests the plugin's public folder as a stylesheet, and Arlo's public assets no longer carry a fixed 20170424 query string.
+* Fix: In the Starter and Starter hero themes, the first click on an event card's expand button no longer leaves the card in the wrong state.
+* Fix: Another plugin's custom post type named event, presenter or venue no longer has its content replaced by Arlo's event, presenter or venue template, and its canonical URL no longer gets a region segment added.
+* Fix: The [arlo_event_template_rich_snippet], [arlo_oa_rich_snippet], [arlo_venue_rich_snippet] and [arlo_presenter_rich_snippet] shortcodes now render nothing when they are used outside their own list item or page, or when the row they describe is incomplete or has no name. Previously a customised template could raise PHP warnings or a fatal error, or output meaningless structured data. Presenters and venues without a page no longer get the address of another page in their structured data.
+* Fix: Rewrite rules are no longer regenerated on every admin request. They are refreshed only when Arlo's page addresses change, and repaired if Arlo's routes go missing.
+* Fix: Saving any Arlo setting while the "Powered by Arlo" opt-in notice was showing recorded the credit as declined and removed the notice. The notice now stays until you answer it.
+* Fix: Visiting the archive of another plugin's custom post type no longer raises PHP "Undefined property" warnings from Arlo's region redirect.
+* Fix: The Arlo Settings page no longer shows every tab stacked, with broken region and filter controls, for administrators who cannot edit templates.
+* Fix: Test with demo data no longer publishes an existing page just because its address matches an Arlo page, such as events. It publishes only the pages assigned as Arlo pages, and the notice now lists any that still need one.
+* Fix: Network activating or deactivating Arlo on a multisite network no longer leaves WordPress switched to another site afterwards, so other plugins' activation and deactivation code runs in the site it was started from.
+* Fix: Upgrading from a release older than 3.3 no longer stops with a fatal error ("Class ArloTraining\Arlo_For_Wordpress not found") when the 3.2 and 3.3 upgrade steps add the Online activities and Schedule pages.
+* Fix: Saving the Arlo Upcoming Events widget no longer removes backslashes from its template, so escaped content such as JSON-LD is no longer saved as invalid JSON. Templates already saved this way need to be edited again.
+* Fix: Backslashes are no longer removed from filter and search values in Arlo page addresses, Arlo widget titles, or searches on the Arlo admin lists.
+* Fix: Arlo no longer changes a canonical URL that is turned off, or the canonical URL of a post or page that is not an Arlo page.
+* Fix: The presenter filter no longer lists presenters from an import that is not live, which could add stale names or list a renamed presenter twice, and a tag ID from an import that is not live no longer resolves to a tag name in page addresses.
+* Fix: Changing the tax exempt tag now clears the tax exempt flag from events that carry only the previous tag, so their prices no longer show without tax.
+* Fix: A delta import that updates event availability now clears the page cache of supported caching plugins (WP Super Cache and W3 Total Cache), so cached pages no longer show old availability until they expire.
+* Fix: Saving the settings with a host page missing from a post type entry no longer raises a PHP warning or moves that type's Arlo posts out from under their host page. The stored host page is kept.
+* Fix: On a site that shows prices with tax, the structured data of the [arlo_event_rich_snippet] and [arlo_oa_rich_snippet] shortcodes now compares a replacement offer's price with tax, so the low and high prices are correct when an offer has been replaced.
+* Fix: An import now stops and reports the failure when the database rejects a write to a presenter, venue or event template page, or to a stored snapshot part. Previously the failure was ignored and the import carried on with incomplete data. A failed event template page creation was also ignored.
+* Fix: A failed download of a snapshot fragment is now retried, except when the server answers 400, 401, 403 or 404, which cannot succeed on retry. Fragment download failures no longer count toward disabling sync after repeated platform failures, because fragments are not served by the Arlo platform.
+* Fix: In Theme Z, the catalogue and schedule "Show more" buttons no longer stop working when the filter shortcode is removed or shows no filters, and the next batch of courses keeps the page's active filters and region.
+* Fix: In Theme Z, a customised template that keeps a "Show more" button for a catalogue or schedule category but removes the page wrapper around it no longer stops the page's other lists from loading more.
+* Fix: In Theme Z, each "Show more" button now pages only its own list, so a list with no next page no longer shows "Show more" or loads another list's page. A failed request can now be retried.
+* Fix: In Theme Z, damaged customised markup around the "Show more" buttons or the session popups no longer breaks the other buttons and popups on the page.
+* Fix: Migrating Custom CSS no longer leaves Additional CSS that the Site Editor rejects with "The custom CSS is invalid. Do not use <> markup." A "<" followed by a letter in an inline SVG image address, a comment or a media query is now rewritten in a way that means the same to browsers, the readiness check lists what will be adjusted, and CSS with a "<" that cannot be rewritten safely is listed under "Must fix" and is not migrated until it is changed.
 
 = 5.2.1 =
 * Fix: On block themes, Arlo's stylesheets now load before Additional CSS, so Custom CSS migrated to Additional CSS overrides them as it did before migrating.

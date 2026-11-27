@@ -34,6 +34,37 @@ class SchedulerException extends \Exception {}
 class PlatformAccessHttpException extends \Exception {}
 
 /**
+ * A snapshot fragment file could not be retrieved over HTTP from the snapshot file host.
+ *
+ * Fragments are served from a CDN rather than the Arlo platform API, so a
+ * failure here says nothing about platform availability.
+ *
+ * Remarks:
+ * - Retried like any ordinary step failure, up to the importer's retry
+ *   ceiling, because CDN errors are usually transient.
+ * - The exception code is the HTTP status when a response was received, or 0
+ *   for a failure before one arrived (network error, DNS, redirect handling).
+ * - Terminal when the HTTP status code shows the request
+ *   itself is at fault (400, 401, 403, 404), since repeating it cannot succeed.
+ * - Never counted toward the platform-access health circuit breaker.
+ */
+class FragmentAccessHttpException extends \Exception {
+	/**
+	 * HTTP status codes for which retrying cannot help.
+	 *
+	 * @var int[]
+	 */
+	const NON_RETRYABLE_STATUS_CODES = [ 400, 401, 403, 404 ];
+
+	/**
+	 * @return bool Whether a later attempt may succeed.
+	 */
+	public function is_retryable(): bool {
+		return ! in_array( $this->getCode(), self::NON_RETRYABLE_STATUS_CODES, true );
+	}
+}
+
+/**
  * An inbound platform callback that failed validation — a malformed or
  * oversized body, or an unknown request ID. A bad nonce for a request ID that
  * does match an import is the more specific

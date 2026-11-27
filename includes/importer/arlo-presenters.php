@@ -43,11 +43,7 @@ class Presenters extends AbstractImportStep {
 			$post_config_array['ID'] = $post->ID;
 			$post_id                 = $post->ID;
 			$post_config_array       = $this->sanitise_post_text( $post_config_array, $post_id );
-			$updated                 = $wpdb->update( $wpdb->prefix . 'posts', $post_config_array, array( 'id' => $post_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct update of the plugin-owned Arlo post: importer updates deliberately avoid wp_update_post() so third-party post hooks do not fire for every imported entity. The title and content are sanitised first, as wp_insert_post() does on create, and a changed row is cleared from the core post cache below. Arlo's own caches are invalidated through CacheControl when the import finishes.
-			// $wpdb->update() returns the number of changed rows, so an unchanged post skips the cache clear.
-			if ( $updated ) {
-				clean_post_cache( $post_id );
-			}
+			$this->update_post_row( $post_id, $post_config_array );
 		}
 
 		if ( is_numeric( $post_id ) && $post_id > 0 ) {

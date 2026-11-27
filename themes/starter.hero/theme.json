@@ -12,7 +12,7 @@
         ],
         "javascripts": [
             "/custom-assets/slick-1.7.1/slick.min.js",
-            "/custom-assets/collapse.min.js"
+            "/assets/js/arlo-collapse.js"
         ]
     },
     "images": [

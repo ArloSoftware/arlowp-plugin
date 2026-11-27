@@ -195,6 +195,7 @@ function arlo_delete_options() {
 		'arlo_import_disabled_since',
 		'arlo_rejected_callback_log_state',
 		'arlo_rejected_matched_callback_log_state',
+		'arlo_rewrite_signature',
 	];
 
 	foreach ( $options as $option ) {
@@ -286,11 +287,20 @@ function arlo_delete_important_options() {
 /**
  * Expire plugin-owned admin UI cookies.
  *
+ * Covers the current settings tab cookie and the two legacy names older
+ * versions set. Skipped once output has started, because setcookie() cannot
+ * send headers then and would raise a warning.
+ *
  * @return void
  */
 function arlo_delete_cookies() {
-	setcookie( 'arlo-vertical-tab', '', -1, '/' );
-	setcookie( 'arlo-nav-tab', '', -1, '/' );
+	if ( headers_sent() ) {
+		return;
+	}
+
+	foreach ( array( 'arlo-current-tab', 'arlo-vertical-tab', 'arlo-nav-tab' ) as $cookie_name ) {
+		setcookie( $cookie_name, '', -1, '/' );
+	}
 }
 
 arlo_uninstall();

@@ -66,7 +66,8 @@ class OnlineActivities {
 					break;
 
 				default:
-					$where[]      = $key;
+					// Keys outside the named cases are SQL text, so only the fixed shapes are accepted.
+					$where[]      = QueryShape::get_validated_condition_key( $key );
 					$parameters[] = $value;
 					break;
 			}
@@ -78,9 +79,7 @@ class OnlineActivities {
 		}
 
 		// order
-		if ( ! empty( $order ) ) {
-			$order = ' ORDER BY ' . implode( ', ', $order );//ReviewNote, the value in $order is string literals defined in PHP(always none here), no parameter there.
-		}
+		$order = QueryShape::build_order_clause( $order );
 
 		//limit
 

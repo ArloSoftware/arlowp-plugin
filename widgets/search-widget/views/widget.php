@@ -19,13 +19,14 @@ if ( ! empty( $arlo_search_url ) ) {
 	$arlo_widget_title = apply_filters( 'widget_title', empty( $instance['title'] ) ? __( 'Event search', 'arlo-training-and-event-management-system' ) : $instance['title'], $instance, $this->id_base );
 	echo $before_title . esc_html( $arlo_widget_title ) . $after_title; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Widget title output. $arlo_widget_title is escaped, $before_title and $after_title are trusted widget arguments.
 
-	$arlo_search = \ArloTraining\Utilities::clean_string_url_parameter( 'arlo-search' );
+	$arlo_search = \ArloTraining\Utilities::get_sanitized_request_parameter( 'arlo-search' );
 
 	echo '
 		<form class="arlo-search-widget" action="' . esc_url( $arlo_search_url ) . '">'
 	. wp_nonce_field( "arlo-search-widget", "arlo-nonce", true, false ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Search form nonce field HTML output. wp_nonce_field() outputs safe HTML.
 	. '
-			<input type="text" class="search-field" name="arlo-search" value="' . esc_attr( $arlo_search ) . '">
+			<input type="text" class="search-field" name="arlo-search" value="' . \ArloTraining\Utilities::escape_shortcode_brackets_in_html( esc_attr( $arlo_search ) ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The search term is escaped with esc_attr(); the helper only encodes its square brackets.
+	. '">
 		</form>
 		';
 }

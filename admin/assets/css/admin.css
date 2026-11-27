@@ -207,8 +207,43 @@
 	padding-inline-start: 24px;
 }
 
+/* "Must fix" items lead with the same caution icon as the migration notice, in place of a bullet. */
+#arlo-css-analysis ul.arlo-css-must-fix {
+	list-style: none;
+	padding-inline-start: 0;
+}
+
+#arlo-css-analysis ul.arlo-css-must-fix li {
+	position: relative;
+	padding-inline-start: 26px;
+}
+
+#arlo-css-analysis ul.arlo-css-must-fix .arlo-css-notice-icon {
+	position: absolute;
+	inset-inline-start: 0;
+	top: 1px;
+	margin: 0;
+}
+
+/* The arrow between a problem and what the migration will do about it, drawn by the dashicons font so it has a solid weight. #00a32a is WordPress's admin success green, 3.2:1 on white, above the 3:1 needed for a graphic; the arrow is decorative and "Fix:" is read in its place. */
+#arlo-css-analysis .arlo-css-fix-arrow {
+	color: #00a32a;
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+	margin: 0 2px;
+	vertical-align: text-bottom;
+}
+
 #arlo-css-analysis p {
 	margin: 8px 0 0;
+}
+
+/* Findings from before the latest edit; line numbers may have moved. */
+#arlo-css-analysis p.arlo-css-stale {
+	margin: 0 0 8px;
+	font-style: italic;
+	color: #50575e;
 }
 
 #arlo-css-migration-confirmation .description,
@@ -827,7 +862,8 @@
 }
 
 .arlo-legacy-region-id-handling-warning,
-.arlo-legacy-region-id-handling-length-warning {
+.arlo-legacy-region-id-handling-length-warning,
+.arlo-region-id-warning {
 	margin-top: 0.5em;
 }
 
@@ -1458,4 +1494,70 @@ a.arlo-filter-section-toggle h2 {
 
 .arlo-message ul li {
 	margin: 0.15em 0;
+}
+
+/* Previews the public "Powered by Arlo" credit inline in the opt-in label. The inner element copies the front-end size and opacity (see public.css) so the box stays solid. */
+.arlo-powered-by-opt-in-credit {
+	display: inline-block;
+	margin: 0 6px;
+	padding: 0 4px;
+	border: 1px solid #dcdcde;
+	border-radius: 3px;
+	background: #fff;
+	line-height: 0;
+	vertical-align: middle;
+}
+
+.arlo-powered-by-opt-in-credit-content {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.2em;
+	font-size: 10px;
+	line-height: 1;
+	opacity: 0.5;
+}
+
+.arlo-powered-by-opt-in-credit img {
+	display: block;
+	width: 27px;
+	height: 27px;
+}
+
+/* Marks a site whose "Powered by Arlo" credit was showing before the upgrade. Uses the .notice-info blue (#3858e9), which has 5:1 text contrast on white. */
+.arlo-powered-by-opt-in-pill {
+	display: inline-block;
+	margin-left: 6px;
+	padding: 0 8px;
+	border: 1px solid #3858e9;
+	border-radius: 999px;
+	background: #fff;
+	color: #3858e9;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 20px;
+	vertical-align: middle;
+}
+
+/* Keeps the Misc opt-in text in its own column so a wrapped line hangs under the text, not under the checkbox. */
+.arlo-powered-by-setting {
+	max-width: 40em;
+}
+
+.arlo-powered-by-setting label {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.5em;
+}
+
+.arlo-powered-by-setting input[type="checkbox"] {
+	flex: 0 0 auto;
+	margin: 0.15em 0 0;
+}
+
+.arlo-powered-by-setting .description {
+	margin-left: calc(1rem + 0.5em);
+}
+
+.arlo-powered-by-setting em {
+	white-space: nowrap;
 }

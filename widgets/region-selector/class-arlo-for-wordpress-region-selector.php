@@ -107,7 +107,7 @@ class Arlo_For_Wordpress_Region_Selector extends WP_Widget {
 		$widget_string .= ob_get_clean();
 		$widget_string .= $after_widget;
 
-		echo $widget_string; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Widget output. The content is built from safe sources.
+		echo $widget_string; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $before_widget and $after_widget are the theme's registered sidebar markup; the view output is escaped where each value is emitted.
 	} // end widget
 
 	/**
@@ -120,7 +120,12 @@ class Arlo_For_Wordpress_Region_Selector extends WP_Widget {
 
 		$instance = $old_instance;
 
-		$instance['title'] = wp_strip_all_tags( wp_unslash( $new_instance['title'] ) );
+		// A missing or non-string title keeps the stored title instead of reaching the tag stripper.
+		if ( isset( $new_instance['title'] ) && is_string( $new_instance['title'] ) ) {
+			$instance['title'] = wp_strip_all_tags( $new_instance['title'] );
+		} elseif ( ! isset( $instance['title'] ) || ! is_string( $instance['title'] ) ) {
+			$instance['title'] = '';
+		}
 
 		return $instance;
 	} // end widget

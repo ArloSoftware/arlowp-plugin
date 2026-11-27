@@ -46,16 +46,11 @@ class Arlo_Feature_Pointer {
 
 		$this->pointerAlign = ( $pointerAlign == null ) ? 'center' : $pointerAlign;
 
-		$seen_it       = explode( ',', (string) get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true ) );
-		$do_add_script = false;
+		$seen_it = explode( ',', (string) get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true ) );
 		if ( ! in_array( $pointerID, $seen_it, true ) ) {
-			$do_add_script = true;
-			add_action( 'admin_print_footer_scripts', array( $this, 'feature_pointer_script' ) );
-		}
-
-		if ( $do_add_script ) {
 			wp_enqueue_script( 'wp-pointer' );
 			wp_enqueue_style( 'wp-pointer' );
+			wp_add_inline_script( 'wp-pointer', $this->get_pointer_script() );
 		}
 	}
 
@@ -82,31 +77,37 @@ class Arlo_Feature_Pointer {
 	}
 
 	/**
-	 * Add the pointer code
+	 * Builds the script that opens the pointer and records its dismissal.
 	 *
 	 * @since    1.0.0
+	 *
+	 * @return string
 	 */
-	function feature_pointer_script() {
-		?>
-		<script type="text/javascript">// <![CDATA[
-		jQuery(document).ready(function($) {
-			if(typeof(jQuery().pointer) != 'undefined') {
-				$(<?php echo wp_json_encode( $this->pointerTarget ); ?>).pointer({
-					content: <?php echo wp_json_encode( $this->pointerContent ); ?>,
-					position: {
-						edge: <?php echo wp_json_encode( $this->pointerEdge ); ?>,
-						align: <?php echo wp_json_encode( $this->pointerAlign ); ?>
-					},
-					close: function() {
-						$.post( ajaxurl, {
-							pointer: <?php echo wp_json_encode( $this->pointerID ); ?>,
-							action: 'dismiss-wp-pointer'
-						});
-					}
-				}).pointer('open');
-			}
-		});
-		// ]]></script>
-		<?php
-	} // end arlo_pointer1_footer_script()
+	private function get_pointer_script(): string {
+		$args = array(
+			'id'       => $this->pointerID,
+			'target'   => $this->pointerTarget,
+			'content'  => $this->pointerContent,
+			'position' => array(
+				'edge'  => $this->pointerEdge,
+				'align' => $this->pointerAlign,
+			),
+		);
+
+		return 'jQuery(function ($) {
+	var args = ' . wp_json_encode( $args, JSON_HEX_TAG ) . ';
+
+	if (typeof $.fn.pointer === "undefined") {
+		return;
+	}
+
+	$(args.target).pointer({
+		content: args.content,
+		position: args.position,
+		close: function () {
+			$.post(ajaxurl, { pointer: args.id, action: "dismiss-wp-pointer" });
+		}
+	}).pointer("open");
+});';
+	}
 }

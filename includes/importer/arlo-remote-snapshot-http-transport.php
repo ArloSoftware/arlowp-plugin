@@ -89,7 +89,7 @@ class RemoteSnapshotHttpTransport implements SnapshotHttpTransport {
 				return $body;
 			}
 
-			throw new \ArloTraining\PlatformAccessHttpException( $hostname . ' returned ' . $code . ' ' . wp_remote_retrieve_response_message( $response ) ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception is caught by the calling context and written to the error log; not rendered in any browser context.
+			throw new \ArloTraining\PlatformAccessHttpException( $hostname . ' returned ' . $code . ' ' . wp_remote_retrieve_response_message( $response ), $code ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception is caught by the calling context and written to the error log; not rendered in any browser context.
 		}
 	}
 

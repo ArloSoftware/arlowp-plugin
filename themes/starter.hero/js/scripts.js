@@ -205,8 +205,19 @@ jQuery(function($){
         });
 
         $('.event-card .btn-expand').click(function() {
-            $(this).closest('.event-card').toggleClass('expanded');
-            $(this).closest('.event-card').find('.event-expandable').collapse('toggle');
+            var $card = $(this).closest('.event-card');
+            var panels = $card.find('.event-expandable').get();
+            var toggled = panels.length === 0;
+
+            // A panel that is still animating ignores the click, so the card must keep its state to match.
+            panels.forEach(function(panel) {
+                if (window.ArloCollapse.toggle(panel)) {
+                    toggled = true;
+                }
+            });
+            if (toggled) {
+                $card.toggleClass('expanded');
+            }
         });
 
 

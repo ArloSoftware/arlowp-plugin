@@ -183,11 +183,18 @@ class SnapshotHandler {
 	 * off the scheduler for the next import step.
 	 * On error: throws an exception with sanitized error fields.
 	 *
+	 * Field shapes are checked before anything is stored or the scheduler is kicked: SnapshotUri must be a
+	 * string, and an Error must be an object whose Code and Message are scalars.
+	 *
 	 * @param object $snapshot_response The decoded snapshot response object.
-	 * @throws \Exception On error responses or missing content.
+	 * @throws \Exception On error responses, malformed fields or missing content.
 	 */
 	public function process( object $snapshot_response ): void {
 		if ( ! empty( $snapshot_response->SnapshotUri ) ) {
+			if ( ! is_string( $snapshot_response->SnapshotUri ) ) {
+				throw new \Exception( 'Snapshot response SnapshotUri is not a string' );
+			}
+
 			$this->importer->update_import_entry(
 				[
 					'callback_json' => wp_json_encode( $snapshot_response ),
@@ -195,8 +202,15 @@ class SnapshotHandler {
 			);
 			$this->importer->kick_off_scheduler();
 		} elseif ( ! empty( $snapshot_response->Error ) ) {
-			$code    = sanitize_text_field( (string) ( $snapshot_response->Error->Code ?? '' ) );
-			$message = sanitize_text_field( (string) ( $snapshot_response->Error->Message ?? '' ) );
+			$error = $snapshot_response->Error;
+			if ( ! is_object( $error )
+				|| ( isset( $error->Code ) && ! is_scalar( $error->Code ) )
+				|| ( isset( $error->Message ) && ! is_scalar( $error->Message ) ) ) {
+				throw new \Exception( 'Snapshot response Error is malformed' );
+			}
+
+			$code    = sanitize_text_field( (string) ( $error->Code ?? '' ) );
+			$message = sanitize_text_field( (string) ( $error->Message ?? '' ) );
 			$parts   = array_filter( [ $code, $message ] );
 			throw new \Exception(
 				! empty( $parts ) ? implode( ': ', $parts ) : 'Error in the response for the snapshot request' // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message is caught by the import pipeline, written to the Arlo log table via Logger, and escaped with esc_html() at admin render time.

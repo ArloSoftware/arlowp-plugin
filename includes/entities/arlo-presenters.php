@@ -15,6 +15,9 @@ class Presenters {
 			throw new Exception( 'Limit must be a positive integer or null' );
 		}
 
+		// Validate before the conditions below append their own ordering.
+		$order = QueryShape::get_validated_order( $order );
+
 		global $wpdb;
 
 		$query = "SELECT p.* FROM {$wpdb->prefix}arlo_presenters AS p";
@@ -121,12 +124,10 @@ class Presenters {
 			$query .= ' GROUP BY ' . implode( ', ', $group_by );
 		}
 
-		if ( count( $order ) ) {
-			$query .= ' ORDER BY ' . implode( ', ', $order );
-		}
+		$query .= QueryShape::build_order_clause( $order );
 
 		if ( intval( $limit ) > 1 ) {
-			$query       .= 'LIMIT %d';
+			$query       .= ' LIMIT %d';
 			$parameters[] = $limit;
 		}
 

@@ -151,6 +151,17 @@ class Crypto {
 	private static function jwe_validate_header( $jwe_header = '' ) {
 		$jwe_header = json_decode( $jwe_header );
 
+		// The header is attacker-influenced JSON: require its shape before alg and enc reach string operations.
+		if ( ! is_object( $jwe_header ) ) {
+			throw new \Exception( 'JWE header is not a JSON object' );
+		}
+		if ( isset( $jwe_header->alg ) && ! is_string( $jwe_header->alg ) ) {
+			throw new \Exception( 'JWE header "alg" value is not a string' );
+		}
+		if ( isset( $jwe_header->enc ) && ! is_string( $jwe_header->enc ) ) {
+			throw new \Exception( 'JWE header "enc" value is not a string' );
+		}
+
 		if ( ! ( ! empty( $jwe_header->alg ) && $jwe_header->alg == 'dir' ) ) {
 			throw new \Exception( sprintf( 'JWE header "alg" value of "%s" is not supported', ( ! empty( $jwe_header->alg ) ? $jwe_header->alg : 'empty' ) ) ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message is caught by the import pipeline, written to the Arlo log table via Logger, and escaped with esc_html() at admin render time.
 		}

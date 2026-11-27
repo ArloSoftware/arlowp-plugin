@@ -94,10 +94,13 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists {
 	}
 
 	public function column_v_name( $item ) {
-		$actions = array(
-			'edit' => sprintf( '<a href="%s" target="_blank">Edit</a>', esc_url( sprintf( 'https://%s/management/Venues/Venue.aspx?id=%d', $this->platform_url, $item->v_arlo_id ) ) ), // TODO: still uses legacy .aspx route — update when Console URL is confirmed
-			'view' => sprintf( '<a href="%s" target="_blank">View</a>', esc_url( $item->guid ) ),
-		);
+		$actions = array();
+
+		if ( $this->should_show_arlo_manage_record_link() ) {
+			$actions['edit'] = sprintf( '<a href="%s" target="_blank">Edit</a>', esc_url( sprintf( 'https://%s/management/Venues/Venue.aspx?id=%d', $this->platform_url, $item->v_arlo_id ) ) ); // Link to the venue in the Arlo management console.
+		}
+
+		$actions['view'] = sprintf( '<a href="%s" target="_blank">View</a>', esc_url( $item->guid ) );
 
 		return sprintf( '%1$s %2$s', esc_html( $item->v_name ), $this->row_actions( $actions ) );
 	}
@@ -181,20 +184,20 @@ class Arlo_For_Wordpress_Venues extends Arlo_For_Wordpress_Lists {
 			e.e_name
 		FROM
 			{$wpdb->prefix}arlo_venues AS v
-		LEFT JOIN 
+		LEFT JOIN
 			{$wpdb->prefix}arlo_events AS e
 		ON
 			v.v_arlo_id = e.v_id
 		AND
 			e.import_id = v.import_id
-		LEFT JOIN 
+		LEFT JOIN
 			{$wpdb->prefix}posts
 		ON
 			ID = v_post_id
 		WHERE
-			" . $where['where'] . "	
+			" . $where['where'] . "
 		GROUP BY
-			v.v_arlo_id		
+			v.v_arlo_id
 		";
 		return \ArloTraining\Utilities::prepare_sql( $sql_venues, $where['parameter'] );
 	}

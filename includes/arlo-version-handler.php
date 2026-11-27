@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 #[\AllowDynamicProperties]
 class VersionHandler {
-	const VERSION                                     = '5.2.1';
+	const VERSION                                     = '5.2.2';
 	private const PRE_VERSION_5_2_0_REGION_MAX_LENGTH = 5;
 
 	private $message_handler;
@@ -762,7 +762,7 @@ class VersionHandler {
 				//try to add OA page (don't publish)
 				$page_name = 'oa';
 
-				$page_ids = Arlo_For_Wordpress::add_pages( $page_name );
+				$page_ids = \Arlo_For_Wordpress::add_pages( $page_name );
 				break;
 			case '3.3':
 				$theme_settings = get_option( 'arlo_themes_settings', [] );
@@ -771,7 +771,7 @@ class VersionHandler {
 
 				//Add Schedule template and OA template
 				$page_name = 'schedule';
-				$page_ids  = Arlo_For_Wordpress::add_pages( $page_name );
+				$page_ids  = \Arlo_For_Wordpress::add_pages( $page_name );
 
 				$selected_theme_id = get_option( 'arlo_theme' );
 
@@ -1080,12 +1080,13 @@ class VersionHandler {
 	 * Selects the "now disabled by default" opt-in banner wording for a site that upgrades while undecided.
 	 *
 	 * The credit used to be on by default, so a site that has already recorded a choice is left alone.
+	 * A site whose saved templates do not contain the credit shortcode never showed it, so it is not marked.
 	 *
 	 * @return void
 	 */
 	private function maybe_mark_powered_by_upgrade_notice(): void {
 		$settings = get_option( 'arlo_settings', [] );
-		if ( is_array( $settings ) && ! array_key_exists( \Arlo_For_Wordpress::POWERED_BY_SETTING, $settings ) ) {
+		if ( is_array( $settings ) && ! array_key_exists( \Arlo_For_Wordpress::POWERED_BY_SETTING, $settings ) && \Arlo_For_Wordpress::templates_contain_powered_by_credit( $settings ) ) {
 			update_option( \Arlo_For_Wordpress::POWERED_BY_UPGRADE_NOTICE_OPTION, '1' );
 			// Widget output cached while the credit was on by default must not keep showing it.
 			CacheControl::invalidate_upcoming_widget_cache();

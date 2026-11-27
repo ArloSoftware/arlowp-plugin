@@ -84,11 +84,14 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists {
 		}
 	}
 
-	function column_et_code( $item ) {
-		$actions = array(
-			'edit' => sprintf( '<a href="%s" target="_blank">Edit</a>', esc_url( sprintf( "https://%s/management/Console/#/events/%d", $this->platform_url, $item->et_arlo_id ) ) ),
-			'view' => sprintf( '<a href="%s" target="_blank">View</a>', esc_url( $item->guid ) ),
-		);
+	public function column_et_code( $item ) {
+		$actions = array();
+
+		if ( $this->should_show_arlo_manage_record_link() ) {
+			$actions['edit'] = sprintf( '<a href="%s" target="_blank">Edit</a>', esc_url( sprintf( "https://%s/management/Console/#/events/%d", $this->platform_url, $item->et_arlo_id ) ) );
+		}
+
+		$actions['view'] = sprintf( '<a href="%s" target="_blank">View</a>', esc_url( $item->guid ) );
 
 		return sprintf( '%1$s %2$s', esc_html( $item->et_code ), $this->row_actions( $actions ) );
 	}
@@ -147,9 +150,9 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists {
 			GROUP_CONCAT(DISTINCT et.et_region) AS et_region
 		FROM
 			{$wpdb->prefix}arlo_eventtemplates AS et
-		LEFT JOIN 
+		LEFT JOIN
 			{$wpdb->prefix}arlo_events AS e
-		ON 
+		ON
 			et.et_arlo_id = e.et_arlo_id
 		AND
 			et.et_region = e.e_region
@@ -163,7 +166,7 @@ class Arlo_For_Wordpress_Templates extends Arlo_For_Wordpress_Lists {
 			et.et_arlo_id = oat_arlo_id
 		AND
 			oa.import_id = et.import_id
-		LEFT JOIN 
+		LEFT JOIN
 			{$wpdb->prefix}posts
 		ON
 			ID = et_post_id

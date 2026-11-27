@@ -172,7 +172,7 @@ class Scheduler {
 	private function get_running_tasks_count() {
 		global $wpdb;
 		// Counts only actively-executing tasks (status 2) — one mid-subtask this instant.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- SQL is static and safe. No caching needed for import process , low-frequency operations with high-frequency data updates. Direct database query is required for custom table.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- The statement is fixed text on the plugin-owned task table and takes no input. It is not cached because it reads live task state during an import.
 		$result = $wpdb->get_results(
 			"
 		SELECT
@@ -200,7 +200,7 @@ class Scheduler {
 		global $wpdb;
 		// Counts every in-flight task (status 1 paused + 2 running) — i.e. a task that
 		// has started but not finished, whether or not work is executing right now.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- SQL is static and safe. No caching needed for data import process, low-frequency operations with high-frequency data updates. Direct database query is required for custom table.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- The statement is fixed text on the plugin-owned task table and takes no input. It is not cached because it reads live task state during an import.
 		$result = $wpdb->get_results(
 			"
 		SELECT
@@ -953,7 +953,7 @@ class Scheduler {
 			// Terminating one import also drains later queued import rows, otherwise the
 			// next queued import can restart immediately. Keep this broader termination
 			// scoped to active import rows so future scheduler task types are not cancelled.
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- SQL is static and safe. No caching needed for import process , low-frequency operations with high-frequency data updates. Direct database query is required for custom table
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- The table is plugin-owned and every value is bound with prepare(). It is not cached because it changes live task state.
 			$query = $wpdb->query(
 				$wpdb->prepare(
 					"
@@ -1007,7 +1007,7 @@ class Scheduler {
 			}
 		);
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- SQL is static and safe. No caching needed for import process , low-frequency operations with high-frequency data updates. Direct database query is required for custom table
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- The table is plugin-owned and every value is bound with prepare(). It is not cached because it changes live task state.
 		$query = $wpdb->query(
 			$wpdb->prepare(
 				"

@@ -75,10 +75,12 @@ class Arlo_For_Wordpress_OnlineActivities extends Arlo_For_Wordpress_Lists {
 		}
 	}
 
-	function column_oa_code( $item ) {
-		$actions = array(
-			'edit' => '<a href="' . esc_url( sprintf( 'https://%s/management/Console/#/onlineactivities/%d', $this->platform_url, $item->oa_arlo_id ) ) . '" target="_blank">Edit</a>',
-		);
+	public function column_oa_code( $item ) {
+		$actions = array();
+
+		if ( $this->should_show_arlo_manage_record_link() ) {
+			$actions['edit'] = '<a href="' . esc_url( sprintf( 'https://%s/management/Console/#/onlineactivities/%d', $this->platform_url, $item->oa_arlo_id ) ) . '" target="_blank">Edit</a>';
+		}
 
 		if ( ! empty( $item->guid ) ) {
 			$actions['view'] = sprintf( '<a href="%s" target="_blank">View</a>', esc_url( $item->guid ) );
@@ -152,7 +154,7 @@ class Arlo_For_Wordpress_OnlineActivities extends Arlo_For_Wordpress_Lists {
 			posts.guid
 		FROM
 			{$wpdb->prefix}arlo_onlineactivities AS oa
-		LEFT JOIN 
+		LEFT JOIN
 			{$wpdb->prefix}arlo_eventtemplates AS et
 		ON
 			oat_arlo_id = et_arlo_id

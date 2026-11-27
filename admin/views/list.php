@@ -17,7 +17,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div class="wrap arlo-wrap arlo-list">
 	<h2><?php echo esc_html( $list->get_title() ); ?></h2>
-	<?php if ( $list::TABLENAME !== 'arlo_log' ) { ?>
+	<?php // The demo platform has no management console, so these links are hidden for it. See should_show_arlo_manage_record_link(). ?>
+	<?php if ( $list::TABLENAME !== 'arlo_log' && $list->should_show_arlo_manage_record_link() ) { ?>
 	<a href="<?php echo esc_url( $list->get_new_link() ); ?>" target="_blank" rel="noopener noreferrer" class="button button-primary">New <?php echo esc_html( strtolower( $list->singular ) ); ?></a>
 	&nbsp;&nbsp;&nbsp;
 	<a href="<?php echo esc_url( $list->get_list_link() ); ?>" target="_blank" rel="noopener noreferrer" class="arlo-middle">Manage <?php echo esc_html( strtolower( $list->plural ) ); ?> in Arlo</a>

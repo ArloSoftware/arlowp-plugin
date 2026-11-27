@@ -48,7 +48,7 @@ class Templates extends AbstractImportStep {
 		$description_summary = ! empty( $entity_payload->Description ) && ! empty( $entity_payload->Description->Summary ) ? $entity_payload->Description->Summary : null;
 		$post_id             = $this->save_update_wp_post( $entity_payload->Name, $description_summary );
 
-		if ( $post_id > 0 ) {
+		if ( is_numeric( $post_id ) && $post_id > 0 ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching  -- Direct database query is required. No cache needed for the insert operation in data import process. Cache will be reset after the import process done.
 			$query = $wpdb->query(
 				$wpdb->prepare(
@@ -110,7 +110,6 @@ class Templates extends AbstractImportStep {
 	}
 
 	private function save_update_wp_post( $title, $content = '' ) {
-		global $wpdb;
 		// create associated custom post, if it dosen't exist
 		$post_config_array = array(
 			'post_title'   => $title,
@@ -131,11 +130,7 @@ class Templates extends AbstractImportStep {
 			$post_config_array['ID'] = $post->ID;
 			$post_id                 = $post->ID;
 			$post_config_array       = $this->sanitise_post_text( $post_config_array, $post_id );
-			$updated                 = $wpdb->update( $wpdb->prefix . 'posts', $post_config_array, array( 'id' => $post_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct update of the plugin-owned Arlo post: importer updates deliberately avoid wp_update_post() so third-party post hooks do not fire for every imported entity. The title and content are sanitised first, as wp_insert_post() does on create, and a changed row is cleared from the core post cache below. Arlo's own caches are invalidated through CacheControl when the import finishes.
-			// $wpdb->update() returns the number of changed rows, so an unchanged post skips the cache clear.
-			if ( $updated ) {
-				clean_post_cache( $post_id );
-			}
+			$this->update_post_row( $post_id, $post_config_array );
 		}
 
 		return $post_id;
